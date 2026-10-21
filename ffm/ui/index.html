@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Funding-Fit Memo</title>
+<meta name="description" content="A deterministic feasibility screen for BC non-profit housing: pick a site, describe an option, run the rules, read the memo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wordmark">Funding-Fit <em>Memo</em></div>
+  <div class="topbar-controls">
+    <label class="asof">
+      <span class="eyebrow">Rules as of</span>
+      <input type="date" id="as-of">
+    </label>
+    <button id="run-btn" class="btn btn-primary" type="button">Run the rules</button>
+    <div id="stamp-box" class="stamp" hidden>
+      <span class="eyebrow">Stamp</span>
+      <code id="stamp-text"></code>
+      <button id="copy-stamp" class="btn btn-quiet btn-small" type="button" title="Copy the stamp">Copy</button>
+    </div>
+  </div>
+</header>
+
+<nav class="steps" aria-label="Steps">
+  <a href="#step-site" data-step="1"><span class="step-n">1</span> Site</a>
+  <a href="#step-option" data-step="2"><span class="step-n">2</span> Option</a>
+  <a href="#step-run" data-step="3"><span class="step-n">3</span> Run and read</a>
+  <a href="#step-export" data-step="4"><span class="step-n">4</span> Export</a>
+</nav>
+
+<main class="panes">
+  <aside class="inputs">
+    <section id="step-site" class="card input-card">
+      <div class="eyebrow">01 · Site</div>
+      <h2 class="serif">Site</h2>
+      <div class="field">
+        <label for="site-select">Site file</label>
+        <select id="site-select"></select>
+      </div>
+      <form id="site-form" class="form" autocomplete="off"></form>
+      <div class="form-actions">
+        <button id="save-site" class="btn btn-quiet" type="button">Save site as…</button>
+        <span id="site-dirty" class="dirty" hidden>edited, not saved</span>
+      </div>
+    </section>
+
+    <section id="step-option" class="card input-card">
+      <div class="eyebrow">02 · Option</div>
+      <h2 class="serif">Option</h2>
+      <div class="field">
+        <label for="option-select">Option file</label>
+        <select id="option-select"></select>
+      </div>
+      <form id="option-form" class="form" autocomplete="off"></form>
+      <div class="form-actions">
+        <button id="save-option" class="btn btn-quiet" type="button">Save option as…</button>
+        <span id="option-dirty" class="dirty" hidden>edited, not saved</span>
+      </div>
+    </section>
+  </aside>
+
+  <section class="memo-pane" id="step-run">
+    <div class="memo-tools">
+      <label class="tool">
+        <span class="eyebrow">Open a past run</span>
+        <select id="open-run"><option value="">This run</option></select>
+      </label>
+      <label class="tool">
+        <span class="eyebrow">Compare with…</span>
+        <select id="compare-run"><option value="">Nothing</option></select>
+      </label>
+      <span id="compare-note" class="tool-note"></span>
+    </div>
+    <div id="memo" class="memo"></div>
+
+    <footer id="step-export" class="export">
+      <div class="eyebrow">04 · Export</div>
+      <div class="action-bar">
+        <a id="dl-html" class="btn" href="#" download aria-disabled="true">Download memo (HTML)</a>
+        <a id="dl-md" class="btn" href="#" download aria-disabled="true">Download memo (Markdown)</a>
+        <button id="print-btn" class="btn" type="button" disabled>Print</button>
+        <a id="dl-massing" class="btn" href="#" download aria-disabled="true">Download massing.json</a>
+        <button id="revit-btn" class="btn" type="button" disabled>Export to Revit</button>
+      </div>
+      <div id="export-panel" class="export-panel" hidden></div>
+    </footer>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="/app.js"></script>
+</body>
+</html>

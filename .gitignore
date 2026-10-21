@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.DS_Store
+outputs/demo*/
+# Revit models and anything derived from an office template stay local: the model, the result
+# JSON (it names the template and its link paths) and the sheet exports (they carry the title block)
+outputs/**/*.rvt
+outputs/**/*.0001.rvt
+*.rvt.lock
+outputs/**/ffm_revit_result.json
+outputs/**/ffm_sheet.png
+outputs/**/ffm_sheet.pdf

@@ -1,0 +1,103 @@
+{
+  "layer": "E",
+  "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+  "rules": [
+    {
+      "id": "bch.chf.eligibility",
+      "title": "BC Housing Community Housing Fund: eligibility and unit mix",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": ["*"],
+      "check": "chf_fit",
+      "versions": [
+        {
+          "effective_from": "2025-05-30",
+          "params": {
+            "eligible_proponent_types": ["non_profit_society", "housing_cooperative", "municipal_housing_provider", "first_nation"],
+            "mix": {"market": 0.30, "rgi": 0.50, "deep_subsidy": 0.20},
+            "mix_tolerance": 0.02,
+            "low_moderate_income_limits_cad": {"under_two_bed": 85870, "two_bed_plus": 138770, "effective": "2025-03-01"},
+            "min_lease_years_nominal": 60,
+            "min_accessible_unit_share": 0.05,
+            "readiness_site_control": ["finalized", "purchase_agreement", "letter_of_intent", "council_resolution"],
+            "readiness_construction_start_months_after_award": 18,
+            "provisional_grant_per_unit_cad_2025_26": 171211,
+            "rated_weights": {"development": 0.60, "operations": 0.40},
+            "rated_thresholds": {"development": 0.35, "operations": 0.25},
+            "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+          },
+          "source": {
+            "title": "BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page",
+            "url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf",
+            "section": "Eligibility; unit mix 30/50/20; minimum requirements; rated criteria",
+            "rfp_2023_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
+            "program_url": "https://www.bchousing.org/projects-partners/Building-BC/CHF"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bc.bcbuilds.eligibility",
+      "title": "BC Builds: eligibility and below-market requirement",
+      "jurisdiction": "Province of BC / BC Housing",
+      "applies_to_districts": ["*"],
+      "check": "bc_builds_fit",
+      "versions": [
+        {
+          "effective_from": "2024-02-13",
+          "params": {
+            "min_below_market_unit_share": 0.20,
+            "min_discount_to_market": 0.20,
+            "non_profit_must_team_with_developer": true,
+            "tenant_income_limits_cad": {"under_two_bed_no_children": 143900, "two_bed_plus_with_children": 212240},
+            "land_lease_years": [60, 99],
+            "max_non_residential_share": 0.30,
+            "ground_breaking_months_after_land_letter": [12, 18],
+            "submission": "Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template"
+          },
+          "source": {
+            "title": "BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024",
+            "url": "https://www.bcbuildshomes.ca/developers-operators",
+            "section": "Applicant requirements; grants; timelines",
+            "announcement_url": "https://news.gov.bc.ca/releases/2024HOUS0021-000648"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.pdf.predevelopment_loan",
+      "title": "BC Housing Project Development Fund (pre-development loans)",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": ["*"],
+      "check": "info_only",
+      "versions": [
+        {
+          "effective_from": "2025-01-01",
+          "params": {"max_loan_cad": 250000, "eligible_costs": "due diligence, feasibility and design"},
+          "source": {
+            "title": "UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000)",
+            "url": "https://www.ubcm.ca/node/111136",
+            "section": "Provincial response"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cmhc.ahf.readiness",
+      "title": "CMHC Affordable Housing Fund: readiness and submission mechanics",
+      "jurisdiction": "CMHC",
+      "applies_to_districts": ["*"],
+      "check": "info_only",
+      "versions": [
+        {
+          "effective_from": "2024-03-13",
+          "params": {"construction_start_months_after_approval": 6, "intake": "continuous", "submission": "online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist", "criteria_note": "Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding"},
+          "source": {
+            "title": "CMHC, Affordable Housing Fund applicant guide",
+            "url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx",
+            "section": "Minimum submission requirements; readiness"
+          }
+        }
+      ]
+    }
+  ]
+}

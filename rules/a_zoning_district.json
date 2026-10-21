@@ -1,0 +1,87 @@
+{
+  "layer": "A",
+  "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+  "rules": [
+    {
+      "id": "cov.rm1.outright_fsr",
+      "title": "RM-1 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["RM-1", "RM-1N"],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {"max_fsr": 1.20},
+          "source": {
+            "title": "City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule",
+            "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+            "section": "Existing zoning; RM-1 District Schedule s.4.7",
+            "verify": "Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law before the user sessions: https://bylaws.vancouver.ca/zoning/zoning-by-law-consolidated.pdf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm1.outright_height",
+      "title": "RM-1 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["RM-1", "RM-1N"],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {"max_height_m": 10.7},
+          "source": {
+            "title": "City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule",
+            "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+            "section": "Existing zoning; RM-1 District Schedule s.4.3",
+            "verify": "Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law."
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.irp.social_housing_rezoning",
+      "title": "Interim Rezoning Policy for Social Housing in Former Community Vision Areas",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "rezoning_policy_social_housing",
+      "versions": [
+        {
+          "effective_from": "2023-11-01",
+          "params": {
+            "requires_100pct_social_housing": true,
+            "benchmark_height_m_low": 19.9,
+            "benchmark_height_m_high": 21.3,
+            "benchmark_fsr": 3.0,
+            "benchmark_note": "Staff used the RM-4 district as the comparison for 998 E 19th Ave: about 19.9 to 21.3 m and about 3.0 FSR; the policy itself sets no maximum, so height and density are negotiated."
+          },
+          "source": {
+            "title": "Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026)",
+            "url": "https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf",
+            "section": "s.3.1.1; staff benchmark from the 998 E 19th Ave referral report",
+            "verify": "Map 1 of the policy decides whether a site is inside a former Community Vision area; outside it the Affordable Housing Policies (1989) apply."
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.parking_minimums",
+      "title": "Off-street parking minimums",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "parking_minimums",
+      "versions": [
+        {
+          "effective_from": "2024-06-26",
+          "params": {"minimum_spaces_per_unit": 0},
+          "source": {
+            "title": "City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide)",
+            "url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx",
+            "section": "Parking By-law amendments, June 2024"
+          }
+        }
+      ]
+    }
+  ]
+}

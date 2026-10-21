@@ -1,0 +1,60 @@
+{
+  "layer": "B",
+  "layer_title": "Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)",
+  "rules": [
+    {
+      "id": "bc.ssmuh.minimum_units",
+      "title": "Small-scale multi-unit housing minimum unit counts",
+      "jurisdiction": "Province of British Columbia",
+      "applies_to_districts": ["R1-1", "RS", "RT"],
+      "check": "ssmuh_minimum_units",
+      "versions": [
+        {
+          "effective_from": "2024-06-30",
+          "params": {
+            "small_lot_max_m2": 280,
+            "units_small_lot": 3,
+            "units_large_lot": 4,
+            "units_near_frequent_bus": 6,
+            "frequent_bus_distance_m": 400,
+            "near_bus_min_lot_m2": 281,
+            "no_parking_minimum_when_six": true,
+            "exempt_lot_min_m2": 4050,
+            "exempt_if_no_water_or_sewer": true,
+            "exempt_in_transit_oriented_area": true
+          },
+          "source": {
+            "title": "Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual",
+            "url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf",
+            "section": "Bill 44; Local Government Act Part 14 Division 5; manual Packages A to D",
+            "manual_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/ssmuh_provincial_policy_manual.pdf"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bc.toa.minimum_density",
+      "title": "Transit-oriented area minimum allowable height and density",
+      "jurisdiction": "Province of British Columbia",
+      "applies_to_districts": ["*"],
+      "check": "toa_status",
+      "versions": [
+        {
+          "effective_from": "2024-06-30",
+          "params": {
+            "tiers_storeys": {"1": 20, "2": 12, "3": 8},
+            "note": "Minimum allowable heights by tier around SkyTrain stations and bus exchanges, from 4 to 20 storeys; the City of Vancouver designated 29 transit-oriented areas in June 2024. Tier boundaries come from the City's TOA map, which this tool does not yet read; the user confirms the tier.",
+            "vancouver_toa_count": 29
+          },
+          "source": {
+            "title": "Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024",
+            "url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx",
+            "section": "Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments",
+            "webinar_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf",
+            "verify": "Tier storey figures are the Province's SkyTrain-station tiers as commonly reported; confirm against the Transit-Oriented Areas Designation Regulation before the user sessions."
+          }
+        }
+      ]
+    }
+  ]
+}

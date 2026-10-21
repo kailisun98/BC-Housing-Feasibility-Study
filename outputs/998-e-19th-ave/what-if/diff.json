@@ -1,0 +1,78 @@
+{
+  "previous_stamp": "20e44f1445ecaff9",
+  "current_stamp": "20e44f1445ecaff9",
+  "previous_as_of": "2026-10-23",
+  "current_as_of": "2026-10-23",
+  "rules_changed": false,
+  "changes": [
+    {
+      "rule_id": "bc.bcbuilds.eligibility",
+      "change": "changed",
+      "from": "uncertain",
+      "to": "pass",
+      "from_version": "2024-02-13",
+      "to_version": "2024-02-13",
+      "finding": "BC Builds: fits the published criteria: non-residential space is 15.7% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter."
+    },
+    {
+      "rule_id": "bc.code_basis",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "5 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15."
+    },
+    {
+      "rule_id": "bch.chf.eligibility",
+      "change": "finding_changed",
+      "from": "uncertain",
+      "to": "uncertain",
+      "finding": "Community Housing Fund: fit cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; Site control (letter of intent) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)."
+    },
+    {
+      "rule_id": "cov.family_units",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "32 of 88 units (36.4%) have two or more bedrooms, against a 35.0% minimum."
+    },
+    {
+      "rule_id": "cov.irp.social_housing_rezoning",
+      "change": "changed",
+      "from": "conditional",
+      "to": "pass",
+      "from_version": "2023-11-01",
+      "to_version": "2023-11-01",
+      "finding": "Eligible for consideration as 100% social housing under the policy, within the staff benchmark."
+    },
+    {
+      "rule_id": "cov.parking_minimums",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 40 vehicle and 220 bicycle spaces, which are set by the Parking By-law at the development permit stage."
+    },
+    {
+      "rule_id": "cov.rm1.outright_fsr",
+      "change": "finding_changed",
+      "from": "uncertain",
+      "to": "uncertain",
+      "finding": "FSR 2.49 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated."
+    },
+    {
+      "rule_id": "cov.rm1.outright_height",
+      "change": "finding_changed",
+      "from": "uncertain",
+      "to": "uncertain",
+      "finding": "Height 18.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated."
+    },
+    {
+      "rule_id": "cov.trees.replacement",
+      "change": "changed",
+      "from": "conditional",
+      "to": "pass",
+      "from_version": "2023-01-01",
+      "to_version": "2023-01-01",
+      "finding": "Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 19, leaving 20, which meets the minimum."
+    }
+  ]
+}

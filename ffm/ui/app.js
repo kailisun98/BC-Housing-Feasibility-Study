@@ -1034,10 +1034,158 @@ function revitResultHtml(r, run) {
     ${run.revit && run.revit.sheet_png ? `<a href="${base}/ffm_sheet.png" target="_blank" rel="noopener"><img src="${base}/ffm_sheet.png?t=${Date.now()}" alt="Revit sheet"></a>` : ""}`;
 }
 
+// ---------------------------------------------------------------- walkthrough: a spotlight over each step, in order
+
+const TOUR = [
+  { target: ".topbar-controls", title: "Rules as of",
+    text: "Pick the date the rules should be read on. The engine applies the versions in force that day and stamps the memo with them, so two memos can be told apart." },
+  { target: "#step-site", title: "Step 1 · Site",
+    text: "Choose a site file or describe a new one: district, lot, policy areas, trees, owner. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
+  { target: "#step-option", title: "Step 2 · Option",
+    text: "Describe the building: storeys, floor area, the unit mix, tenure, the funders you aim at, and the rezoning path if there is one. Save it as a file to rerun the same thing from the command line." },
+  { target: "#run-btn", title: "Run the rules", action: "run",
+    text: "One click. In under a second the engine writes a stamped memo to the outputs folder and reads it here." },
+  { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers",
+    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from." },
+  { target: ".figures", fallback: "#memo", title: "The massing",
+    text: "Plan and section drawn from the same numbers as the memo, with the staff benchmark. When the Revit script has run on this folder, the sheet it built appears as a third figure." },
+  { target: ".ledger", fallback: "#memo", title: "The full ledger",
+    text: "Every rule the engine ran, by layer, collapsed until you open it: status, finding, numbers used and the source link." },
+  { target: ".memo-tools", title: "Past runs",
+    text: "Open an earlier run, or compare two. When a rule changes version, the table names it and the stamp changes." },
+  { target: "#step-export", title: "Step 4 · Export",
+    text: "Download the memo as HTML or Markdown, print it, take the massing file, or open Export to Revit for the two lines that build the sheet." },
+];
+const TOUR_KEY = "ffm.walkthrough.seen";
+const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0 };
+
+function tourTarget(step) {
+  return document.querySelector(step.target) || (step.fallback ? document.querySelector(step.fallback) : null);
+}
+
+function reducedMotion() {
+  return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function startTour(at = 0) {
+  if (tour.active) endTour();
+  tour.active = true;
+  tour.spot = document.createElement("div");
+  tour.spot.className = "tour-spot";
+  tour.card = document.createElement("div");
+  tour.card.className = "tour-card";
+  tour.card.setAttribute("role", "dialog");
+  tour.card.setAttribute("aria-live", "polite");
+  document.body.append(tour.spot, tour.card);
+  $("#tour-offer").hidden = true;
+  showTourStep(at);
+  window.addEventListener("resize", positionTourSoon);
+  window.addEventListener("scroll", positionTourSoon, { passive: true });
+  document.addEventListener("keydown", tourKeys);
+}
+
+function endTour() {
+  if (!tour.active) return;
+  tour.active = false;
+  tour.spot.remove(); tour.card.remove();
+  tour.spot = tour.card = null;
+  cancelAnimationFrame(tour.raf);
+  clearTimeout(tour.timer);
+  window.removeEventListener("resize", positionTourSoon);
+  window.removeEventListener("scroll", positionTourSoon);
+  document.removeEventListener("keydown", tourKeys);
+  try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* private window: fine */ }
+}
+
+function tourKeys(e) {
+  if (e.key === "Escape") { e.preventDefault(); endTour(); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); tourNext(); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); showTourStep(tour.i - 1); }
+}
+
+async function tourNext() {
+  const step = TOUR[tour.i];
+  if (step.action === "run" && !state.run) {
+    const btn = $(".tour-next", tour.card);
+    if (btn) { btn.disabled = true; btn.textContent = "Running…"; }
+    await runRules();
+    if (!tour.active) return;
+    if (!state.run) { showTourStep(tour.i); return; }   // the run failed; the toast says why
+  }
+  showTourStep(tour.i + 1);
+}
+
+function showTourStep(i) {
+  if (!tour.active) return;
+  if (i < 0) i = 0;
+  if (i >= TOUR.length) { endTour(); toast("That is the whole page. Run the rules whenever you like."); return; }
+  tour.i = i;
+  const step = TOUR[i];
+  const last = i === TOUR.length - 1;
+  const primary = step.action === "run" && !state.run ? "Run and continue" : (last ? "Done" : "Next");
+  tour.card.innerHTML = `
+    <button class="tour-close" type="button" aria-label="Close the walkthrough">×</button>
+    <div class="eyebrow">Walkthrough · ${i + 1} of ${TOUR.length}</div>
+    <h3 class="serif">${h(step.title)}</h3>
+    <p>${h(step.text)}</p>
+    <div class="tour-nav">
+      <button class="btn btn-quiet btn-small tour-back" type="button"${i === 0 ? " disabled" : ""}>Back</button>
+      <span class="spacer"></span>
+      <span class="counter">Esc to close</span>
+      <button class="btn btn-primary btn-small tour-next" type="button">${h(primary)}</button>
+    </div>`;
+  $(".tour-close", tour.card).addEventListener("click", endTour);
+  $(".tour-back", tour.card).addEventListener("click", () => showTourStep(tour.i - 1));
+  $(".tour-next", tour.card).addEventListener("click", tourNext);
+  const el = tourTarget(step);
+  if (el) {
+    const r = el.getBoundingClientRect();
+    const tall = r.height > innerHeight * 0.6;
+    const top = r.top + scrollY - (tall ? 120 : Math.max(16, (innerHeight - r.height) / 2));
+    window.scrollTo({ top: Math.max(0, top), behavior: reducedMotion() ? "auto" : "smooth" });
+  }
+  positionTour();
+  setTimeout(positionTour, 350);
+  $(".tour-next", tour.card).focus({ preventScroll: true });
+}
+
+function positionTour() {
+  if (!tour.active) return;
+  const step = TOUR[tour.i];
+  const el = tourTarget(step);
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  const pad = 8;
+  const maxH = innerHeight * 0.62;
+  const top = r.top + scrollY - pad, left = r.left + scrollX - pad;
+  const w = r.width + 2 * pad, hgt = Math.min(r.height, maxH) + 2 * pad;
+  Object.assign(tour.spot.style, { top: `${top}px`, left: `${left}px`, width: `${w}px`, height: `${hgt}px` });
+  const cw = tour.card.offsetWidth, ch = tour.card.offsetHeight;
+  const cx = Math.min(Math.max(left, scrollX + 16), scrollX + innerWidth - cw - 16);
+  let cy = top + hgt + 14;
+  if (cy - scrollY + ch > innerHeight - 12 && (top - scrollY) - ch - 14 > 110) cy = top - ch - 14;
+  if (cy - scrollY + ch > innerHeight - 12) cy = scrollY + innerHeight - ch - 12;
+  Object.assign(tour.card.style, { top: `${cy}px`, left: `${cx}px` });
+}
+
+function positionTourSoon() {   // scroll and resize: one update per frame, with a fallback when frames do not run
+  if (!tour.active) return;
+  cancelAnimationFrame(tour.raf);
+  clearTimeout(tour.timer);
+  tour.raf = requestAnimationFrame(positionTour);
+  tour.timer = setTimeout(positionTour, 120);
+}
+
+function offerTour() {
+  let seen = false;
+  try { seen = !!localStorage.getItem(TOUR_KEY); } catch (e) { seen = false; }
+  $("#tour-offer").hidden = seen;
+}
+
 // ---------------------------------------------------------------- steps
 
 function setStep(n) {
-  $$(".steps a").forEach(a => {
+  $$(".steps a[data-step]").forEach(a => {
     const k = Number(a.dataset.step);
     a.classList.toggle("active", k === n);
     a.classList.toggle("done", k < n);
@@ -1075,7 +1223,7 @@ async function init() {
   $("#site-select").addEventListener("change", e => selectSite(e.target.value).catch(err => toast(err.message, true)));
   $("#option-select").addEventListener("change", e => selectOption(e.target.value).catch(err => toast(err.message, true)));
   $("#as-of").addEventListener("change", () => { if (!state.run) renderQuiet(); });
-  $$(".steps a").forEach(a => a.addEventListener("click", e => {
+  $$(".steps a[data-step]").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const target = document.querySelector(a.getAttribute("href"));
     if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1089,6 +1237,9 @@ async function init() {
     setStep(4);
     panel.scrollIntoView({ behavior: "smooth", block: "start" });
   });
+  $("#tour-link").addEventListener("click", e => { e.preventDefault(); startTour(0); });
+  $("#tour-start").addEventListener("click", () => startTour(0));
+  $("#tour-dismiss").addEventListener("click", () => { $("#tour-offer").hidden = true; try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* fine */ } });
   $("#open-run").addEventListener("change", e => openRun(e.target.value).catch(err => toast(err.message, true)));
   $("#compare-run").addEventListener("change", e => { state.compareRun = e.target.value || null; applyCompare().catch(err => toast(err.message, true)); });
   document.addEventListener("keydown", e => {
@@ -1107,6 +1258,7 @@ async function init() {
   }
   setStep(1);
   watchSteps();
+  offerTour();
 }
 
 document.addEventListener("DOMContentLoaded", init);

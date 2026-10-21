@@ -63,7 +63,9 @@ allowed on their land and whether BC Housing would fund it, and shows its work."
 ## Live run in the UI (2 min)
 
 Start `python -m ffm ui` before the talk; the page opens with 998 E 19th Ave and the as-approved
-option loaded. The script below has the same beats as the command-line one.
+option loaded. The script below has the same beats as the command-line one. If the room needs
+orientation first, press **Walkthrough** at the end of the step strip: nine spotlights, Esc to
+leave, and its fourth stop runs the rules for you.
 
 1. Set *Rules as of* to 2026-10-23 and press **Run the rules**. The three answers land in under a
    second; read them aloud: *Not outright. By rezoning: not yet confirmed.* · *Not yet confirmed.*

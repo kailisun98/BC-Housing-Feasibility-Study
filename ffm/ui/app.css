@@ -347,6 +347,40 @@ table.plain td.status { white-space: nowrap; }
 .revit-result img { max-width: 100%; border: 1px solid var(--hair); border-radius: 4px; background: #fff; }
 .revit-result .err { color: var(--fail); font-size: 13px; }
 
+/* ---------------------------------------------------------------- walkthrough */
+
+.steps .tour-link {
+  margin-left: auto; color: var(--accent); text-transform: none; letter-spacing: 0; font-size: 13px;
+  border-bottom-color: transparent;
+}
+.steps .tour-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.tour-offer {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  margin: 16px 24px -8px; padding: 10px 16px;
+  background: var(--card); border: 1px solid var(--hair); border-radius: var(--radius); font-size: 14px;
+}
+.tour-spot {
+  position: absolute; z-index: 30; border-radius: 10px; pointer-events: none;
+  box-shadow: 0 0 0 9999px rgba(27, 27, 26, 0.5);
+  outline: 2px solid var(--accent); outline-offset: 0;
+  transition: top 180ms ease, left 180ms ease, width 180ms ease, height 180ms ease;
+}
+.tour-card {
+  position: absolute; z-index: 31; width: min(400px, calc(100vw - 32px));
+  background: var(--card); color: var(--ink); border: 1px solid var(--hair); border-radius: var(--radius);
+  padding: 18px 20px 16px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+}
+.tour-card .eyebrow { margin-bottom: 6px; }
+.tour-card h3 { font-size: 20px; margin: 0 0 8px; }
+.tour-card p { margin: 0 0 14px; font-size: 15px; line-height: 1.5; }
+.tour-card .tour-nav { display: flex; align-items: center; gap: 8px; }
+.tour-card .tour-nav .spacer { flex: 1; }
+.tour-card .counter { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--grey); }
+.tour-card .tour-close { position: absolute; top: 8px; right: 10px; border: 0; background: transparent; color: var(--grey); font-size: 18px; cursor: pointer; line-height: 1; padding: 4px; }
+.tour-card .tour-close:hover { color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .tour-spot { transition: none; } }
+@media print { .tour-spot, .tour-card, .tour-link, .tour-offer { display: none !important; } }
+
 /* ---------------------------------------------------------------- toast */
 
 .toast {

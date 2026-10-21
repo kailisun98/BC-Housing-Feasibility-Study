@@ -40,7 +40,8 @@ python -m unittest -v                      # evaluation cases (evals/cases.md) a
 only, no build step): the site and option forms on the left, the memo on the right rendered from
 `ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. Every
 Run writes a normal run folder under `outputs/<site-id>/`, so anything done in the page can be
-repeated from the command line.
+repeated from the command line. A two-minute **Walkthrough** (end of the step strip, offered once
+on a first visit) spotlights each part of the page in order and can run the rules on the way.
 
 Each run writes to `--out`:
 

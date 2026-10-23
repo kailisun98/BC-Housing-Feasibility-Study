@@ -661,6 +661,23 @@
         "retained": null,
         "street": "Expo Blvd"
       },
+      "context": {
+        "street": {
+          "name": "Expo Blvd",
+          "width_m": 30
+        },
+        "left_street": {
+          "name": "Pacific Blvd",
+          "width_m": 30
+        },
+        "right_street": {
+          "name": "Cambie Bridge",
+          "width_m": 30
+        },
+        "lane": false,
+        "neighbours": false,
+        "trees": []
+      },
       "notes": "A triangular surface parking lot between Expo Blvd, Pacific Blvd and the Cambie Bridge, inside the False Creek North ODP area (CD-1; by-law number to confirm). Site area is derived from the development application's floor area and FSR (23,215 m² at 5.94) and the frontage and depth are an equivalent rectangle, so the plan figure is a stand-in for the real triangle. No tree survey is in the public record; the lot is paved. Transit-oriented area tier is left null until the City's TOA map is checked (Stadium-Chinatown and Yaletown-Roundhouse stations are both within about 800 m). The rule stack has no CD-1 outright schedule, so the memo's 'outright: yes' means no coded outright limit was tested, not that a 29-storey tower is permitted outright: the ODP and CD-1 amendments of July 2023 were the rezoning.",
       "sources": [
         {

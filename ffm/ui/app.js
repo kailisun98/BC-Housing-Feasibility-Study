@@ -976,22 +976,91 @@ function polyEl(pts, attrs) {
   return `<polygon points="${pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ")}" ${attrs} ${NS}/>`;
 }
 
-function figPlan(m) {
+/* The context around the lot, in half tone: the street in front, the lane behind, cross streets, the neighbouring
+   parcels, street trees and the trees on site. Real figures come from site.context when the site file has them;
+   otherwise typical defaults stand in (a 20 m street, a 6 m lane, neighbours of the lot's own depth) and the
+   on-site trees, whose positions are rarely public, are placed schematically along the rear. */
+const HALF = { street: "#e9e9e6", parcel: "#f4f4f2", line: "#c9c9c5", text: "#8e8e8e", tree: "#9fb07f", treeLine: "#7f9664", gone: "#bdbdbd" };
+
+function siteContext(site, m) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
-  const pad = Math.max(4, W * 0.07);
+  const c = (site && site.context) || {};
+  const street = { name: (c.street && c.street.name) || (site && site.street_trees && site.street_trees.street) || "street", width: (c.street && c.street.width_m) || 20 };
+  const lane = c.lane === false || c.lane === null ? null : { width: (c.lane && c.lane.width_m) || 6 };
+  const cross = [];
+  for (const k of ["left", "right"]) {
+    const x = c[`${k}_street`] || (c.cross_street && c.cross_street.side === k ? c.cross_street : null);
+    if (x) cross.push({ side: k, name: x.name || "street", width: x.width_m || 20 });
+  }
+  const neighbours = [];
+  for (const k of ["left", "right"]) {
+    if (c.neighbours === false || cross.some(x => x.side === k)) continue;
+    const n = (c.neighbours && c.neighbours[k]) || {};
+    neighbours.push({ side: k, width: n.frontage_m || Math.max(12, Math.round(W * 0.6)) });
+  }
+  const streetTrees = (c.street_trees_count != null ? c.street_trees_count : (site && site.street_trees && site.street_trees.count)) || 0;
+  const list = (site && site.existing_trees_on_site) || [];
+  const pos = Object.fromEntries((c.trees || []).map(t => [t.id, t]));
+  let schematic = false;
+  const trees = list.map((t, i) => {
+    const p = pos[t.id];
+    if (!p) schematic = true;
+    const crown = (p && p.crown_m) || Math.min(6, Math.max(2, (t.dbh_cm || 20) / 10));
+    const x = p ? p.x : 6 + (W - 12) * (list.length > 1 ? i / (list.length - 1) : 0.5);
+    const y = p ? p.y : D - 7;
+    return { id: t.id, x, y, crown, retained: t.status === "retain" };
+  });
+  const left = cross.find(x => x.side === "left"), right = cross.find(x => x.side === "right");
+  const nl = neighbours.find(n => n.side === "left"), nr = neighbours.find(n => n.side === "right");
+  const ext = { left: left ? left.width : nl ? nl.width : 0, right: right ? right.width : nr ? nr.width : 0 };
+  const xmin = -ext.left, xmax = W + ext.right, ymin = -street.width, ymax = D + (lane ? lane.width : 0);
+  // the ground shapes, in lot coordinates (x along the frontage, y into the lot; the street is y < 0)
+  const ground = [];
+  ground.push({ ring: [[xmin, ymin], [xmax, ymin], [xmax, 0], [xmin, 0]], fill: HALF.street, label: street.name, at: [W / 2, -street.width / 2] });
+  if (lane) ground.push({ ring: [[xmin, D], [xmax, D], [xmax, ymax], [xmin, ymax]], fill: HALF.street, label: "lane", at: [W / 2, D + lane.width / 2] });
+  for (const x of cross) {
+    const ring = x.side === "left" ? [[xmin, 0], [0, 0], [0, ymax], [xmin, ymax]] : [[W, 0], [xmax, 0], [xmax, ymax], [W, ymax]];
+    ground.push({ ring, fill: HALF.street, label: x.name, at: [x.side === "left" ? -x.width / 2 : W + x.width / 2, D / 2], rotate: true });
+  }
+  for (const n of neighbours) {
+    const ring = n.side === "left" ? [[-n.width, 0], [0, 0], [0, D], [-n.width, D]] : [[W, 0], [W + n.width, 0], [W + n.width, D], [W, D]];
+    ground.push({ ring, fill: HALF.parcel, dash: true, label: "neighbour", at: [n.side === "left" ? -n.width / 2 : W + n.width / 2, D * 0.85] });
+  }
+  const streetTreeList = [];
+  for (let i = 0; i < streetTrees; i++) streetTreeList.push({ x: W * (i + 0.5) / streetTrees, y: -3, crown: 2.5 });
+  return { W, D, street, lane, cross, neighbours, streetTrees: streetTreeList, trees, schematic, ground, xmin, xmax, ymin, ymax };
+}
+
+function figPlan(m, ctx) {
+  const W = m.lot.frontage_m, D = m.lot.depth_m;
+  const pad = Math.max(3, W * 0.05);
   const fs = Math.max(2.2, W / 34);
-  const vbW = W + 2 * pad, vbH = D + 2 * pad + fs * 1.6;
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
-  const Y = y => pad + (D - y);                       // the street edge (y = 0) drawn at the bottom
-  const P = pts => pts.map(([x, y]) => [pad + x, Y(y)]);
-  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Plan: lot, setback envelope and the two massing footprints">`;
-  s += polyEl(P(m.lot.polygon), `fill="#f4f4f2" stroke="${FIG.lot}" stroke-width="1.2"`);
+  const x0 = ctx.xmin - pad, x1 = ctx.xmax + pad + fs * 1.6, y0 = ctx.ymin - pad, y1 = ctx.ymax + pad;
+  const Y = y => y1 - y;                                // the street (y < 0) drawn at the bottom
+  const X = x => x - x0;
+  const P = pts => pts.map(([x, y]) => [X(x), Y(y)]);
+  const vbW = x1 - x0, vbH = y1 - y0;
+  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Plan: the lot with its street, lane, neighbours and trees in half tone, the setback envelope and the two massing footprints">`;
+  for (const g of ctx.ground) s += polyEl(P(g.ring), `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
+  for (const g of ctx.ground) {
+    const [lx, ly] = [X(g.at[0]), Y(g.at[1])];
+    s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}"${g.rotate ? ` transform="rotate(-90 ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(g.label)}</text>`;
+  }
+  for (const t of ctx.streetTrees) s += `<circle cx="${X(t.x).toFixed(2)}" cy="${Y(t.y).toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
+  s += polyEl(P(m.lot.polygon), `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
   s += polyEl(P(m.envelope.polygon), `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
   if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" stroke="${FIG.outrightStroke}" stroke-width="1.2" fill-opacity="0.9"`);
   if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.5"`);
-  s += `<text x="${(pad + W / 2).toFixed(2)}" y="${(Y(0) + fs * 1.35).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">street · frontage ${W} m</text>`;
-  const rx = pad + W + fs * 0.9, ry = Y(D / 2);
-  s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}" transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">depth ${D} m</text>`;
+  for (const t of ctx.trees) {
+    const cx = X(t.x).toFixed(2), cy = Y(t.y).toFixed(2);
+    if (t.retained) s += `<circle cx="${cx}" cy="${cy}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.45" stroke="${HALF.treeLine}" stroke-width="0.8" ${NS}/>`;
+    else s += `<circle cx="${cx}" cy="${cy}" r="${t.crown}" fill="none" stroke="${HALF.gone}" stroke-width="0.6" stroke-dasharray="1.5 1.5" ${NS}/><text x="${cx}" y="${(Y(t.y) + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.gone}">×</text>`;
+    s += `<text x="${(X(t.x) + t.crown + 0.5).toFixed(2)}" y="${(Y(t.y) - t.crown * 0.6).toFixed(2)}" font-size="${(fs * 0.7).toFixed(2)}" fill="${t.retained ? HALF.treeLine : HALF.gone}">${h(t.id)}</text>`;
+  }
+  s += `<text x="${X(W / 2).toFixed(2)}" y="${(Y(0) + fs * 1.2).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">frontage ${h(W)} m</text>`;
+  const rx = X(ctx.xmax) + fs * 0.9, ry = Y(D / 2);
+  s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}" transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">depth ${h(D)} m</text>`;
   s += `</svg>`;
   return s;
 }
@@ -1043,7 +1112,7 @@ function figSection(m) {
    view survives a re-render. No library: the boxes are projected and painted far to near. */
 const VIEW3D = { mode: "plan", az: 35, el: 28 };
 
-function fig3d(m, az = VIEW3D.az, el = VIEW3D.el) {
+function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
   const a = az * Math.PI / 180, e = el * Math.PI / 180;
@@ -1055,14 +1124,19 @@ function fig3d(m, az = VIEW3D.az, el = VIEW3D.el) {
     const rx = (x - cx) * ca - (y - cy) * sa, ry = (x - cx) * sa + (y - cy) * ca;
     return { x: rx, y: -(z * ce + ry * se), d: ry * ce - z * se };
   };
-  const pts = [];
   const poly = (ring, attrs) => {
-    const P = ring.map(proj); pts.push(...P);
+    const P = ring.map(proj);
     return `<polygon points="${P.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ")}" ${attrs} ${NS}/>`;
   };
   const line = (p, q, attrs) => {
-    const A = proj(p), B = proj(q); pts.push(A, B);
+    const A = proj(p), B = proj(q);
     return `<line x1="${A.x.toFixed(2)}" y1="${A.y.toFixed(2)}" x2="${B.x.toFixed(2)}" y2="${B.y.toFixed(2)}" ${attrs} ${NS}/>`;
+  };
+  // a tree as a lollipop: a stem and a crown, in the half tone
+  const tree = (t, opacity) => {
+    const top = (t.crown * 1.4) + 2.5, c = proj([t.x, t.y, top]);
+    return line([t.x, t.y, 0], [t.x, t.y, top], `stroke="${HALF.treeLine}" stroke-width="0.8"`) +
+      `<circle cx="${c.x.toFixed(2)}" cy="${c.y.toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="${opacity}" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
   };
   // a box from a footprint ring: the top and the four sides, painted far to near
   const box = (ring, z0, z1, fill, stroke, opacity, floors) => {
@@ -1089,34 +1163,53 @@ function fig3d(m, az = VIEW3D.az, el = VIEW3D.el) {
     return s;
   };
   let body = "";
-  body += poly(m.lot.polygon, `fill="#f4f4f2" stroke="${FIG.lot}" stroke-width="1.2"`);
+  // the context on the ground first, in half tone, then the lot, the envelope, the masses and the trees
+  for (const g of ctx.ground) body += poly(g.ring, `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
+  for (const g of ctx.ground) {
+    const c = proj(g.at);
+    body += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}">${h(g.label)}</text>`;
+  }
+  body += poly(m.lot.polygon, `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
   body += poly(m.envelope.polygon, `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
-  if (masses.outright) body += box(masses.outright.footprint, masses.outright.base_z || 0, (masses.outright.base_z || 0) + masses.outright.height_m, FIG.outrightFill, FIG.outrightStroke, 0.9, null);
+  // the trees and the masses are painted far to near so a tree behind a mass stays behind it
+  const items = [];
+  for (const t of ctx.streetTrees) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.35) });
+  for (const t of ctx.trees) if (t.retained) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.45) });
+  if (masses.outright) items.push({ d: -1e9, s: box(masses.outright.footprint, masses.outright.base_z || 0, (masses.outright.base_z || 0) + masses.outright.height_m, FIG.outrightFill, FIG.outrightStroke, 0.9, null) });
   if (masses.proposed) {
     const p = masses.proposed;
-    body += box(p.footprint, p.base_z || 0, (p.base_z || 0) + p.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: p.storeys, f2f: p.floor_to_floor_m });
+    const depth = p.footprint.reduce((s, [x, y]) => s + proj([x, y, 0]).d, 0) / p.footprint.length;
+    items.push({ d: depth, s: box(p.footprint, p.base_z || 0, (p.base_z || 0) + p.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: p.storeys, f2f: p.floor_to_floor_m }) });
   }
+  // the outright mass sits inside the proposed one: paint it right before the proposed box
+  const prop = items.find(i => i.d !== -1e9 && i.s.includes(FIG.proposedFill));
+  for (const i of items) if (i.d === -1e9) i.d = prop ? prop.d + 1e-6 : 0;
+  items.sort((u, v) => v.d - u.d);
+  body += items.map(i => i.s).join("");
   const b = m.policy_benchmark;
   if (b && b.height_m && masses.proposed) {
     for (const z of b.height_m) body += poly(masses.proposed.footprint.map(([x, y]) => [x, y, z]), `fill="none" stroke="${FIG.bench}" stroke-width="1" stroke-dasharray="4 3"`);
   }
-  // labels: the street edge, and the heights at the near top corner of each mass
+  // labels: the heights at the near top corner of each mass
   const labels = [];
-  const street = proj([W / 2, -fs * 1.2, 0]); pts.push(street);
-  labels.push(`<text x="${street.x.toFixed(2)}" y="${(street.y + fs * 0.4).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">street · frontage ${h(W)} m</text>`);
   const nearest = ring => ring.map(([x, y]) => [x, y]).sort((u, v) => proj(u).d - proj(v).d)[0];
   for (const [name, colour, weight] of [["proposed", FIG.proposedStroke, 600], ["outright", FIG.lot, 400]]) {
     const x = masses[name]; if (!x) continue;
-    const c = nearest(x.footprint); const t = proj([c[0], c[1], (x.base_z || 0) + x.height_m]); pts.push({ x: t.x + fs * 9, y: t.y - fs * 1.5 });
+    const c = nearest(x.footprint); const t = proj([c[0], c[1], (x.base_z || 0) + x.height_m]);
     labels.push(`<text x="${(t.x + fs * 0.5).toFixed(2)}" y="${(t.y - fs * 0.5).toFixed(2)}" font-size="${fs}" font-weight="${weight}" fill="${colour}">${h(x.height_m)} m · ${name}</text>`);
   }
-  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  // a steady frame: the largest extent the drawing can reach at any azimuth for this tilt, so turning never
+  // rescales it (only a change of tilt re-frames, and gently)
+  const corners = [[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]];
+  const R = Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy)));
+  const zmax = Math.max(...m.masses.map(x => (x.base_z || 0) + x.height_m), 1);
+  const top = zmax * ce + R * se, bottom = R * se;
   const pad = fs * 1.5;
-  const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad, x1 = Math.max(...xs) + pad, y1 = Math.max(...ys) + pad;
-  return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${labels.join("")}</svg>`;
+  const x0 = -R - pad - fs * 3, x1 = R + pad + fs * 3, y0 = -top - pad - fs, y1 = bottom + pad;
+  return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, its surroundings in half tone, the setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${labels.join("")}</svg>`;
 }
 
-function figOne(m) {
+function figOne(m, ctx) {
   const three = VIEW3D.mode === "3d";
   return `<div class="fig-head">
       <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}</div>
@@ -1125,7 +1218,7 @@ function figOne(m) {
         <button type="button" class="segbtn" data-view="3d" aria-pressed="${three}">3D</button>
       </div>
     </div>
-    <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m) : figPlan(m)}</div>
+    <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m, ctx) : figPlan(m, ctx)}</div>
     ${three ? `<p class="fig-hint">Drag to orbit, arrow keys to turn; the view is a straight axonometric of the same massing.json, with the storey lines at ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
 }
 
@@ -1133,14 +1226,15 @@ function wireFigures(run) {
   const fig = $("#fig-01");
   if (!fig || !run.massing) return;
   const m = run.massing;
-  const redraw = () => { fig.innerHTML = figOne(m); wireFigures(run); };
+  const ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
+  const redraw = () => { fig.innerHTML = figOne(m, ctx); wireFigures(run); };
   $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => { if (VIEW3D.mode !== b.dataset.view) { VIEW3D.mode = b.dataset.view; redraw(); } }));
   const svg = $(".fig3d svg", fig);
   if (!svg) return;
   const turn = (daz, del) => {
     VIEW3D.az = (VIEW3D.az + daz) % 360;
     VIEW3D.el = Math.max(8, Math.min(80, VIEW3D.el + del));
-    const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m);
+    const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m, ctx);
     svg.innerHTML = fresh.firstElementChild.innerHTML;
     svg.setAttribute("viewBox", fresh.firstElementChild.getAttribute("viewBox"));
   };
@@ -1169,10 +1263,18 @@ function renderFigures(run) {
   const out = [];
   if (m) {
     const sb = m.envelope.setbacks_m || {};
+    const ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
+    const around = [ctx.street.name + " in front"];
+    if (ctx.lane) around.push("a lane behind");
+    for (const x of ctx.cross) around.push(`${x.name} to the ${x.side}`);
+    if (ctx.neighbours.length) around.push(ctx.neighbours.length === 2 ? "neighbouring parcels either side" : "a neighbouring parcel");
+    if (ctx.streetTrees.length) around.push(`${ctx.streetTrees.length} street trees`);
+    const retained = ctx.trees.filter(t => t.retained).length, removed = ctx.trees.length - retained;
+    const treeNote = ctx.trees.length ? ` On site, ${retained} tree${retained === 1 ? "" : "s"} retained and ${removed} to be removed (×)${ctx.schematic ? ", placed schematically because the survey is not on file" : ""}.` : "";
     out.push(`<figure class="card figure">
-      <div id="fig-01">${figOne(m)}</div>
-      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span></div>
-      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back.</figcaption>
+      <div id="fig-01">${figOne(m, ctx)}</div>
+      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-context"></i>context</span></div>
+      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back. Context in half tone: ${h(around.join(", "))}.${treeNote}</figcaption>
     </figure>`);
     const bench = m.policy_benchmark;
     const trees = m.trees;

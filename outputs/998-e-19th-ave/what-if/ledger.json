@@ -719,7 +719,27 @@
         "retained": 4,
         "street": "E 19th Ave"
       },
-      "notes": "Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session.",
+      "context": {
+        "street": {
+          "name": "E 19th Ave",
+          "width_m": 20
+        },
+        "cross_street": {
+          "name": "Windsor St",
+          "side": "left",
+          "width_m": 20
+        },
+        "lane": {
+          "width_m": 6
+        },
+        "neighbours": {
+          "right": {
+            "frontage_m": 45
+          }
+        },
+        "trees": []
+      },
+      "notes": "Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.",
       "sources": [
         {
           "title": "City of Vancouver referral report, rezoning of 998 E 19th Ave (11 Jun 2024)",

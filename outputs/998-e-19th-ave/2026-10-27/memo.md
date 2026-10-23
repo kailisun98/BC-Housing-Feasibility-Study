@@ -1,6 +1,6 @@
 # Funding-fit memo: 998 E 19th Ave, Vancouver, BC V5V 1K7
 
-**Option:** As approved by Council, 25 Jul 2024: six-storey social housing over a rebuilt church  
+**Option:** As approved by Council, 25 Jul 2024: six-storey social housing  
 **Proponent:** Catalyst Community Developments Society (non profit society)  
 **Rules as of:** 2026-10-27 · **version stamp:** `6d1b07fe59dd3775` · engine 0.1.0  
 
@@ -92,7 +92,7 @@ Previous stamp `20e44f1445ecaff9` (rules as of 2026-10-23) → current `6d1b07fe
 ## Inputs
 - Site `998-e-19th-ave`: RM-1, 2,810.7 m², 75.6 × 37.2 m; owner: Vancouver First Church of the Nazarene.
 - Option `998-e-19th-ave-as-approved`: 6 storeys, 22.3 m, 8,299.0 m² GFA; units studio 30, one bed 37, two bed 26, three bed plus 12; tenure social housing.
-- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session.
+- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.
 - Option notes: Numbers are the City's as-submitted statistics from the referral report. Rent-tier split, accessible-unit count and setbacks are not in the report and are placeholders or left null so the engine marks them uncertain.
 
 ## Sources

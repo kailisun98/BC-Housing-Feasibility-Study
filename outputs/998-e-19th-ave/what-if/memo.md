@@ -95,7 +95,7 @@ Previous stamp `20e44f1445ecaff9` (rules as of 2026-10-23) → current `20e44f14
 ## Inputs
 - Site `998-e-19th-ave`: RM-1, 2,810.7 m², 75.6 × 37.2 m; owner: Vancouver First Church of the Nazarene.
 - Option `998-e-19th-ave-what-if-5-storey`: 5 storeys, 18.3 m, 7,000.0 m² GFA; units studio 24, one bed 32, two bed 24, three bed plus 8; tenure social housing.
-- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session.
+- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.
 - Option notes: Hypothetical option written to show the engine reacting: lower height inside the 19.9 to 21.3 m benchmark, 19 replacement trees to clear the Schedule C minimum, a 30/50/20 rent-tier split, 5 accessible units and a stated land tenure. None of these figures come from Catalyst or the City.
 
 ## Sources

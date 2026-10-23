@@ -27,9 +27,8 @@
     <button id="run-btn" class="btn btn-primary" type="button" title="Run the rules (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Run the rules</button>
     <span id="engine-chip" class="engine-chip" hidden></span>
     <div id="stamp-box" class="stamp" hidden>
-      <span class="eyebrow">Stamp</span>
-      <code id="stamp-text"></code>
-      <button id="copy-stamp" class="btn btn-quiet btn-small" type="button" title="Copy the stamp" aria-label="Copy the stamp">Copy</button>
+      <span class="eyebrow">Rules</span>
+      <b id="stamp-text" title="The rules revision of the memo on screen"></b>
     </div>
   </div>
 </header>
@@ -89,11 +88,11 @@
 
   <section class="memo-pane" id="step-run" tabindex="-1" aria-label="The memo">
     <div class="memo-tools">
-      <label class="tool">
+      <label class="tool" id="tool-open">
         <span class="eyebrow">Open a past run</span>
         <select id="open-run"><option value="">This run</option></select>
       </label>
-      <label class="tool">
+      <label class="tool" id="tool-compare">
         <span class="eyebrow">Compare with…</span>
         <select id="compare-run"><option value="">Nothing</option></select>
       </label>

@@ -140,10 +140,18 @@ Run folders are named by option, not date (`as-approved`, `as-approved-rules-202
 `what-if-funder-ready`; `as-permitted`, `what-if-12-storey`); the 5-storey what-if was deleted on
 23 Oct 2026 as a duplicate of the funder-ready one.
 The 998 site's transit-oriented answer is now No (nearest SkyTrain stations over 800 m; confirm on
-the City's map). The home page's "Find a fit that qualifies" link opens
+the City's map). The home page's compare links ("or see two options compared", "Compare two options") open
 `app.html?run=998-e-19th-ave/what-if-funder-ready&compare=998-e-19th-ave/as-approved`; when two runs are
-compared, each of the three answer cards opens with an A | B strip, and a Side by side card and the
-What changed revision table follow the title block. Inputs carry marks (needed to run, read by a
+compared, a Side by side card follows the title block with the two run pickers (`#tool-open`,
+`#tool-compare`, moved there by `placeRunTools` in `app.js`, keeping focus) in a row over its A and B
+columns, a one-line trade-off, the four answers, and only the rules whose status differs (the rest behind
+a disclosure); then What changed. `compareKind` tells a change of rules (Revision, the delta) from two
+options under the same rules ("What changed between the two options", no delta). The answer cards carry
+no A | B strip any more. Opening a run that has a stored diff.json compares it with the run it was
+recorded against when the list can tell which (`recordedAgainst`). The UI no longer shows the stamp's
+hash: each distinct stamp on file is a rules revision, R1, R2… (`noteRevisions` / `rev` in `app.js`,
+numbered by the earliest as-of date across all sites); the hash appears only in the memo's Rules revision
+card. The engine's memo.md/memo.html and the Revit Comments still carry the hash. Inputs carry marks (needed to run, read by a
 rule, drawings only) and (i) explanations from `FIELD_META` in `app.js`; the memo has a
 "Clauses applied" table (proposed, permitted or required, the ask) before the layered ledger.
 

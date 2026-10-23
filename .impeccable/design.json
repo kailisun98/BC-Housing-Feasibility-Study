@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-22T22:41:07-07:00",
+  "generatedAt": "2026-10-23T00:57:50-07:00",
   "title": "Design System: Funding-Fit Memo",
   "extensions": {
     "colorMeta": {
@@ -273,6 +273,96 @@
           "#c3d0ad",
           "#e6ecdc"
         ]
+      },
+      "street-text": {
+        "role": "tertiary",
+        "displayName": "Street Text",
+        "canonical": "#63635F",
+        "tonalRamp": [
+          "#1f1f1e",
+          "#33332f",
+          "#4a4a47",
+          "#63635f",
+          "#8e8e8a",
+          "#b3b3ae",
+          "#dcdcd8",
+          "#f6f6f4"
+        ]
+      },
+      "bench-text": {
+        "role": "tertiary",
+        "displayName": "Bench Text",
+        "canonical": "#8F5A0E",
+        "tonalRamp": [
+          "#2e1d05",
+          "#4c3008",
+          "#6e450b",
+          "#8f5a0e",
+          "#c77d14",
+          "#e0a03a",
+          "#f2cf94",
+          "#fff1d6"
+        ]
+      },
+      "band": {
+        "role": "neutral",
+        "displayName": "Band",
+        "canonical": "#E7EEF5",
+        "tonalRamp": [
+          "#1f2933",
+          "#2c3e50",
+          "#5f6672",
+          "#8a96a3",
+          "#b7c3d0",
+          "#d3dce6",
+          "#e7eef5",
+          "#f5f6f8"
+        ]
+      },
+      "band-line": {
+        "role": "neutral",
+        "displayName": "Band Line",
+        "canonical": "#D3DCE6",
+        "tonalRamp": [
+          "#1f2933",
+          "#2c3e50",
+          "#5f6672",
+          "#8a96a3",
+          "#b7c3d0",
+          "#d3dce6",
+          "#e7eef5",
+          "#f5f6f8"
+        ]
+      },
+      "band-group": {
+        "role": "neutral",
+        "displayName": "Band Group",
+        "canonical": "#DBE4EE",
+        "tonalRamp": [
+          "#1f2933",
+          "#2c3e50",
+          "#5f6672",
+          "#8a96a3",
+          "#b7c3d0",
+          "#dbe4ee",
+          "#e7eef5",
+          "#f5f6f8"
+        ]
+      },
+      "night-band": {
+        "role": "neutral",
+        "displayName": "Night Band",
+        "canonical": "#191F26",
+        "tonalRamp": [
+          "#0b0e12",
+          "#14181d",
+          "#191f26",
+          "#252c35",
+          "#2b323c",
+          "#3d4752",
+          "#5f6672",
+          "#9aa4b1"
+        ]
       }
     },
     "typographyMeta": {
@@ -312,9 +402,9 @@
         "displayName": "Mono",
         "purpose": "Rule ids, hashes, paths, shell lines; what a machine wrote."
       },
-      "stamp": {
-        "displayName": "Stamp",
-        "purpose": "The version stamp in a mono double rule."
+      "revision": {
+        "displayName": "Revision",
+        "purpose": "The rules revision, R1, R2…, in a 1px Ink box in the top bar and in bold in the title block."
       }
     },
     "shadows": [
@@ -380,8 +470,12 @@
         "value": "1600px"
       },
       {
-        "name": "ruler-vertical",
-        "value": "899px"
+        "name": "home-steps-stack",
+        "value": "860px"
+      },
+      {
+        "name": "home-stages-vertical",
+        "value": "640px"
       }
     ]
   },
@@ -451,12 +545,12 @@
       "css": ".ds-steps { display: flex; gap: 4px; padding: 6px 12px; border-bottom: 1px solid #e1e5ea; background: #ffffff; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 500; } .ds-step { color: #5f6672; text-decoration: none; padding: 5px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; } .ds-step:hover { background: rgba(44, 62, 80, .1); color: #2c3e50; box-shadow: inset 0 -3px 0 rgba(44, 62, 80, .55); } .ds-n { width: 20px; height: 20px; border-radius: 50%; background: #e9eef4; color: #2c3e50; display: inline-grid; place-items: center; font-size: 11px; font-weight: 600; } .ds-active { background: #e9eef4; color: #2c3e50; } .ds-active .ds-n, .ds-done .ds-n { background: #2c3e50; color: #ffffff; }"
     },
     {
-      "name": "Stamp",
+      "name": "Rules revision",
       "kind": "chip",
-      "refersTo": "status-pill",
-      "description": "The version stamp in the top bar: mono uppercase inside a double rule, with Copy.",
-      "html": "<span class=\"ds-stamp\"><code class=\"ds-stamp-code\">20e44f1445ecaff9</code><button class=\"ds-stamp-btn\">Copy</button></span>",
-      "css": ".ds-stamp { display: inline-flex; align-items: center; gap: 8px; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; padding: 4px; } .ds-stamp-code { font: 600 11.5px/1.15 'IBM Plex Mono', Menlo, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; color: #5f6672; border: 2px solid currentColor; border-radius: 2px; box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px currentColor; margin: 0 4px; } .ds-stamp-btn { font: inherit; font-size: 12px; font-weight: 500; min-height: 26px; padding: 3px 9px; border: 1px solid #e1e5ea; border-radius: 5px; background: transparent; color: #2c3e50; cursor: pointer; }"
+      "refersTo": null,
+      "description": "The memo's rules revision in the top bar: a Rules key and R1, R2… in a small 1px Ink box; the stamp's hash stays in the memo's Rules revision card.",
+      "html": "<span class=\"ds-rev-tag\"><span class=\"ds-rev-key\">Rules</span><b>R1</b></span>",
+      "css": ".ds-rev-tag { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; } .ds-rev-key { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5f6672; } .ds-rev-tag b { display: inline-block; min-width: 30px; padding: 2px 7px; border: 1px solid #2c3e50; border-radius: 3px; font: 600 12.5px/1.25 'IBM Plex Sans', sans-serif; color: #2c3e50; text-align: center; }"
     },
     {
       "name": "Revision mark",
@@ -467,17 +561,17 @@
       "css": ".ds-rev-p { font: 13px/1.45 'IBM Plex Sans', Helvetica, Arial, sans-serif; color: #2c3e50; margin: 0; } .ds-rev { display: inline-block; width: 16px; height: 14px; vertical-align: -2px; color: #2c3e50; } .ds-rev path { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; } .ds-rev text { fill: currentColor; font: 600 7.5px 'IBM Plex Sans', sans-serif; } .ds-rev-cloud { background: none; color: inherit; padding: 0 3px; border: 1px dashed #2c3e50; border-radius: 7px; }"
     },
     {
-      "name": "Issued sheet",
-      "kind": "card",
-      "refersTo": "drawing-sheet",
-      "description": "The home page's close: a white drawing sheet whose actions are title-block cells, ending on a title block with the stamp.",
-      "html": "<div class=\"ds-sheet\"><h3 class=\"ds-sheet-h\">See it work on a real case.</h3><div class=\"ds-cells\"><div><b>Run</b><button class=\"ds-btn-p\">Run the case</button></div><div><b>Compare</b><button class=\"ds-btn-q\">Watch a rule change</button></div><div><b>Read</b><button class=\"ds-btn-q\">Read the memo</button></div></div></div>",
-      "css": ".ds-sheet { background: #ffffff; border: 1px solid #e1e5ea; border-radius: 6px; box-shadow: 0 1px 2px rgba(20,30,40,.06); padding: 14px; font: 13px/1.45 'IBM Plex Sans', Helvetica, Arial, sans-serif; color: #1f2933; } .ds-sheet-h { font-size: 18px; font-weight: 600; margin: 0 0 10px; } .ds-cells { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid #1f2933; } .ds-cells > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 14px 8px 0; margin-right: 14px; border-right: 1px solid #e1e5ea; } .ds-cells > div:last-child { border-right: 0; } .ds-cells b { font-size: 11px; color: #5f6672; letter-spacing: .06em; text-transform: uppercase; } .ds-btn-p, .ds-btn-q { font: 500 13px/1.25 'IBM Plex Sans', sans-serif; padding: 6px 12px; border-radius: 5px; min-height: 30px; cursor: pointer; } .ds-btn-p { background: #2c3e50; color: #ffffff; border: 1px solid transparent; } .ds-btn-q { background: transparent; color: #2c3e50; border: 1px solid #e1e5ea; } .ds-btn-p:hover { background: #56657a; box-shadow: 0 2px 6px rgba(20,30,40,.25); } .ds-btn-q:hover { background: #c3cbd5; border-color: #8a96a3; } .ds-btn-p:focus-visible, .ds-btn-q:focus-visible { outline: 2px solid #2a6fb8; outline-offset: 1px; }"
+      "name": "Side by side head",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "A comparison's head: the two run pickers in a row laid on the A and B columns, a one-line trade-off, then the answers of each run as pills.",
+      "html": "<div class=\"ds-sbs\"><div class=\"ds-pick-row\"><span></span><label><span>A · This run</span><select><option>2026-10-23 · what-if-funder-ready · What-if</option></select></label><label><span>B · Compared</span><select><option>2026-10-23 · as-approved · As approved by Council</option></select></label></div><p>A against B: 88 units against 105, 5 storeys against 6. Both read under the same rules.</p><table><tbody><tr><th>By rezoning</th><td>Yes</td><td>Yes, with conditions</td></tr></tbody></table></div>",
+      "css": ".ds-sbs { font: 12px/1.45 'IBM Plex Sans', Helvetica, Arial, sans-serif; color: #2c3e50; } .ds-pick-row { display: grid; grid-template-columns: 120px 1fr 1fr; margin-bottom: 8px; } .ds-pick-row label { display: flex; flex-direction: column; gap: 3px; padding-right: 8px; } .ds-pick-row label span { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; } .ds-pick-row select { width: 100%; border: 1px solid #e1e5ea; border-radius: 4px; padding: 5px 8px; font: 12.5px 'IBM Plex Sans', sans-serif; background: #ffffff; color: #2c3e50; } .ds-sbs p { font-size: 13px; margin: 0 0 8px; } .ds-sbs table { width: 100%; table-layout: fixed; border-collapse: collapse; } .ds-sbs th, .ds-sbs td { text-align: left; padding: 6px 8px 6px 0; border-bottom: 1px solid #e1e5ea; } .ds-sbs th { width: 120px; } .ds-pick-row select:focus-visible { outline: 2px solid #2a6fb8; outline-offset: 1px; }"
     }
   ],
   "narrative": {
     "northStar": "The Drafting Tool",
-    "overview": "The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the talking; IBM Plex Mono is reserved for what a machine wrote down, stamps, rule ids, hashes, paths and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good drawing set is dense, and it stays calm because every element has a fixed job.\n\nColour is meaning. Blue is for links, focus, the selection and the step you are on; amber is for what is pending, the \"not sure\" answer, the engine still loading, a benchmark line; green, yellow, red, blue and grey mark the six statuses, always beside the printed word, never instead of it. The status strip under the step bar carries one line of feedback for every action, with a dot that says info, busy, ok or error. The massing drawings sit on white paper in both themes and keep Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a red dashed line for the setback envelope, amber dashes for the staff benchmark.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).\n\nThe home page in front of the tool speaks the same language. It is read rather than operated, so its running prose sits at a reading size while everything else keeps the tool's density, and its figures are HTML drawn with the drawing set's own devices (stage cells, a table of layers, a three-step flow, a memo row with its notes, a sheet issued for review to close on) rather than pictures of them. When something changes between two readings of the rules, it is marked the way a drawing marks a revision.",
+    "overview": "The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the talking; IBM Plex Mono is reserved for what a machine wrote down, rule ids, fingerprints, paths and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good drawing set is dense, and it stays calm because every element has a fixed job.\n\nColour is meaning. Blue is for links, focus, the selection and the step you are on; amber is for what is pending, the \"not sure\" answer, the engine still loading, a benchmark line; green, yellow, red, blue and grey mark the six statuses, always beside the printed word, never instead of it. The status strip under the step bar carries one line of feedback for every action, with a dot that says info, busy, ok or error. The massing drawings sit on white paper in both themes and keep Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a red dashed line for the setback envelope, amber dashes for the staff benchmark.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).\n\nThe home page in front of the tool speaks the same language. It is read rather than operated, so its running prose sits at a reading size while everything else keeps the tool's density, and it is kept quiet: headings, short paragraphs, one table and one sheet of white paper (a row of the memo) below a capture of the memo itself; the stages and the steps sit on the page under hairlines, without boxes. When something changes between two readings of the rules, it is marked the way a drawing marks a revision.",
     "keyCharacteristics": [
       "One sans at 13px with 11px uppercase keys; mono only for machine-written text.",
       "Slate ink, cool grey page, white panels; dark mode is the same tool at night, not an inversion.",
@@ -505,7 +599,7 @@
       },
       {
         "name": "The Revision Rule",
-        "body": "When two readings of the rules are compared, what changed carries a delta with its letter (A) and the comparison's answer sits right under the title block, before the three answers. Nothing else uses the delta.",
+        "body": "When two readings of the rules are compared, what changed carries a delta with its letter (A) and the comparison's answer sits right under the title block, before the three answers. Two options read under the same rules are compared without it: their difference is in the numbers, not the rules. Nothing else uses the delta.",
         "section": "colors"
       },
       {
@@ -520,7 +614,7 @@
       },
       {
         "name": "The Machine Mono Rule",
-        "body": "Mono is for text a machine produced or will consume: stamps, ids, hashes, paths, shell lines, the as-of date. Human sentences are never set in mono.",
+        "body": "Mono is for text a machine produced or will consume: fingerprints, ids, hashes, paths, shell lines, the as-of date. Human sentences are never set in mono.",
         "section": "typography"
       },
       {
@@ -537,6 +631,8 @@
       "Do keep panels at 6px radius, 12px by 14px padding, 1px Line and the one-pixel shadow, 12px apart.",
       "Do keep the drawings on white paper in both themes with Lotwise's drawing tones.",
       "Do mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.",
+      "Do name a reading of the rules by its revision, R1, R2…, and keep the stamp's hash to the Rules revision card.",
+      "Do alternate the home page's sections between the page grey and the slate Band, edge to edge.",
       "Do reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card.",
       "Do draw explanatory figures in HTML, not SVG text, so they reflow on a phone and read at the page's own sizes."
     ],
@@ -544,6 +640,7 @@
       "Don't build a dashboard: no gauges, KPI tiles, sparklines, or icon-plus-heading cards as structure.",
       "Don't reach for a landing page's kit: no gradients, glass, hero numbers, floating shadows, marketing voice.",
       "Don't bring back a serif, a 16px body, or large display type; the memo reads at drafting density, and the home page's prose stops at 14px.",
+      "Don't box what can sit on the page: the home page keeps one sheet of paper below the hero, one primary button per action group, and lets hairlines and space do the rest.",
       "Don't put a status colour on a button, a heading or a background that carries no status.",
       "Don't add a toast, a second accent, or a shadow deeper than one pixel on anything at rest.",
       "Don't use \"N/A\", a colour without its word, or a checkbox where \"not sure\" is a legitimate answer.",

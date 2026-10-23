@@ -307,6 +307,8 @@ const state = {
   runs: [],             // past runs for the site
   compareRun: null,     // run_id to diff against on the next run
   step: 1,              // the step the reader is on, for the step bar
+  revSeen: new Map(),   // rules stamp -> the earliest as-of date it was read on
+  revisions: new Map(), // rules stamp -> "R1", "R2"…
 };
 
 const PRELOAD_SITE = "998-e-19th-ave";
@@ -928,7 +930,30 @@ async function saveAs(kind) {
 async function loadRuns() {
   const sid = state.siteId || (state.site && state.site.id);
   state.runs = sid ? await api(`/api/runs?site=${encodeURIComponent(sid)}`) : [];
+  noteRevisions(state.runs);
 }
+
+/* The rules' revisions. A memo's stamp is a hash of the rule files and the versions in force on its as-of date;
+   the reader sees it as R1, R2 and so on: the distinct stamps on file, across every site, numbered by the earliest
+   date each was read on (ties by the stamp itself, so every machine numbers them alike). The hash itself stays in
+   the Rules revision card at the foot of the memo, and in the Revit elements' Comments. */
+async function loadRevisions() {
+  const lists = await Promise.all((state.sites || []).map(s => api(`/api/runs?site=${encodeURIComponent(s.id)}`).catch(() => [])));
+  noteRevisions(lists.flat());
+}
+
+function noteRevisions(runs) {
+  for (const r of runs || []) {
+    if (!r || !r.stamp) continue;
+    const seen = state.revSeen.get(r.stamp);
+    if (!seen || (r.as_of && r.as_of < seen)) state.revSeen.set(r.stamp, r.as_of || "9999");
+  }
+  const order = [...state.revSeen.entries()].sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
+  state.revisions = new Map(order.map(([stamp], i) => [stamp, `R${i + 1}`]));
+}
+
+/* A rules stamp as the reader sees it: its revision number. */
+const rev = stamp => (stamp && state.revisions.get(stamp)) || "an unlisted revision";
 
 async function runRules() {
   const btn = $("#run-btn");
@@ -942,6 +967,7 @@ async function runRules() {
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
     state.run = run;
+    noteRevisions([run]);
     await attachCause(run);
     renderMemo(run);
     showStamp(run.stamp);
@@ -952,7 +978,7 @@ async function runRules() {
     fillRunSelects();
     setCompareNote(run.diff);
     const ms = Math.round(performance.now() - t0);
-    toast(`Ran the rules as of ${run.as_of} in ${ms} ms · stamp ${run.stamp} · ${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · against ${run.diff.previous_as_of}: ${changesPhrase(run.diff)}` : ""}`);
+    toast(`Ran the rules as of ${run.as_of} (${rev(run.stamp)}) in ${ms} ms · ${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}`);
     $("#step-run").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   } catch (e) {
     toast(e.message, true);
@@ -962,8 +988,9 @@ async function runRules() {
   }
 }
 
+/* The top bar names the memo's rules revision, R1, R2…; the stamp behind it is in the memo's Rules revision card. */
 function showStamp(stamp) {
-  $("#stamp-text").textContent = stamp || "";
+  $("#stamp-text").textContent = stamp ? rev(stamp) : "";
   $("#stamp-box").hidden = !stamp;
 }
 
@@ -993,6 +1020,7 @@ function renderQuiet() {
   if (state.run) return;  // a run is on screen: leave it
   const site = state.site || {}, opt = state.option || {};
   const n = state.rules.length;
+  placeRunTools(false);
   $("#memo").className = "memo";
   $("#memo").innerHTML = `
     <div class="card memo-head">
@@ -1002,7 +1030,7 @@ function renderQuiet() {
         <div><b>Proponent</b><span>${h(opt.proponent || "—")}</span></div>
         <div><b>Rules as of</b><span>${h($("#as-of").value || todayISO())}</span></div>
       </div>
-      <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the stamped memo in this tab" : "writes a stamped memo to <code>outputs/</code>"}, and reads it here: three answers first, then the massing and the full ledger.</p>
+      <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the memo in this tab" : "writes the memo to <code>outputs/</code>"}, and reads it here: three answers first, then the massing and the full ledger.</p>
     </div>
     <div class="answers">
       ${quietCard("01 · Is it allowed", "Is it allowed?", "Outright under the district, then by rezoning under the City policy that applies.")}
@@ -1024,73 +1052,79 @@ function renderMemo(run) {
   const site = L.inputs.site, opt = L.inputs.option;
   const parts = [];
 
-  // 1. header: the memo's title block; a comparison adds a revision cell
+  // 1. header: the memo's title block. A comparison adds a cell: Revision (with the delta) when the rules moved, or
+  // Compared with when two options are read under the same rules
   const d = run.diff;
+  const kind = d ? compareKind(d) : null;
+  const B = d && run.compareLedger ? run.compareLedger : null;
+  const cmpCell = !d ? "" : kind === "rules"
+    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(rev(d.previous_stamp))} <span class="cont">(rules as of ${h(d.previous_as_of)})</span></span></div>`
+    : `<div><b>Compared with</b><span>${B ? h(optionName(B)) : "a run"} <span class="cont">(as of ${h(d.previous_as_of)})</span></span></div>`;
   parts.push(`<div class="card memo-head">
     <h1>${h(site.address || site.id)}</h1>
     <div class="memo-meta">
       <div><b>Option</b><span>${h(opt.name || opt.id)}</span></div>
       <div><b>Proponent</b><span>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="cont">(${h(String(opt.proponent_type).replace(/_/g, " "))})</span>` : ""}</span></div>
       <div><b>Rules as of</b><span>${h(L.run.as_of)}</span></div>
-      <div><b>Stamp</b><span><code>${h(L.run.stamp.stamp)}</code> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
-      ${d ? `<div class="rev-cell"><b>Revision</b><span>${REV} against ${h(d.previous_as_of)} · <code>${h(d.previous_stamp)}</code></span></div>` : ""}
+      <div><b>Rules revision</b><span><b class="rev-no">${h(rev(L.run.stamp.stamp))}</b> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
+      ${cmpCell}
     </div>
     <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
   </div>`);
 
-  // 2. a comparison's answer comes straight after the title block; 3. the three answers; 4. the massing figures
-  // beside them at >=1600 px, under them otherwise; 5. the full ledger; 6. inputs, sources, version stamp
-  if (d) parts.push(renderChanges(d));
-  if (d && run.compareLedger) parts.push(renderSideBySide(run));
-  const changed = new Set(d ? (d.changes || []).map(c => c.rule_id) : []);
+  // 2. a comparison comes straight after the title block: the two runs side by side, their pickers heading the A
+  // and B columns, then What changed; 3. the three answers; 4. the massing figures beside them at >=1600 px, under
+  // them otherwise; 5. the full ledger; 6. inputs, sources, version stamp. Only a change in the rules carries the
+  // delta into the clauses and the ledger (the Revision Rule); two options differ in their numbers, not their rules.
+  if (B) parts.push(renderSideBySide(run));
+  if (d) parts.push(renderChanges(d, L));
+  const changed = new Set(kind === "rules" ? (d.changes || []).map(c => c.rule_id) : []);
   const rest = [];
   rest.push(renderClauses(res, L, changed));
   rest.push(renderLedger(res, changed));
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run));
-  // when two runs are compared, each answer opens with both verdicts, A (this run) beside B (the compared run)
-  const B = d && run.compareLedger ? run.compareLedger : null;
-  const ab = (html, rows) => (B ? html.replace("</h2>", "</h2>" + abBlock(rows, L, B)) : html);
-  const vp = w => `<span class="pill pill-${h(verdictStatus(w) || "na")}">${h(cap(w))}</span>`;
-  const a1 = ab(answerAllowed(L), [["Outright", vp(L.summary.answers.allowed.outright.verdict), vp(B && B.summary.answers.allowed.outright.verdict)],
-                                   ["By rezoning", vp(L.summary.answers.allowed.by_rezoning.verdict), vp(B && B.summary.answers.allowed.by_rezoning.verdict)]]);
-  const a2 = ab(answerFunders(L), [["Fits the funders", vp(L.summary.answers.funded.verdict), vp(B && B.summary.answers.funded.verdict)]]);
-  const openItems = X => { const n = ((X.summary.answers.unsure) || []).length; return n ? `<span class="pill pill-${X.summary.answers.unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${n} open</span>` : `<span class="pill pill-pass">Nothing open</span>`; };
-  const a3 = ab(answerUnsure(L), [["Open items", openItems(L), B ? openItems(B) : ""]]);
   parts.push(`<div class="memo-body">
-    <div class="answers">${a1}${a2}${a3}</div>
+    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L)}</div>
     ${renderFigures(run)}
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
 
+  // the run pickers leave the memo before it is replaced and come back after; a picker that had focus keeps it
   const memoEl = $("#memo");
+  const focused = document.activeElement && ["open-run", "compare-run"].includes(document.activeElement.id) ? document.activeElement : null;
+  placeRunTools(false);
   memoEl.innerHTML = parts.join("\n");
   memoEl.className = "memo";
   void memoEl.offsetWidth;  // restart the fade
   memoEl.classList.add("landed");
+  placeRunTools(true);
+  if (focused && document.activeElement !== focused) focused.focus({ preventScroll: !!focused.closest("#side-by-side") });
   wireFigures(run);
   wireLedger();
   setPrintFooter(run);
 }
 
-/* The A | B strip at the head of an answer card: this run's verdict beside the compared run's, each column named
-   by its option. */
-function abBlock(rows, A, B) {
-  const name = X => (X.inputs && X.inputs.option && (X.inputs.option.name || X.inputs.option.id)) || "option";
-  const short = s => (String(s).length > 60 ? String(s).slice(0, 57) + "…" : String(s));
-  return `<div class="ab" role="table" aria-label="This run beside the compared run">
-    <div class="ab-row ab-head" role="row"><span role="columnheader"></span><span role="columnheader"><b>A</b> ${h(short(name(A)))} <span class="cont">(${h(A.run.as_of)})</span></span><span role="columnheader"><b>B</b> ${h(short(name(B)))} <span class="cont">(${h(B.run.as_of)})</span></span></div>
-    ${rows.map(([k, a, b]) => `<div class="ab-row" role="row"><span role="rowheader">${h(k)}</span><span role="cell">${a}</span><span role="cell">${b}</span></div>`).join("")}
-  </div>`;
+/* An option's name as the reader knows it. */
+const optionName = L => (L && L.inputs && L.inputs.option && (L.inputs.option.name || L.inputs.option.id)) || "option";
+
+/* A rule id with a break allowed after each dot and underscore, so a narrow column wraps it between its words. */
+const idBreak = id => h(id).replace(/([._])/g, "$1<wbr>");
+
+/* What kind of comparison this is: the rules moved (another as-of date or other rule files), two options were read
+   under the same rules, or the two runs are the same. attachCause decides it from the two ledgers when it can. */
+function compareKind(d) {
+  if (d.kind) return d.kind;
+  return d.rules_changed || d.previous_as_of !== d.current_as_of ? "rules" : "options";
 }
 
-/* Every printed page carries the address, the date and the stamp in its footer, and its page number. */
+/* Every printed page carries the address, the date and the rules revision in its footer, and its page number. */
 function setPrintFooter(run) {
   let st = $("#print-page");
   if (!st) { st = document.createElement("style"); st.id = "print-page"; document.head.appendChild(st); }
   const site = (run.ledger && run.ledger.inputs && run.ledger.inputs.site) || {};
-  const text = `Funding-Fit Memo · ${site.address || site.id || ""} · rules as of ${run.as_of} · stamp ${String(run.stamp || "").toUpperCase()}`.replace(/["\\\n]/g, " ");
+  const text = `Funding-Fit Memo · ${site.address || site.id || ""} · rules as of ${run.as_of} · ${rev(run.stamp)}`.replace(/["\\\n]/g, " ");
   st.textContent = `@media print { @page { margin: 14mm 14mm 16mm;
     @bottom-left { content: "${text}"; font: 7.5pt "IBM Plex Mono", monospace; color: #444; }
     @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "IBM Plex Sans", sans-serif; color: #444; } } }`;
@@ -1158,6 +1192,7 @@ function answerUnsure(L) {
 // ---------------------------------------------------------------- the clauses applied: proposed, permitted, the ask
 
 const pct = x => (typeof x === "number" ? `${(100 * x).toFixed(x * 100 % 1 ? 1 : 0)}%` : "—");
+const UNIT_WORD = { studio: "studio", one_bed: "1-bed", two_bed: "2-bed", three_bed_plus: "3-bed+" };
 const num = x => (x === null || x === undefined ? "—" : fmtNum(x));
 
 /* Each check's numbers split three ways: what the option proposes (the simulation's input), what the clause permits
@@ -1195,19 +1230,31 @@ function splitValues(r, L) {
                ask: v.shortfall > 0 ? `${num(v.shortfall)} tree${v.shortfall === 1 ? "" : "s"} short: plant more or pay $${num(v.cash_in_lieu_cad)} cash in lieu.` : ask };
     case "code_basis_flags":
       return { proposed: `${num(v.storeys)} storeys`, permitted: `Part ${v.part || "—"} of the BC Building Code (Part 9 up to 3 storeys and 600 m²)`, ask: "" };
-    case "unit_area_flags":
-      return { proposed: `average ${num(v.average_gross_area_per_unit_m2)} m² gross per unit`, permitted: `BC Housing minimum net areas from ${num(v.min_net_area_m2)} m²`, ask: "" };
+    case "unit_area_flags": {
+      // the minimum net area is given per unit type: studio 33, one-bed 49, …
+      const mins = v.min_net_area_m2 && typeof v.min_net_area_m2 === "object"
+        ? Object.entries(v.min_net_area_m2).map(([k, x]) => `${UNIT_WORD[k] || k.replace(/_/g, " ")} ${num(x)}`).join(", ") + " m²"
+        : `${num(v.min_net_area_m2)} m²`;
+      return { proposed: `average ${num(v.average_gross_area_per_unit_m2)} m² gross per unit`, permitted: `BC Housing minimum net areas: ${mins}`, ask: "" };
+    }
     case "chf_fit": {
       const mix = v.mix_shares ? `mix ${pct(v.mix_shares.market)} / ${pct(v.mix_shares.rgi)} / ${pct(v.mix_shares.deep_subsidy)}` : "rent-tier mix not given";
       const req = v.required_mix ? `${pct(v.required_mix.market)} market / ${pct(v.required_mix.rgi)} RGI / ${pct(v.required_mix.deep_subsidy)} deep subsidy (±2 points); 5% accessible; 60-year lease at nominal value; site control` : "";
       const unknown = (v.unknown || []).length ? `Supply: ${v.unknown.join("; ")}.` : "";
       const fails = (v.fails || []).length ? `Fix: ${v.fails.join("; ")}.` : "";
-      return { proposed: `${mix}; ${num(opt.accessible_units)} accessible; site control ${String(opt.site_control || "—").replace(/_/g, " ")}`, permitted: req, ask: [fails, unknown].filter(Boolean).join(" ") || ask };
+      const access = opt.accessible_units == null ? "accessible units not given" : `${num(opt.accessible_units)} accessible`;
+      const control = opt.site_control ? `site control ${String(opt.site_control).replace(/_/g, " ")}` : "site control not given";
+      return { proposed: `${mix}; ${access}; ${control}`, permitted: req, ask: [fails, unknown].filter(Boolean).join(" ") || ask };
     }
     case "bc_builds_fit": {
       const unknown = (v.unknown || []).length ? `Supply: ${v.unknown.join("; ")}.` : "";
       const fails = (v.fails || []).length ? `Fix: ${v.fails.join("; ")}.` : "";
-      return { proposed: `${pct(opt.below_market_unit_share)} of units at ${pct(opt.below_market_discount)} below market; ${num(opt.non_residential_gfa_m2 || 0)} m² non-residential`, permitted: "at least 20% of units at least 20% below market; non-residential at most 30% of area; a non-profit teamed with a builder", ask: [fails, unknown].filter(Boolean).join(" ") || ask };
+      // a missing share or discount is said in words, not left as a dash in the middle of a sentence
+      const below = opt.below_market_unit_share == null && opt.below_market_discount == null ? "below-market share and discount not given"
+        : opt.below_market_unit_share == null ? `below-market share not given, at ${pct(opt.below_market_discount)} below market`
+        : opt.below_market_discount == null ? `${pct(opt.below_market_unit_share)} of units below market, discount not given`
+        : `${pct(opt.below_market_unit_share)} of units at ${pct(opt.below_market_discount)} below market`;
+      return { proposed: `${below}; ${num(opt.non_residential_gfa_m2 || 0)} m² non-residential`, permitted: "at least 20% of units at least 20% below market; non-residential at most 30% of area; a non-profit teamed with a builder", ask: [fails, unknown].filter(Boolean).join(" ") || ask };
     }
     case "dcl_cac":
       return { proposed: "social housing", permitted: `DCL ${v.dcl_exempt ? "exempt" : "payable"}, CAC ${v.cac_exempt ? "exempt" : "payable"}`, ask: "" };
@@ -1230,7 +1277,7 @@ function renderClauses(res, L, changed = new Set()) {
   const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
     const s = splitValues(r, L);
     return `<tr class="st-${h(r.status)}">
-      <td><span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · v ${h(r.version_effective_from || "—")}${r.source && r.source.section ? ` · ${h(r.source.section)}` : ""}</code></td>
+      <td><span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
       <td class="status">${pill(r.status)}</td>
       <td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>
@@ -1250,38 +1297,89 @@ function renderClauses(res, L, changed = new Set()) {
   </section>`;
 }
 
-/* Two runs side by side: the three answers of each, then every rule's status in both, the differences marked. */
+/* The two run pickers. With two runs compared they head the Side by side card's A and B columns, so the choice
+   sits above what it changes; otherwise, and whenever the memo is about to be replaced, they sit above the memo.
+   In the card their keys name the column; a hidden phrase keeps what each one does in its accessible name. */
+const RUN_TOOLS = [["open", "#tool-open", "A · This run", " (open a past run)"], ["compare", "#tool-compare", "B · Compared", " (choose the run to compare with)"]];
+
+function placeRunTools(intoMemo) {
+  const tools = $(".memo-tools");
+  for (const [slot, id, word, purpose] of RUN_TOOLS) {
+    const label = $(id), eyebrow = $(".eyebrow", label);
+    if (!eyebrow.dataset.text) eyebrow.dataset.text = eyebrow.textContent;
+    let hint = $(".tool-purpose", label);
+    if (!hint) { hint = document.createElement("span"); hint.className = "sr-only tool-purpose"; eyebrow.after(hint); }
+    const cell = intoMemo ? $(`#side-by-side [data-slot="${slot}"]`) : null;
+    if (cell) { cell.prepend(label); eyebrow.textContent = word; hint.textContent = purpose; }
+    else { tools.insertBefore(label, $("#compare-note")); eyebrow.textContent = eyebrow.dataset.text; hint.textContent = ""; }
+  }
+  tools.hidden = !$(".tool", tools);
+}
+
+/* What the two options trade, in the units a board reads: units, storeys, height and floor area, A against B. */
+function tradeOff(A, B) {
+  const a = (A.inputs && A.inputs.option) || {}, b = (B.inputs && B.inputs.option) || {};
+  const units = o => { const v = Object.values(o.units || {}).filter(x => typeof x === "number"); return v.length ? v.reduce((s, x) => s + x, 0) : null; };
+  const facts = [[units(a), units(b), "units"], [a.storeys, b.storeys, "storeys"], [a.height_m, b.height_m, "m high"], [a.gfa_m2, b.gfa_m2, "m² of floor area"]]
+    .filter(([x, y]) => x != null && y != null && x !== y)
+    .map(([x, y, unit]) => `${fmtNum(x)} ${unit} against ${fmtNum(y)}`);
+  return facts.length ? `A against B: ${facts.join(", ")}.` : "The two runs propose the same building.";
+}
+
+/* Two runs side by side: the pickers on the A and B columns, the four answers of each, then the rules whose status
+   differs; the rules that read the same in both wait behind a disclosure. */
 function renderSideBySide(run) {
-  const A = run.ledger, B = run.compareLedger;
+  const A = run.ledger, B = run.compareLedger, d = run.diff;
   if (!A || !B) return "";
-  const nameOf = L => (L.inputs && L.inputs.option && (L.inputs.option.name || L.inputs.option.id)) || "option";
+  const kind = d ? compareKind(d) : "options";
   const ans = L => L.summary.answers;
   const verdictCell = w => `<span class="pill pill-${h(verdictStatus(w) || "na")}">${h(cap(w))}</span>`;
+  const openCell = L => { const u = ans(L).unsure || []; return u.length ? `<span class="pill pill-${u.some(x => x.status === "fail") ? "fail" : "uncertain"}">${u.length} open</span>` : `<span class="pill pill-pass">Nothing open</span>`; };
   const head = [
-    ["Allowed outright", ans(A).allowed.outright.verdict, ans(B).allowed.outright.verdict],
-    ["By rezoning", ans(A).allowed.by_rezoning.verdict, ans(B).allowed.by_rezoning.verdict],
-    ["Fits the funders", ans(A).funded.verdict, ans(B).funded.verdict],
-    ["Open items", String((ans(A).unsure || []).length), String((ans(B).unsure || []).length)],
+    ["Allowed outright", verdictCell(ans(A).allowed.outright.verdict), verdictCell(ans(B).allowed.outright.verdict)],
+    ["By rezoning", verdictCell(ans(A).allowed.by_rezoning.verdict), verdictCell(ans(B).allowed.by_rezoning.verdict)],
+    ["Fits the funders", verdictCell(ans(A).funded.verdict), verdictCell(ans(B).funded.verdict)],
+    ["Open items", openCell(A), openCell(B)],
   ];
+  const lead = kind === "rules"
+    ? `The same site and option read under the rules as of ${h(A.run.as_of)} (${h(rev(A.run.stamp.stamp))}) against ${h(B.run.as_of)} (${h(rev(B.run.stamp.stamp))}).`
+    : `${h(tradeOff(A, B))} Both read under the same rules, ${h(rev(A.run.stamp.stamp))}.`;
   const byId = Object.fromEntries(B.results.map(r => [r.rule_id, r]));
   const rows = A.results.filter(r => r.status !== "not_applicable" || (byId[r.rule_id] && byId[r.rule_id].status !== "not_applicable")).map(r => {
     const b = byId[r.rule_id];
+    return { r, b, differs: !b || b.status !== r.status };
+  });
+  const differ = rows.filter(x => x.differs), same = rows.filter(x => !x.differs);
+  const row = ({ r, b }) => {
     const sa = splitValues(r, A), sb = b ? splitValues(b, B) : { proposed: "" };
-    const differs = !b || b.status !== r.status;
-    return `<tr${differs ? ' class="differs"' : ""}>
-      <td><span class="rule-title">${h(r.title)}</span><code class="rule-id">${h(r.rule_id)}</code></td>
+    return `<tr>
+      <td><span class="rule-title">${h(r.title)}</span><code class="rule-id">${idBreak(r.rule_id)}</code></td>
       <td class="status">${pill(r.status)}<div class="cont">${h(sa.proposed || "")}</div></td>
       <td class="status">${b ? pill(b.status) : "<span class=\"cont\">not run</span>"}<div class="cont">${h(sb.proposed || "")}</div></td>
-      <td class="delta">${differs ? "≠" : ""}</td>
     </tr>`;
-  }).join("");
-  return `<section class="card section side" id="side-by-side">
-    <h2>Side by side: this run against ${h(run.diff && run.diff.previous_as_of || "the compared run")}</h2>
-    <table class="plain side-head"><thead><tr><th></th><th>A · ${h(nameOf(A))} <span class="cont">(as of ${h(A.run.as_of)})</span></th><th>B · ${h(nameOf(B))} <span class="cont">(as of ${h(B.run.as_of)})</span></th></tr></thead>
-      <tbody>${head.map(([k, a, b]) => `<tr><th scope="row">${h(k)}</th><td>${k === "Open items" ? h(a) : verdictCell(a)}</td><td>${k === "Open items" ? h(b) : verdictCell(b)}</td></tr>`).join("")}</tbody></table>
-    <table class="plain side-rules"><colgroup><col class="c-rule"><col class="c-ab"><col class="c-ab"><col class="c-delta"></colgroup>
-      <thead><tr><th>Rule</th><th>A</th><th>B</th><th><span class="sr-only">Differs</span></th></tr></thead><tbody>${rows}</tbody></table>
-    <p class="cont">≠ marks a rule whose status differs between the two runs; under each status is what that option proposed.</p>
+  };
+  const table = list => `<table class="plain side-rules"><colgroup><col class="c-rule"><col class="c-ab"><col class="c-ab"></colgroup>
+      <thead><tr><th>Rule</th><th>A</th><th>B</th></tr></thead><tbody>${list.map(row).join("")}</tbody></table>`;
+  // each run's open items, with the person who resolves them, for the run that still has some
+  const openList = [["A", A], ["B", B]].filter(([, L]) => (ans(L).unsure || []).length).map(([k, L]) => `<details class="side-open">
+      <summary>${k} · ${h(optionName(L))}: ${ans(L).unsure.length} open item${ans(L).unsure.length === 1 ? "" : "s"}</summary>
+      <ul>${ans(L).unsure.map(u => `<li>${pill(u.status)} <b>${h(u.title)}</b> <span class="cont">${h(u.action || "")}</span></li>`).join("")}</ul>
+    </details>`).join("");
+  return `<section class="card section side" id="side-by-side" aria-labelledby="side-h">
+    <h2 id="side-h">Side by side</h2>
+    <div class="pick-row" role="group" aria-label="The two runs compared">
+      <span class="pick-key" aria-hidden="true"></span>
+      <div class="pick" data-slot="open"><span class="pick-name">A · ${h(optionName(A))} <span class="cont">(as of ${h(A.run.as_of)})</span></span></div>
+      <div class="pick" data-slot="compare"><span class="pick-name">B · ${h(optionName(B))} <span class="cont">(as of ${h(B.run.as_of)})</span></span></div>
+    </div>
+    <p class="side-lead">${lead}</p>
+    <table class="plain side-head"><thead><tr><th><span class="sr-only">Answer</span></th><th><span class="sr-only">A, ${h(optionName(A))}</span></th><th><span class="sr-only">B, ${h(optionName(B))}</span></th></tr></thead>
+      <tbody>${head.map(([k, a, b]) => `<tr><th scope="row">${h(k)}</th><td>${a}</td><td>${b}</td></tr>`).join("")}</tbody></table>
+    ${openList}
+    <h3 class="side-sub">${differ.length ? `${differ.length} of ${rows.length} rules read differently` : `All ${rows.length} rules read the same in both`}</h3>
+    ${differ.length ? table(differ) : ""}
+    ${same.length ? `<details class="side-same"><summary>${differ.length ? `The other ${same.length} rules, the same in both` : `Show the ${same.length} rules`}</summary>${table(same)}</details>` : ""}
+    <p class="cont side-note">Under each status is what that option proposed.</p>
   </section>`;
 }
 
@@ -1321,7 +1419,7 @@ function renderInputs(site, opt) {
   const u = opt.units || {};
   const units = Object.entries(u).map(([k, v]) => `${k.replace(/_/g, " ")} ${v ?? "—"}`).join(", ");
   const tenure = String(opt.tenure || "").replace(/_/g, " ");
-  return `<section class="card section">
+  return `<section class="card section inputs-used">
     <h2>Inputs</h2>
     <ul>
       <li>Site <code>${h(site.id)}</code>: ${h(site.zoning_district || "—")}, ${h(fmtNum(site.site_area_m2 ?? "—"))} m², ${h(site.frontage_m ?? "—")} × ${h(site.depth_m ?? "—")} m; owner: ${h(site.owner || "—")}.</li>
@@ -1355,13 +1453,14 @@ function renderSources(res, site, opt) {
   </section>`;
 }
 
+/* The memo's rules revision, and the fingerprint behind it: the one place the stamp's hash is shown. */
 function renderStamp(run) {
   const st = run.stamp;
   const files = Object.entries(st.rules_files || {}).map(([f, hsh]) => `<li><code>${h(f)}</code> <span class="hash">${h(hsh.slice(0, 16))}…</span></li>`).join("");
   return `<section class="card section stampbox">
-    <h2>Version stamp</h2>
-    <p>Stamp <code>${h(st.stamp)}</code>: a hash of the rules hash and the rule versions in force on ${h(run.as_of)}. Change one number in one rule and it changes.</p>
-    <p class="hash">Rules hash (SHA-256 over all rule files): ${h(st.rules_hash)}</p>
+    <h2>Rules revision ${h(rev(st.stamp))}</h2>
+    <p>${h(rev(st.stamp))} is this reading of the rules: the rule files below and the versions in force on ${h(run.as_of)}. Change one number in one rule, or read the rules on a date when a version changes, and the memo is on a new revision. Revisions are numbered R1, R2 and so on by the earliest date each was read on, across the runs on file.</p>
+    <p class="hash">Fingerprint ${h(st.stamp)} · rules hash (SHA-256 over all rule files) ${h(st.rules_hash)}</p>
     <ul>${files}</ul>
   </section>`;
 }
@@ -1372,7 +1471,7 @@ function renderStamp(run) {
    drawings sit on white paper): envelope blue, grey streets and lanes, drawing ink, amber for a form line */
 const tok = (name, fallback) => (getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
 const FIG = { paper: tok("--c-paper", "#ffffff"), proposedFill: tok("--c-envelope", "#3c8cdc"), proposedStroke: tok("--c-envelope-line", "#2a6fb8"),
-              outrightFill: tok("--c-lane", "#bdbdbd"), outrightStroke: tok("--c-street", "#8e8e8e"), bench: tok("--c-bench", "#c77d14"),
+              outrightFill: tok("--c-lane", "#bdbdbd"), outrightStroke: tok("--c-street", "#8e8e8e"), bench: tok("--c-bench", "#c77d14"), benchText: tok("--c-bench-text", "#8f5a0e"),
               lot: tok("--c-drawink", "#1f2933"), env: tok("--c-env", "#c81e1e"), grey: tok("--c-drawmuted", "#5f6672") };
 const SVG_OPEN = `xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" role="img"`;
 const NS = `vector-effect="non-scaling-stroke"`;
@@ -1432,7 +1531,7 @@ function polyEl(pts, attrs) {
    otherwise typical defaults stand in (a 20 m street, a 6 m lane, neighbours of the lot's own depth) and the
    on-site trees, whose positions are rarely public, are placed schematically along the rear. */
 const HALF = { street: tok("--c-half-road", "#e9e9e6"), parcel: tok("--c-bldg", "#f4f4f2"), building: tok("--c-half-building", "#e2e2df"),
-               line: tok("--c-half-line", "#c9c9c5"), text: tok("--c-street", "#8e8e8e"), tree: tok("--c-tree", "#9fb07f"),
+               line: tok("--c-half-line", "#c9c9c5"), text: tok("--c-street-text", "#63635f"), tree: tok("--c-tree", "#9fb07f"),
                treeLine: tok("--c-tree-line", "#7f9664"), gone: tok("--c-lane", "#bdbdbd") };
 
 function siteContext(site, m) {
@@ -1634,11 +1733,23 @@ function figSection(m, fsIn = null) {
     for (const z of b.height_m) {
       s += `<line x1="${pad.toFixed(2)}" y1="${Yz(z).toFixed(2)}" x2="${(pad + W).toFixed(2)}" y2="${Yz(z).toFixed(2)}" stroke="${FIG.bench}" stroke-width="1" stroke-dasharray="4 3" ${NS}/>`;
     }
-    s += `<text x="${lx.toFixed(2)}" y="${(Yz(b.height_m[0]) + fs * 1.05).toFixed(2)}" font-size="${fs}" fill="${FIG.bench}">${h(b.height_m[0])} to ${h(b.height_m[1])} m · staff benchmark</text>`;
   }
-  if (masses.proposed) s += `<text x="${lx.toFixed(2)}" y="${(Yz(masses.proposed.height_m) - fs * 0.35).toFixed(2)}" font-size="${fs}" fill="${FIG.proposedStroke}" font-weight="600">${h(masses.proposed.height_m)} m · proposed</text>`;
-  if (masses.outright) s += `<text x="${lx.toFixed(2)}" y="${(Yz(masses.outright.height_m) - fs * 0.35).toFixed(2)}" font-size="${fs}" fill="${FIG.lot}">${h(masses.outright.height_m)} m · outright</text>`;
-  s += `<text x="${(pad + W / 2).toFixed(2)}" y="${(ground + fs * 1.3).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">heights in metres · setback envelope ${h(m.envelope.width_m)} m wide</text>`;
+  // the height labels beside the frontage, each at its own height, then pushed down where two would overprint, so
+  // a proposed height just under the benchmark still reads; a short leader joins a moved label to its line
+  const tags = [];
+  if (b && b.height_m) tags.push({ at: Yz(b.height_m[0]), y: Yz(b.height_m[0]) + fs * 1.05, fill: FIG.benchText, text: `${h(b.height_m[0])} to ${h(b.height_m[1])} m · staff benchmark` });
+  if (masses.proposed) tags.push({ at: Yz(masses.proposed.height_m), y: Yz(masses.proposed.height_m) - fs * 0.35, fill: FIG.proposedStroke, weight: 600, text: `${h(masses.proposed.height_m)} m · proposed` });
+  if (masses.outright) tags.push({ at: Yz(masses.outright.height_m), y: Yz(masses.outright.height_m) - fs * 0.35, fill: FIG.lot, text: `${h(masses.outright.height_m)} m · outright` });
+  tags.sort((u, v) => u.y - v.y);
+  for (let k = 1; k < tags.length; k++) tags[k].y = Math.max(tags[k].y, tags[k - 1].y + fs * 1.5);
+  for (const t of tags) {
+    const moved = Math.abs(t.y - (t.at - fs * 0.35)) > fs * 0.5 && Math.abs(t.y - (t.at + fs * 1.05)) > fs * 0.5;
+    if (moved) s += `<line x1="${(pad + W).toFixed(2)}" y1="${t.at.toFixed(2)}" x2="${(lx - fs * 0.25).toFixed(2)}" y2="${(t.y - fs * 0.35).toFixed(2)}" stroke="${t.fill}" stroke-width="0.6" ${NS}/>`;
+    s += `<text x="${lx.toFixed(2)}" y="${t.y.toFixed(2)}" font-size="${fs}" fill="${t.fill}"${t.weight ? ` font-weight="${t.weight}"` : ""}>${t.text}</text>`;
+  }
+  // the note under the ground line starts at the lot's edge, so a narrow figure runs it into the label room instead
+  // of cutting it off on the left
+  s += `<text x="${pad.toFixed(2)}" y="${(ground + fs * 1.3).toFixed(2)}" font-size="${fs}" fill="${FIG.grey}">heights in metres · setback envelope ${h(m.envelope.width_m)} m wide</text>`;
   s += `</svg>`;
   return s;
 }
@@ -1905,28 +2016,52 @@ function figSheet(run) {
   return `<figure class="card figure">
     <div class="eyebrow">FIG 03 · Revit sheet ${h(r.sheet_number || "")}</div>
     <a href="${base}/ffm_sheet.png" target="_blank" rel="noopener"><img src="${base}/ffm_sheet.png" alt="The Revit sheet exported by the massing script"></a>
-    <figcaption><b>${c.masses ?? "?"} masses</b>, ${c.floor_plates ?? "?"} floor plates, ${c.model_lines ?? "?"} model lines, ${c.views ?? "?"} views, ${c.dimensions ?? 0} dimensions and ${c.notes ?? 0} notes on sheet ${h(r.sheet_number || "")}; stamp <code>${h(run.stamp)}</code> in every element's Comments. Stages: ${h(stages)}.${r.sheet_pdf ? ` <a href="${base}/ffm_sheet.pdf" target="_blank" rel="noopener">PDF</a>.` : ""}${r.errors ? ` ${r.errors} stage error(s) recorded in the result file.` : ""}</figcaption>
+    <figcaption><b>${c.masses ?? "?"} masses</b>, ${c.floor_plates ?? "?"} floor plates, ${c.model_lines ?? "?"} model lines, ${c.views ?? "?"} views, ${c.dimensions ?? 0} dimensions and ${c.notes ?? 0} notes on sheet ${h(r.sheet_number || "")}; the fingerprint of rules ${h(rev(run.stamp))} in every element's Comments. Stages: ${h(stages)}.${r.sheet_pdf ? ` <a href="${base}/ffm_sheet.pdf" target="_blank" rel="noopener">PDF</a>.` : ""}${r.errors ? ` ${r.errors} stage error(s) recorded in the result file.` : ""}</figcaption>
   </figure>`;
 }
 
 // ---------------------------------------------------------------- what changed
 
-/* The engine's words for a change (engine.diff), as a reader would say them. */
-function changeWord(c) {
+/* The engine's words for a change (engine.diff), as a reader would say them. Between two options read under the same
+   rules a reworded finding is the option's numbers changing, not the rule. */
+function changeWord(c, kind = "rules") {
   if (c.change === "changed") return c.from_version !== c.to_version ? (c.from === c.to ? "new version" : "new version and status") : "status changed";
-  return { added: "rule added", removed: "rule dropped", finding_changed: "finding reworded" }[c.change] || String(c.change).replace(/_/g, " ");
+  if (c.change === "finding_changed") return kind === "rules" ? "finding reworded" : "numbers changed";
+  return { added: "rule added", removed: "rule dropped" }[c.change] || String(c.change).replace(/_/g, " ");
 }
 
+/* A comparison in a few words for the status strip: how many statuses and versions moved, without the rule ids. */
 function changesPhrase(d) {
-  const n = (d.changes || []).length;
-  if (!n) return "no rule changed version or status";
-  return `${n} rule${n === 1 ? "" : "s"} changed (${d.changes.map(c => c.rule_id).join(", ")})`;
+  const ch = d.changes || [];
+  if (!ch.length) return "no rule changed version or status";
+  const st = ch.filter(c => c.from !== c.to).length;
+  const ver = ch.filter(c => c.from_version && c.to_version && c.from_version !== c.to_version).length;
+  const bits = [st && (st === 1 ? "1 status differs" : `${st} statuses differ`), ver && `${ver} new version${ver === 1 ? "" : "s"}`].filter(Boolean);
+  return bits.length ? bits.join(", ") : `the same statuses, ${ch.length} finding${ch.length === 1 ? "" : "s"} with other numbers`;
 }
 
-/* The note beside the selects only speaks when the memo cannot: a comparison waiting for the next run. Once a memo
-   is compared, its What changed card says it, so the note stays empty. */
+/* An option's name up to its colon: "As approved by Council, 25 Jul 2024", not the description after it. */
+const shortName = s => String(s || "").split(":")[0].trim();
+
+/* What a comparison found, for the status strip and the toasts: the rules' dates when the rules moved, the compared
+   option's name when two options were read under the same rules. */
+function compareSummary(run) {
+  const d = run.diff;
+  if (!d) return "";
+  return compareKind(d) === "rules"
+    ? `rules as of ${d.current_as_of} against ${d.previous_as_of}: ${changesPhrase(d)} · ${rev(d.previous_stamp)} → ${rev(d.current_stamp)}`
+    : `against ${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a run as of ${d.previous_as_of}`}: ${changesPhrase(d)}`;
+}
+
+/* The note beside the pickers speaks only when the memo cannot: a comparison waiting for the next run, or a run
+   recorded against an earlier one that the list cannot tell apart. Once two runs are compared, the Side by side
+   card says it, so the note stays empty. */
 function setCompareNote(d) {
-  $("#compare-note").textContent = !state.run && state.compareRun ? "Applies to the next run." : "";
+  const run = state.run;
+  let note = "";
+  if (!run && state.compareRun) note = "Applies to the next run.";
+  else if (run && d && !run.compareLedger) note = `This run was recorded against a run as of ${d.previous_as_of} (rules ${rev(d.previous_stamp)}); choose it under Compare with… to see the two side by side.`;
+  $("#compare-note").textContent = note;
 }
 
 /* Why two stamps differ, as precisely as the two ledgers allow: the rule files, the as-of date, the site's or the
@@ -1947,46 +2082,60 @@ async function attachCause(run) {
     const same = changed.length ? "" : ", same site and option";
     const because = [date, ...changed].filter(Boolean);
     d.cause = `${files}${same}; the difference is ${because.length ? because.join(" and ") : (d.rules_changed ? "in the rule files alone" : "not in the inputs or the date")}`;
+    d.kind = d.rules_changed || date ? "rules" : changed.length ? "options" : "same";
   } catch (e) {
     d.cause = null;   // the earlier run could not be read: fall back to the general sentence
   }
 }
 
-/* What changed, as a revision: the comparison's answer sits under the title block, before the three answers. */
-function renderChanges(d) {
+/* What changed. When the rules moved it is a revision: the delta in its heading, the version in force on each row.
+   Between two options read under the same rules it is the options' numbers, so the version column goes. Rows are
+   named by the rule's title, the status read from the compared run (B) to this one (A). */
+function renderChanges(d, L) {
+  const kind = compareKind(d), rules = kind === "rules";
+  const titles = Object.fromEntries(((L && L.results) || []).map(r => [r.rule_id, r.title]));
   const changes = d.changes || [];
   const rows = changes.map(c => {
     const ver = c.from_version && c.to_version && c.from_version !== c.to_version;
     const status = c.from && c.to ? (c.from === c.to ? `${pill(c.to)} <span class="cont">unchanged</span>` : `${pill(c.from)} → ${pill(c.to)}`) : (c.to ? pill(c.to) : c.from ? pill(c.from) : "—");
     return `<tr>
-      <td data-label="Rule"><code>${h(c.rule_id)}</code><div class="cont">${h(changeWord(c))}</div></td>
-      <td class="ver" data-label="Version in force">${ver ? `<span class="was">${h(c.from_version)}</span> → ${h(c.to_version)}` : h(c.to_version || c.from_version || "—")}</td>
-      <td class="trans" data-label="Status">${status}</td>
+      <td data-label="Rule"><span class="rule-title">${h(titles[c.rule_id] || c.rule_id)}</span><code class="rule-id">${idBreak(c.rule_id)}</code><div class="cont">${h(changeWord(c, kind))}</div></td>
+      ${rules ? `<td class="ver" data-label="Version in force">${ver ? `<span class="was">${h(c.from_version)}</span> → ${h(c.to_version)}` : h(c.to_version || c.from_version || "—")}</td>` : ""}
+      <td class="trans" data-label="${rules ? "Status" : "Status, B → A"}">${status}</td>
       <td data-label="Now reads">${h(c.finding)}</td>
     </tr>`;
   }).join("");
   const sameVerdict = changes.length && changes.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
+  const cause = d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs");
+  const lead = rules
+    ? `Rules <b>${h(rev(d.previous_stamp))}</b> → <b>${h(rev(d.current_stamp))}</b> · ${h(cause)}.`
+    : `Same rules, ${h(rev(d.current_stamp))}; ${h(cause.replace(/^same rule files(, same site and option)?; /, ""))}.`;
   return `<section class="card section changes" id="changes">
-    <h2>${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}</h2>
-    <p class="stamps">Stamp <code>${h(d.previous_stamp)}</code> → <code>${h(d.current_stamp)}</code> · ${h(d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs"))}.</p>
+    <h2>${rules ? `${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}` : "What changed between the two options"}</h2>
+    <p class="stamps">${lead}</p>
     ${changes.length ? `${sameVerdict ? `<p class="same">Same verdict${changes.length === 1 ? "" : "s"}, new version${changes.length === 1 ? "" : "s"}: the memo names the version it used.</p>` : ""}
-    <table class="plain"><thead><tr><th>Rule</th><th>Version in force</th><th>Status</th><th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
+    <table class="plain"><thead><tr><th>Rule</th>${rules ? "<th>Version in force</th><th>Status</th>" : "<th>Status, B → A</th>"}<th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
     : `<p>No rule changed version or status between the two runs.</p>`}
   </section>`;
 }
 
 // ---------------------------------------------------------------- past runs: open, compare
 
-/* A past run, as a reader picks it: the date, the option, the start of the stamp, and the folder when it says more. */
+/* A past run, as a reader picks it: the date, then a named folder (as-approved, what-if-…) where there is one, the
+   option, the rules revision, and a timestamped folder last. A narrow picker still shows the first two. */
 function runLabel(r) {
   const option = r.option_name || r.option_id || "option";
-  return `${r.as_of} · ${option} · stamp ${String(r.stamp || "").slice(0, 8)}${r.folder && r.folder !== r.as_of ? ` · ${r.folder}` : ""}${r.revit ? " · Revit" : ""}`;
+  const named = r.folder && r.folder !== r.as_of && !/^\d{4}-\d\d-\d\d/.test(r.folder);
+  const stamped = r.folder && r.folder !== r.as_of && !named;
+  return `${r.as_of} · ${named ? `${r.folder} · ` : ""}${option} · ${rev(r.stamp)}${stamped ? ` · ${r.folder}` : ""}${r.revit ? " · Revit" : ""}`;
 }
 
 function fillRunSelects() {
   const open = $("#open-run"), cmp = $("#compare-run");
   const cur = state.run ? state.run.run_id : "";
-  open.innerHTML = `<option value="">${state.run ? "This run" : "Choose a run…"}</option>` +
+  // the open run is chosen in the list; a blank first entry only while no run, or one the list lacks, is on screen
+  const listed = state.runs.some(r => r.run_id === cur);
+  open.innerHTML = (listed ? "" : `<option value="">${state.run ? "This run" : "Choose a run…"}</option>`) +
     state.runs.map(r => `<option value="${h(r.run_id)}"${r.run_id === cur ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
   cmp.innerHTML = `<option value="">Nothing</option>` +
     state.runs.filter(r => r.run_id !== cur).map(r => `<option value="${h(r.run_id)}"${r.run_id === state.compareRun ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
@@ -1998,18 +2147,38 @@ async function openRun(runId) {
   setStatus(`Opening the run ${runId}…`, "busy");
   const run = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
   state.run = run;
+  noteRevisions([run]);
   // the date in the top bar is the date of the memo on screen, and so of the next run
   $("#as-of").value = run.as_of;
   showStamp(run.stamp);
   enableExports(run);
   await syncInputsTo(run);
-  if (state.compareRun && state.compareRun !== runId) await applyCompare(false);
+  // a run cannot be compared with itself; a run recorded against an earlier one opens compared with it, when the
+  // list can tell which run that was
+  const selfCompared = state.compareRun === runId;
+  if (selfCompared) state.compareRun = null;
+  if (!state.compareRun && run.diff) state.compareRun = recordedAgainst(run);
+  if (state.compareRun) await applyCompare(false);
   renderMemo(run);
   fillRunSelects();
   setCompareNote(run.diff);
   setStep(3);
   closeExportPanel();
-  setStatus(`Opened the run as of ${run.as_of} · stamp ${run.stamp} · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}${run.diff ? ` · against ${run.diff.previous_as_of}: ${changesPhrase(run.diff)}` : ""}`, "ok");
+  setStatus(`Opened the run as of ${run.as_of} (${rev(run.stamp)}) · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
+}
+
+/* The run a stored comparison (diff.json) was made against. The diff names only that run's date and rules stamp,
+   and several runs can share both, so: the runs with that date and stamp, narrowed to one option (this run's own
+   option first, as in a change of rules), then the named folder among them. Same option, date and rules give the
+   same memo, so any of them is the run compared. Ambiguous between options: none, and the note says so. */
+function recordedAgainst(run) {
+  const d = run.diff;
+  const hits = state.runs.filter(r => r.run_id !== run.run_id && r.as_of === d.previous_as_of && r.stamp === d.previous_stamp);
+  const own = run.ledger && run.ledger.run && run.ledger.run.option_id;
+  const options = [...new Set(hits.map(r => r.option_id))];
+  const pick = options.length === 1 ? hits : hits.filter(r => r.option_id === own);
+  if (!pick.length || new Set(pick.map(r => r.option_id)).size !== 1) return null;
+  return (pick.find(r => !/^\d{4}-\d\d-\d\d/.test(r.folder || "")) || pick[0]).run_id;
 }
 
 /* An opened run shows its own site and option in the inputs, unless the reader has unsaved edits there. */
@@ -2035,7 +2204,10 @@ async function applyCompare(render = true) {
     if (render) setStatus(state.compareRun ? `The next run will be compared with ${state.compareRun}.` : "No comparison.", "info");
     return;
   }
-  if (!state.compareRun || state.compareRun === run.run_id) {
+  // the same run on both sides is no comparison: clear it, so the picker and the memo agree, and say why
+  const selfCompared = state.compareRun === run.run_id;
+  if (selfCompared) state.compareRun = null;
+  if (!state.compareRun) {
     run.diff = null;
     run.compareLedger = null;
   } else {
@@ -2047,11 +2219,13 @@ async function applyCompare(render = true) {
   if (render) {
     renderMemo(run);
     if (run.diff) {
-      setStatus(`Compared the run as of ${run.diff.current_as_of} with ${run.diff.previous_as_of}: ${changesPhrase(run.diff)} · stamp ${run.diff.previous_stamp} → ${run.diff.current_stamp}`, "ok");
-      const box = $("#changes");
+      setStatus(`Compared ${compareSummary(run)}`, "ok");
+      const box = $("#side-by-side") || $("#changes");
       if (box) box.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     } else {
-      setStatus("Comparison cleared.", "info");
+      fillRunSelects();
+      setStatus(selfCompared ? "A and B were the same run, so the comparison was cleared; the run pickers are back above the memo."
+        : "Comparison cleared; the run pickers are back above the memo.", "info");
     }
   }
 }
@@ -2114,8 +2288,8 @@ async function checkRevit() {
   try {
     const r = await api(`/api/runs/${run.run_id}/ffm_revit_result.json`);
     if (r.stamp !== run.stamp) {
-      box.innerHTML = `<p class="err">A result exists in this folder but for stamp ${h(r.stamp)}, not this run's ${h(run.stamp)}. Run the script again on this folder.</p>`;
-      setStatus(`The Revit result in this folder is for stamp ${r.stamp}, not ${run.stamp}: run the script again on this folder.`, "error");
+      box.innerHTML = `<p class="err">A result exists in this folder but for rules ${h(rev(r.stamp))}, not this run's ${h(rev(run.stamp))}. Run the script again on this folder.</p>`;
+      setStatus(`The Revit result in this folder is for rules ${rev(r.stamp)}, not ${rev(run.stamp)}: run the script again on this folder.`, "error");
       return;
     }
     const refreshed = await postJSON(`/api/runs/${run.run_id}/memo`, {});   // memo gains its "Built in Revit" section
@@ -2157,21 +2331,21 @@ function revitResultHtml(r, run) {
 
 const TOUR = [
   { target: ".topbar-controls", title: "Rules as of",
-    text: "Pick the date the rules should be read on. The engine applies the versions in force that day and stamps the memo with them, so two memos can be told apart." },
+    text: "Pick the date the rules should be read on. The engine applies the versions in force that day, and the memo names that reading of the rules as a revision, R1, R2 and so on, so two memos can be told apart." },
   { target: "#step-site", title: "Step 1 · Site",
     text: "Choose a site file; the card sums it up in a line. Edit opens the form: district, lot, policy areas, trees, owner. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
   { target: "#step-option", title: "Step 2 · Option",
     text: "The building: storeys, floor area, the unit mix, tenure, the funders you aim at, and the rezoning path if there is one. Edit to change it; save it as a file to rerun the same thing from the command line." },
   { target: "#run-btn", title: "Run the rules", action: "run",
-    text: "One click, or Ctrl+Enter. In under a second the engine writes a stamped memo to the outputs folder and reads it here." },
+    text: "One click, or Ctrl+Enter. In under a second the engine writes the memo to the outputs folder and reads it here." },
   { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers",
     text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from." },
   { target: ".figures", fallback: "#memo", title: "The massing",
     text: "Plan and section drawn from the same numbers as the memo, with the staff benchmark. When the Revit script has run on this folder, the sheet it built appears as a third figure." },
   { target: ".ledger", fallback: "#memo", title: "The full ledger",
     text: "Every rule the engine ran, by layer, collapsed until you open it: status, finding, numbers used and the source link." },
-  { target: ".memo-tools", title: "Past runs",
-    text: "Open an earlier run, or compare two. The change lands under the title block with a revision mark: the rule, its old and new version, and the new stamp." },
+  { target: ".memo-tools:not([hidden]), #side-by-side .pick-row", title: "Past runs",
+    text: "Open an earlier run, or compare two. The two runs then sit side by side under the title block, these pickers heading their columns, and What changed follows with a revision mark: the rule, its old and new version, and the new rules revision." },
   { target: "#step-export", title: "Step 4 · Export",
     text: "Download the memo as HTML or Markdown, print it, take the massing file, or open Export to Revit for the two lines that build the sheet." },
 ];
@@ -2394,7 +2568,6 @@ async function copyText(text) {
 async function init() {
   $("#as-of").value = todayISO();
   $("#run-btn").addEventListener("click", runRules);
-  $("#copy-stamp").addEventListener("click", () => copyText($("#stamp-text").textContent));
   $("#print-btn").addEventListener("click", () => window.print());
   $("#save-site").addEventListener("click", () => saveAs("site"));
   $("#save-option").addEventListener("click", () => saveAs("option"));
@@ -2435,7 +2608,7 @@ async function init() {
     if (!panel.hidden) { closeExportPanel(); return; }
     renderExportPanel(state.run);
     setStep(4);
-    setStatus(`Export to Revit: the two lines that build sheet FFM-01 for stamp ${state.run.stamp}.`, "info");
+    setStatus(`Export to Revit: the two lines that build sheet FFM-01 for this memo (rules ${rev(state.run.stamp)}).`, "info");
     panel.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   });
   // printing opens every ledger layer, and closes the ones it opened afterwards
@@ -2453,6 +2626,7 @@ async function init() {
   try {
     state.rules = await api(`/api/rules?as_of=${$("#as-of").value}`);
     await loadSites();
+    await loadRevisions();
     const first = state.sites.some(s => s.id === PRELOAD_SITE) ? PRELOAD_SITE : (state.sites[0] ? state.sites[0].id : "__new__");
     state.optionId = PRELOAD_OPTION;
     $("#site-select").value = first;

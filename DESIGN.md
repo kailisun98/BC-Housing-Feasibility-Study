@@ -30,6 +30,8 @@ colors:
   paper: "#FFFFFF"
   envelope-blue: "#3C8CDC"
   street-grey: "#8E8E8E"
+  street-text: "#63635F"
+  bench-text: "#8F5A0E"
   lane-grey: "#BDBDBD"
   draw-ink: "#1F2933"
   draw-muted: "#5F6672"
@@ -52,6 +54,10 @@ colors:
   night-red: "#E0554F"
   night-ok: "#4CAE6D"
   night-warn: "#E0B43A"
+  band: "#E7EEF5"
+  band-line: "#D3DCE6"
+  band-group: "#DBE4EE"
+  night-band: "#191F26"
 typography:
   title:
     fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
@@ -100,11 +106,11 @@ typography:
     fontSize: "11px"
     fontWeight: 400
     lineHeight: 1.5
-  stamp:
-    fontFamily: "IBM Plex Mono, SF Mono, Menlo, Consolas, monospace"
-    fontSize: "11.5px"
+  revision:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "12.5px"
     fontWeight: 600
-    letterSpacing: "0.08em"
+    lineHeight: 1.25
 rounded:
   mark: "2px"
   control: "4px"
@@ -188,7 +194,7 @@ components:
 
 The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise
 massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the
-talking; IBM Plex Mono is reserved for what a machine wrote down, stamps, rule ids, hashes, paths
+talking; IBM Plex Mono is reserved for what a machine wrote down, rule ids, fingerprints, paths
 and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by
 a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that
 lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good
@@ -207,10 +213,11 @@ no icon-and-heading cards as page structure) and not a startup landing page (no 
 hero numbers, floating shadows or marketing voice).
 
 The home page in front of the tool speaks the same language. It is read rather than operated, so its
-running prose sits at a reading size while everything else keeps the tool's density, and its figures
-are HTML drawn with the drawing set's own devices (stage cells, a table of layers, a three-step flow, a
-memo row with its notes, a sheet issued for review to close on) rather than pictures of them. When
-something changes between two readings of the rules, it is marked the way a drawing marks a revision.
+running prose sits at a reading size while everything else keeps the tool's density, and it is kept
+quiet: headings, short paragraphs, one table and one sheet of white paper (a row of the memo) below a
+capture of the memo itself; the stages and the steps sit on the page under hairlines, without boxes.
+When something changes between two readings of the rules, it is marked the way a drawing marks a
+revision.
 
 **Key Characteristics:**
 - One sans at 13px with 11px uppercase keys; mono only for machine-written text.
@@ -254,6 +261,9 @@ The drawings' tones, fixed in both themes because the paper is always white:
 - **Paper** (`{colors.paper}`): the figure card and the Revit sheet image.
 - **Envelope Blue** (`{colors.envelope-blue}`): the proposed mass at 50% fill, line Blue.
 - **Lane Grey** (`{colors.lane-grey}`): the outright mass, line **Street Grey** (`{colors.street-grey}`).
+- **Street Text** (`{colors.street-text}`) and **Bench Text** (`{colors.bench-text}`): words drawn in
+  those families, the street names and the benchmark's label, dark enough for 4.5:1 on the paper;
+  the lines themselves keep Street Grey and Amber.
 - **Draw Ink** (`{colors.draw-ink}`) and **Draw Muted** (`{colors.draw-muted}`): the lot line,
   labels, dimension strings, the scale bar, the north arrow and captions; **Draw Note**
   (`{colors.draw-note}`): a caveat under a figure.
@@ -272,6 +282,13 @@ The drawings' tones, fixed in both themes because the paper is always white:
 - **Line** (`{colors.line}`): every border and table rule.
 - **Group** (`{colors.group}`): secondary buttons, the active step, badges, the not-applicable wash.
 - **Muted** (`{colors.muted}`): labels, keys, captions, the continuation of a finding.
+- **Band** (`{colors.band}`): the home page only. Every other section sits on this slate, the page's
+  own hue one shade deeper (oklch 0.945 0.012 252), run the window's width so the page reads as
+  segments; inside a band, **Band Line** (`{colors.band-line}`) and **Band Group**
+  (`{colors.band-group}`) stand in for Line and Group, and white paper keeps its own cool rules. At
+  night the band is `{colors.night-band}`, between the night page and panel. A warm beige was tried
+  first and dropped: at hue 86 it sat on Amber's own hue, so it read as pending and dulled the amber
+  marks on it; on slate, amber stays the page's one warm note.
 - The night set, **Night Ink** to **Night Warn**: the same roles at night; page `{colors.night-page}`,
   panel `{colors.night-panel}`, line `{colors.night-line}`, field `{colors.night-field}`, group
   `{colors.night-group}`.
@@ -291,7 +308,8 @@ night colours otherwise).
 
 **The Revision Rule.** When two readings of the rules are compared, what changed carries a delta
 with its letter (A) and the comparison's answer sits right under the title block, before the three
-answers. Nothing else uses the delta.
+answers. Two options read under the same rules are compared without it: their difference is in the
+numbers, not the rules. Nothing else uses the delta.
 
 ## Typography
 
@@ -316,10 +334,11 @@ is a verdict sentence at 18px weight 600 with its operative words in the status 
 - **Table** (11.5px): the ledger's rows; 12px in the answer cards' tables.
 - **Mono** (400, 11px): rule ids, numbers used, hashes, paths, the shell lines; the engine chip at
   11px 500 uppercase. Nothing on either page is set below 11px.
-- **Reading** (400, 14px, 1.6, a 66-character measure): the home page's running prose only: the
-  lede, the section paragraphs, the close's paragraph. Its headline is 22px 600 (20px on a phone)
+- **Reading** (400, 14px, 1.6, a measure of 52ch, about 68 characters of Plex Sans): the home page's running prose only: the
+  lede, the section paragraphs, the three steps, the close's paragraph. Its headline is 22px 600 (20px on a phone)
   and its section headings 18px; its cards, figures and labels stay at the sizes above.
-- **Stamp** (600, 11.5px mono, 0.08em, uppercase): the version stamp inside a double rule.
+- **Revision** (600, 12.5px sans): the rules revision, R1, R2…, in a 1px Ink box in the top bar and
+  in bold in the title block.
 - **Drawing labels** (IBM Plex Sans, 11.5px on screen): the figures are drawn in metres and scale
   with their card, so their labels are refitted to 11.5px whatever the card's width; context labels
   run at 0.9 of that, tree ids at 0.85, and labels over the half tone carry a thin paper halo.
@@ -332,7 +351,7 @@ Hierarchy inside a paragraph comes from colour, not weight.
 a column, a figure or a title-block field, and nothing else. It never sits above a heading as a
 kicker: a heading speaks for itself.
 
-**The Machine Mono Rule.** Mono is for text a machine produced or will consume: stamps, ids,
+**The Machine Mono Rule.** Mono is for text a machine produced or will consume: fingerprints, ids,
 hashes, paths, shell lines, the as-of date. Human sentences are never set in mono.
 
 ## Layout
@@ -351,12 +370,17 @@ and the figures sit side by side, the figures in a 460px column, and the ledger 
 the full width beneath.
 
 The home page is one 1280px column with a 20px gutter (16px on a phone); its top bar's contents
-line up with that column at any width, and its four anchors mark the section the reader is in. The
-first viewport is the headline, lede and two ways in beside a capture of the memo itself. Then four
-sections, 64px apart (48px on a phone), each a heading, a short paragraph at the reading size and one
-drawing sheet that carries its material: where the memo sits, how it works, what the memo answers
-(three neutral cards, then one memo row), and the issued sheet. Cards and steps sit three across
-down to 860px and stack below it; the stages wrap to three across at 1080px and run down a phone.
+line up with that column at any width, and its four anchors mark the section the reader is in. On a
+phone the bar stops sticking and the anchors take a second row. The first viewport is the headline,
+lede and two ways in (the primary button and a plain link, the engine's download noted under them)
+beside a capture of the memo itself, with the memo's three findings set in type under the picture,
+in the memo's own pills. Then four sections, each 56px top and bottom (44px on a phone), each a
+heading and a short paragraph at the reading size: the problem (five stages on a hairline, then the
+rule layers as a table), how it works (three steps), one row of the memo on white paper, and the real
+case with its three ways in (one button, two links). The sections alternate between the page grey and
+a slate Band across the window's width (the problem and the memo row sit on the band), so each
+reads as its own segment; the footer follows under a hairline. The steps sit three across down to
+860px and stack below it; the stages run down the page below 640px.
 
 Rhythm is a 4px scale: 4, 6, 8, 12, 14, 16, 20. Panels carry 12px by 14px of padding and sit 12px
 apart. Forms are a single column with 8px between fields and 6px within a group; groups are
@@ -382,7 +406,7 @@ Only something that is actually above the page casts more.
 
 ## Shapes
 
-Small and consistent: marks and the stamp box 2px, fields and small controls 4px, buttons 5px,
+Small and consistent: marks 2px, the revision box 3px, fields and small controls 4px, buttons 5px,
 panels 6px, the tour card and spotlight 8px, pills 10px, badges and status marks fully round.
 Borders are 1px Line everywhere; the three-state control is one 4px box whose chosen segment fills
 Ink (Amber for "Not sure"). The uncertain pill alone has a dashed amber border. Figures are drawn
@@ -396,11 +420,12 @@ Dark and plain; they say what they do.
 - **Shape:** 5px radius, 30px minimum height, 13px weight 500, 6px by 12px padding; small variant
   26px high at 12px.
 - **Primary:** Ink fill, Panel text. One per screen: Run the rules; the walkthrough's Next and
-  Take the walkthrough; on the home page, Open the tool and the issued sheet's Run the case.
-- **Secondary:** Group fill, Ink text; Download memo (HTML), Print, Check Revit result.
+  Take the walkthrough; on the home page, the two "Run the real case with a walkthrough" buttons,
+  each with its alternatives as plain links beside it.
+- **Secondary:** Group fill, Ink text; Download memo (HTML), Print, Check Revit result, and the home
+  page's top-bar Open the tool, so the hero's button is the page's one dark one.
 - **Quiet:** transparent with a Line border; Save as…, Edit / Done, Copy, Back, Not now, the other
-  downloads, Export to Revit, Hide inputs, Open all layers, the home page's Watch a rule change and
-  Read the memo.
+  downloads, Export to Revit, Hide inputs, Open all layers.
 - **Hover:** primary mixes 24% Panel into Ink and casts the hover shadow; secondary deepens 18%
   toward Ink with a darker border. **Press:** translateY(1px), shadow off. Disabled sits at 45%
   opacity; a disabled download link has no href, so it is out of the tab order too. On a coarse
@@ -448,20 +473,55 @@ here, including opening a past run, a comparison and reading the Revit result; t
   ends the bar.
 - **Top bar:** the wordmark (a link back to the home page) and subtitle, then the as-of date in a
   mono field (the date of the memo on screen, and of the next run), the primary button (Ctrl+Enter),
-  the engine chip, and the version stamp as a mono uppercase double-rule stamp with a Copy button.
+  the engine chip, and the memo's rules revision: a "Rules" key and R1, R2… in a small 1px Ink box.
   A skip link to the memo comes first in the tab order.
 
 ### Title block
 The memo's header: an 18px title over a row of cells, each a Key over a 12.5px value, keys aligned
-to the top, separated by 1px lines, under a 2px Ink rule; the stamp cell carries the mono stamp and
-the engine version. A comparison adds a Revision cell: the delta, the earlier date and its stamp.
+to the top, separated by 1px lines, under a 2px Ink rule; the Rules revision cell carries R1, R2… in
+bold and the engine version. A comparison adds a cell: Revised from (the delta, the earlier revision
+and its date)
+when the rules moved, Compared with (the other option's name and date) when two options were read
+under the same rules.
+
+### Rules revision
+A memo's stamp (a hash of the rule files and the versions in force on its as-of date) is shown to the
+reader as a revision of the rules: R1, R2 and so on, the distinct stamps on file across every site,
+numbered by the earliest date each was read on (ties by the stamp, so every machine numbers them
+alike). The top bar, the title block, the comparison, the run pickers, the status strip and the print
+footer say the R-number; the hash appears once, as the fingerprint in the Rules revision card at the
+foot of the memo, and in the Revit elements' Comments. The downloadable memo files are written by the
+engine and still print the stamp.
+
+### Side by side
+A comparison opens with it, directly under the title block.
+- **Pickers:** the two run pickers ("Open a past run" and "Compare with…", above the memo otherwise)
+  move into a row laid on its A and B columns, their keys renamed "A · This run" and "B · Compared";
+  a hidden phrase keeps what each does in its accessible name. A picker that had focus keeps it as
+  the memo is redrawn, wherever the picker lands. On a phone the two stack across the card. In print
+  and when presenting the pickers hide and each option's name stands in their place.
+- **Lead:** one sentence: for two options, what they trade (units, storeys, height, floor area, A
+  against B) and the shared revision; for two readings of the rules, the two dates and revisions.
+- **Answers:** the four answers for each run as pills, open items included; under them, behind a
+  disclosure, each run's open items with the person who resolves them.
+- **Rules:** "n of 14 rules read differently" over a table of only those rules, each status with
+  what that option proposed under it; the rules that read the same wait behind a disclosure. No row
+  band and no ≠: the table holds only differences.
+- The answer cards below carry no A | B strip; this card is the comparison's one place.
+- Choosing the same run for A and B clears the comparison, and the status strip says why. A run
+  recorded against an earlier one opens compared with it, when the run list can tell which run that
+  was (same date, rules revision and option); otherwise the note beside the pickers says what it was recorded
+  against.
 
 ### What changed
-A comparison's answer, directly under the title block: a 14px heading with the delta, the two
-stamps and why they differ (the rule files, the as-of date, the site's or the option's inputs, read
-from the two ledgers), "Same verdict, new version" when only the version moved, and a table of Rule, Version in
-force (old struck through, then new), Status and Now reads. Changed rows in the ledger carry the
-delta and their layer opens. On a phone the table stacks, each value under its column's name.
+Under the Side by side card. When the rules moved: a 14px heading with the delta, the two revisions (R1 → R2) and
+why they differ (the rule files, the as-of date, the site's or the option's inputs, read from the two
+ledgers), "Same verdict, new version" when only the version moved, and a table of Rule, Version in
+force (old struck through, then new), Status and Now reads; changed rows in the clauses and the
+ledger carry the delta and their layer opens. Between two options: "What changed between the two
+options", "Same rules, R1", no version column, the status read B → A, and "numbers changed"
+where the engine says a finding was reworded. Rows are named by the rule's title over its id. On a
+phone the table stacks, each value under its column's name.
 
 ### Answer cards
 The signature component. A badge-numbered 14px heading, the verdict at 18px 600 with the operative
@@ -481,29 +541,29 @@ carrying the numbers; a caveat under a figure is set in Draw Note. A drawing is 
 on screen. The plan and the section draw the outright mass as a heavy dashed outline over the
 proposed fill (and the legend's swatch says so); the plan adds dimension strings with ticks along
 the frontage and the depth, a scale bar in two halves, a north arrow only where the site's
-OpenStreetMap frame gives the bearing, and always names the address street, beside the lot. The axonometric leads its
+OpenStreetMap frame gives the bearing, and always names the address street, beside the lot, its
+street names in Street Text. The section's height labels (benchmark in Bench Text, proposed, outright)
+sit at their heights and are pushed apart where two would overprint, a thin leader joining a moved
+label to its line; its note under the ground line starts at the lot's edge. The axonometric leads its
 height labels off the masses on leader lines, turns under a sideways drag (vertical swipes still
 scroll a phone) and under the arrow keys. FIG 03 is the Revit sheet image.
 
-### Drawing sheets (home page)
-White paper, 1px Line, 6px corners, the one-pixel shadow, 16px of padding, and a figure block along
-the foot (a 2px Draw Ink rule, a Key "Fig n · name", then a sentence). The figures are HTML, never
-SVG text, so they reflow and keep the page's type sizes:
-- **Where the memo sits (Fig 1):** five stage cells in a row with arrows between, numbered with
-  outlined badges on the half-tone parcel fill; the memo's stage is filled Draw Ink. Under them the
-  five rule layers as a table (layer key, what it covers; who usually reads it; when), closed by a
-  2px rule and the sentence that ties all five to day one. On a phone the stages run down the page
-  and the table stacks, each value after its column's name.
-- **How it works (Fig 2):** three steps side by side with arrows, each a badge-numbered 14px
-  heading over its material (outlined boxes, the five layers as half-tone rows, a miniature memo with
-  its title rule), and a dashed rule before the loop back ("change a number, run again").
-- **One row of the memo (Fig 3):** the row's five columns in an outlined box, a Key, the value and,
-  under it, a note on a 1px Draw Ink leader; the rows line up across the columns (CSS subgrid). When
-  narrow each column becomes a key beside its value and note. A "Who resolves it" band follows on the
-  conditional wash.
-- **The issued sheet:** the page's close. A heading and paragraph, the three actions as title-block
-  cells (Run, Compare, Read) each with its button and a sentence, and a title block of Site, Rules and
-  Status.
+### Home page devices
+HTML, never pictures of it, so everything reflows and keeps the page's type sizes. Only the memo row
+sits on paper; the rest sits on the page.
+- **Stages:** five on one Line hairline, each a 9px dot over its name and, where it has one, a 12px
+  Muted note; the memo's stage has the filled Ink dot and the note "the memo reads layers A to E",
+  tying it to the table's layer keys. Below 640px they run down a vertical hairline.
+- **Rule layers:** a table on the page (layer key, what it covers; who usually reads it; when) with
+  Key column heads and 1px Line rows. On a phone it stacks, each value after its column's name.
+- **Steps:** three columns, each under a 1px Line rule, a badge-numbered 14px heading over a
+  paragraph at the reading size; the third lists the memo's three questions, each in Ink with its
+  qualifier in Muted, then a 13px Muted sentence on the massing and the Revit sheet.
+- **Findings under the hero:** the as-approved memo's three answers as a small definition list,
+  each question a 12.5px key beside its answer in the memo's pills; one column on a narrow phone.
+- **One row of the memo:** white paper (1px Line, 6px corners, the one-pixel shadow, 16px by 18px of
+  padding) holding the row's five columns, each a Key over a 1px Line and its value; when narrow each
+  column becomes a key beside its value. A "Who resolves it" band follows on the conditional wash.
 
 ### Engine chip
 A fully round mono label at 11px that reads loading (amber, with a spinner), ready (green) or
@@ -517,9 +577,9 @@ returns focus to where it was.
 
 ### Print
 The memo prints alone, light whatever the theme, every ledger layer open, the figures without their
-switches, and a footer on every page with the address, the as-of date, the stamp and the page
-number. The home page prints light, its figures unbroken, with the tool's address in place of the
-buttons.
+switches, and a footer on every page with the address, the as-of date, the rules revision and the page
+number. The home page prints light, its memo row and steps unbroken, with the tool's address in place
+of the buttons.
 
 ## Do's and Don'ts
 
@@ -531,6 +591,8 @@ buttons.
 - **Do** keep panels at 6px radius, 12px by 14px padding, 1px Line and the one-pixel shadow, 12px apart.
 - **Do** keep the drawings on white paper in both themes with Lotwise's drawing tones.
 - **Do** mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.
+- **Do** name a reading of the rules by its revision, R1, R2…, and keep the stamp's hash to the Rules revision card.
+- **Do** alternate the home page's sections between the page grey and the slate Band, edge to edge.
 - **Do** reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card.
 - **Do** draw explanatory figures in HTML, not SVG text, so they reflow on a phone and read at the page's own sizes.
 
@@ -538,6 +600,7 @@ buttons.
 - **Don't** build a dashboard: no gauges, KPI tiles, sparklines, or icon-plus-heading cards as structure.
 - **Don't** reach for a landing page's kit: no gradients, glass, hero numbers, floating shadows, marketing voice.
 - **Don't** bring back a serif, a 16px body, or large display type; the memo reads at drafting density, and the home page's prose stops at 14px.
+- **Don't** box what can sit on the page: the home page keeps one sheet of paper below the hero, one primary button per action group, and lets hairlines and space do the rest.
 - **Don't** put a status colour on a button, a heading or a background that carries no status.
 - **Don't** add a toast, a second accent, or a shadow deeper than one pixel on anything at rest.
 - **Don't** use "N/A", a colour without its word, or a checkbox where "not sure" is a legitimate answer.

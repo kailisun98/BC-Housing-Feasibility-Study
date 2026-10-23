@@ -20,10 +20,10 @@
   <nav class="topnav" aria-label="On this page">
     <a href="#why">The problem</a>
     <a href="#how">How it works</a>
-    <a href="#memo">The memo</a>
+    <a href="#memo">A memo row</a>
     <a href="#try">Try it</a>
   </nav>
-  <a class="btn btn-primary btn-small" href="app.html">Open the tool</a>
+  <a class="btn btn-small" href="app.html">Open the tool</a>
 </header>
 
 <main id="main">
@@ -33,193 +33,132 @@
     <h1 id="hero-h">Will this housing scheme be allowed, and will a funder back it?</h1>
     <p class="lede">Funding-Fit Memo checks a site and a building option against Vancouver's zoning, the Province's rules, City policy, design standards and the funding programs, all at once, before the first drawing. It writes a short memo with three answers and shows every rule it used.</p>
     <p class="hero-actions">
-      <a class="btn btn-primary" href="app.html?tour=1">Open the tool with a walkthrough</a>
-      <a class="btn btn-quiet" href="app.html?run=998-e-19th-ave/what-if-funder-ready&amp;compare=998-e-19th-ave/as-approved">See two options compared</a>
+      <a class="btn btn-primary" href="app.html?tour=1">Run the real case with a walkthrough</a>
+      <a class="text-link" href="app.html?run=998-e-19th-ave/what-if-funder-ready&amp;compare=998-e-19th-ave/as-approved">See two options compared</a>
     </p>
+    <p class="hero-note">On the web the engine loads into your browser once (about 10 MB); nothing is uploaded.</p>
   </div>
   <figure class="hero-shot">
     <!-- hero-memo.jpg: captured from the tool itself, app.html?run=998-e-19th-ave/as-approved with the inputs hidden,
-         a 1600 px window at 1x, from the memo's title down (1580 x 1027, JPEG q80, about 260 KB; the hero shows it
-         at 700 px or less); recaptured 23 Oct 2026 by the Impeccable session's capture script -->
-    <a href="app.html?run=998-e-19th-ave/as-approved"><img src="hero-memo.jpg" alt="The memo for 998 E 19th Ave: a title block with the option, proponent, date and stamp; three answer cards reading Not outright, by rezoning yes with conditions; Not yet confirmed; and four open items each with a named person; beside them the site plan with its streets and neighbours and the section across the frontage." width="1580" height="1027" fetchpriority="high"></a>
-    <figcaption>The memo for 998 E 19th Ave, Vancouver, as the tool writes it. <a href="app.html?run=998-e-19th-ave/as-approved">Open it in the tool</a>.</figcaption>
+         a 1600 px window at 1x, from the memo's title down (1580 x 1027, JPEG q80, about 260 KB); hero-memo-790.jpg is
+         the same capture at half size for phones. Recaptured 23 Oct 2026, after the stamps became rules revisions
+         (R1), by the Impeccable session's capture script -->
+    <a href="app.html?run=998-e-19th-ave/as-approved"><img src="hero-memo.jpg" srcset="hero-memo-790.jpg 790w, hero-memo.jpg 1580w" sizes="(max-width: 1080px) calc(100vw - 32px), 700px" alt="Open this memo in the tool: the memo for 998 E 19th Ave with its title block, three answer cards, site plan and section." width="1580" height="1027" fetchpriority="high"></a>
+    <!-- the picture's findings, set in type so they can be read and quoted; they are the as-approved run's answers -->
+    <figcaption>
+      <p class="found-title">What the memo found for 998 E 19th Ave, as approved by Council:</p>
+      <dl class="found">
+        <div><dt>Is it allowed?</dt><dd><span class="pill pill-fail">No</span> outright; <span class="pill pill-conditional">Yes, with conditions</span> by rezoning</dd></div>
+        <div><dt>Does it fit the funders?</dt><dd><span class="pill pill-uncertain">Not yet confirmed</span></dd></div>
+        <div><dt>What is still unsure?</dt><dd>4 open items, each with a named person</dd></div>
+      </dl>
+    </figcaption>
   </figure>
 </section>
 
 <!-- ------------------------------------------------------------ the problem -->
-<section class="section wrap" id="why" aria-labelledby="why-h">
-  <div class="section-intro">
-    <h2 id="why-h">The problem: the rules are read late, by different people.</h2>
-    <p>A board votes pre-development money, often $200,000 to $500,000, on a feasibility read that cites nothing and carries no date.</p>
-    <p>The rules it rests on sit in five layers, each read by someone else at a later stage, so the first drawing usually comes before the first rule check. The memo is that check, done on day one and dated.</p>
-  </div>
+<section class="section wrap band" id="why" aria-labelledby="why-h">
+  <h2 id="why-h">The problem: the rules are read late, by different people.</h2>
+  <p class="intro">A board votes pre-development money, often $200,000 to $500,000, on a feasibility read that cites nothing and carries no date. The rules it rests on sit in five layers, each read by someone else at a later stage. The memo reads all five on day one, and dates what it read.</p>
 
-  <figure class="sheet diagram" aria-labelledby="why-fig">
-    <ol class="stages" aria-label="Five stages, from site to construction">
-      <li><span class="badge">1</span><b>Site</b></li>
-      <li class="is-memo"><span class="badge">2</span><b>Feasibility</b><span>the memo, dated and cited</span></li>
-      <li class="is-money"><span class="badge">3</span><b>Pre-development</b><span class="money">$200,000 to $500,000 is voted here</span></li>
-      <li><span class="badge">4</span><b>Funding and approvals</b></li>
-      <li><span class="badge">5</span><b>Design and build</b></li>
-    </ol>
-    <div class="table-wrap">
-      <table class="layers">
-        <thead><tr><th scope="col">The rules, in five layers</th><th scope="col">Usually read by</th><th scope="col">Usually read when</th></tr></thead>
-        <tbody>
-          <tr><th scope="row"><span class="layer-key">A</span><span>Zoning district: density, height, the rezoning path</span></th><td data-label="Usually read by">City planning staff</td><td data-label="Usually read when">at pre-application</td></tr>
-          <tr><th scope="row"><span class="layer-key">B</span><span>Province: small-scale minimums, transit-oriented areas</span></th><td data-label="Usually read by">The architect, if someone asks</td><td data-label="Usually read when">during design</td></tr>
-          <tr><th scope="row"><span class="layer-key">C</span><span>City policy: family units, social housing, trees, levies</span></th><td data-label="Usually read by">Planners and an arborist</td><td data-label="Usually read when">once a site plan exists</td></tr>
-          <tr><th scope="row"><span class="layer-key">D</span><span>Design standards: unit areas, the code basis</span></th><td data-label="Usually read by">The architect</td><td data-label="Usually read when">during design</td></tr>
-          <tr><th scope="row"><span class="layer-key">E</span><span>Funders: Community Housing Fund, BC Builds, CMHC</span></th><td data-label="Usually read by">The development manager</td><td data-label="Usually read when">when a call opens</td></tr>
-        </tbody>
-        <tfoot><tr><td colspan="3"><b>All five, read on day one at stage 2:</b> 17 rules from 13 public sources, each dated.</td></tr></tfoot>
-      </table>
-    </div>
-    <figcaption class="fig-block" id="why-fig"><span>Fig 1 · Where the memo sits</span><span>The memo is stage two; without it the same rules arrive one at a time, weeks into design.</span></figcaption>
-  </figure>
+  <ol class="stages" aria-label="Five stages, from site to construction">
+    <li>Site</li>
+    <li class="is-memo"><b>Feasibility</b> <span>the memo reads layers A to E</span></li>
+    <li>Pre-development <span>$200,000 to $500,000 voted</span></li>
+    <li>Funding and approvals</li>
+    <li>Design and build</li>
+  </ol>
+
+  <div class="table-wrap">
+    <table class="layers">
+      <caption class="sr-only">The five layers of rules, who usually reads each, and when</caption>
+      <thead><tr><th scope="col">The rules, in five layers</th><th scope="col">Usually read by</th><th scope="col">Usually read when</th></tr></thead>
+      <tbody>
+        <tr><th scope="row"><span class="layer-key">A</span>Zoning district: density, height, the rezoning path</th><td data-label="Read by">City planning staff</td><td data-label="When">at pre-application</td></tr>
+        <tr><th scope="row"><span class="layer-key">B</span>Province: small-scale minimums, transit-oriented areas</th><td data-label="Read by">The architect, if someone asks</td><td data-label="When">during design</td></tr>
+        <tr><th scope="row"><span class="layer-key">C</span>City policy: family units, social housing, trees, levies</th><td data-label="Read by">Planners and an arborist</td><td data-label="When">once a site plan exists</td></tr>
+        <tr><th scope="row"><span class="layer-key">D</span>Design standards: unit areas, the code basis</th><td data-label="Read by">The architect</td><td data-label="When">during design</td></tr>
+        <tr><th scope="row"><span class="layer-key">E</span>Funders: Community Housing Fund, BC Builds, CMHC</th><td data-label="Read by">The development manager</td><td data-label="When">when a call opens</td></tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <!-- ------------------------------------------------------------ how it works -->
 <section class="section wrap" id="how" aria-labelledby="how-h">
-  <div class="section-intro">
-    <h2 id="how-h">How it works: three steps.</h2>
-    <p>Give it a site and an option, run the rules, read the memo. Same inputs and the same rules always give the same memo.</p>
-  </div>
-
-  <figure class="sheet diagram" aria-labelledby="how-fig">
-    <ol class="flow">
-      <li class="flow-step">
-        <h3><span class="badge">1</span> You give it</h3>
-        <div class="box"><b>A site</b><span>address, zoning, lot size, trees, owner</span></div>
-        <div class="box"><b>An option</b><span>storeys, floor area, units, rents, funders</span><span class="pending">"Not sure" is an honest answer</span></div>
-        <p>Choose an example site or type in your own; each field has an (i) that says what it is for and which rule reads it. A blank comes back as "uncertain", never as a guess.</p>
-      </li>
-      <li class="flow-step">
-        <h3><span class="badge">2</span> Run the rules</h3>
-        <ul class="layer-list" aria-label="The five layers">
-          <li><span class="layer-key">A</span>Zoning district</li>
-          <li><span class="layer-key">B</span>Province</li>
-          <li><span class="layer-key">C</span>City policy</li>
-          <li><span class="layer-key">D</span>Design standards</li>
-          <li><span class="layer-key">E</span>Funders</li>
-        </ul>
-        <p>Each rule is dated and cited; the versions in force make the stamp, <code class="stamp">20e44f1445ecaff9</code>.</p>
-        <p>Press <b>Run the rules</b>; the memo appears beside the form.</p>
-      </li>
-      <li class="flow-step">
-        <h3><span class="badge">3</span> Read the memo</h3>
-        <div class="mini-memo">
-          <p class="mini-title"><span>998 E 19th Ave</span><span class="mono">stamp 20e44f14</span></p>
-          <ol>
-            <li>Is it allowed?</li>
-            <li>Does it fit the funders?</li>
-            <li>What is still unsure, and who resolves it?</li>
-          </ol>
-          <p class="mini-more">then the drawings, the clauses applied, the full ledger and the inputs as read</p>
-        </div>
-      </li>
-    </ol>
-    <p class="loop"><b>Change a number, run again,</b> and compare the two runs side by side.</p>
-    <figcaption class="fig-block" id="how-fig"><span>Fig 2 · The steps</span><span>The stamp names the rule versions the memo read.</span></figcaption>
-  </figure>
+  <h2 id="how-h">How it works.</h2>
+  <ol class="steps">
+    <li>
+      <h3><span class="badge">1</span> Give it a site and an option</h3>
+      <p>The site: address, zoning, lot size, trees, owner. The option: storeys, floor area, units, rents, funders. "Not sure" is an honest answer: a blank comes back as uncertain, never as a guess.</p>
+    </li>
+    <li>
+      <h3><span class="badge">2</span> Run the rules</h3>
+      <p>As of 23 Oct 2026, 17 dated, cited rules from 13 public sources, in the five layers above. The versions in force on the day form a revision of the rules, R1, R2 and so on, and the same inputs under the same revision always give the same memo.</p>
+    </li>
+    <li>
+      <h3><span class="badge">3</span> Read the memo</h3>
+      <ol class="questions">
+        <li><b>Is it allowed?</b> Outright, or by rezoning.</li>
+        <li><b>Does it fit the funders?</b> Yes, no, or what is missing.</li>
+        <li><b>What is still unsure?</b> Each open item, with a named person.</li>
+      </ol>
+      <p class="also">Beside the answers it draws the massing the rules allow, in plan, section and 3D, and a pyRevit script rebuilds it in Revit on an annotated sheet.</p>
+    </li>
+  </ol>
+  <p class="aside">Change a number and run again to compare the two runs side by side.</p>
 </section>
 
-<!-- ------------------------------------------------------------ the memo -->
-<section class="section wrap" id="memo" aria-labelledby="memo-h">
-  <div class="section-intro">
-    <h2 id="memo-h">What the memo answers.</h2>
-    <p>Three questions, in order, each answered with a status word. Every finding shows the clause it comes from and the numbers it used.</p>
-  </div>
-  <div class="answers">
-    <article class="answer">
-      <h3><span class="badge">1</span> Is it allowed?</h3>
-      <p class="verdict">Outright, or <em>by rezoning</em>.</p>
-      <p>Density and height against the district schedule, the rezoning policy that applies, the Province's transit rules, the family-unit and tree by-laws.</p>
-    </article>
-    <article class="answer">
-      <h3><span class="badge">2</span> Does it fit the funders?</h3>
-      <p class="verdict"><em>Yes</em>, no, or what is missing.</p>
-      <p>The Community Housing Fund, BC Builds and the others, against their published criteria: proponent, rent mix, accessible units, site control, lease.</p>
-    </article>
-    <article class="answer">
-      <h3><span class="badge">3</span> What is still unsure?</h3>
-      <p class="verdict">Each open item, <em>with a named person</em>.</p>
-      <p>The architect, the development manager or the planner, and the document they need to check.</p>
-    </article>
-  </div>
+<!-- ------------------------------------------------------------ one row of the memo -->
+<section class="section wrap band" id="memo" aria-labelledby="memo-h">
+  <h2 id="memo-h">Every finding shows its working.</h2>
+  <p class="intro">One row of the memo: the clause and its version, the status in a word, what the option proposes against what the clause permits, the ask between them, and the person who resolves it.</p>
 
-  <figure class="sheet diagram" aria-labelledby="memo-fig">
+  <figure class="sheet memo-sheet">
     <dl class="memo-row">
       <div class="col">
         <dt>Clause</dt>
-        <dd class="v"><b>Protection of Trees By-law 9958</b><span class="sub">minimum trees, protection distances, cash in lieu</span><code>cov.trees.replacement · v 2023-01-01</code></dd>
-        <dd class="note">The clause and its version, linked to the published by-law.</dd>
+        <dd><b>Protection of Trees By-law 9958</b><span class="sub">minimum trees, protection distances, cash in lieu</span><code>cov.trees.replacement · v 2023-01-01</code></dd>
       </div>
       <div class="col">
         <dt>Status</dt>
-        <dd class="v"><span class="pill pill-conditional">Conditional</span></dd>
-        <dd class="note">Always a word: pass, conditional, fail or uncertain.</dd>
+        <dd><span class="pill pill-conditional">Conditional</span></dd>
       </div>
       <div class="col">
         <dt>Proposed</dt>
-        <dd class="v">9 existing, 1 kept, 16 planted: <b>17 trees after</b></dd>
-        <dd class="note">What the option puts forward: the numbers the simulation used.</dd>
+        <dd>9 existing, 1 kept, 16 planted: <b>17 trees after</b></dd>
       </div>
       <div class="col">
         <dt>Permitted</dt>
-        <dd class="v">Schedule C: at least <b>20 trees</b> on 2,811 m²</dd>
-        <dd class="note">What the clause allows or requires.</dd>
+        <dd>Schedule C: at least <b>20 trees</b> on 2,811 m²</dd>
       </div>
       <div class="col">
         <dt>The ask</dt>
-        <dd class="v ask">3 trees short: plant 3 more, or $3,000 cash in lieu</dd>
-        <dd class="note">The gap, and what closes it: a relaxation, a negotiation, a missing figure.</dd>
+        <dd class="ask">3 trees short: plant 3 more, or $3,000 cash in lieu</dd>
       </div>
     </dl>
     <p class="who"><b>Who resolves it</b> Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu.</p>
-    <figcaption class="fig-block" id="memo-fig"><span>Fig 3 · One row of the memo</span><span>As the memo prints it. Every open finding is handed to a named person; the tool does not decide.</span></figcaption>
   </figure>
 </section>
 
 <!-- ------------------------------------------------------------ try it -->
 <section class="section wrap close" id="try" aria-labelledby="try-h">
-  <div class="sheet issue">
-    <div class="issue-head">
-      <h2 id="try-h">Try it on a real case.</h2>
-      <p>998 E 19th Ave, Vancouver: six storeys of social housing on church land, approved by Council in July 2024. The inputs come from the City's public report; the placeholders say they are placeholders.</p>
-    </div>
-    <ul class="issue-actions">
-      <li>
-        <b>Run</b>
-        <a class="btn btn-primary" href="app.html?tour=1">Run the 998 E 19th Ave case</a>
-        <p>A two-minute walkthrough runs the rules for you. On the web the engine loads into your browser once (about 10 MB); nothing is uploaded.</p>
-      </li>
-      <li>
-        <b>Compare</b>
-        <a class="btn btn-quiet" href="app.html?run=998-e-19th-ave/what-if-funder-ready&amp;compare=998-e-19th-ave/as-approved">Find a fit that qualifies</a>
-        <p>The approved scheme beside a what-if that answers every funder question: the same site, two options, and the memo's three answers side by side.</p>
-      </li>
-      <li>
-        <b>Read</b>
-        <a class="btn btn-quiet" href="data/runs/998-e-19th-ave/what-if-funder-ready/memo.html">Read a finished memo</a>
-        <p>The what-if's memo as a document, with its ledger and sources.</p>
-      </li>
-    </ul>
-    <p class="print-only">Try it at kailisun98.github.io/BC-Housing-Feasibility-Study</p>
-    <div class="titleblock">
-      <div><b>Site</b>998 E 19th Ave, Vancouver</div>
-      <div><b>Rules</b>17 rules from 13 public sources, each dated and cited</div>
-      <div><b>Status</b>A feasibility screen, not legal, planning or funding advice</div>
-    </div>
-  </div>
-  <p class="close-aside">Working on a site of your own? <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study/issues/new?title=Request%3A%20a%2020-minute%20session&amp;body=Who%20I%20am%20and%20the%20kind%20of%20site%20I%20work%20on%3A%0A%0AA%20good%20time%20to%20talk%3A%0A">Ask for a 20-minute session</a>, or run it on your own machine with <code>python -m ffm ui</code>.</p>
+  <h2 id="try-h">Try it on a real case.</h2>
+  <p class="intro">998 E 19th Ave, Vancouver: six storeys of social housing on church land, approved by Council in July 2024. The inputs come from the City's public report; the placeholders say they are placeholders.</p>
+  <p class="close-actions">
+    <a class="btn btn-primary" href="app.html?tour=1">Run the real case with a walkthrough</a>
+    <a class="text-link" href="app.html?run=998-e-19th-ave/what-if-funder-ready&amp;compare=998-e-19th-ave/as-approved">See two options compared</a>
+    <a class="text-link" href="data/runs/998-e-19th-ave/as-approved/memo.html">Read the approved case's memo</a>
+  </p>
+  <p class="aside">The walkthrough takes two minutes and runs the rules for you. The compared option is a hypothetical what-if, labelled as one.</p>
+  <p class="print-only">Try it at kailisun98.github.io/BC-Housing-Feasibility-Study</p>
 </section>
 
 </main>
 
 <footer class="foot wrap">
-  <p>Funding-Fit Memo · ARCH 540, UBC School of Architecture and Landscape Architecture, fall 2026 · Kai · <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study">Source on GitHub</a> · MIT licence for the code; the cited documents belong to their publishers.</p>
-  <p>It does not decide: every open finding is handed to a named person. It does not read maps or PDFs: the rules were transcribed from the cited documents by hand.</p>
+  <p>Working on a site of your own? <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study/issues/new?title=Request%3A%20a%2020-minute%20session&amp;body=Who%20I%20am%20and%20the%20kind%20of%20site%20I%20work%20on%3A%0A%0AA%20good%20time%20to%20talk%3A%0A">Ask for a 20-minute session</a>, or run it on your own machine with <code>python -m ffm ui</code>.</p>
+  <p>Funding-Fit Memo · ARCH 540, UBC School of Architecture and Landscape Architecture, fall 2026 · Kai · <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study">Source on GitHub</a> · MIT licence for the code; the cited documents belong to their publishers. A feasibility screen, not legal, planning or funding advice: it does not decide, and every open finding is handed to a named person.</p>
 </footer>
 
 <script src="home.js"></script>

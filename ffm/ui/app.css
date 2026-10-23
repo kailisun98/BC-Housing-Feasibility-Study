@@ -20,6 +20,8 @@
   /* the drawing colours, the same in both themes (the drawings sit on white paper) */
   --c-paper: #ffffff; --c-envelope: #3c8cdc; --c-envelope-line: #2a6fb8; --c-street: #8e8e8e; --c-lane: #bdbdbd; --c-bldg: #f4f4f2;
   --c-drawink: #1f2933; --c-drawmuted: #5f6672; --c-drawnote: #7a5a00; --c-rule: #e1e5ea; --c-env: #c81e1e; --c-bench: #c77d14;
+  /* text drawn in those colours, dark enough to read at 4.5:1 on the paper: street names, the benchmark's label */
+  --c-street-text: #63635f; --c-bench-text: #8f5a0e;
   /* the half tone the context is drawn in: roads, neighbouring buildings, their outlines, trees */
   --c-half-road: #e9e9e6; --c-half-building: #e2e2df; --c-half-line: #c9c9c5; --c-tree: #9fb07f; --c-tree-line: #7f9664;
   --shadow: 0 1px 2px rgba(20, 30, 40, .06);
@@ -85,14 +87,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .asof { display: flex; align-items: center; gap: 8px; }
 .asof .eyebrow { margin: 0; }
 .asof input[type="date"] { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; font-family: var(--mono); }
-/* the version stamp as a title-block stamp: mono, uppercase, a double rule */
-.stamp { display: flex; align-items: center; gap: 8px; }
-.stamp .eyebrow { display: none; }
-.stamp code {
-  display: inline-block; padding: 3px 10px; color: var(--muted); border: 2px solid currentColor; border-radius: 2px;
-  box-shadow: 0 0 0 2px var(--panel), 0 0 0 3px currentColor; font: 600 11.5px/1.15 var(--mono); letter-spacing: .08em; text-transform: uppercase;
-  margin: 0 4px;
-}
+/* the memo's rules revision: a key, then R1, R2… in a small ruled box, the way a title block numbers revisions */
+.stamp { display: flex; align-items: center; gap: 6px; }
+.stamp .eyebrow { margin: 0; }
+.stamp b { display: inline-block; min-width: 30px; padding: 2px 7px; border: 1px solid var(--ink); border-radius: 3px; font: 600 12.5px/1.25 var(--sans); color: var(--ink); text-align: center; }
 .engine-chip { font: 500 11px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 5px 9px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); white-space: nowrap; }
 .engine-chip.ready { color: var(--ok); border-color: var(--ok); }
 .engine-chip.error { color: var(--red); border-color: var(--red); white-space: normal; }
@@ -149,7 +147,8 @@ body.presenting .memo-tools, body.presenting .tour-offer { display: none; }
   .inputs { grid-template-columns: 1fr; }
   .topbar { padding: 8px 12px; }
   .wordmark em { display: none; }
-  .steps { overflow-x: auto; }
+  /* the step tabs wrap to a second line rather than hide Export, Hide inputs and Walkthrough past the edge */
+  .steps { flex-wrap: wrap; row-gap: 2px; }
   .input-card, .memo-pane, .memo .card, .export { scroll-margin-top: 8px; }
   /* the title block wraps two cells to a row, without a rule running into the empty space */
   .memo-meta > div { border-right: 0; margin-right: 0; padding-right: 12px; flex-basis: 45%; }
@@ -227,9 +226,28 @@ body.presenting .memo-tools, body.presenting .tour-offer { display: none; }
 
 /* ------------------------------------------------------------------ the memo */
 .memo-tools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 16px; margin: 0 0 12px; }
-.memo-tools .tool { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
-.memo-tools .tool .eyebrow { margin: 0; }
-.memo-tools select { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; max-width: min(100%, 460px); }
+/* the two run pickers: above the memo, or heading the Side by side card's A and B columns when two runs are compared */
+.tool { display: flex; flex-direction: column; gap: 3px; min-width: 0; max-width: 100%; }
+.tool .eyebrow { margin: 0; }
+.tool select { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; max-width: min(100%, 460px); }
+/* in the card the pickers sit in a row laid on the answer table's columns: a 150px key column, then A, then B */
+.side .pick-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) minmax(0, 1fr); margin: 0 0 8px; }
+.side .pick { min-width: 0; padding-right: 8px; }
+.side .pick .tool .eyebrow { color: var(--ink); }
+.side .pick select { width: 100%; max-width: none; }
+/* the option's name is the picker's own text on screen; it shows whole only where the picker hides (print, presenting) */
+.side .pick-name { display: none; font-size: 12px; color: var(--ink); font-weight: 600; }
+body.presenting .side .pick-name { display: block; }
+body.presenting .side .pick .tool { display: none; }
+@media (max-width: 760px) {
+  /* a phone: the two pickers stack across the card's width, so each shows its run's date and folder */
+  .side .pick-row { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
+  .side .pick-key { display: none; }
+  .side .pick { padding-right: 0; }
+  .side .side-head th[scope="row"], .side .side-head thead th:first-child { width: 92px; }
+  /* a long verdict wraps inside its pill rather than push past the card */
+  .side .side-head .pill { white-space: normal; max-width: 100%; overflow-wrap: normal; }
+}
 .tool-note { font-size: 12px; color: var(--muted); align-self: center; }
 .tool-note code { color: var(--ink); }
 
@@ -248,7 +266,7 @@ body.presenting .memo-tools, body.presenting .tour-offer { display: none; }
 .memo-meta b { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
 .memo-meta .cont { color: var(--muted); }
 .memo-meta code { font: 600 11.5px/1.3 var(--mono); }
-.memo-head .quiet { color: var(--muted); margin: 0; max-width: 72ch; font-size: 12.5px; }
+.memo-head .quiet { color: var(--muted); margin: 0; max-width: 58ch; font-size: 12.5px; }
 
 /* a revision, the drafting way: a delta with its letter beside what changed, and a revision row in the title block */
 .rev { display: inline-block; width: 16px; height: 14px; vertical-align: -2px; color: var(--ink); flex: 0 0 auto; }
@@ -341,7 +359,7 @@ table.plain td.status { white-space: nowrap; }
 /* a drawing is as tall as it needs to be on a screen and no taller; its labels are set at a fixed size (app.js) */
 .figure .fig-body svg, .figure .fig-section svg { max-height: 440px; }
 .figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
-.figure figcaption { font-size: 12px; color: var(--c-drawmuted); margin-top: 8px; line-height: 1.45; max-width: 72ch; }
+.figure figcaption { font-size: 12px; color: var(--c-drawmuted); margin-top: 8px; line-height: 1.45; max-width: 60ch; }
 .figure figcaption b { color: var(--c-drawink); font-weight: 600; }
 .figure .legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 8px; font-size: 11.5px; color: var(--c-drawmuted); }
 .figure .legend i { display: inline-block; width: 14px; height: 8px; margin-right: 6px; vertical-align: middle; border: 1px solid transparent; }
@@ -373,6 +391,8 @@ table.plain td.status { white-space: nowrap; }
 .changes .stamps { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; }
 .changes .stamps code { color: var(--ink); font-weight: 600; }
 .changes .same { margin: 0 0 8px; font-weight: 500; }
+.changes .rule-title { font-weight: 600; }
+.changes .rule-id { display: block; margin-top: 1px; font: 11px var(--mono); color: var(--muted); }
 .changes table.plain td.ver { font-family: var(--mono); font-size: 11px; white-space: nowrap; color: var(--ink); }
 .changes table.plain td.ver .was { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
 .changes table.plain td.trans { white-space: nowrap; }
@@ -388,6 +408,8 @@ table.plain td.status { white-space: nowrap; }
 
 /* ------------------------------------------------------------------ export */
 .export { margin-top: 12px; padding: 12px 14px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--ink); box-shadow: var(--shadow); }
+/* the inputs the memo read: notes can run long, so the list keeps a reading measure */
+.inputs-used li { max-width: 80ch; }
 .export h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .export .export-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); max-width: 80ch; }
 .action-bar { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -420,7 +442,7 @@ table.plain td.status { white-space: nowrap; }
 /* ------------------------------------------------------------------ touch: 44px targets on a coarse pointer */
 @media (pointer: coarse) {
   .btn, .steps a, .tri button, .segbtn { min-height: 44px; }
-  .field input[type="text"], .field input[type="number"], .field select, .memo-tools select, .asof input[type="date"] { min-height: 44px; }
+  .field input[type="text"], .field input[type="number"], .field select, .tool select, .asof input[type="date"] { min-height: 44px; }
   .tree-row { grid-template-columns: 40px 1fr 64px 84px 44px; }
   .tree-row input, .tree-row select, .tree-row .x { min-height: 44px; }
   .checks label { min-height: 44px; align-items: center; }
@@ -445,18 +467,8 @@ table.plain td.status { white-space: nowrap; }
 .field-row .field .label-line { gap: 4px; }
 @media (pointer: coarse) { .info-btn { width: 28px; height: 28px; font-size: 13px; } }
 
-/* ------------------------------------------------------------------ A | B at the head of each answer when two runs are compared */
-.ab { display: grid; grid-template-columns: minmax(90px, auto) 1fr 1fr; gap: 0; margin: 0 0 10px; border: 1px solid color-mix(in srgb, var(--tone) 25%, var(--wash)); border-radius: 4px; background: color-mix(in srgb, #ffffff 55%, var(--wash)); font-size: 12px; }
-.ab-row { display: contents; }
-.ab-row > span { padding: 5px 8px; border-bottom: 1px solid color-mix(in srgb, var(--tone) 18%, var(--wash)); display: flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
-.ab-row:last-child > span { border-bottom: 0; }
-.ab-head > span { font-size: 11px; color: var(--muted); }
-.ab-head b { color: var(--ink); font-weight: 700; margin-right: 2px; }
-.ab-row > span[role="rowheader"] { color: var(--muted); font-weight: 500; }
-@media (max-width: 760px) { .ab { grid-template-columns: 1fr 1fr; } .ab-row > span[role="rowheader"], .ab-head > span:first-child { grid-column: 1 / -1; padding-bottom: 0; border-bottom: 0; } }
-
 /* ------------------------------------------------------------------ the clauses applied, and two runs side by side */
-.clauses .intro, .side .intro { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; max-width: 90ch; }
+.clauses .intro, .side .intro { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; max-width: 62ch; }
 .clauses .intro b { color: var(--ink); font-weight: 600; }
 .clauses .counts { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 8px; }
 .clauses table.plain { font-size: 11.5px; table-layout: fixed; }
@@ -464,22 +476,38 @@ table.plain td.status { white-space: nowrap; }
 .clauses td { overflow-wrap: anywhere; vertical-align: top; }
 .clauses .rule-title { font-weight: 600; }
 .clauses .rule-id { color: var(--muted); font: 11px var(--mono); display: block; margin-top: 2px; }
+/* the clause's section is a citation in words, so it is set in the sans, not the machine's mono */
+.clauses .rule-sec { display: block; font-size: 11px; color: var(--muted); margin-top: 1px; }
+/* a rule id wraps between its words (at the dots and underscores), never mid-word */
+.clauses .rule-id, .side .rule-id, .changes .rule-id { overflow-wrap: break-word; word-break: normal; }
 .clauses td.nums { font-size: 11.5px; color: var(--ink); }
 .clauses td.ask { color: var(--s-conditional-text); }
 .clauses tr.st-pass td.ask, .clauses tr.st-info td.ask { color: var(--muted); }
 .clauses tr.st-fail td.ask { color: var(--s-fail-text); }
 .clauses .na { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
 .side table.plain { table-layout: fixed; }
-.side .side-head { margin-bottom: 12px; }
+/* what the comparison comes to, in one sentence under the pickers */
+.side .side-lead { margin: 0 0 10px; font-size: 13px; line-height: 1.5; max-width: 72ch; }
+.side .side-lead code { font-size: 11px; color: var(--muted); }
+.side .side-head { margin-bottom: 10px; }
+/* the answer table's header row carries the run names for a screen reader only; the pickers above head it on screen */
+.side .side-head thead th { height: 0; padding: 0; border: 0; line-height: 0; }
 .side .side-head th[scope="row"] { text-transform: none; letter-spacing: 0; font-size: 12px; color: var(--ink); width: 150px; }
-.side .side-head thead th { font-size: 11.5px; text-transform: none; letter-spacing: 0; color: var(--ink); }
-.side col.c-rule { width: 34%; } .side col.c-ab { width: 30%; } .side col.c-delta { width: 28px; }
+.side .side-head thead th:first-child { width: 150px; }
+/* each run's open items, behind a disclosure, with the person who resolves them */
+.side .side-open { margin: 0 0 8px; font-size: 12px; }
+.side .side-open summary, .side .side-same summary { cursor: pointer; color: var(--ink); font-weight: 500; padding: 3px 0; }
+.side .side-open ul { margin: 4px 0 6px; padding: 0; list-style: none; display: grid; gap: 6px; }
+.side .side-open li { line-height: 1.45; max-width: 90ch; }
+.side .side-sub { font-size: 12.5px; font-weight: 600; margin: 14px 0 6px; padding-top: 10px; border-top: 1px solid var(--line); }
+.side .side-same { margin: 6px 0 0; font-size: 12px; }
+.side .side-same table { margin-top: 4px; }
+.side .side-note { margin: 8px 0 0; font-size: 11.5px; }
+.side col.c-rule { width: 38%; } .side col.c-ab { width: 31%; }
 .side td { vertical-align: top; overflow-wrap: anywhere; font-size: 11.5px; }
 .side .rule-title { font-weight: 600; }
 .side .rule-id { color: var(--muted); font: 11px var(--mono); display: block; margin-top: 2px; }
 .side td.status .cont { white-space: normal; font-size: 11px; margin-top: 3px; }
-.side td.delta { font-weight: 700; color: var(--s-conditional-text); text-align: center; }
-.side tr.differs td { background: var(--status-busy); }
 @media (max-width: 760px) {
   .clauses table.plain, .clauses thead, .clauses tbody, .clauses tr, .clauses td { display: block; }
   .clauses colgroup, .clauses thead { display: none; }
@@ -494,7 +522,8 @@ table.plain td.status { white-space: nowrap; }
           --s-pass-text: #246a3d; --s-conditional-text: #7a5a00; --s-fail-text: #a81a1a; --s-uncertain-text: #8f5a0e; --s-na-text: #444; --s-info-text: #245f9c;
           --s-pass-wash: #fff; --s-conditional-wash: #fff; --s-fail-wash: #fff; --s-uncertain-wash: #fff; --s-na-wash: #fff; --s-info-wash: #fff; }
   body { background: #fff; font-size: 10.5pt; }
-  .bars, .skip, .inputs, .export, .memo-tools, .tour-offer, .tour-spot, .tour-card, .seg, .fig-hint, .ledger .tools { display: none !important; }
+  .side .pick-name { display: block; }
+  .bars, .skip, .inputs, .export, .memo-tools, .side .pick .tool, .tour-offer, .tour-spot, .tour-card, .seg, .fig-hint, .ledger .tools { display: none !important; }
   .panes { display: block; min-height: 0; }
   .memo-pane { padding: 0; }
   .card { border: 0; padding: 0 0 10pt; break-inside: avoid; box-shadow: none; }

@@ -202,5 +202,6 @@ The rule files carry their own citations. The main documents:
 - Province of BC, Small-Scale Multi-Unit Housing policy manual and Transit-Oriented Areas policy manual: see `rules/b_provincial.json`
 - BC Housing, Community Housing Fund RFP #1070-2526-022 and program page; BC Builds program page; Design Guidelines and Construction Standards: see `rules/d_design_standards.json` and `rules/e_funding_programs.json`
 - CMHC, Affordable Housing Fund: see `rules/e_funding_programs.json`
+- Map data © OpenStreetMap contributors, ODbL 1.0 (https://www.openstreetmap.org/copyright): the roads, buildings and trees drawn around each site, fetched with `python -m ffm context` through Nominatim and the Overpass API and stored under the site file's `osm` key
 
 Licence: MIT for the code. The cited documents belong to their publishers.

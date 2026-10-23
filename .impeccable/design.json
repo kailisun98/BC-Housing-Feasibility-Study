@@ -1,0 +1,144 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-22T19:30:00-07:00",
+  "title": "Design System: Funding-Fit Memo",
+  "extensions": {
+    "colorMeta": {
+      "deep-blue": { "role": "primary", "displayName": "Deep Blue", "canonical": "#1D4ED8", "tonalRamp": ["#0b1f5c", "#122e86", "#173db0", "#1d4ed8", "#4a73e4", "#7a98ec", "#aabdf3", "#dbe3fa"] },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#FAF9F6", "tonalRamp": ["#262522", "#4d4b46", "#73716a", "#99978f", "#bfbdb4", "#dcdad3", "#edece7", "#faf9f6"] },
+      "ink": { "role": "neutral", "displayName": "Ink", "canonical": "#1B1B1A", "tonalRamp": ["#1b1b1a", "#333331", "#4d4d4a", "#6b6b66", "#8a8a84", "#aaaaa3", "#cbcbc5", "#ecece8"] },
+      "memo-grey": { "role": "neutral", "displayName": "Memo Grey", "canonical": "#6B6B66", "tonalRamp": ["#232321", "#3a3a37", "#52524e", "#6b6b66", "#86867f", "#a3a39b", "#c2c2bb", "#e2e2dd"] },
+      "cool-desk": { "role": "neutral", "displayName": "Cool Desk", "canonical": "#EEF2F8", "tonalRamp": ["#1d2430", "#33404f", "#4d5c70", "#6a7a90", "#8d9bae", "#b0bccb", "#d1d9e5", "#eef2f8"] },
+      "sand": { "role": "neutral", "displayName": "Sand", "canonical": "#F3EFE6", "tonalRamp": ["#2d281c", "#4a4330", "#6a6147", "#8c8162", "#ada285", "#cbc2aa", "#e2dbc9", "#f3efe6"] },
+      "pass": { "role": "secondary", "displayName": "Pass", "canonical": "#15803D", "tonalRamp": ["#062b14", "#0b4a22", "#106531", "#15803d", "#2f9a55", "#5fb37b", "#97cdab", "#d2e9da"] },
+      "conditional": { "role": "secondary", "displayName": "Conditional", "canonical": "#B45309", "tonalRamp": ["#3d1c03", "#653004", "#8c4206", "#b45309", "#cf7126", "#e2965a", "#efbb92", "#f8ddc8"] },
+      "fail": { "role": "secondary", "displayName": "Fail", "canonical": "#B91C1C", "tonalRamp": ["#3f0909", "#681010", "#911616", "#b91c1c", "#d13f3f", "#e26d6d", "#eea1a1", "#f8d3d3"] },
+      "uncertain": { "role": "secondary", "displayName": "Uncertain", "canonical": "#6D28D9", "tonalRamp": ["#250d4a", "#3d177c", "#5620ad", "#6d28d9", "#8a52e2", "#aa80ea", "#c9acf2", "#e7d9f9"] },
+      "proposed-blue": { "role": "tertiary", "displayName": "Proposed Blue", "canonical": "#2F6FED", "tonalRamp": ["#0f2651", "#183d84", "#2355b8", "#2f6fed", "#5a8cf1", "#86a9f5", "#b1c5f8", "#dbe3fc"] },
+      "outright-grey": { "role": "tertiary", "displayName": "Outright Grey", "canonical": "#C9CED6", "tonalRamp": ["#2b2f36", "#464c56", "#636a76", "#818995", "#a1a8b3", "#c9ced6", "#dee2e7", "#f0f2f5"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The memo's title, the site address. One per page." },
+      "verdict": { "displayName": "Verdict", "purpose": "The answer sentence at the head of each answer card; operative word italic and in the status hue." },
+      "headline": { "displayName": "Headline", "purpose": "Card and section headings." },
+      "body": { "displayName": "Body", "purpose": "Findings and prose; first sentence Ink, continuation Memo Grey." },
+      "label": { "displayName": "Label", "purpose": "Form labels, buttons, table cells." },
+      "eyebrow": { "displayName": "Eyebrow", "purpose": "Mono uppercase section labels, figure labels, pill text." },
+      "mono": { "displayName": "Mono", "purpose": "Stamps, rule ids, hashes, numbers used." }
+    },
+    "shadows": [
+      { "name": "walkthrough-card", "value": "0 16px 40px rgba(0, 0, 0, 0.22)", "purpose": "Only the guided-tour card, floating over the dimmed page." }
+    ],
+    "motion": [
+      { "name": "land", "value": "150ms ease-out, opacity 0 to 1 with a 3px rise", "purpose": "The memo arriving after a run; the only entrance." },
+      { "name": "spot-fade", "value": "opacity 150ms ease-out", "purpose": "The walkthrough spotlight between stops." }
+    ],
+    "breakpoints": [
+      { "name": "stack", "value": "1100px" },
+      { "name": "single", "value": "760px" },
+      { "name": "figures-column", "value": "1600px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one blue action on a screen: Run the rules.",
+      "html": "<button class=\"ds-btn-primary\">Run the rules</button>",
+      "css": ".ds-btn-primary { font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1.25; color: #ffffff; background: #1d4ed8; border: 1px solid #1d4ed8; border-radius: 6px; padding: 7px 14px; cursor: pointer; } .ds-btn-primary:hover { filter: brightness(0.95); } .ds-btn-primary:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Downloads, Print, Check Revit result: card fill, ink text.",
+      "html": "<button class=\"ds-btn\">Download memo (HTML)</button>",
+      "css": ".ds-btn { font-family: Inter, system-ui, sans-serif; font-size: 14px; font-weight: 500; line-height: 1.25; color: #1b1b1a; background: #ffffff; border: 1px solid #d6d3cc; border-radius: 6px; padding: 7px 14px; cursor: pointer; } .ds-btn:hover { border-color: #1b1b1a; } .ds-btn:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 2px; }"
+    },
+    {
+      "name": "Status pill",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "A printed status word on its hue; here, uncertain.",
+      "html": "<span class=\"ds-pill ds-pill-uncertain\">Uncertain</span> <span class=\"ds-pill ds-pill-pass\">Pass</span> <span class=\"ds-pill ds-pill-conditional\">Conditional</span>",
+      "css": ".ds-pill { display: inline-block; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; color: #ffffff; border-radius: 999px; padding: 2px 9px; margin-right: 6px; } .ds-pill-uncertain { background: #6d28d9; } .ds-pill-pass { background: #15803d; } .ds-pill-conditional { background: #b45309; }"
+    },
+    {
+      "name": "Answer card",
+      "kind": "card",
+      "refersTo": "answer-card-uncertain",
+      "description": "The signature card: eyebrow and verdict word in the status hue on a faint wash.",
+      "html": "<section class=\"ds-answer\"><div class=\"ds-eyebrow\">01 · Is it allowed</div><h2 class=\"ds-q\">Is it allowed?</h2><p class=\"ds-verdict\">Not outright. By rezoning: <em>not yet confirmed</em>.</p><p class=\"ds-finding\"><span class=\"ds-lead\">FSR 2.95 exceeds the outright maximum of 1.2;</span> <span class=\"ds-cont\">it can proceed only by rezoning, where density is negotiated.</span></p></section>",
+      "css": ".ds-answer { background: #f3f0fa; border: 1px solid #e4e2dc; border-radius: 8px; padding: 22px; font-family: Inter, system-ui, sans-serif; color: #1b1b1a; max-width: 560px; } .ds-eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; color: #5b21b6; margin-bottom: 6px; } .ds-q { font-family: Fraunces, Georgia, serif; font-size: 20px; font-weight: 400; color: #6b6b66; margin: 0 0 12px; } .ds-verdict { font-family: Fraunces, Georgia, serif; font-size: 28px; line-height: 1.25; font-weight: 500; margin: 0 0 14px; } .ds-verdict em { font-weight: 400; color: #5b21b6; } .ds-finding { font-size: 16px; line-height: 1.5; margin: 0; } .ds-cont { color: #5e5d66; }"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "A labelled field with help text; blue focus ring and caret.",
+      "html": "<div class=\"ds-field\"><label class=\"ds-label\" for=\"ds-in\">Zoning district</label><input id=\"ds-in\" class=\"ds-input\" value=\"RM-1\"><span class=\"ds-help\">As written in the by-law: RM-1, RS-1, RT-3, R1-1 …</span></div>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 5px; font-family: Inter, system-ui, sans-serif; max-width: 360px; } .ds-label { font-size: 13px; font-weight: 500; color: #6b6b66; } .ds-input { font: inherit; font-size: 14px; line-height: 1.35; color: #1b1b1a; background: #ffffff; border: 1px solid #d6d3cc; border-radius: 6px; padding: 7px 10px; caret-color: #1d4ed8; } .ds-input:focus { outline: 2px solid #1d4ed8; outline-offset: 1px; } .ds-help { font-size: 12px; color: #6b6b66; }"
+    },
+    {
+      "name": "Three-state control",
+      "kind": "custom",
+      "refersTo": "input",
+      "description": "Yes / No / Not sure; the honest choice fills Uncertain purple.",
+      "html": "<div class=\"ds-tri\" role=\"radiogroup\"><button class=\"ds-tri-b\" role=\"radio\" aria-checked=\"false\">Yes</button><button class=\"ds-tri-b\" role=\"radio\" aria-checked=\"false\">No</button><button class=\"ds-tri-b ds-tri-unsure\" role=\"radio\" aria-checked=\"true\">Not sure</button></div>",
+      "css": ".ds-tri { display: inline-flex; border: 1px solid #d6d3cc; border-radius: 6px; overflow: hidden; background: #ffffff; font-family: Inter, system-ui, sans-serif; } .ds-tri-b { border: 0; background: transparent; padding: 6px 12px; font-size: 13px; cursor: pointer; color: #6b6b66; border-right: 1px solid #d6d3cc; } .ds-tri-b:last-child { border-right: 0; } .ds-tri-b[aria-checked=\"true\"] { background: #1b1b1a; color: #faf9f6; } .ds-tri-b.ds-tri-unsure[aria-checked=\"true\"] { background: #6d28d9; color: #ffffff; } .ds-tri-b:focus-visible { outline: 2px solid #1d4ed8; outline-offset: 1px; }"
+    },
+    {
+      "name": "Step strip",
+      "kind": "nav",
+      "refersTo": "button-quiet",
+      "description": "Four steps; the current one in Deep Blue with a filled circle.",
+      "html": "<nav class=\"ds-steps\"><a class=\"ds-step ds-done\" href=\"#\"><span class=\"ds-n\">1</span> Site</a><a class=\"ds-step ds-active\" href=\"#\"><span class=\"ds-n\">2</span> Option</a><a class=\"ds-step\" href=\"#\"><span class=\"ds-n\">3</span> Run and read</a><a class=\"ds-step\" href=\"#\"><span class=\"ds-n\">4</span> Export</a></nav>",
+      "css": ".ds-steps { display: flex; gap: 28px; padding: 0 8px; border-bottom: 1px solid #e4e2dc; background: #faf9f6; font-family: Inter, system-ui, sans-serif; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 500; } .ds-step { color: #6b6b66; text-decoration: none; padding: 10px 0 9px; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 8px; } .ds-step:hover { color: #1d4ed8; } .ds-n { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; width: 18px; height: 18px; border-radius: 50%; border: 1px solid #d6d3cc; display: inline-grid; place-items: center; letter-spacing: 0; } .ds-active { color: #1d4ed8; border-bottom-color: #1d4ed8; } .ds-active .ds-n { background: #1d4ed8; color: #ffffff; border-color: #1d4ed8; } .ds-done .ds-n { border-color: #1d4ed8; color: #1d4ed8; }"
+    },
+    {
+      "name": "Stamp chip",
+      "kind": "chip",
+      "refersTo": "status-pill",
+      "description": "The version stamp in the top bar: mono on a hairline chip, with Copy.",
+      "html": "<span class=\"ds-stamp\"><span class=\"ds-stamp-eyebrow\">Stamp</span><code class=\"ds-stamp-code\">20e44f1445ecaff9</code><button class=\"ds-stamp-btn\">Copy</button></span>",
+      "css": ".ds-stamp { display: inline-flex; align-items: center; gap: 8px; font-family: Inter, system-ui, sans-serif; } .ds-stamp-eyebrow { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: #6b6b66; font-weight: 500; } .ds-stamp-code { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; padding: 3px 7px; border: 1px solid #e4e2dc; border-radius: 6px; background: #ffffff; color: #1b1b1a; } .ds-stamp-btn { font: inherit; font-size: 12px; font-weight: 500; padding: 3px 9px; border: 1px solid #d6d3cc; border-radius: 6px; background: transparent; color: #1b1b1a; cursor: pointer; } .ds-stamp-btn:hover { border-color: #1b1b1a; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Careful Memo",
+    "overview": "The product is a memo, and the interface is the desk it sits on. Everything the reader sees is set like a document someone took trouble over: warm paper rather than white, a serif voice for the sentences a person would say aloud, a sans for the working parts, and a monospace whisper for the things a machine wrote down, stamps, rule ids, section eyebrows. The page is calm and unhurried. One idea per card, hairlines instead of boxes, and nothing that moves unless a run has just landed.\n\nColour is meaning, never decoration. Six status hues exist only to say pass, conditional, fail, uncertain, not applicable or info, and the same hue that marks a status word also tints the card that carries the answer. One deep blue belongs to the things you can touch: the Run button, the step you are on, links, focus, the caret. Three regions tell the reader where they are: the cool pane where facts are entered, the paper where the memo is read, and the sand band where it leaves for a file or for Revit. The massing drawings keep their own three tones, blue for proposed, grey for outright, amber for the staff benchmark, because those are the memo's own figures.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).",
+    "keyCharacteristics": [
+      "Three voices: serif for human sentences, sans for the interface and body, mono for stamps and labels.",
+      "Paper and ink first; dark mode is composed from warm near-black, not inverted.",
+      "Status is always a word; its colour only accompanies it.",
+      "One accent, deep blue, for interactive elements only.",
+      "Flat surfaces separated by hairlines; the only shadow belongs to the walkthrough card.",
+      "Cards wear a faint wash in the hue of the answer they give."
+    ],
+    "rules": [
+      { "name": "The Status-Only Rule", "body": "A status hue appears only where a status word is printed or where a card carries that status. It never colours a button, a heading, a chart or a decoration.", "section": "colors" },
+      { "name": "The One Hand Rule", "body": "Deep blue marks what the reader can act on and nothing else. If an element is blue, it can be clicked or typed into.", "section": "colors" },
+      { "name": "The Written Word Rule", "body": "Colour accompanies a status; it never carries it alone. Every pill, verdict and chip prints its word.", "section": "colors" },
+      { "name": "The Lead Sentence Rule", "body": "In any finding, the first sentence is Ink and the continuation is grey. Hierarchy inside a paragraph comes from colour, not weight.", "section": "typography" },
+      { "name": "The Eyebrow Rule", "body": "Section eyebrows are mono, 11px, uppercase, tracked 0.08em, and sit above a serif heading. They are the brief's own device and stay.", "section": "typography" },
+      { "name": "The Hairline Rule", "body": "Depth is drawn, not cast. A card is a hairline and a change of tone; nothing at rest has a shadow.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do print every status as a word and let its hue accompany it; a pill, a verdict word, a card wash.",
+      "Do keep Deep Blue for things the reader can act on, and give the active step, links and focus that blue.",
+      "Do set the memo's sentences in Fraunces at 40 / 28 / 20px and keep body Inter at 16px with 1.5 line height.",
+      "Do separate surfaces with 1px hairlines and tone; keep cards at 8px radius and 22px padding.",
+      "Do compose dark mode from Night Paper and Night Card with the lifted status inks; check every pair stays above 4.5:1.",
+      "Do keep the figures' three tones, blue proposed, grey outright, amber benchmark, exactly as drawn."
+    ],
+    "donts": [
+      "Don't build a dashboard: no gauges, KPI tiles, sparklines, or icon-plus-heading cards as structure.",
+      "Don't reach for a landing page's kit: no gradients, glass, hero numbers, floating shadows, marketing voice.",
+      "Don't put a status hue on a button, a heading, a chart or a background that carries no status.",
+      "Don't add a second accent, a coloured side border, or a shadow on anything that is not the walkthrough card.",
+      "Don't animate anything but the 150ms fade when a run lands and the walkthrough spotlight's fade; honour reduced motion.",
+      "Don't use \"N/A\", icons in place of words, or a checkbox where \"not sure\" is a legitimate answer."
+    ]
+  }
+}

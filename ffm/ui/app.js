@@ -19,6 +19,12 @@ function pill(status) {
   return `<span class="pill pill-${h(status)}">${h(STATUS_WORD[status] || status)}</span>`;
 }
 
+/* A revision mark, the drafting way: a delta with its letter, beside whatever a comparison changed. */
+const REV = `<svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(revised)</span>`;
+
+/* Scrolls follow the reader's motion setting. */
+function scrollBehavior() { return reducedMotion() ? "auto" : "smooth"; }
+
 function cap(s) { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /* The status a verdict word stands for, so a card can wear its colour. */
@@ -48,6 +54,14 @@ function leadCont(text) {
   const m = t.match(/^(.+?[.;:])\s+(.+)$/s);
   if (!m) return `<span class="lead">${h(t)}</span>`;
   return `<span class="lead">${h(m[1])}</span> <span class="cont">${h(m[2])}</span>`;
+}
+
+/* A finding that opens with the program's name already printed in its title ("BC Builds: fit cannot…" under
+   "BC Builds: eligibility…") drops the repeat. */
+function withoutRepeat(title, finding) {
+  const m = String(finding || "").match(/^([^:;.]{3,60}):\s+(.+)$/s);
+  if (!m || !String(title || "").toLowerCase().includes(m[1].toLowerCase())) return finding;
+  return cap(m[2]);
 }
 
 function sourceLink(src) {
@@ -292,6 +306,7 @@ const state = {
   run: null,            // the last /api/run response
   runs: [],             // past runs for the site
   compareRun: null,     // run_id to diff against on the next run
+  step: 1,              // the step the reader is on, for the step bar
 };
 
 const PRELOAD_SITE = "998-e-19th-ave";
@@ -374,8 +389,8 @@ const OPTION_FIELDS = [
   { group: "Tenure", fields: [
     { key: "tenure", label: "Tenure", type: "select", options: [["social_housing", "Social housing"], ["secured_market_rental", "Secured market rental"], ["other", "Other"]] },
     { row: true, fields: [
-      { key: "share_below_hils", label: "Share below HILs", type: "number", help: "0.30 = 30%" },
-      { key: "max_rent_share_of_income", label: "Max rent / income", type: "number", help: "0.30 = 30%" },
+      { key: "share_below_hils", label: "Share below HILs", type: "number", share: true, help: "0.30 = 30%" },
+      { key: "max_rent_share_of_income", label: "Max rent / income", type: "number", share: true, help: "0.30 = 30%" },
       { key: "housing_agreement_years", label: "Agreement (years)", type: "number", int: true },
     ]},
     { key: "owner_type_at_completion", label: "Owner at completion", type: "select", options: [
@@ -391,8 +406,8 @@ const OPTION_FIELDS = [
     ]},
     { row: true, fields: [
       { key: "accessible_units", label: "Accessible units", type: "number", int: true },
-      { key: "below_market_unit_share", label: "Below-market share", type: "number", help: "of units, 0–1" },
-      { key: "below_market_discount", label: "Discount to market", type: "number", help: "0.20 = 20%" },
+      { key: "below_market_unit_share", label: "Below-market share", type: "number", share: true, help: "of units, 0–1" },
+      { key: "below_market_discount", label: "Discount to market", type: "number", share: true, help: "0.20 = 20%" },
     ]},
     { key: "site_control", label: "Site control", type: "select", options: [
       ["", "Not sure"], ["letter_of_intent", "Letter of intent"], ["purchase_agreement", "Purchase agreement"],
@@ -410,23 +425,145 @@ const OPTION_FIELDS = [
   ]},
 ];
 
+/* What each input is for. `need` says who reads it: "run" means the engine cannot build the memo and the massing
+   without it; "rule" means a rule reads it and a blank comes back as "uncertain" (never guessed); "figure" means
+   only the drawings use it; nothing means it is a note for people. `info` is the explanation behind the (i). */
+const FIELD_META = {
+  "id": { need: "run", info: "Names the file (sites/<id>.json or options/<id>.json) and the outputs folder. Letters, digits and hyphens." },
+  "zoning_district": { need: "run", info: "The district schedule that applies without a rezoning, as the by-law writes it. The rule stack has outright limits for RM-1 and RM-1N (FSR 1.2, 10.7 m) and the SSMUH rule for R1-1, RS and RT; any other district, such as CD-1, gets 'not applicable' for those rules, so 'outright: yes' there means no coded limit was tested." },
+  "site_area_m2": { need: "run", info: "Divides the option's floor area into an FSR, sets Schedule C's minimum tree count (2,551 to 2,900 m² needs 20 trees) and sizes the outright mass." },
+  "frontage_m": { need: "run", info: "With the depth, the rectangle the massing is drawn in. For an irregular lot use the rectangle with the same area and say so in the notes; the FSR still uses the recorded area." },
+  "depth_m": { need: "run", info: "With the frontage, the rectangle the massing is drawn in; the street is along the frontage, the lane behind the depth." },
+  "in_former_community_vision_area": { need: "rule", info: "Map 1 of the Interim Rezoning Policy for Social Housing (1 Nov 2023, amended 31 Mar 2026). Inside the map, 100% social housing can rezone to CD-1 against a staff benchmark (here about 19.9 to 21.3 m and FSR 3.0). Outside it, the Affordable Housing Policies (1989) or an area plan apply and this rule reads 'not applicable'." },
+  "in_transit_oriented_area": { need: "rule", info: "Bill 47 (2023): inside a provincially designated transit-oriented area the City may not refuse the minimum height and density for the tier. Vancouver designated 29 such areas in June 2024, around SkyTrain stations and bus exchanges. Check the City's TOA map; 'Not sure' comes back as uncertain." },
+  "toa_tier": { need: "rule", info: "Distance bands around a SkyTrain station: Tier 1 within 200 m, minimum allowable 20 storeys; Tier 2 200 to 400 m, 12 storeys; Tier 3 400 to 800 m, 8 storeys. Bus-exchange areas use lower tiers the stack does not code yet. The tier comes from the City's TOA map, which the tool does not read." },
+  "frequent_bus_stop_within_400m": { need: "", info: "Recorded for the record: no rule in the stack reads it yet. It will matter when frequent-transit policies are coded." },
+  "has_water_and_sewer": { need: "rule", info: "The Small-Scale Multi-Unit Housing minimums (Bill 44) apply only where the lot has water and sewer service; 'No' switches that rule off." },
+  "existing_trees_on_site": { need: "rule", info: "Protection of Trees By-law 9958. The survey must cover every tree of 20 cm DBH or more on the site, within 2 m of the boundary and on the adjoining street. Schedule A sets the protection barrier by trunk diameter (40 cm: 2.4 m, which the massing must leave clear); Schedule C sets how many trees the site must have after development, by area; each missing tree is $1,000 cash in lieu. No survey on file: the rule says so and returns uncertain." },
+  "street_trees.count": { need: "figure", info: "Drawn along the frontage in the figures; no rule reads it." },
+  "land_tenure_plan": { need: "rule", info: "Who will hold the land. The Community Housing Fund needs a lease of at least 60 years at nominal value, or ownership. Write 'to confirm' while it is unsettled: the check then returns uncertain instead of guessing. The option's own tenure plan overrides this one." },
+  "owner_type": { need: "", info: "A note for the memo: church, society, municipality, private. The DCL exemption for church use is read from the referral report, not from this field." },
+  "proponent_type": { need: "rule", info: "The Community Housing Fund takes non-profit societies, housing co-operatives, municipal housing providers and First Nations; private or other proponents fail that check. BC Builds takes any proponent that meets its below-market terms." },
+  "developer_partner": { need: "rule", info: "BC Builds asks a non-profit to team with a developer or builder; a 'No' here fails that check for a non-profit." },
+  "tenure": { need: "run", info: "Social housing, as the DCL By-law defines it, is exempt from development cost levies and community amenity contributions and rezones under the social housing policy. Secured market rental answers to the below-market rental policy instead (20% of floor area at 20% below the CMHC average)." },
+  "storeys": { need: "run", info: "Tested against the transit-oriented minimum for the tier and the code basis (Part 9 up to three storeys and 600 m², Part 3 above). Storeys × floor to floor should land near the height; where the stated height is taller, the massing uses the stated height and says the extra is parapet or a taller ground floor." },
+  "height_m": { need: "run", info: "Tested against the district's outright maximum (RM-1: 10.7 m) and, in a rezoning, the staff benchmark (here 19.9 to 21.3 m). Over the outright limit means a rezoning is needed; over the benchmark means a bigger ask of staff." },
+  "floor_to_floor_m": { need: "figure", info: "Sizes the storeys in the section and the Revit floor plates. 3.0 to 3.3 m is usual for wood-frame residential." },
+  "gfa_m2": { need: "run", info: "Gross floor area over all storeys. Divided by the site area it is the FSR, tested against the outright maximum (RM-1: 1.2) and the benchmark (about 3.0). The massing spreads it evenly over the storeys." },
+  "residential_gfa_m2": { need: "rule", info: "With the non-residential area, BC Builds' cap of 30% non-residential floor area." },
+  "non_residential_gfa_m2": { need: "rule", info: "Childcare, a hall, a church, shops. BC Builds caps non-residential space at 30% of the floor area." },
+  "setbacks_m.front": { need: "figure", info: "Setbacks size the envelope the masses are drawn in; they are not read from the by-law here, so say in the notes when they are placeholders." },
+  "setbacks_m.rear": { need: "figure", info: "The rear yard, usually the lane side; it also leaves room for the retained trees' barriers." },
+  "setbacks_m.side": { need: "figure", info: "Applied on both sides; the envelope's width is the frontage less twice this." },
+  "units.studio": { need: "rule", info: "The bedroom mix. In a rezoning at least 35% of units must have two or more bedrooms, and from 27 Oct 2026 at least 5% three or more. Leave the mix blank and the family-unit rule returns uncertain." },
+  "units.one_bed": { need: "rule", info: "Counted toward the total; the family share is two-bedroom-plus over all units." },
+  "units.two_bed": { need: "rule", info: "Counts as a family unit: at least 35% of units must have two or more bedrooms in a rezoning." },
+  "units.three_bed_plus": { need: "rule", info: "Counts as a family unit, and from 27 Oct 2026 at least 5% of units must have three or more bedrooms." },
+  "share_below_hils": { need: "rule", info: "Housing Income Limits are BC Housing's yearly income ceilings by unit size. The City's social housing definition needs at least 30% of the units for households below the HILs, at rents of at most 30% of income. 0.30 means 30%." },
+  "max_rent_share_of_income": { need: "rule", info: "The rent ceiling for the HILs units: at most 30% of household income under the City's definition." },
+  "housing_agreement_years": { need: "rule", info: "The City secures social housing by a housing agreement for the longer of 60 years and the life of the building; BC Builds' leases run 60 to 99 years." },
+  "owner_type_at_completion": { need: "rule", info: "The social housing definition needs the building owned by a non-profit society, a housing co-operative, the City, the Province or Canada. A private owner fails it." },
+  "target_programs": { need: "rule", info: "The funders whose fit decides the memo's second answer. Programs left unticked are still run and listed in the ledger as information." },
+  "rent_tiers_units.market": { need: "rule", info: "The Community Housing Fund's mix: 30% of units at market-ish rents for low to moderate incomes (2025 limits $85,870 under two bedrooms, $138,770 two bedrooms and up), 50% rent-geared-to-income, 20% deep subsidy, each within 2 points. Blank tiers leave the fund's check uncertain." },
+  "rent_tiers_units.rgi": { need: "rule", info: "Rent-geared-to-income units: 50% of the total under the Community Housing Fund's 30/50/20 mix." },
+  "rent_tiers_units.deep_subsidy": { need: "rule", info: "Deep-subsidy (shelter-rate) units: 20% of the total under the Community Housing Fund's 30/50/20 mix." },
+  "accessible_units": { need: "rule", info: "The Community Housing Fund needs at least 5% of units accessible (adaptable units are counted separately by the design guidelines)." },
+  "below_market_unit_share": { need: "rule", info: "BC Builds: at least 20% of the units at least 20% below market rent; 1.0 means every unit. The City's below-market rental policy for secured market rental counts floor area instead." },
+  "below_market_discount": { need: "rule", info: "The discount of those units to market: at least 20% for BC Builds (0.20)." },
+  "site_control": { need: "rule", info: "Readiness for a funding call. The Community Housing Fund accepts a finalized deal, a purchase agreement, a letter of intent or a council resolution; 'none yet' fails the readiness bar. Construction must also be able to start within 18 months of an award." },
+  "replacement_trees_proposed": { need: "rule", info: "Trees planted after construction. Retained plus replacement trees must reach Schedule C's minimum for the site area; each tree short is $1,000 cash in lieu." },
+  "parking_spaces": { need: "", info: "No minimum off-street parking applies in Vancouver since June 2024; the count is reported as information. Bicycle spaces are set by the Parking By-law at the development permit stage." },
+  "bicycle_spaces": { need: "", info: "Reported as information; the Parking By-law sets the minimum at the development permit stage." },
+  "rezoning_path": { need: "rule", info: "Blank means the option must fit outright. Name a path (CD-1 under the Interim Rezoning Policy for Social Housing, an ODP amendment) and the memo answers 'by rezoning' through that policy; the outright rules then read as the ask, not as a fail." },
+  "proponent": { need: "", info: "The society, co-operative or body that will own and run the housing; printed in the memo's title block." },
+  "name": { need: "", info: "How the option is listed and printed; say when it is hypothetical." },
+  "address": { need: "", info: "Printed as the memo's title; python -m ffm context geocodes it to draw the surroundings." },
+  "municipality": { need: "", info: "A note: the rule stack is written for the City of Vancouver." },
+  "owner": { need: "", info: "Printed in the memo's inputs." },
+  "notes": { need: "", info: "Placeholders, assumptions and what still needs checking. The memo prints them." },
+};
+
+const NEED_WORD = { run: "needed to run", rule: "read by a rule; blank means uncertain", figure: "drawings only" };
+
+/* The label of a field: its text, the mark that says who reads it, and the (i) that opens the explanation. */
+function labelHtml(f, id, opts = {}) {
+  const meta = FIELD_META[f.key] || {};
+  const need = meta.need || "";
+  const tag = opts.tag || "label";
+  const attrs = tag === "label" ? ` for="${id}"` : ` id="${id}-label"`;
+  const mark = need ? `<i class="need need-${need}" title="${h(NEED_WORD[need])}" aria-hidden="true"></i><span class="sr-only">(${h(NEED_WORD[need])})</span>` : "";
+  const text = opts.hideLabel ? `<span class="sr-only">${h(f.label)}</span>` : h(f.label);
+  const info = meta.info ? `<button type="button" class="info-btn" aria-label="About ${h(f.label)}" aria-expanded="false" data-info="${h(meta.info)}">i</button>` : "";
+  return `<span class="label-line"><${tag}${attrs} class="${opts.hideLabel ? "sr-only" : ""}">${mark}${text}</${tag}>${info}</span>`;
+}
+
 // ---------------------------------------------------------------- form rendering
 
 function renderForm(formEl, schema, obj, onChange) {
   formEl.innerHTML = "";
+  const legend = document.createElement("p");
+  legend.className = "need-legend";
+  formEl.appendChild(legend);
   for (const group of schema) {
     const g = document.createElement("div");
     g.className = "group";
     g.innerHTML = `<div class="eyebrow">${h(group.group)}</div>`;
-    for (const f of group.fields) g.appendChild(renderField(f, obj, onChange));
+    // a group of one field named like the group ("Notes / Notes") shows the name once; the label stays for screen readers
+    const single = group.fields.length === 1 && group.fields[0].label === group.group;
+    for (const f of group.fields) g.appendChild(renderField(single ? { ...f, hideLabel: true } : f, obj, onChange));
     formEl.appendChild(g);
   }
+  refreshNeeds(formEl, schema, obj);
 }
+
+/* The legend over a form: how many of the needed fields and of the rule-read fields are filled in. */
+function refreshNeeds(formEl, schema, obj) {
+  const legend = $(".need-legend", formEl);
+  if (!legend) return;
+  const counts = { run: [0, 0], rule: [0, 0] };
+  const walk = fields => {
+    for (const f of fields) {
+      if (f.row) { walk(f.fields); continue; }
+      const need = (FIELD_META[f.key] || {}).need;
+      if (!need || !counts[need]) continue;
+      const v = getPath(obj, f.key);
+      const filled = Array.isArray(v) ? v.length > 0 : (f.type === TRI ? v === true || v === false : v !== null && v !== undefined && v !== "");
+      counts[need][1]++;
+      if (filled) counts[need][0]++;
+    }
+  };
+  for (const g of schema) walk(g.fields);
+  const [r0, r1] = counts.run, [u0, u1] = counts.rule;
+  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i> needed to run: <b>${r0} of ${r1}</b></span>
+    <span><i class="need need-rule" aria-hidden="true"></i> read by a rule: <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">(a blank comes back as uncertain)</span>` : ""}</span>
+    <span><i class="need need-figure" aria-hidden="true"></i> drawings only</span>`;
+}
+
+/* The (i) beside a label opens a short explanation under it; Esc, a click elsewhere or the same (i) closes it. */
+function closeInfo() {
+  $$(".pop").forEach(p => p.remove());
+  $$(".info-btn[aria-expanded='true']").forEach(b => b.setAttribute("aria-expanded", "false"));
+}
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".info-btn");
+  if (!btn) { if (!e.target.closest(".pop")) closeInfo(); return; }
+  const open = btn.getAttribute("aria-expanded") === "true";
+  closeInfo();
+  if (open) return;
+  const pop = document.createElement("div");
+  pop.className = "pop";
+  pop.setAttribute("role", "note");
+  pop.innerHTML = `<p>${h(btn.dataset.info)}</p>`;
+  btn.closest(".field, .label-line").insertAdjacentElement("afterend", pop);
+  btn.setAttribute("aria-expanded", "true");
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $(".pop")) { closeInfo(); } });
 
 function renderField(f, obj, onChange) {
   if (f.row) {
     const wrap = document.createElement("div");
     if (f.label) wrap.innerHTML = `<div class="field"><span class="label">${h(f.label)}</span></div>`;
+    if (f.label) { const first = f.fields[0]; const m = FIELD_META[first.key]; if (m && m.need) $(".label", wrap).insertAdjacentHTML("afterbegin", `<i class="need need-${m.need}" title="${h(NEED_WORD[m.need])}" aria-hidden="true"></i>`); }
     const row = document.createElement("div");
     row.className = "field-row";
     for (const sub of f.fields) row.appendChild(renderField(sub, obj, onChange));
@@ -445,42 +582,58 @@ function renderField(f, obj, onChange) {
     return el;
   }
   if (f.type === TRI) {
-    el.innerHTML = `<span class="label">${h(f.label)}</span>`;
+    el.innerHTML = labelHtml(f, id, { tag: "span" });
+    $("span[id]", el).classList.add("label");
     const tri = document.createElement("div");
     tri.className = "tri";
     tri.setAttribute("role", "radiogroup");
-    tri.setAttribute("aria-label", f.label);
-    for (const [v, lab] of [[true, "Yes"], [false, "No"], [null, "Not sure"]]) {
+    tri.setAttribute("aria-labelledby", `${id}-label`);
+    // a radio group: one tab stop on the chosen answer, the arrow keys move the choice
+    const choices = [[true, "Yes"], [false, "No"], [null, "Not sure"]];
+    const current = value === undefined ? null : value;
+    const buttons = [];
+    const choose = (i, focus) => {
+      setPath(obj, f.key, choices[i][0]);
+      buttons.forEach((x, k) => { x.setAttribute("aria-checked", String(k === i)); x.tabIndex = k === i ? 0 : -1; });
+      if (focus) buttons[i].focus();
+      onChange(f.key);
+    };
+    choices.forEach(([v, lab], i) => {
       const b = document.createElement("button");
       b.type = "button";
       b.textContent = lab;
       b.className = v === null ? "unsure" : "";
       b.setAttribute("role", "radio");
-      b.setAttribute("aria-checked", String((value === undefined ? null : value) === v));
-      b.addEventListener("click", () => {
-        setPath(obj, f.key, v);
-        $$("button", tri).forEach(x => x.setAttribute("aria-checked", "false"));
-        b.setAttribute("aria-checked", "true");
-        onChange(f.key);
+      b.setAttribute("aria-checked", String(current === v));
+      b.tabIndex = current === v ? 0 : -1;
+      b.addEventListener("click", () => choose(i, false));
+      b.addEventListener("keydown", e => {
+        const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (!step) return;
+        e.preventDefault();
+        choose((i + step + choices.length) % choices.length, true);
       });
+      buttons.push(b);
       tri.appendChild(b);
-    }
+    });
+    if (!buttons.some(b => b.tabIndex === 0)) buttons[2].tabIndex = 0;
     el.appendChild(tri);
     return el;
   }
   if (f.type === "select") {
     const opts = f.options.map(([v, lab]) => `<option value="${h(v)}"${String(value ?? "") === String(v) ? " selected" : ""}>${h(lab)}</option>`).join("");
-    el.innerHTML = `<label for="${id}">${h(f.label)}</label><select id="${id}">${opts}</select>${f.help ? `<span class="help">${h(f.help)}</span>` : ""}`;
+    el.innerHTML = `${labelHtml(f, id)}<select id="${id}">${opts}</select>${f.help ? `<span class="help">${h(f.help)}</span>` : ""}`;
     $("select", el).addEventListener("change", e => { setPath(obj, f.key, e.target.value === "" ? null : e.target.value); onChange(f.key); });
     return el;
   }
   if (f.type === "textarea") {
-    el.innerHTML = `<label for="${id}">${h(f.label)}</label><textarea id="${id}">${h(value ?? "")}</textarea>`;
+    el.innerHTML = `${labelHtml(f, id, { hideLabel: f.hideLabel })}<textarea id="${id}">${h(value ?? "")}</textarea>`;
     $("textarea", el).addEventListener("input", e => { setPath(obj, f.key, e.target.value || null); onChange(f.key); });
     return el;
   }
   if (f.type === "programs") {
-    el.innerHTML = `<span class="label">${h(f.label)}</span>`;
+    el.innerHTML = labelHtml(f, id, { tag: "span" });
+    $("span[id]", el).classList.add("label");
     const box = document.createElement("div");
     box.className = "checks";
     const chosen = new Set(Array.isArray(value) ? value : []);
@@ -501,7 +654,8 @@ function renderField(f, obj, onChange) {
     return el;
   }
   if (f.type === "trees") {
-    el.innerHTML = `<span class="label">Existing trees on site</span>`;
+    el.innerHTML = labelHtml({ ...f, label: "Existing trees on site" }, id, { tag: "span" });
+    $("span[id]", el).classList.add("label");
     const list = document.createElement("div");
     list.className = "trees";
     const trees = Array.isArray(value) ? value : [];
@@ -515,7 +669,7 @@ function renderField(f, obj, onChange) {
           <input type="text" value="${h(t.species ?? "")}" aria-label="Species" placeholder="species">
           <input type="number" step="any" value="${t.dbh_cm ?? ""}" aria-label="DBH in cm" placeholder="DBH">
           <select aria-label="Retain or remove"><option value="retain"${t.status === "retain" ? " selected" : ""}>retain</option><option value="remove"${t.status === "remove" ? " selected" : ""}>remove</option></select>
-          <button type="button" class="x" title="Remove this row">×</button>`;
+          <button type="button" class="x" title="Remove this tree" aria-label="Remove tree ${h(t.id || i + 1)}">×</button>`;
         const [idIn, spIn, dbhIn] = $$("input", row);
         idIn.addEventListener("input", e => { t.id = e.target.value || null; onChange(f.key); });
         spIn.addEventListener("input", e => { t.species = e.target.value || null; onChange(f.key); });
@@ -535,16 +689,22 @@ function renderField(f, obj, onChange) {
     el.appendChild(list);
     return el;
   }
-  // text, slug, number
+  // text, slug, number. A blank number is read as "not sure", and the empty field says so.
   const isNum = f.type === "number";
-  el.innerHTML = `<label for="${id}">${h(f.label)}</label>
-    <input id="${id}" type="${isNum ? "number" : "text"}"${isNum ? ` step="${f.int ? "1" : "any"}"` : ""} value="${h(value ?? "")}">
-    ${f.help ? `<span class="help">${h(f.help)}</span>` : ""}`;
+  const warnId = `${id}-warn`;
+  el.innerHTML = `${labelHtml(f, id, { hideLabel: f.hideLabel })}
+    <input id="${id}" type="${isNum ? "number" : "text"}"${isNum ? ` step="${f.int ? "1" : "any"}" placeholder="not sure"` : ""}${f.share ? ` min="0" max="1" aria-describedby="${warnId}"` : ""} value="${h(value ?? "")}">
+    ${f.help ? `<span class="help">${h(f.help)}</span>` : ""}
+    ${f.share ? `<span class="help warn" id="${warnId}" hidden>Write a share as a decimal: 0.30 for 30%.</span>` : ""}`;
+  const warn = f.share ? $(".warn", el) : null;
+  const checkShare = v => { if (warn) warn.hidden = !(typeof v === "number" && v > 1); };
+  checkShare(value);
   $("input", el).addEventListener("input", e => {
     let v = e.target.value;
     if (isNum) v = v === "" ? null : Number(v);
     else if (f.type === "slug") v = v.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "-") || null;
     else v = v === "" ? null : v;
+    checkShare(v);
     setPath(obj, f.key, v);
     onChange(f.key);
   });
@@ -558,6 +718,48 @@ function unitsLive(option) {
   const fam = n("two_bed") + n("three_bed_plus");
   if (!total) return `total <b>0</b> units`;
   return `total <b>${total}</b> units · two-bed or more <b>${fam}</b> (<b>${(100 * fam / total).toFixed(1)}%</b>) · three-bed or more <b>${n("three_bed_plus")}</b> (<b>${(100 * n("three_bed_plus") / total).toFixed(1)}%</b>)`;
+}
+
+/* How many three-state answers in a form are "not sure" (null), for the card's one-line summary. */
+function countUnsure(obj, schema) {
+  let n = 0;
+  const walk = fields => { for (const f of fields) { if (f.row) walk(f.fields); else if (f.type === TRI && getPath(obj, f.key) == null) n++; } };
+  for (const g of schema) walk(g.fields);
+  return n;
+}
+
+function unsureNote(n) { return n ? ` · <span class="unsure-n">${n} answer${n === 1 ? "" : "s"} not sure</span>` : ""; }
+
+function siteSummary(s) {
+  if (!s) return "";
+  const dims = s.frontage_m != null && s.depth_m != null ? ` · ${h(s.frontage_m)} × ${h(s.depth_m)} m` : "";
+  return `<b>${h(s.address || s.id || "A new site")}</b> · ${h(s.zoning_district || "district not set")} · ${s.site_area_m2 != null ? `${h(fmtNum(s.site_area_m2))} m²` : "area not set"}${dims}${unsureNote(countUnsure(s, SITE_FIELDS))}`;
+}
+
+function optionSummary(o) {
+  if (!o) return "";
+  const u = o.units || {};
+  const total = ["studio", "one_bed", "two_bed", "three_bed_plus"].reduce((t, k) => t + (Number(u[k]) || 0), 0);
+  const bits = [];
+  if (o.storeys != null) bits.push(`${h(o.storeys)} storeys`);
+  if (o.height_m != null) bits.push(`${h(o.height_m)} m`);
+  if (o.gfa_m2 != null) bits.push(`${h(fmtNum(o.gfa_m2))} m² GFA`);
+  if (total) bits.push(`${total} units`);
+  if (o.tenure) bits.push(h(String(o.tenure).replace(/_/g, " ")));
+  return `<b>${h(o.name || o.id || "A new option")}</b>${bits.length ? ` · ${bits.join(" · ")}` : ""}${unsureNote(countUnsure(o, OPTION_FIELDS))}`;
+}
+
+/* An input card collapses to its file and a summary once a file is chosen, so the memo leads; Edit opens the form. */
+function setCollapsed(kind, collapsed) {
+  const card = $(`#step-${kind}`), btn = $(`#edit-${kind}`);
+  card.classList.toggle("collapsed", collapsed);
+  btn.textContent = collapsed ? "Edit" : "Done";
+  btn.setAttribute("aria-expanded", String(!collapsed));
+  btn.setAttribute("aria-label", collapsed ? `Edit the ${kind}` : `Close the ${kind} form`);
+}
+
+function refreshSummary(kind) {
+  $(`#${kind}-summary`).innerHTML = kind === "site" ? siteSummary(state.site) : optionSummary(state.option);
 }
 
 /* rent_tiers_units: all three blank means "not stated" (null), which the engine reads as unsure. */
@@ -619,14 +821,19 @@ async function selectSite(id) {
   }
   renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
   $("#site-dirty").hidden = !state.siteDirty;
+  refreshSummary("site");
+  setCollapsed("site", id !== "__new__");
   await loadOptions();
   await loadRuns();
   fillRunSelects();
+  setStep(state.step);
 }
 
 function onSiteChange() {
   state.siteDirty = true;
   $("#site-dirty").hidden = false;
+  refreshSummary("site");
+  refreshNeeds($("#site-form"), SITE_FIELDS, state.site);
 }
 
 async function loadOptions() {
@@ -652,12 +859,17 @@ async function selectOption(id) {
   }
   renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
   $("#option-dirty").hidden = !state.optionDirty;
+  refreshSummary("option");
+  setCollapsed("option", id !== "__new__");
   renderQuiet();
+  setStep(state.step);
 }
 
 function onOptionChange(key) {
   state.optionDirty = true;
   $("#option-dirty").hidden = false;
+  refreshSummary("option");
+  refreshNeeds($("#option-form"), OPTION_FIELDS, state.option);
   if (key && key.startsWith("units.")) {
     const live = $('[data-live="units"]');
     if (live) live.innerHTML = unitsLive(state.option);
@@ -718,17 +930,18 @@ async function runRules() {
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
     state.run = run;
+    await attachCause(run);
     renderMemo(run);
     showStamp(run.stamp);
     enableExports(run);
     setStep(3);
-    $("#export-panel").hidden = true;
+    closeExportPanel();
     await loadRuns();
     fillRunSelects();
-    $("#compare-note").textContent = run.diff ? `${run.diff.changes.length} change${run.diff.changes.length === 1 ? "" : "s"} · ${run.diff.previous_stamp} → ${run.diff.current_stamp}` : "";
+    setCompareNote(run.diff);
     const ms = Math.round(performance.now() - t0);
-    toast(`Ran the rules as of ${run.as_of} in ${ms} ms · stamp ${run.stamp} · ${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}`);
-    $("#step-run").scrollIntoView({ behavior: "smooth", block: "start" });
+    toast(`Ran the rules as of ${run.as_of} in ${ms} ms · stamp ${run.stamp} · ${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · against ${run.diff.previous_as_of}: ${changesPhrase(run.diff)}` : ""}`);
+    $("#step-run").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   } catch (e) {
     toast(e.message, true);
   } finally {
@@ -747,10 +960,11 @@ function enableExports(run) {
   const base = run ? `api/runs/${run.run_id}` : "";
   const urls = on ? (run.downloads || { html: `${base}/memo.html?download=1`, md: `${base}/memo.md?download=1`, massing: run.massing ? `${base}/massing.json?download=1` : null }) : {};
   const stem = run ? run.run_id.replace("/", "_") : "memo";
+  // a disabled download has no href, so it is neither clickable nor in the tab order
   const set = (sel, key, name) => {
     const a = $(sel);
     const ok = on && !!urls[key];
-    a.href = ok ? urls[key] : "#";
+    if (ok) a.href = urls[key]; else a.removeAttribute("href");
     a.setAttribute("download", name);
     a.setAttribute("aria-disabled", String(!ok));
   };
@@ -798,7 +1012,8 @@ function renderMemo(run) {
   const site = L.inputs.site, opt = L.inputs.option;
   const parts = [];
 
-  // 1. header
+  // 1. header: the memo's title block; a comparison adds a revision cell
+  const d = run.diff;
   parts.push(`<div class="card memo-head">
     <h1>${h(site.address || site.id)}</h1>
     <div class="memo-meta">
@@ -806,15 +1021,19 @@ function renderMemo(run) {
       <div><b>Proponent</b><span>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="cont">(${h(String(opt.proponent_type).replace(/_/g, " "))})</span>` : ""}</span></div>
       <div><b>Rules as of</b><span>${h(L.run.as_of)}</span></div>
       <div><b>Stamp</b><span><code>${h(L.run.stamp.stamp)}</code> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
+      ${d ? `<div class="rev-cell"><b>Revision</b><span>${REV} against ${h(d.previous_as_of)} · <code>${h(d.previous_stamp)}</code></span></div>` : ""}
     </div>
     <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
   </div>`);
 
-  // 2. the three answers; 3. the massing figures beside them at >=1600 px, under them otherwise;
-  // 4. what changed; 5. the full ledger; 6. inputs, sources, version stamp
+  // 2. a comparison's answer comes straight after the title block; 3. the three answers; 4. the massing figures
+  // beside them at >=1600 px, under them otherwise; 5. the full ledger; 6. inputs, sources, version stamp
+  if (d) parts.push(renderChanges(d));
+  if (d && run.compareLedger) parts.push(renderSideBySide(run));
+  const changed = new Set(d ? (d.changes || []).map(c => c.rule_id) : []);
   const rest = [];
-  if (run.diff) rest.push(renderChanges(run.diff));
-  rest.push(renderLedger(res));
+  rest.push(renderClauses(res, L, changed));
+  rest.push(renderLedger(res, changed));
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run));
@@ -830,6 +1049,29 @@ function renderMemo(run) {
   void memoEl.offsetWidth;  // restart the fade
   memoEl.classList.add("landed");
   wireFigures(run);
+  wireLedger();
+  setPrintFooter(run);
+}
+
+/* Every printed page carries the address, the date and the stamp in its footer, and its page number. */
+function setPrintFooter(run) {
+  let st = $("#print-page");
+  if (!st) { st = document.createElement("style"); st.id = "print-page"; document.head.appendChild(st); }
+  const site = (run.ledger && run.ledger.inputs && run.ledger.inputs.site) || {};
+  const text = `Funding-Fit Memo · ${site.address || site.id || ""} · rules as of ${run.as_of} · stamp ${String(run.stamp || "").toUpperCase()}`.replace(/["\\\n]/g, " ");
+  st.textContent = `@media print { @page { margin: 14mm 14mm 16mm;
+    @bottom-left { content: "${text}"; font: 7.5pt "IBM Plex Mono", monospace; color: #444; }
+    @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "IBM Plex Sans", sans-serif; color: #444; } } }`;
+}
+
+/* The ledger opens one layer at a time, or all at once; printing opens every layer and closes them again after. */
+function wireLedger() {
+  const btn = $(".ledger .open-all");
+  if (!btn) return;
+  const sync = () => { const all = $$(".ledger details").every(x => x.open); btn.textContent = all ? "Close all layers" : "Open all layers"; btn.setAttribute("aria-expanded", String(all)); };
+  btn.addEventListener("click", () => { const open = !$$(".ledger details").every(x => x.open); $$(".ledger details").forEach(x => { x.open = open; }); sync(); });
+  $$(".ledger details").forEach(x => x.addEventListener("toggle", sync));
+  sync();
 }
 
 function answerAllowed(L) {
@@ -857,7 +1099,7 @@ function answerFunders(L) {
   const targets = new Set(opt.target_programs || []);
   const rows = res.filter(r => r.layer === "E" && (!targets.size || targets.has(r.rule_id)));
   const others = res.filter(r => r.layer === "E" && targets.size && !targets.has(r.rule_id));
-  let body = `<ul class="finding-list">${rows.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
+  let body = `<ul class="finding-list">${rows.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(withoutRepeat(r.title, r.finding))}</span></span></li>`).join("")}</ul>`;
   if (others.length) body += `<p class="path" style="margin-top:12px">Not targeted, listed in the ledger: ${others.map(r => h(r.title)).join("; ")}.</p>`;
   return `<section class="card answer" data-verdict="${h(verdictStatus(ans.funded.verdict))}">
     <h2><span class="badge">2</span> Does it fit the funders?</h2>
@@ -881,7 +1123,137 @@ function answerUnsure(L) {
   </section>`;
 }
 
-function renderLedger(res) {
+// ---------------------------------------------------------------- the clauses applied: proposed, permitted, the ask
+
+const pct = x => (typeof x === "number" ? `${(100 * x).toFixed(x * 100 % 1 ? 1 : 0)}%` : "—");
+const num = x => (x === null || x === undefined ? "—" : fmtNum(x));
+
+/* Each check's numbers split three ways: what the option proposes (the simulation's input), what the clause permits
+   or requires, and the ask when the two differ. Checks the table does not know fall back to a split by key name. */
+function splitValues(r, L) {
+  const v = r.values || {}, opt = (L.inputs && L.inputs.option) || {};
+  const ask = r.action || "";
+  const path = L.summary && L.summary.answers && L.summary.answers.rezoning_path;
+  switch (r.check) {
+    case "district_outright_fsr":
+      return { proposed: `FSR ${num(v.fsr && Number(v.fsr).toFixed(2))} (${num(v.gfa_m2)} m² on ${num(v.site_area_m2)} m²)`, permitted: `FSR ${num(v.max_fsr_outright)} outright`,
+               ask: v.fsr > v.max_fsr_outright ? `Density above the outright limit: ${path ? `relaxation by rezoning (${path})` : "a rezoning"}.` : "" };
+    case "district_outright_height":
+      return { proposed: `${num(v.height_m)} m, ${num(v.storeys)} storeys`, permitted: `${num(v.max_height_m_outright)} m outright`,
+               ask: v.height_m > v.max_height_m_outright ? `Height above the outright limit: ${path ? `relaxation by rezoning (${path})` : "a rezoning"}.` : "" };
+    case "rezoning_policy_social_housing": {
+      const b = v.benchmark_height_m || [];
+      return { proposed: `${num(v.height_m)} m, FSR ${num(v.fsr && Number(v.fsr).toFixed(2))}`, permitted: `staff benchmark ${num(b[0])} to ${num(b[1])} m, about FSR ${num(v.benchmark_fsr)} (negotiated, no maximum)`,
+               ask: b[1] && v.height_m > b[1] ? `${(v.height_m - b[1]).toFixed(1)} m above the benchmark: to be negotiated with staff.` : (b[1] && v.fsr > v.benchmark_fsr ? "Density above the benchmark: to be negotiated with staff." : "") };
+    }
+    case "parking_minimums":
+      return { proposed: `${num(v.parking_spaces)} vehicle, ${num(v.bicycle_spaces)} bicycle spaces`, permitted: "no minimum (June 2024); bicycle spaces set at development permit", ask: "" };
+    case "toa_status":
+      return { proposed: v.storeys != null ? `${num(v.storeys)} storeys` : `${num(opt.storeys)} storeys`, permitted: v.tier ? `tier ${v.tier}: at least ${num(v.min_storeys || v.floors)} storeys may not be refused` : "tier 1: 20, tier 2: 12, tier 3: 8 storeys minimum allowable", ask };
+    case "family_unit_share": {
+      const m3 = v.min_three_plus_bed_share;
+      return { proposed: v.units_total ? `${num(v.two_plus_bed_units)} of ${num(v.units_total)} units two-bed+ (${pct(v.two_plus_bed_share)}); ${num(v.three_plus_bed_units)} three-bed+ (${pct(v.three_plus_bed_share)})` : "unit mix not given",
+               permitted: `at least ${pct(v.min_two_plus_bed_share ?? 0.35)} two-bed+${m3 != null ? `, ${pct(m3)} three-bed+` : ""}`, ask };
+    }
+    case "social_housing_definition":
+      return { proposed: `${pct(v.share_below_hils)} of units below HILs; ${num(v.housing_agreement_years)}-year agreement; owner ${String(v.owner_type_at_completion || "—").replace(/_/g, " ")}`,
+               permitted: "at least 30% below HILs at rent of at most 30% of income; 60 years or the life of the building; non-profit, co-op or government owner", ask };
+    case "tree_replacement":
+      return { proposed: `${num(v.existing)} existing, ${num(v.removed)} removed, ${num(v.replacements_proposed)} replacements, ${num(v.trees_after)} after`, permitted: `Schedule C: at least ${num(v.schedule_c_required)} trees on ${num(v.site_area_m2)} m²`,
+               ask: v.shortfall > 0 ? `${num(v.shortfall)} tree${v.shortfall === 1 ? "" : "s"} short: plant more or pay $${num(v.cash_in_lieu_cad)} cash in lieu.` : ask };
+    case "code_basis_flags":
+      return { proposed: `${num(v.storeys)} storeys`, permitted: `Part ${v.part || "—"} of the BC Building Code (Part 9 up to 3 storeys and 600 m²)`, ask: "" };
+    case "unit_area_flags":
+      return { proposed: `average ${num(v.average_gross_area_per_unit_m2)} m² gross per unit`, permitted: `BC Housing minimum net areas from ${num(v.min_net_area_m2)} m²`, ask: "" };
+    case "chf_fit": {
+      const mix = v.mix_shares ? `mix ${pct(v.mix_shares.market)} / ${pct(v.mix_shares.rgi)} / ${pct(v.mix_shares.deep_subsidy)}` : "rent-tier mix not given";
+      const req = v.required_mix ? `${pct(v.required_mix.market)} market / ${pct(v.required_mix.rgi)} RGI / ${pct(v.required_mix.deep_subsidy)} deep subsidy (±2 points); 5% accessible; 60-year lease at nominal value; site control` : "";
+      const unknown = (v.unknown || []).length ? `Supply: ${v.unknown.join("; ")}.` : "";
+      const fails = (v.fails || []).length ? `Fix: ${v.fails.join("; ")}.` : "";
+      return { proposed: `${mix}; ${num(opt.accessible_units)} accessible; site control ${String(opt.site_control || "—").replace(/_/g, " ")}`, permitted: req, ask: [fails, unknown].filter(Boolean).join(" ") || ask };
+    }
+    case "bc_builds_fit": {
+      const unknown = (v.unknown || []).length ? `Supply: ${v.unknown.join("; ")}.` : "";
+      const fails = (v.fails || []).length ? `Fix: ${v.fails.join("; ")}.` : "";
+      return { proposed: `${pct(opt.below_market_unit_share)} of units at ${pct(opt.below_market_discount)} below market; ${num(opt.non_residential_gfa_m2 || 0)} m² non-residential`, permitted: "at least 20% of units at least 20% below market; non-residential at most 30% of area; a non-profit teamed with a builder", ask: [fails, unknown].filter(Boolean).join(" ") || ask };
+    }
+    case "dcl_cac":
+      return { proposed: "social housing", permitted: `DCL ${v.dcl_exempt ? "exempt" : "payable"}, CAC ${v.cac_exempt ? "exempt" : "payable"}`, ask: "" };
+    case "info_only":
+      return { proposed: "", permitted: Object.entries(v).filter(([, x]) => x !== null && typeof x !== "object").map(([k, x]) => `${k.replace(/_/g, " ")}: ${fmtNum(x)}`).join("; "), ask: "" };
+    default: {
+      const lim = k => /^(max_|min_|required|benchmark_|schedule_|eligible)/.test(k);
+      const flat = Object.entries(v).filter(([, x]) => x !== null && x !== undefined && typeof x !== "object");
+      return { proposed: flat.filter(([k]) => !lim(k)).map(([k, x]) => `${k.replace(/_/g, " ")} ${fmtNum(x)}`).join("; "), permitted: flat.filter(([k]) => lim(k)).map(([k, x]) => `${k.replace(/_/g, " ")} ${fmtNum(x)}`).join("; "), ask };
+    }
+  }
+}
+
+/* Every clause that applied to this site and option, in one table: its status, the numbers the option proposes,
+   what the clause permits or requires, and the ask where they differ. Not-applicable rules are named underneath. */
+function renderClauses(res, L, changed = new Set()) {
+  const applied = res.filter(r => r.status !== "not_applicable");
+  const na = res.filter(r => r.status === "not_applicable");
+  const order = { fail: 0, conditional: 1, uncertain: 2, pass: 3, info: 4 };
+  const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
+    const s = splitValues(r, L);
+    return `<tr class="st-${h(r.status)}">
+      <td><span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · v ${h(r.version_effective_from || "—")}${r.source && r.source.section ? ` · ${h(r.source.section)}` : ""}</code></td>
+      <td class="status">${pill(r.status)}</td>
+      <td class="nums">${h(s.proposed || "—")}</td>
+      <td class="nums">${h(s.permitted || "—")}</td>
+      <td class="ask">${s.ask ? h(s.ask) : `<span class="cont">—</span>`}</td>
+    </tr>`;
+  }).join("");
+  const counts = {};
+  for (const r of applied) counts[r.status] = (counts[r.status] || 0) + 1;
+  const countPills = ["fail", "conditional", "uncertain", "pass", "info"].filter(s => counts[s]).map(s => `<span class="pill pill-${s}">${counts[s]} ${h(STATUS_WORD[s])}</span>`).join("");
+  return `<section class="card section clauses">
+    <h2>Clauses applied · ${applied.length} of ${res.length} rules</h2>
+    <p class="intro">Every clause that applies to this site and option, worst first. <b>Proposed</b> is what the option puts forward and the simulation used; <b>permitted or required</b> is the clause's own limit; <b>the ask</b> is the relaxation, negotiation or missing figure that stands between them.</p>
+    <div class="counts">${countPills}</div>
+    <table class="plain"><colgroup><col class="c-rule"><col class="c-status"><col class="c-prop"><col class="c-perm"><col class="c-ask"></colgroup>
+      <thead><tr><th>Clause</th><th>Status</th><th>Proposed (simulated)</th><th>Permitted or required</th><th>The ask</th></tr></thead><tbody>${rows}</tbody></table>
+    ${na.length ? `<p class="na">Not applicable here: ${na.map(r => `${h(r.title)} <code>${h(r.rule_id)}</code>`).join("; ")}.</p>` : ""}
+  </section>`;
+}
+
+/* Two runs side by side: the three answers of each, then every rule's status in both, the differences marked. */
+function renderSideBySide(run) {
+  const A = run.ledger, B = run.compareLedger;
+  if (!A || !B) return "";
+  const nameOf = L => (L.inputs && L.inputs.option && (L.inputs.option.name || L.inputs.option.id)) || "option";
+  const ans = L => L.summary.answers;
+  const verdictCell = w => `<span class="pill pill-${h(verdictStatus(w) || "na")}">${h(cap(w))}</span>`;
+  const head = [
+    ["Allowed outright", ans(A).allowed.outright.verdict, ans(B).allowed.outright.verdict],
+    ["By rezoning", ans(A).allowed.by_rezoning.verdict, ans(B).allowed.by_rezoning.verdict],
+    ["Fits the funders", ans(A).funded.verdict, ans(B).funded.verdict],
+    ["Open items", String((ans(A).unsure || []).length), String((ans(B).unsure || []).length)],
+  ];
+  const byId = Object.fromEntries(B.results.map(r => [r.rule_id, r]));
+  const rows = A.results.filter(r => r.status !== "not_applicable" || (byId[r.rule_id] && byId[r.rule_id].status !== "not_applicable")).map(r => {
+    const b = byId[r.rule_id];
+    const sa = splitValues(r, A), sb = b ? splitValues(b, B) : { proposed: "" };
+    const differs = !b || b.status !== r.status;
+    return `<tr${differs ? ' class="differs"' : ""}>
+      <td><span class="rule-title">${h(r.title)}</span><code class="rule-id">${h(r.rule_id)}</code></td>
+      <td class="status">${pill(r.status)}<div class="cont">${h(sa.proposed || "")}</div></td>
+      <td class="status">${b ? pill(b.status) : "<span class=\"cont\">not run</span>"}<div class="cont">${h(sb.proposed || "")}</div></td>
+      <td class="delta">${differs ? "≠" : ""}</td>
+    </tr>`;
+  }).join("");
+  return `<section class="card section side" id="side-by-side">
+    <h2>Side by side: this run against ${h(run.diff && run.diff.previous_as_of || "the compared run")}</h2>
+    <table class="plain side-head"><thead><tr><th></th><th>A · ${h(nameOf(A))} <span class="cont">(as of ${h(A.run.as_of)})</span></th><th>B · ${h(nameOf(B))} <span class="cont">(as of ${h(B.run.as_of)})</span></th></tr></thead>
+      <tbody>${head.map(([k, a, b]) => `<tr><th scope="row">${h(k)}</th><td>${k === "Open items" ? h(a) : verdictCell(a)}</td><td>${k === "Open items" ? h(b) : verdictCell(b)}</td></tr>`).join("")}</tbody></table>
+    <table class="plain side-rules"><colgroup><col class="c-rule"><col class="c-ab"><col class="c-ab"><col class="c-delta"></colgroup>
+      <thead><tr><th>Rule</th><th>A</th><th>B</th><th><span class="sr-only">Differs</span></th></tr></thead><tbody>${rows}</tbody></table>
+    <p class="cont">≠ marks a rule whose status differs between the two runs; under each status is what that option proposed.</p>
+  </section>`;
+}
+
+function renderLedger(res, changed = new Set()) {
   const layers = [];
   for (const r of res) {
     let L = layers.find(x => x.layer === r.layer);
@@ -893,21 +1265,22 @@ function renderLedger(res) {
     for (const r of L.rows) counts[r.status] = (counts[r.status] || 0) + 1;
     const countPills = Object.entries(counts).map(([s, n]) => `<span class="pill pill-${h(s)}">${n} ${h(STATUS_WORD[s] || s)}</span>`).join("");
     const rows = L.rows.map(r => `<tr>
-      <td><span class="rule-title">${h(r.title)}</span><code class="rule-id">${h(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code></td>
+      <td><span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code></td>
       <td class="status">${pill(r.status)}</td>
       <td>${h(r.finding)}</td>
       <td class="nums">${h(fmtValues(r.values))}</td>
       <td class="src">${sourceLink(r.source)}</td>
     </tr>`).join("");
-    return `<details>
-      <summary><span class="layer">Layer ${h(L.layer)}</span><span class="layer-title">${h(L.title)}</span><span class="counts">${countPills}</span></summary>
+    const revised = L.rows.some(r => changed.has(r.rule_id));
+    return `<details${revised ? " open" : ""}>
+      <summary><span class="layer">Layer ${h(L.layer)}</span><span class="layer-title">${h(L.title)}</span>${revised ? REV : ""}<span class="counts">${countPills}</span></summary>
       <table class="plain"><colgroup><col class="c-rule"><col class="c-status"><col class="c-finding"><col class="c-nums"><col class="c-src"></colgroup><thead><tr><th>Rule</th><th>Status</th><th>Finding</th><th>Numbers used</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>
     </details>`;
   });
   return `<section class="card section ledger">
-    <div class="eyebrow">Full ledger · ${res.length} rules</div>
-    <h2>Full ledger</h2>
-    <p class="cont" style="color:var(--grey);margin-bottom:6px">Every rule the engine ran, by layer, with the arithmetic it used and the clause it came from. Click a layer to open it.</p>
+    <h2>Full ledger by layer · ${res.length} rules</h2>
+    <p class="intro">The same rules by layer, with the engine's finding, every number it used and the clause it came from, including the rules that did not apply. Open a layer to read its rows.</p>
+    <div class="tools"><button class="btn btn-quiet btn-small open-all" type="button" aria-expanded="false">Open all layers</button></div>
     ${blocks.join("")}
   </section>`;
 }
@@ -917,7 +1290,6 @@ function renderInputs(site, opt) {
   const units = Object.entries(u).map(([k, v]) => `${k.replace(/_/g, " ")} ${v ?? "—"}`).join(", ");
   const tenure = String(opt.tenure || "").replace(/_/g, " ");
   return `<section class="card section">
-    <div class="eyebrow">Inputs</div>
     <h2>Inputs</h2>
     <ul>
       <li>Site <code>${h(site.id)}</code>: ${h(site.zoning_district || "—")}, ${h(fmtNum(site.site_area_m2 ?? "—"))} m², ${h(site.frontage_m ?? "—")} × ${h(site.depth_m ?? "—")} m; owner: ${h(site.owner || "—")}.</li>
@@ -946,7 +1318,6 @@ function renderSources(res, site, opt) {
     items.push(`<li>${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.title || s.url)}</a>` : h(s.title)}</li>`);
   }
   return `<section class="card section sources">
-    <div class="eyebrow">Sources</div>
     <h2>Sources</h2>
     <ul>${items.join("")}</ul>
   </section>`;
@@ -956,7 +1327,6 @@ function renderStamp(run) {
   const st = run.stamp;
   const files = Object.entries(st.rules_files || {}).map(([f, hsh]) => `<li><code>${h(f)}</code> <span class="hash">${h(hsh.slice(0, 16))}…</span></li>`).join("");
   return `<section class="card section stampbox">
-    <div class="eyebrow">Version stamp</div>
     <h2>Version stamp</h2>
     <p>Stamp <code>${h(st.stamp)}</code>: a hash of the rules hash and the rule versions in force on ${h(run.as_of)}. Change one number in one rule and it changes.</p>
     <p class="hash">Rules hash (SHA-256 over all rule files): ${h(st.rules_hash)}</p>
@@ -966,11 +1336,60 @@ function renderStamp(run) {
 
 // ---------------------------------------------------------------- figures: drawn from massing.json, formatting only
 
-/* the drawing colours of the Lotwise sheets: envelope blue, grey streets and lanes, drawing ink, amber for a form line */
-const FIG = { proposedFill: "#3c8cdc", proposedStroke: "#2a6fb8", outrightFill: "#bdbdbd", outrightStroke: "#8e8e8e",
-              bench: "#c77d14", lot: "#1f2933", env: "#c81e1e", grey: "#5f6672" };
+/* the drawing colours of the Lotwise sheets, read from app.css's --c-* tokens (the same in both themes, because the
+   drawings sit on white paper): envelope blue, grey streets and lanes, drawing ink, amber for a form line */
+const tok = (name, fallback) => (getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
+const FIG = { paper: tok("--c-paper", "#ffffff"), proposedFill: tok("--c-envelope", "#3c8cdc"), proposedStroke: tok("--c-envelope-line", "#2a6fb8"),
+              outrightFill: tok("--c-lane", "#bdbdbd"), outrightStroke: tok("--c-street", "#8e8e8e"), bench: tok("--c-bench", "#c77d14"),
+              lot: tok("--c-drawink", "#1f2933"), env: tok("--c-env", "#c81e1e"), grey: tok("--c-drawmuted", "#5f6672") };
 const SVG_OPEN = `xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" role="img"`;
 const NS = `vector-effect="non-scaling-stroke"`;
+/* a label drawn over the half tone keeps a thin paper halo so it reads over roads and buildings */
+const HALO = `paint-order="stroke" stroke="#ffffff" stroke-linejoin="round"`;
+const halo = fs => `${HALO} stroke-width="${(fs * 0.28).toFixed(2)}"`;
+
+/* Drawing labels at one size on screen. The figures are drawn in metres and scale with their card, so a label sized
+   in metres would read 20 px in a wide card and 9 px in a narrow one; after a first render the label size is set
+   again from the drawing's own scale. */
+const LABEL_PX = 11.5;
+function fitLabels(box, build) {
+  let fs = null;
+  for (let pass = 0; pass < 3; pass++) {
+    box.innerHTML = build(fs);
+    const svg = $("svg", box), ctm = svg && svg.getScreenCTM();
+    if (!ctm || !ctm.a) break;
+    const next = LABEL_PX / ctm.a;
+    if (fs && Math.abs(next - fs) / fs < 0.03) break;
+    fs = next;
+  }
+  return fs;
+}
+
+/* A scale bar in the drawing's corner: a round length near a fifth of the frame, in two halves. */
+function scaleBar(x, y, frameW, fs) {
+  const L = [5, 10, 20, 25, 50, 100].find(v => v >= frameW / 6) || 100;
+  const hgt = fs * 0.4;
+  return `<g class="scalebar">
+    <rect x="${(x - fs * 0.4).toFixed(2)}" y="${(y - fs * 1.5).toFixed(2)}" width="${(L + fs * 3.6).toFixed(2)}" height="${(fs * 2.1).toFixed(2)}" fill="${FIG.paper}" fill-opacity="0.85"/>
+    <rect x="${x.toFixed(2)}" y="${(y - hgt).toFixed(2)}" width="${(L / 2).toFixed(2)}" height="${hgt.toFixed(2)}" fill="${FIG.lot}"/>
+    <rect x="${(x + L / 2).toFixed(2)}" y="${(y - hgt).toFixed(2)}" width="${(L / 2).toFixed(2)}" height="${hgt.toFixed(2)}" fill="${FIG.paper}" stroke="${FIG.lot}" stroke-width="0.8" ${NS}/>
+    <text x="${x.toFixed(2)}" y="${(y - hgt - fs * 0.35).toFixed(2)}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">0</text>
+    <text x="${(x + L).toFixed(2)}" y="${(y - hgt - fs * 0.35).toFixed(2)}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">${L} m</text>
+  </g>`;
+}
+
+/* A north arrow, only where the site's OpenStreetMap frame says which way the lot faces; the plan is drawn with the
+   street at the bottom, so north is wherever the frame puts it. x_axis_bearing_deg is the bearing of the lot's x axis
+   (along the frontage); the plan's up is the y axis, 90 degrees anticlockwise of it. */
+function northArrow(cx, cy, bearing, fs) {
+  const rot = 90 - bearing;          // north, measured clockwise from the drawing's up
+  const r = fs * 1.15, t = rot * Math.PI / 180, d = r + fs * 0.8;
+  const nx = cx + d * Math.sin(t), ny = cy - d * Math.cos(t) + fs * 0.35;   // the N stays upright, beyond the tip
+  return `<g class="north"><g transform="rotate(${rot.toFixed(1)} ${cx.toFixed(2)} ${cy.toFixed(2)})">
+    <circle cx="${cx.toFixed(2)}" cy="${cy.toFixed(2)}" r="${r.toFixed(2)}" fill="${FIG.paper}" fill-opacity="0.85" stroke="${FIG.lot}" stroke-width="0.8" ${NS}/>
+    <polygon points="${cx.toFixed(2)},${(cy - r * 0.92).toFixed(2)} ${(cx + r * 0.42).toFixed(2)},${(cy + r * 0.55).toFixed(2)} ${cx.toFixed(2)},${(cy + r * 0.2).toFixed(2)} ${(cx - r * 0.42).toFixed(2)},${(cy + r * 0.55).toFixed(2)}" fill="${FIG.lot}"/>
+    </g><text x="${nx.toFixed(2)}" y="${ny.toFixed(2)}" font-size="${(fs * 0.95).toFixed(2)}" font-weight="600" text-anchor="middle" fill="${FIG.lot}" ${halo(fs)}>N</text></g>`;
+}
 
 function polyEl(pts, attrs) {
   return `<polygon points="${pts.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(" ")}" ${attrs} ${NS}/>`;
@@ -980,7 +1399,9 @@ function polyEl(pts, attrs) {
    parcels, street trees and the trees on site. Real figures come from site.context when the site file has them;
    otherwise typical defaults stand in (a 20 m street, a 6 m lane, neighbours of the lot's own depth) and the
    on-site trees, whose positions are rarely public, are placed schematically along the rear. */
-const HALF = { street: "#e9e9e6", parcel: "#f4f4f2", building: "#e2e2df", line: "#c9c9c5", text: "#8e8e8e", tree: "#9fb07f", treeLine: "#7f9664", gone: "#bdbdbd" };
+const HALF = { street: tok("--c-half-road", "#e9e9e6"), parcel: tok("--c-bldg", "#f4f4f2"), building: tok("--c-half-building", "#e2e2df"),
+               line: tok("--c-half-line", "#c9c9c5"), text: tok("--c-street", "#8e8e8e"), tree: tok("--c-tree", "#9fb07f"),
+               treeLine: tok("--c-tree-line", "#7f9664"), gone: tok("--c-lane", "#bdbdbd") };
 
 function siteContext(site, m) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
@@ -1040,6 +1461,26 @@ function osmContext(site, m, base) {
   const o = site.osm, W = m.lot.frontage_m, D = m.lot.depth_m;
   const r = (o.radius_m || 120) * 0.92;
   const ground = [], labels = [], seen = new Set();
+  // the address street is always named, beside the lot and clear of the frontage dimension along its front
+  const front = o.frame && o.frame.front_street;
+  if (front) {
+    let best = null;
+    for (const road of (o.roads || []).filter(x => x.name === front)) {
+      const pts = road.points || [], T = [W + Math.max(18, W * 0.35), -(road.width_m || 8) / 2];
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const [x1, y1] = pts[i], [x2, y2] = pts[i + 1], dx = x2 - x1, dy = y2 - y1, L2 = dx * dx + dy * dy;
+        if (!L2) continue;
+        const t = Math.max(0, Math.min(1, ((T[0] - x1) * dx + (T[1] - y1) * dy) / L2));
+        const q = [x1 + t * dx, y1 + t * dy], dist = Math.hypot(q[0] - T[0], q[1] - T[1]);
+        if (!best || dist < best.dist) best = { dist, at: q, angle: Math.atan2(dy, dx) * 180 / Math.PI };
+      }
+    }
+    if (best) {
+      let angle = best.angle; if (angle > 90) angle -= 180; if (angle < -90) angle += 180;
+      labels.push({ text: front, at: best.at, angle, strong: true });
+      seen.add(front);
+    }
+  }
   for (const road of o.roads || []) {
     const w = road.width_m || 8, pts = road.points || [];
     for (let i = 0; i + 1 < pts.length; i++) {
@@ -1070,16 +1511,17 @@ function osmContext(site, m, base) {
   return Object.assign({}, base, {
     ground, labels, buildings, osmTrees, streetTrees: [],
     xmin: W / 2 - r, xmax: W / 2 + r, ymin: D / 2 - r, ymax: D / 2 + r, frameRadius: r * 0.75,
-    osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: o.frame && o.frame.front_street },
+    osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: o.frame && o.frame.front_street,
+           bearing: o.frame && typeof o.frame.x_axis_bearing_deg === "number" ? o.frame.x_axis_bearing_deg : null },
   });
 }
 
-function figPlan(m, ctx) {
+function figPlan(m, ctx, fsIn = null) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
   const pad = Math.max(3, W * 0.05);
-  const fs = Math.max(2.2, W / 34);
+  const fs = fsIn || Math.max(2.2, W / 34);
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
-  const x0 = ctx.xmin - pad, x1 = ctx.xmax + pad + fs * 1.6, y0 = ctx.ymin - pad, y1 = ctx.ymax + pad;
+  const x0 = ctx.xmin - pad, x1 = Math.max(ctx.xmax + pad, W + fs * 2.6 + pad), y0 = ctx.ymin - pad, y1 = ctx.ymax + pad;
   const Y = y => y1 - y;                                // the street (y < 0) drawn at the bottom
   const X = x => x - x0;
   const P = pts => pts.map(([x, y]) => [X(x), Y(y)]);
@@ -1090,45 +1532,58 @@ function figPlan(m, ctx) {
   for (const b of ctx.buildings) s += polyEl(P(b.polygon), `fill="${HALF.building}" stroke="${HALF.line}" stroke-width="0.6"`);
   for (const l of ctx.labels) {
     const [lx, ly] = [X(l.at[0]), Y(l.at[1])];
-    s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}"${l.angle ? ` transform="rotate(${(-l.angle).toFixed(1)} ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(l.text)}</text>`;
+    s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${l.strong ? FIG.grey : HALF.text}"${l.strong ? ` font-weight="600"` : ""} ${halo(fs)}${l.angle ? ` transform="rotate(${(-l.angle).toFixed(1)} ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(l.text)}</text>`;
   }
   for (const t of ctx.streetTrees.concat(ctx.osmTrees)) s += `<circle cx="${X(t.x).toFixed(2)}" cy="${Y(t.y).toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
-  s += polyEl(P(m.lot.polygon), `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
+  s += polyEl(P(m.lot.polygon), `fill="${FIG.paper}" stroke="${FIG.lot}" stroke-width="1.2"`);
   s += polyEl(P(m.envelope.polygon), `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
-  if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" stroke="${FIG.outrightStroke}" stroke-width="1.2" fill-opacity="0.9"`);
+  // the proposed footprint, then the outright one drawn over it as a heavy dashed outline, so both read in plan
   if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.5"`);
+  if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" fill-opacity="${masses.proposed ? 0.35 : 0.9}" stroke="${FIG.outrightStroke}" stroke-width="2" stroke-dasharray="6 3"`);
+  // tree ids only where there is room for them: at the label size, schematic trees along the rear would overprint
+  const gap = ctx.trees.reduce((g, t, i) => Math.min(g, ...ctx.trees.slice(i + 1).map(u => Math.hypot(u.x - t.x, u.y - t.y))), Infinity);
+  const ids = gap > fs * 2.4;
   for (const t of ctx.trees) {
     const cx = X(t.x).toFixed(2), cy = Y(t.y).toFixed(2);
     if (t.retained) s += `<circle cx="${cx}" cy="${cy}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.45" stroke="${HALF.treeLine}" stroke-width="0.8" ${NS}/>`;
-    else s += `<circle cx="${cx}" cy="${cy}" r="${t.crown}" fill="none" stroke="${HALF.gone}" stroke-width="0.6" stroke-dasharray="1.5 1.5" ${NS}/><text x="${cx}" y="${(Y(t.y) + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.gone}">×</text>`;
-    s += `<text x="${(X(t.x) + t.crown + 0.5).toFixed(2)}" y="${(Y(t.y) - t.crown * 0.6).toFixed(2)}" font-size="${(fs * 0.7).toFixed(2)}" fill="${t.retained ? HALF.treeLine : HALF.gone}">${h(t.id)}</text>`;
+    else s += `<circle cx="${cx}" cy="${cy}" r="${t.crown}" fill="none" stroke="${HALF.gone}" stroke-width="0.6" stroke-dasharray="1.5 1.5" ${NS}/>${t.crown > fs * 0.5 ? `<text x="${cx}" y="${(Y(t.y) + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.gone}">×</text>` : ""}`;
+    if (ids) s += `<text x="${(X(t.x) + t.crown + 0.5).toFixed(2)}" y="${(Y(t.y) - t.crown * 0.6).toFixed(2)}" font-size="${(fs * 0.85).toFixed(2)}" fill="${t.retained ? HALF.treeLine : HALF.gone}" ${halo(fs)}>${h(t.id)}</text>`;
   }
-  s += `<text x="${X(W / 2).toFixed(2)}" y="${(Y(0) + fs * 1.2).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">frontage ${h(W)} m</text>`;
-  const rx = X(ctx.xmax) + fs * 0.9, ry = Y(D / 2);
-  s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}" transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">depth ${h(D)} m</text>`;
+  // dimension strings: the frontage along the front line, the depth along the right-hand lot line, each with ticks
+  const tick = fs * 0.35;
+  const fy = Y(0) + fs * 0.55;
+  s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${X(0).toFixed(2)}" y1="${fy.toFixed(2)}" x2="${X(W).toFixed(2)}" y2="${fy.toFixed(2)}"/>`
+     + `<line x1="${(X(0) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(0) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/>`
+     + `<line x1="${(X(W) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(W) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/></g>`;
+  s += `<text x="${X(W / 2).toFixed(2)}" y="${(fy + fs * 1.2).toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>frontage ${h(W)} m</text>`;
+  const dx = X(W) + fs * 0.6;
+  s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${dx.toFixed(2)}" y1="${Y(0).toFixed(2)}" x2="${dx.toFixed(2)}" y2="${Y(D).toFixed(2)}"/>`
+     + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(0) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(0) - tick).toFixed(2)}"/>`
+     + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(D) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(D) - tick).toFixed(2)}"/></g>`;
+  const rx = dx + fs * 0.95, ry = Y(D / 2);
+  s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)} transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">depth ${h(D)} m</text>`;
+  s += scaleBar(fs * 1.4, vbH - fs * 0.9, x1 - x0, fs);
+  if (ctx.osm && ctx.osm.bearing != null) s += northArrow(vbW - fs * 2.2, fs * 2.4, ctx.osm.bearing, fs);
   s += `</svg>`;
   return s;
 }
 
-function figSection(m) {
+function figSection(m, fsIn = null) {
   const W = m.lot.frontage_m;
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
   let hmax = Math.max(...m.masses.map(x => x.height_m), 1);
   const b = m.policy_benchmark;
   if (b && b.height_m) hmax = Math.max(hmax, b.height_m[1]);
   const pad = Math.max(4, W * 0.07);
-  const fs = Math.max(2.2, W / 34);
-  const labelRoom = Math.max(36, W * 0.5);
+  const fs = fsIn || Math.max(2.2, W / 34);
+  const labelRoom = Math.max(W * 0.25, fs * 19);   // room for "19.9 to 21.3 m · staff benchmark" at the label size
   const vbW = W + 2 * pad + labelRoom, vbH = hmax + pad + fs * 2.2;
   const ground = fs * 1.2 + hmax;
   const Yz = z => ground - z;
   const envX = pad + (m.envelope.setbacks_m.side || 0), envW = m.envelope.width_m;
   let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Section across the frontage: outright and proposed heights with the staff benchmark">`;
   s += `<line x1="${(pad - 2).toFixed(2)}" y1="${ground.toFixed(2)}" x2="${(pad + W + 2).toFixed(2)}" y2="${ground.toFixed(2)}" stroke="${FIG.lot}" stroke-width="1.2" ${NS}/>`;
-  if (masses.outright) {
-    const o = masses.outright;
-    s += `<rect x="${envX.toFixed(2)}" y="${Yz(o.height_m).toFixed(2)}" width="${envW.toFixed(2)}" height="${o.height_m}" fill="${FIG.outrightFill}" stroke="${FIG.outrightStroke}" stroke-width="1.2" ${NS}/>`;
-  }
+  // as in plan: the proposed mass, then the outright one over it as a heavy dashed outline, so both read
   if (masses.proposed) {
     const p = masses.proposed;
     s += `<rect x="${envX.toFixed(2)}" y="${Yz(p.height_m).toFixed(2)}" width="${envW.toFixed(2)}" height="${p.height_m}" fill="${FIG.proposedFill}" fill-opacity="0.45" stroke="${FIG.proposedStroke}" stroke-width="1.2" ${NS}/>`;
@@ -1137,6 +1592,10 @@ function figSection(m) {
       if (yk <= Yz(p.height_m)) break;
       s += `<line x1="${envX.toFixed(2)}" y1="${yk.toFixed(2)}" x2="${(envX + envW).toFixed(2)}" y2="${yk.toFixed(2)}" stroke="${FIG.proposedStroke}" stroke-width="0.6" stroke-opacity="0.6" ${NS}/>`;
     }
+  }
+  if (masses.outright) {
+    const o = masses.outright;
+    s += `<rect x="${envX.toFixed(2)}" y="${Yz(o.height_m).toFixed(2)}" width="${envW.toFixed(2)}" height="${o.height_m}" fill="${FIG.outrightFill}" fill-opacity="${masses.proposed ? 0.35 : 0.9}" stroke="${FIG.outrightStroke}" stroke-width="2" stroke-dasharray="6 3" ${NS}/>`;
   }
   const lx = pad + W + fs * 0.8;
   if (b && b.height_m) {
@@ -1157,13 +1616,13 @@ function figSection(m) {
    view survives a re-render. No library: the boxes are projected and painted far to near. */
 const VIEW3D = { mode: "plan", az: 35, el: 28 };
 
-function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
+function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
   const a = az * Math.PI / 180, e = el * Math.PI / 180;
   const ca = Math.cos(a), sa = Math.sin(a), ce = Math.cos(e), se = Math.sin(e);
   const cx = W / 2, cy = D / 2;
-  const fs = Math.max(2.2, Math.max(W, D) / 34);
+  const fs = fsIn || Math.max(2.2, Math.max(W, D) / 34);
   // metres to the picture plane; y runs away from the street, z up; the viewer starts on the street side
   const proj = ([x, y, z = 0]) => {
     const rx = (x - cx) * ca - (y - cy) * sa, ry = (x - cx) * sa + (y - cy) * ca;
@@ -1211,10 +1670,6 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
   // the context on the ground first, in half tone, then the lot, the envelope, the masses and the trees
   if (ctx.osm) body += poly([[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]], `fill="${HALF.parcel}" stroke="none"`);
   for (const g of ctx.ground) body += poly(g.ring, g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
-  for (const l of ctx.labels) {
-    const c = proj(l.at);
-    body += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}">${h(l.text)}</text>`;
-  }
   body += poly(m.lot.polygon, `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
   body += poly(m.envelope.polygon, `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
   // the buildings around, the trees and the masses are painted far to near so a tree behind a mass stays behind it
@@ -1236,17 +1691,34 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
   for (const i of items) if (i.d === -1e9) i.d = prop ? prop.d + 1e-6 : 0;
   items.sort((u, v) => v.d - u.d);
   body += items.map(i => i.s).join("");
+  // the street names last, over the buildings around, with a paper halo, so none is hidden behind a block
+  for (const l of ctx.labels) {
+    const c = proj(l.at);
+    body += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${l.strong ? FIG.grey : HALF.text}"${l.strong ? ` font-weight="600"` : ""} ${halo(fs)}>${h(l.text)}</text>`;
+  }
   const b = m.policy_benchmark;
   if (b && b.height_m && masses.proposed) {
     for (const z of b.height_m) body += poly(masses.proposed.footprint.map(([x, y]) => [x, y, z]), `fill="none" stroke="${FIG.bench}" stroke-width="1" stroke-dasharray="4 3"`);
   }
-  // labels: the heights at the near top corner of each mass
+  // labels: the heights, led off the near top corner of each mass so they sit beside the building, not on its faces
   const labels = [];
   const nearest = ring => ring.map(([x, y]) => [x, y]).sort((u, v) => proj(u).d - proj(v).d)[0];
+  // every corner of every mass on the picture plane, so the labels can stand clear of all of them
+  const pts = [];
+  for (const x of m.masses) for (const [px, py] of x.footprint) for (const z of [x.base_z || 0, (x.base_z || 0) + x.height_m]) pts.push(proj([px, py, z]));
+  const minX = Math.min(...pts.map(p => p.x)), maxX = Math.max(...pts.map(p => p.x));
+  let lastY = null;
   for (const [name, colour, weight] of [["proposed", FIG.proposedStroke, 600], ["outright", FIG.lot, 400]]) {
     const x = masses[name]; if (!x) continue;
     const c = nearest(x.footprint); const t = proj([c[0], c[1], (x.base_z || 0) + x.height_m]);
-    labels.push(`<text x="${(t.x + fs * 0.5).toFixed(2)}" y="${(t.y - fs * 0.5).toFixed(2)}" font-size="${fs}" font-weight="${weight}" fill="${colour}">${h(x.height_m)} m · ${name}</text>`);
+    const side = t.x < 0 ? -1 : 1;                       // out on the side the near corner is on
+    const lx = side < 0 ? minX - fs * 0.9 : maxX + fs * 0.9;
+    let ly = t.y + fs * 0.35;
+    if (lastY != null && Math.abs(ly - lastY) < fs * 1.4) ly = lastY + fs * 1.4;
+    lastY = ly;
+    labels.push(`<line x1="${t.x.toFixed(2)}" y1="${t.y.toFixed(2)}" x2="${(lx - side * fs * 0.3).toFixed(2)}" y2="${(ly - fs * 0.35).toFixed(2)}" stroke="${colour}" stroke-width="0.8" ${NS}/>`
+      + `<circle cx="${t.x.toFixed(2)}" cy="${t.y.toFixed(2)}" r="${(fs * 0.18).toFixed(2)}" fill="${colour}"/>`
+      + `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" font-size="${fs.toFixed(2)}" font-weight="${weight}" fill="${colour}" text-anchor="${side < 0 ? "end" : "start"}" ${halo(fs)}>${h(x.height_m)} m · ${name}</text>`);
   }
   // a steady frame: the largest extent the drawing can reach at any azimuth for this tilt, so turning never
   // rescales it (only a change of tilt re-frames, and gently)
@@ -1259,7 +1731,7 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
   return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, its surroundings in half tone, the setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${labels.join("")}</svg>`;
 }
 
-function figOne(m, ctx) {
+function figOne(m, ctx, fs = null) {
   const three = VIEW3D.mode === "3d";
   return `<div class="fig-head">
       <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}</div>
@@ -1268,40 +1740,84 @@ function figOne(m, ctx) {
         <button type="button" class="segbtn" data-view="3d" aria-pressed="${three}">3D</button>
       </div>
     </div>
-    <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m, ctx) : figPlan(m, ctx)}</div>
-    ${three ? `<p class="fig-hint">Drag to orbit, arrow keys to turn; the view is a straight axonometric of the same massing.json, with the storey lines at ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
+    <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m, ctx, VIEW3D.az, VIEW3D.el, fs) : figPlan(m, ctx, fs)}</div>
+    ${three ? `<p class="fig-hint">Drag sideways to turn it; the arrow keys turn and tilt it. A straight axonometric of the same massing numbers, with storey lines every ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
 }
+
+let figWatch = null;   // the ResizeObserver that refits the drawings' labels when their cards change width
 
 function wireFigures(run) {
   const fig = $("#fig-01");
   if (!fig || !run.massing) return;
   const m = run.massing;
   const ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
-  const redraw = () => { fig.innerHTML = figOne(m, ctx); wireFigures(run); };
-  $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => { if (VIEW3D.mode !== b.dataset.view) { VIEW3D.mode = b.dataset.view; redraw(); } }));
-  const svg = $(".fig3d svg", fig);
-  if (!svg) return;
-  const turn = (daz, del) => {
-    VIEW3D.az = (VIEW3D.az + daz) % 360;
-    VIEW3D.el = Math.max(8, Math.min(80, VIEW3D.el + del));
-    const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m, ctx);
-    svg.innerHTML = fresh.firstElementChild.innerHTML;
-    svg.setAttribute("viewBox", fresh.firstElementChild.getAttribute("viewBox"));
+  const fit = () => {
+    const body = $(".fig-body", fig);
+    if (body) VIEW3D.fs = fitLabels(body, fs => (VIEW3D.mode === "3d" ? fig3d(m, ctx, VIEW3D.az, VIEW3D.el, fs) : figPlan(m, ctx, fs)));
+    const sec = $("#fig-02");
+    if (sec) fitLabels(sec, fs => figSection(m, fs));
+    wireOrbit();
   };
-  let drag = null;
-  svg.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY }; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
-  svg.addEventListener("pointermove", e => {
-    if (!drag) return;
-    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-    drag = { x: e.clientX, y: e.clientY };
-    turn(dx * 0.5, dy * 0.4);
-  });
-  const stop = () => { drag = null; };
-  svg.addEventListener("pointerup", stop); svg.addEventListener("pointercancel", stop);
-  svg.addEventListener("keydown", e => {
-    const k = { ArrowLeft: [-6, 0], ArrowRight: [6, 0], ArrowUp: [0, 4], ArrowDown: [0, -4] }[e.key];
-    if (k) { e.preventDefault(); turn(k[0], k[1]); }
-  });
+  const redraw = () => { fig.innerHTML = figOne(m, ctx); wireFigures(run); };
+  $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => {
+    if (VIEW3D.mode === b.dataset.view) return;
+    VIEW3D.mode = b.dataset.view;
+    redraw();
+    const now = $(`.segbtn[data-view="${VIEW3D.mode}"]`, fig);
+    if (now) now.focus();
+  }));
+
+  // the axonometric turns under a drag (one redraw per frame) or the arrow keys
+  function wireOrbit() {
+    const svg = $(".fig3d svg", fig);
+    if (!svg) return;
+    const turn = (daz, del) => {
+      VIEW3D.az = (VIEW3D.az + daz) % 360;
+      VIEW3D.el = Math.max(8, Math.min(80, VIEW3D.el + del));
+      const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m, ctx, VIEW3D.az, VIEW3D.el, VIEW3D.fs);
+      svg.innerHTML = fresh.firstElementChild.innerHTML;
+      svg.setAttribute("viewBox", fresh.firstElementChild.getAttribute("viewBox"));
+    };
+    let drag = null, pending = [0, 0], raf = 0;
+    const flush = () => { raf = 0; if (pending[0] || pending[1]) { turn(pending[0], pending[1]); pending = [0, 0]; } };
+    const stop = () => { drag = null; };
+    svg.addEventListener("pointerdown", e => {
+      if (e.button > 0) return;
+      drag = { x: e.clientX, y: e.clientY };
+      svg.setPointerCapture(e.pointerId);
+      svg.focus({ preventScroll: true });
+      e.preventDefault();
+    });
+    svg.addEventListener("pointermove", e => {
+      if (!drag) return;
+      pending[0] += (e.clientX - drag.x) * 0.5;
+      pending[1] += (e.clientY - drag.y) * 0.4;
+      drag = { x: e.clientX, y: e.clientY };
+      if (!raf) raf = requestAnimationFrame(flush);
+    });
+    for (const ev of ["pointerup", "pointercancel", "lostpointercapture"]) svg.addEventListener(ev, stop);
+    window.addEventListener("blur", stop, { once: true });
+    svg.addEventListener("keydown", e => {
+      const k = { ArrowLeft: [-6, 0], ArrowRight: [6, 0], ArrowUp: [0, 4], ArrowDown: [0, -4] }[e.key];
+      if (k) { e.preventDefault(); turn(k[0], k[1]); }
+    });
+  }
+
+  fit();
+  // refit when the cards change width: a window resize, the inputs hidden or shown, the wide two-column layout
+  if (figWatch) figWatch.disconnect();
+  const figures = $(".figures");
+  if (figures && "ResizeObserver" in window) {
+    let w = Math.round(figures.getBoundingClientRect().width), raf = 0;
+    figWatch = new ResizeObserver(entries => {
+      const nw = Math.round(entries[0].contentRect.width);
+      if (Math.abs(nw - w) < 4) return;
+      w = nw;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(fit);
+    });
+    figWatch.observe(figures);
+  }
 }
 
 function massLine(x) {
@@ -1331,16 +1847,16 @@ function renderFigures(run) {
     out.push(`<figure class="card figure">
       <div id="fig-01">${figOne(m, ctx)}</div>
       <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-building"></i>building</span><span><i class="fig-context"></i>road</span></div>
-      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back. ${contextNote}${treeNote}</figcaption>
+      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back, so the outright mass is drawn dashed over the proposed one, here and in the section. ${contextNote}${treeNote}${ctx.osm && ctx.osm.bearing != null ? " The north arrow follows the OpenStreetMap frame; the plan is drawn with the street at the bottom." : ""}</figcaption>
     </figure>`);
     const bench = m.policy_benchmark;
     const trees = m.trees;
     out.push(`<figure class="card figure">
       <div class="eyebrow">FIG 02 · Section across the frontage</div>
-      ${figSection(m)}
+      <div class="fig-section" id="fig-02">${figSection(m)}</div>
       <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span>${bench && bench.height_m ? `<span><i class="fig-bench"></i>staff benchmark</span>` : ""}</div>
       <figcaption>${m.masses.map(massLine).join(" ")}${bench && bench.height_m ? ` Staff benchmark under <code>${h(bench.rule_id)}</code>: ${h(bench.height_m[0])} to ${h(bench.height_m[1])} m, about FSR ${h(bench.fsr)}.` : ""}${trees ? ` Trees: Schedule C requires ${h(trees.required)}, the plan leaves ${h(trees.after)} (shortfall ${h(trees.shortfall)}).` : ""}</figcaption>
-      ${(m.warnings || []).map(w => `<p class="note">${h(w)}</p>`).join("")}
+      ${(m.warnings || []).map(w => `<p class="note">${h(String(w).replace(/(\d) x (\d)/g, "$1 × $2"))}</p>`).join("")}
     </figure>`);
   } else if (run.massing_note) {
     out.push(`<div class="card figure"><div class="eyebrow">Massing</div><p class="note">${h(run.massing_note)}</p></div>`);
@@ -1363,30 +1879,76 @@ function figSheet(run) {
 
 // ---------------------------------------------------------------- what changed
 
+/* The engine's words for a change (engine.diff), as a reader would say them. */
+function changeWord(c) {
+  if (c.change === "changed") return c.from_version !== c.to_version ? (c.from === c.to ? "new version" : "new version and status") : "status changed";
+  return { added: "rule added", removed: "rule dropped", finding_changed: "finding reworded" }[c.change] || String(c.change).replace(/_/g, " ");
+}
+
+function changesPhrase(d) {
+  const n = (d.changes || []).length;
+  if (!n) return "no rule changed version or status";
+  return `${n} rule${n === 1 ? "" : "s"} changed (${d.changes.map(c => c.rule_id).join(", ")})`;
+}
+
+/* The note beside the selects only speaks when the memo cannot: a comparison waiting for the next run. Once a memo
+   is compared, its What changed card says it, so the note stays empty. */
+function setCompareNote(d) {
+  $("#compare-note").textContent = !state.run && state.compareRun ? "Applies to the next run." : "";
+}
+
+/* Why two stamps differ, as precisely as the two ledgers allow: the rule files, the as-of date, the site's or the
+   option's inputs. The inputs are compared key by key, whatever their order. */
+const stable = v => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
+
+async function attachCause(run) {
+  const d = run.diff;
+  if (!d || !state.compareRun) return;
+  try {
+    const [site, folder] = state.compareRun.split("/");
+    const prev = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
+    run.compareLedger = prev.ledger || null;   // for the side-by-side card
+    const a = (prev.ledger && prev.ledger.inputs) || {}, b = (run.ledger && run.ledger.inputs) || {};
+    const changed = [stable(a.site) !== stable(b.site) && "the site's inputs", stable(a.option) !== stable(b.option) && "the option's inputs"].filter(Boolean);
+    const date = d.previous_as_of !== d.current_as_of ? `the as-of date (${d.previous_as_of} → ${d.current_as_of})` : null;
+    const files = d.rules_changed ? "the rule files changed" : "same rule files";
+    const same = changed.length ? "" : ", same site and option";
+    const because = [date, ...changed].filter(Boolean);
+    d.cause = `${files}${same}; the difference is ${because.length ? because.join(" and ") : (d.rules_changed ? "in the rule files alone" : "not in the inputs or the date")}`;
+  } catch (e) {
+    d.cause = null;   // the earlier run could not be read: fall back to the general sentence
+  }
+}
+
+/* What changed, as a revision: the comparison's answer sits under the title block, before the three answers. */
 function renderChanges(d) {
-  const rows = (d.changes || []).map(c => {
-    const ver = c.from_version && c.from_version !== c.to_version;
+  const changes = d.changes || [];
+  const rows = changes.map(c => {
+    const ver = c.from_version && c.to_version && c.from_version !== c.to_version;
+    const status = c.from && c.to ? (c.from === c.to ? `${pill(c.to)} <span class="cont">unchanged</span>` : `${pill(c.from)} → ${pill(c.to)}`) : (c.to ? pill(c.to) : c.from ? pill(c.from) : "—");
     return `<tr>
-      <td><code>${h(c.rule_id)}</code></td>
-      <td class="change">${h(String(c.change).replace(/_/g, " "))}</td>
-      <td>${c.from ? pill(c.from) : "—"}${ver ? `<div class="cont" style="font-size:12px;margin-top:4px">v ${h(c.from_version)}</div>` : ""}</td>
-      <td>${c.to ? pill(c.to) : "—"}${ver ? `<div class="cont" style="font-size:12px;margin-top:4px">v ${h(c.to_version)}</div>` : ""}</td>
-      <td>${h(c.finding)}</td>
+      <td data-label="Rule"><code>${h(c.rule_id)}</code><div class="cont">${h(changeWord(c))}</div></td>
+      <td class="ver" data-label="Version in force">${ver ? `<span class="was">${h(c.from_version)}</span> → ${h(c.to_version)}` : h(c.to_version || c.from_version || "—")}</td>
+      <td class="trans" data-label="Status">${status}</td>
+      <td data-label="Now reads">${h(c.finding)}</td>
     </tr>`;
   }).join("");
-  return `<section class="card section changes">
-    <div class="eyebrow">What changed</div>
-    <h2>What changed since the previous run</h2>
-    <p class="stamps">previous <b>${h(d.previous_stamp)}</b> (as of ${h(d.previous_as_of)}) → current <b>${h(d.current_stamp)}</b> (as of ${h(d.current_as_of)}) · ${d.rules_changed ? "the rule files themselves changed" : "rule files unchanged; differences come from the as-of date or the inputs"}</p>
-    ${rows ? `<table class="plain"><thead><tr><th>Rule</th><th>Change</th><th>From</th><th>To</th><th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>` : `<p>No rule changed status.</p>`}
+  const sameVerdict = changes.length && changes.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
+  return `<section class="card section changes" id="changes">
+    <h2>${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}</h2>
+    <p class="stamps">Stamp <code>${h(d.previous_stamp)}</code> → <code>${h(d.current_stamp)}</code> · ${h(d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs"))}.</p>
+    ${changes.length ? `${sameVerdict ? `<p class="same">Same verdict${changes.length === 1 ? "" : "s"}, new version${changes.length === 1 ? "" : "s"}: the memo names the version it used.</p>` : ""}
+    <table class="plain"><thead><tr><th>Rule</th><th>Version in force</th><th>Status</th><th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
+    : `<p>No rule changed version or status between the two runs.</p>`}
   </section>`;
 }
 
 // ---------------------------------------------------------------- past runs: open, compare
 
+/* A past run, as a reader picks it: the date, the option, the start of the stamp, and the folder when it says more. */
 function runLabel(r) {
-  const v = r.verdicts || {};
-  return `${r.as_of} · ${r.stamp} · ${r.folder}${r.revit ? " · Revit" : ""} · outright ${v.outright}, funders ${v.funded}`;
+  const option = r.option_name || r.option_id || "option";
+  return `${r.as_of} · ${option} · stamp ${String(r.stamp || "").slice(0, 8)}${r.folder && r.folder !== r.as_of ? ` · ${r.folder}` : ""}${r.revit ? " · Revit" : ""}`;
 }
 
 function fillRunSelects() {
@@ -1401,30 +1963,65 @@ function fillRunSelects() {
 async function openRun(runId) {
   if (!runId) return;
   const [site, folder] = runId.split("/");
+  setStatus(`Opening the run ${runId}…`, "busy");
   const run = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
   state.run = run;
+  // the date in the top bar is the date of the memo on screen, and so of the next run
+  $("#as-of").value = run.as_of;
   showStamp(run.stamp);
   enableExports(run);
+  await syncInputsTo(run);
   if (state.compareRun && state.compareRun !== runId) await applyCompare(false);
   renderMemo(run);
   fillRunSelects();
+  setCompareNote(run.diff);
   setStep(3);
-  $("#export-panel").hidden = true;
+  closeExportPanel();
+  setStatus(`Opened the run as of ${run.as_of} · stamp ${run.stamp} · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}${run.diff ? ` · against ${run.diff.previous_as_of}: ${changesPhrase(run.diff)}` : ""}`, "ok");
+}
+
+/* An opened run shows its own site and option in the inputs, unless the reader has unsaved edits there. */
+async function syncInputsTo(run) {
+  if (state.siteDirty || state.optionDirty) return;
+  const siteId = run.run_id.split("/")[0];
+  const optId = run.ledger && run.ledger.run && run.ledger.run.option_id;
+  if (optId) state.optionId = optId;
+  if (state.siteId !== siteId && state.sites.some(s => s.id === siteId)) {
+    $("#site-select").value = siteId;
+    await selectSite(siteId);
+  } else if (optId && state.options.some(o => o.id === optId) && $("#option-select").value !== optId) {
+    $("#option-select").value = optId;
+    await selectOption(optId);
+  }
 }
 
 async function applyCompare(render = true) {
   const run = state.run;
   const note = $("#compare-note");
-  if (!run) { note.textContent = state.compareRun ? "Applies to the next run." : ""; return; }
+  if (!run) {
+    note.textContent = state.compareRun ? "Applies to the next run." : "";
+    if (render) setStatus(state.compareRun ? `The next run will be compared with ${state.compareRun}.` : "No comparison.", "info");
+    return;
+  }
   if (!state.compareRun || state.compareRun === run.run_id) {
     run.diff = null;
-    note.textContent = "";
+    run.compareLedger = null;
   } else {
-    const d = await api(`/api/diff?from=${encodeURIComponent(state.compareRun)}&to=${encodeURIComponent(run.run_id)}`);
-    run.diff = d;
-    note.textContent = `${d.changes.length} change${d.changes.length === 1 ? "" : "s"} · ${d.previous_stamp} → ${d.current_stamp}`;
+    if (render) setStatus("Comparing the two runs…", "busy");
+    run.diff = await api(`/api/diff?from=${encodeURIComponent(state.compareRun)}&to=${encodeURIComponent(run.run_id)}`);
+    await attachCause(run);
   }
-  if (render) renderMemo(run);
+  setCompareNote(run.diff);
+  if (render) {
+    renderMemo(run);
+    if (run.diff) {
+      setStatus(`Compared the run as of ${run.diff.current_as_of} with ${run.diff.previous_as_of}: ${changesPhrase(run.diff)} · stamp ${run.diff.previous_stamp} → ${run.diff.current_stamp}`, "ok");
+      const box = $("#changes");
+      if (box) box.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+    } else {
+      setStatus("Comparison cleared.", "info");
+    }
+  }
 }
 
 // ---------------------------------------------------------------- export to Revit
@@ -1463,6 +2060,7 @@ function renderExportPanel(run) {
                : `<div><button id="check-revit" class="btn" type="button">Check Revit result</button></div><div id="revit-result" class="revit-result"></div>`}
     </div>`;
   panel.hidden = false;
+  $("#revit-btn").setAttribute("aria-expanded", "true");
   $$("[data-copy]", panel).forEach(b => b.addEventListener("click", () => copyText($("#" + b.dataset.copy).textContent)));
   if (!STATIC) {
     $("#check-revit").addEventListener("click", checkRevit);
@@ -1470,23 +2068,33 @@ function renderExportPanel(run) {
   }
 }
 
+function closeExportPanel() {
+  $("#export-panel").hidden = true;
+  $("#revit-btn").setAttribute("aria-expanded", "false");
+}
+
 async function checkRevit() {
   const run = state.run;
   if (!run) return;
   const box = $("#revit-result");
   box.innerHTML = `<p class="cont">Reading ffm_revit_result.json…</p>`;
+  setStatus("Reading the Revit result for this run…", "busy");
   try {
     const r = await api(`/api/runs/${run.run_id}/ffm_revit_result.json`);
     if (r.stamp !== run.stamp) {
       box.innerHTML = `<p class="err">A result exists in this folder but for stamp ${h(r.stamp)}, not this run's ${h(run.stamp)}. Run the script again on this folder.</p>`;
+      setStatus(`The Revit result in this folder is for stamp ${r.stamp}, not ${run.stamp}: run the script again on this folder.`, "error");
       return;
     }
     const refreshed = await postJSON(`/api/runs/${run.run_id}/memo`, {});   // memo gains its "Built in Revit" section
     run.revit = refreshed.revit;
     box.innerHTML = revitResultHtml(r, run);
     renderMemo(run);
+    const bad = Object.entries(r.stages || {}).filter(([, v]) => v !== "ok").map(([k]) => k);
+    setStatus(bad.length ? `Read the Revit result: stages ${bad.join(", ")} did not finish; the others stand.` : `Read the Revit result: every stage ok, and the memo now has its "Built in Revit" section.`, bad.length ? "error" : "ok");
   } catch (e) {
     box.innerHTML = `<p class="cont">${h(e.message)} Nothing built for this run yet: run the script, then check again.</p>`;
+    setStatus("No Revit result for this run yet: run the script, then check again.", "info");
   }
 }
 
@@ -1519,11 +2127,11 @@ const TOUR = [
   { target: ".topbar-controls", title: "Rules as of",
     text: "Pick the date the rules should be read on. The engine applies the versions in force that day and stamps the memo with them, so two memos can be told apart." },
   { target: "#step-site", title: "Step 1 · Site",
-    text: "Choose a site file or describe a new one: district, lot, policy areas, trees, owner. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
+    text: "Choose a site file; the card sums it up in a line. Edit opens the form: district, lot, policy areas, trees, owner. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
   { target: "#step-option", title: "Step 2 · Option",
-    text: "Describe the building: storeys, floor area, the unit mix, tenure, the funders you aim at, and the rezoning path if there is one. Save it as a file to rerun the same thing from the command line." },
+    text: "The building: storeys, floor area, the unit mix, tenure, the funders you aim at, and the rezoning path if there is one. Edit to change it; save it as a file to rerun the same thing from the command line." },
   { target: "#run-btn", title: "Run the rules", action: "run",
-    text: "One click. In under a second the engine writes a stamped memo to the outputs folder and reads it here." },
+    text: "One click, or Ctrl+Enter. In under a second the engine writes a stamped memo to the outputs folder and reads it here." },
   { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers",
     text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from." },
   { target: ".figures", fallback: "#memo", title: "The massing",
@@ -1531,12 +2139,12 @@ const TOUR = [
   { target: ".ledger", fallback: "#memo", title: "The full ledger",
     text: "Every rule the engine ran, by layer, collapsed until you open it: status, finding, numbers used and the source link." },
   { target: ".memo-tools", title: "Past runs",
-    text: "Open an earlier run, or compare two. When a rule changes version, the table names it and the stamp changes." },
+    text: "Open an earlier run, or compare two. The change lands under the title block with a revision mark: the rule, its old and new version, and the new stamp." },
   { target: "#step-export", title: "Step 4 · Export",
     text: "Download the memo as HTML or Markdown, print it, take the massing file, or open Export to Revit for the two lines that build the sheet." },
 ];
 const TOUR_KEY = "ffm.walkthrough.seen";
-const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0 };
+const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0, returnTo: null };
 
 function tourTarget(step) {
   return document.querySelector(step.target) || (step.fallback ? document.querySelector(step.fallback) : null);
@@ -1549,12 +2157,15 @@ function reducedMotion() {
 function startTour(at = 0) {
   if (tour.active) endTour();
   tour.active = true;
+  tour.returnTo = document.activeElement && document.activeElement !== document.body ? document.activeElement : $("#tour-link");
   tour.spot = document.createElement("div");
   tour.spot.className = "tour-spot";
   tour.card = document.createElement("div");
   tour.card.className = "tour-card";
   tour.card.setAttribute("role", "dialog");
-  tour.card.setAttribute("aria-live", "polite");
+  tour.card.setAttribute("aria-modal", "true");
+  tour.card.setAttribute("aria-labelledby", "tour-title");
+  tour.card.setAttribute("aria-describedby", "tour-text");
   document.body.append(tour.spot, tour.card);
   $("#tour-offer").hidden = true;
   showTourStep(at);
@@ -1574,11 +2185,26 @@ function endTour() {
   window.removeEventListener("scroll", positionTourSoon);
   document.removeEventListener("keydown", tourKeys);
   try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* private window: fine */ }
+  // focus goes back where it was before the walkthrough
+  const back = tour.returnTo;
+  tour.returnTo = null;
+  if (back && document.contains(back) && typeof back.focus === "function") back.focus({ preventScroll: true });
 }
 
 function tourKeys(e) {
-  if (e.key === "Escape") { e.preventDefault(); endTour(); }
-  else if (e.key === "ArrowRight") { e.preventDefault(); tourNext(); }
+  if (e.key === "Escape") { e.preventDefault(); endTour(); return; }
+  if (e.key === "Tab") {             // the walkthrough holds the keyboard: Tab cycles inside its card
+    const f = $$("button:not([disabled])", tour.card);
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1];
+    if (!tour.card.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    return;
+  }
+  // the arrows page through the walkthrough, except where they belong to a field or the 3D view
+  if (e.target && e.target.closest && e.target.closest("input, select, textarea, [contenteditable], .fig3d, [role='radio']")) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); tourNext(); }
   else if (e.key === "ArrowLeft") { e.preventDefault(); showTourStep(tour.i - 1); }
 }
 
@@ -1604,13 +2230,12 @@ function showTourStep(i) {
   const primary = step.action === "run" && !state.run ? "Run and continue" : (last ? "Done" : "Next");
   tour.card.innerHTML = `
     <button class="tour-close" type="button" aria-label="Close the walkthrough">×</button>
-    <div class="eyebrow">Walkthrough · ${i + 1} of ${TOUR.length}</div>
-    <h3>${h(step.title)}</h3>
-    <p>${h(step.text)}</p>
+    <h3 id="tour-title">${h(step.title)}</h3>
+    <p id="tour-text">${h(step.text)}</p>
     <div class="tour-nav">
       <button class="btn btn-quiet btn-small tour-back" type="button"${i === 0 ? " disabled" : ""}>Back</button>
       <span class="spacer"></span>
-      <span class="counter">Esc to close</span>
+      <span class="counter">${i + 1} of ${TOUR.length} · Esc closes</span>
       <button class="btn btn-primary btn-small tour-next" type="button">${h(primary)}</button>
     </div>`;
   $(".tour-close", tour.card).addEventListener("click", endTour);
@@ -1658,30 +2283,72 @@ function positionTourSoon() {   // scroll and resize: one update per frame, with
 function offerTour() {
   let seen = false;
   try { seen = !!localStorage.getItem(TOUR_KEY); } catch (e) { seen = false; }
-  $("#tour-offer").hidden = seen;
+  // a reader who arrived on a link to a run or to the walkthrough already knows where they are going
+  const q = new URLSearchParams(location.search);
+  $("#tour-offer").hidden = seen || q.has("run") || q.has("tour");
 }
 
 // ---------------------------------------------------------------- steps
 
+/* The step bar: the current step is the one the reader is working in (aria-current); a step is done when its work is
+   done (a site and an option chosen, a memo on screen), not when the page has scrolled past it. */
+function stepsDone() {
+  return {
+    1: !!(state.site && (state.siteId || state.site.address)),
+    2: !!(state.option && (state.optionId || state.option.storeys != null)),
+    3: !!state.run,
+    4: false,
+  };
+}
+
+/* The first step whose work is not done yet: with the case preloaded, that is Run and read. */
+function firstOpenStep() {
+  const done = stepsDone();
+  return [1, 2, 3, 4].find(k => !done[k]) || 4;
+}
+
 function setStep(n) {
+  state.step = n;
+  const done = stepsDone();
   $$(".steps a[data-step]").forEach(a => {
     const k = Number(a.dataset.step);
     a.classList.toggle("active", k === n);
-    a.classList.toggle("done", k < n);
+    a.classList.toggle("done", k !== n && done[k]);
+    if (k === n) a.setAttribute("aria-current", "step"); else a.removeAttribute("aria-current");
   });
 }
 
+const STEP_OF = { "step-site": 1, "step-option": 2, "step-run": 3, "step-export": 4 };
+
 function watchSteps() {
-  const map = { "step-site": 1, "step-option": 2, "step-run": 3, "step-export": 4 };
+  // where the reader is working: focus or a click inside a step's panel
+  const follow = e => {
+    const sec = e.target && e.target.closest && e.target.closest("#step-site, #step-option, #step-export, #step-run");
+    if (sec) setStep(STEP_OF[sec.id]);
+  };
+  document.addEventListener("focusin", follow);
+  document.addEventListener("pointerdown", follow);
+  // and scrolling: side by side, the inputs and the memo are both on screen, so only the memo pane's scroll counts
   if (!("IntersectionObserver" in window)) return;
+  const stacked = window.matchMedia("(max-width: 1100px)");
   const io = new IntersectionObserver(entries => {
-    const vis = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-    if (vis) setStep(map[vis.target.id]);
+    const vis = entries.filter(e => e.isIntersecting && (stacked.matches || e.target.id === "step-run" || e.target.id === "step-export"))
+                       .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (vis) setStep(STEP_OF[vis.target.id]);
   }, { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.2, 0.5] });
-  for (const id of Object.keys(map)) { const el = document.getElementById(id); if (el) io.observe(el); }
+  for (const id of Object.keys(STEP_OF)) { const el = document.getElementById(id); if (el) io.observe(el); }
 }
 
 // ---------------------------------------------------------------- wiring
+
+/* Presenting: the inputs step aside and the memo takes the width; the steps to Site or Option bring them back. */
+function showInputs(show) {
+  $(".panes").classList.toggle("no-inputs", !show);
+  document.body.classList.toggle("presenting", !show);
+  const btn = $("#hide-inputs");
+  btn.textContent = show ? "Hide inputs" : "Show inputs";
+  btn.setAttribute("aria-expanded", String(show));
+}
 
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); toast("Copied."); }
@@ -1699,23 +2366,49 @@ async function init() {
   $("#print-btn").addEventListener("click", () => window.print());
   $("#save-site").addEventListener("click", () => saveAs("site"));
   $("#save-option").addEventListener("click", () => saveAs("option"));
-  $("#site-select").addEventListener("change", e => selectSite(e.target.value).catch(err => toast(err.message, true)));
-  $("#option-select").addEventListener("change", e => selectOption(e.target.value).catch(err => toast(err.message, true)));
-  $("#as-of").addEventListener("change", () => { if (!state.run) renderQuiet(); });
+  // switching files discards unsaved edits, so ask first
+  $("#site-select").addEventListener("change", e => {
+    if ((state.siteDirty || state.optionDirty) && !confirm("Switch the site file? The unsaved edits to the site and option will be lost.")) { e.target.value = state.siteId || "__new__"; return; }
+    selectSite(e.target.value).catch(err => toast(err.message, true));
+  });
+  $("#option-select").addEventListener("change", e => {
+    if (state.optionDirty && !confirm("Switch the option file? The unsaved edits to the option will be lost.")) { e.target.value = state.optionId || "__new__"; return; }
+    selectOption(e.target.value).catch(err => toast(err.message, true));
+  });
+  for (const kind of ["site", "option"]) {
+    $(`#edit-${kind}`).addEventListener("click", () => {
+      const open = $(`#step-${kind}`).classList.contains("collapsed");
+      setCollapsed(kind, !open);
+      if (open) { const first = $(`#${kind}-form input, #${kind}-form select, #${kind}-form textarea, #${kind}-form button`); if (first) first.focus(); }
+    });
+  }
+  $("#hide-inputs").addEventListener("click", e => showInputs($(".panes").classList.contains("no-inputs")));
+  $("#as-of").addEventListener("change", () => {
+    if (!state.run) renderQuiet();
+    else setStatus(`The next run will read the rules as of ${$("#as-of").value}; the memo on screen is as of ${state.run.as_of}.`, "info");
+  });
   $$(".steps a[data-step]").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
     const target = document.querySelector(a.getAttribute("href"));
-    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (target && target.closest(".inputs")) showInputs(true);
+    if (target) {
+      target.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+      target.focus({ preventScroll: true });
+    }
     setStep(Number(a.dataset.step));
   }));
   $("#revit-btn").addEventListener("click", () => {
     if (!state.run) return;
     const panel = $("#export-panel");
-    if (!panel.hidden) { panel.hidden = true; return; }
+    if (!panel.hidden) { closeExportPanel(); return; }
     renderExportPanel(state.run);
     setStep(4);
-    panel.scrollIntoView({ behavior: "smooth", block: "start" });
+    setStatus(`Export to Revit: the two lines that build sheet FFM-01 for stamp ${state.run.stamp}.`, "info");
+    panel.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   });
+  // printing opens every ledger layer, and closes the ones it opened afterwards
+  window.addEventListener("beforeprint", () => $$(".ledger details:not([open])").forEach(d => { d.open = true; d.dataset.printOpened = "1"; }));
+  window.addEventListener("afterprint", () => $$(".ledger details[data-print-opened]").forEach(d => { d.open = false; delete d.dataset.printOpened; }));
   $("#tour-link").addEventListener("click", e => { e.preventDefault(); startTour(0); });
   $("#tour-start").addEventListener("click", () => startTour(0));
   $("#tour-dismiss").addEventListener("click", () => { $("#tour-offer").hidden = true; try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* fine */ } });
@@ -1732,10 +2425,11 @@ async function init() {
     state.optionId = PRELOAD_OPTION;
     $("#site-select").value = first;
     await selectSite(first);
+    setStatus("Pick a site and an option, set the date the rules should be read on, then run the rules.", "info");
   } catch (e) {
     toast(`Could not load the inputs: ${e.message}`, true);
   }
-  setStep(1);
+  setStep(firstOpenStep());
   watchSteps();
   offerTour();
   if (STATIC) loadEngine().catch(() => { /* the chip says why; past runs still open */ });

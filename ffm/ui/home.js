@@ -64,6 +64,19 @@
     });
     measureLanes();
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureLanes);
+
+    // on paper the findings carry their statuses and owners: print the day-one state, then put the switch back
+    let before = null;
+    window.addEventListener("beforeprint", () => {
+      before = ruler.dataset.state;
+      ruler.dataset.state = "day1";
+      measureLanes();
+    });
+    window.addEventListener("afterprint", () => {
+      if (before) ruler.dataset.state = before;
+      before = null;
+      measureLanes();
+    });
   }
 
   // ---------------------------------------------------------------- the rule change

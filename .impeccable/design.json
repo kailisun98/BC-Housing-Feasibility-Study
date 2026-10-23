@@ -1,50 +1,388 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T02:30:00-07:00",
+  "generatedAt": "2026-10-22T21:09:56-07:00",
   "title": "Design System: Funding-Fit Memo",
   "extensions": {
     "colorMeta": {
-      "ink": { "role": "primary", "displayName": "Ink", "canonical": "#2C3E50", "tonalRamp": ["#14181d", "#1c2128", "#2c3e50", "#3f5368", "#5f6672", "#8a93a0", "#b6bbc1", "#e6ebf1"] },
-      "blue": { "role": "primary", "displayName": "Blue", "canonical": "#2A6FB8", "tonalRamp": ["#0f2b4c", "#184270", "#245f9c", "#2a6fb8", "#3c8cdc", "#5aa2ea", "#8cc0f2", "#eaf0f8"] },
-      "amber": { "role": "secondary", "displayName": "Amber", "canonical": "#C77D14", "tonalRamp": ["#3a2f14", "#5c3f0a", "#8f5a0e", "#c77d14", "#e0a03a", "#ebb45c", "#f1cf98", "#fff1d6"] },
-      "ok": { "role": "secondary", "displayName": "OK", "canonical": "#2F7D4A", "tonalRamp": ["#163121", "#1c4a2d", "#246a3d", "#2f7d4a", "#4cae6d", "#6fcb8d", "#a8dfbb", "#e1f2e5"] },
-      "warn": { "role": "secondary", "displayName": "Warn", "canonical": "#D9A520", "tonalRamp": ["#3a2f14", "#5c4408", "#7a5a00", "#b8880f", "#d9a520", "#e0b43a", "#e8c56a", "#fff1d6"] },
-      "red": { "role": "secondary", "displayName": "Red", "canonical": "#C81E1E", "tonalRamp": ["#3b1c1c", "#6c1212", "#a81a1a", "#c81e1e", "#e0554f", "#ef8a85", "#f5b5b2", "#fbe1e1"] },
-      "teal": { "role": "secondary", "displayName": "Teal", "canonical": "#2A9D8F", "tonalRamp": ["#0f3a35", "#17594f", "#1f7a6e", "#2a9d8f", "#3fb3a4", "#6cc7bb", "#a3ddd5", "#dff2ef"] },
-      "page": { "role": "neutral", "displayName": "Page", "canonical": "#F5F6F8", "tonalRamp": ["#14181d", "#1c2128", "#232c37", "#2c343d", "#8a93a0", "#e1e5ea", "#e9eef4", "#f5f6f8"] },
-      "muted": { "role": "neutral", "displayName": "Muted", "canonical": "#5F6672", "tonalRamp": ["#1f2933", "#2c343d", "#48505b", "#5f6672", "#6b7684", "#8a93a0", "#9aa4b1", "#b6bbc1"] },
-      "envelope-blue": { "role": "tertiary", "displayName": "Envelope Blue", "canonical": "#3C8CDC", "tonalRamp": ["#123052", "#1d4a7c", "#2a6fb8", "#3c8cdc", "#6aa8e5", "#95c1ec", "#bfd9f3", "#e6f0fa"] },
-      "lane-grey": { "role": "tertiary", "displayName": "Lane Grey", "canonical": "#BDBDBD", "tonalRamp": ["#2e2e2e", "#4a4a4a", "#6b6b6b", "#8e8e8e", "#bdbdbd", "#d6d6d6", "#e8e8e8", "#f4f4f2"] }
+      "ink": {
+        "role": "primary",
+        "displayName": "Ink",
+        "canonical": "#2C3E50",
+        "tonalRamp": [
+          "#14181d",
+          "#1c2128",
+          "#2c3e50",
+          "#3f5368",
+          "#5f6672",
+          "#8a93a0",
+          "#b6bbc1",
+          "#e6ebf1"
+        ]
+      },
+      "blue": {
+        "role": "primary",
+        "displayName": "Blue",
+        "canonical": "#2A6FB8",
+        "tonalRamp": [
+          "#0f2b4c",
+          "#184270",
+          "#245f9c",
+          "#2a6fb8",
+          "#3c8cdc",
+          "#5aa2ea",
+          "#8cc0f2",
+          "#eaf0f8"
+        ]
+      },
+      "amber": {
+        "role": "secondary",
+        "displayName": "Amber",
+        "canonical": "#C77D14",
+        "tonalRamp": [
+          "#3a2f14",
+          "#5c3f0a",
+          "#8f5a0e",
+          "#c77d14",
+          "#e0a03a",
+          "#ebb45c",
+          "#f1cf98",
+          "#fff1d6"
+        ]
+      },
+      "ok": {
+        "role": "secondary",
+        "displayName": "OK",
+        "canonical": "#2F7D4A",
+        "tonalRamp": [
+          "#163121",
+          "#1c4a2d",
+          "#246a3d",
+          "#2f7d4a",
+          "#4cae6d",
+          "#6fcb8d",
+          "#a8dfbb",
+          "#e1f2e5"
+        ]
+      },
+      "warn": {
+        "role": "secondary",
+        "displayName": "Warn",
+        "canonical": "#D9A520",
+        "tonalRamp": [
+          "#3a2f14",
+          "#5c4408",
+          "#7a5a00",
+          "#b8880f",
+          "#d9a520",
+          "#e0b43a",
+          "#e8c56a",
+          "#fff1d6"
+        ]
+      },
+      "red": {
+        "role": "secondary",
+        "displayName": "Red",
+        "canonical": "#C81E1E",
+        "tonalRamp": [
+          "#3b1c1c",
+          "#6c1212",
+          "#a81a1a",
+          "#c81e1e",
+          "#e0554f",
+          "#ef8a85",
+          "#f5b5b2",
+          "#fbe1e1"
+        ]
+      },
+      "teal": {
+        "role": "secondary",
+        "displayName": "Teal",
+        "canonical": "#2A9D8F",
+        "tonalRamp": [
+          "#0f3a35",
+          "#17594f",
+          "#1f7a6e",
+          "#2a9d8f",
+          "#3fb3a4",
+          "#6cc7bb",
+          "#a3ddd5",
+          "#dff2ef"
+        ]
+      },
+      "page": {
+        "role": "neutral",
+        "displayName": "Page",
+        "canonical": "#F5F6F8",
+        "tonalRamp": [
+          "#14181d",
+          "#1c2128",
+          "#232c37",
+          "#2c343d",
+          "#8a93a0",
+          "#e1e5ea",
+          "#e9eef4",
+          "#f5f6f8"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#5F6672",
+        "tonalRamp": [
+          "#1f2933",
+          "#2c343d",
+          "#48505b",
+          "#5f6672",
+          "#6b7684",
+          "#8a93a0",
+          "#9aa4b1",
+          "#b6bbc1"
+        ]
+      },
+      "envelope-blue": {
+        "role": "tertiary",
+        "displayName": "Envelope Blue",
+        "canonical": "#3C8CDC",
+        "tonalRamp": [
+          "#123052",
+          "#1d4a7c",
+          "#2a6fb8",
+          "#3c8cdc",
+          "#6aa8e5",
+          "#95c1ec",
+          "#bfd9f3",
+          "#e6f0fa"
+        ]
+      },
+      "lane-grey": {
+        "role": "tertiary",
+        "displayName": "Lane Grey",
+        "canonical": "#BDBDBD",
+        "tonalRamp": [
+          "#2e2e2e",
+          "#4a4a4a",
+          "#6b6b6b",
+          "#8e8e8e",
+          "#bdbdbd",
+          "#d6d6d6",
+          "#e8e8e8",
+          "#f4f4f2"
+        ]
+      },
+      "amber-ink": {
+        "role": "secondary",
+        "displayName": "Amber Ink",
+        "canonical": "#14181D",
+        "tonalRamp": [
+          "#0b0d10",
+          "#14181d",
+          "#1c2128",
+          "#2c343d",
+          "#3d4752",
+          "#5f6672",
+          "#9aa4b1",
+          "#e6ebf1"
+        ]
+      },
+      "half-road": {
+        "role": "tertiary",
+        "displayName": "Half Road",
+        "canonical": "#E9E9E6",
+        "tonalRamp": [
+          "#4a4a47",
+          "#6b6b67",
+          "#8e8e8a",
+          "#b3b3ae",
+          "#c9c9c5",
+          "#dcdcd8",
+          "#e9e9e6",
+          "#f6f6f4"
+        ]
+      },
+      "half-parcel": {
+        "role": "tertiary",
+        "displayName": "Half Parcel",
+        "canonical": "#F4F4F2",
+        "tonalRamp": [
+          "#4d4d4a",
+          "#6f6f6b",
+          "#929290",
+          "#b7b7b3",
+          "#d3d3cf",
+          "#e6e6e2",
+          "#f4f4f2",
+          "#fbfbfa"
+        ]
+      },
+      "half-building": {
+        "role": "tertiary",
+        "displayName": "Half Building",
+        "canonical": "#E2E2DF",
+        "tonalRamp": [
+          "#464644",
+          "#666663",
+          "#888885",
+          "#adadaa",
+          "#c9c9c5",
+          "#d7d7d4",
+          "#e2e2df",
+          "#f1f1ef"
+        ]
+      },
+      "half-line": {
+        "role": "tertiary",
+        "displayName": "Half Line",
+        "canonical": "#C9C9C5",
+        "tonalRamp": [
+          "#3f3f3d",
+          "#5c5c59",
+          "#7c7c79",
+          "#9e9e9a",
+          "#b6b6b2",
+          "#c9c9c5",
+          "#dcdcd9",
+          "#efefed"
+        ]
+      },
+      "tree": {
+        "role": "tertiary",
+        "displayName": "Tree",
+        "canonical": "#9FB07F",
+        "tonalRamp": [
+          "#2f3a1f",
+          "#46552d",
+          "#5f733d",
+          "#7f9664",
+          "#9fb07f",
+          "#bac8a1",
+          "#d5dfc4",
+          "#eef3e6"
+        ]
+      },
+      "tree-line": {
+        "role": "tertiary",
+        "displayName": "Tree Line",
+        "canonical": "#7F9664",
+        "tonalRamp": [
+          "#26301a",
+          "#3a4728",
+          "#506237",
+          "#677e48",
+          "#7f9664",
+          "#9fb07f",
+          "#c3d0ad",
+          "#e6ecdc"
+        ]
+      }
     },
     "typographyMeta": {
-      "title": { "displayName": "Title", "purpose": "The memo's title and the verdict sentence; the loudest text on the page." },
-      "wordmark": { "displayName": "Wordmark", "purpose": "The top bar's product name." },
-      "heading": { "displayName": "Heading", "purpose": "Panel and card headings, each with a round badge." },
-      "body": { "displayName": "Body", "purpose": "Findings and prose; first sentence Ink, continuation Muted." },
-      "small": { "displayName": "Small", "purpose": "Fields, selects, the status strip, captions." },
-      "label": { "displayName": "Label", "purpose": "Form labels above fields." },
-      "key": { "displayName": "Key", "purpose": "Uppercase group labels, table headers, figure labels, title-block keys, pill text." },
-      "table": { "displayName": "Table", "purpose": "The ledger's rows." },
-      "mono": { "displayName": "Mono", "purpose": "Rule ids, hashes, paths, shell lines; what a machine wrote." },
-      "stamp": { "displayName": "Stamp", "purpose": "The version stamp in a mono double rule." }
+      "title": {
+        "displayName": "Title",
+        "purpose": "The memo's title and the verdict sentence; the loudest text on the page."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "The top bar's product name."
+      },
+      "heading": {
+        "displayName": "Heading",
+        "purpose": "Panel and card headings, each with a round badge."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Findings and prose; first sentence Ink, continuation Muted."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Fields, selects, the status strip, captions."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Form labels above fields."
+      },
+      "key": {
+        "displayName": "Key",
+        "purpose": "Uppercase group labels, table headers, figure labels, title-block keys, pill text."
+      },
+      "table": {
+        "displayName": "Table",
+        "purpose": "The ledger's rows."
+      },
+      "mono": {
+        "displayName": "Mono",
+        "purpose": "Rule ids, hashes, paths, shell lines; what a machine wrote."
+      },
+      "stamp": {
+        "displayName": "Stamp",
+        "purpose": "The version stamp in a mono double rule."
+      }
     },
     "shadows": [
-      { "name": "panel", "value": "0 1px 2px rgba(20, 30, 40, 0.06)", "purpose": "Every card at rest; a sheet on a desk." },
-      { "name": "button-hover", "value": "0 2px 6px rgba(20, 30, 40, 0.25)", "purpose": "The primary button while hovered." },
-      { "name": "walkthrough-card", "value": "0 10px 30px rgba(0, 0, 0, 0.28)", "purpose": "The guided-tour card over the dimmed page." },
-      { "name": "spotlight", "value": "0 0 0 9999px rgba(20, 30, 40, 0.45), 0 0 0 2px #2A6FB8", "purpose": "The walkthrough's cut-out." }
+      {
+        "name": "panel",
+        "value": "0 1px 2px rgba(20, 30, 40, 0.06)",
+        "purpose": "Every card at rest; a sheet on a desk."
+      },
+      {
+        "name": "button-hover",
+        "value": "0 2px 6px rgba(20, 30, 40, 0.25)",
+        "purpose": "The primary button while hovered."
+      },
+      {
+        "name": "walkthrough-card",
+        "value": "0 10px 30px rgba(0, 0, 0, 0.28)",
+        "purpose": "The guided-tour card over the dimmed page."
+      },
+      {
+        "name": "spotlight",
+        "value": "0 0 0 9999px rgba(20, 30, 40, 0.45), 0 0 0 2px #2A6FB8",
+        "purpose": "The walkthrough's cut-out."
+      }
     ],
     "motion": [
-      { "name": "land", "value": "150ms ease-out, opacity 0 to 1 with a 3px rise", "purpose": "The memo arriving after a run; the only entrance." },
-      { "name": "press", "value": "transform 60ms ease-out, translateY(1px)", "purpose": "A button sinking under the pointer." },
-      { "name": "hover", "value": "background, border, color, shadow 120ms ease-out", "purpose": "Buttons, tabs and segments reacting to the pointer." },
-      { "name": "spin", "value": "900ms linear, infinite", "purpose": "The busy dot in the status strip and the engine chip while loading." },
-      { "name": "spot-fade", "value": "opacity 150ms ease-out", "purpose": "The walkthrough spotlight between stops." }
+      {
+        "name": "land",
+        "value": "150ms ease-out, opacity 0 to 1 with a 3px rise",
+        "purpose": "The memo arriving after a run; the only entrance."
+      },
+      {
+        "name": "press",
+        "value": "transform 60ms ease-out, translateY(1px)",
+        "purpose": "A button sinking under the pointer."
+      },
+      {
+        "name": "hover",
+        "value": "background, border, color, shadow 120ms ease-out",
+        "purpose": "Buttons, tabs and segments reacting to the pointer."
+      },
+      {
+        "name": "spin",
+        "value": "900ms linear, infinite",
+        "purpose": "The busy dot in the status strip and the engine chip while loading."
+      },
+      {
+        "name": "spot-fade",
+        "value": "opacity 150ms ease-out",
+        "purpose": "The walkthrough spotlight between stops."
+      }
     ],
     "breakpoints": [
-      { "name": "stack", "value": "1100px" },
-      { "name": "single", "value": "760px" },
-      { "name": "figures-column", "value": "1600px" }
+      {
+        "name": "stack",
+        "value": "1100px"
+      },
+      {
+        "name": "single",
+        "value": "760px"
+      },
+      {
+        "name": "figures-column",
+        "value": "1600px"
+      },
+      {
+        "name": "ruler-vertical",
+        "value": "899px"
+      }
     ]
   },
   "components": [
@@ -100,9 +438,9 @@
       "name": "Three-state control",
       "kind": "custom",
       "refersTo": "input",
-      "description": "Yes / No / Not sure as a segmented control; the chosen segment fills Ink, Not sure fills Amber.",
+      "description": "Yes / No / Not sure as a radio group; the chosen segment fills Ink, Not sure fills Amber with Amber Ink text (5.4:1).",
       "html": "<div class=\"ds-tri\" role=\"radiogroup\"><button class=\"ds-tri-b\" role=\"radio\" aria-checked=\"false\">Yes</button><button class=\"ds-tri-b\" role=\"radio\" aria-checked=\"false\">No</button><button class=\"ds-tri-b ds-tri-unsure\" role=\"radio\" aria-checked=\"true\">Not sure</button></div>",
-      "css": ".ds-tri { display: inline-flex; border: 1px solid #e1e5ea; border-radius: 4px; overflow: hidden; background: #ffffff; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; } .ds-tri-b { border: 0; background: #ffffff; padding: 5px 8px; min-height: 28px; font-size: 13px; font-weight: 500; cursor: pointer; color: #5f6672; border-right: 1px solid #e1e5ea; } .ds-tri-b:last-child { border-right: 0; } .ds-tri-b[aria-checked=\"true\"] { background: #2c3e50; color: #ffffff; } .ds-tri-b.ds-tri-unsure[aria-checked=\"true\"] { background: #c77d14; color: #ffffff; } .ds-tri-b:focus-visible { outline: 2px solid #2a6fb8; outline-offset: 1px; }"
+      "css": ".ds-tri { display: inline-flex; border: 1px solid #e1e5ea; border-radius: 4px; overflow: hidden; background: #ffffff; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; } .ds-tri-b { border: 0; background: #ffffff; padding: 5px 8px; min-height: 28px; font-size: 13px; font-weight: 500; cursor: pointer; color: #5f6672; border-right: 1px solid #e1e5ea; } .ds-tri-b:last-child { border-right: 0; } .ds-tri-b[aria-checked=\"true\"] { background: #2c3e50; color: #ffffff; } .ds-tri-b.ds-tri-unsure[aria-checked=\"true\"] { background: #c77d14; color: #14181d; } .ds-tri-b:focus-visible { outline: 2px solid #2a6fb8; outline-offset: 1px; }"
     },
     {
       "name": "Step bar",
@@ -119,27 +457,77 @@
       "description": "The version stamp in the top bar: mono uppercase inside a double rule, with Copy.",
       "html": "<span class=\"ds-stamp\"><code class=\"ds-stamp-code\">20e44f1445ecaff9</code><button class=\"ds-stamp-btn\">Copy</button></span>",
       "css": ".ds-stamp { display: inline-flex; align-items: center; gap: 8px; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; padding: 4px; } .ds-stamp-code { font: 600 11.5px/1.15 'IBM Plex Mono', Menlo, Consolas, monospace; letter-spacing: 0.08em; text-transform: uppercase; padding: 3px 10px; color: #5f6672; border: 2px solid currentColor; border-radius: 2px; box-shadow: 0 0 0 2px #ffffff, 0 0 0 3px currentColor; margin: 0 4px; } .ds-stamp-btn { font: inherit; font-size: 12px; font-weight: 500; min-height: 26px; padding: 3px 9px; border: 1px solid #e1e5ea; border-radius: 5px; background: transparent; color: #2c3e50; cursor: pointer; }"
+    },
+    {
+      "name": "Revision mark",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "A comparison's change, marked the drafting way: a delta with its letter beside what changed, and a dashed cloud around changed words.",
+      "html": "<p class=\"ds-rev-p\">38 of 105 units (36.2%) have two or more bedrooms; <mark class=\"ds-rev-cloud\">12 (11.4%) have three or more.</mark> <svg class=\"ds-rev\" viewBox=\"0 0 16 14\" aria-hidden=\"true\"><path d=\"M8 1.2 15 12.8H1Z\"/><text x=\"8\" y=\"11.2\" text-anchor=\"middle\">A</text></svg></p>",
+      "css": ".ds-rev-p { font: 13px/1.45 'IBM Plex Sans', Helvetica, Arial, sans-serif; color: #2c3e50; margin: 0; } .ds-rev { display: inline-block; width: 16px; height: 14px; vertical-align: -2px; color: #2c3e50; } .ds-rev path { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; } .ds-rev text { fill: currentColor; font: 600 7.5px 'IBM Plex Sans', sans-serif; } .ds-rev-cloud { background: none; color: inherit; padding: 0 3px; border: 1px dashed #2c3e50; border-radius: 7px; }"
+    },
+    {
+      "name": "Issued sheet",
+      "kind": "card",
+      "refersTo": "drawing-sheet",
+      "description": "The home page's close: a white drawing sheet whose actions are title-block cells, ending on a title block with the stamp.",
+      "html": "<div class=\"ds-sheet\"><h3 class=\"ds-sheet-h\">See it work on a real case.</h3><div class=\"ds-cells\"><div><b>Run</b><button class=\"ds-btn-p\">Run the case</button></div><div><b>Compare</b><button class=\"ds-btn-q\">Watch a rule change</button></div><div><b>Read</b><button class=\"ds-btn-q\">Read the memo</button></div></div></div>",
+      "css": ".ds-sheet { background: #ffffff; border: 1px solid #e1e5ea; border-radius: 6px; box-shadow: 0 1px 2px rgba(20,30,40,.06); padding: 14px; font: 13px/1.45 'IBM Plex Sans', Helvetica, Arial, sans-serif; color: #1f2933; } .ds-sheet-h { font-size: 18px; font-weight: 600; margin: 0 0 10px; } .ds-cells { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 2px solid #1f2933; } .ds-cells > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 14px 8px 0; margin-right: 14px; border-right: 1px solid #e1e5ea; } .ds-cells > div:last-child { border-right: 0; } .ds-cells b { font-size: 11px; color: #5f6672; letter-spacing: .06em; text-transform: uppercase; } .ds-btn-p, .ds-btn-q { font: 500 13px/1.25 'IBM Plex Sans', sans-serif; padding: 6px 12px; border-radius: 5px; min-height: 30px; cursor: pointer; } .ds-btn-p { background: #2c3e50; color: #ffffff; border: 1px solid transparent; } .ds-btn-q { background: transparent; color: #2c3e50; border: 1px solid #e1e5ea; } .ds-btn-p:hover { background: #56657a; box-shadow: 0 2px 6px rgba(20,30,40,.25); } .ds-btn-q:hover { background: #c3cbd5; border-color: #8a96a3; } .ds-btn-p:focus-visible, .ds-btn-q:focus-visible { outline: 2px solid #2a6fb8; outline-offset: 1px; }"
     }
   ],
   "narrative": {
     "northStar": "The Drafting Tool",
-    "overview": "The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the talking; IBM Plex Mono is reserved for what a machine wrote down, stamps, rule ids, hashes, paths and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good drawing set is dense, and it stays calm because every element has a fixed job.\n\nColour is meaning. Blue is for links, focus, the selection and the step you are on; amber is for what is pending, the \"not sure\" answer, the engine still loading, a benchmark line; green, yellow, red, blue and grey mark the six statuses, always beside the printed word, never instead of it. The status strip under the step bar carries one line of feedback for every action, with a dot that says info, busy, ok or error. The massing drawings sit on white paper in both themes and keep Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a red dashed line for the setback envelope, amber dashes for the staff benchmark.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).",
+    "overview": "The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the talking; IBM Plex Mono is reserved for what a machine wrote down, stamps, rule ids, hashes, paths and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good drawing set is dense, and it stays calm because every element has a fixed job.\n\nColour is meaning. Blue is for links, focus, the selection and the step you are on; amber is for what is pending, the \"not sure\" answer, the engine still loading, a benchmark line; green, yellow, red, blue and grey mark the six statuses, always beside the printed word, never instead of it. The status strip under the step bar carries one line of feedback for every action, with a dot that says info, busy, ok or error. The massing drawings sit on white paper in both themes and keep Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a red dashed line for the setback envelope, amber dashes for the staff benchmark.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).\n\nThe home page in front of the tool speaks the same language at the same density, and borrows the drawing set's own devices where it needs structure: a week ruler on a sheet with a title block, a schedule with numbered general notes, and a sheet issued for review to close on. When something changes between two readings of the rules, it is marked the way a drawing marks a revision.",
     "keyCharacteristics": [
       "One sans at 13px with 11px uppercase keys; mono only for machine-written text.",
       "Slate ink, cool grey page, white panels; dark mode is the same tool at night, not an inversion.",
       "Buttons are ink-filled; the secondary ones take the group grey. Hover lifts, press sinks 1px.",
       "A status is a word on a tinted pill with a round mark and a glyph before it.",
       "Numbered badges stand in for section numbers; step panels and answer cards share them.",
-      "Drawings are always on white paper, whatever the theme."
+      "Drawings are always on white paper, whatever the theme.",
+      "A comparison is a revision: a delta with its letter beside whatever changed."
     ],
     "rules": [
-      { "name": "The Marked Word Rule", "body": "A status is a printed word with a coloured mark before it. The colour never appears without the word, and the word never appears without its mark.", "section": "colors" },
-      { "name": "The Pending Amber Rule", "body": "Amber means not yet settled: a loading engine, an unsaved edit, an unsure answer, an uncertain finding, a benchmark still under negotiation. It is never a highlight.", "section": "colors" },
-      { "name": "The White Paper Rule", "body": "Drawings and the Revit sheet sit on white in both themes, with their own fixed inks; the theme changes the desk, not the paper.", "section": "colors" },
-      { "name": "The Lead Sentence Rule", "body": "In any finding, the first sentence is Ink and the continuation is Muted. Hierarchy inside a paragraph comes from colour, not weight.", "section": "typography" },
-      { "name": "The Key Rule", "body": "Every small uppercase label is the same key: 11px, 600, 0.06em. It names a group, a column, a figure or a title-block field, and nothing else.", "section": "typography" },
-      { "name": "The Machine Mono Rule", "body": "Mono is for text a machine produced or will consume: stamps, ids, hashes, paths, shell lines, the as-of date. Human sentences are never set in mono.", "section": "typography" },
-      { "name": "The One Pixel Rule", "body": "A panel's shadow is one pixel; it says \"sheet on a desk\", not \"floating\". Only something that is actually above the page casts more.", "section": "elevation" }
+      {
+        "name": "The Marked Word Rule",
+        "body": "A status is a printed word with a coloured mark before it. The colour never appears without the word, and the word never appears without its mark.",
+        "section": "colors"
+      },
+      {
+        "name": "The Pending Amber Rule",
+        "body": "Amber means not yet settled: a loading engine, an unsaved edit, an unsure answer, an uncertain finding, a benchmark still under negotiation. It is never a highlight, and never text on white: amber itself is 3.3:1, so words take Uncertain Text and fills take Amber Ink.",
+        "section": "colors"
+      },
+      {
+        "name": "The White Paper Rule",
+        "body": "Drawings and the Revit sheet sit on white in both themes, with their own fixed inks; the theme changes the desk, not the paper. A light-token reset on paper re-declares the derived tokens too (the status marks are resolved where they are defined, so they would keep the night colours otherwise).",
+        "section": "colors"
+      },
+      {
+        "name": "The Revision Rule",
+        "body": "When two readings of the rules are compared, what changed carries a delta with its letter (A) and the comparison's answer sits right under the title block, before the three answers. Nothing else uses the delta.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lead Sentence Rule",
+        "body": "In any finding, the first sentence is Ink and the continuation is Muted. Hierarchy inside a paragraph comes from colour, not weight.",
+        "section": "typography"
+      },
+      {
+        "name": "The Key Rule",
+        "body": "Every small uppercase label is the same key: 11px, 600, 0.06em. It names a group, a column, a figure or a title-block field, and nothing else. It never sits above a heading as a kicker: a heading speaks for itself.",
+        "section": "typography"
+      },
+      {
+        "name": "The Machine Mono Rule",
+        "body": "Mono is for text a machine produced or will consume: stamps, ids, hashes, paths, shell lines, the as-of date. Human sentences are never set in mono.",
+        "section": "typography"
+      },
+      {
+        "name": "The One Pixel Rule",
+        "body": "A panel's shadow is one pixel; it says \"sheet on a desk\", not \"floating\". Only something that is actually above the page casts more.",
+        "section": "elevation"
+      }
     ],
     "dos": [
       "Do set everything in IBM Plex Sans at 13px with 11px uppercase keys, and keep mono for what a machine wrote.",
@@ -147,7 +535,9 @@
       "Do fill buttons with Ink (secondary with Group), lift them on hover and sink them 1px on press.",
       "Do keep Blue for links, focus and the active step, and Amber for what is pending.",
       "Do keep panels at 6px radius, 12px by 14px padding, 1px Line and the one-pixel shadow, 12px apart.",
-      "Do keep the drawings on white paper in both themes with Lotwise's drawing tones."
+      "Do keep the drawings on white paper in both themes with Lotwise's drawing tones.",
+      "Do mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.",
+      "Do reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card."
     ],
     "donts": [
       "Don't build a dashboard: no gauges, KPI tiles, sparklines, or icon-plus-heading cards as structure.",
@@ -155,7 +545,8 @@
       "Don't bring back a serif, a 16px body, or large display type; the memo reads at drafting density.",
       "Don't put a status colour on a button, a heading or a background that carries no status.",
       "Don't add a toast, a second accent, or a shadow deeper than one pixel on anything at rest.",
-      "Don't use \"N/A\", a colour without its word, or a checkbox where \"not sure\" is a legitimate answer."
+      "Don't use \"N/A\", a colour without its word, or a checkbox where \"not sure\" is a legitimate answer.",
+      "Don't set amber as text on white, put a key above a heading as a kicker, or end a page on a dark band of buttons."
     ]
   }
 }

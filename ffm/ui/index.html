@@ -13,20 +13,23 @@
 <!-- static-config -->
 </head>
 <body>
+<a class="skip" href="#step-run">Skip to the memo</a>
 
+<div class="bars">
 <header class="topbar">
-  <h1 class="wordmark">Funding-Fit Memo <em>a feasibility screen for BC non-profit housing</em></h1>
+  <p class="wordmark"><a href="./" title="Back to the home page">Funding-Fit Memo</a> <em>a feasibility screen for BC non-profit housing</em></p>
   <div class="topbar-controls">
     <label class="asof">
       <span class="eyebrow">Rules as of</span>
-      <input type="date" id="as-of">
+      <input type="date" id="as-of" aria-describedby="as-of-help">
+      <span id="as-of-help" class="sr-only">The next run reads the rules in force on this date.</span>
     </label>
-    <button id="run-btn" class="btn btn-primary" type="button">Run the rules</button>
+    <button id="run-btn" class="btn btn-primary" type="button" title="Run the rules (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Run the rules</button>
     <span id="engine-chip" class="engine-chip" hidden></span>
     <div id="stamp-box" class="stamp" hidden>
       <span class="eyebrow">Stamp</span>
       <code id="stamp-text"></code>
-      <button id="copy-stamp" class="btn btn-quiet btn-small" type="button" title="Copy the stamp">Copy</button>
+      <button id="copy-stamp" class="btn btn-quiet btn-small" type="button" title="Copy the stamp" aria-label="Copy the stamp">Copy</button>
     </div>
   </div>
 </header>
@@ -36,9 +39,11 @@
   <a href="#step-option" data-step="2"><span class="step-n">2</span> Option</a>
   <a href="#step-run" data-step="3"><span class="step-n">3</span> Run and read</a>
   <a href="#step-export" data-step="4"><span class="step-n">4</span> Export</a>
+  <button id="hide-inputs" class="btn btn-quiet btn-small steps-toggle" type="button" aria-expanded="true" aria-controls="inputs">Hide inputs</button>
   <a href="#" id="tour-link" class="tour-link">Walkthrough</a>
 </nav>
-<div id="status" class="strip" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Pick a site and an option, set the date the rules should be read on, then run the rules.</span></div>
+<div id="status" class="strip" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Loading the sites, options and rules…</span></div>
+</div>
 <div id="tour-offer" class="tour-offer" hidden>
   <span>New here? A two-minute walkthrough shows the four steps on the page.</span>
   <button id="tour-start" class="btn btn-primary btn-small" type="button">Take the walkthrough</button>
@@ -46,13 +51,17 @@
 </div>
 
 <main class="panes">
-  <aside class="inputs">
-    <section id="step-site" class="card input-card">
-      <h2><span class="badge">1</span> Site</h2>
+  <aside class="inputs" id="inputs" aria-label="Inputs">
+    <section id="step-site" class="card input-card" tabindex="-1">
+      <div class="card-head">
+        <h2><span class="badge">1</span> Site</h2>
+        <button id="edit-site" class="btn btn-quiet btn-small" type="button" aria-expanded="true" aria-controls="site-form">Done</button>
+      </div>
       <div class="field">
         <label for="site-select">Site file</label>
         <select id="site-select"></select>
       </div>
+      <p id="site-summary" class="input-summary"></p>
       <form id="site-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
         <button id="save-site" class="btn btn-quiet" type="button">Save site as…</button>
@@ -60,12 +69,16 @@
       </div>
     </section>
 
-    <section id="step-option" class="card input-card">
-      <h2><span class="badge">2</span> Option</h2>
+    <section id="step-option" class="card input-card" tabindex="-1">
+      <div class="card-head">
+        <h2><span class="badge">2</span> Option</h2>
+        <button id="edit-option" class="btn btn-quiet btn-small" type="button" aria-expanded="true" aria-controls="option-form">Done</button>
+      </div>
       <div class="field">
         <label for="option-select">Option file</label>
         <select id="option-select"></select>
       </div>
+      <p id="option-summary" class="input-summary"></p>
       <form id="option-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
         <button id="save-option" class="btn btn-quiet" type="button">Save option as…</button>
@@ -74,7 +87,7 @@
     </section>
   </aside>
 
-  <section class="memo-pane" id="step-run">
+  <section class="memo-pane" id="step-run" tabindex="-1" aria-label="The memo">
     <div class="memo-tools">
       <label class="tool">
         <span class="eyebrow">Open a past run</span>
@@ -88,15 +101,16 @@
     </div>
     <div id="memo" class="memo"></div>
 
-    <footer id="step-export" class="export">
+    <footer id="step-export" class="export" tabindex="-1">
       <h2><span class="badge">4</span> Export</h2>
       <div class="action-bar">
-        <a id="dl-html" class="btn" href="#" download aria-disabled="true">Download memo (HTML)</a>
-        <a id="dl-md" class="btn" href="#" download aria-disabled="true">Download memo (Markdown)</a>
+        <a id="dl-html" class="btn" download aria-disabled="true">Download memo (HTML)</a>
         <button id="print-btn" class="btn" type="button" disabled>Print</button>
-        <a id="dl-massing" class="btn" href="#" download aria-disabled="true">Download massing.json</a>
-        <button id="revit-btn" class="btn" type="button" disabled>Export to Revit</button>
+        <a id="dl-md" class="btn btn-quiet" download aria-disabled="true">Download memo (Markdown)</a>
+        <a id="dl-massing" class="btn btn-quiet" download aria-disabled="true">Download massing.json</a>
+        <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
       </div>
+      <p class="export-note">The HTML memo is the one to send: it opens in any browser and prints with its ledger. The Markdown is the same text for a repository or a wiki.</p>
       <div id="export-panel" class="export-panel" hidden></div>
     </footer>
   </section>

@@ -7,16 +7,14 @@
 /* ------------------------------------------------------------------ tokens: light first, dark under the OS setting */
 :root {
   --ink: #2c3e50; --muted: #5f6672; --page: #f5f6f8; --panel: #ffffff; --line: #e1e5ea; --group: #e9eef4;
-  --amber: #c77d14; --amber-ink: #ffffff; --blue: #2a6fb8; --red: #c81e1e; --ok: #2f7d4a; --warn: #d9a520;
+  --amber: #c77d14; --amber-ink: #14181d; --blue: #2a6fb8; --red: #c81e1e; --ok: #2f7d4a; --warn: #d9a520;
   --on-signal: #ffffff; --on-warn: #1f2933;
   --s-pass: var(--ok);          --s-pass-text: #246a3d;        --s-pass-wash: #e1f2e5;
   --s-conditional: var(--warn); --s-conditional-text: #7a5a00; --s-conditional-wash: #fff1d6;
   --s-uncertain: var(--amber);  --s-uncertain-text: #8f5a0e;   --s-uncertain-wash: #fff1d6;
   --s-na: #8a93a0;              --s-na-text: #5f6672;          --s-na-wash: var(--group);
   /* the drawing colours, the same in both themes (the drawings sit on white paper) */
-  --c-paper: #ffffff; --c-envelope: #3c8cdc; --c-street: #8e8e8e; --c-lane: #bdbdbd; --c-drawink: #1f2933; --c-drawmuted: #5f6672;
-  /* the closing band: the tool's dark ink as a field */
-  --band: #2c3e50; --on-band: #ffffff; --on-band-muted: #c5cfda; --band-line: #4a5d70; --band-link: #a9cdf3;
+  --c-paper: #ffffff; --c-envelope: #3c8cdc; --c-street: #8e8e8e; --c-lane: #bdbdbd; --c-drawink: #1f2933; --c-drawmuted: #5f6672; --c-rule: #e1e5ea;
   --shadow: 0 1px 2px rgba(20, 30, 40, .06);
   --sans: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
@@ -34,14 +32,15 @@
     --s-conditional-text: #e8c56a; --s-conditional-wash: #3a2f14;
     --s-uncertain-text: #ebb45c; --s-uncertain-wash: #3a2f14;
     --s-na: #6b7684; --s-na-text: #9aa4b1; --s-na-wash: #232c37;
-    --band: #1f2b38; --on-band: #e6ebf1; --on-band-muted: #a9b4c1; --band-line: #34475a; --band-link: #8cc0f2;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   }
-  /* the drawings stay on white paper, so everything drawn on them keeps the light tokens */
+  /* the drawings stay on white paper, so everything drawn on them keeps the light tokens. The status marks are
+     re-declared too: --s-pass and the rest are resolved where they are defined, so they would keep the night colours. */
   :root:not([data-theme="light"]) .sheet, :root:not([data-theme="light"]) .figure {
     color-scheme: light;
-    --ink: #2c3e50; --muted: #5f6672; --panel: #ffffff; --line: #e1e5ea; --group: #e9eef4;
-    --amber: #c77d14; --amber-ink: #ffffff; --red: #c81e1e; --ok: #2f7d4a; --warn: #d9a520; --on-signal: #ffffff; --on-warn: #1f2933;
+    --ink: #2c3e50; --muted: #5f6672; --panel: #ffffff; --line: #e1e5ea; --group: #e9eef4; --blue: #2a6fb8;
+    --amber: #c77d14; --amber-ink: #14181d; --red: #c81e1e; --ok: #2f7d4a; --warn: #d9a520; --on-signal: #ffffff; --on-warn: #1f2933;
+    --s-pass: #2f7d4a; --s-conditional: #d9a520; --s-uncertain: #c77d14; --s-na: #8a93a0; --s-na-text: #5f6672; --s-na-wash: #e9eef4;
     --s-pass-text: #246a3d; --s-pass-wash: #e1f2e5; --s-conditional-text: #7a5a00; --s-conditional-wash: #fff1d6;
     --s-uncertain-text: #8f5a0e; --s-uncertain-wash: #fff1d6;
   }
@@ -53,6 +52,8 @@ html { accent-color: var(--ink); scroll-padding-top: 56px; }
 a:focus-visible, button:focus-visible { outline: var(--focus); outline-offset: 1px; border-radius: 3px; }
 * { box-sizing: border-box; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
 [hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.print-only { display: none; }
 
 html, body { margin: 0; }
 body { background: var(--page); color: var(--ink); font: 13px/1.45 var(--sans); font-variant-numeric: tabular-nums; -webkit-text-size-adjust: 100%; }
@@ -68,9 +69,10 @@ button { font: inherit; color: inherit; }
 .skip:focus { top: 8px; }
 
 /* ------------------------------------------------------------------ top bar: the wordmark, the page's anchors, the way in */
+/* the bar spans the window; its contents line up with the page's 1280px column */
 .topbar {
   position: sticky; top: 0; z-index: 10; height: 46px;
-  display: flex; align-items: center; gap: 16px; padding: 0 var(--gutter);
+  display: flex; align-items: center; gap: 16px; padding: 0 max(var(--gutter), calc((100% - 1280px) / 2 + var(--gutter)));
   background: var(--panel); border-bottom: 1px solid var(--line);
 }
 .wordmark { color: var(--ink); text-decoration: none; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
@@ -91,12 +93,7 @@ button { font: inherit; color: inherit; }
 .btn-primary:hover { background: color-mix(in srgb, var(--ink) 76%, var(--panel)); border-color: transparent; color: var(--panel); box-shadow: 0 2px 6px rgba(20, 30, 40, .25); }
 .btn-small { min-height: 26px; padding: 3px 9px; font-size: 12px; }
 .btn:active { transform: translateY(1px); box-shadow: none; }
-/* on the ink band: the primary inverts, the others are drawn in outline */
-.btn-invert { background: var(--on-band); color: var(--band); }
-.btn-invert:hover { background: color-mix(in srgb, var(--on-band) 86%, var(--band)); color: var(--band); border-color: transparent; box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
-.btn-outline { background: transparent; color: var(--on-band); border-color: var(--band-line); }
-.btn-outline:hover { background: color-mix(in srgb, var(--on-band) 10%, transparent); color: var(--on-band); border-color: var(--on-band-muted); }
-.close a:focus-visible { outline-color: var(--band-link); }
+.btn-quiet { background: transparent; border-color: var(--line); }
 @media (hover: none) { .btn:hover { box-shadow: none; } }
 @media (prefers-reduced-motion: reduce) { .btn, .topnav a { transition: none; } .btn:active { transform: none; } }
 
@@ -144,7 +141,8 @@ button { font: inherit; color: inherit; }
 /* ------------------------------------------------------------------ the ruler: twelve weeks, a design band, six findings */
 .ruler-body { position: relative; padding: 12px 14px 12px; }
 .weeks, .pins { list-style: none; margin: 0; padding: 0; }
-.weeks { position: relative; height: 16px; margin: 0 0 6px; font: 500 11px/16px var(--mono); color: var(--c-drawmuted); letter-spacing: .04em; }
+/* the weeks carry the argument, so they read in ink at the label size, not as a faint scale */
+.weeks { position: relative; height: 16px; margin: 0 0 6px; font: 500 12px/16px var(--mono); color: var(--c-drawink); letter-spacing: .02em; }
 .weeks li { position: absolute; left: calc(var(--k) / 12 * 100%); transform: translateX(-50%); white-space: nowrap; }
 .weeks li:first-child { transform: none; }
 .weeks li:last-child { transform: translateX(-100%); }
@@ -176,7 +174,7 @@ button { font: inherit; color: inherit; }
 .pin { position: relative; padding-top: 6px; border-top: 1px solid var(--c-drawink); line-height: 1.45; }
 .pin p + p { margin-top: 3px; }
 .pin-when { font-size: 12px; line-height: 1.4; color: var(--c-drawmuted); }
-.pin-when .mono { font: 500 11px/1.4 var(--mono); letter-spacing: .03em; }
+.pin-when .mono { font: 500 11px/1.4 var(--mono); letter-spacing: .03em; color: var(--c-drawink); }
 .pin-head b { font-weight: 600; }
 .pin-head .pill { margin-right: 4px; }
 .pin-text { color: var(--c-drawink); }
@@ -202,9 +200,15 @@ button { font: inherit; color: inherit; }
   .js .ruler[data-state="late"] .pin { font-size: 12.5px; }
 }
 @media (max-width: 1080px) { .pins { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-/* narrow: time runs down the page; in the late state the gap between findings is the weeks between them */
+@media (min-width: 900px) and (max-width: 1180px) { .band-c .band-more { display: none; } }
+/* narrow: time runs down the page; in the late state the gap between findings is the weeks between them. The design
+   band stays, in short labels, so the cost of the late rules (two redraws) is still drawn; the switch stays in view. */
 @media (max-width: 899px) {
-  .weeks, .band { display: none; }
+  .weeks { display: none; }
+  .band { margin: 0 0 14px; }
+  .band-more { display: none; }
+  .ruler[data-state="day1"] .band { display: none; }
+  .js .sheet-head { position: sticky; top: 46px; z-index: 2; background: var(--c-paper); padding-bottom: 10px; border-radius: 6px 6px 0 0; }
   .pins { grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 0; padding-left: 16px; border-left: 1px solid var(--c-street); }
   .pin::before { content: ""; position: absolute; left: -20px; top: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--c-drawink); }
   .js .ruler[data-state="late"] .pins { gap: 0; }
@@ -215,7 +219,7 @@ button { font: inherit; color: inherit; }
 
 /* the title block: keys over 12.5px values, the stamp at the end (as on the memo) */
 .titleblock { display: flex; flex-wrap: wrap; border-top: 2px solid var(--c-drawink); margin: 0 14px; padding: 0 0 2px; font-size: 12.5px; color: var(--c-drawink); }
-.titleblock > div, .memo-meta > div { display: flex; flex-direction: column; justify-content: center; gap: 1px; padding: 6px 12px 6px 0; margin-right: 12px; border-right: 1px solid var(--line); flex: 1 1 140px; min-width: 0; }
+.titleblock > div, .memo-meta > div { display: flex; flex-direction: column; justify-content: flex-start; gap: 1px; padding: 6px 12px 6px 0; margin-right: 12px; border-right: 1px solid var(--line); flex: 1 1 140px; min-width: 0; }
 .titleblock > div:last-child, .memo-meta > div:last-child { border-right: 0; margin-right: 0; }
 .titleblock b, .memo-meta b { font-size: 11px; color: var(--c-drawmuted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
 .titleblock .tb-stamp, .memo-meta .tb-stamp { flex: 0 0 auto; align-items: flex-start; }
@@ -229,9 +233,10 @@ button { font: inherit; color: inherit; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); }
 .card-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
 
-/* the five layers, as a table with the rule weight of the memo's ledger */
-.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow); }
-.layers { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.45; min-width: 720px; }
+/* the five layers, as a drawing schedule on white paper: the table, its general notes, and a schedule label */
+.schedule { padding: 4px 14px 0; }
+.table-wrap { overflow-x: auto; }
+.layers { width: 100%; border-collapse: collapse; font-size: 12px; line-height: 1.45; min-width: 720px; color: var(--c-drawink); }
 .layers th, .layers td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--line); }
 .layers thead th { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; padding-top: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--ink); }
 .layers tbody tr:last-child > * { border-bottom: 0; }
@@ -239,17 +244,22 @@ button { font: inherit; color: inherit; }
 .layers td:last-child { color: var(--muted); }
 .layer-key { display: inline-flex; width: 20px; height: 20px; margin-right: 8px; border-radius: 50%; align-items: center; justify-content: center; background: var(--ink); color: var(--panel); font: 600 11px/1 var(--sans); vertical-align: 1px; }
 
-.costs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 20px; margin: 12px 0 0; }
-.costs > div { border-top: 2px solid var(--ink); padding-top: 8px; }
-.costs dt { font-weight: 600; margin-bottom: 2px; }
-.costs dd { margin: 0; color: var(--muted); }
+/* general notes, numbered as on a drawing, under the schedule */
+.notes { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 4px 14px; padding: 10px 0 4px; border-top: 1px solid var(--line); }
+.notes-key { font-size: 11px; color: var(--c-drawmuted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; padding-top: 2px; }
+.notes ol { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--c-drawmuted); }
+.notes li::marker { color: var(--c-drawink); font-weight: 600; font-variant-numeric: tabular-nums; }
+.notes li b { color: var(--c-drawink); font-weight: 600; }
+.schedule .fig-block { margin-top: 6px; padding-bottom: 8px; }
 
 /* the three answers, washed in the status of the answer they give (as in the tool) */
 .answers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .answer { --tone: var(--ink); --wash: var(--panel); background: var(--wash); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
 .answer[data-verdict] { border-color: transparent; }
 .answer[data-verdict="uncertain"] { --tone: var(--s-uncertain-text); --wash: var(--s-uncertain-wash); }
-.answer h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+.answer h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+/* the numbered badge of the tool's answer cards: the three questions are answered in order */
+.badge { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; background: var(--group); color: var(--ink); flex: 0 0 20px; letter-spacing: 0; }
 .verdict { font-size: 18px; line-height: 1.3; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 8px; text-wrap: balance; }
 .verdict em { font-style: normal; color: var(--tone); }
 .answer .cont { color: var(--ink); }
@@ -278,6 +288,7 @@ button { font: inherit; color: inherit; }
 .fig-block { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 10px; padding-top: 6px; border-top: 2px solid var(--c-drawink); font-size: 12px; color: var(--c-drawmuted); }
 .fig-block > span:first-child { font-weight: 600; color: var(--c-drawink); letter-spacing: .06em; text-transform: uppercase; font-size: 11px; }
 .fig-block .stamp { margin-left: auto; color: var(--c-drawink); box-shadow: 0 0 0 2px var(--c-paper), 0 0 0 3px currentColor; }
+.fig-block .mono { font-size: 11px; }
 .d-ground { stroke: var(--c-drawink); stroke-width: 1.4; }
 .d-lot line { stroke: var(--c-drawmuted); stroke-width: .8; }
 .d-label { fill: var(--c-drawink); font-size: 11.5px; }
@@ -291,14 +302,23 @@ button { font: inherit; color: inherit; }
 /* the rule change: the same option read on either side of 27 Oct 2026 */
 .change { padding: 12px 14px; }
 .change-body { margin-top: 10px; }
-[data-asof="27"] .change-body [data-asof="23"], [data-asof="23"] .change-body [data-asof="27"] { display: none; }
+/* which date's text shows; the switch's own buttons carry data-asof too, so they are left out */
+.change[data-asof="27"] :not(button)[data-asof="23"], .change[data-asof="23"] :not(button)[data-asof="27"] { display: none; }
+/* a revision, the drafting way: a delta with its letter beside what changed, and the changed words clouded */
+.rev { display: inline-block; width: 16px; height: 14px; vertical-align: -2px; color: var(--ink); }
+.rev path { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; }
+.rev text { fill: currentColor; font: 600 7.5px var(--sans); }
+.stamp-rev { display: inline-flex; align-items: center; gap: 4px; }
+mark.rev-text { background: none; color: inherit; padding: 0 3px; border: 1px dashed var(--ink); border-radius: 7px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.change-verdict { margin-top: 6px; font-weight: 500; }
 .memo-meta { display: flex; flex-wrap: wrap; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); font-size: 12.5px; }
 .memo-meta b { color: var(--muted); }
 .memo-meta .stamp { box-shadow: 0 0 0 2px var(--panel), 0 0 0 3px currentColor; }
 .change-finding { margin-top: 10px; max-width: 80ch; }
 .change-source { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
-.diffline { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font: 11px/1.6 var(--mono); color: var(--muted); overflow-wrap: anywhere; }
-.diffline b { font-family: var(--sans); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); margin-right: 10px; }
+.diffline { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 12.5px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
+.diffline b { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); margin-right: 10px; }
+.diffline code { font-size: 11px; color: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .ruler .pin .pill, .ruler .pin-who { animation: none !important; } .band-seg { transition: none; } }
 .change-note { margin-top: 8px; font-size: 12.5px; color: var(--muted); max-width: 100ch; }
 
@@ -307,19 +327,22 @@ button { font: inherit; color: inherit; }
 .limits li { padding: 8px 0; border-top: 1px solid var(--line); color: var(--muted); }
 .limits li b { color: var(--ink); font-weight: 600; }
 
-/* ------------------------------------------------------------------ the close: the tool's ink as a field, three ways to see it work */
-.close { margin-top: 48px; background: var(--band); color: var(--on-band); padding: 28px 0 24px; }
-.close-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px 32px; align-items: start; }
-.close h2 { font-size: 18px; line-height: 1.3; margin-bottom: 6px; }
-.close-intro p { color: var(--on-band-muted); max-width: 60ch; }
-.ctas { list-style: none; margin: 0; padding: 0; }
-.ctas li { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 6px 16px; align-items: center; padding: 10px 0; border-top: 1px solid var(--band-line); }
-.ctas li:first-child { border-top: 0; padding-top: 0; }
-.ctas .btn { justify-self: start; width: 100%; }
-.ctas p { color: var(--on-band-muted); font-size: 12.5px; }
-.close-aside { grid-column: 1 / -1; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--band-line); color: var(--on-band-muted); font-size: 12.5px; }
-.close-aside a { color: var(--band-link); }
-.close-aside code { color: var(--on-band); font-size: 11px; padding: 2px 6px; border: 1px solid var(--band-line); border-radius: 4px; white-space: nowrap; }
+/* ------------------------------------------------------------------ the close: the page ends on a sheet issued for review,
+   its three actions laid out as title-block cells, its own title block carrying the stamp of the memo it links to */
+.close { padding-top: 36px; }
+.issue { padding: 14px 14px 4px; }
+.issue-head h2 { font-size: 18px; line-height: 1.3; margin-bottom: 4px; color: var(--c-drawink); }
+.issue-head p { color: var(--c-drawmuted); max-width: 80ch; }
+.issue-actions { list-style: none; margin: 14px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 2px solid var(--c-drawink); }
+.issue-actions li { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 8px 14px 12px 0; margin-right: 14px; border-right: 1px solid var(--line); }
+.issue-actions li:last-child { border-right: 0; margin-right: 0; }
+.issue-actions b { font-size: 11px; color: var(--c-drawmuted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+.issue-actions p { font-size: 12.5px; color: var(--c-drawmuted); }
+.issue-actions code { color: var(--c-drawink); }
+.issue .titleblock { margin: 0; border-top-width: 1px; border-top-color: var(--line); }
+.issue .titleblock .stamp { color: var(--c-drawink); }
+.close-aside { margin-top: 10px; color: var(--muted); font-size: 12.5px; }
+.close-aside code { font-size: 11px; padding: 2px 6px; border: 1px solid var(--line); border-radius: 4px; white-space: nowrap; }
 
 .foot { padding-top: 16px; padding-bottom: 24px; font-size: 12.5px; color: var(--muted); }
 .foot p + p { margin-top: 2px; }
@@ -328,10 +351,18 @@ button { font: inherit; color: inherit; }
 @media (max-width: 1080px) {
   .topnav { display: none; }
   .topbar .btn { margin-left: auto; }
-  .hero, .proof, .close-grid { grid-template-columns: minmax(0, 1fr); }
+  .hero, .proof { grid-template-columns: minmax(0, 1fr); }
   .answers { grid-template-columns: minmax(0, 1fr); }
   .a-row { grid-template-columns: 96px minmax(0, 1fr); }
   .a-row .a-note { grid-column: 2; padding-left: 10px; }
+}
+/* one column but still wide: the section keeps a drawing's width, so its labels stay near the page's drafting size,
+   and its caption and figure block sit beside it, the way notes sit beside a drawing on a sheet */
+@media (min-width: 761px) and (max-width: 1080px) {
+  .proof .figure { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); column-gap: 20px; align-items: end; }
+  .proof .figure > .card-title, .proof .figure > .fig-block { grid-column: 1 / -1; }
+  .proof .figure > svg { grid-column: 1; grid-row: 2; }
+  .proof .figure > figcaption { grid-column: 2; grid-row: 2; margin-top: 0; }
 }
 @media (max-width: 760px) {
   :root { --gutter: 16px; }
@@ -339,7 +370,10 @@ button { font: inherit; color: inherit; }
   .wordmark em { display: none; }
   .hero { padding-top: 16px; }
   .section { padding-top: 28px; }
-  .costs { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .notes { grid-template-columns: minmax(0, 1fr); }
+  .issue-actions { grid-template-columns: minmax(0, 1fr); }
+  .issue-actions li { border-right: 0; margin-right: 0; padding-right: 0; border-bottom: 1px solid var(--line); }
+  .issue-actions li:last-child { border-bottom: 0; }
   /* the section drawing swaps to its narrow version, whose labels sit beside the masses at a legible size */
   .figure .fig-wide { display: none; }
   .figure .fig-narrow { display: block; }
@@ -353,20 +387,40 @@ button { font: inherit; color: inherit; }
   .layers tr { padding: 10px 12px; border-bottom: 1px solid var(--line); }
   .layers tbody tr:last-child { border-bottom: 0; }
   .layers th, .layers td { padding: 0; border: 0; white-space: normal; }
-  .layers tbody th { margin-bottom: 6px; }
+  .layers tbody th { margin-bottom: 6px; width: auto; white-space: normal; }
   .layers td + td { margin-top: 6px; }
   .layers td::before { content: attr(data-label); display: block; font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
   .a-row { grid-template-columns: minmax(0, 1fr); }
   .a-row .a-note { grid-column: 1; }
-  .ctas li { grid-template-columns: minmax(0, 1fr); }
-  .close { margin-top: 36px; padding: 24px 0 20px; }
+  .schedule { padding: 0; }
+  .schedule .notes, .schedule .fig-block { margin-left: 12px; margin-right: 12px; }
 }
-@media (pointer: coarse) { .btn, .switch button, .topnav a { min-height: 44px; } }
+@media (pointer: coarse) {
+  .btn, .switch button, .topnav a { min-height: 44px; }
+  .wordmark { display: inline-flex; align-items: center; min-height: 44px; }
+}
 
-/* ------------------------------------------------------------------ print: the argument on paper, day-one state */
+/* ------------------------------------------------------------------ print: the argument on paper, in its day-one state
+   (home.js also switches the ruler to day one on beforeprint and back after), light whatever the screen's theme */
 @media print {
-  .topbar, .skip, .switch, .ctas .btn { display: none !important; }
+  :root { color-scheme: light; --ink: #2c3e50; --muted: #5f6672; --page: #fff; --panel: #fff; --line: #d5dae0; --group: #e9eef4; --blue: #1a4f8a;
+          --amber: #c77d14; --amber-ink: #14181d; --red: #c81e1e; --ok: #2f7d4a; --warn: #d9a520; --on-signal: #fff; --on-warn: #1f2933;
+          --s-pass: #2f7d4a; --s-conditional: #d9a520; --s-uncertain: #c77d14; --s-na: #8a93a0; --s-na-text: #5f6672; --s-na-wash: #e9eef4;
+          --s-pass-text: #246a3d; --s-pass-wash: #e1f2e5; --s-conditional-text: #7a5a00; --s-conditional-wash: #fff1d6;
+          --s-uncertain-text: #8f5a0e; --s-uncertain-wash: #fff1d6; --shadow: none; }
+  .topbar, .skip, .switch, .issue-actions .btn, .close-aside { display: none !important; }
   body { background: #fff; }
-  .close { --band: #fff; --on-band: #000; --on-band-muted: #333; --band-line: #ccc; --band-link: #1a4f8a; background: #fff; color: #000; }
+  .print-only { display: block; margin-top: 8px; font-weight: 600; }
   .section { padding-top: 20px; break-inside: avoid-page; }
+  .sheet, .card, .figure { box-shadow: none; }
+  .pill, .pill::before, .answer, .rev { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  /* the findings print with their statuses and owners: the day-one grid, whatever the switch showed */
+  .ruler [data-when="late"] { display: none !important; }
+  .ruler [data-when="day1"] { display: inline !important; }
+  .ruler .band, .ruler .weeks { display: none !important; }
+  .ruler .pins { display: grid !important; position: static !important; height: auto !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px 18px !important; padding-left: 0 !important; border-left: 0 !important; }
+  .ruler .pin { position: static !important; width: auto !important; margin-top: 0 !important; break-inside: avoid; }
+  .ruler .pin::before, .ruler .pin::after { content: none !important; }
+  .ruler .pin .pill { display: inline-flex !important; }
+  .ruler .pin-who { display: block !important; }
 }

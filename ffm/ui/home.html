@@ -34,14 +34,15 @@
 </section>
 
 <div class="wrap">
-  <figure class="sheet ruler" id="ruler" data-state="late" aria-labelledby="ruler-caption">
+  <figure class="sheet ruler" id="ruler" data-state="late" aria-labelledby="ruler-h">
+    <h2 class="sr-only" id="ruler-h">Six findings for 998 E 19th Ave, without the memo and with it</h2>
     <div class="sheet-head">
       <div class="switch" role="group" aria-label="Show the findings">
         <button type="button" data-state="late" aria-pressed="true">Without the memo</button>
         <button type="button" data-state="day1" aria-pressed="false">With the memo</button>
       </div>
       <p class="sheet-caption" id="ruler-caption" aria-live="polite">
-        <span data-when="late">Six findings for one real scheme, arriving one at a time, weeks into design.</span>
+        <span data-when="late">Six findings for one real scheme, arriving one at a time, weeks into design. Switch to <b>With the memo</b> to see them on day one.</span>
         <span data-when="day1">The same six on day one, each with its status, its rule and who resolves it.</span>
       </p>
     </div>
@@ -55,10 +56,11 @@
       </ol>
 
       <div class="band" aria-hidden="true">
-        <span class="band-seg band-a"><i data-when="late">Design</i><i data-when="day1">Design, with every limit known and each open item assigned</i></span>
-        <span class="band-seg band-b"><i>Redraw: height and trees</i></span>
-        <span class="band-seg band-c"><i>Redraw: rent tiers and accessible units</i></span>
+        <span class="band-seg band-a"><i data-when="late">Design</i><i data-when="day1">Design<span class="band-more">, with every limit known and each open item assigned</span></i></span>
+        <span class="band-seg band-b"><i>Redraw<span class="band-more">: height and trees</span></i></span>
+        <span class="band-seg band-c"><i>Redraw<span class="band-more">: rent tiers and accessible units</span></i></span>
       </div>
+      <p class="sr-only" data-when="late">Design runs from week 1 to about week 5; the scheme is then redrawn for height and trees until week 9, and again for rent tiers and accessible units until week 12.</p>
 
       <ol class="pins">
         <li class="pin" data-lane="1" style="--wk:1; --a:.357; --gap:1">
@@ -116,6 +118,7 @@
     <p>A scheme on church land in Vancouver answers to its zoning district, to provincial overrides, to the City's rezoning policies, to design standards and to the funding programs themselves. The tool's rule stack holds 17 rules from 13 public sources. On a small project nobody reads all of them before the first sketch, and nobody writes down which version they read.</p>
   </div>
 
+  <figure class="sheet schedule" aria-labelledby="schedule-label">
   <div class="table-wrap">
     <table class="layers">
       <thead><tr><th scope="col">Layer</th><th scope="col">What it decides</th><th scope="col">Where it is written</th><th scope="col">Usually checked by</th></tr></thead>
@@ -129,11 +132,16 @@
     </table>
   </div>
 
-  <dl class="costs">
-    <div><dt>What a late rule costs</dt><dd>Weeks of unpaid design, a scheme redrawn, or a project that stops.</dd></div>
-    <div><dt>What goes unrecorded</dt><dd>Which version of which rule the scheme was checked against.</dd></div>
-    <div><dt>Why a chat answer does not fix it</dt><dd>It cannot be cited, repeated or dated, and a board needs the opposite of a guess.</dd></div>
-  </dl>
+  <div class="notes">
+    <b class="notes-key">Notes</b>
+    <ol>
+      <li><b>What a late rule costs.</b> Weeks of unpaid design, a scheme redrawn, or a project that stops.</li>
+      <li><b>What goes unrecorded.</b> Which version of which rule the scheme was checked against.</li>
+      <li><b>Why a chat answer does not fix it.</b> It cannot be cited, repeated or dated, and a board needs the opposite of a guess.</li>
+    </ol>
+  </div>
+  <figcaption class="fig-block" id="schedule-label"><span>Schedule · Rule layers</span><span>17 rules from 13 public sources, each dated and cited</span></figcaption>
+  </figure>
 </section>
 
 <section class="section wrap" id="memo" aria-labelledby="memo-h">
@@ -144,17 +152,17 @@
 
   <div class="answers">
     <article class="answer" data-verdict="uncertain">
-      <h3>Is it allowed?</h3>
+      <h3><span class="badge">1</span> Is it allowed?</h3>
       <p class="verdict">Not outright. By rezoning: <em>not yet confirmed</em>.</p>
       <p class="cont">FSR 2.95 against an outright 1.20, and 22.3 m against 10.7 m, so it needs a rezoning. The Interim Rezoning Policy makes it eligible.</p>
     </article>
     <article class="answer" data-verdict="uncertain">
-      <h3>Does it fit the funders?</h3>
+      <h3><span class="badge">2</span> Does it fit the funders?</h3>
       <p class="verdict"><em>Not yet confirmed.</em></p>
       <p class="cont">BC Builds and the Community Housing Fund each need figures the option does not state yet: the below-market share, the rent tiers, the accessible units.</p>
     </article>
-    <article class="answer">
-      <h3>What is still unsure, and who resolves it?</h3>
+    <article class="answer" data-verdict="uncertain">
+      <h3><span class="badge">3</span> What is still unsure, and who resolves it?</h3>
       <p class="verdict"><em>Five open items</em>, each with a named person.</p>
       <p class="cont">Two for the architect, two for the development manager, one for both.</p>
     </article>
@@ -254,9 +262,9 @@
         <g class="d-bench">
           <line x1="44" y1="76.8" x2="220" y2="76.8"/><line x1="44" y1="65.6" x2="220" y2="65.6"/>
         </g>
-        <text class="d-bench-t" x="224" y="62">staff benchmark</text>
-        <text class="d-bench-t" x="224" y="88">19.9 to 21.3 m</text>
-        <text class="d-label d-strong" x="62" y="44">Proposed · 6 storeys · 22.3 m · FSR 2.95</text>
+        <text class="d-bench-t" x="224" y="89">staff benchmark</text>
+        <text class="d-bench-t" x="224" y="102">19.9 to 21.3 m</text>
+        <text class="d-label d-strong" x="65" y="44">Proposed · 6 storeys · 22.3 m · FSR 2.95</text>
         <text class="d-label" x="64" y="214">Outright</text>
         <text class="d-label" x="64" y="228">3 storeys · 9.9 m</text>
         <line class="d-ground" x1="2" y1="236" x2="356" y2="236"/>
@@ -294,13 +302,13 @@
     <div class="change-body" aria-live="polite">
       <div class="memo-meta">
         <div><b>Rule</b><span class="mono">cov.family_units</span></div>
-        <div><b>Version in force</b><span class="mono" data-asof="23">1992-01-01</span><span class="mono" data-asof="27">2026-10-27</span></div>
+        <div><b>Version in force</b><span class="mono" data-asof="23">1992-01-01</span><span data-asof="27"><span class="mono">2026-10-27</span> <svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(revised)</span></span></div>
         <div><b>Status</b><span><span class="pill pill-pass">Pass</span></span></div>
-        <div class="tb-stamp"><b>Stamp</b><code class="stamp" data-asof="23">20e44f1445ecaff9</code><code class="stamp" data-asof="27">6d1b07fe59dd3775</code></div>
+        <div class="tb-stamp"><b>Stamp</b><code class="stamp" data-asof="23">20e44f1445ecaff9</code><span data-asof="27" class="stamp-rev"><code class="stamp">6d1b07fe59dd3775</code> <svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(revised)</span></span></div>
       </div>
       <p class="change-finding">
         <span data-asof="23">38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum.</span>
-        <span data-asof="27">38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum; 12 (11.4%) have three or more, against a 5.0% minimum.</span>
+        <span data-asof="27">38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum; <mark class="rev-text">12 (11.4%) have three or more, against a 5.0% minimum.</mark> <svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(added in revision A)</span></span>
       </p>
       <p class="change-source">
         <span data-asof="23">Source: High-Density Housing for Families with Children Guidelines (1992), as stated in the <a href="https://council.vancouver.ca/20240625/documents/rr1.pdf" target="_blank" rel="noopener">998 E 19th Ave referral report</a>.</span>
@@ -308,7 +316,11 @@
       </p>
     </div>
 
-    <p class="diffline"><b>What changed</b> 1 rule · cov.family_units · version 1992-01-01 → 2026-10-27 · pass → pass · stamp 20e44f1445ecaff9 → 6d1b07fe59dd3775</p>
+    <p class="diffline">
+      <span data-asof="23"><b>What changed</b> nothing yet: read as of 23 Oct, the memo uses the 1992 version. The new version takes effect on 27 Oct 2026; switch the date to see the revision.</span>
+      <span data-asof="27"><b>Revision A</b> 1 rule, <code>cov.family_units</code>: version <code>1992-01-01</code> → <code>2026-10-27</code>, pass → pass, stamp <code>20e44f1445ecaff9</code> → <code>6d1b07fe59dd3775</code>.</span>
+    </p>
+    <p class="change-verdict" data-asof="27">Same verdict, new version: the memo names the version it used, and the new stamp tells the two memos apart.</p>
     <p class="change-note">Same inputs and the same rules give the same ledger, byte for byte. No language model runs inside the engine: it is standard-library Python and plain JSON rule files a firm can read and maintain, and a rule change is recorded as a new dated version, so the old memo can still be reproduced.</p>
   </div>
 </section>
@@ -323,28 +335,38 @@
   </ul>
 </section>
 
-<section class="close" id="try" aria-labelledby="try-h">
-  <div class="wrap close-grid">
-    <div class="close-intro">
+<section class="section wrap close" id="try" aria-labelledby="try-h">
+  <div class="sheet issue">
+    <div class="issue-head">
       <h2 id="try-h">See it work on a real case.</h2>
       <p>998 E 19th Ave, Vancouver: six storeys of social housing over a rebuilt church, approved by Council on 25 Jul 2024. Its inputs come from the City's public referral report, apart from the declared placeholders; the rules come from the by-laws, policies and funding documents they cite.</p>
     </div>
-    <ul class="ctas">
+    <ul class="issue-actions">
       <li>
-        <a class="btn btn-invert" href="app.html?tour=1">Run the 998 E 19th Ave case</a>
+        <b>Run</b>
+        <a class="btn btn-primary" href="app.html?tour=1">Run the 998 E 19th Ave case</a>
         <p>Opens the tool with a two-minute walkthrough that runs the rules for you. On the web the engine loads into your browser once, about 10 MB, and nothing is uploaded.</p>
       </li>
       <li>
-        <a class="btn btn-outline" href="app.html?run=998-e-19th-ave/2026-10-27&amp;compare=998-e-19th-ave/2026-10-23">Watch a rule change</a>
+        <b>Compare</b>
+        <a class="btn btn-quiet" href="app.html?run=998-e-19th-ave/2026-10-27&amp;compare=998-e-19th-ave/2026-10-23">Watch a rule change</a>
         <p>Opens the 23 and 27 Oct runs compared: one rule, two version dates, a new stamp.</p>
       </li>
       <li>
-        <a class="btn btn-outline" href="data/runs/998-e-19th-ave/2026-10-27/memo.html">Read the memo it wrote</a>
-        <p>The whole memo with its ledger, sources and stamp, as a document you can print.</p>
+        <b>Read</b>
+        <a class="btn btn-quiet" href="data/runs/998-e-19th-ave/2026-10-27/memo.html">Read the memo it wrote</a>
+        <p>The 27 Oct memo, stamped <code>6d1b07fe59dd3775</code>, with its ledger and sources, as a document you can print.</p>
       </li>
     </ul>
-    <p class="close-aside">Doing feasibility work on a site of your own? <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study/issues/new?title=Request%3A%20a%2020-minute%20session&amp;body=Who%20I%20am%20and%20the%20kind%20of%20site%20I%20work%20on%3A%0A%0AA%20good%20time%20to%20talk%3A%0A">Ask for a 20-minute session</a>. To run it on your own machine: <code>python -m ffm ui</code></p>
+    <p class="print-only">Try it at kailisun98.github.io/BC-Housing-Feasibility-Study</p>
+    <div class="titleblock">
+      <div><b>Issue</b>For review</div>
+      <div><b>Site</b>998 E 19th Ave, Vancouver</div>
+      <div><b>Rules as of</b><span class="mono">2026-10-27</span></div>
+      <div class="tb-stamp"><b>Stamp</b><code class="stamp">6d1b07fe59dd3775</code></div>
+    </div>
   </div>
+  <p class="close-aside">Doing feasibility work on a site of your own? <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study/issues/new?title=Request%3A%20a%2020-minute%20session&amp;body=Who%20I%20am%20and%20the%20kind%20of%20site%20I%20work%20on%3A%0A%0AA%20good%20time%20to%20talk%3A%0A">Ask for a 20-minute session</a>. To run it on your own machine: <code>python -m ffm ui</code></p>
 </section>
 
 </main>

@@ -1,0 +1,64 @@
+{
+  "previous_stamp": "20e44f1445ecaff9",
+  "current_stamp": "20e44f1445ecaff9",
+  "previous_as_of": "2026-10-23",
+  "current_as_of": "2026-10-23",
+  "rules_changed": false,
+  "changes": [
+    {
+      "rule_id": "bc.bcbuilds.eligibility",
+      "change": "changed",
+      "from": "uncertain",
+      "to": "pass",
+      "from_version": "2024-02-13",
+      "to_version": "2024-02-13",
+      "finding": "BC Builds: fits the published criteria: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter."
+    },
+    {
+      "rule_id": "bc.code_basis",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "12 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15."
+    },
+    {
+      "rule_id": "bch.chf.eligibility",
+      "change": "finding_changed",
+      "from": "uncertain",
+      "to": "uncertain",
+      "finding": "Community Housing Fund: fit cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; Site control (finalized) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)."
+    },
+    {
+      "rule_id": "bch.design_guidelines.unit_areas",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 80 m² gross per unit, so net areas should be checked at the plan stage."
+    },
+    {
+      "rule_id": "cov.family_units",
+      "change": "changed",
+      "from": "uncertain",
+      "to": "pass",
+      "from_version": "1992-01-01",
+      "to_version": "1992-01-01",
+      "finding": "48 of 120 units (40.0%) have two or more bedrooms, against a 35.0% minimum."
+    },
+    {
+      "rule_id": "cov.parking_minimums",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 30 vehicle and 220 bicycle spaces, which are set by the Parking By-law at the development permit stage."
+    },
+    {
+      "rule_id": "cov.social_housing_definition",
+      "change": "changed",
+      "from": "uncertain",
+      "to": "pass",
+      "from_version": "2023-01-01",
+      "to_version": "2023-01-01",
+      "finding": "Meets the City's social housing definition: 30.0% of units for households below HILs (minimum 30.0%), owned by a city, secured for 60 years."
+    }
+  ]
+}

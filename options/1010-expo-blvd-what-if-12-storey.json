@@ -1,0 +1,54 @@
+{
+  "id": "1010-expo-blvd-what-if-12-storey",
+  "name": "What-if (hypothetical, for the demo): twelve storeys with the full funder data supplied",
+  "proponent": "City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society",
+  "proponent_type": "municipal_housing_provider",
+  "developer_partner": true,
+  "tenure": "social_housing",
+  "rezoning_path": "False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program",
+  "storeys": 12,
+  "height_m": 36.6,
+  "gfa_m2": 9600.0,
+  "residential_gfa_m2": 9600.0,
+  "non_residential_gfa_m2": 0.0,
+  "units": {
+    "studio": 30,
+    "one_bed": 42,
+    "two_bed": 36,
+    "three_bed_plus": 12
+  },
+  "rent_tiers_units": {
+    "market": 36,
+    "rgi": 60,
+    "deep_subsidy": 24
+  },
+  "share_below_hils": 0.3,
+  "max_rent_share_of_income": 0.3,
+  "owner_type_at_completion": "city",
+  "housing_agreement_years": 60,
+  "accessible_units": 6,
+  "below_market_unit_share": 1.0,
+  "below_market_discount": 0.2,
+  "land_tenure_plan": "City-owned; 60-year lease at nominal rent to the BC Indigenous Housing Society (assumed for this what-if; not confirmed)",
+  "site_control": "finalized",
+  "parking_spaces": 30,
+  "bicycle_spaces": 220,
+  "replacement_trees_proposed": 43,
+  "target_programs": [
+    "bch.chf.eligibility",
+    "bc.bcbuilds.eligibility"
+  ],
+  "floor_to_floor_m": 3.05,
+  "setbacks_m": {
+    "front": 3.0,
+    "rear": 3.0,
+    "side": 3.0
+  },
+  "notes": "Hypothetical option written to show the engine reacting on a CD-1 site: a 12-storey, 120-unit version of the tower with a stated bedroom mix (40% two-bed-plus, 10% three-bed-plus), a 30/50/20 rent-tier split, 30% of units below HILs, a 60-year housing agreement, 6 accessible units, 43 replacement trees to meet Schedule C on the paved lot, and a stated land tenure. None of these figures come from the City, BC Housing or the operator.",
+  "sources": [
+    {
+      "title": "Derived by hand from the as-permitted option for demonstration",
+      "url": "https://www.shapeyourcity.ca/1050-expo-blvd"
+    }
+  ]
+}

@@ -1,0 +1,108 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "1010-expo-blvd",
+  "option_id": "1010-expo-blvd-what-if-12-storey",
+  "as_of": "2026-10-23",
+  "stamp": "20e44f1445ecaff9",
+  "lot": {
+    "polygon": [
+      [
+        0,
+        0
+      ],
+      [
+        78.2,
+        0
+      ],
+      [
+        78.2,
+        50.0
+      ],
+      [
+        0,
+        50.0
+      ]
+    ],
+    "frontage_m": 78.2,
+    "depth_m": 50.0,
+    "area_m2": 3908.0,
+    "street_side": "y = 0"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        3.0,
+        3.0
+      ],
+      [
+        75.2,
+        3.0
+      ],
+      [
+        75.2,
+        47.0
+      ],
+      [
+        3.0,
+        47.0
+      ]
+    ],
+    "width_m": 72.2,
+    "depth_m": 44.0,
+    "area_m2": 3176.8,
+    "setbacks_m": {
+      "front": 3.0,
+      "rear": 3.0,
+      "side": 3.0
+    }
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 12 storeys, FSR 2.46",
+      "footprint": [
+        [
+          3.0,
+          3.0
+        ],
+        [
+          75.2,
+          3.0
+        ],
+        [
+          75.2,
+          14.08
+        ],
+        [
+          3.0,
+          14.08
+        ]
+      ],
+      "base_z": 0.0,
+      "height_m": 36.6,
+      "storeys": 12,
+      "floor_to_floor_m": 3.05,
+      "plate_area_m2": 800.0,
+      "gfa_m2": 9600.0,
+      "fsr": 2.456,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 43,
+    "after": 43,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "Option height 36.6 m exceeds 12 x 3.05 m = 36.6 m; the extra 0.0 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
+  ]
+}

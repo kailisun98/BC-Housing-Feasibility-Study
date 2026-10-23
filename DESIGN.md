@@ -383,6 +383,11 @@ words in the status text colour, then findings in lead-and-continuation prose or
 the third card holds a table of open items with a Who / what column in Muted. Wash and tone come
 from one `data-verdict` attribute.
 
+### Segmented control
+Plan | 3D on FIG 01 (and the pattern for any two-or-three-way view switch): one 4px box with a
+Line border, 11.5px weight 500 segments at 3px by 10px, the pressed segment filled Draw Ink with
+white text, the rest Draw Muted on paper; hover tints a segment Group.
+
 ### Figures
 A white-paper card with a key-style figure label in Draw Muted, an SVG drawn in metres with
 non-scaling strokes and IBM Plex Sans labels, a swatch legend, and a 12px caption carrying the

@@ -30,6 +30,11 @@ python -m ffm run --site sites/998-e-19th-ave.json \
                   --out outputs/998-e-19th-ave/2026-10-27 --as-of 2026-10-27 \
                   --previous outputs/998-e-19th-ave/2026-10-23/ledger.json
 
+# the second case study: 1010 Expo Blvd, a 29-storey City-owned social housing tower in False Creek North (CD-1)
+python -m ffm run --site sites/1010-expo-blvd.json \
+                  --option options/1010-expo-blvd-as-permitted.json \
+                  --out outputs/1010-expo-blvd/2026-10-23 --as-of 2026-10-23
+
 python -m ffm rules --as-of 2026-10-27     # which version of each rule is in force
 python -m ffm stamp                        # the version stamp alone
 python -m ffm ui                           # the web UI: pick a site and option, run, read, export
@@ -38,7 +43,9 @@ python -m unittest -v                      # evaluation cases (evals/cases.md) a
 
 `python -m ffm ui` serves a one-page app at http://127.0.0.1:8765 from `ffm/ui/` (standard library
 only, no build step): the site and option forms on the left, the memo on the right rendered from
-`ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. Every
+`ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. FIG 01
+has a **Plan | 3D** switch: the 3D view is an orbitable axonometric of the lot, the setback envelope
+and the two masses drawn from the same `massing.json` (drag or use the arrow keys). Every
 Run writes a normal run folder under `outputs/<site-id>/`, so anything done in the page can be
 repeated from the command line. A two-minute **Walkthrough** (end of the step strip, offered once
 on a first visit) spotlights each part of the page in order and can run the rules on the way.
@@ -163,6 +170,14 @@ the TOA tier). It does not model shadows, parking layouts or pro formas. It does
   repository comes from a private client file.
 - The *what-if* option is hypothetical and says so in its `notes`; none of its figures come from
   Catalyst Community Developments or the City.
+- The 1010 Expo Blvd inputs (formerly 1050 Expo Blvd: 29 storeys, 88.4 m, 23,215 m², FSR 5.94,
+  299 social housing units, City-owned, operated by the BC Indigenous Housing Society) come from the
+  City's Shape Your City application page (DP-2023-00629), its False Creek North social housing
+  page, the City's non-market housing projects list and the architect's project page. The site is
+  a triangle; its area is derived from the application's floor area and FSR and the plan uses an
+  equivalent rectangle. The bedroom mix and the share below HILs are not public and are left null.
+  The rule stack has no CD-1 outright schedule, so "outright: yes" there means no coded outright
+  limit was tested; the July 2023 ODP and CD-1 amendments were the rezoning.
 - Placeholders that must be replaced before a real use: the red pine DBH (species named, diameter
   not, in the referral report) and the setbacks in the option files.
 - Before any practitioner's own project is run through the tool, their permission is asked, and
@@ -179,6 +194,7 @@ _To be added after the user sessions._
 The rule files carry their own citations. The main documents:
 
 - City of Vancouver, referral report, rezoning of 998 E 19th Ave (11 Jun 2024): https://council.vancouver.ca/20240625/documents/rr1.pdf
+- City of Vancouver, Shape Your City, 1050 Expo Boulevard development application DP-2023-00629: https://www.shapeyourcity.ca/1050-expo-blvd and False Creek North social housing: https://www.shapeyourcity.ca/false-creek-north-non-market-housing
 - Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas: https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf
 - High-Density Housing for Families with Children Guidelines (1992) and the City's Housing options for families page (amendment effective 27 Oct 2026); Protection of Trees By-law 9958; Zoning and Development By-law (social housing definition): see `rules/c_city_policies.json`
 - Province of BC, Small-Scale Multi-Unit Housing policy manual and Transit-Oriented Areas policy manual: see `rules/b_provincial.json`

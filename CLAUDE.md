@@ -123,6 +123,13 @@ Export to Revit panel with *Check Revit result* (which also rewrites the memo). 
 `outputs/<site>/<timestamp>/`. `docs/pitch-outline.md` has the UI version of the live run. Not
 done: nothing launches Revit from the server (by design); no dark-mode polish pass.
 
+Added 23 Oct 2026: FIG 01 carries a Plan | 3D segmented switch; the 3D view (`fig3d` in `app.js`)
+is a dependency-free orbitable axonometric drawn from `massing.json`. A second case study,
+`sites/1010-expo-blvd.json` with `options/1010-expo-blvd-as-permitted.json` and the run in
+`outputs/1010-expo-blvd/2026-10-23/`, comes from public City pages (see README); it is a CD-1 site,
+so the outright rules are not applicable and the memo's "outright: yes" is an engine limitation
+noted in the site file, not a finding.
+
 The page also runs on GitHub Pages (https://kailisun98.github.io/BC-Housing-Feasibility-Study/):
 `python -m ffm pages` (`ffm/pages.py`) builds a static site whose `app.js` detects
 `window.FFM_STATIC`, reads the committed runs from `data/` and runs the engine in Pyodide from

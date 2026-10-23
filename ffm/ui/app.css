@@ -301,6 +301,18 @@ table.plain td.status { white-space: nowrap; }
 .fig-bench { background: none; border: 0 !important; border-top: 2px dashed var(--amber) !important; height: 0 !important; }
 .fig-env { background: none; border: 1px dashed var(--red) !important; }
 .figure .note { font-size: 12px; color: var(--c-drawnote); margin: 8px 0 0; }
+/* a figure's head: the label and, for the plan, the Plan | 3D segmented control */
+.fig-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.fig-head .eyebrow { margin: 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--c-paper); }
+.segbtn { border: 0; border-radius: 0; background: var(--c-paper); color: var(--c-drawmuted); font-size: 11.5px; font-weight: 500; padding: 3px 10px; min-height: 24px; cursor: pointer; transition: background-color .12s ease-out, color .12s ease-out; }
+.segbtn + .segbtn { border-left: 1px solid var(--line); }
+.segbtn:hover:not([aria-pressed="true"]) { background: #e9eef4; color: var(--c-drawink); }
+.segbtn[aria-pressed="true"] { background: var(--c-drawink); color: #ffffff; }
+.fig3d svg { cursor: grab; touch-action: none; user-select: none; max-height: 480px; }
+.fig3d svg:active { cursor: grabbing; }
+.fig3d svg:focus-visible { outline: var(--focus); outline-offset: 2px; }
+.fig-hint { font-size: 11px; color: var(--c-drawmuted); margin-top: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .figure { border-color: var(--line); } }
 
 .changes table.plain td.change { font-family: var(--mono); font-size: 11px; white-space: nowrap; }

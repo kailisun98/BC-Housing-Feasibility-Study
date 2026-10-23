@@ -1,0 +1,26 @@
+{
+  "id": "1010-expo-blvd",
+  "address": "1010 Expo Blvd (formerly 1050 Expo Blvd), Vancouver, BC",
+  "municipality": "City of Vancouver",
+  "zoning_district": "CD-1",
+  "site_area_m2": 3908.0,
+  "frontage_m": 78.2,
+  "depth_m": 50.0,
+  "in_former_community_vision_area": false,
+  "in_transit_oriented_area": null,
+  "toa_tier": null,
+  "frequent_bus_stop_within_400m": null,
+  "has_water_and_sewer": true,
+  "owner_type": "municipality",
+  "owner": "City of Vancouver (site transferred by Concord Pacific under the False Creek North social housing agreement, 2023)",
+  "land_tenure_plan": "City-owned; BC Housing develops and the BC Indigenous Housing Society operates under a lease (terms to confirm)",
+  "existing_trees_on_site": [],
+  "street_trees": {"count": null, "retained": null, "street": "Expo Blvd"},
+  "notes": "A triangular surface parking lot between Expo Blvd, Pacific Blvd and the Cambie Bridge, inside the False Creek North ODP area (CD-1; by-law number to confirm). Site area is derived from the development application's floor area and FSR (23,215 m² at 5.94) and the frontage and depth are an equivalent rectangle, so the plan figure is a stand-in for the real triangle. No tree survey is in the public record; the lot is paved. Transit-oriented area tier is left null until the City's TOA map is checked (Stadium-Chinatown and Yaletown-Roundhouse stations are both within about 800 m). The rule stack has no CD-1 outright schedule, so the memo's 'outright: yes' means no coded outright limit was tested, not that a 29-storey tower is permitted outright: the ODP and CD-1 amendments of July 2023 were the rezoning.",
+  "sources": [
+    {"title": "Shape Your City, 1050 Expo Boulevard development application DP-2023-00629 (29 storeys, 88.4 m, 23,215 m², FSR 5.94, 299 social housing units; DP issued 5 Feb 2025)", "url": "https://www.shapeyourcity.ca/1050-expo-blvd"},
+    {"title": "Shape Your City, False Creek North social housing (ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; 29 storeys, 88.1 m at 1050 Expo Blvd)", "url": "https://www.shapeyourcity.ca/false-creek-north-non-market-housing"},
+    {"title": "City of Vancouver, non-market housing projects (1010 Expo Blvd: 299 units, BC Indigenous Housing Society, under construction, completion 2029)", "url": "https://vancouver.ca/people-programs/non-market-housing-projects.aspx"},
+    {"title": "Journal of Commerce, Vancouver approves 661 new social housing units across three sites in North False Creek (Jul 2023)", "url": "https://canada.constructconnect.com/joc/news/government/2023/07/vancouver-approves-661-new-social-housing-units-across-three-sites-in-north-false-creek"}
+  ]
+}

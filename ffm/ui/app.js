@@ -829,6 +829,7 @@ function renderMemo(run) {
   memoEl.className = "memo";
   void memoEl.offsetWidth;  // restart the fade
   memoEl.classList.add("landed");
+  wireFigures(run);
 }
 
 function answerAllowed(L) {
@@ -1037,6 +1038,128 @@ function figSection(m) {
   return s;
 }
 
+/* FIG 01 in three dimensions: an orbitable axonometric of the lot, the setback envelope and the two masses, drawn
+   from the same massing.json. The camera turns about the lot's centre; azimuth and elevation live in VIEW3D so the
+   view survives a re-render. No library: the boxes are projected and painted far to near. */
+const VIEW3D = { mode: "plan", az: 35, el: 28 };
+
+function fig3d(m, az = VIEW3D.az, el = VIEW3D.el) {
+  const W = m.lot.frontage_m, D = m.lot.depth_m;
+  const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
+  const a = az * Math.PI / 180, e = el * Math.PI / 180;
+  const ca = Math.cos(a), sa = Math.sin(a), ce = Math.cos(e), se = Math.sin(e);
+  const cx = W / 2, cy = D / 2;
+  const fs = Math.max(2.2, Math.max(W, D) / 34);
+  // metres to the picture plane; y runs away from the street, z up; the viewer starts on the street side
+  const proj = ([x, y, z = 0]) => {
+    const rx = (x - cx) * ca - (y - cy) * sa, ry = (x - cx) * sa + (y - cy) * ca;
+    return { x: rx, y: -(z * ce + ry * se), d: ry * ce - z * se };
+  };
+  const pts = [];
+  const poly = (ring, attrs) => {
+    const P = ring.map(proj); pts.push(...P);
+    return `<polygon points="${P.map(p => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(" ")}" ${attrs} ${NS}/>`;
+  };
+  const line = (p, q, attrs) => {
+    const A = proj(p), B = proj(q); pts.push(A, B);
+    return `<line x1="${A.x.toFixed(2)}" y1="${A.y.toFixed(2)}" x2="${B.x.toFixed(2)}" y2="${B.y.toFixed(2)}" ${attrs} ${NS}/>`;
+  };
+  // a box from a footprint ring: the top and the four sides, painted far to near
+  const box = (ring, z0, z1, fill, stroke, opacity, floors) => {
+    const faces = [];
+    const n = ring.length;
+    for (let i = 0; i < n; i++) {
+      const p = ring[i], q = ring[(i + 1) % n];
+      faces.push({ ring: [[p[0], p[1], z0], [q[0], q[1], z0], [q[0], q[1], z1], [p[0], p[1], z1]], side: [p, q] });
+    }
+    faces.push({ ring: ring.map(([x, y]) => [x, y, z1]), top: true });
+    for (const f of faces) f.depth = f.ring.reduce((s, p) => s + proj(p).d, 0) / f.ring.length;
+    faces.sort((u, v) => v.depth - u.depth);
+    let s = "";
+    for (const f of faces) {
+      s += poly(f.ring, `fill="${fill}" fill-opacity="${f.top ? Math.min(1, opacity + 0.15) : opacity}" stroke="${stroke}" stroke-width="1" stroke-linejoin="round"`);
+      if (floors && f.side) {
+        for (let k = 1; k < floors.storeys; k++) {
+          const z = z0 + k * floors.f2f;
+          if (z >= z1) break;
+          s += line([f.side[0][0], f.side[0][1], z], [f.side[1][0], f.side[1][1], z], `stroke="${stroke}" stroke-width="0.6" stroke-opacity="0.5"`);
+        }
+      }
+    }
+    return s;
+  };
+  let body = "";
+  body += poly(m.lot.polygon, `fill="#f4f4f2" stroke="${FIG.lot}" stroke-width="1.2"`);
+  body += poly(m.envelope.polygon, `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
+  if (masses.outright) body += box(masses.outright.footprint, masses.outright.base_z || 0, (masses.outright.base_z || 0) + masses.outright.height_m, FIG.outrightFill, FIG.outrightStroke, 0.9, null);
+  if (masses.proposed) {
+    const p = masses.proposed;
+    body += box(p.footprint, p.base_z || 0, (p.base_z || 0) + p.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: p.storeys, f2f: p.floor_to_floor_m });
+  }
+  const b = m.policy_benchmark;
+  if (b && b.height_m && masses.proposed) {
+    for (const z of b.height_m) body += poly(masses.proposed.footprint.map(([x, y]) => [x, y, z]), `fill="none" stroke="${FIG.bench}" stroke-width="1" stroke-dasharray="4 3"`);
+  }
+  // labels: the street edge, and the heights at the near top corner of each mass
+  const labels = [];
+  const street = proj([W / 2, -fs * 1.2, 0]); pts.push(street);
+  labels.push(`<text x="${street.x.toFixed(2)}" y="${(street.y + fs * 0.4).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">street · frontage ${h(W)} m</text>`);
+  const nearest = ring => ring.map(([x, y]) => [x, y]).sort((u, v) => proj(u).d - proj(v).d)[0];
+  for (const [name, colour, weight] of [["proposed", FIG.proposedStroke, 600], ["outright", FIG.lot, 400]]) {
+    const x = masses[name]; if (!x) continue;
+    const c = nearest(x.footprint); const t = proj([c[0], c[1], (x.base_z || 0) + x.height_m]); pts.push({ x: t.x + fs * 9, y: t.y - fs * 1.5 });
+    labels.push(`<text x="${(t.x + fs * 0.5).toFixed(2)}" y="${(t.y - fs * 0.5).toFixed(2)}" font-size="${fs}" font-weight="${weight}" fill="${colour}">${h(x.height_m)} m · ${name}</text>`);
+  }
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const pad = fs * 1.5;
+  const x0 = Math.min(...xs) - pad, y0 = Math.min(...ys) - pad, x1 = Math.max(...xs) + pad, y1 = Math.max(...ys) + pad;
+  return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${labels.join("")}</svg>`;
+}
+
+function figOne(m) {
+  const three = VIEW3D.mode === "3d";
+  return `<div class="fig-head">
+      <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}</div>
+      <div class="seg" role="group" aria-label="View of figure 1">
+        <button type="button" class="segbtn" data-view="plan" aria-pressed="${!three}">Plan</button>
+        <button type="button" class="segbtn" data-view="3d" aria-pressed="${three}">3D</button>
+      </div>
+    </div>
+    <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m) : figPlan(m)}</div>
+    ${three ? `<p class="fig-hint">Drag to orbit, arrow keys to turn; the view is a straight axonometric of the same massing.json, with the storey lines at ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
+}
+
+function wireFigures(run) {
+  const fig = $("#fig-01");
+  if (!fig || !run.massing) return;
+  const m = run.massing;
+  const redraw = () => { fig.innerHTML = figOne(m); wireFigures(run); };
+  $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => { if (VIEW3D.mode !== b.dataset.view) { VIEW3D.mode = b.dataset.view; redraw(); } }));
+  const svg = $(".fig3d svg", fig);
+  if (!svg) return;
+  const turn = (daz, del) => {
+    VIEW3D.az = (VIEW3D.az + daz) % 360;
+    VIEW3D.el = Math.max(8, Math.min(80, VIEW3D.el + del));
+    const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m);
+    svg.innerHTML = fresh.firstElementChild.innerHTML;
+    svg.setAttribute("viewBox", fresh.firstElementChild.getAttribute("viewBox"));
+  };
+  let drag = null;
+  svg.addEventListener("pointerdown", e => { drag = { x: e.clientX, y: e.clientY }; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+  svg.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    drag = { x: e.clientX, y: e.clientY };
+    turn(dx * 0.5, dy * 0.4);
+  });
+  const stop = () => { drag = null; };
+  svg.addEventListener("pointerup", stop); svg.addEventListener("pointercancel", stop);
+  svg.addEventListener("keydown", e => {
+    const k = { ArrowLeft: [-6, 0], ArrowRight: [6, 0], ArrowUp: [0, 4], ArrowDown: [0, -4] }[e.key];
+    if (k) { e.preventDefault(); turn(k[0], k[1]); }
+  });
+}
+
 function massLine(x) {
   return `<b>${h(x.label)}</b>: plate ${fmtNum(x.plate_area_m2)} m² × ${x.storeys} = ${fmtNum(x.gfa_m2)} m² (FSR ${Number(x.fsr).toFixed(2)}), ${h(x.height_m)} m high.`;
 }
@@ -1047,8 +1170,7 @@ function renderFigures(run) {
   if (m) {
     const sb = m.envelope.setbacks_m || {};
     out.push(`<figure class="card figure">
-      <div class="eyebrow">FIG 01 · Plan</div>
-      ${figPlan(m)}
+      <div id="fig-01">${figOne(m)}</div>
       <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span></div>
       <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back.</figcaption>
     </figure>`);

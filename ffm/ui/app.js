@@ -75,15 +75,13 @@ async function postJSON(path, obj) {
   return api(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(obj) });
 }
 
-let toastTimer = null;
-function toast(msg, isError = false) {
-  const t = $("#toast");
-  t.textContent = msg;
-  t.classList.toggle("error", !!isError);
-  t.hidden = false;
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { t.hidden = true; }, isError ? 7000 : 3500);
+/* One line of feedback for every action, in the status strip under the steps: info, ok, error or busy. */
+function setStatus(msg, kind = "info") {
+  const s = $("#status");
+  $("#status-text", s).textContent = msg;
+  s.className = "strip " + (kind === "info" ? "" : kind);
 }
+function toast(msg, isError = false) { setStatus(msg, isError ? "error" : "ok"); }
 
 function getPath(obj, path) {
   return path.split(".").reduce((o, k) => (o == null ? undefined : o[k]), obj);
@@ -713,8 +711,9 @@ async function runRules() {
   if (!state.site || !state.option) return;
   btn.classList.add("busy");
   btn.textContent = "Running…";
+  setStatus("Running the rules…", "busy");
   try {
-    if (STATIC && !engine) { btn.textContent = "Loading the engine…"; await loadEngine(); btn.textContent = "Running…"; }
+    if (STATIC && !engine) { btn.textContent = "Loading the engine…"; setStatus("Loading the rules engine in your browser…", "busy"); await loadEngine(); btn.textContent = "Running…"; }
     const body = { site: state.site, option: tidyOption(state.option), as_of: $("#as-of").value || todayISO(), previous_run: state.compareRun || null };
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
@@ -771,12 +770,11 @@ function renderQuiet() {
   $("#memo").className = "memo";
   $("#memo").innerHTML = `
     <div class="card memo-head">
-      <div class="eyebrow">03 · Run and read</div>
       <h1>${h(site.address || site.id || "A site")}</h1>
       <div class="memo-meta">
-        <div><b>Option</b><br>${h(opt.name || opt.id || "—")}</div>
-        <div><b>Proponent</b><br>${h(opt.proponent || "—")}</div>
-        <div><b>Rules as of</b><br>${h($("#as-of").value || todayISO())}</div>
+        <div><b>Option</b><span>${h(opt.name || opt.id || "—")}</span></div>
+        <div><b>Proponent</b><span>${h(opt.proponent || "—")}</span></div>
+        <div><b>Rules as of</b><span>${h($("#as-of").value || todayISO())}</span></div>
       </div>
       <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the stamped memo in this tab" : "writes a stamped memo to <code>outputs/</code>"}, and reads it here: three answers first, then the massing and the full ledger.</p>
     </div>
@@ -788,9 +786,9 @@ function renderQuiet() {
 }
 
 function quietCard(eyebrow, title, line) {
+  const n = String(eyebrow).trim().charAt(1);   // "01 · …" → 1
   return `<section class="card answer">
-    <div class="eyebrow">${h(eyebrow)}</div>
-    <h2>${h(title)}</h2>
+    <h2><span class="badge">${h(n)}</span> ${h(title)}</h2>
     <p class="verdict quiet">${h(line)}</p>
   </section>`;
 }
@@ -802,13 +800,12 @@ function renderMemo(run) {
 
   // 1. header
   parts.push(`<div class="card memo-head">
-    <div class="eyebrow">03 · Run and read</div>
     <h1>${h(site.address || site.id)}</h1>
     <div class="memo-meta">
-      <div><b>Option</b><br>${h(opt.name || opt.id)}</div>
-      <div><b>Proponent</b><br>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="cont">(${h(String(opt.proponent_type).replace(/_/g, " "))})</span>` : ""}</div>
-      <div><b>Rules as of</b><br>${h(L.run.as_of)}</div>
-      <div><b>Version stamp</b><br><code>${h(L.run.stamp.stamp)}</code> <span class="cont">· engine ${h(L.run.engine_version)}</span></div>
+      <div><b>Option</b><span>${h(opt.name || opt.id)}</span></div>
+      <div><b>Proponent</b><span>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="cont">(${h(String(opt.proponent_type).replace(/_/g, " "))})</span>` : ""}</span></div>
+      <div><b>Rules as of</b><span>${h(L.run.as_of)}</span></div>
+      <div><b>Stamp</b><span><code>${h(L.run.stamp.stamp)}</code> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
     </div>
     <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
   </div>`);
@@ -848,8 +845,7 @@ function answerAllowed(L) {
   }
   const status = verdictStatus(path ? bz.verdict : o.verdict);   // the operative answer: by rezoning when a path is stated
   return `<section class="card answer" data-verdict="${h(status)}">
-    <div class="eyebrow">01 · Is it allowed</div>
-    <h2>Is it allowed?</h2>
+    <h2><span class="badge">1</span> Is it allowed?</h2>
     <p class="verdict">${verdict}</p>
     ${body}
   </section>`;
@@ -863,8 +859,7 @@ function answerFunders(L) {
   let body = `<ul class="finding-list">${rows.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
   if (others.length) body += `<p class="path" style="margin-top:12px">Not targeted, listed in the ledger: ${others.map(r => h(r.title)).join("; ")}.</p>`;
   return `<section class="card answer" data-verdict="${h(verdictStatus(ans.funded.verdict))}">
-    <div class="eyebrow">02 · Does it fit the funders</div>
-    <h2>Does it fit the funders?</h2>
+    <h2><span class="badge">2</span> Does it fit the funders?</h2>
     <p class="verdict"><em>${h(cap(ans.funded.verdict))}.</em></p>
     ${body}
   </section>`;
@@ -879,8 +874,7 @@ function answerUnsure(L) {
   </tbody></table>` : "";
   const worst = items.some(u => u.status === "fail") ? "fail" : (n ? "uncertain" : "pass");   // the card wears the heaviest open status
   return `<section class="card answer" data-verdict="${worst}">
-    <div class="eyebrow">03 · Still unsure</div>
-    <h2>What is still unsure, and who resolves it?</h2>
+    <h2><span class="badge">3</span> What is still unsure, and who resolves it?</h2>
     <p class="verdict">${verdict}</p>
     ${table}
   </section>`;
@@ -971,9 +965,10 @@ function renderStamp(run) {
 
 // ---------------------------------------------------------------- figures: drawn from massing.json, formatting only
 
-const FIG = { proposedFill: "#2f6fed", proposedStroke: "#1e40af", outrightFill: "#c9ced6", outrightStroke: "#6b7280",
-              bench: "#b45309", lot: "#1B1B1A", env: "#8a8a85", grey: "#6B6B66" };
-const SVG_OPEN = `xmlns="http://www.w3.org/2000/svg" font-family="Inter, system-ui, sans-serif" role="img"`;
+/* the drawing colours of the Lotwise sheets: envelope blue, grey streets and lanes, drawing ink, amber for a form line */
+const FIG = { proposedFill: "#3c8cdc", proposedStroke: "#2a6fb8", outrightFill: "#bdbdbd", outrightStroke: "#8e8e8e",
+              bench: "#c77d14", lot: "#1f2933", env: "#c81e1e", grey: "#5f6672" };
+const SVG_OPEN = `xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" role="img"`;
 const NS = `vector-effect="non-scaling-stroke"`;
 
 function polyEl(pts, attrs) {
@@ -989,10 +984,10 @@ function figPlan(m) {
   const Y = y => pad + (D - y);                       // the street edge (y = 0) drawn at the bottom
   const P = pts => pts.map(([x, y]) => [pad + x, Y(y)]);
   let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Plan: lot, setback envelope and the two massing footprints">`;
-  s += polyEl(P(m.lot.polygon), `fill="#f6f5f1" stroke="${FIG.lot}" stroke-width="1.2"`);
+  s += polyEl(P(m.lot.polygon), `fill="#f4f4f2" stroke="${FIG.lot}" stroke-width="1.2"`);
   s += polyEl(P(m.envelope.polygon), `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
   if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" stroke="${FIG.outrightStroke}" stroke-width="1.2" fill-opacity="0.9"`);
-  if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.35"`);
+  if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.5"`);
   s += `<text x="${(pad + W / 2).toFixed(2)}" y="${(Y(0) + fs * 1.35).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">street · frontage ${W} m</text>`;
   const rx = pad + W + fs * 0.9, ry = Y(D / 2);
   s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}" transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">depth ${D} m</text>`;
@@ -1021,7 +1016,7 @@ function figSection(m) {
   }
   if (masses.proposed) {
     const p = masses.proposed;
-    s += `<rect x="${envX.toFixed(2)}" y="${Yz(p.height_m).toFixed(2)}" width="${envW.toFixed(2)}" height="${p.height_m}" fill="${FIG.proposedFill}" fill-opacity="0.3" stroke="${FIG.proposedStroke}" stroke-width="1.2" ${NS}/>`;
+    s += `<rect x="${envX.toFixed(2)}" y="${Yz(p.height_m).toFixed(2)}" width="${envW.toFixed(2)}" height="${p.height_m}" fill="${FIG.proposedFill}" fill-opacity="0.45" stroke="${FIG.proposedStroke}" stroke-width="1.2" ${NS}/>`;
     for (let k = 1; k < p.storeys; k++) {
       const yk = Yz(k * p.floor_to_floor_m);
       if (yk <= Yz(p.height_m)) break;
@@ -1035,8 +1030,8 @@ function figSection(m) {
     }
     s += `<text x="${lx.toFixed(2)}" y="${(Yz(b.height_m[0]) + fs * 1.05).toFixed(2)}" font-size="${fs}" fill="${FIG.bench}">${h(b.height_m[0])} to ${h(b.height_m[1])} m · staff benchmark</text>`;
   }
-  if (masses.proposed) s += `<text x="${lx.toFixed(2)}" y="${(Yz(masses.proposed.height_m) - fs * 0.35).toFixed(2)}" font-size="${fs}" fill="#1e3a8a" font-weight="600">${h(masses.proposed.height_m)} m · proposed</text>`;
-  if (masses.outright) s += `<text x="${lx.toFixed(2)}" y="${(Yz(masses.outright.height_m) - fs * 0.35).toFixed(2)}" font-size="${fs}" fill="#374151">${h(masses.outright.height_m)} m · outright</text>`;
+  if (masses.proposed) s += `<text x="${lx.toFixed(2)}" y="${(Yz(masses.proposed.height_m) - fs * 0.35).toFixed(2)}" font-size="${fs}" fill="${FIG.proposedStroke}" font-weight="600">${h(masses.proposed.height_m)} m · proposed</text>`;
+  if (masses.outright) s += `<text x="${lx.toFixed(2)}" y="${(Yz(masses.outright.height_m) - fs * 0.35).toFixed(2)}" font-size="${fs}" fill="${FIG.lot}">${h(masses.outright.height_m)} m · outright</text>`;
   s += `<text x="${(pad + W / 2).toFixed(2)}" y="${(ground + fs * 1.3).toFixed(2)}" font-size="${fs}" text-anchor="middle" fill="${FIG.grey}">heights in metres · setback envelope ${h(m.envelope.width_m)} m wide</text>`;
   s += `</svg>`;
   return s;
@@ -1167,7 +1162,7 @@ function renderExportPanel(run) {
   const f = run.files || {};
   const panel = $("#export-panel");
   panel.innerHTML = `
-    <h3 class="serif">Export to Revit</h3>
+    <h3>Export to Revit</h3>
     <div class="block">
       <span class="eyebrow">This run's massing.json</span>
       <div class="codeline"><code class="path" id="exp-path">${h(f.massing_json || (STATIC ? "Download massing.json from the action bar above and save it next to this run's ledger.json on the machine that has Revit." : "This run has no massing.json."))}</code><button class="btn btn-quiet btn-small" type="button" data-copy="exp-path">Copy</button></div>
@@ -1216,7 +1211,7 @@ async function checkRevit() {
 
 function revitResultHtml(r, run) {
   const base = `/api/runs/${run.run_id}`;
-  const stages = Object.entries(r.stages || {}).map(([k, v]) => `<span class="pill pill-${v === "ok" ? "pass" : "fail"}">${h(k)} ${h(v)}</span>`).join("");
+  const stages = Object.entries(r.stages || {}).map(([k, v]) => `<span class="pill pill-${v === "ok" ? "pass" : "fail"}">${h(k)}</span>`).join("");
   const items = (r.built || []).map(b => {
     switch (b.kind) {
       case "mass": return `Mass <b>${h(b.name)}</b> (element ${h(b.element_id)}): ${h(b.storeys)} storeys, ${h(b.height_m)} m, plate ${fmtNum(b.plate_area_m2)} m², FSR ${h(b.fsr)}.`;
@@ -1329,7 +1324,7 @@ function showTourStep(i) {
   tour.card.innerHTML = `
     <button class="tour-close" type="button" aria-label="Close the walkthrough">×</button>
     <div class="eyebrow">Walkthrough · ${i + 1} of ${TOUR.length}</div>
-    <h3 class="serif">${h(step.title)}</h3>
+    <h3>${h(step.title)}</h3>
     <p>${h(step.text)}</p>
     <div class="tour-nav">
       <button class="btn btn-quiet btn-small tour-back" type="button"${i === 0 ? " disabled" : ""}>Back</button>

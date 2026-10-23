@@ -21,9 +21,10 @@ STATUS_WORD = {
     "pass": "Pass", "conditional": "Conditional", "fail": "Fail", "uncertain": "Uncertain",
     "not_applicable": "Not applicable", "info": "Info",
 }
+# the UI's status set (DESIGN.md), deepened where white text sits on it: every pair clears 4.5:1
 STATUS_COLOR = {
-    "pass": "#15803d", "conditional": "#b45309", "fail": "#b91c1c", "uncertain": "#6d28d9",
-    "not_applicable": "#6b7280", "info": "#1d4ed8",
+    "pass": "#2f7d4a", "conditional": "#9a6b00", "fail": "#c81e1e", "uncertain": "#a3640c",
+    "not_applicable": "#5f6672", "info": "#2a6fb8",
 }
 
 
@@ -311,15 +312,15 @@ def html_page(md: str, svg_text: str | None = None) -> str:
     close()
     body = "\n".join(out)
     css = """
-    :root{--ink:#1a1a1a;--muted:#555;--line:#e5e5e5;--bg:#fff}
-    body{font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);max-width:1100px;margin:32px auto;padding:0 20px;line-height:1.45}
-    h1{font-size:26px;margin:0 0 8px} h2{font-size:19px;margin:28px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px} h3{font-size:15px;margin:18px 0 6px;color:var(--muted)}
-    blockquote{border-left:3px solid #ccc;margin:12px 0;padding:4px 14px;color:var(--muted);font-size:14px}
-    table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0 16px} th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left} th{background:#fafafa}
-    code{background:#f3f3f3;padding:1px 4px;border-radius:3px;font-size:12px}
-    .pill{color:#fff;border-radius:10px;padding:1px 8px;font-size:12px;white-space:nowrap}
+    :root{--ink:#2c3e50;--muted:#5f6672;--line:#e1e5ea;--bg:#fff;--group:#e9eef4;--field:#f5f6f8;--blue:#2a6fb8}
+    body{font-family:"IBM Plex Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:13.5px;color:var(--ink);background:var(--bg);max-width:1100px;margin:32px auto;padding:0 20px;line-height:1.45}
+    h1{font-size:22px;font-weight:600;margin:0 0 8px;letter-spacing:-0.01em} h2{font-size:16px;font-weight:600;margin:28px 0 8px;border-bottom:1px solid var(--line);padding-bottom:4px} h3{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin:18px 0 6px;color:var(--muted)}
+    blockquote{border-left:3px solid var(--line);margin:12px 0;padding:4px 14px;color:var(--muted);font-size:12.5px}
+    table{border-collapse:collapse;width:100%;font-size:12px;margin:8px 0 16px} th,td{border:1px solid var(--line);padding:6px 8px;vertical-align:top;text-align:left} th{background:var(--group);font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+    code{font-family:"IBM Plex Mono","SF Mono",Menlo,Consolas,monospace;background:var(--field);border:1px solid var(--line);padding:1px 4px;border-radius:3px;font-size:11.5px}
+    .pill{color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600;white-space:nowrap}
     figure{margin:12px 0} figure svg{max-width:100%;height:auto;border:1px solid var(--line)} figcaption{font-size:12px;color:var(--muted)}
-    li{margin:3px 0} a{color:#1d4ed8}
+    li{margin:3px 0} a{color:var(--blue)}
     @media print{body{margin:0;max-width:none} h2{break-after:avoid}}
     """
     return f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Funding-fit memo</title><style>{css}</style></head><body>{body}</body></html>"

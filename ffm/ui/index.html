@@ -7,15 +7,15 @@
 <meta name="description" content="A deterministic feasibility screen for BC non-profit housing: pick a site, describe an option, run the rules, read the memo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231B1B1A'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='%23FAF9F6' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232c3e50'/%3E%3Ctext x='16' y='22' font-family='IBM Plex Sans,Helvetica,Arial,sans-serif' font-weight='600' font-size='18' fill='%23ffffff' text-anchor='middle'%3EF%3C/text%3E%3C/svg%3E">
 <!-- static-config -->
 </head>
 <body>
 
 <header class="topbar">
-  <div class="wordmark">Funding-Fit <em>Memo</em></div>
+  <h1 class="wordmark">Funding-Fit Memo <em>a feasibility screen for BC non-profit housing</em></h1>
   <div class="topbar-controls">
     <label class="asof">
       <span class="eyebrow">Rules as of</span>
@@ -38,6 +38,7 @@
   <a href="#step-export" data-step="4"><span class="step-n">4</span> Export</a>
   <a href="#" id="tour-link" class="tour-link">Walkthrough</a>
 </nav>
+<div id="status" class="strip" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Pick a site and an option, set the date the rules should be read on, then run the rules.</span></div>
 <div id="tour-offer" class="tour-offer" hidden>
   <span>New here? A two-minute walkthrough shows the four steps on the page.</span>
   <button id="tour-start" class="btn btn-primary btn-small" type="button">Take the walkthrough</button>
@@ -47,8 +48,7 @@
 <main class="panes">
   <aside class="inputs">
     <section id="step-site" class="card input-card">
-      <div class="eyebrow">01 · Site</div>
-      <h2 class="serif">Site</h2>
+      <h2><span class="badge">1</span> Site</h2>
       <div class="field">
         <label for="site-select">Site file</label>
         <select id="site-select"></select>
@@ -61,8 +61,7 @@
     </section>
 
     <section id="step-option" class="card input-card">
-      <div class="eyebrow">02 · Option</div>
-      <h2 class="serif">Option</h2>
+      <h2><span class="badge">2</span> Option</h2>
       <div class="field">
         <label for="option-select">Option file</label>
         <select id="option-select"></select>
@@ -90,7 +89,7 @@
     <div id="memo" class="memo"></div>
 
     <footer id="step-export" class="export">
-      <div class="eyebrow">04 · Export</div>
+      <h2><span class="badge">4</span> Export</h2>
       <div class="action-bar">
         <a id="dl-html" class="btn" href="#" download aria-disabled="true">Download memo (HTML)</a>
         <a id="dl-md" class="btn" href="#" download aria-disabled="true">Download memo (Markdown)</a>
@@ -103,7 +102,6 @@
   </section>
 </main>
 
-<div id="toast" class="toast" hidden></div>
 
 <script src="app.js"></script>
 </body>

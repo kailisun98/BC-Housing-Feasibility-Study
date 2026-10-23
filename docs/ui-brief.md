@@ -122,7 +122,10 @@ Looked at on awwwards (21 Oct 2026) and taken from the pieces that fit a memo, n
   mono micro-labels like `FIG 0.1`, cards separated by hairlines rather than shadows. Borrow the
   figure labelling for the massing drawings and the ink/grey sentence hierarchy for findings.
 
-The resulting system:
+The resulting system (superseded on 23 Oct 2026: Kai pinned the Lotwise massing app,
+https://kailisun98.github.io/r1-1-massing/, as the visual precedent, and `DESIGN.md` now records the
+system as shipped: IBM Plex Sans at 13 px, slate ink on a cool grey page, white panels, ink-filled
+buttons, statuses as marked words. The layout, endpoints and definition of done below still hold):
 
 - **Type**: serif for the memo's title, the three verdict sentences and section headings
   (Fraunces or Newsreader from Google Fonts; fallback Georgia); sans for everything interactive and

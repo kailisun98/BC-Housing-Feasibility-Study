@@ -87,6 +87,25 @@ def cmd_ui(a: argparse.Namespace) -> int:
     return ui_server.serve(port=a.port, open_browser=not a.no_browser)
 
 
+def cmd_context(a: argparse.Namespace) -> int:
+    """Fetch the OpenStreetMap context around a site (roads, buildings, trees) and store it in the site file."""
+    from . import osm
+    path = Path(a.site)
+    site = engine.load_json(path)
+    center = None
+    if a.center:
+        lat, lon = (float(v) for v in a.center.split(","))
+        center = (lat, lon)
+    block = osm.fetch_for_site(site, radius_m=float(a.radius), center=center)
+    site["osm"] = block
+    path.write_text(osm.dumps_site(site), encoding="utf-8")
+    c, f = block["counts"], block["frame"]
+    print(f"{path}: {c['roads']} roads, {c['buildings']} buildings, {c['trees']} trees within {block['radius_m']:.0f} m of "
+          f"{block['center']['lat']}, {block['center']['lon']}; front street {f['front_street']!r} ({'matched by name' if f['front_street_matched_by_name'] else 'nearest road'}), "
+          f"x axis bearing {f['x_axis_bearing_deg']}°; {c['buildings_on_site_omitted']} building(s) on the lot omitted. {block['attribution']}.")
+    return 0
+
+
 def cmd_rules(a: argparse.Namespace) -> int:
     on = _date(a.as_of)
     rules = load_rules(Path(a.rules) if a.rules else RULES_DIR)
@@ -120,6 +139,12 @@ def main(argv: list[str] | None = None) -> int:
     mm = sub.add_parser("memo", help="rewrite the memo for an existing run folder (picks up the Revit result)")
     mm.add_argument("--out", required=True)
     mm.set_defaults(fn=cmd_memo)
+
+    c = sub.add_parser("context", help="fetch the OpenStreetMap context around a site into the site file (needs the network once)")
+    c.add_argument("--site", required=True)
+    c.add_argument("--radius", default=120, help="metres around the address (default 120)")
+    c.add_argument("--center", help="lat,lon to use instead of geocoding the address")
+    c.set_defaults(fn=cmd_context)
 
     l = sub.add_parser("rules", help="list rules and the version in force")
     l.add_argument("--as-of", dest="as_of")

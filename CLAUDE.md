@@ -130,6 +130,15 @@ is a dependency-free orbitable axonometric drawn from `massing.json`. A second c
 so the outright rules are not applicable and the memo's "outright: yes" is an engine limitation
 noted in the site file, not a finding.
 
+Context from OpenStreetMap (23 Oct 2026): `python -m ffm context --site sites/<id>.json [--radius 120]
+[--center lat,lon]` (`ffm/osm.py`, standard library) locates the address with Nominatim, fetches
+roads, buildings and trees from the Overpass API, converts them into the lot frame (front street
+matched by name, frame nudged so the front and any cross street sit half a right-of-way outside the
+lot lines, buildings on the lot itself omitted) and stores the block under the site's `osm` key. The
+figures read that block; without it they fall back to a schematic context. The block carries the
+ODbL attribution, which the figure caption and README repeat. Re-run the command to refresh; it
+reuses the saved centre, so Nominatim is asked once per site.
+
 The page also runs on GitHub Pages (https://kailisun98.github.io/BC-Housing-Feasibility-Study/):
 `python -m ffm pages` (`ffm/pages.py`) builds a static site whose `app.js` detects
 `window.FFM_STATIC`, reads the committed runs from `data/` and runs the engine in Pyodide from

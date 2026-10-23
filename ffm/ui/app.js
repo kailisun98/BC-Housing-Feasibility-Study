@@ -980,7 +980,7 @@ function polyEl(pts, attrs) {
    parcels, street trees and the trees on site. Real figures come from site.context when the site file has them;
    otherwise typical defaults stand in (a 20 m street, a 6 m lane, neighbours of the lot's own depth) and the
    on-site trees, whose positions are rarely public, are placed schematically along the rear. */
-const HALF = { street: "#e9e9e6", parcel: "#f4f4f2", line: "#c9c9c5", text: "#8e8e8e", tree: "#9fb07f", treeLine: "#7f9664", gone: "#bdbdbd" };
+const HALF = { street: "#e9e9e6", parcel: "#f4f4f2", building: "#e2e2df", line: "#c9c9c5", text: "#8e8e8e", tree: "#9fb07f", treeLine: "#7f9664", gone: "#bdbdbd" };
 
 function siteContext(site, m) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
@@ -1028,7 +1028,50 @@ function siteContext(site, m) {
   }
   const streetTreeList = [];
   for (let i = 0; i < streetTrees; i++) streetTreeList.push({ x: W * (i + 0.5) / streetTrees, y: -3, crown: 2.5 });
-  return { W, D, street, lane, cross, neighbours, streetTrees: streetTreeList, trees, schematic, ground, xmin, xmax, ymin, ymax };
+  const labels = ground.map(g => ({ text: g.label, at: g.at, angle: g.rotate ? 90 : 0 }));
+  const base = { W, D, street, lane, cross, neighbours, streetTrees: streetTreeList, trees, schematic, ground, labels, buildings: [], osmTrees: [], xmin, xmax, ymin, ymax, osm: null };
+  return site && site.osm ? osmContext(site, m, base) : base;
+}
+
+/* The same context from OpenStreetMap when `python -m ffm context` has stored it in the site file: roads as
+   strips of their width, building footprints (extruded in 3D by their tagged height or storeys), mapped trees,
+   all already in the lot's metres. The lot's own trees from the site file stay as they are. */
+function osmContext(site, m, base) {
+  const o = site.osm, W = m.lot.frontage_m, D = m.lot.depth_m;
+  const r = (o.radius_m || 120) * 0.92;
+  const ground = [], labels = [], seen = new Set();
+  for (const road of o.roads || []) {
+    const w = road.width_m || 8, pts = road.points || [];
+    for (let i = 0; i + 1 < pts.length; i++) {
+      const [x1, y1] = pts[i], [x2, y2] = pts[i + 1];
+      const L = Math.hypot(x2 - x1, y2 - y1); if (!L) continue;
+      const nx = -(y2 - y1) / L * w / 2, ny = (x2 - x1) / L * w / 2;
+      ground.push({ ring: [[x1 + nx, y1 + ny], [x2 + nx, y2 + ny], [x2 - nx, y2 - ny], [x1 - nx, y1 - ny]], fill: HALF.street, seam: true });
+    }
+    if (road.name && !seen.has(road.name) && pts.length > 1) {
+      // label the longest segment of each named road, once, if it falls inside the frame
+      let best = null;
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const L = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+        if (!best || L > best.L) best = { L, i };
+      }
+      const [x1, y1] = pts[best.i], [x2, y2] = pts[best.i + 1];
+      const at = [(x1 + x2) / 2, (y1 + y2) / 2];
+      if (Math.abs(at[0] - W / 2) < r && Math.abs(at[1] - D / 2) < r) {
+        let angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+        if (angle > 90) angle -= 180; if (angle < -90) angle += 180;
+        labels.push({ text: road.name, at, angle });
+        seen.add(road.name);
+      }
+    }
+  }
+  const buildings = (o.buildings || []).map(b => ({ polygon: b.polygon, height: b.height_m || 7, name: b.name }));
+  const osmTrees = (o.trees || []).map(t => ({ x: t.x, y: t.y, crown: t.crown_m || 3 }));
+  return Object.assign({}, base, {
+    ground, labels, buildings, osmTrees, streetTrees: [],
+    xmin: W / 2 - r, xmax: W / 2 + r, ymin: D / 2 - r, ymax: D / 2 + r, frameRadius: r * 0.75,
+    osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: o.frame && o.frame.front_street },
+  });
 }
 
 function figPlan(m, ctx) {
@@ -1041,13 +1084,15 @@ function figPlan(m, ctx) {
   const X = x => x - x0;
   const P = pts => pts.map(([x, y]) => [X(x), Y(y)]);
   const vbW = x1 - x0, vbH = y1 - y0;
-  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Plan: the lot with its street, lane, neighbours and trees in half tone, the setback envelope and the two massing footprints">`;
-  for (const g of ctx.ground) s += polyEl(P(g.ring), `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
-  for (const g of ctx.ground) {
-    const [lx, ly] = [X(g.at[0]), Y(g.at[1])];
-    s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}"${g.rotate ? ` transform="rotate(-90 ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(g.label)}</text>`;
+  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Plan: the lot with its streets, buildings and trees in half tone, the setback envelope and the two massing footprints">`;
+  s += `<rect x="0" y="0" width="${vbW.toFixed(2)}" height="${vbH.toFixed(2)}" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
+  for (const g of ctx.ground) s += polyEl(P(g.ring), g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
+  for (const b of ctx.buildings) s += polyEl(P(b.polygon), `fill="${HALF.building}" stroke="${HALF.line}" stroke-width="0.6"`);
+  for (const l of ctx.labels) {
+    const [lx, ly] = [X(l.at[0]), Y(l.at[1])];
+    s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}"${l.angle ? ` transform="rotate(${(-l.angle).toFixed(1)} ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(l.text)}</text>`;
   }
-  for (const t of ctx.streetTrees) s += `<circle cx="${X(t.x).toFixed(2)}" cy="${Y(t.y).toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
+  for (const t of ctx.streetTrees.concat(ctx.osmTrees)) s += `<circle cx="${X(t.x).toFixed(2)}" cy="${Y(t.y).toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
   s += polyEl(P(m.lot.polygon), `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
   s += polyEl(P(m.envelope.polygon), `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
   if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" stroke="${FIG.outrightStroke}" stroke-width="1.2" fill-opacity="0.9"`);
@@ -1164,16 +1209,21 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
   };
   let body = "";
   // the context on the ground first, in half tone, then the lot, the envelope, the masses and the trees
-  for (const g of ctx.ground) body += poly(g.ring, `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
-  for (const g of ctx.ground) {
-    const c = proj(g.at);
-    body += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}">${h(g.label)}</text>`;
+  if (ctx.osm) body += poly([[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]], `fill="${HALF.parcel}" stroke="none"`);
+  for (const g of ctx.ground) body += poly(g.ring, g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
+  for (const l of ctx.labels) {
+    const c = proj(l.at);
+    body += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${HALF.text}">${h(l.text)}</text>`;
   }
   body += poly(m.lot.polygon, `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
   body += poly(m.envelope.polygon, `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
-  // the trees and the masses are painted far to near so a tree behind a mass stays behind it
+  // the buildings around, the trees and the masses are painted far to near so a tree behind a mass stays behind it
   const items = [];
-  for (const t of ctx.streetTrees) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.35) });
+  for (const b of ctx.buildings) {
+    const depth = b.polygon.reduce((s, [x, y]) => s + proj([x, y, 0]).d, 0) / b.polygon.length;
+    items.push({ d: depth, s: box(b.polygon, 0, b.height, HALF.building, HALF.line, 0.95, null) });
+  }
+  for (const t of ctx.streetTrees.concat(ctx.osmTrees)) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.35) });
   for (const t of ctx.trees) if (t.retained) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.45) });
   if (masses.outright) items.push({ d: -1e9, s: box(masses.outright.footprint, masses.outright.base_z || 0, (masses.outright.base_z || 0) + masses.outright.height_m, FIG.outrightFill, FIG.outrightStroke, 0.9, null) });
   if (masses.proposed) {
@@ -1201,7 +1251,7 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el) {
   // a steady frame: the largest extent the drawing can reach at any azimuth for this tilt, so turning never
   // rescales it (only a change of tilt re-frames, and gently)
   const corners = [[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]];
-  const R = Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy)));
+  const R = ctx.frameRadius || Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy)));
   const zmax = Math.max(...m.masses.map(x => (x.base_z || 0) + x.height_m), 1);
   const top = zmax * ce + R * se, bottom = R * se;
   const pad = fs * 1.5;
@@ -1264,17 +1314,24 @@ function renderFigures(run) {
   if (m) {
     const sb = m.envelope.setbacks_m || {};
     const ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
-    const around = [ctx.street.name + " in front"];
-    if (ctx.lane) around.push("a lane behind");
-    for (const x of ctx.cross) around.push(`${x.name} to the ${x.side}`);
-    if (ctx.neighbours.length) around.push(ctx.neighbours.length === 2 ? "neighbouring parcels either side" : "a neighbouring parcel");
-    if (ctx.streetTrees.length) around.push(`${ctx.streetTrees.length} street trees`);
+    let contextNote;
+    if (ctx.osm) {
+      const c = ctx.osm.counts, om = ctx.osm.omitted;
+      contextNote = `Context in half tone from OpenStreetMap (${h(ctx.osm.attribution)}; fetched ${h(ctx.osm.fetched)}, ${h(ctx.osm.radius)} m around the address): ${c.roads ?? 0} roads, ${c.buildings ?? 0} buildings and ${c.trees ?? 0} mapped trees, with ${h(ctx.osm.frontStreet || "the nearest road")} taken as the front street.${om.length ? ` ${om.length === 1 ? "The building now on the lot is" : `${om.length} buildings now on the lot are`} left out${om[0] && om[0].name ? ` (${h(om.map(b => b.name).filter(Boolean).join(", "))})` : ""}.` : ""}`;
+    } else {
+      const around = [ctx.street.name + " in front"];
+      if (ctx.lane) around.push("a lane behind");
+      for (const x of ctx.cross) around.push(`${x.name} to the ${x.side}`);
+      if (ctx.neighbours.length) around.push(ctx.neighbours.length === 2 ? "neighbouring parcels either side" : "a neighbouring parcel");
+      if (ctx.streetTrees.length) around.push(`${ctx.streetTrees.length} street trees`);
+      contextNote = `Context in half tone, schematic: ${h(around.join(", "))}. Run <code>python -m ffm context --site sites/${h(m.site_id)}.json</code> to draw it from OpenStreetMap instead.`;
+    }
     const retained = ctx.trees.filter(t => t.retained).length, removed = ctx.trees.length - retained;
     const treeNote = ctx.trees.length ? ` On site, ${retained} tree${retained === 1 ? "" : "s"} retained and ${removed} to be removed (×)${ctx.schematic ? ", placed schematically because the survey is not on file" : ""}.` : "";
     out.push(`<figure class="card figure">
       <div id="fig-01">${figOne(m, ctx)}</div>
-      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-context"></i>context</span></div>
-      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back. Context in half tone: ${h(around.join(", "))}.${treeNote}</figcaption>
+      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-building"></i>building</span><span><i class="fig-context"></i>road</span></div>
+      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back. ${contextNote}${treeNote}</figcaption>
     </figure>`);
     const bench = m.policy_benchmark;
     const trees = m.trees;

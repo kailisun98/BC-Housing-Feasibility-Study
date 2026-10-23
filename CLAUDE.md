@@ -123,6 +123,15 @@ Export to Revit panel with *Check Revit result* (which also rewrites the memo). 
 `outputs/<site>/<timestamp>/`. `docs/pitch-outline.md` has the UI version of the live run. Not
 done: nothing launches Revit from the server (by design); no dark-mode polish pass.
 
+The page also runs on GitHub Pages (https://kailisun98.github.io/BC-Housing-Feasibility-Study/):
+`python -m ffm pages` (`ffm/pages.py`) builds a static site whose `app.js` detects
+`window.FFM_STATIC`, reads the committed runs from `data/` and runs the engine in Pyodide from
+`engine/`. Published from the `gh-pages` branch (see the README); the Actions workflow in
+`.github/workflows/pages.yml` is written but uncommitted because the gh CLI token here lacks the
+`workflow` scope (`gh auth refresh -s workflow` in Kai's own terminal, or a commit from GitHub
+Desktop, fixes that). Never let the pages build copy office-template files; `pages.py` lists the
+run files it copies.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

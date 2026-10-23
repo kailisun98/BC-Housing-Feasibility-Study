@@ -46,14 +46,27 @@ on a first visit) spotlights each part of the page in order and can run the rule
 ### On the web
 
 The same page runs on GitHub Pages at https://kailisun98.github.io/BC-Housing-Feasibility-Study/
-with no server behind it. `python -m ffm pages --out _site` (run by `.github/workflows/pages.yml`
-on every push to `main`) writes the committed runs as data files, so past runs open at once, and
-ships the engine's own source files, which the page loads into [Pyodide](https://pyodide.org)
-(CPython compiled to WebAssembly, about 10 MB from a CDN, cached after the first visit). *Run the
-rules* then runs the identical code in the browser: nothing is uploaded, and a browser run lives
-in the tab until you download its memo. Saving a site or option downloads the JSON instead of
-writing it. The Revit step stays on a machine with Revit. The engine itself remains dependency-free;
-Pyodide is only fetched by the web build.
+with no server behind it. `python -m ffm pages --out _site` writes the committed runs as data
+files, so past runs open at once, and ships the engine's own source files, which the page loads
+into [Pyodide](https://pyodide.org) (CPython compiled to WebAssembly, about 10 MB from a CDN,
+cached after the first visit). *Run the rules* then runs the identical code in the browser:
+nothing is uploaded, and a browser run lives in the tab until you download its memo. Saving a
+site or option downloads the JSON instead of writing it. The Revit step stays on a machine with
+Revit. The engine itself remains dependency-free; Pyodide is only fetched by the web build.
+
+Publishing: the built site is pushed to the `gh-pages` branch, which Pages serves. To republish
+after a change, build into an empty folder, commit it on `gh-pages` and push:
+
+```powershell
+python -m ffm pages --out ..\ffm-site
+cd ..\ffm-site; git init; git checkout -b gh-pages; git add -A; git commit -m "Build the web UI"
+git push -f https://github.com/kailisun98/BC-Housing-Feasibility-Study.git gh-pages
+```
+
+A workflow that does this on every push to `main` is ready in `.github/workflows/pages.yml`; it
+is not committed yet because pushing a workflow file needs a token with the `workflow` scope.
+Commit it from GitHub Desktop, then switch Pages (repository settings) to build from GitHub
+Actions.
 
 Each run writes to `--out`:
 

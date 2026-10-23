@@ -1,0 +1,56 @@
+[
+ {
+  "run_id": "998-e-19th-ave/2026-10-23",
+  "folder": "2026-10-23",
+  "folder_abs": null,
+  "as_of": "2026-10-23",
+  "stamp": "20e44f1445ecaff9",
+  "option_id": "998-e-19th-ave-as-approved",
+  "option_name": "As approved by Council, 25 Jul 2024: six-storey social housing over a rebuilt church",
+  "written": "2026-10-21T13:45:24",
+  "verdicts": {
+   "outright": "no",
+   "by_rezoning": "not yet confirmed",
+   "funded": "not yet confirmed"
+  },
+  "has_diff": false,
+  "has_massing": true,
+  "revit": null
+ },
+ {
+  "run_id": "998-e-19th-ave/2026-10-27",
+  "folder": "2026-10-27",
+  "folder_abs": null,
+  "as_of": "2026-10-27",
+  "stamp": "6d1b07fe59dd3775",
+  "option_id": "998-e-19th-ave-as-approved",
+  "option_name": "As approved by Council, 25 Jul 2024: six-storey social housing over a rebuilt church",
+  "written": "2026-10-20T15:02:50",
+  "verdicts": {
+   "outright": "no",
+   "by_rezoning": "not yet confirmed",
+   "funded": "not yet confirmed"
+  },
+  "has_diff": true,
+  "has_massing": true,
+  "revit": null
+ },
+ {
+  "run_id": "998-e-19th-ave/what-if",
+  "folder": "what-if",
+  "folder_abs": null,
+  "as_of": "2026-10-23",
+  "stamp": "20e44f1445ecaff9",
+  "option_id": "998-e-19th-ave-what-if-5-storey",
+  "option_name": "What-if (hypothetical, for the demo): five storeys inside the staff benchmark, full funder data supplied",
+  "written": "2026-10-20T15:02:50",
+  "verdicts": {
+   "outright": "no",
+   "by_rezoning": "not yet confirmed",
+   "funded": "not yet confirmed"
+  },
+  "has_diff": true,
+  "has_massing": true,
+  "revit": null
+ }
+]

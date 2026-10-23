@@ -1,0 +1,18 @@
+{
+  "previous_stamp": "20e44f1445ecaff9",
+  "current_stamp": "6d1b07fe59dd3775",
+  "previous_as_of": "2026-10-23",
+  "current_as_of": "2026-10-27",
+  "rules_changed": false,
+  "changes": [
+    {
+      "rule_id": "cov.family_units",
+      "change": "changed",
+      "from": "pass",
+      "to": "pass",
+      "from_version": "1992-01-01",
+      "to_version": "2026-10-27",
+      "finding": "38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum; 12 (11.4%) have three or more, against a 5.0% minimum."
+    }
+  ]
+}

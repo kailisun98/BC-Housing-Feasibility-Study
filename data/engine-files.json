@@ -1,0 +1,13 @@
+[
+ "ffm/__init__.py",
+ "ffm/rules_loader.py",
+ "ffm/checks.py",
+ "ffm/engine.py",
+ "ffm/massing.py",
+ "ffm/memo.py",
+ "rules/a_zoning_district.json",
+ "rules/b_provincial.json",
+ "rules/c_city_policies.json",
+ "rules/d_design_standards.json",
+ "rules/e_funding_programs.json"
+]

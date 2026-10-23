@@ -1,0 +1,133 @@
+{
+  "layer": "C",
+  "layer_title": "City of Vancouver policies that attach to a rezoning",
+  "rules": [
+    {
+      "id": "cov.family_units",
+      "title": "Family-unit requirement in rezonings",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "family_unit_share",
+      "versions": [
+        {
+          "effective_from": "1992-01-01",
+          "effective_to": "2026-10-26",
+          "params": {"min_two_plus_bed_share": 0.35, "min_three_plus_bed_share": null},
+          "source": {
+            "title": "High-Density Housing for Families with Children Guidelines (1992) as applied in rezonings; the 998 E 19th Ave referral report states the 35% policy minimum",
+            "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+            "section": "Unit mix; family units 38 of 105 (36%) against a 35% minimum"
+          }
+        },
+        {
+          "effective_from": "2026-10-27",
+          "params": {"min_two_plus_bed_share": 0.35, "min_three_plus_bed_share": 0.05},
+          "source": {
+            "title": "City of Vancouver, Housing options for families: at least 35% two-bedroom-plus units including at least 5% three-bedroom-plus in rezonings; City-wide Design and Development Guidelines replace the 1992 guidelines",
+            "url": "https://vancouver.ca/people-programs/housing-options-for-families.aspx",
+            "section": "Amendment effective 27 Oct 2026"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.social_housing_definition",
+      "title": "Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "social_housing_definition",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {
+            "min_share_below_hils": 0.30,
+            "max_rent_share_of_income": 0.30,
+            "eligible_owner_types": ["non_profit_society", "housing_cooperative", "city", "province", "canada"],
+            "min_agreement_years": 60
+          },
+          "source": {
+            "title": "998 E 19th Ave referral report: social housing as defined in the Vancouver Development Cost Levy By-law No. 9755 (at least 30% of units for households below the Housing Income Limits, rents not exceeding 30% of income, owned by a non-profit or government, secured by housing agreement for the longer of 60 years and the life of the building)",
+            "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+            "section": "Tenure and affordability; Housing Agreement and Section 219 covenant"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.below_market_rental",
+      "title": "Below-market rental housing policy for rezonings (secured market rental)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "below_market_rental_policy",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {
+            "requires_100pct_secured_rental": true,
+            "min_below_market_floor_area_share": 0.20,
+            "min_discount_to_cmhc_average": 0.20,
+            "covenant_years": 60,
+            "min_family_unit_share": 0.35
+          },
+          "source": {
+            "title": "City of Vancouver, Policy: Below-Market Rental Housing for Rezonings",
+            "url": "https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf",
+            "section": "Policy requirements"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.trees.replacement",
+      "title": "Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "tree_replacement",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {
+            "schedule_c_min_trees_by_site_area_m2": [
+              [0, 365, 2], [366, 450, 3], [451, 565, 4], [566, 750, 5], [751, 1000, 6],
+              [1001, 1250, 7], [1251, 1600, 8], [1601, 1850, 9], [1851, 2200, 12],
+              [2201, 2550, 16], [2551, 2900, 20], [2901, 3250, 25]
+            ],
+            "over_3250_base_trees": 30,
+            "over_3250_extra_tree_per_m2": 50,
+            "schedule_a_barrier_m_by_dbh_cm": [
+              [20, 1.2], [25, 1.5], [30, 1.8], [35, 2.1], [40, 2.4], [45, 2.7],
+              [50, 3.0], [55, 3.3], [60, 3.6], [75, 4.5], [90, 5.0], [100, 6.0]
+            ],
+            "cash_in_lieu_per_tree_cad": 1000,
+            "replacement_setbacks_m": {"side_boundary_or_structure": 1.0, "principal_building": 1.5, "other_tree": 2.5},
+            "survey_scope": "every tree on the site, within 2 m of the boundary, and on the adjoining street"
+          },
+          "source": {
+            "title": "City of Vancouver Protection of Trees By-law No. 9958 (consolidated)",
+            "url": "https://bylaws.vancouver.ca/9958c.PDF",
+            "section": "Schedule A (s.1.2), Schedule C (ss.5.1, 5.2, 6.2), s.6.2 cash in lieu, s.6.5 siting, s.7.2 arborist report"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.dcl_cac_social_housing",
+      "title": "Development cost levy and community amenity contribution treatment of social housing",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "dcl_cac",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {"social_housing_dcl_exempt": true, "social_housing_cac_exempt": true, "church_dcl_exempt": true},
+          "source": {
+            "title": "998 E 19th Ave referral report: CAC exempt under the policy's social housing exemption; DCL exempt as church and social housing (estimated value $3,075,715 at 30 Sep 2023 rates)",
+            "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+            "section": "Public benefits",
+            "verify": "Current DCL rates and exemptions: City of Vancouver DCL bulletin (not yet opened in this project)."
+          }
+        }
+      ]
+    }
+  ]
+}

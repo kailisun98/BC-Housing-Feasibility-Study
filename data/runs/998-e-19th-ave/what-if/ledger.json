@@ -1,0 +1,789 @@
+{
+  "run": {
+    "as_of": "2026-10-23",
+    "site_id": "998-e-19th-ave",
+    "option_id": "998-e-19th-ave-what-if-5-storey",
+    "engine_version": "0.1.0",
+    "stamp": {
+      "as_of": "2026-10-23",
+      "rules_hash": "14450d4face5e50cd1cccd94ba3236ecd49379484bbeb612cf300342bdc9fe9c",
+      "rules_files": {
+        "a_zoning_district.json": "ef2791008abaf57c509921f14d0601c146e3dcf6fd4c637eccb2bb2b46aa01d3",
+        "b_provincial.json": "0fede33e5d62b1bd85ea63435ef0012ef3c0772df8c0192d1e74b8a29f807cb8",
+        "c_city_policies.json": "961f8f2e91ce2d3ff3924b839b5a40bcdf6eb702d5cc528e82dc8c7e6aee8ea0",
+        "d_design_standards.json": "dc53a9b24d8090907c86f9da969579022518645d7dae1e09cfda67cac3b81302",
+        "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb"
+      },
+      "stamp": "20e44f1445ecaff9",
+      "rule_versions": [
+        {
+          "rule_id": "cov.rm1.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "rule_id": "cov.rm1.outright_height",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "rule_id": "cov.irp.social_housing_rezoning",
+          "layer": "A",
+          "version_effective_from": "2023-11-01",
+          "version_effective_to": null,
+          "source_url": "https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf"
+        },
+        {
+          "rule_id": "cov.parking_minimums",
+          "layer": "A",
+          "version_effective_from": "2024-06-26",
+          "version_effective_to": null,
+          "source_url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx"
+        },
+        {
+          "rule_id": "bc.ssmuh.minimum_units",
+          "layer": "B",
+          "version_effective_from": "2024-06-30",
+          "version_effective_to": null,
+          "source_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf"
+        },
+        {
+          "rule_id": "bc.toa.minimum_density",
+          "layer": "B",
+          "version_effective_from": "2024-06-30",
+          "version_effective_to": null,
+          "source_url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx"
+        },
+        {
+          "rule_id": "cov.family_units",
+          "layer": "C",
+          "version_effective_from": "1992-01-01",
+          "version_effective_to": "2026-10-26",
+          "source_url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "rule_id": "cov.social_housing_definition",
+          "layer": "C",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "rule_id": "cov.below_market_rental",
+          "layer": "C",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf"
+        },
+        {
+          "rule_id": "cov.trees.replacement",
+          "layer": "C",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/9958c.PDF"
+        },
+        {
+          "rule_id": "cov.dcl_cac_social_housing",
+          "layer": "C",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "rule_id": "bch.design_guidelines.unit_areas",
+          "layer": "D",
+          "version_effective_from": "2019-05-01",
+          "version_effective_to": null,
+          "source_url": "https://compositedesign.ca/doc/bchousing/BCH-Design-Guidelines-Construction-Standards.pdf"
+        },
+        {
+          "rule_id": "bc.code_basis",
+          "layer": "D",
+          "version_effective_from": "2025-09-15",
+          "version_effective_to": null,
+          "source_url": "https://vancouver.ca/files/cov/guide-to-2025-vbbl-updates-v1.01.pdf"
+        },
+        {
+          "rule_id": "bch.chf.eligibility",
+          "layer": "E",
+          "version_effective_from": "2025-05-30",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf"
+        },
+        {
+          "rule_id": "bc.bcbuilds.eligibility",
+          "layer": "E",
+          "version_effective_from": "2024-02-13",
+          "version_effective_to": null,
+          "source_url": "https://www.bcbuildshomes.ca/developers-operators"
+        },
+        {
+          "rule_id": "bch.pdf.predevelopment_loan",
+          "layer": "E",
+          "version_effective_from": "2025-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.ubcm.ca/node/111136"
+        },
+        {
+          "rule_id": "cmhc.ahf.readiness",
+          "layer": "E",
+          "version_effective_from": "2024-03-13",
+          "version_effective_to": null,
+          "source_url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx"
+        }
+      ]
+    }
+  },
+  "results": [
+    {
+      "rule_id": "cov.irp.social_housing_rezoning",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "Interim Rezoning Policy for Social Housing in Former Community Vision Areas",
+      "jurisdiction": "City of Vancouver",
+      "check": "rezoning_policy_social_housing",
+      "source": {
+        "title": "Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026)",
+        "url": "https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf",
+        "section": "s.3.1.1; staff benchmark from the 998 E 19th Ave referral report",
+        "verify": "Map 1 of the policy decides whether a site is inside a former Community Vision area; outside it the Affordable Housing Policies (1989) apply."
+      },
+      "version_effective_from": "2023-11-01",
+      "version_effective_to": null,
+      "status": "pass",
+      "finding": "Eligible for consideration as 100% social housing under the policy, within the staff benchmark.",
+      "values": {
+        "benchmark_height_m": [
+          19.9,
+          21.3
+        ],
+        "benchmark_fsr": 3.0,
+        "height_m": 18.3,
+        "fsr": 2.49
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.parking_minimums",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "Off-street parking minimums",
+      "jurisdiction": "City of Vancouver",
+      "check": "parking_minimums",
+      "source": {
+        "title": "City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide)",
+        "url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx",
+        "section": "Parking By-law amendments, June 2024"
+      },
+      "version_effective_from": "2024-06-26",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 40 vehicle and 220 bicycle spaces, which are set by the Parking By-law at the development permit stage.",
+      "values": {
+        "parking_spaces": 40,
+        "bicycle_spaces": 220
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rm1.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-1 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule",
+        "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+        "section": "Existing zoning; RM-1 District Schedule s.4.7",
+        "verify": "Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law before the user sessions: https://bylaws.vancouver.ca/zoning/zoning-by-law-consolidated.pdf"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "uncertain",
+      "finding": "FSR 2.49 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated.",
+      "values": {
+        "fsr": 2.49,
+        "max_fsr_outright": 1.2,
+        "gfa_m2": 7000.0,
+        "site_area_m2": 2810.7
+      },
+      "action": "Architect and manager: confirm the rezoning path and the density staff will support."
+    },
+    {
+      "rule_id": "cov.rm1.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-1 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule",
+        "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+        "section": "Existing zoning; RM-1 District Schedule s.4.3",
+        "verify": "Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law."
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "uncertain",
+      "finding": "Height 18.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated.",
+      "values": {
+        "height_m": 18.3,
+        "max_height_m_outright": 10.7,
+        "storeys": 5
+      },
+      "action": "Architect: confirm the height staff will support under the policy."
+    },
+    {
+      "rule_id": "bc.ssmuh.minimum_units",
+      "layer": "B",
+      "layer_title": "Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)",
+      "title": "Small-scale multi-unit housing minimum unit counts",
+      "jurisdiction": "Province of British Columbia",
+      "check": "ssmuh_minimum_units",
+      "source": {
+        "title": "Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual",
+        "url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf",
+        "section": "Bill 44; Local Government Act Part 14 Division 5; manual Packages A to D",
+        "manual_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/ssmuh_provincial_policy_manual.pdf"
+      },
+      "version_effective_from": "2024-06-30",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for R1-1, RS, RT districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bc.toa.minimum_density",
+      "layer": "B",
+      "layer_title": "Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)",
+      "title": "Transit-oriented area minimum allowable height and density",
+      "jurisdiction": "Province of British Columbia",
+      "check": "toa_status",
+      "source": {
+        "title": "Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024",
+        "url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx",
+        "section": "Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments",
+        "webinar_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf",
+        "verify": "Tier storey figures are the Province's SkyTrain-station tiers as commonly reported; confirm against the Transit-Oriented Areas Designation Regulation before the user sessions."
+      },
+      "version_effective_from": "2024-06-30",
+      "version_effective_to": null,
+      "status": "uncertain",
+      "finding": "Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.",
+      "values": {},
+      "action": "Architect: check the City's transit-oriented areas map and record the tier."
+    },
+    {
+      "rule_id": "cov.below_market_rental",
+      "layer": "C",
+      "layer_title": "City of Vancouver policies that attach to a rezoning",
+      "title": "Below-market rental housing policy for rezonings (secured market rental)",
+      "jurisdiction": "City of Vancouver",
+      "check": "below_market_rental_policy",
+      "source": {
+        "title": "City of Vancouver, Policy: Below-Market Rental Housing for Rezonings",
+        "url": "https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf",
+        "section": "Policy requirements"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "The below-market rental policy applies to 100% secured market rental rezonings; social housing is governed by the social housing definition instead.",
+      "values": {},
+      "action": ""
+    },
+    {
+      "rule_id": "cov.dcl_cac_social_housing",
+      "layer": "C",
+      "layer_title": "City of Vancouver policies that attach to a rezoning",
+      "title": "Development cost levy and community amenity contribution treatment of social housing",
+      "jurisdiction": "City of Vancouver",
+      "check": "dcl_cac",
+      "source": {
+        "title": "998 E 19th Ave referral report: CAC exempt under the policy's social housing exemption; DCL exempt as church and social housing (estimated value $3,075,715 at 30 Sep 2023 rates)",
+        "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+        "section": "Public benefits",
+        "verify": "Current DCL rates and exemptions: City of Vancouver DCL bulletin (not yet opened in this project)."
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Social housing is exempt from development cost levies and from community amenity contributions in a rezoning; the church use is also DCL-exempt. The exemption's value is worth stating in the memo.",
+      "values": {
+        "dcl_exempt": true,
+        "cac_exempt": true
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.family_units",
+      "layer": "C",
+      "layer_title": "City of Vancouver policies that attach to a rezoning",
+      "title": "Family-unit requirement in rezonings",
+      "jurisdiction": "City of Vancouver",
+      "check": "family_unit_share",
+      "source": {
+        "title": "High-Density Housing for Families with Children Guidelines (1992) as applied in rezonings; the 998 E 19th Ave referral report states the 35% policy minimum",
+        "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+        "section": "Unit mix; family units 38 of 105 (36%) against a 35% minimum"
+      },
+      "version_effective_from": "1992-01-01",
+      "version_effective_to": "2026-10-26",
+      "status": "pass",
+      "finding": "32 of 88 units (36.4%) have two or more bedrooms, against a 35.0% minimum.",
+      "values": {
+        "units_total": 88,
+        "two_plus_bed_units": 32,
+        "two_plus_bed_share": 0.3636,
+        "three_plus_bed_units": 8,
+        "three_plus_bed_share": 0.0909,
+        "min_two_plus_bed_share": 0.35,
+        "min_three_plus_bed_share": null
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.social_housing_definition",
+      "layer": "C",
+      "layer_title": "City of Vancouver policies that attach to a rezoning",
+      "title": "Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755)",
+      "jurisdiction": "City of Vancouver",
+      "check": "social_housing_definition",
+      "source": {
+        "title": "998 E 19th Ave referral report: social housing as defined in the Vancouver Development Cost Levy By-law No. 9755 (at least 30% of units for households below the Housing Income Limits, rents not exceeding 30% of income, owned by a non-profit or government, secured by housing agreement for the longer of 60 years and the life of the building)",
+        "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf",
+        "section": "Tenure and affordability; Housing Agreement and Section 219 covenant"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "pass",
+      "finding": "Meets the City's social housing definition: 30.0% of units for households below HILs (minimum 30.0%), owned by a non profit society, secured for 60 years.",
+      "values": {
+        "share_below_hils": 0.3,
+        "owner_type_at_completion": "non_profit_society",
+        "housing_agreement_years": 60
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.trees.replacement",
+      "layer": "C",
+      "layer_title": "City of Vancouver policies that attach to a rezoning",
+      "title": "Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu",
+      "jurisdiction": "City of Vancouver",
+      "check": "tree_replacement",
+      "source": {
+        "title": "City of Vancouver Protection of Trees By-law No. 9958 (consolidated)",
+        "url": "https://bylaws.vancouver.ca/9958c.PDF",
+        "section": "Schedule A (s.1.2), Schedule C (ss.5.1, 5.2, 6.2), s.6.2 cash in lieu, s.6.5 siting, s.7.2 arborist report"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "pass",
+      "finding": "Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 19, leaving 20, which meets the minimum.",
+      "values": {
+        "site_area_m2": 2810.7,
+        "schedule_c_required": 20,
+        "existing": 9,
+        "retained": 1,
+        "removed": 8,
+        "replacements_proposed": 19,
+        "trees_after": 20,
+        "shortfall": 0,
+        "cash_in_lieu_cad": 0,
+        "protection_barriers": [
+          {
+            "tree": "T1",
+            "dbh_cm": 40,
+            "barrier_m": 2.4
+          }
+        ],
+        "survey_scope": "every tree on the site, within 2 m of the boundary, and on the adjoining street"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bc.code_basis",
+      "layer": "D",
+      "layer_title": "Building code and funder design standards (flags, not checks, at this stage)",
+      "title": "Building code basis flags (BC Building Code 2024; Vancouver Building By-law 2025)",
+      "jurisdiction": "Province of BC; City of Vancouver",
+      "check": "code_basis_flags",
+      "source": {
+        "title": "Province of BC, BC Building Code 2024; City of Vancouver, Guide to 2025 Vancouver Building By-law updates",
+        "url": "https://vancouver.ca/files/cov/guide-to-2025-vbbl-updates-v1.01.pdf",
+        "section": "Part 3 vs Part 9 basis (Div A 1.3.3.2); encapsulated mass timber",
+        "bcbc_url": "https://news.gov.bc.ca/30004"
+      },
+      "version_effective_from": "2025-09-15",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "5 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15.",
+      "values": {
+        "storeys": 5,
+        "part": 3
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bch.design_guidelines.unit_areas",
+      "layer": "D",
+      "layer_title": "Building code and funder design standards (flags, not checks, at this stage)",
+      "title": "BC Housing Design Guidelines: minimum net unit areas",
+      "jurisdiction": "BC Housing",
+      "check": "unit_area_flags",
+      "source": {
+        "title": "BC Housing Design Guidelines and Construction Standards (2019 edition; copy)",
+        "url": "https://compositedesign.ca/doc/bchousing/BCH-Design-Guidelines-Construction-Standards.pdf",
+        "section": "Unit areas; building envelope; structure",
+        "verify": "The current edition on bchousing.org could not be fetched; confirm the figures against it before the user sessions."
+      },
+      "version_effective_from": "2019-05-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 67 m² gross per unit, so net areas should be checked at the plan stage.",
+      "values": {
+        "min_net_area_m2": {
+          "studio": 33,
+          "one_bed": 49,
+          "two_bed": 67,
+          "three_bed_plus": 86
+        },
+        "average_gross_area_per_unit_m2": 67.0
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bc.bcbuilds.eligibility",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "title": "BC Builds: eligibility and below-market requirement",
+      "jurisdiction": "Province of BC / BC Housing",
+      "check": "bc_builds_fit",
+      "source": {
+        "title": "BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024",
+        "url": "https://www.bcbuildshomes.ca/developers-operators",
+        "section": "Applicant requirements; grants; timelines",
+        "announcement_url": "https://news.gov.bc.ca/releases/2024HOUS0021-000648"
+      },
+      "version_effective_from": "2024-02-13",
+      "version_effective_to": null,
+      "status": "pass",
+      "finding": "BC Builds: fits the published criteria: non-residential space is 15.7% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
+      "values": {
+        "fails": [],
+        "unknown": [],
+        "notes": [
+          "non-residential space is 15.7% of area, under the 30% cap",
+          "ground must break within 12 to 18 months of the conditional land contribution letter"
+        ],
+        "tenant_income_limits_cad": {
+          "under_two_bed_no_children": 143900,
+          "two_bed_plus_with_children": 212240
+        },
+        "submission": "Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bch.chf.eligibility",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "title": "BC Housing Community Housing Fund: eligibility and unit mix",
+      "jurisdiction": "BC Housing",
+      "check": "chf_fit",
+      "source": {
+        "title": "BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page",
+        "url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf",
+        "section": "Eligibility; unit mix 30/50/20; minimum requirements; rated criteria",
+        "rfp_2023_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
+        "program_url": "https://www.bchousing.org/projects-partners/Building-BC/CHF"
+      },
+      "version_effective_from": "2025-05-30",
+      "version_effective_to": null,
+      "status": "uncertain",
+      "finding": "Community Housing Fund: fit cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; Site control (letter of intent) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).",
+      "values": {
+        "required_mix": {
+          "market": 0.3,
+          "rgi": 0.5,
+          "deep_subsidy": 0.2
+        },
+        "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+        "mix_shares": {
+          "market": 0.295,
+          "rgi": 0.5,
+          "deep_subsidy": 0.205
+        },
+        "fails": [],
+        "unknown": [
+          "land tenure (lease of at least 60 years at nominal value, or ownership)"
+        ],
+        "notes": [
+          "unit mix matches 30/50/20 within tolerance",
+          "site control (letter of intent) meets the readiness bar",
+          "construction must be able to start within 18 months of award",
+          "program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+        ],
+        "provisional_grant_per_unit_cad": 171211,
+        "indicative_grant_cad": 15066568
+      },
+      "action": "Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $15,066,568 for 88 units."
+    },
+    {
+      "rule_id": "bch.pdf.predevelopment_loan",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "title": "BC Housing Project Development Fund (pre-development loans)",
+      "jurisdiction": "BC Housing",
+      "check": "info_only",
+      "source": {
+        "title": "UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000)",
+        "url": "https://www.ubcm.ca/node/111136",
+        "section": "Provincial response"
+      },
+      "version_effective_from": "2025-01-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "max loan cad: 250000; eligible costs: due diligence, feasibility and design.",
+      "values": {
+        "max_loan_cad": 250000,
+        "eligible_costs": "due diligence, feasibility and design"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cmhc.ahf.readiness",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "title": "CMHC Affordable Housing Fund: readiness and submission mechanics",
+      "jurisdiction": "CMHC",
+      "check": "info_only",
+      "source": {
+        "title": "CMHC, Affordable Housing Fund applicant guide",
+        "url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx",
+        "section": "Minimum submission requirements; readiness"
+      },
+      "version_effective_from": "2024-03-13",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding.",
+      "values": {
+        "construction_start_months_after_approval": 6,
+        "intake": "continuous",
+        "submission": "online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist",
+        "criteria_note": "Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding"
+      },
+      "action": ""
+    }
+  ],
+  "summary": {
+    "counts": {
+      "fail": 0,
+      "conditional": 0,
+      "uncertain": 4,
+      "pass": 5,
+      "info": 6,
+      "not_applicable": 2
+    },
+    "answers": {
+      "allowed": {
+        "outright": {
+          "verdict": "no",
+          "fail": [],
+          "conditional": [],
+          "uncertain": [
+            "cov.rm1.outright_fsr",
+            "cov.rm1.outright_height"
+          ]
+        },
+        "by_rezoning": {
+          "verdict": "not yet confirmed",
+          "fail": [],
+          "conditional": [],
+          "uncertain": [
+            "bc.toa.minimum_density"
+          ]
+        },
+        "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing"
+      },
+      "funded": {
+        "verdict": "not yet confirmed",
+        "fail": [],
+        "conditional": [],
+        "uncertain": [
+          "bch.chf.eligibility"
+        ]
+      },
+      "unsure": [
+        {
+          "rule_id": "bc.toa.minimum_density",
+          "title": "Transit-oriented area minimum allowable height and density",
+          "status": "uncertain",
+          "finding": "Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.",
+          "action": "Architect: check the City's transit-oriented areas map and record the tier."
+        },
+        {
+          "rule_id": "bch.chf.eligibility",
+          "title": "BC Housing Community Housing Fund: eligibility and unit mix",
+          "status": "uncertain",
+          "finding": "Community Housing Fund: fit cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; Site control (letter of intent) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).",
+          "action": "Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $15,066,568 for 88 units."
+        }
+      ]
+    }
+  },
+  "inputs": {
+    "site": {
+      "id": "998-e-19th-ave",
+      "address": "998 E 19th Ave, Vancouver, BC V5V 1K7",
+      "municipality": "City of Vancouver",
+      "zoning_district": "RM-1",
+      "site_area_m2": 2810.7,
+      "frontage_m": 75.6,
+      "depth_m": 37.2,
+      "in_former_community_vision_area": true,
+      "in_transit_oriented_area": null,
+      "toa_tier": null,
+      "frequent_bus_stop_within_400m": null,
+      "has_water_and_sewer": true,
+      "owner_type": "church",
+      "owner": "Vancouver First Church of the Nazarene",
+      "land_tenure_plan": "long-term lease or transfer to a non-profit society (to confirm)",
+      "existing_trees_on_site": [
+        {
+          "id": "T1",
+          "species": "red pine",
+          "dbh_cm": 40,
+          "status": "retain"
+        },
+        {
+          "id": "T2",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T3",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T4",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T5",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T6",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T7",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T8",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        },
+        {
+          "id": "T9",
+          "species": "unknown",
+          "dbh_cm": null,
+          "status": "remove"
+        }
+      ],
+      "street_trees": {
+        "count": 4,
+        "retained": 4,
+        "street": "E 19th Ave"
+      },
+      "notes": "Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session.",
+      "sources": [
+        {
+          "title": "City of Vancouver referral report, rezoning of 998 E 19th Ave (11 Jun 2024)",
+          "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "title": "Shape Your City application page, 998 E 19th Ave",
+          "url": "https://shapeyourcity.ca/998-e-19-ave"
+        }
+      ]
+    },
+    "option": {
+      "id": "998-e-19th-ave-what-if-5-storey",
+      "name": "What-if (hypothetical, for the demo): five storeys inside the staff benchmark, full funder data supplied",
+      "proponent": "Catalyst Community Developments Society",
+      "proponent_type": "non_profit_society",
+      "developer_partner": true,
+      "tenure": "social_housing",
+      "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing",
+      "storeys": 5,
+      "height_m": 18.3,
+      "gfa_m2": 7000.0,
+      "residential_gfa_m2": 5900.0,
+      "non_residential_gfa_m2": 1100.0,
+      "units": {
+        "studio": 24,
+        "one_bed": 32,
+        "two_bed": 24,
+        "three_bed_plus": 8
+      },
+      "rent_tiers_units": {
+        "market": 26,
+        "rgi": 44,
+        "deep_subsidy": 18
+      },
+      "share_below_hils": 0.3,
+      "max_rent_share_of_income": 0.3,
+      "owner_type_at_completion": "non_profit_society",
+      "housing_agreement_years": 60,
+      "accessible_units": 5,
+      "below_market_unit_share": 1.0,
+      "below_market_discount": 0.2,
+      "land_tenure_plan": "60-year lease at nominal rent to the society (assumed for this what-if; not confirmed by the owner)",
+      "site_control": "letter_of_intent",
+      "parking_spaces": 40,
+      "bicycle_spaces": 220,
+      "replacement_trees_proposed": 19,
+      "target_programs": [
+        "bch.chf.eligibility",
+        "bc.bcbuilds.eligibility"
+      ],
+      "floor_to_floor_m": 3.3,
+      "setbacks_m": {
+        "front": 3.7,
+        "rear": 6.0,
+        "side": 3.0
+      },
+      "notes": "Hypothetical option written to show the engine reacting: lower height inside the 19.9 to 21.3 m benchmark, 19 replacement trees to clear the Schedule C minimum, a 30/50/20 rent-tier split, 5 accessible units and a stated land tenure. None of these figures come from Catalyst or the City.",
+      "sources": [
+        {
+          "title": "Derived by hand from the as-approved option for demonstration",
+          "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        }
+      ]
+    }
+  }
+}

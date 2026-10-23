@@ -1,0 +1,166 @@
+# Funding-fit memo: 998 E 19th Ave, Vancouver, BC V5V 1K7
+
+**Option:** As approved by Council, 25 Jul 2024: six-storey social housing over a rebuilt church  
+**Proponent:** Catalyst Community Developments Society (non profit society)  
+**Rules as of:** 2026-10-23 · **version stamp:** `20e44f1445ecaff9` · engine 0.1.0  
+
+> Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there.
+
+## 1. Is it allowed?
+**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. Height 22.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated.
+
+**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): not yet confirmed.**
+- *Conditional* — Interim Rezoning Policy for Social Housing in Former Community Vision Areas: Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.
+- *Uncertain* — Transit-oriented area minimum allowable height and density: Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.
+- *Conditional* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit.
+
+## 2. Does it fit the funders?
+**Not yet confirmed.**
+- *Uncertain* — BC Builds: eligibility and below-market requirement: BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 15.1% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter.
+- *Uncertain* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: fit cannot be confirmed without the rent-tier split (market / rent-geared-to-income / deep subsidy units); accessible unit count (5% minimum); land tenure (lease of at least 60 years at nominal value, or ownership). Site control (letter of intent) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).
+
+## 3. What is still unsure, and who resolves it?
+| Item | Status | Who / what |
+|---|---|---|
+| Interim Rezoning Policy for Social Housing in Former Community Vision Areas | Conditional | Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case. |
+| Transit-oriented area minimum allowable height and density | Uncertain | Architect: check the City's transit-oriented areas map and record the tier. |
+| Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Conditional | Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu. |
+| BC Builds: eligibility and below-market requirement | Uncertain | Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices. |
+| BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $17,977,155 for 105 units. |
+
+## Massing derived from the rules
+- **Proposed: 6 storeys, FSR 2.95** — plate 1,383 m² × 6 storeys = 8,299 m² (FSR 2.95), 22.3 m high, inside a 69.6 × 27.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- **Outright: FSR 1.2, 10.7 m** — plate 1,124 m² × 3 storeys = 3,373 m² (FSR 1.20), 9.9 m high, inside a 69.6 × 27.5 m setback envelope. Derived from: cov.rm1.outright_fsr, cov.rm1.outright_height, option.setbacks_m, option.floor_to_floor_m.
+- Staff benchmark under cov.irp.social_housing_rezoning: 19.9 to 21.3 m, about FSR 3.0.
+- Note: Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.
+
+![Massing plan and section](massing.svg)
+
+`massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
+
+## Built in Revit
+Mode: new project (headless), template PUBLIC TEMPLATE.rte. Stages: views ok, annotations ok, links ok, masses ok, sheet ok.
+- Mass `FFM proposed` (element 4078907): 6 storeys, 22.3 m, plate 1,383.2 m², FSR 2.953.
+- Mass `FFM outright` (element 4078913): 3 storeys, 9.9 m, plate 1,124.3 m², FSR 1.2.
+- Floor plates: 5.
+- Model lines: lot 4, setback envelope 4.
+- View: FFM section across frontage (element 4078936).
+- View: FFM massing axon (element 4078916).
+- View: FFM massing plan (element 4078925).
+- Annotations: 6 dimensions, 5 text notes, 2 benchmark lines.
+- Sheet FFM-01 (element 4078963), title block: yes.
+- Saved as `ffm_massing.rvt` next to this memo.
+- Exported `ffm_sheet.pdf`.
+- Exported `ffm_sheet.png`.
+
+![Revit sheet](ffm_sheet.png)
+
+Text placed on the sheet (quotable in the memo):
+
+> 1. IS IT ALLOWED?
+> Outright under RM-1: no.
+>   - FSR 2.95 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated.
+>   - Height 22.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated.
+> By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): not yet confirmed.
+>   - [CONDITIONAL] Interim Rezoning Policy for Social Housing in Former Community Vision Areas: Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.
+>   - [UNCERTAIN] Transit-oriented area minimum allowable height and density: Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.
+>   - [CONDITIONAL] Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit.
+>
+> 2. DOES IT FIT THE FUNDERS?  Not yet confirmed.
+>   - [UNCERTAIN] BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 15.1% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter.
+>   - [UNCERTAIN] Community Housing Fund: fit cannot be confirmed without the rent-tier split (market / rent-geared-to-income / deep subsidy units); accessible unit count (5% minimum); land tenure (lease of at least 60 years at nominal value, or ownership). Site control (letter of intent) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).
+>
+> 3. STILL UNSURE, AND WHO RESOLVES IT
+>   - [CONDITIONAL] Interim Rezoning Policy for Social Housing in Former Community Vision Areas -> Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case.
+>   - [UNCERTAIN] Transit-oriented area minimum allowable height and density -> Architect: check the City's transit-oriented areas map and record the tier.
+>   - [CONDITIONAL] Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu -> Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu.
+>   - [UNCERTAIN] BC Builds: eligibility and below-market requirement -> Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices.
+>   - [UNCERTAIN] BC Housing Community Housing Fund: eligibility and unit mix -> Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $17,977,155 for 105 units.
+>
+> MASSING, DERIVED FROM THE RULES
+>   - Proposed: 6 storeys, FSR 2.95: plate 1,383 m2 x 6 = 8,299 m2 (FSR 2.95), 22.3 m high; envelope 69.6 x 27.5 m
+>   - Outright: FSR 1.2, 10.7 m: plate 1,124 m2 x 3 = 3,373 m2 (FSR 1.20), 9.9 m high; envelope 69.6 x 27.5 m
+>   - Staff benchmark (cov.irp.social_housing_rezoning): 19.9 to 21.3 m, about FSR 3.0
+>   - Trees: Schedule C requires 20, plan leaves 17, shortfall 3
+>   - Note: Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.
+>
+
+## Full ledger
+
+### Layer A: Zoning district (City of Vancouver Zoning and Development By-law)
+
+| Rule | Status | Finding | Numbers used | Source |
+|---|---|---|---|---|
+| Interim Rezoning Policy for Social Housing in Former Community Vision Areas (`cov.irp.social_housing_rezoning`, v 2023-11-01) | Conditional | Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff. | benchmark fsr = 3; height m = 22.3; fsr = 2.953 | [Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026), s.3.1.1; staff benchmark from the 998 E 19th Ave referral report](https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf) |
+| Off-street parking minimums (`cov.parking_minimums`, v 2024-06-26) | Info | No minimum off-street parking applies citywide since June 2024; the option provides 68 vehicle and 260 bicycle spaces, which are set by the Parking By-law at the development permit stage. | parking spaces = 68; bicycle spaces = 260 | [City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide), Parking By-law amendments, June 2024](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
+| RM-1 outright floor space ratio (`cov.rm1.outright_fsr`, v 2023-01-01) | Uncertain | FSR 2.95 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. | fsr = 2.953; max fsr outright = 1.2; gfa m2 = 8,299; site area m2 = 2,810.7 | [City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule, Existing zoning; RM-1 District Schedule s.4.7](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| RM-1 outright maximum height (`cov.rm1.outright_height`, v 2023-01-01) | Uncertain | Height 22.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated. | height m = 22.3; max height m outright = 10.7; storeys = 6 | [City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule, Existing zoning; RM-1 District Schedule s.4.3](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+
+### Layer B: Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)
+
+| Rule | Status | Finding | Numbers used | Source |
+|---|---|---|---|---|
+| Small-scale multi-unit housing minimum unit counts (`bc.ssmuh.minimum_units`, v 2024-06-30) | Not applicable | Written for R1-1, RS, RT districts; this site is zoned RM-1. | district = RM-1 | [Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual, Bill 44; Local Government Act Part 14 Division 5; manual Packages A to D](https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf) |
+| Transit-oriented area minimum allowable height and density (`bc.toa.minimum_density`, v 2024-06-30) | Uncertain | Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed. |  | [Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024, Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
+
+### Layer C: City of Vancouver policies that attach to a rezoning
+
+| Rule | Status | Finding | Numbers used | Source |
+|---|---|---|---|---|
+| Below-market rental housing policy for rezonings (secured market rental) (`cov.below_market_rental`, v 2023-01-01) | Not applicable | The below-market rental policy applies to 100% secured market rental rezonings; social housing is governed by the social housing definition instead. |  | [City of Vancouver, Policy: Below-Market Rental Housing for Rezonings, Policy requirements](https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf) |
+| Development cost levy and community amenity contribution treatment of social housing (`cov.dcl_cac_social_housing`, v 2023-01-01) | Info | Social housing is exempt from development cost levies and from community amenity contributions in a rezoning; the church use is also DCL-exempt. The exemption's value is worth stating in the memo. | dcl exempt = True; cac exempt = True | [998 E 19th Ave referral report: CAC exempt under the policy's social housing exemption; DCL exempt as church and social housing (estimated value $3,075,715 at 30 Sep 2023 rates), Public benefits](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| Family-unit requirement in rezonings (`cov.family_units`, v 1992-01-01) | Pass | 38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum. | units total = 105; two plus bed units = 38; two plus bed share = 0.362; three plus bed units = 12; three plus bed share = 0.114; min two plus bed share = 0.35; min three plus bed share = None | [High-Density Housing for Families with Children Guidelines (1992) as applied in rezonings; the 998 E 19th Ave referral report states the 35% policy minimum, Unit mix; family units 38 of 105 (36%) against a 35% minimum](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755) (`cov.social_housing_definition`, v 2023-01-01) | Pass | Meets the City's social housing definition: 30.0% of units for households below HILs (minimum 30.0%), owned by a non profit society, secured for 60 years. | share below hils = 0.3; owner type at completion = non_profit_society; housing agreement years = 60 | [998 E 19th Ave referral report: social housing as defined in the Vancouver Development Cost Levy By-law No. 9755 (at least 30% of units for households below the Housing Income Limits, rents not exceeding 30% of income, owned by a non-profit or government, secured by housing agreement for the longer of 60 years and the life of the building), Tenure and affordability; Housing Agreement and Section 219 covenant](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu (`cov.trees.replacement`, v 2023-01-01) | Conditional | Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit. | site area m2 = 2,810.7; schedule c required = 20; existing = 9; retained = 1; removed = 8; replacements proposed = 16; trees after = 17; shortfall = 3; cash in lieu cad = 3000; survey scope = every tree on the site, within 2 m of the boundary, and on the adjoining street | [City of Vancouver Protection of Trees By-law No. 9958 (consolidated), Schedule A (s.1.2), Schedule C (ss.5.1, 5.2, 6.2), s.6.2 cash in lieu, s.6.5 siting, s.7.2 arborist report](https://bylaws.vancouver.ca/9958c.PDF) |
+
+### Layer D: Building code and funder design standards (flags, not checks, at this stage)
+
+| Rule | Status | Finding | Numbers used | Source |
+|---|---|---|---|---|
+| Building code basis flags (BC Building Code 2024; Vancouver Building By-law 2025) (`bc.code_basis`, v 2025-09-15) | Info | 6 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15. | storeys = 6; part = 3 | [Province of BC, BC Building Code 2024; City of Vancouver, Guide to 2025 Vancouver Building By-law updates, Part 3 vs Part 9 basis (Div A 1.3.3.2); encapsulated mass timber](https://vancouver.ca/files/cov/guide-to-2025-vbbl-updates-v1.01.pdf) |
+| BC Housing Design Guidelines: minimum net unit areas (`bch.design_guidelines.unit_areas`, v 2019-05-01) | Info | BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 67 m² gross per unit, so net areas should be checked at the plan stage. | average gross area per unit m2 = 67.1 | [BC Housing Design Guidelines and Construction Standards (2019 edition; copy), Unit areas; building envelope; structure](https://compositedesign.ca/doc/bchousing/BCH-Design-Guidelines-Construction-Standards.pdf) |
+
+### Layer E: Funding programs: eligibility criteria the memo tests (not the submission package)
+
+| Rule | Status | Finding | Numbers used | Source |
+|---|---|---|---|---|
+| BC Builds: eligibility and below-market requirement (`bc.bcbuilds.eligibility`, v 2024-02-13) | Uncertain | BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 15.1% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter. | submission = Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template | [BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024, Applicant requirements; grants; timelines](https://www.bcbuildshomes.ca/developers-operators) |
+| BC Housing Community Housing Fund: eligibility and unit mix (`bch.chf.eligibility`, v 2025-05-30) | Uncertain | Community Housing Fund: fit cannot be confirmed without the rent-tier split (market / rent-geared-to-income / deep subsidy units); accessible unit count (5% minimum); land tenure (lease of at least 60 years at nominal value, or ownership). Site control (letter of intent) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026). | status = 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026); provisional grant per unit cad = 171211; indicative grant cad = 17977155 | [BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page, Eligibility; unit mix 30/50/20; minimum requirements; rated criteria](https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf) |
+| BC Housing Project Development Fund (pre-development loans) (`bch.pdf.predevelopment_loan`, v 2025-01-01) | Info | max loan cad: 250000; eligible costs: due diligence, feasibility and design. | max loan cad = 250000; eligible costs = due diligence, feasibility and design | [UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000), Provincial response](https://www.ubcm.ca/node/111136) |
+| CMHC Affordable Housing Fund: readiness and submission mechanics (`cmhc.ahf.readiness`, v 2024-03-13) | Info | construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding. | construction start months after approval = 6; intake = continuous; submission = online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note = Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding | [CMHC, Affordable Housing Fund applicant guide, Minimum submission requirements; readiness](https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx) |
+
+## Inputs
+- Site `998-e-19th-ave`: RM-1, 2,810.7 m², 75.6 × 37.2 m; owner: Vancouver First Church of the Nazarene.
+- Option `998-e-19th-ave-as-approved`: 6 storeys, 22.3 m, 8,299.0 m² GFA; units studio 30, one bed 37, two bed 26, three bed plus 12; tenure social housing.
+- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session.
+- Option notes: Numbers are the City's as-submitted statistics from the referral report. Rent-tier split, accessible-unit count and setbacks are not in the report and are placeholders or left null so the engine marks them uncertain.
+
+## Sources
+- Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026) — https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf *(verify: Map 1 of the policy decides whether a site is inside a former Community Vision area; outside it the Affordable Housing Policies (1989) apply.)*
+- City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide) — https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx
+- City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule — https://council.vancouver.ca/20240625/documents/rr1.pdf *(verify: Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law before the user sessions: https://bylaws.vancouver.ca/zoning/zoning-by-law-consolidated.pdf)*
+- City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule — https://council.vancouver.ca/20240625/documents/rr1.pdf *(verify: Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law.)*
+- Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual — https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf
+- Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024 — https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx *(verify: Tier storey figures are the Province's SkyTrain-station tiers as commonly reported; confirm against the Transit-Oriented Areas Designation Regulation before the user sessions.)*
+- City of Vancouver, Policy: Below-Market Rental Housing for Rezonings — https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf
+- 998 E 19th Ave referral report: CAC exempt under the policy's social housing exemption; DCL exempt as church and social housing (estimated value $3,075,715 at 30 Sep 2023 rates) — https://council.vancouver.ca/20240625/documents/rr1.pdf *(verify: Current DCL rates and exemptions: City of Vancouver DCL bulletin (not yet opened in this project).)*
+- High-Density Housing for Families with Children Guidelines (1992) as applied in rezonings; the 998 E 19th Ave referral report states the 35% policy minimum — https://council.vancouver.ca/20240625/documents/rr1.pdf
+- 998 E 19th Ave referral report: social housing as defined in the Vancouver Development Cost Levy By-law No. 9755 (at least 30% of units for households below the Housing Income Limits, rents not exceeding 30% of income, owned by a non-profit or government, secured by housing agreement for the longer of 60 years and the life of the building) — https://council.vancouver.ca/20240625/documents/rr1.pdf
+- City of Vancouver Protection of Trees By-law No. 9958 (consolidated) — https://bylaws.vancouver.ca/9958c.PDF
+- Province of BC, BC Building Code 2024; City of Vancouver, Guide to 2025 Vancouver Building By-law updates — https://vancouver.ca/files/cov/guide-to-2025-vbbl-updates-v1.01.pdf
+- BC Housing Design Guidelines and Construction Standards (2019 edition; copy) — https://compositedesign.ca/doc/bchousing/BCH-Design-Guidelines-Construction-Standards.pdf *(verify: The current edition on bchousing.org could not be fetched; confirm the figures against it before the user sessions.)*
+- BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024 — https://www.bcbuildshomes.ca/developers-operators
+- BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page — https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf
+- UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000) — https://www.ubcm.ca/node/111136
+- CMHC, Affordable Housing Fund applicant guide — https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx
+- City of Vancouver referral report, rezoning of 998 E 19th Ave (11 Jun 2024) — https://council.vancouver.ca/20240625/documents/rr1.pdf
+- Shape Your City application page, 998 E 19th Ave — https://shapeyourcity.ca/998-e-19-ave
+
+## Version stamp
+- Rules hash (SHA-256 over all rule files): `14450d4face5e50cd1cccd94ba3236ecd49379484bbeb612cf300342bdc9fe9c`
+- `a_zoning_district.json`: `ef2791008abaf57c…`
+- `b_provincial.json`: `0fede33e5d62b1bd…`
+- `c_city_policies.json`: `961f8f2e91ce2d3f…`
+- `d_design_standards.json`: `dc53a9b24d809090…`
+- `e_funding_programs.json`: `9267a33722068790…`
+- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `20e44f1445ecaff9`

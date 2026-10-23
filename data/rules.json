@@ -1,0 +1,193 @@
+[
+ {
+  "id": "cov.rm1.outright_fsr",
+  "layer": "A",
+  "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+  "title": "RM-1 outright floor space ratio",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "RM-1",
+   "RM-1N"
+  ],
+  "version_effective_from": "2023-01-01"
+ },
+ {
+  "id": "cov.rm1.outright_height",
+  "layer": "A",
+  "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+  "title": "RM-1 outright maximum height",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "RM-1",
+   "RM-1N"
+  ],
+  "version_effective_from": "2023-01-01"
+ },
+ {
+  "id": "cov.irp.social_housing_rezoning",
+  "layer": "A",
+  "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+  "title": "Interim Rezoning Policy for Social Housing in Former Community Vision Areas",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2023-11-01"
+ },
+ {
+  "id": "cov.parking_minimums",
+  "layer": "A",
+  "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+  "title": "Off-street parking minimums",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2024-06-26"
+ },
+ {
+  "id": "bc.ssmuh.minimum_units",
+  "layer": "B",
+  "layer_title": "Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)",
+  "title": "Small-scale multi-unit housing minimum unit counts",
+  "jurisdiction": "Province of British Columbia",
+  "applies_to_districts": [
+   "R1-1",
+   "RS",
+   "RT"
+  ],
+  "version_effective_from": "2024-06-30"
+ },
+ {
+  "id": "bc.toa.minimum_density",
+  "layer": "B",
+  "layer_title": "Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)",
+  "title": "Transit-oriented area minimum allowable height and density",
+  "jurisdiction": "Province of British Columbia",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2024-06-30"
+ },
+ {
+  "id": "cov.family_units",
+  "layer": "C",
+  "layer_title": "City of Vancouver policies that attach to a rezoning",
+  "title": "Family-unit requirement in rezonings",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "1992-01-01"
+ },
+ {
+  "id": "cov.social_housing_definition",
+  "layer": "C",
+  "layer_title": "City of Vancouver policies that attach to a rezoning",
+  "title": "Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755)",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2023-01-01"
+ },
+ {
+  "id": "cov.below_market_rental",
+  "layer": "C",
+  "layer_title": "City of Vancouver policies that attach to a rezoning",
+  "title": "Below-market rental housing policy for rezonings (secured market rental)",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2023-01-01"
+ },
+ {
+  "id": "cov.trees.replacement",
+  "layer": "C",
+  "layer_title": "City of Vancouver policies that attach to a rezoning",
+  "title": "Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2023-01-01"
+ },
+ {
+  "id": "cov.dcl_cac_social_housing",
+  "layer": "C",
+  "layer_title": "City of Vancouver policies that attach to a rezoning",
+  "title": "Development cost levy and community amenity contribution treatment of social housing",
+  "jurisdiction": "City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2023-01-01"
+ },
+ {
+  "id": "bch.design_guidelines.unit_areas",
+  "layer": "D",
+  "layer_title": "Building code and funder design standards (flags, not checks, at this stage)",
+  "title": "BC Housing Design Guidelines: minimum net unit areas",
+  "jurisdiction": "BC Housing",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2019-05-01"
+ },
+ {
+  "id": "bc.code_basis",
+  "layer": "D",
+  "layer_title": "Building code and funder design standards (flags, not checks, at this stage)",
+  "title": "Building code basis flags (BC Building Code 2024; Vancouver Building By-law 2025)",
+  "jurisdiction": "Province of BC; City of Vancouver",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2025-09-15"
+ },
+ {
+  "id": "bch.chf.eligibility",
+  "layer": "E",
+  "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+  "title": "BC Housing Community Housing Fund: eligibility and unit mix",
+  "jurisdiction": "BC Housing",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2025-05-30"
+ },
+ {
+  "id": "bc.bcbuilds.eligibility",
+  "layer": "E",
+  "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+  "title": "BC Builds: eligibility and below-market requirement",
+  "jurisdiction": "Province of BC / BC Housing",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2024-02-13"
+ },
+ {
+  "id": "bch.pdf.predevelopment_loan",
+  "layer": "E",
+  "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+  "title": "BC Housing Project Development Fund (pre-development loans)",
+  "jurisdiction": "BC Housing",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2025-01-01"
+ },
+ {
+  "id": "cmhc.ahf.readiness",
+  "layer": "E",
+  "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+  "title": "CMHC Affordable Housing Fund: readiness and submission mechanics",
+  "jurisdiction": "CMHC",
+  "applies_to_districts": [
+   "*"
+  ],
+  "version_effective_from": "2024-03-13"
+ }
+]

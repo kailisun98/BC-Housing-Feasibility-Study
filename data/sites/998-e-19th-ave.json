@@ -1,0 +1,34 @@
+{
+  "id": "998-e-19th-ave",
+  "address": "998 E 19th Ave, Vancouver, BC V5V 1K7",
+  "municipality": "City of Vancouver",
+  "zoning_district": "RM-1",
+  "site_area_m2": 2810.7,
+  "frontage_m": 75.6,
+  "depth_m": 37.2,
+  "in_former_community_vision_area": true,
+  "in_transit_oriented_area": null,
+  "toa_tier": null,
+  "frequent_bus_stop_within_400m": null,
+  "has_water_and_sewer": true,
+  "owner_type": "church",
+  "owner": "Vancouver First Church of the Nazarene",
+  "land_tenure_plan": "long-term lease or transfer to a non-profit society (to confirm)",
+  "existing_trees_on_site": [
+    {"id": "T1", "species": "red pine", "dbh_cm": 40, "status": "retain"},
+    {"id": "T2", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T3", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T4", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T5", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T6", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T7", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T8", "species": "unknown", "dbh_cm": null, "status": "remove"},
+    {"id": "T9", "species": "unknown", "dbh_cm": null, "status": "remove"}
+  ],
+  "street_trees": {"count": 4, "retained": 4, "street": "E 19th Ave"},
+  "notes": "Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session.",
+  "sources": [
+    {"title": "City of Vancouver referral report, rezoning of 998 E 19th Ave (11 Jun 2024)", "url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"},
+    {"title": "Shape Your City application page, 998 E 19th Ave", "url": "https://shapeyourcity.ca/998-e-19-ave"}
+  ]
+}

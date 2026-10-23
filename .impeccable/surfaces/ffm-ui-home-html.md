@@ -1,55 +1,54 @@
 ---
-version: 1
+version: 2
 slug: "ffm-ui-home-html"
 primary_target: "ffm/ui/home.html"
-related_targets: []
+related_targets: ["ffm/ui/home.css", "ffm/ui/home.js", "ffm/ui/hero-memo.jpg"]
 ---
 
 # Surface brief: home page (ffm/ui/home.html)
 
-Scope: the front door of Funding-Fit Memo, served at `/` locally and on GitHub Pages; the tool moves to
-`/app.html` (source file stays `ffm/ui/index.html`). Visitor mode: Persuade.
+Scope: the front door of Funding-Fit Memo, served at `/` locally and on GitHub Pages; the tool is
+`/app.html` (source file `ffm/ui/index.html`). Visitor mode: Persuade, read like a short paper: the visitor
+should be able to browse it by its four sections and read any one of them comfortably.
 
 Audience and job: practitioners first (non-profit development managers, feasibility architects); course
 reviewers and board readers read over their shoulder. They should understand why feasibility checks come
-late, believe the memo's answers are shown, cited and dated, and try it on the real case.
+late, see what the memo answers and how one of its rows reads, and try it on the real case.
 
-Action: three demonstration calls to action at the close: run the 998 E 19th Ave case with the
-walkthrough (`app.html?tour=1`), watch a rule change (`app.html?run=…&compare=…`), read the memo it wrote
-(`data/runs/998-e-19th-ave/2026-10-27/memo.html`). A quiet GitHub issue link asks for a 20-minute session.
-"Open the tool" sits in the top bar.
+Action: the hero offers the tool with its walkthrough (`app.html?tour=1`) and two options compared
+(`app.html?run=998-e-19th-ave/what-if-funder-ready&compare=998-e-19th-ave/as-approved`). The close repeats
+them as Run / Compare / Read, Read opening the what-if's memo
+(`data/runs/998-e-19th-ave/what-if-funder-ready/memo.html`). A quiet GitHub issue link asks for a 20-minute
+session. "Open the tool" sits in the top bar.
 
-Proof and content: only the committed 998 E 19th Ave runs (23 and 27 Oct 2026), the rule files and
-massing.json. Week timings on the ruler are illustrative and labelled so; every finding is the tool's own.
-No testimonials, adoption claims or pricing.
+Proof and content: only the committed 998 E 19th Ave runs, the rule files and what the tool prints. The hero
+image is a capture of the tool's own as-approved memo (provenance in a comment beside the img). No
+testimonials, adoption claims or pricing.
 
-Constraints: visual world is the tool's Lotwise restyle (commit 9d805fc, recorded in DESIGN.md). The
-`?tour` / `?run` / `?compare` deep links live in app.js (`followLink`); a wordmark link from the tool back
-to the home page is still open.
+Constraints: visual world is the tool's (DESIGN.md). `hero-memo.jpg` keeps its name: `server.py` serves it and
+`pages.py` copies it. The `?tour` / `?run` / `?compare` deep links live in app.js (`followLink`).
 
-## Direction contract
+## Direction contract (revised 23 Oct 2026: the reading pass)
 
-THESIS: The problem is time. A dated week ruler shows the rules that surface after design starts, pinned
-where they bite; one switch collapses them to day one, where the memo states all six with status and owner.
-It refuses the category default: headline, subcopy and button over a row of feature cards.
+THESIS: Will this scheme be allowed, and will a funder back it? The page answers the way the memo does: the
+problem, how it works, what the memo answers, then the real case, each section a heading, a short paragraph at
+reading size, and one drawing sheet that carries its material.
 
-OWN-WORLD: Lotwise. Cool grey page #f5f6f8, white panels with a 1px #e1e5ea line and a whisper shadow, slate
-ink #2c3e50, blue #2a6fb8 only for links and focus, amber #c77d14 for pending, status pills with a glyph
-mark, IBM Plex Sans at 13px body, 18px titles and 11px keys, Plex Mono for weeks, ids and the double-rule stamp,
-drawings on white paper with a title block, dark-ink buttons that lift on hover and sink on press.
+OWN-WORLD: the tool's. Cool grey page, white panels with a 1px line and a whisper shadow, slate ink, blue only
+for links and focus, amber for what is pending, status pills with a glyph mark, Plex Mono for ids and the
+double-rule stamp, drawings on white paper with a figure block along the foot, dark-ink buttons.
 
-STORY: Rules arrive late and cost redraws; they live in five layers owned by different people; the memo
-answers them on day one with arithmetic, clause, date and owner; it re-stamps when a rule changes; try it.
+READING: labels, cards and figures keep the tool's drafting density (13px, 11px keys); running prose is 14px on
+a 1.6 leading and a 66-character measure; the headline is 22px (20px on a phone), section headings 18px.
+Sections sit 64px apart (48px on a phone). The top bar's anchors mark the section the reader is in.
 
-FIRST VIEWPORT: Top bar (wordmark, anchors, Open the tool). The headline at DESIGN.md's 18px title size
-on the left, one 13px paragraph on the right; the drawing sheet carries the viewport, title block and
-stamp included, with room to spare at 1366x768 windowed. Kai kept DESIGN.md's rule against a 16px body
-and large display type (Oct 2026), so the whole page sits at the tool's drafting density. Below, full width, a white drawing sheet: a Without / With the memo switch, the
-WK 0 to WK 12 ruler, a design band with redraw marks, six findings hanging from their weeks in two lanes,
-and a title block with site, as-of date and the stamp.
+FIGURES: HTML in the drafting language, never pictures of it, so they reflow on a phone and their type stays at
+the page's sizes. Fig 1: five stage cells with the memo's stage in ink, then the five rule layers as a table
+with who reads them and when. Fig 2: three steps (you give it, run the rules, read the memo) with the loop
+back. Fig 3: one row of the memo, each column's note under its value.
 
-FORM: "Before the first drawing", third of my seven ranked structures, dealt by seed 3ea85d75.
-Signature interaction: the switch FLIP-moves the six findings from their weeks into a day-one grid, where
-each gains its status pill and who resolves it; 420 ms ease-out, instant under reduced motion.
+FIRST VIEWPORT: Top bar (wordmark, anchors, Open the tool). The headline and lede on the left with the two ways
+in; the memo itself on the right, captured from the tool from its title down.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+FINISH: the reading pass was audited (a11y, performance, theming, responsive, integrity) and its findings
+implemented on 23 Oct 2026; DESIGN.md records the reading sizes.

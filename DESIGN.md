@@ -206,10 +206,11 @@ Two things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts f
 no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass,
 hero numbers, floating shadows or marketing voice).
 
-The home page in front of the tool speaks the same language at the same density, and borrows the
-drawing set's own devices where it needs structure: a week ruler on a sheet with a title block, a
-schedule with numbered general notes, and a sheet issued for review to close on. When something
-changes between two readings of the rules, it is marked the way a drawing marks a revision.
+The home page in front of the tool speaks the same language. It is read rather than operated, so its
+running prose sits at a reading size while everything else keeps the tool's density, and its figures
+are HTML drawn with the drawing set's own devices (stage cells, a table of layers, a three-step flow, a
+memo row with its notes, a sheet issued for review to close on) rather than pictures of them. When
+something changes between two readings of the rules, it is marked the way a drawing marks a revision.
 
 **Key Characteristics:**
 - One sans at 13px with 11px uppercase keys; mono only for machine-written text.
@@ -314,7 +315,10 @@ is a verdict sentence at 18px weight 600 with its operative words in the status 
   keys, the tour counter, pill text.
 - **Table** (11.5px): the ledger's rows; 12px in the answer cards' tables.
 - **Mono** (400, 11px): rule ids, numbers used, hashes, paths, the shell lines; the engine chip at
-  11px 500 uppercase; the home page's week numbers at 12px 500 in Draw Ink.
+  11px 500 uppercase. Nothing on either page is set below 11px.
+- **Reading** (400, 14px, 1.6, a 66-character measure): the home page's running prose only: the
+  lede, the section paragraphs, the close's paragraph. Its headline is 22px 600 (20px on a phone)
+  and its section headings 18px; its cards, figures and labels stay at the sizes above.
 - **Stamp** (600, 11.5px mono, 0.08em, uppercase): the version stamp inside a double rule.
 - **Drawing labels** (IBM Plex Sans, 11.5px on screen): the figures are drawn in metres and scale
   with their card, so their labels are refitted to 11.5px whatever the card's width; context labels
@@ -347,9 +351,12 @@ and the figures sit side by side, the figures in a 460px column, and the ledger 
 the full width beneath.
 
 The home page is one 1280px column with a 20px gutter (16px on a phone); its top bar's contents
-line up with that column at any width. Sections sit 36px apart, each a heading, a paragraph and
-then its material: the ruler sheet in the first viewport, the rule-layer schedule, the three
-answers beside a ledger row and a section, the rule change, the limits, and the issued sheet.
+line up with that column at any width, and its four anchors mark the section the reader is in. The
+first viewport is the headline, lede and two ways in beside a capture of the memo itself. Then four
+sections, 64px apart (48px on a phone), each a heading, a short paragraph at the reading size and one
+drawing sheet that carries its material: where the memo sits, how it works, what the memo answers
+(three neutral cards, then one memo row), and the issued sheet. Cards and steps sit three across
+down to 860px and stack below it; the stages wrap to three across at 1080px and run down a phone.
 
 Rhythm is a 4px scale: 4, 6, 8, 12, 14, 16, 20. Panels carry 12px by 14px of padding and sit 12px
 apart. Forms are a single column with 8px between fields and 6px within a group; groups are
@@ -463,8 +470,7 @@ the third card holds a table of open items with a Who / what column in Muted. Wa
 from one `data-verdict` attribute.
 
 ### Segmented control
-Plan | 3D on FIG 01, and on the home page Without / With the memo and Rules as of 23 / 27 Oct (the
-pattern for any two-or-three-way view switch): one 4px box with a Line border, 11.5px weight 500
+Plan | 3D on FIG 01 (the pattern for any two-or-three-way view switch): one 4px box with a Line border, 11.5px weight 500
 segments at 3px by 10px, the pressed segment filled Draw Ink with white text, the rest Draw Muted
 on paper; hover tints a segment.
 
@@ -480,19 +486,24 @@ height labels off the masses on leader lines, turns under a sideways drag (verti
 scroll a phone) and under the arrow keys. FIG 03 is the Revit sheet image.
 
 ### Drawing sheets (home page)
-White paper, 1px Line, 6px corners, the one-pixel shadow, with the drawing devices the page's
-argument needs:
-- **The ruler sheet:** a segmented switch and caption, the WK 0 to WK 12 ruler, a design band whose
-  redraws are hatched (the drafting convention for work done twice), six findings hung from their
-  weeks by leaders in two lanes, and a title block of Site, Option, Rules as of, Timing and Stamp.
-  The switch moves the findings to a day-one grid where they gain their pill and their "Who"
-  (FLIP, 420ms ease-out; instant under reduced motion). On a phone the weeks run down the page, the
-  band stays in short labels and the switch sticks under the top bar. Print shows the day-one grid.
-- **The schedule:** the rule layers as a table with an ink-keyed layer letter, then numbered
-  general notes under a Notes key, then a schedule label in the figure-block style.
+White paper, 1px Line, 6px corners, the one-pixel shadow, 16px of padding, and a figure block along
+the foot (a 2px Draw Ink rule, a Key "Fig n · name", then a sentence). The figures are HTML, never
+SVG text, so they reflow and keep the page's type sizes:
+- **Where the memo sits (Fig 1):** five stage cells in a row with arrows between, numbered with
+  outlined badges on the half-tone parcel fill; the memo's stage is filled Draw Ink. Under them the
+  five rule layers as a table (layer key, what it covers; who usually reads it; when), closed by a
+  2px rule and the sentence that ties all five to day one. On a phone the stages run down the page
+  and the table stacks, each value after its column's name.
+- **How it works (Fig 2):** three steps side by side with arrows, each a badge-numbered 14px
+  heading over its material (outlined boxes, the five layers as half-tone rows, a miniature memo with
+  its title rule), and a dashed rule before the loop back ("change a number, run again").
+- **One row of the memo (Fig 3):** the row's five columns in an outlined box, a Key, the value and,
+  under it, a note on a 1px Draw Ink leader; the rows line up across the columns (CSS subgrid). When
+  narrow each column becomes a key beside its value and note. A "Who resolves it" band follows on the
+  conditional wash.
 - **The issued sheet:** the page's close. A heading and paragraph, the three actions as title-block
-  cells (Run, Compare, Read) each with its button and a sentence, and a title block of Issue (For
-  review), Site, Rules as of and the stamp of the memo the Read action opens.
+  cells (Run, Compare, Read) each with its button and a sentence, and a title block of Site, Rules and
+  Status.
 
 ### Engine chip
 A fully round mono label at 11px that reads loading (amber, with a spinner), ready (green) or
@@ -507,8 +518,8 @@ returns focus to where it was.
 ### Print
 The memo prints alone, light whatever the theme, every ledger layer open, the figures without their
 switches, and a footer on every page with the address, the as-of date, the stamp and the page
-number. The home page prints its argument in the day-one state, with the tool's address in place
-of the buttons.
+number. The home page prints light, its figures unbroken, with the tool's address in place of the
+buttons.
 
 ## Do's and Don'ts
 
@@ -521,11 +532,12 @@ of the buttons.
 - **Do** keep the drawings on white paper in both themes with Lotwise's drawing tones.
 - **Do** mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.
 - **Do** reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card.
+- **Do** draw explanatory figures in HTML, not SVG text, so they reflow on a phone and read at the page's own sizes.
 
 ### Don't:
 - **Don't** build a dashboard: no gauges, KPI tiles, sparklines, or icon-plus-heading cards as structure.
 - **Don't** reach for a landing page's kit: no gradients, glass, hero numbers, floating shadows, marketing voice.
-- **Don't** bring back a serif, a 16px body, or large display type; the memo reads at drafting density.
+- **Don't** bring back a serif, a 16px body, or large display type; the memo reads at drafting density, and the home page's prose stops at 14px.
 - **Don't** put a status colour on a button, a heading or a background that carries no status.
 - **Don't** add a toast, a second accent, or a shadow deeper than one pixel on anything at rest.
 - **Don't** use "N/A", a colour without its word, or a checkbox where "not sure" is a legitimate answer.

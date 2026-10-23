@@ -28,9 +28,9 @@
 
 <main id="main">
 
-<section class="hero wrap">
+<section class="hero wrap" aria-labelledby="hero-h">
   <div class="hero-text">
-    <h1>Will this housing scheme be allowed, and will a funder back it?</h1>
+    <h1 id="hero-h">Will this housing scheme be allowed, and will a funder back it?</h1>
     <p class="lede">Funding-Fit Memo checks a site and a building option against Vancouver's zoning, the Province's rules, City policy, design standards and the funding programs, all at once, before the first drawing. It writes a short memo with three answers and shows every rule it used.</p>
     <p class="hero-actions">
       <a class="btn btn-primary" href="app.html?tour=1">Open the tool with a walkthrough</a>
@@ -38,260 +38,150 @@
     </p>
   </div>
   <figure class="hero-shot">
-    <a href="app.html?run=998-e-19th-ave/as-approved"><img src="hero-memo.jpg" alt="The memo for 998 E 19th Ave: a title block with the option, proponent, date and stamp; three answer cards reading Not outright, by rezoning yes with conditions; Not yet confirmed; and four open items each with a named person; beside them the site plan with its streets and neighbours and the section across the frontage." width="1800" height="1715"></a>
-    <figcaption>The memo for 998 E 19th Ave, Vancouver, as the tool writes it.</figcaption>
+    <!-- hero-memo.jpg: captured from the tool itself, app.html?run=998-e-19th-ave/as-approved with the inputs hidden,
+         a 1600 px window at 1x, from the memo's title down (1580 x 1027, JPEG q80, about 260 KB; the hero shows it
+         at 700 px or less); recaptured 23 Oct 2026 by the Impeccable session's capture script -->
+    <a href="app.html?run=998-e-19th-ave/as-approved"><img src="hero-memo.jpg" alt="The memo for 998 E 19th Ave: a title block with the option, proponent, date and stamp; three answer cards reading Not outright, by rezoning yes with conditions; Not yet confirmed; and four open items each with a named person; beside them the site plan with its streets and neighbours and the section across the frontage." width="1580" height="1027" fetchpriority="high"></a>
+    <figcaption>The memo for 998 E 19th Ave, Vancouver, as the tool writes it. <a href="app.html?run=998-e-19th-ave/as-approved">Open it in the tool</a>.</figcaption>
   </figure>
 </section>
 
+<!-- ------------------------------------------------------------ the problem -->
 <section class="section wrap" id="why" aria-labelledby="why-h">
   <div class="section-intro">
     <h2 id="why-h">The problem: the rules are read late, by different people.</h2>
-    <p>A board votes pre-development money, often $200,000 to $500,000, on a feasibility read that cites nothing and carries no date. The rules it rests on sit in five layers, each read by someone else at a later stage, so the first drawing usually comes before the first rule check. The memo is that check, done on day one and dated.</p>
+    <p>A board votes pre-development money, often $200,000 to $500,000, on a feasibility read that cites nothing and carries no date.</p>
+    <p>The rules it rests on sit in five layers, each read by someone else at a later stage, so the first drawing usually comes before the first rule check. The memo is that check, done on day one and dated.</p>
   </div>
+
   <figure class="sheet diagram" aria-labelledby="why-fig">
-    <div class="diagram-wrap">
-    <svg viewBox="0 0 960 330" role="img" aria-labelledby="why-fig why-desc" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
-      <title id="why-fig">Where the memo sits, and the five layers of rules it reads</title>
-      <desc id="why-desc">Five stages from site to construction; the memo is stage two, feasibility, before pre-development money is spent. Five rule layers, each usually read later by a different person, all feed the memo on day one.</desc>
-      <g font-size="12.5" fill="#1f2933">
-        <!-- the five stages -->
-        <g>
-          <rect x="20" y="28" width="150" height="54" rx="4" fill="#f4f4f2" stroke="#c9c9c5"/>
-          <text x="32" y="50" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">1</text>
-          <text x="32" y="70" font-weight="600">Site</text>
-        </g>
-        <g>
-          <rect x="200" y="20" width="170" height="70" rx="4" fill="#2c3e50"/>
-          <text x="212" y="42" font-size="11" fill="#c9d3dd" font-weight="600" letter-spacing="1">2</text>
-          <text x="212" y="62" fill="#ffffff" font-weight="600">Feasibility</text>
-          <text x="212" y="80" font-size="11.5" fill="#c9d3dd">the memo, dated and cited</text>
-        </g>
-        <g>
-          <rect x="400" y="28" width="150" height="54" rx="4" fill="#f4f4f2" stroke="#c9c9c5"/>
-          <text x="412" y="50" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">3</text>
-          <text x="412" y="70" font-weight="600">Pre-development</text>
-        </g>
-        <g>
-          <rect x="580" y="28" width="170" height="54" rx="4" fill="#f4f4f2" stroke="#c9c9c5"/>
-          <text x="592" y="50" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">4</text>
-          <text x="592" y="70" font-weight="600">Funding and approvals</text>
-        </g>
-        <g>
-          <rect x="780" y="28" width="160" height="54" rx="4" fill="#f4f4f2" stroke="#c9c9c5"/>
-          <text x="792" y="50" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">5</text>
-          <text x="792" y="70" font-weight="600">Design and build</text>
-        </g>
-        <g stroke="#8e8e8e" stroke-width="1.2" fill="#8e8e8e">
-          <line x1="170" y1="55" x2="196" y2="55"/><path d="M192 51l6 4-6 4z"/>
-          <line x1="370" y1="55" x2="396" y2="55"/><path d="M392 51l6 4-6 4z"/>
-          <line x1="550" y1="55" x2="576" y2="55"/><path d="M572 51l6 4-6 4z"/>
-          <line x1="750" y1="55" x2="776" y2="55"/><path d="M772 51l6 4-6 4z"/>
-        </g>
-        <text x="475" y="108" font-size="11.5" fill="#c77d14" font-weight="600" text-anchor="middle">$200,000 to $500,000 is voted here</text>
-        <!-- the five layers, each read late by someone else -->
-        <g font-size="12">
-          <text x="20" y="150" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">THE RULES, IN FIVE LAYERS</text>
-          <text x="420" y="150" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">USUALLY READ BY</text>
-          <text x="700" y="150" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">USUALLY READ WHEN</text>
-          <g>
-            <rect x="20" y="162" width="380" height="26" fill="#e9e9e6" stroke="#c9c9c5"/>
-            <text x="30" y="179" font-weight="600">A</text><text x="48" y="179">Zoning district: density, height, the rezoning path</text>
-            <text x="420" y="179">City planning staff</text><text x="700" y="179" fill="#5f6672">at pre-application</text>
-          </g>
-          <g>
-            <rect x="20" y="192" width="380" height="26" fill="#e9e9e6" stroke="#c9c9c5"/>
-            <text x="30" y="209" font-weight="600">B</text><text x="48" y="209">Province: small-scale minimums, transit-oriented areas</text>
-            <text x="420" y="209">The architect, if someone asks</text><text x="700" y="209" fill="#5f6672">during design</text>
-          </g>
-          <g>
-            <rect x="20" y="222" width="380" height="26" fill="#e9e9e6" stroke="#c9c9c5"/>
-            <text x="30" y="239" font-weight="600">C</text><text x="48" y="239">City policy: family units, social housing, trees, levies</text>
-            <text x="420" y="239">Planners and an arborist</text><text x="700" y="239" fill="#5f6672">once a site plan exists</text>
-          </g>
-          <g>
-            <rect x="20" y="252" width="380" height="26" fill="#e9e9e6" stroke="#c9c9c5"/>
-            <text x="30" y="269" font-weight="600">D</text><text x="48" y="269">Design standards: unit areas, the code basis</text>
-            <text x="420" y="269">The architect</text><text x="700" y="269" fill="#5f6672">during design</text>
-          </g>
-          <g>
-            <rect x="20" y="282" width="380" height="26" fill="#e9e9e6" stroke="#c9c9c5"/>
-            <text x="30" y="299" font-weight="600">E</text><text x="48" y="299">Funders: Community Housing Fund, BC Builds, CMHC</text>
-            <text x="420" y="299">The development manager</text><text x="700" y="299" fill="#5f6672">when a call opens</text>
-          </g>
-        </g>
-        <!-- the bracket: all five, on day one, into the memo -->
-        <g stroke="#2a6fb8" stroke-width="1.5" fill="none">
-          <path d="M 404 162 L 410 162 L 410 308 L 404 308"/>
-          <path d="M 410 235 L 414 235 L 414 128 L 285 128 L 285 96"/>
-          <path d="M 281 101 l 4 -6 l 4 6" fill="#2a6fb8" stroke="none"/>
-        </g>
-        <text x="292" y="124" font-size="11.5" fill="#2a6fb8" font-weight="600">all five, read on day one: 17 rules from 13 public sources, each dated</text>
-      </g>
-    </svg>
+    <ol class="stages" aria-label="Five stages, from site to construction">
+      <li><span class="badge">1</span><b>Site</b></li>
+      <li class="is-memo"><span class="badge">2</span><b>Feasibility</b><span>the memo, dated and cited</span></li>
+      <li class="is-money"><span class="badge">3</span><b>Pre-development</b><span class="money">$200,000 to $500,000 is voted here</span></li>
+      <li><span class="badge">4</span><b>Funding and approvals</b></li>
+      <li><span class="badge">5</span><b>Design and build</b></li>
+    </ol>
+    <div class="table-wrap">
+      <table class="layers">
+        <thead><tr><th scope="col">The rules, in five layers</th><th scope="col">Usually read by</th><th scope="col">Usually read when</th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><span class="layer-key">A</span><span>Zoning district: density, height, the rezoning path</span></th><td data-label="Usually read by">City planning staff</td><td data-label="Usually read when">at pre-application</td></tr>
+          <tr><th scope="row"><span class="layer-key">B</span><span>Province: small-scale minimums, transit-oriented areas</span></th><td data-label="Usually read by">The architect, if someone asks</td><td data-label="Usually read when">during design</td></tr>
+          <tr><th scope="row"><span class="layer-key">C</span><span>City policy: family units, social housing, trees, levies</span></th><td data-label="Usually read by">Planners and an arborist</td><td data-label="Usually read when">once a site plan exists</td></tr>
+          <tr><th scope="row"><span class="layer-key">D</span><span>Design standards: unit areas, the code basis</span></th><td data-label="Usually read by">The architect</td><td data-label="Usually read when">during design</td></tr>
+          <tr><th scope="row"><span class="layer-key">E</span><span>Funders: Community Housing Fund, BC Builds, CMHC</span></th><td data-label="Usually read by">The development manager</td><td data-label="Usually read when">when a call opens</td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="3"><b>All five, read on day one at stage 2:</b> 17 rules from 13 public sources, each dated.</td></tr></tfoot>
+      </table>
     </div>
-    <figcaption class="fig-block"><span>FIG · Where the memo sits</span><span>The memo is stage two; without it the same rules arrive one at a time, weeks into design.</span></figcaption>
+    <figcaption class="fig-block" id="why-fig"><span>Fig 1 · Where the memo sits</span><span>The memo is stage two; without it the same rules arrive one at a time, weeks into design.</span></figcaption>
   </figure>
 </section>
 
+<!-- ------------------------------------------------------------ how it works -->
 <section class="section wrap" id="how" aria-labelledby="how-h">
   <div class="section-intro">
     <h2 id="how-h">How it works: three steps.</h2>
+    <p>Give it a site and an option, run the rules, read the memo. Same inputs and the same rules always give the same memo.</p>
   </div>
+
   <figure class="sheet diagram" aria-labelledby="how-fig">
-    <div class="diagram-wrap">
-    <svg viewBox="0 0 960 240" role="img" aria-labelledby="how-fig how-desc" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
-      <title id="how-fig">Site and option in, the rule stack, the memo out</title>
-      <desc id="how-desc">A site file and an option file go into the rule stack of five dated layers; out comes a memo with three answers, drawings, a clauses table and a ledger, with a version stamp. Change a number, run again, and the two runs are compared side by side.</desc>
-      <g font-size="12.5" fill="#1f2933">
-        <!-- 1 the inputs -->
-        <text x="20" y="24" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">1 · YOU GIVE IT</text>
-        <rect x="20" y="36" width="230" height="64" rx="4" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
-        <text x="32" y="58" font-weight="600">A site</text>
-        <text x="32" y="76" font-size="11.5" fill="#5f6672">address, zoning, lot size, trees, owner</text>
-        <rect x="20" y="110" width="230" height="64" rx="4" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
-        <text x="32" y="132" font-weight="600">An option</text>
-        <text x="32" y="150" font-size="11.5" fill="#5f6672">storeys, floor area, units, rents, funders</text>
-        <text x="32" y="166" font-size="11.5" fill="#c77d14" font-weight="600">"Not sure" is an honest answer</text>
-        <!-- 2 the rules -->
-        <text x="330" y="24" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">2 · RUN THE RULES</text>
-        <g>
-          <rect x="330" y="36" width="250" height="26" fill="#e9e9e6" stroke="#c9c9c5"/><text x="340" y="53"><tspan font-weight="600">A</tspan>  Zoning district</text>
-          <rect x="330" y="64" width="250" height="26" fill="#e9e9e6" stroke="#c9c9c5"/><text x="340" y="81"><tspan font-weight="600">B</tspan>  Province</text>
-          <rect x="330" y="92" width="250" height="26" fill="#e9e9e6" stroke="#c9c9c5"/><text x="340" y="109"><tspan font-weight="600">C</tspan>  City policy</text>
-          <rect x="330" y="120" width="250" height="26" fill="#e9e9e6" stroke="#c9c9c5"/><text x="340" y="137"><tspan font-weight="600">D</tspan>  Design standards</text>
-          <rect x="330" y="148" width="250" height="26" fill="#e9e9e6" stroke="#c9c9c5"/><text x="340" y="165"><tspan font-weight="600">E</tspan>  Funders</text>
-        </g>
-        <text x="330" y="190" font-size="11.5" fill="#5f6672">each rule dated and cited; the versions in force make the stamp</text>
-        <text x="330" y="205" font-family="IBM Plex Mono, Menlo, monospace" font-size="11" fill="#1f2933" font-weight="600">20E44F1445ECAFF9</text>
-        <!-- 3 the memo -->
-        <text x="660" y="24" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">3 · READ THE MEMO</text>
-        <rect x="660" y="36" width="280" height="138" rx="4" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
-        <line x1="660" y1="58" x2="940" y2="58" stroke="#1f2933" stroke-width="1.5"/>
-        <text x="672" y="51" font-size="11" font-weight="600" letter-spacing="1" fill="#5f6672">998 E 19TH AVE · STAMP 20E44F14</text>
-        <g font-size="12">
-          <circle cx="680" cy="76" r="7" fill="#e9eef4"/><text x="680" y="79.5" font-size="9.5" font-weight="700" text-anchor="middle">1</text><text x="694" y="80">Is it allowed?</text>
-          <circle cx="680" cy="100" r="7" fill="#e9eef4"/><text x="680" y="103.5" font-size="9.5" font-weight="700" text-anchor="middle">2</text><text x="694" y="104">Does it fit the funders?</text>
-          <circle cx="680" cy="124" r="7" fill="#e9eef4"/><text x="680" y="127.5" font-size="9.5" font-weight="700" text-anchor="middle">3</text><text x="694" y="128">What is still unsure, and who resolves it?</text>
-        </g>
-        <text x="672" y="152" font-size="11.5" fill="#5f6672">then the drawings, the clauses applied,</text>
-        <text x="672" y="167" font-size="11.5" fill="#5f6672">the full ledger and the inputs as read</text>
-        <!-- arrows -->
-        <g stroke="#8e8e8e" stroke-width="1.2" fill="#8e8e8e">
-          <line x1="250" y1="105" x2="326" y2="105"/><path d="M322 101l6 4-6 4z"/>
-          <line x1="580" y1="105" x2="656" y2="105"/><path d="M652 101l6 4-6 4z"/>
-        </g>
-        <!-- the loop -->
-        <g stroke="#2a6fb8" stroke-width="1.5" fill="none">
-          <path d="M 800 174 L 800 228 L 135 228 L 135 180"/>
-          <path d="M 131 185 l 4 -6 l 4 6" fill="#2a6fb8" stroke="none"/>
-        </g>
-        <text x="468" y="224" font-size="11.5" fill="#2a6fb8" font-weight="600" text-anchor="middle">change a number, run again, compare the two runs side by side</text>
-      </g>
-    </svg>
-    </div>
-    <figcaption class="fig-block"><span>FIG · The steps</span><span>Same inputs and the same rules always give the same memo; the stamp names the rule versions it read.</span></figcaption>
+    <ol class="flow">
+      <li class="flow-step">
+        <h3><span class="badge">1</span> You give it</h3>
+        <div class="box"><b>A site</b><span>address, zoning, lot size, trees, owner</span></div>
+        <div class="box"><b>An option</b><span>storeys, floor area, units, rents, funders</span><span class="pending">"Not sure" is an honest answer</span></div>
+        <p>Choose an example site or type in your own; each field has an (i) that says what it is for and which rule reads it. A blank comes back as "uncertain", never as a guess.</p>
+      </li>
+      <li class="flow-step">
+        <h3><span class="badge">2</span> Run the rules</h3>
+        <ul class="layer-list" aria-label="The five layers">
+          <li><span class="layer-key">A</span>Zoning district</li>
+          <li><span class="layer-key">B</span>Province</li>
+          <li><span class="layer-key">C</span>City policy</li>
+          <li><span class="layer-key">D</span>Design standards</li>
+          <li><span class="layer-key">E</span>Funders</li>
+        </ul>
+        <p>Each rule is dated and cited; the versions in force make the stamp, <code class="stamp">20e44f1445ecaff9</code>.</p>
+        <p>Press <b>Run the rules</b>; the memo appears beside the form.</p>
+      </li>
+      <li class="flow-step">
+        <h3><span class="badge">3</span> Read the memo</h3>
+        <div class="mini-memo">
+          <p class="mini-title"><span>998 E 19th Ave</span><span class="mono">stamp 20e44f14</span></p>
+          <ol>
+            <li>Is it allowed?</li>
+            <li>Does it fit the funders?</li>
+            <li>What is still unsure, and who resolves it?</li>
+          </ol>
+          <p class="mini-more">then the drawings, the clauses applied, the full ledger and the inputs as read</p>
+        </div>
+      </li>
+    </ol>
+    <p class="loop"><b>Change a number, run again,</b> and compare the two runs side by side.</p>
+    <figcaption class="fig-block" id="how-fig"><span>Fig 2 · The steps</span><span>The stamp names the rule versions the memo read.</span></figcaption>
   </figure>
-  <div class="answers steps">
-    <article class="answer" data-verdict="info">
-      <h3><span class="badge">1</span> Pick a site</h3>
-      <p class="cont">Choose an example site or type in your own. Each field has an (i) that says what it is for and which rule reads it.</p>
-    </article>
-    <article class="answer" data-verdict="info">
-      <h3><span class="badge">2</span> Describe the option</h3>
-      <p class="cont">Storeys, height, floor area, the unit mix, rents, who will own it, which funders you have in mind. A blank comes back as "uncertain", never as a guess.</p>
-    </article>
-    <article class="answer" data-verdict="info">
-      <h3><span class="badge">3</span> Run the rules</h3>
-      <p class="cont">Press <b>Run the rules</b>. The memo appears beside the form. Change a number and run again to compare.</p>
-    </article>
-  </div>
 </section>
 
+<!-- ------------------------------------------------------------ the memo -->
 <section class="section wrap" id="memo" aria-labelledby="memo-h">
   <div class="section-intro">
     <h2 id="memo-h">What the memo answers.</h2>
+    <p>Three questions, in order, each answered with a status word. Every finding shows the clause it comes from and the numbers it used.</p>
   </div>
   <div class="answers">
-    <article class="answer" data-verdict="conditional">
+    <article class="answer">
       <h3><span class="badge">1</span> Is it allowed?</h3>
       <p class="verdict">Outright, or <em>by rezoning</em>.</p>
-      <p class="cont">Density and height against the district schedule, the rezoning policy that applies, the Province's transit rules, the family-unit and tree by-laws.</p>
+      <p>Density and height against the district schedule, the rezoning policy that applies, the Province's transit rules, the family-unit and tree by-laws.</p>
     </article>
-    <article class="answer" data-verdict="pass">
+    <article class="answer">
       <h3><span class="badge">2</span> Does it fit the funders?</h3>
       <p class="verdict"><em>Yes</em>, no, or what is missing.</p>
-      <p class="cont">The Community Housing Fund, BC Builds and the others, against their published criteria: proponent, rent mix, accessible units, site control, lease.</p>
+      <p>The Community Housing Fund, BC Builds and the others, against their published criteria: proponent, rent mix, accessible units, site control, lease.</p>
     </article>
-    <article class="answer" data-verdict="uncertain">
+    <article class="answer">
       <h3><span class="badge">3</span> What is still unsure?</h3>
       <p class="verdict">Each open item, <em>with a named person</em>.</p>
-      <p class="cont">The architect, the development manager or the planner, and the document they need to check.</p>
+      <p>The architect, the development manager or the planner, and the document they need to check.</p>
     </article>
   </div>
+
   <figure class="sheet diagram" aria-labelledby="memo-fig">
-    <div class="diagram-wrap">
-    <svg viewBox="0 0 960 316" role="img" aria-labelledby="memo-fig memo-desc" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
-      <title id="memo-fig">One row of the memo, read left to right</title>
-      <desc id="memo-desc">For every clause the memo prints the status as a word, what the option proposes, what the clause permits, the ask between them, the person who resolves it, and the source clause with its version date. The example is the tree by-law row for 998 E 19th Ave.</desc>
-      <g font-size="12.5" fill="#1f2933">
-        <text x="20" y="24" font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">ONE ROW OF THE MEMO, AS IT PRINTS IT</text>
-        <!-- the row -->
-        <rect x="20" y="38" width="920" height="118" rx="4" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
-        <g font-size="11" fill="#5f6672" font-weight="600" letter-spacing="1">
-          <text x="32" y="58">CLAUSE</text><text x="250" y="58">STATUS</text><text x="372" y="58">PROPOSED</text><text x="552" y="58">PERMITTED</text><text x="722" y="58">THE ASK</text>
-        </g>
-        <line x1="32" y1="64" x2="928" y2="64" stroke="#e1e5ea"/>
-        <text x="32" y="84" font-weight="600">Protection of Trees By-law 9958</text>
-        <text x="32" y="100" font-size="11.5" fill="#5f6672">minimum trees, protection</text>
-        <text x="32" y="114" font-size="11.5" fill="#5f6672">distances, cash in lieu</text>
-        <text x="32" y="138" font-family="IBM Plex Mono, Menlo, monospace" font-size="10.5" fill="#5f6672">cov.trees.replacement · v 2023-01-01</text>
-        <!-- status pill -->
-        <rect x="250" y="72" width="96" height="20" rx="10" fill="#fff1d6"/>
-        <circle cx="262" cy="82" r="7" fill="#d9a520"/><text x="262" y="85.5" font-size="9.5" font-weight="700" text-anchor="middle" fill="#1f2933">!</text>
-        <text x="274" y="86" font-size="11" font-weight="600" fill="#7a5a00">Conditional</text>
-        <text x="372" y="84">9 existing, 1 kept,</text>
-        <text x="372" y="100">16 planted</text>
-        <text x="372" y="116" font-weight="600">17 trees after</text>
-        <text x="552" y="84">Schedule C: at least</text>
-        <text x="552" y="100" font-weight="600">20 trees</text>
-        <text x="552" y="116">on 2,811 m²</text>
-        <text x="722" y="84" fill="#7a5a00">3 trees short:</text>
-        <text x="722" y="100" fill="#7a5a00">plant 3 more, or</text>
-        <text x="722" y="116" fill="#7a5a00">$3,000 cash in lieu</text>
-        <!-- callouts under the row -->
-        <g stroke="#2a6fb8" stroke-width="1.2" fill="none">
-          <line x1="298" y1="156" x2="298" y2="184"/>
-          <line x1="440" y1="156" x2="440" y2="184"/>
-          <line x1="620" y1="156" x2="620" y2="184"/>
-          <line x1="800" y1="156" x2="800" y2="184"/>
-          <line x1="120" y1="156" x2="120" y2="184"/>
-        </g>
-        <g font-size="11.5" fill="#2a6fb8">
-          <text x="120" y="200" text-anchor="middle" font-weight="600">the clause and its version</text>
-          <text x="120" y="215" text-anchor="middle">linked to the published by-law</text>
-          <text x="298" y="200" text-anchor="middle" font-weight="600">always a word</text>
-          <text x="298" y="215" text-anchor="middle">pass, conditional,</text>
-          <text x="298" y="229" text-anchor="middle">fail or uncertain</text>
-          <text x="450" y="200" text-anchor="middle" font-weight="600">what the option puts forward</text>
-          <text x="450" y="215" text-anchor="middle">the numbers the</text>
-          <text x="450" y="229" text-anchor="middle">simulation used</text>
-          <text x="620" y="200" text-anchor="middle" font-weight="600">what the clause allows</text>
-          <text x="620" y="215" text-anchor="middle">or requires</text>
-          <text x="800" y="200" text-anchor="middle" font-weight="600">the gap, and what closes it</text>
-          <text x="800" y="215" text-anchor="middle">a relaxation, a negotiation,</text>
-          <text x="800" y="229" text-anchor="middle">a missing figure</text>
-        </g>
-        <!-- who resolves -->
-        <rect x="20" y="250" width="920" height="44" rx="4" fill="#fff1d6" stroke="#e6dfcf"/>
-        <text x="32" y="268" font-size="11" fill="#7a5a00" font-weight="600" letter-spacing="1">WHO RESOLVES IT</text>
-        <text x="32" y="285" font-size="12.5">Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu.</text>
-      </g>
-    </svg>
-    </div>
-    <figcaption class="fig-block"><span>FIG · A clause, as the memo reads it</span><span>Every open finding is handed to a named person; the tool does not decide.</span></figcaption>
+    <dl class="memo-row">
+      <div class="col">
+        <dt>Clause</dt>
+        <dd class="v"><b>Protection of Trees By-law 9958</b><span class="sub">minimum trees, protection distances, cash in lieu</span><code>cov.trees.replacement · v 2023-01-01</code></dd>
+        <dd class="note">The clause and its version, linked to the published by-law.</dd>
+      </div>
+      <div class="col">
+        <dt>Status</dt>
+        <dd class="v"><span class="pill pill-conditional">Conditional</span></dd>
+        <dd class="note">Always a word: pass, conditional, fail or uncertain.</dd>
+      </div>
+      <div class="col">
+        <dt>Proposed</dt>
+        <dd class="v">9 existing, 1 kept, 16 planted: <b>17 trees after</b></dd>
+        <dd class="note">What the option puts forward: the numbers the simulation used.</dd>
+      </div>
+      <div class="col">
+        <dt>Permitted</dt>
+        <dd class="v">Schedule C: at least <b>20 trees</b> on 2,811 m²</dd>
+        <dd class="note">What the clause allows or requires.</dd>
+      </div>
+      <div class="col">
+        <dt>The ask</dt>
+        <dd class="v ask">3 trees short: plant 3 more, or $3,000 cash in lieu</dd>
+        <dd class="note">The gap, and what closes it: a relaxation, a negotiation, a missing figure.</dd>
+      </div>
+    </dl>
+    <p class="who"><b>Who resolves it</b> Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu.</p>
+    <figcaption class="fig-block" id="memo-fig"><span>Fig 3 · One row of the memo</span><span>As the memo prints it. Every open finding is handed to a named person; the tool does not decide.</span></figcaption>
   </figure>
 </section>
 
+<!-- ------------------------------------------------------------ try it -->
 <section class="section wrap close" id="try" aria-labelledby="try-h">
   <div class="sheet issue">
     <div class="issue-head">

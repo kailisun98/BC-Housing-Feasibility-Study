@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-22T21:09:56-07:00",
+  "generatedAt": "2026-10-22T22:41:07-07:00",
   "title": "Design System: Funding-Fit Memo",
   "extensions": {
     "colorMeta": {
@@ -477,7 +477,7 @@
   ],
   "narrative": {
     "northStar": "The Drafting Tool",
-    "overview": "The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the talking; IBM Plex Mono is reserved for what a machine wrote down, stamps, rule ids, hashes, paths and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good drawing set is dense, and it stays calm because every element has a fixed job.\n\nColour is meaning. Blue is for links, focus, the selection and the step you are on; amber is for what is pending, the \"not sure\" answer, the engine still loading, a benchmark line; green, yellow, red, blue and grey mark the six statuses, always beside the printed word, never instead of it. The status strip under the step bar carries one line of feedback for every action, with a dot that says info, busy, ok or error. The massing drawings sit on white paper in both themes and keep Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a red dashed line for the setback envelope, amber dashes for the staff benchmark.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).\n\nThe home page in front of the tool speaks the same language at the same density, and borrows the drawing set's own devices where it needs structure: a week ruler on a sheet with a title block, a schedule with numbered general notes, and a sheet issued for review to close on. When something changes between two readings of the rules, it is marked the way a drawing marks a revision.",
+    "overview": "The memo is produced by a tool, and the tool looks like one: the same language as Kai's Lotwise massing app, which is the pinned precedent. One sans, IBM Plex Sans at 13px, does nearly all the talking; IBM Plex Mono is reserved for what a machine wrote down, stamps, rule ids, hashes, paths and the lines to paste into a shell. Slate ink on a cool grey page, with white panels separated by a 1px line and a whisper of shadow. Corners are small, 4 to 6px, and buttons are dark ink that lifts on hover and sinks on press. Nothing is decorative; the page is dense the way a good drawing set is dense, and it stays calm because every element has a fixed job.\n\nColour is meaning. Blue is for links, focus, the selection and the step you are on; amber is for what is pending, the \"not sure\" answer, the engine still loading, a benchmark line; green, yellow, red, blue and grey mark the six statuses, always beside the printed word, never instead of it. The status strip under the step bar carries one line of feedback for every action, with a dot that says info, busy, ok or error. The massing drawings sit on white paper in both themes and keep Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a red dashed line for the setback envelope, amber dashes for the staff benchmark.\n\nTwo things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake, no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass, hero numbers, floating shadows or marketing voice).\n\nThe home page in front of the tool speaks the same language. It is read rather than operated, so its running prose sits at a reading size while everything else keeps the tool's density, and its figures are HTML drawn with the drawing set's own devices (stage cells, a table of layers, a three-step flow, a memo row with its notes, a sheet issued for review to close on) rather than pictures of them. When something changes between two readings of the rules, it is marked the way a drawing marks a revision.",
     "keyCharacteristics": [
       "One sans at 13px with 11px uppercase keys; mono only for machine-written text.",
       "Slate ink, cool grey page, white panels; dark mode is the same tool at night, not an inversion.",
@@ -537,12 +537,13 @@
       "Do keep panels at 6px radius, 12px by 14px padding, 1px Line and the one-pixel shadow, 12px apart.",
       "Do keep the drawings on white paper in both themes with Lotwise's drawing tones.",
       "Do mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.",
-      "Do reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card."
+      "Do reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card.",
+      "Do draw explanatory figures in HTML, not SVG text, so they reflow on a phone and read at the page's own sizes."
     ],
     "donts": [
       "Don't build a dashboard: no gauges, KPI tiles, sparklines, or icon-plus-heading cards as structure.",
       "Don't reach for a landing page's kit: no gradients, glass, hero numbers, floating shadows, marketing voice.",
-      "Don't bring back a serif, a 16px body, or large display type; the memo reads at drafting density.",
+      "Don't bring back a serif, a 16px body, or large display type; the memo reads at drafting density, and the home page's prose stops at 14px.",
       "Don't put a status colour on a button, a heading or a background that carries no status.",
       "Don't add a toast, a second accent, or a shadow deeper than one pixel on anything at rest.",
       "Don't use \"N/A\", a colour without its word, or a checkbox where \"not sure\" is a legitimate answer.",

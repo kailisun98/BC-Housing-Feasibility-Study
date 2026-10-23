@@ -163,6 +163,17 @@ memo.md/memo.html and the Revit Comments still carry it. Inputs carry marks (nee
 rule, drawings only) and (i) explanations from `FIELD_META` in `app.js`; the memo has a
 "Clauses applied" table (proposed, permitted or required, the ask) before the layered ledger.
 
+PDF and the inputs rail (23 Oct 2026): Download PDF and Print both use `paperDocument(run)` in `app.js`,
+a self-contained paper layout of the memo for a reviewer (title block; the three answers with the rules
+that decide them; open items with who resolves them; the comparison; clauses; massing figures; the full
+ledger by layer; inputs; numbered sources with URLs; how to reproduce it), with every rule referred to as
+A1…E4. `POST /api/pdf` in `server.py` prints that HTML with a headless Edge or Chrome (`find_browser`,
+`FFM_BROWSER` overrides) and returns the PDF; without a browser (501), or on GitHub Pages, the page
+opens the same document in the print dialog. The preview server the Claude app starts cannot launch
+Edge (its sandbox), so test the PDF against a server started from a shell (`python -m ffm ui`). The
+step bar's "Hide inputs" button is gone: the rail folds with the chevron row at its top
+(`#rail-toggle`, `showInputs`), remembered in localStorage (`ffm.inputs.collapsed`).
+
 Context from OpenStreetMap (23 Oct 2026): `python -m ffm context --site sites/<id>.json [--radius 120]
 [--center lat,lon]` (`ffm/osm.py`, standard library) locates the address with Nominatim, fetches
 roads, buildings and trees from the Overpass API, converts them into the lot frame (front street

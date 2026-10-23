@@ -361,8 +361,12 @@ together as one block, and the top bar grows a row rather than let its controls 
 input rail sits on the left at min(420px, 36vw) on the page grey with a 1px line on its right, the
 memo on the right taking the rest. The rail holds the Site and Option cards 12px apart with 16px
 side padding; once a file is chosen each card collapses to its file and a one-line summary, and
-Edit opens the form. "Hide inputs", in the step bar beside Walkthrough, sets the rail aside, with the
-run tools and the walkthrough offer, so the memo takes the width, for presenting.
+Edit opens the form. The rail folds with its own control: a row at its top, keyed Inputs, with a
+chevron (an SVG, not a glyph). One click folds the rail to a 44px strip (56px on a wide touch screen)
+that reads Inputs upward under a right-pointing chevron and sticks under the bars; another click, or
+the Site or Option step, opens it again, and the reader's choice is kept for the next visit. Stacked
+over the memo below 1100px, the rail folds to its single row, the chevron pointing up to fold and down
+to open. Folding moves nothing else: the run pickers and the walkthrough stay where they are.
 The memo pane has 20px side padding, and anything a link or a step lands on keeps a scroll margin
 the height of the bars. Below 1100px the panes stack and the two input cards sit side by side;
 below 760px everything is one column and the bars stop sticking. At 1600px and above the answers
@@ -422,10 +426,10 @@ Dark and plain; they say what they do.
 - **Primary:** Ink fill, Panel text. One per screen: Run the rules; the walkthrough's Next and
   Take the walkthrough; on the home page, the two "Run the real case with a walkthrough" buttons,
   each with its alternatives as plain links beside it.
-- **Secondary:** Group fill, Ink text; Download memo (HTML), Print, Check Revit result, and the home
+- **Secondary:** Group fill, Ink text; Download PDF, Print, Check Revit result, and the home
   page's top-bar Open the tool, so the hero's button is the page's one dark one.
 - **Quiet:** transparent with a Line border; Save as…, Edit / Done, Copy, Back, Not now, the other
-  downloads, Export to Revit, Hide inputs, Open all layers.
+  downloads (memo HTML, Markdown, massing.json), Export to Revit, Open all layers.
 - **Hover:** primary mixes 24% Panel into Ink and casts the hover shadow; secondary deepens 18%
   toward Ink with a darker border. **Press:** translateY(1px), shadow off. Disabled sits at 45%
   opacity; a disabled download link has no href, so it is out of the tab order too. On a coarse
@@ -580,11 +584,29 @@ its 14px heading, 12.5px text, Back / Next buttons and a Key counter ("3 of 9 ·
 stays inside the card, the arrows page through it except inside a field or the 3D view, and Esc
 returns focus to where it was.
 
-### Print
-The memo prints alone, light whatever the theme, every ledger layer open, the figures without their
-switches, and a footer on every page with the address, the as-of date, the memo's revision and the page
-number. The home page prints light, its memo row and steps unbroken, with the tool's address in place
-of the buttons.
+### The paper memo (PDF and Print)
+Download PDF and Print both lay the memo out for paper, for whoever reviews it, as one self-contained
+document built from the run (`paperDocument` in `app.js`): the local server prints it to a PDF file with
+a headless Edge or Chrome; where there is no server or no such browser, it opens in the print dialog,
+where Save as PDF gives the same pages. US Letter, 20 / 16 / 18 mm margins.
+- **Order:** the address and a drawing-style title block (option, revision, rules date, proponent, site,
+  what it is compared with, fingerprint); then numbered sections: 1 the three answers, each with the
+  rules that decide it; 2 the open items, each with who resolves it and what to do; 3 the comparison,
+  when there is one (the answers A against B, then what changed rule by rule); the clauses applied
+  (proposed, permitted, the ask); the massing (plan and section, labels printed at about 6.5pt, the
+  street names without the screen's halo); the full ledger by layer (finding, every number used, the
+  source section); the inputs; the sources with their URLs printed; and how to reproduce the memo (the
+  command, the fingerprint, the rule files' hashes, the rule versions in force).
+- **References:** every rule is named by its layer and place, A1 to E4, in every section, so any answer
+  can be followed to its clause and, through its S number, to its document.
+- **Type:** IBM Plex Sans 8.6pt, tables 7.6pt with 6.3pt uppercase keys, ids and numbers in Plex Mono;
+  rule ids wrap at their dots and underscores. Statuses keep their mark and word, readable in grey.
+- **Running header and footer** from page 2: the address and the tool's name on the left, the revision
+  and rules date on the right; on every page the fingerprint, the issue date and the disclaimer, and
+  "Page n of N". Table headers repeat on each page and rows do not split.
+The page itself still prints alone when printed from the browser's own menu: light whatever the theme,
+every ledger layer open, the figures without their switches. The home page prints light, its memo row
+and steps unbroken, with the tool's address in place of the buttons.
 
 ## Do's and Don'ts
 

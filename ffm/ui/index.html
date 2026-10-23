@@ -38,7 +38,6 @@
   <a href="#step-option" data-step="2"><span class="step-n">2</span> Option</a>
   <a href="#step-run" data-step="3"><span class="step-n">3</span> Run and read</a>
   <a href="#step-export" data-step="4"><span class="step-n">4</span> Export</a>
-  <button id="hide-inputs" class="btn btn-quiet btn-small steps-toggle" type="button" aria-expanded="true" aria-controls="inputs">Hide inputs</button>
   <a href="#" id="tour-link" class="tour-link">Walkthrough</a>
 </nav>
 <div id="status" class="strip" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Loading the sites, options and rules…</span></div>
@@ -51,6 +50,11 @@
 
 <main class="panes">
   <aside class="inputs" id="inputs" aria-label="Inputs">
+    <button id="rail-toggle" class="rail-toggle" type="button" aria-expanded="true" aria-controls="inputs-body" title="Collapse the inputs">
+      <span class="rail-label">Inputs</span>
+      <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5"/></svg>
+    </button>
+    <div id="inputs-body" class="inputs-body">
     <section id="step-site" class="card input-card" tabindex="-1">
       <div class="card-head">
         <h2><span class="badge">1</span> Site</h2>
@@ -84,6 +88,7 @@
         <span id="option-dirty" class="dirty" hidden>edited, not saved</span>
       </div>
     </section>
+    </div>
   </aside>
 
   <section class="memo-pane" id="step-run" tabindex="-1" aria-label="The memo">
@@ -103,13 +108,14 @@
     <footer id="step-export" class="export" tabindex="-1">
       <h2><span class="badge">4</span> Export</h2>
       <div class="action-bar">
-        <a id="dl-html" class="btn" download aria-disabled="true">Download memo (HTML)</a>
+        <button id="pdf-btn" class="btn" type="button" disabled>Download PDF</button>
         <button id="print-btn" class="btn" type="button" disabled>Print</button>
+        <a id="dl-html" class="btn btn-quiet" download aria-disabled="true">Download memo (HTML)</a>
         <a id="dl-md" class="btn btn-quiet" download aria-disabled="true">Download memo (Markdown)</a>
         <a id="dl-massing" class="btn btn-quiet" download aria-disabled="true">Download massing.json</a>
         <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
       </div>
-      <p class="export-note">The HTML memo is the one to send: it opens in any browser and prints with its ledger. The Markdown is the same text for a repository or a wiki.</p>
+      <p class="export-note">The PDF is the one to send for review: every answer names the rules that decide it, every rule its numbers and its source, and the last section says how to reproduce the memo. Print gives the same pages. The HTML memo opens in any browser; the Markdown is the same text for a repository or a wiki.</p>
       <div id="export-panel" class="export-panel" hidden></div>
     </footer>
   </section>

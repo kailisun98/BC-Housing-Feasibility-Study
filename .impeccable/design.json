@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T01:13:14-07:00",
+  "generatedAt": "2026-10-23T01:31:21-07:00",
   "title": "Design System: First Read",
   "extensions": {
     "colorMeta": {
@@ -543,6 +543,14 @@
       "description": "Four steps with round badges; the current one on a group tab with its badge filled Ink.",
       "html": "<nav class=\"ds-steps\"><a class=\"ds-step ds-done\" href=\"#\"><span class=\"ds-n\">1</span> Site</a><a class=\"ds-step ds-active\" href=\"#\"><span class=\"ds-n\">2</span> Option</a><a class=\"ds-step\" href=\"#\"><span class=\"ds-n\">3</span> Run and read</a><a class=\"ds-step\" href=\"#\"><span class=\"ds-n\">4</span> Export</a></nav>",
       "css": ".ds-steps { display: flex; gap: 4px; padding: 6px 12px; border-bottom: 1px solid #e1e5ea; background: #ffffff; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 500; } .ds-step { color: #5f6672; text-decoration: none; padding: 5px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; } .ds-step:hover { background: rgba(44, 62, 80, .1); color: #2c3e50; box-shadow: inset 0 -3px 0 rgba(44, 62, 80, .55); } .ds-n { width: 20px; height: 20px; border-radius: 50%; background: #e9eef4; color: #2c3e50; display: inline-grid; place-items: center; font-size: 11px; font-weight: 600; } .ds-active { background: #e9eef4; color: #2c3e50; } .ds-active .ds-n, .ds-done .ds-n { background: #2c3e50; color: #ffffff; }"
+    },
+    {
+      "name": "Rail toggle",
+      "kind": "button",
+      "refersTo": null,
+      "description": "The inputs rail's own fold control: a row keyed Inputs with an SVG chevron; folded, a 44px strip reading Inputs upward.",
+      "html": "<button class=\"ds-rail\" aria-expanded=\"true\"><span>Inputs</span><svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M10 3.5 5.5 8 10 12.5\"/></svg></button>",
+      "css": ".ds-rail { display: flex; align-items: center; justify-content: space-between; width: 280px; min-height: 30px; padding: 4px 4px 4px 2px; border: 0; border-radius: 4px; background: transparent; color: #5f6672; font: 600 11px/1 'IBM Plex Sans', sans-serif; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; } .ds-rail:hover { background: rgba(44,62,80,.08); color: #2c3e50; } .ds-rail svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; } .ds-rail:focus-visible { outline: 2px solid #2a6fb8; outline-offset: 1px; }"
     },
     {
       "name": "Revision tag",

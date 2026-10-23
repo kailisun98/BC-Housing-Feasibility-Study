@@ -112,8 +112,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   font-size: 11px; font-weight: 600; background: var(--group); color: var(--ink); flex: 0 0 20px; letter-spacing: 0;
 }
 .steps a.active .step-n, .steps a.done .step-n { background: var(--ink); color: var(--panel); }
-.steps .steps-toggle { margin-left: auto; flex: 0 0 auto; }
-.steps .tour-link { margin-left: 4px; color: var(--blue); font-weight: 500; }
+.steps .tour-link { margin-left: auto; color: var(--blue); font-weight: 500; }
 .steps .tour-link:hover { color: var(--ink); }
 
 .strip { display: flex; align-items: center; gap: 10px; padding: 6px 16px; font-size: 12.5px; border-bottom: 1px solid var(--line); background: var(--status-info); min-width: 0; min-height: var(--strip-h); }
@@ -128,26 +127,51 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 /* ------------------------------------------------------------------ layout: the step rail and the stage */
 .panes { display: grid; grid-template-columns: min(420px, 36vw) minmax(0, 1fr); gap: 0; min-height: calc(100vh - var(--bars-h)); }
-.inputs { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 12px 16px 24px; border-right: 1px solid var(--line); background: var(--page); align-self: stretch; }
+.inputs { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 8px 16px 24px; border-right: 1px solid var(--line); background: var(--page); align-self: stretch; }
+.inputs-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .memo-pane { min-width: 0; padding: 12px 20px 40px; background: var(--page); }
-/* presenting: the inputs step aside, with the run tools and the walkthrough offer, and the memo takes the width */
-.panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
-.panes.no-inputs .inputs { display: none; }
-body.presenting .memo-tools, body.presenting .tour-offer { display: none; }
+
+/* the rail's own collapse control: a row keyed Inputs with a chevron; collapsed, the rail is a 44px strip that
+   reads Inputs upward, sticks under the bars and opens again on a click. The memo takes the width it frees. */
+.rail-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 30px; padding: 4px 4px 4px 2px;
+  border: 0; border-radius: 4px; background: transparent; color: var(--muted); cursor: pointer;
+  font: 600 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; transition: background-color .12s ease-out, color .12s ease-out;
+}
+.rail-toggle:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); color: var(--ink); }
+.rail-toggle:focus-visible { outline: var(--focus); outline-offset: 1px; }
+.rail-toggle .chev { width: 16px; height: 16px; flex: 0 0 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .16s ease-out; }
+.panes.no-inputs { grid-template-columns: 44px minmax(0, 1fr); }
+.panes.no-inputs .inputs { padding: 8px 6px; }
+.panes.no-inputs .inputs-body { display: none; }
+.panes.no-inputs .rail-toggle { position: sticky; top: calc(var(--bars-h) + 8px); flex-direction: column-reverse; justify-content: flex-end; gap: 10px; padding: 8px 0 10px; }
+.panes.no-inputs .rail-label { writing-mode: vertical-rl; transform: rotate(180deg); }
+.panes.no-inputs .rail-toggle .chev { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .rail-toggle, .rail-toggle .chev { transition: none; } }
+/* a wide touch screen: the folded strip is wide enough for a 44px target */
+@media (pointer: coarse) and (min-width: 1101px) { .panes.no-inputs { grid-template-columns: 56px minmax(0, 1fr); } }
 /* a link or a step lands its target below the sticky bars, not under them */
 .input-card, .memo-pane, .memo .card, .export { scroll-margin-top: calc(var(--bars-h) + 8px); }
 @media (max-width: 1100px) {
   /* stacked, the panes take their content's height; stretching them to the window opened gaps between the cards */
   .panes { grid-template-columns: 1fr; min-height: 0; align-content: start; }
-  .inputs { display: grid; grid-template-columns: 1fr 1fr; align-items: start; align-content: start; align-self: start; border-right: 0; border-bottom: 1px solid var(--line); }
+  .inputs { align-self: start; border-right: 0; border-bottom: 1px solid var(--line); }
+  .inputs-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  /* stacked over the memo, the rail folds up to its one row; the chevron points up to fold, down to open */
+  .rail-toggle .chev { transform: rotate(90deg); }
+  .panes.no-inputs { grid-template-columns: 1fr; }
+  .panes.no-inputs .inputs { padding: 6px 16px; }
+  .panes.no-inputs .rail-toggle { position: static; flex-direction: row; justify-content: space-between; padding: 4px 4px 4px 2px; }
+  .panes.no-inputs .rail-label { writing-mode: horizontal-tb; transform: none; }
+  .panes.no-inputs .rail-toggle .chev { transform: rotate(-90deg); }
 }
 @media (max-width: 760px) {
   /* a phone: one column, and the bars scroll away with the page */
   .bars { position: static; }
-  .inputs { grid-template-columns: 1fr; }
+  .inputs-body { grid-template-columns: 1fr; }
   .topbar { padding: 8px 12px; }
   .wordmark em { display: none; }
-  /* the step tabs wrap to a second line rather than hide Export, Hide inputs and Walkthrough past the edge */
+  /* the step tabs wrap to a second line rather than hide Export and Walkthrough past the edge */
   .steps { flex-wrap: wrap; row-gap: 2px; }
   .input-card, .memo-pane, .memo .card, .export { scroll-margin-top: 8px; }
   /* the title block wraps two cells to a row, without a rule running into the empty space */
@@ -235,10 +259,8 @@ body.presenting .memo-tools, body.presenting .tour-offer { display: none; }
 .side .pick { min-width: 0; padding-right: 8px; }
 .side .pick .tool .eyebrow { color: var(--ink); }
 .side .pick select { width: 100%; max-width: none; }
-/* the option's name is the picker's own text on screen; it shows whole only where the picker hides (print, presenting) */
+/* the option's name is the picker's own text on screen; it shows whole only in print, where the picker hides */
 .side .pick-name { display: none; font-size: 12px; color: var(--ink); font-weight: 600; }
-body.presenting .side .pick-name { display: block; }
-body.presenting .side .pick .tool { display: none; }
 @media (max-width: 760px) {
   /* a phone: the two pickers stack across the card's width, so each shows its run's date and folder */
   .side .pick-row { grid-template-columns: minmax(0, 1fr); row-gap: 10px; }
@@ -441,7 +463,7 @@ table.plain td.status { white-space: nowrap; }
 
 /* ------------------------------------------------------------------ touch: 44px targets on a coarse pointer */
 @media (pointer: coarse) {
-  .btn, .steps a, .tri button, .segbtn { min-height: 44px; }
+  .btn, .steps a, .tri button, .segbtn, .rail-toggle { min-height: 44px; }
   .field input[type="text"], .field input[type="number"], .field select, .tool select, .asof input[type="date"] { min-height: 44px; }
   .tree-row { grid-template-columns: 40px 1fr 64px 84px 44px; }
   .tree-row input, .tree-row select, .tree-row .x { min-height: 44px; }

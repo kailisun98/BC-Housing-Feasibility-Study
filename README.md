@@ -50,7 +50,7 @@ python -m unittest -v                      # evaluation cases (evals/cases.md) a
 `python -m ffm ui` serves the tool from `ffm/ui/` (standard library only, no build step). It opens on
 a home page at http://127.0.0.1:8765 that explains the problem and offers three demonstrations; the
 tool itself is at http://127.0.0.1:8765/app.html: the site and option forms on the left, the memo
-on the right rendered from `ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. FIG 01
+on the right rendered from `ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. Download PDF lays the memo out for a reviewer (the answers with the rules that decide them, open items with who resolves them, every clause, the massing, the full ledger with sources, and how to reproduce it) and prints it with a headless Edge or Chrome found on the machine; on the web version, or without such a browser, it opens the same pages in the print dialog. The inputs rail folds with the arrow at its top. FIG 01
 has a **Plan | 3D** switch: the 3D view is an orbitable axonometric of the lot, the setback envelope
 and the two masses drawn from the same `massing.json` (drag or use the arrow keys). Every
 Run writes a normal run folder under `outputs/<site-id>/`, so anything done in the page can be

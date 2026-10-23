@@ -24,6 +24,9 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
                                             | diff.json | ffm_revit_result.json | ffm_sheet_notes.json
                                             | ffm_sheet.png | ffm_sheet.pdf   (?download=1 to attach)
     POST /api/runs/<site>/<folder>/memo     rewrite memo.md / memo.html for that run (picks up a Revit result)
+    POST /api/pdf                           body {html}: the page's paper memo, printed to PDF by a headless Edge
+                                            or Chrome found on this machine (FFM_BROWSER names another); 501 when
+                                            there is none, and the page falls back to its print dialog
 
 Runs are written to outputs/<site-id>/<timestamp>/, so they are also usable from the command line.
 """
@@ -31,8 +34,12 @@ Runs are written to outputs/<site-id>/<timestamp>/, so they are also usable from
 from __future__ import annotations
 
 import json
+import os
 import re
+import shutil
+import subprocess
 import sys
+import tempfile
 import threading
 import traceback
 import webbrowser
@@ -321,6 +328,51 @@ def rewrite_memo(site_id: str, folder: str) -> dict:
     return {"run_id": f"{site_id}/{folder}", "revit": revit_summary(out, stamp)}
 
 
+# ---------------------------------------------------------------- PDF
+
+def find_browser() -> str | None:
+    """A Chromium browser that can print to PDF headlessly: FFM_BROWSER if set, else Edge (on every Windows
+    machine) or Chrome or Chromium in their usual places or on PATH."""
+    cands = [os.environ.get("FFM_BROWSER")]
+    if sys.platform == "win32":
+        for base in (os.environ.get("PROGRAMFILES(X86)"), os.environ.get("PROGRAMFILES"), os.environ.get("LOCALAPPDATA")):
+            if base:
+                cands += [os.path.join(base, "Microsoft", "Edge", "Application", "msedge.exe"),
+                          os.path.join(base, "Google", "Chrome", "Application", "chrome.exe")]
+    elif sys.platform == "darwin":
+        cands += ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                  "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+                  "/Applications/Chromium.app/Contents/MacOS/Chromium"]
+    for name in ("google-chrome", "google-chrome-stable", "chromium", "chromium-browser", "microsoft-edge", "msedge", "chrome"):
+        cands.append(shutil.which(name))
+    return next((c for c in cands if c and os.path.isfile(c)), None)
+
+
+def render_pdf(body: Any) -> bytes:
+    """The page's paper memo (a whole HTML document) printed to PDF by a headless browser. The page builds the
+    document, so the PDF is exactly what it shows in the print dialog; this only does the printing. The
+    browser's own header and footer are off: the document carries its own on every page."""
+    html = body.get("html") if isinstance(body, dict) else None
+    if not isinstance(html, str) or "<html" not in html[:400].lower():
+        raise ApiError(400, "Send the memo as {html: '<!doctype html>…'}.")
+    browser = find_browser()
+    if not browser:
+        raise ApiError(501, "No Edge or Chrome was found to print the PDF; use Print and choose Save as PDF.")
+    with tempfile.TemporaryDirectory(prefix="first-read-pdf-") as tmp:
+        src, out = Path(tmp) / "memo.html", Path(tmp) / "memo.pdf"
+        src.write_text(html, encoding="utf-8")
+        cmd = [browser, "--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
+               "--no-pdf-header-footer", f"--user-data-dir={Path(tmp) / 'profile'}", "--virtual-time-budget=8000",
+               f"--print-to-pdf={out}", src.as_uri()]
+        try:
+            subprocess.run(cmd, capture_output=True, timeout=90, check=False)
+        except subprocess.TimeoutExpired:
+            raise ApiError(504, "The browser took too long to print the PDF.")
+        if not out.exists() or out.stat().st_size == 0:
+            raise ApiError(500, "The browser did not write the PDF.")
+        return out.read_bytes()
+
+
 # ---------------------------------------------------------------- HTTP
 
 class Handler(BaseHTTPRequestHandler):
@@ -429,6 +481,8 @@ class Handler(BaseHTTPRequestHandler):
             mm = re.match(r"^/api/runs/([^/]+)/([^/]+)/memo$", path)
             if mm:
                 return self._json(rewrite_memo(mm.group(1), mm.group(2)))
+            if path == "/api/pdf":
+                return self._send(200, render_pdf(body), "application/pdf")
             raise ApiError(404, "Not found.")
         except ApiError as e:
             self._json({"error": str(e)}, e.status)

@@ -17,9 +17,11 @@ runs inside the engine, and that is a design decision, not an omission.
 
 ```powershell
 python -m unittest -v                                   # 23 tests must pass
-python -m ffm run --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-as-approved.json --out outputs/998-e-19th-ave/2026-10-23 --as-of 2026-10-23
-python -m ffm run --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-as-approved.json --out outputs/998-e-19th-ave/2026-10-27 --as-of 2026-10-27 --previous outputs/998-e-19th-ave/2026-10-23/ledger.json
-python -m ffm run --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-what-if-5-storey.json --out outputs/998-e-19th-ave/what-if --as-of 2026-10-23 --previous outputs/998-e-19th-ave/2026-10-23/ledger.json
+python -m ffm run --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-as-approved.json --out outputs/998-e-19th-ave/as-approved --as-of 2026-10-23
+python -m ffm run --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-as-approved.json --out outputs/998-e-19th-ave/as-approved-rules-2026-10-27 --as-of 2026-10-27 --previous outputs/998-e-19th-ave/as-approved/ledger.json
+python -m ffm run --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-what-if-funder-ready.json --out outputs/998-e-19th-ave/what-if-funder-ready --as-of 2026-10-23 --previous outputs/998-e-19th-ave/as-approved/ledger.json
+python -m ffm run --site sites/1010-expo-blvd.json --option options/1010-expo-blvd-as-permitted.json --out outputs/1010-expo-blvd/as-permitted --as-of 2026-10-23
+python -m ffm run --site sites/1010-expo-blvd.json --option options/1010-expo-blvd-what-if-12-storey.json --out outputs/1010-expo-blvd/what-if-12-storey --as-of 2026-10-23 --previous outputs/1010-expo-blvd/as-permitted/ledger.json
 python -m ffm ui                                        # the web UI at http://127.0.0.1:8765 (--port, --no-browser)
 ```
 
@@ -133,10 +135,13 @@ noted in the site file, not a finding.
 Comparison demo (23 Oct 2026): `options/998-e-19th-ave-what-if-funder-ready.json` is the five-storey
 what-if with every funder question answered (rent tiers 30/50/20, 5 accessible units, 60-year
 agreement, 19 replacement trees, land tenure stated as settled), so its run in
-`outputs/998-e-19th-ave/funder-ready/` reads by rezoning: yes, funders: yes, nothing outstanding.
+`outputs/998-e-19th-ave/what-if-funder-ready/` reads by rezoning: yes, funders: yes, nothing outstanding.
+Run folders are named by option, not date (`as-approved`, `as-approved-rules-2026-10-27`,
+`what-if-funder-ready`; `as-permitted`, `what-if-12-storey`); the 5-storey what-if was deleted on
+23 Oct 2026 as a duplicate of the funder-ready one.
 The 998 site's transit-oriented answer is now No (nearest SkyTrain stations over 800 m; confirm on
 the City's map). The home page's "Find a fit that qualifies" link opens
-`app.html?run=998-e-19th-ave/funder-ready&compare=998-e-19th-ave/2026-10-23`; when two runs are
+`app.html?run=998-e-19th-ave/what-if-funder-ready&compare=998-e-19th-ave/as-approved`; when two runs are
 compared, each of the three answer cards opens with an A | B strip, and a Side by side card and the
 What changed revision table follow the title block. Inputs carry marks (needed to run, read by a
 rule, drawings only) and (i) explanations from `FIELD_META` in `app.js`; the memo has a

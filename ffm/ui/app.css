@@ -440,7 +440,7 @@ table.plain td.status { white-space: nowrap; }
 .label-line label, .label-line .label { flex: 1 1 auto; }
 .info-btn { flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--muted); background: transparent; color: var(--muted); font: 600 10px/1 var(--mono); padding: 0; cursor: pointer; min-height: 0; }
 .info-btn:hover, .info-btn[aria-expanded="true"] { background: var(--ink); border-color: var(--ink); color: var(--panel); }
-.pop { margin: 2px 0 6px; padding: 8px 10px; background: var(--status-info); border: 1px solid var(--line); border-left: 3px solid var(--blue); border-radius: 4px; font-size: 12px; line-height: 1.5; color: var(--ink); }
+.pop { position: fixed; z-index: 40; margin: 0; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--blue); border-radius: 4px; box-shadow: 0 6px 20px rgba(20, 30, 40, .18); font-size: 12px; line-height: 1.5; color: var(--ink); pointer-events: none; }
 .pop p { margin: 0; }
 .field-row .field .label-line { gap: 4px; }
 @media (pointer: coarse) { .info-btn { width: 28px; height: 28px; font-size: 13px; } }

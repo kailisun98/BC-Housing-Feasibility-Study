@@ -539,25 +539,37 @@ function refreshNeeds(formEl, schema, obj) {
     <span><i class="need need-figure" aria-hidden="true"></i> drawings only</span>`;
 }
 
-/* The (i) beside a label opens a short explanation under it; Esc, a click elsewhere or the same (i) closes it. */
+/* The (i) beside a label opens a small note floating over the page, beside the button, so nothing below it moves.
+   Any click, a scroll, Esc or the same (i) closes it. */
 function closeInfo() {
   $$(".pop").forEach(p => p.remove());
   $$(".info-btn[aria-expanded='true']").forEach(b => b.setAttribute("aria-expanded", "false"));
 }
-document.addEventListener("click", e => {
-  const btn = e.target.closest(".info-btn");
-  if (!btn) { if (!e.target.closest(".pop")) closeInfo(); return; }
-  const open = btn.getAttribute("aria-expanded") === "true";
-  closeInfo();
-  if (open) return;
+function openInfo(btn) {
   const pop = document.createElement("div");
   pop.className = "pop";
   pop.setAttribute("role", "note");
   pop.innerHTML = `<p>${h(btn.dataset.info)}</p>`;
-  btn.closest(".field, .label-line").insertAdjacentElement("afterend", pop);
+  document.body.appendChild(pop);
+  const r = btn.getBoundingClientRect(), w = Math.min(300, window.innerWidth - 24);
+  pop.style.width = `${w}px`;
+  // to the right of the (i) when there is room, else under it; never past the window's edges
+  let left = r.right + 8, top = r.top - 6;
+  if (left + w > window.innerWidth - 12) { left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12)); top = r.bottom + 6; }
+  const ph = pop.offsetHeight;
+  if (top + ph > window.innerHeight - 12) top = Math.max(12, window.innerHeight - ph - 12);
+  pop.style.left = `${left}px`;
+  pop.style.top = `${top}px`;
   btn.setAttribute("aria-expanded", "true");
+}
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".info-btn");
+  const open = btn && btn.getAttribute("aria-expanded") === "true";
+  closeInfo();
+  if (btn && !open) openInfo(btn);
 });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && $(".pop")) { closeInfo(); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $(".pop")) closeInfo(); });
+window.addEventListener("scroll", () => { if ($(".pop")) closeInfo(); }, { capture: true, passive: true });
 
 function renderField(f, obj, onChange) {
   if (f.row) {

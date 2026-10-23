@@ -54,7 +54,8 @@ STATIC_DIR = Path(__file__).resolve().parent
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$")
 STATIC_FILES = {"index.html": "text/html; charset=utf-8", "app.js": "text/javascript; charset=utf-8",
                 "app.css": "text/css; charset=utf-8", "home.html": "text/html; charset=utf-8",
-                "home.js": "text/javascript; charset=utf-8", "home.css": "text/css; charset=utf-8"}
+                "home.js": "text/javascript; charset=utf-8", "home.css": "text/css; charset=utf-8",
+                "hero-memo.jpg": "image/jpeg"}
 RUN_FILES = {
     "memo.html": "text/html; charset=utf-8", "memo.md": "text/markdown; charset=utf-8",
     "ledger.json": "application/json; charset=utf-8", "massing.json": "application/json; charset=utf-8",
@@ -391,7 +392,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._static("home.html")
                 if path in ("/app", "/app.html"):
                     return self._static("index.html")
-                if path in ("/app.js", "/app.css", "/home.js", "/home.css"):
+                if path in ("/app.js", "/app.css", "/home.js", "/home.css", "/hero-memo.jpg"):
                     return self._static(path[1:])
                 if path == "/favicon.ico":
                     return self._send(204, b"", "image/x-icon")

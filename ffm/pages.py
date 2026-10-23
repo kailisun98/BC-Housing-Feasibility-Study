@@ -63,7 +63,7 @@ def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>")
     (out / "app.html").write_text(html, encoding="utf-8")
     shutil.copy(ui.STATIC_DIR / "home.html", out / "index.html")
-    for name in ("app.js", "app.css", "home.js", "home.css"):
+    for name in ("app.js", "app.css", "home.js", "home.css", "hero-memo.jpg"):
         shutil.copy(ui.STATIC_DIR / name, out / name)
     (out / ".nojekyll").write_text("", encoding="utf-8")
     n += 7

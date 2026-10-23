@@ -22,18 +22,24 @@ Python 3.10 or newer, standard library only.
 # the as-approved option for 998 E 19th Ave, rules as of 23 Oct 2026
 python -m ffm run --site sites/998-e-19th-ave.json \
                   --option options/998-e-19th-ave-as-approved.json \
-                  --out outputs/998-e-19th-ave/2026-10-23 --as-of 2026-10-23
+                  --out outputs/998-e-19th-ave/as-approved --as-of 2026-10-23
 
 # the same option under the family-unit rule that takes effect 27 Oct 2026, diffed against the first run
 python -m ffm run --site sites/998-e-19th-ave.json \
                   --option options/998-e-19th-ave-as-approved.json \
-                  --out outputs/998-e-19th-ave/2026-10-27 --as-of 2026-10-27 \
-                  --previous outputs/998-e-19th-ave/2026-10-23/ledger.json
+                  --out outputs/998-e-19th-ave/as-approved-rules-2026-10-27 --as-of 2026-10-27 \
+                  --previous outputs/998-e-19th-ave/as-approved/ledger.json
+
+# a what-if that answers every funder question, compared with the approved scheme
+python -m ffm run --site sites/998-e-19th-ave.json \
+                  --option options/998-e-19th-ave-what-if-funder-ready.json \
+                  --out outputs/998-e-19th-ave/what-if-funder-ready --as-of 2026-10-23 \
+                  --previous outputs/998-e-19th-ave/as-approved/ledger.json
 
 # the second case study: 1010 Expo Blvd, a 29-storey City-owned social housing tower in False Creek North (CD-1)
 python -m ffm run --site sites/1010-expo-blvd.json \
                   --option options/1010-expo-blvd-as-permitted.json \
-                  --out outputs/1010-expo-blvd/2026-10-23 --as-of 2026-10-23
+                  --out outputs/1010-expo-blvd/as-permitted --as-of 2026-10-23
 
 python -m ffm rules --as-of 2026-10-27     # which version of each rule is in force
 python -m ffm stamp                        # the version stamp alone

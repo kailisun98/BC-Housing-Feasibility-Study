@@ -54,19 +54,10 @@ nothing is uploaded, and a browser run lives in the tab until you download its m
 site or option downloads the JSON instead of writing it. The Revit step stays on a machine with
 Revit. The engine itself remains dependency-free; Pyodide is only fetched by the web build.
 
-Publishing: the built site is pushed to the `gh-pages` branch, which Pages serves. To republish
-after a change, build into an empty folder, commit it on `gh-pages` and push:
-
-```powershell
-python -m ffm pages --out ..\ffm-site
-cd ..\ffm-site; git init; git checkout -b gh-pages; git add -A; git commit -m "Build the web UI"
-git push -f https://github.com/kailisun98/BC-Housing-Feasibility-Study.git gh-pages
-```
-
-A workflow that does this on every push to `main` is ready in `.github/workflows/pages.yml`; it
-is not committed yet because pushing a workflow file needs a token with the `workflow` scope.
-Commit it from GitHub Desktop, then switch Pages (repository settings) to build from GitHub
-Actions.
+Publishing is automatic: `.github/workflows/pages.yml` runs the tests, builds the site with
+`python -m ffm pages --out _site` and deploys it to Pages on every push to `main`. To preview a
+build locally, run the same command and serve the folder with `python -m http.server --directory
+_site`.
 
 Each run writes to `--out`:
 

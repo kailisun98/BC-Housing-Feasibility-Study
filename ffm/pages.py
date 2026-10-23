@@ -34,11 +34,23 @@ def _write_json(path: Path, obj) -> None:
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+def _clear(out: Path) -> None:
+    """Empty the output folder but keep a .git inside it, so a checkout of the gh-pages branch can
+    be rebuilt in place and pushed."""
+    for child in out.iterdir():
+        if child.name == ".git":
+            continue
+        if child.is_dir():
+            shutil.rmtree(child)
+        else:
+            child.unlink()
+
+
 def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     out = Path(out)
     if out.exists():
-        shutil.rmtree(out)
-    (out / "data").mkdir(parents=True)
+        _clear(out)
+    (out / "data").mkdir(parents=True, exist_ok=True)
     n = 0
 
     # the page, with the static configuration injected where index.html leaves a marker

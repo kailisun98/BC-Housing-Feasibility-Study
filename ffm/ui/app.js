@@ -1909,10 +1909,14 @@ function wireFigures(run) {
     if (now) now.focus();
   }));
 
-  // the axonometric turns under a drag (one redraw per frame) or the arrow keys
+  // the axonometric turns under a drag (one redraw per frame) or the arrow keys. Its box keeps the size it was first
+  // drawn at: a turn or a tilt changes only the viewBox, which the box fits by scaling (meet), so the figure and the
+  // page below it never move. A change of the card's width redraws it and measures the box again.
   function wireOrbit() {
     const svg = $(".fig3d svg", fig);
     if (!svg) return;
+    const boxH = Math.round(svg.getBoundingClientRect().height);
+    if (boxH > 0) { svg.style.width = "100%"; svg.style.height = `${boxH}px`; }
     const turn = (daz, del) => {
       VIEW3D.az = (VIEW3D.az + daz) % 360;
       VIEW3D.el = Math.max(8, Math.min(80, VIEW3D.el + del));

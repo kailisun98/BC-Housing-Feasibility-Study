@@ -127,6 +127,16 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- SVG
 
+# The drawing tones of the UI's figures (DESIGN.md): drawing ink and muted on white paper, envelope
+# blue for the proposed mass, lane grey for the outright one, red for the setback envelope, amber for
+# the staff benchmark. The SVG is the same drawing in the memo, the UI and the committed run folders.
+DRAWING_COLOURS = {
+    "paper": "#ffffff", "ink": "#1f2933", "muted": "#5f6672", "lot": "#f4f4f2",
+    "envelope": "#c81e1e", "proposed": "#3c8cdc", "proposed_line": "#2a6fb8",
+    "outright": "#bdbdbd", "outright_line": "#8e8e8e", "benchmark": "#c77d14",
+}
+
+
 def svg(m: dict[str, Any]) -> str:
     """Plan (left) and section (right) of the masses, to scale, with the numbers printed."""
     W, D = m["lot"]["frontage_m"], m["lot"]["depth_m"]
@@ -155,45 +165,46 @@ def svg(m: dict[str, Any]) -> str:
         d = " ".join(f"{ox + x * scale:.1f},{oy + y * scale:.1f}" for x, y in pts)
         return f'<polygon points="{d}" fill="{fill}" stroke="{stroke}" stroke-width="1.5" stroke-dasharray="{dash}" fill-opacity="{op}"/>'
 
-    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}" height="{height:.0f}" viewBox="0 0 {width:.0f} {height:.0f}" font-family="Helvetica, Arial, sans-serif" font-size="12">',
-           f'<rect width="100%" height="100%" fill="#ffffff"/>',
+    C = DRAWING_COLOURS
+    out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}" height="{height:.0f}" viewBox="0 0 {width:.0f} {height:.0f}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="{C["ink"]}">',
+           f'<rect width="100%" height="100%" fill="{C["paper"]}"/>',
            f'<text x="{ox}" y="{pad - 4}" font-size="14" font-weight="600">Plan · {m["site_id"]} · {m["lot"]["frontage_m"]} × {m["lot"]["depth_m"]} m, {m["lot"]["area_m2"]:,.0f} m²</text>',
-           P(m["lot"]["polygon"], "#f4f4f2", "#333"),
-           P(m["envelope"]["polygon"], "none", "#888", dash="6 4")]
+           P(m["lot"]["polygon"], C["lot"], C["ink"]),
+           P(m["envelope"]["polygon"], "none", C["envelope"], dash="6 4")]
     if "outright" in masses:
-        out.append(P(masses["outright"]["footprint"], "#c9ced6", "#6b7280", op=0.9))
+        out.append(P(masses["outright"]["footprint"], C["outright"], C["outright_line"], op=0.9))
     if "proposed" in masses:
-        out.append(P(masses["proposed"]["footprint"], "#2f6fed", "#1e40af", op=0.35))
-    out.append(f'<text x="{ox}" y="{oy + plan_h + 16}" fill="#555">street (y = 0 is the top edge) · dashed = setback envelope {m["envelope"]["width_m"]} × {m["envelope"]["depth_m"]} m</text>')
+        out.append(P(masses["proposed"]["footprint"], C["proposed"], C["proposed_line"], op=0.5))
+    out.append(f'<text x="{ox}" y="{oy + plan_h + 16}" fill="{C["muted"]}">street (y = 0 is the top edge) · dashed = setback envelope {m["envelope"]["width_m"]} × {m["envelope"]["depth_m"]} m</text>')
 
     # Section
     out.append(f'<text x="{sx}" y="{pad - 4}" font-size="14" font-weight="600">Section across the frontage · heights in m</text>')
-    out.append(f'<line x1="{sx}" y1="{sy}" x2="{sx + sec_w}" y2="{sy}" stroke="#333" stroke-width="1.5"/>')
+    out.append(f'<line x1="{sx}" y1="{sy}" x2="{sx + sec_w}" y2="{sy}" stroke="{C["ink"]}" stroke-width="1.5"/>')
     env_x0 = m["envelope"]["setbacks_m"].get("side", 0) * scale
     env_w = m["envelope"]["width_m"] * scale
     if "outright" in masses:
         o = masses["outright"]
-        out.append(f'<rect x="{sx + env_x0:.1f}" y="{sy - o["height_m"] * scale:.1f}" width="{env_w:.1f}" height="{o["height_m"] * scale:.1f}" fill="#c9ced6" stroke="#6b7280" stroke-width="1.5"/>')
-        out.append(f'<text x="{sx + env_x0 + 6:.1f}" y="{sy - 6:.1f}" fill="#374151">{o["label"]} · {o["storeys"]} storeys (grey)</text>')
+        out.append(f'<rect x="{sx + env_x0:.1f}" y="{sy - o["height_m"] * scale:.1f}" width="{env_w:.1f}" height="{o["height_m"] * scale:.1f}" fill="{C["outright"]}" stroke="{C["outright_line"]}" stroke-width="1.5"/>')
+        out.append(f'<text x="{sx + env_x0 + 6:.1f}" y="{sy - 6:.1f}" fill="{C["ink"]}">{o["label"]} · {o["storeys"]} storeys (grey)</text>')
     if "proposed" in masses:
         p = masses["proposed"]
-        out.append(f'<rect x="{sx + env_x0:.1f}" y="{sy - p["height_m"] * scale:.1f}" width="{env_w:.1f}" height="{p["height_m"] * scale:.1f}" fill="#2f6fed" fill-opacity="0.3" stroke="#1e40af" stroke-width="1.5"/>')
+        out.append(f'<rect x="{sx + env_x0:.1f}" y="{sy - p["height_m"] * scale:.1f}" width="{env_w:.1f}" height="{p["height_m"] * scale:.1f}" fill="{C["proposed"]}" fill-opacity="0.45" stroke="{C["proposed_line"]}" stroke-width="1.5"/>')
         for k in range(1, p["storeys"]):
             yk = sy - k * p["floor_to_floor_m"] * scale
-            out.append(f'<line x1="{sx + env_x0:.1f}" y1="{yk:.1f}" x2="{sx + env_x0 + env_w:.1f}" y2="{yk:.1f}" stroke="#1e40af" stroke-width="0.6" stroke-opacity="0.6"/>')
-        out.append(f'<text x="{sx + env_x0 + 6:.1f}" y="{sy - p["height_m"] * scale - 6:.1f}" fill="#1e3a8a" font-weight="600">{p["label"]} · {p["height_m"]} m</text>')
+            out.append(f'<line x1="{sx + env_x0:.1f}" y1="{yk:.1f}" x2="{sx + env_x0 + env_w:.1f}" y2="{yk:.1f}" stroke="{C["proposed_line"]}" stroke-width="0.6" stroke-opacity="0.6"/>')
+        out.append(f'<text x="{sx + env_x0 + 6:.1f}" y="{sy - p["height_m"] * scale - 6:.1f}" fill="{C["proposed_line"]}" font-weight="600">{p["label"]} · {p["height_m"]} m</text>')
     b = m.get("policy_benchmark")
     if b and b.get("height_m"):
         lo, hi = b["height_m"]
         for hv, lab, dy in ((lo, f"staff benchmark {lo} m", 12), (hi, f"staff benchmark {hi} m", -3)):
             yv = sy - hv * scale
-            out.append(f'<line x1="{sx}" y1="{yv:.1f}" x2="{sx + sec_w}" y2="{yv:.1f}" stroke="#b45309" stroke-width="1" stroke-dasharray="4 3"/>')
-            out.append(f'<text x="{sx + sec_w - 4:.1f}" y="{yv + dy:.1f}" fill="#b45309" text-anchor="end" font-size="11">{lab}</text>')
+            out.append(f'<line x1="{sx}" y1="{yv:.1f}" x2="{sx + sec_w}" y2="{yv:.1f}" stroke="{C["benchmark"]}" stroke-width="1" stroke-dasharray="4 3"/>')
+            out.append(f'<text x="{sx + sec_w - 4:.1f}" y="{yv + dy:.1f}" fill="{C["benchmark"]}" text-anchor="end" font-size="11">{lab}</text>')
 
     # Footer: the numbers and the stamp
     fy = pad + 24 + max(plan_h, sec_h) + 40
     for i, ln in enumerate(lines):
-        out.append(f'<text x="{ox}" y="{fy + i * 16}" fill="#333">{_esc(ln)}</text>')
+        out.append(f'<text x="{ox}" y="{fy + i * 16}" fill="{C["ink"]}">{_esc(ln)}</text>')
     out.append("</svg>")
     return "\n".join(out)
 

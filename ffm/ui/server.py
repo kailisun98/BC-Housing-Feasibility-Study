@@ -4,7 +4,10 @@ Started with `python -m ffm ui [--port 8765] [--no-browser]`. The page never cal
 this module loads inputs, calls the engine exactly as the command line does, writes the same run
 folder (ledger, memo, massing, diff) and hands the results back as JSON.
 
-    GET  /                                  the page (index.html, app.js, app.css beside this file)
+    GET  /                                  the home page (home.html, home.css, home.js beside this file)
+    GET  /app.html                          the tool (index.html, app.js, app.css beside this file)
+    GET  /data/runs/<site>/<folder>/<file>  a run file at the path the GitHub Pages build gives it, so the
+                                            home page's links work the same here and on the web
     GET  /api/rules?as_of=YYYY-MM-DD        [{id, layer, layer_title, title, version_effective_from}]
     GET  /api/sites                         [{id, address, zoning_district, file}]
     GET  /api/sites/<id>                    site JSON
@@ -50,7 +53,8 @@ STATIC_DIR = Path(__file__).resolve().parent
 
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$")
 STATIC_FILES = {"index.html": "text/html; charset=utf-8", "app.js": "text/javascript; charset=utf-8",
-                "app.css": "text/css; charset=utf-8"}
+                "app.css": "text/css; charset=utf-8", "home.html": "text/html; charset=utf-8",
+                "home.js": "text/javascript; charset=utf-8", "home.css": "text/css; charset=utf-8"}
 RUN_FILES = {
     "memo.html": "text/html; charset=utf-8", "memo.md": "text/markdown; charset=utf-8",
     "ledger.json": "application/json; charset=utf-8", "massing.json": "application/json; charset=utf-8",
@@ -384,8 +388,10 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if method == "GET":
                 if path in ("/", "/index.html"):
+                    return self._static("home.html")
+                if path in ("/app", "/app.html"):
                     return self._static("index.html")
-                if path in ("/app.js", "/app.css"):
+                if path in ("/app.js", "/app.css", "/home.js", "/home.css"):
                     return self._static(path[1:])
                 if path == "/favicon.ico":
                     return self._send(204, b"", "image/x-icon")
@@ -408,7 +414,7 @@ class Handler(BaseHTTPRequestHandler):
                 mm = re.match(r"^/api/runs/([^/]+)/([^/]+)$", path)
                 if mm:
                     return self._json(load_run(mm.group(1), mm.group(2)))
-                mm = re.match(r"^/api/runs/([^/]+)/([^/]+)/([^/]+)$", path)
+                mm = re.match(r"^/(?:api|data)/runs/([^/]+)/([^/]+)/([^/]+)$", path)
                 if mm:
                     return self._run_file(mm.group(1), mm.group(2), mm.group(3), first("download") is not None)
                 raise ApiError(404, "Not found.")

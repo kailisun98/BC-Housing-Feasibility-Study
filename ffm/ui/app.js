@@ -1580,6 +1580,26 @@ async function init() {
   watchSteps();
   offerTour();
   if (STATIC) loadEngine().catch(() => { /* the chip says why; past runs still open */ });
+  await followLink();
+}
+
+// ---------------------------------------------------------------- links from the home page
+
+// ?tour=1 starts the walkthrough; ?run=<site>/<folder>&compare=<site>/<folder> opens a past run and compares it
+// with another. The run renders first, so on the web it shows while the engine loads for the comparison.
+async function followLink() {
+  const q = new URLSearchParams(location.search);
+  const run = q.get("run"), cmp = q.get("compare");
+  if (run) {
+    try {
+      await openRun(run);
+      if (cmp && cmp !== run) { state.compareRun = cmp; fillRunSelects(); await applyCompare(); }
+      $("#step-run").scrollIntoView({ block: "start" });
+    } catch (e) {
+      toast(`Could not open run ${run}: ${e.message}`, true);
+    }
+  }
+  if (q.get("tour")) startTour(0);
 }
 
 document.addEventListener("DOMContentLoaded", init);

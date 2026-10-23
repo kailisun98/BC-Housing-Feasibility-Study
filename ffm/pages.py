@@ -53,18 +53,20 @@ def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     (out / "data").mkdir(parents=True, exist_ok=True)
     n = 0
 
-    # the page, with the static configuration injected where index.html leaves a marker
+    # the tool as app.html, with the static configuration injected where index.html leaves a marker; the
+    # home page as index.html, so the site opens on it (the local server routes them the same way)
     html = (ui.STATIC_DIR / "index.html").read_text(encoding="utf-8")
     config = {"pyodide_url": pyodide_url, "built_at": datetime.now().isoformat(timespec="seconds"), "engine_version": __version__}
     marker = "<!-- static-config -->"
     if marker not in html:
         raise RuntimeError("index.html has no <!-- static-config --> marker")
     html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>")
-    (out / "index.html").write_text(html, encoding="utf-8")
-    for name in ("app.js", "app.css"):
+    (out / "app.html").write_text(html, encoding="utf-8")
+    shutil.copy(ui.STATIC_DIR / "home.html", out / "index.html")
+    for name in ("app.js", "app.css", "home.js", "home.css"):
         shutil.copy(ui.STATIC_DIR / name, out / name)
     (out / ".nojekyll").write_text("", encoding="utf-8")
-    n += 4
+    n += 7
 
     # inputs
     sites = ui.list_sites()

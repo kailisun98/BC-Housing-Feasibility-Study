@@ -41,9 +41,10 @@ python -m ffm ui                           # the web UI: pick a site and option,
 python -m unittest -v                      # evaluation cases (evals/cases.md) and the memo tests
 ```
 
-`python -m ffm ui` serves a one-page app at http://127.0.0.1:8765 from `ffm/ui/` (standard library
-only, no build step): the site and option forms on the left, the memo on the right rendered from
-`ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. FIG 01
+`python -m ffm ui` serves the tool from `ffm/ui/` (standard library only, no build step). It opens on
+a home page at http://127.0.0.1:8765 that explains the problem and offers three demonstrations; the
+tool itself is at http://127.0.0.1:8765/app.html: the site and option forms on the left, the memo
+on the right rendered from `ledger.json`, downloads of the memo and the massing, and the Export to Revit instructions. FIG 01
 has a **Plan | 3D** switch: the 3D view is an orbitable axonometric of the lot, the setback envelope
 and the two masses drawn from the same `massing.json` (drag or use the arrow keys). Every
 Run writes a normal run folder under `outputs/<site-id>/`, so anything done in the page can be
@@ -52,8 +53,9 @@ on a first visit) spotlights each part of the page in order and can run the rule
 
 ### On the web
 
-The same page runs on GitHub Pages at https://kailisun98.github.io/BC-Housing-Feasibility-Study/
-with no server behind it. `python -m ffm pages --out _site` writes the committed runs as data
+The same pages run on GitHub Pages, the home page at
+https://kailisun98.github.io/BC-Housing-Feasibility-Study/ and the tool at `app.html` beside it,
+with no server behind them. `python -m ffm pages --out _site` writes the committed runs as data
 files, so past runs open at once, and ships the engine's own source files, which the page loads
 into [Pyodide](https://pyodide.org) (CPython compiled to WebAssembly, about 10 MB from a CDN,
 cached after the first visit). *Run the rules* then runs the identical code in the browser:

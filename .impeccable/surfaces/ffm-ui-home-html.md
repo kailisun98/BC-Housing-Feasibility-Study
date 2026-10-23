@@ -35,16 +35,16 @@ It refuses the category default: headline, subcopy and button over a row of feat
 
 OWN-WORLD: Lotwise. Cool grey page #f5f6f8, white panels with a 1px #e1e5ea line and a whisper shadow, slate
 ink #2c3e50, blue #2a6fb8 only for links and focus, amber #c77d14 for pending, status pills with a glyph
-mark, IBM Plex Sans 600 for headlines and Plex Mono for weeks, dates, ids and the double-rule stamp,
+mark, IBM Plex Sans at 13px body, 18px titles and 11px keys, Plex Mono for weeks, ids and the double-rule stamp,
 drawings on white paper with a title block, dark-ink buttons that lift on hover and sink on press.
 
 STORY: Rules arrive late and cost redraws; they live in five layers owned by different people; the memo
 answers them on day one with arithmetic, clause, date and owner; it re-stamps when a rule changes; try it.
 
-FIRST VIEWPORT: Top bar (wordmark, anchors, Open the tool). A three-line Plex Sans headline left at about
-52px, one paragraph right (revised at the finish review: the headline is Kai's own sentence from the
-pitch, and two lines at 56px would need about 930px and starve the lede; the saving keeps the title
-block and stamp above the fold at 1366x768). Below, full width, a white drawing sheet: a Without / With the memo switch, the
+FIRST VIEWPORT: Top bar (wordmark, anchors, Open the tool). The headline at DESIGN.md's 18px title size
+on the left, one 13px paragraph on the right; the drawing sheet carries the viewport, title block and
+stamp included, with room to spare at 1366x768 windowed. Kai kept DESIGN.md's rule against a 16px body
+and large display type (Oct 2026), so the whole page sits at the tool's drafting density. Below, full width, a white drawing sheet: a Without / With the memo switch, the
 WK 0 to WK 12 ruler, a design band with redraw marks, six findings hanging from their weeks in two lanes,
 and a title block with site, as-of date and the stamp.
 

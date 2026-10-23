@@ -90,6 +90,18 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border: 1px solid var(--field-border); background: var(--field); border-radius: 6px;
   padding: 5px 8px; font-size: 14px; font-family: var(--mono);
 }
+.engine-chip {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--grey);
+  padding: 4px 10px; border: 1px solid var(--hair); border-radius: 999px; background: var(--card); white-space: nowrap;
+}
+.engine-chip.ready { color: var(--pass); border-color: var(--pass); }
+.engine-chip.error { color: var(--fail); border-color: var(--fail); white-space: normal; }
+.engine-chip.loading::before {
+  content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 7px; vertical-align: 0;
+  background: var(--conditional); animation: pulse 900ms ease-in-out infinite alternate;
+}
+@keyframes pulse { from { opacity: 0.25; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .engine-chip.loading::before { animation: none; } }
 .stamp { display: flex; align-items: center; gap: 8px; }
 .stamp .eyebrow { margin: 0; }
 .stamp code { font-size: 13px; padding: 3px 7px; border: 1px solid var(--hair); border-radius: 6px; background: var(--card); }

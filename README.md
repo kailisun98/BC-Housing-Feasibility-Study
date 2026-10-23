@@ -43,6 +43,18 @@ Run writes a normal run folder under `outputs/<site-id>/`, so anything done in t
 repeated from the command line. A two-minute **Walkthrough** (end of the step strip, offered once
 on a first visit) spotlights each part of the page in order and can run the rules on the way.
 
+### On the web
+
+The same page runs on GitHub Pages at https://kailisun98.github.io/BC-Housing-Feasibility-Study/
+with no server behind it. `python -m ffm pages --out _site` (run by `.github/workflows/pages.yml`
+on every push to `main`) writes the committed runs as data files, so past runs open at once, and
+ships the engine's own source files, which the page loads into [Pyodide](https://pyodide.org)
+(CPython compiled to WebAssembly, about 10 MB from a CDN, cached after the first visit). *Run the
+rules* then runs the identical code in the browser: nothing is uploaded, and a browser run lives
+in the tab until you download its memo. Saving a site or option downloads the JSON instead of
+writing it. The Revit step stays on a machine with Revit. The engine itself remains dependency-free;
+Pyodide is only fetched by the web build.
+
 Each run writes to `--out`:
 
 | File | What it is |

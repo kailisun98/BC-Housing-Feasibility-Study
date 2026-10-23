@@ -6,6 +6,7 @@
     python -m ffm rules [--as-of DATE]      list the rules and the version in force
     python -m ffm stamp [--as-of DATE]      print the version stamp only
     python -m ffm ui [--port 8765] [--no-browser]   the local web UI (ffm/ui/)
+    python -m ffm pages [--out _site]       build the UI as a static site (GitHub Pages; engine runs in Pyodide)
 """
 
 from __future__ import annotations
@@ -72,6 +73,14 @@ def cmd_memo(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_pages(a: argparse.Namespace) -> int:
+    """Build the web UI as a static site (GitHub Pages): data files for the runs, the engine for Pyodide."""
+    from . import pages
+    info = pages.build(Path(a.out), a.pyodide_url) if a.pyodide_url else pages.build(Path(a.out))
+    print(f"built {info['files']} files into {info['out']}: {info['sites']} site(s), {info['options']} option(s), {info['runs']} run(s)")
+    return 0
+
+
 def cmd_ui(a: argparse.Namespace) -> int:
     """Serve the web UI on 127.0.0.1 and open it in the default browser."""
     from .ui import server as ui_server  # imported here so the engine commands stay light
@@ -126,6 +135,11 @@ def main(argv: list[str] | None = None) -> int:
     u.add_argument("--port", type=int, default=8765)
     u.add_argument("--no-browser", dest="no_browser", action="store_true", help="do not open the browser")
     u.set_defaults(fn=cmd_ui)
+
+    g = sub.add_parser("pages", help="build the web UI as a static site for GitHub Pages")
+    g.add_argument("--out", default="_site")
+    g.add_argument("--pyodide-url", dest="pyodide_url", help="pyodide.js URL to load the engine with (default: the pinned CDN release)")
+    g.set_defaults(fn=cmd_pages)
 
     a = p.parse_args(argv)
     return a.fn(a)

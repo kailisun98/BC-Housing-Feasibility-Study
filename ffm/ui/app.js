@@ -53,8 +53,14 @@ function sourceLink(src) {
   return h(label);
 }
 
+/* Two backends, one call: the local Python server (python -m ffm ui), or, on a static host such as
+   GitHub Pages where `python -m ffm pages` set window.FFM_STATIC, data files plus the engine itself
+   running in the browser through Pyodide. Paths are relative so the page works under a sub-path. */
+const STATIC = window.FFM_STATIC || null;
+
 async function api(path, opts = {}) {
-  const r = await fetch(path, opts);
+  if (STATIC) return staticApi(path, opts);
+  const r = await fetch(path.replace(/^\//, ""), opts);
   let body = null;
   try { body = await r.json(); } catch (e) { body = null; }
   if (!r.ok) throw new Error((body && body.error) || `${r.status} ${r.statusText}`);
@@ -92,6 +98,186 @@ function setPath(obj, path, value) {
 function todayISO() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// ---------------------------------------------------------------- static backend (GitHub Pages): data files + the engine in Pyodide
+
+const browserRuns = new Map();   // runs made in this tab: run_id -> {payload, summary}
+let engine = null;               // {pyodide, run, diff} once loaded
+let enginePromise = null;
+
+function setEngineChip(text, kind) {
+  const chip = $("#engine-chip");
+  chip.hidden = false;
+  chip.textContent = text;
+  chip.className = "engine-chip " + (kind || "");
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = src; s.async = true;
+    s.onload = resolve;
+    s.onerror = () => reject(new Error(`could not load ${src}`));
+    document.head.appendChild(s);
+  });
+}
+
+const ENGINE_SHIM = `
+import json, sys
+from datetime import date
+sys.path.insert(0, ".")
+from ffm import engine, massing, memo
+
+def ffm_run(site_json, option_json, as_of, previous_json):
+    site, option = json.loads(site_json), json.loads(option_json)
+    L = engine.evaluate(site, option, date.fromisoformat(as_of))
+    m = svg = note = None
+    try:
+        m = massing.build(site, option, L)
+        svg = massing.svg(m)
+    except ValueError as e:
+        note = str(e)
+    d = engine.diff(json.loads(previous_json), L) if previous_json else None
+    md = memo.markdown(L, m, d)
+    return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note,
+                       "memo_md": md, "memo_html": memo.html_page(md, svg)})
+
+def ffm_diff(a_json, b_json):
+    return json.dumps(engine.diff(json.loads(a_json), json.loads(b_json)))
+`;
+
+function loadEngine() {
+  if (!STATIC) return Promise.resolve(null);
+  if (enginePromise) return enginePromise;
+  enginePromise = (async () => {
+    setEngineChip("Loading the rules engine, about 10 MB, once", "loading");
+    await loadScript(STATIC.pyodide_url);
+    const pyodide = await window.loadPyodide({ indexURL: STATIC.pyodide_url.replace(/pyodide\.js(\?.*)?$/, "") });
+    const files = await (await fetch("data/engine-files.json")).json();
+    for (const f of files) {
+      const r = await fetch(`engine/${f}`);
+      if (!r.ok) throw new Error(`engine file ${f}: ${r.status}`);
+      const dir = f.split("/").slice(0, -1).join("/");
+      if (dir) pyodide.FS.mkdirTree(dir);
+      pyodide.FS.writeFile(f, await r.text());
+    }
+    pyodide.runPython(ENGINE_SHIM);
+    engine = { pyodide, run: pyodide.globals.get("ffm_run"), diff: pyodide.globals.get("ffm_diff") };
+    setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
+    return engine;
+  })().catch(e => {
+    setEngineChip(`Engine did not load: ${e.message}. Past runs still open.`, "error");
+    enginePromise = null;
+    throw e;
+  });
+  return enginePromise;
+}
+
+async function fetchJSON(rel, optional = false) {
+  const r = await fetch(rel, { cache: "no-cache" });
+  if (!r.ok) { if (optional && r.status === 404) return null; throw new Error(`${r.status} for ${rel}`); }
+  return r.json();
+}
+
+async function fetchText(rel, optional = false) {
+  const r = await fetch(rel, { cache: "no-cache" });
+  if (!r.ok) { if (optional && r.status === 404) return null; throw new Error(`${r.status} for ${rel}`); }
+  return r.text();
+}
+
+function blobUrl(text, type) {
+  return URL.createObjectURL(new Blob([text], { type }));
+}
+
+function downloadJSON(obj, name) {
+  const a = document.createElement("a");
+  a.href = blobUrl(JSON.stringify(obj, null, 2) + "\n", "application/json");
+  a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+async function ledgerOf(runId) {
+  if (browserRuns.has(runId)) return browserRuns.get(runId).payload.ledger;
+  return fetchJSON(`data/runs/${runId}/ledger.json`);
+}
+
+async function loadStaticRun(runId) {
+  if (browserRuns.has(runId)) return browserRuns.get(runId).payload;
+  const [ledger, massing, svg, diff] = await Promise.all([
+    fetchJSON(`data/runs/${runId}/ledger.json`), fetchJSON(`data/runs/${runId}/massing.json`, true),
+    fetchText(`data/runs/${runId}/massing.svg`, true), fetchJSON(`data/runs/${runId}/diff.json`, true),
+  ]);
+  const base = `data/runs/${runId}`;
+  return { run_id: runId, folder: runId.split("/")[1], folder_abs: null, as_of: ledger.run.as_of, stamp: ledger.run.stamp.stamp,
+           ledger, massing, svg, diff, massing_note: null, revit: null, files: {},
+           downloads: { html: `${base}/memo.html`, md: `${base}/memo.md`, massing: massing ? `${base}/massing.json` : null } };
+}
+
+async function staticRun(body) {
+  await loadEngine();
+  let site = body.site, option = body.option;
+  if (typeof site === "string") site = await fetchJSON(`data/sites/${site}.json`);
+  if (typeof option === "string") option = await fetchJSON(`data/options/${option}.json`);
+  const prev = body.previous_run ? await ledgerOf(body.previous_run) : null;
+  const out = JSON.parse(engine.run(JSON.stringify(site), JSON.stringify(option), body.as_of || todayISO(), prev ? JSON.stringify(prev) : ""));
+  const now = new Date();
+  const folder = `browser-${now.toTimeString().slice(0, 8).replace(/:/g, "-")}`;
+  const siteId = site.id || "site";
+  const runId = `${siteId}/${folder}`;
+  const L = out.ledger, ans = L.summary.answers;
+  const payload = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp,
+    ledger: L, massing: out.massing, svg: out.svg, diff: out.diff, massing_note: out.massing_note, revit: null, files: {}, in_browser: true,
+    downloads: { html: blobUrl(out.memo_html, "text/html"), md: blobUrl(out.memo_md, "text/markdown"),
+                 massing: out.massing ? blobUrl(JSON.stringify(out.massing, null, 2), "application/json") : null } };
+  const summary = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp, option_id: L.run.option_id,
+    option_name: (L.inputs.option || {}).name, written: now.toISOString().slice(0, 19),
+    verdicts: { outright: ans.allowed.outright.verdict, by_rezoning: ans.allowed.by_rezoning.verdict, funded: ans.funded.verdict },
+    has_diff: !!out.diff, has_massing: !!out.massing, revit: null };
+  browserRuns.set(runId, { payload, summary });
+  return payload;
+}
+
+async function staticApi(path, opts) {
+  const u = new URL(path, "http://static.local/");
+  const p = u.pathname, q = u.searchParams;
+  const method = (opts.method || "GET").toUpperCase();
+  const body = opts.body ? JSON.parse(opts.body) : null;
+  let m;
+  if (method === "GET") {
+    if (p === "/api/rules") return fetchJSON("data/rules.json");
+    if (p === "/api/sites") return fetchJSON("data/sites.json");
+    if ((m = p.match(/^\/api\/sites\/([^/]+)$/))) return fetchJSON(`data/sites/${decodeURIComponent(m[1])}.json`);
+    if (p === "/api/options") {
+      const site = q.get("site") || "";
+      const all = await fetchJSON("data/options.json");
+      return all.map(o => ({ ...o, for_site: !!site && (o.id === site || o.id.startsWith(site + "-")) }))
+                .sort((a, b) => (a.for_site === b.for_site ? a.id.localeCompare(b.id) : (a.for_site ? -1 : 1)));
+    }
+    if ((m = p.match(/^\/api\/options\/([^/]+)$/))) return fetchJSON(`data/options/${decodeURIComponent(m[1])}.json`);
+    if (p === "/api/runs") {
+      const site = q.get("site");
+      const mine = [...browserRuns.values()].map(r => r.summary).reverse();
+      const all = await fetchJSON("data/runs.json");
+      return mine.concat(all).filter(r => !site || r.run_id.startsWith(site + "/"));
+    }
+    if (p === "/api/diff") {
+      const [a, b] = await Promise.all([ledgerOf(q.get("from")), ledgerOf(q.get("to"))]);
+      await loadEngine();
+      return { ...JSON.parse(engine.diff(JSON.stringify(a), JSON.stringify(b))), from_run: q.get("from"), to_run: q.get("to") };
+    }
+    if ((m = p.match(/^\/api\/runs\/([^/]+)\/([^/]+)$/))) return loadStaticRun(`${decodeURIComponent(m[1])}/${decodeURIComponent(m[2])}`);
+    if ((m = p.match(/^\/api\/runs\/([^/]+)\/([^/]+)\/([^/]+)$/))) {
+      const id = `${m[1]}/${m[2]}`;
+      if (browserRuns.has(id)) throw new Error("A browser run keeps no files on disk.");
+      return fetchJSON(`data/runs/${id}/${m[3]}`);
+    }
+    throw new Error(`The web version has no route for ${p}.`);
+  }
+  if (p === "/api/run") return staticRun(body);
+  if (p === "/api/options" || p === "/api/sites") { downloadJSON(body, `${body.id}.json`); return { id: body.id, file: `${body.id}.json`, downloaded: true }; }
+  if (/^\/api\/runs\/[^/]+\/[^/]+\/memo$/.test(p)) return { revit: null };
+  throw new Error(`The web version has no route for ${method} ${p}.`);
 }
 
 // ---------------------------------------------------------------- state
@@ -486,6 +672,11 @@ async function saveAs(kind) {
   if (kind === "option" && !body.name) body.name = prompt("A name for the option:", clean) || clean;
   try {
     const r = await postJSON(kind === "site" ? "/api/sites" : "/api/options", body);
+    if (r.downloaded) {
+      obj.id = clean;
+      toast(`Downloaded ${r.file}. Put it in the ${kind}s/ folder of the repository to keep it.`);
+      return;
+    }
     toast(`Saved ${kind}s/${r.file}`);
     obj.id = clean;
     if (kind === "site") {
@@ -519,6 +710,7 @@ async function runRules() {
   btn.classList.add("busy");
   btn.textContent = "Running…";
   try {
+    if (STATIC && !engine) { btn.textContent = "Loading the engine…"; await loadEngine(); btn.textContent = "Running…"; }
     const body = { site: state.site, option: tidyOption(state.option), as_of: $("#as-of").value || todayISO(), previous_run: state.compareRun || null };
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
@@ -532,7 +724,7 @@ async function runRules() {
     fillRunSelects();
     $("#compare-note").textContent = run.diff ? `${run.diff.changes.length} change${run.diff.changes.length === 1 ? "" : "s"} · ${run.diff.previous_stamp} → ${run.diff.current_stamp}` : "";
     const ms = Math.round(performance.now() - t0);
-    toast(`Ran the rules as of ${run.as_of} in ${ms} ms · stamp ${run.stamp} · wrote outputs/${run.run_id}/`);
+    toast(`Ran the rules as of ${run.as_of} in ${ms} ms · stamp ${run.stamp} · ${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}`);
     $("#step-run").scrollIntoView({ behavior: "smooth", block: "start" });
   } catch (e) {
     toast(e.message, true);
@@ -549,16 +741,19 @@ function showStamp(stamp) {
 
 function enableExports(run) {
   const on = !!run;
-  const base = run ? `/api/runs/${run.run_id}` : "#";
-  const set = (sel, file) => {
+  const base = run ? `api/runs/${run.run_id}` : "";
+  const urls = on ? (run.downloads || { html: `${base}/memo.html?download=1`, md: `${base}/memo.md?download=1`, massing: run.massing ? `${base}/massing.json?download=1` : null }) : {};
+  const stem = run ? run.run_id.replace("/", "_") : "memo";
+  const set = (sel, key, name) => {
     const a = $(sel);
-    a.href = on ? `${base}/${file}?download=1` : "#";
-    a.setAttribute("aria-disabled", String(!on));
+    const ok = on && !!urls[key];
+    a.href = ok ? urls[key] : "#";
+    a.setAttribute("download", name);
+    a.setAttribute("aria-disabled", String(!ok));
   };
-  set("#dl-html", "memo.html");
-  set("#dl-md", "memo.md");
-  set("#dl-massing", "massing.json");
-  $("#dl-massing").setAttribute("aria-disabled", String(!(on && run.massing)));
+  set("#dl-html", "html", `${stem}_memo.html`);
+  set("#dl-md", "md", `${stem}_memo.md`);
+  set("#dl-massing", "massing", `${stem}_massing.json`);
   $("#print-btn").disabled = !on;
   $("#revit-btn").disabled = !(on && run.massing);
 }
@@ -579,7 +774,7 @@ function renderQuiet() {
         <div><b>Proponent</b><br>${h(opt.proponent || "—")}</div>
         <div><b>Rules as of</b><br>${h($("#as-of").value || todayISO())}</div>
       </div>
-      <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, writes a stamped memo to <code>outputs/</code>, and reads it here: three answers first, then the massing and the full ledger.</p>
+      <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the stamped memo in this tab" : "writes a stamped memo to <code>outputs/</code>"}, and reads it here: three answers first, then the massing and the full ledger.</p>
     </div>
     <div class="answers">
       ${quietCard("01 · Is it allowed", "Is it allowed?", "Outright under the district, then by rezoning under the City policy that applies.")}
@@ -955,8 +1150,8 @@ async function applyCompare(render = true) {
 function psLines(run) {
   const f = run.files || {};
   return [
-    `$env:FFM_MASSING_JSON = "${f.massing_json || ""}"`,
-    `$env:FFM_SAVE_AS      = "${(run.folder_abs || "")}\\ffm_massing.rvt"`,
+    `$env:FFM_MASSING_JSON = "${f.massing_json || "C:\\path\\to\\the-downloaded\\massing.json"}"`,
+    `$env:FFM_SAVE_AS      = "${(run.folder_abs || "C:\\path\\to\\the-downloaded")}\\ffm_massing.rvt"`,
     `# $env:FFM_TEMPLATE   = "C:\\path\\to\\your-office-template.rte"   # optional; default is Revit's metric template`,
     `pyrevit run "${f.script || "revit\\ffm_massing_pyrevit.py"}" --revit=2026   # the year 'pyrevit env' reports`,
   ].join("\n");
@@ -969,7 +1164,7 @@ function renderExportPanel(run) {
     <h3 class="serif">Export to Revit</h3>
     <div class="block">
       <span class="eyebrow">This run's massing.json</span>
-      <div class="codeline"><code class="path" id="exp-path">${h(f.massing_json || "This run has no massing.json.")}</code><button class="btn btn-quiet btn-small" type="button" data-copy="exp-path">Copy</button></div>
+      <div class="codeline"><code class="path" id="exp-path">${h(f.massing_json || (STATIC ? "Download massing.json from the action bar above and save it next to this run's ledger.json on the machine that has Revit." : "This run has no massing.json."))}</code><button class="btn btn-quiet btn-small" type="button" data-copy="exp-path">Copy</button></div>
     </div>
     <div class="block">
       <span class="eyebrow">Headless, through the pyRevit CLI (PowerShell, Revit closed)</span>
@@ -982,13 +1177,15 @@ function renderExportPanel(run) {
     </div>
     <div class="block">
       <span class="eyebrow">Result</span>
-      <div><button id="check-revit" class="btn" type="button">Check Revit result</button></div>
-      <div id="revit-result" class="revit-result"></div>
+      ${STATIC ? `<p>The Revit step runs on a machine with Revit. Its result and the sheet image appear here when the page is served there with <code>python -m ffm ui</code>.</p>`
+               : `<div><button id="check-revit" class="btn" type="button">Check Revit result</button></div><div id="revit-result" class="revit-result"></div>`}
     </div>`;
   panel.hidden = false;
   $$("[data-copy]", panel).forEach(b => b.addEventListener("click", () => copyText($("#" + b.dataset.copy).textContent)));
-  $("#check-revit").addEventListener("click", checkRevit);
-  if (run.revit) checkRevit();
+  if (!STATIC) {
+    $("#check-revit").addEventListener("click", checkRevit);
+    if (run.revit) checkRevit();
+  }
 }
 
 async function checkRevit() {
@@ -1259,6 +1456,7 @@ async function init() {
   setStep(1);
   watchSteps();
   offerTour();
+  if (STATIC) loadEngine().catch(() => { /* the chip says why; past runs still open */ });
 }
 
 document.addEventListener("DOMContentLoaded", init);

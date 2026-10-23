@@ -21,6 +21,10 @@ function pill(status) {
 
 function cap(s) { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); }
 
+/* The status a verdict word stands for, so a card can wear its colour. */
+const VERDICT_STATUS = { no: "fail", yes: "pass", "yes, with conditions": "conditional", "not yet confirmed": "uncertain" };
+function verdictStatus(word) { return VERDICT_STATUS[word] || ""; }
+
 function fmtNum(x) {
   if (typeof x === "number") {
     if (Number.isInteger(x)) return x.toLocaleString("en-CA");
@@ -842,7 +846,8 @@ function answerAllowed(L) {
   if (path && policy.length) {
     body += `<ul class="finding-list">${policy.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
   }
-  return `<section class="card answer">
+  const status = verdictStatus(path ? bz.verdict : o.verdict);   // the operative answer: by rezoning when a path is stated
+  return `<section class="card answer" data-verdict="${h(status)}">
     <div class="eyebrow">01 · Is it allowed</div>
     <h2>Is it allowed?</h2>
     <p class="verdict">${verdict}</p>
@@ -857,7 +862,7 @@ function answerFunders(L) {
   const others = res.filter(r => r.layer === "E" && targets.size && !targets.has(r.rule_id));
   let body = `<ul class="finding-list">${rows.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
   if (others.length) body += `<p class="path" style="margin-top:12px">Not targeted, listed in the ledger: ${others.map(r => h(r.title)).join("; ")}.</p>`;
-  return `<section class="card answer">
+  return `<section class="card answer" data-verdict="${h(verdictStatus(ans.funded.verdict))}">
     <div class="eyebrow">02 · Does it fit the funders</div>
     <h2>Does it fit the funders?</h2>
     <p class="verdict"><em>${h(cap(ans.funded.verdict))}.</em></p>
@@ -868,11 +873,12 @@ function answerFunders(L) {
 function answerUnsure(L) {
   const items = L.summary.answers.unsure || [];
   const n = items.length;
-  const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}, each with <em>a named person</em>.` : "Nothing outstanding.";
+  const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}, each with <em>a named person</em>.` : "<em>Nothing outstanding.</em>";
   const table = n ? `<table class="plain"><thead><tr><th>Item</th><th>Status</th><th>Who / what</th></tr></thead><tbody>
     ${items.map(u => `<tr><td>${h(u.title)}</td><td class="status">${pill(u.status)}</td><td class="who">${h(u.action || "—")}</td></tr>`).join("")}
   </tbody></table>` : "";
-  return `<section class="card answer">
+  const worst = items.some(u => u.status === "fail") ? "fail" : (n ? "uncertain" : "pass");   // the card wears the heaviest open status
+  return `<section class="card answer" data-verdict="${worst}">
     <div class="eyebrow">03 · Still unsure</div>
     <h2>What is still unsure, and who resolves it?</h2>
     <p class="verdict">${verdict}</p>

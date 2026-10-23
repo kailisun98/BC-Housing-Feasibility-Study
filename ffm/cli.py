@@ -123,7 +123,7 @@ def cmd_stamp(a: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(prog="ffm", description="Funding-fit memo: deterministic feasibility screen for BC non-profit housing.")
+    p = argparse.ArgumentParser(prog="ffm", description="First Read: a deterministic feasibility screen for BC non-profit housing.")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     r = sub.add_parser("run", help="evaluate a site + option and write ledger, memo and massing")

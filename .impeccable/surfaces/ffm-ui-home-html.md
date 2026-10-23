@@ -7,7 +7,7 @@ related_targets: ["ffm/ui/home.css", "ffm/ui/home.js", "ffm/ui/hero-memo.jpg", "
 
 # Surface brief: home page (ffm/ui/home.html)
 
-Scope: the front door of Funding-Fit Memo, served at `/` locally and on GitHub Pages; the tool is
+Scope: the front door of First Read, served at `/` locally and on GitHub Pages; the tool is
 `/app.html` (source file `ffm/ui/index.html`). Visitor mode: Persuade, read like a short paper: the visitor
 should be able to browse it by its four sections and read any one of them comfortably.
 
@@ -54,7 +54,8 @@ request for a more complementary palette: it shared Amber's hue, so it read as p
 marks; on slate, amber is the one warm note. The problem and the memo row sit on the band; the hero, how it works and the real case on
 the grey; the footer follows under a hairline. Sections carry 56px top and bottom (44px on a phone).
 
-REVISIONS: the page never shows a stamp's hash; the rules are named by revision (R1, R2…), as in the tool.
+REVISIONS: the page never shows a stamp's hash; as in the tool, each memo on a site is a revision (R1, R2…):
+the as-approved memo is R1, the funder-ready what-if R2.
 
 READING: labels and the memo row keep the tool's drafting density (13px, 11px keys); running prose, the steps
 included, is 14px on a 1.6 leading and a 52ch measure (about 68 characters); the headline is 22px (20px on a

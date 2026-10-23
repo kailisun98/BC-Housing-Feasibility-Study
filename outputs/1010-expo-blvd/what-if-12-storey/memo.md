@@ -1,4 +1,4 @@
-# Funding-fit memo: 1010 Expo Blvd (formerly 1050 Expo Blvd), Vancouver, BC
+# First Read memo: 1010 Expo Blvd (formerly 1050 Expo Blvd), Vancouver, BC
 
 **Option:** What-if (hypothetical, for the demo): twelve storeys with the full funder data supplied  
 **Proponent:** City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society (municipal housing provider)  

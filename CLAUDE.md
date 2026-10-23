@@ -1,4 +1,9 @@
-# CLAUDE.md — Funding-Fit Memo
+# CLAUDE.md — First Read
+
+The tool's name is "First Read" (decided by Kai on 23 Oct 2026 for the mid review; it replaced
+"Lot by lot" from earlier that day, which replaced "Funding-Fit Memo"). Subtitle: "a funding-fit
+memo for BC non-profit housing". Only visible names changed: the `ffm` module, the repository
+name and the GitHub Pages URL stay. Do not revert the name without Kai saying so.
 
 Context for Claude Code working in this repository on Kai's Windows machine.
 
@@ -149,9 +154,12 @@ a disclosure); then What changed. `compareKind` tells a change of rules (Revisio
 options under the same rules ("What changed between the two options", no delta). The answer cards carry
 no A | B strip any more. Opening a run that has a stored diff.json compares it with the run it was
 recorded against when the list can tell which (`recordedAgainst`). The UI no longer shows the stamp's
-hash: each distinct stamp on file is a rules revision, R1, R2… (`noteRevisions` / `rev` in `app.js`,
-numbered by the earliest as-of date across all sites); the hash appears only in the memo's Rules revision
-card. The engine's memo.md/memo.html and the Revit Comments still carry the hash. Inputs carry marks (needed to run, read by a
+hash: each memo on a site is a revision, R1, R2… (`noteRevisions` / `madeHere` / `rev` in `app.js`):
+the committed base runs first, then those recorded against another (they have a diff.json), each by
+as-of date and folder, then runs made in the tool in the order made. On 998 E 19th Ave: as-approved R1,
+what-if-funder-ready R2, as-approved-rules-2026-10-27 R3; on 1010 Expo Blvd: as-permitted R1,
+what-if-12-storey R2. The hash appears only in the memo's Rules fingerprint card; the engine's
+memo.md/memo.html and the Revit Comments still carry it. Inputs carry marks (needed to run, read by a
 rule, drawings only) and (i) explanations from `FIELD_META` in `app.js`; the memo has a
 "Clauses applied" table (proposed, permitted or required, the ask) before the layered ledger.
 

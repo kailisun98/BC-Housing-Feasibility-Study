@@ -1,4 +1,4 @@
-/* Funding-Fit Memo, the page. Vanilla JS, no build step.
+/* First Read, the page. Vanilla JS, no build step.
    It formats what the engine wrote (ledger.json, massing.json); it never calculates a rule. */
 
 "use strict";
@@ -307,8 +307,7 @@ const state = {
   runs: [],             // past runs for the site
   compareRun: null,     // run_id to diff against on the next run
   step: 1,              // the step the reader is on, for the step bar
-  revSeen: new Map(),   // rules stamp -> the earliest as-of date it was read on
-  revisions: new Map(), // rules stamp -> "R1", "R2"…
+  revisions: new Map(), // run_id -> "R1", "R2"…: the memo's revision on its site
 };
 
 const PRELOAD_SITE = "998-e-19th-ave";
@@ -933,27 +932,23 @@ async function loadRuns() {
   noteRevisions(state.runs);
 }
 
-/* The rules' revisions. A memo's stamp is a hash of the rule files and the versions in force on its as-of date;
-   the reader sees it as R1, R2 and so on: the distinct stamps on file, across every site, numbered by the earliest
-   date each was read on (ties by the stamp itself, so every machine numbers them alike). The hash itself stays in
-   the Rules revision card at the foot of the memo, and in the Revit elements' Comments. */
-async function loadRevisions() {
-  const lists = await Promise.all((state.sites || []).map(s => api(`/api/runs?site=${encodeURIComponent(s.id)}`).catch(() => [])));
-  noteRevisions(lists.flat());
-}
+/* A memo's revision on its site, R1, R2 and so on, the way a drawing numbers its issues. The committed runs come
+   first: the base runs, then the runs recorded against another (they carry a diff), each group by its as-of date
+   and folder. Then the runs made here, in the order they were made (their folders are timestamps), so a new run
+   always takes the next number. On 998 E 19th Ave the as-approved memo is R1 and the funder-ready what-if R2. The
+   rules stamp behind a memo appears only as the fingerprint in its Rules fingerprint card. */
+const madeHere = r => /^(\d{4}-\d\d-\d\dT|browser-)/.test(r.folder || "");
 
 function noteRevisions(runs) {
-  for (const r of runs || []) {
-    if (!r || !r.stamp) continue;
-    const seen = state.revSeen.get(r.stamp);
-    if (!seen || (r.as_of && r.as_of < seen)) state.revSeen.set(r.stamp, r.as_of || "9999");
-  }
-  const order = [...state.revSeen.entries()].sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
-  state.revisions = new Map(order.map(([stamp], i) => [stamp, `R${i + 1}`]));
+  const list = (runs || []).filter(r => r && r.run_id);
+  const committed = list.filter(r => !madeHere(r)).sort((a, b) => (a.has_diff ? 1 : 0) - (b.has_diff ? 1 : 0)
+    || String(a.as_of).localeCompare(String(b.as_of)) || String(a.folder).localeCompare(String(b.folder)));
+  const made = list.filter(madeHere).sort((a, b) => String(a.written || a.folder).localeCompare(String(b.written || b.folder)));
+  state.revisions = new Map([...committed, ...made].map((r, i) => [r.run_id, `R${i + 1}`]));
 }
 
-/* A rules stamp as the reader sees it: its revision number. */
-const rev = stamp => (stamp && state.revisions.get(stamp)) || "an unlisted revision";
+/* A run as the reader names it: its revision on the site. */
+const rev = runId => (runId && state.revisions.get(runId)) || "a new revision";
 
 async function runRules() {
   const btn = $("#run-btn");
@@ -967,18 +962,17 @@ async function runRules() {
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
     state.run = run;
-    noteRevisions([run]);
+    await loadRuns();   // the new run joins the list first, so it takes the next revision number
     await attachCause(run);
     renderMemo(run);
-    showStamp(run.stamp);
+    showStamp(run);
     enableExports(run);
     setStep(3);
     closeExportPanel();
-    await loadRuns();
     fillRunSelects();
     setCompareNote(run.diff);
     const ms = Math.round(performance.now() - t0);
-    toast(`Ran the rules as of ${run.as_of} (${rev(run.stamp)}) in ${ms} ms · ${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}`);
+    toast(`Ran the rules as of ${run.as_of}: ${rev(run.run_id)}, in ${ms} ms ·${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}`);
     $("#step-run").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   } catch (e) {
     toast(e.message, true);
@@ -988,10 +982,10 @@ async function runRules() {
   }
 }
 
-/* The top bar names the memo's rules revision, R1, R2…; the stamp behind it is in the memo's Rules revision card. */
-function showStamp(stamp) {
-  $("#stamp-text").textContent = stamp ? rev(stamp) : "";
-  $("#stamp-box").hidden = !stamp;
+/* The top bar names the memo's revision on its site, R1, R2…. */
+function showStamp(run) {
+  $("#stamp-text").textContent = run ? rev(run.run_id) : "";
+  $("#stamp-box").hidden = !run;
 }
 
 function enableExports(run) {
@@ -1057,16 +1051,17 @@ function renderMemo(run) {
   const d = run.diff;
   const kind = d ? compareKind(d) : null;
   const B = d && run.compareLedger ? run.compareLedger : null;
+  const prevRev = state.compareRun ? rev(state.compareRun) : "an earlier memo";
   const cmpCell = !d ? "" : kind === "rules"
-    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(rev(d.previous_stamp))} <span class="cont">(rules as of ${h(d.previous_as_of)})</span></span></div>`
-    : `<div><b>Compared with</b><span>${B ? h(optionName(B)) : "a run"} <span class="cont">(as of ${h(d.previous_as_of)})</span></span></div>`;
+    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(prevRev)} <span class="cont">(rules as of ${h(d.previous_as_of)})</span></span></div>`
+    : `<div><b>Compared with</b><span><b class="rev-no">${h(prevRev)}</b> ${B ? h(optionName(B)) : "a run"} <span class="cont">(as of ${h(d.previous_as_of)})</span></span></div>`;
   parts.push(`<div class="card memo-head">
     <h1>${h(site.address || site.id)}</h1>
     <div class="memo-meta">
       <div><b>Option</b><span>${h(opt.name || opt.id)}</span></div>
       <div><b>Proponent</b><span>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="cont">(${h(String(opt.proponent_type).replace(/_/g, " "))})</span>` : ""}</span></div>
       <div><b>Rules as of</b><span>${h(L.run.as_of)}</span></div>
-      <div><b>Rules revision</b><span><b class="rev-no">${h(rev(L.run.stamp.stamp))}</b> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
+      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
       ${cmpCell}
     </div>
     <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
@@ -1077,14 +1072,14 @@ function renderMemo(run) {
   // them otherwise; 5. the full ledger; 6. inputs, sources, version stamp. Only a change in the rules carries the
   // delta into the clauses and the ledger (the Revision Rule); two options differ in their numbers, not their rules.
   if (B) parts.push(renderSideBySide(run));
-  if (d) parts.push(renderChanges(d, L));
+  if (d) parts.push(renderChanges(d, L, run));
   const changed = new Set(kind === "rules" ? (d.changes || []).map(c => c.rule_id) : []);
   const rest = [];
   rest.push(renderClauses(res, L, changed));
   rest.push(renderLedger(res, changed));
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
-  rest.push(renderStamp(L.run));
+  rest.push(renderStamp(L.run, run.run_id));
   parts.push(`<div class="memo-body">
     <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L)}</div>
     ${renderFigures(run)}
@@ -1119,12 +1114,12 @@ function compareKind(d) {
   return d.rules_changed || d.previous_as_of !== d.current_as_of ? "rules" : "options";
 }
 
-/* Every printed page carries the address, the date and the rules revision in its footer, and its page number. */
+/* Every printed page carries the address, the date and the memo's revision in its footer, and its page number. */
 function setPrintFooter(run) {
   let st = $("#print-page");
   if (!st) { st = document.createElement("style"); st.id = "print-page"; document.head.appendChild(st); }
   const site = (run.ledger && run.ledger.inputs && run.ledger.inputs.site) || {};
-  const text = `Funding-Fit Memo · ${site.address || site.id || ""} · rules as of ${run.as_of} · ${rev(run.stamp)}`.replace(/["\\\n]/g, " ");
+  const text = `First Read · ${site.address || site.id || ""} · rules as of ${run.as_of} · ${rev(run.run_id)}`.replace(/["\\\n]/g, " ");
   st.textContent = `@media print { @page { margin: 14mm 14mm 16mm;
     @bottom-left { content: "${text}"; font: 7.5pt "IBM Plex Mono", monospace; color: #444; }
     @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "IBM Plex Sans", sans-serif; color: #444; } } }`;
@@ -1323,7 +1318,7 @@ function tradeOff(A, B) {
   const facts = [[units(a), units(b), "units"], [a.storeys, b.storeys, "storeys"], [a.height_m, b.height_m, "m high"], [a.gfa_m2, b.gfa_m2, "m² of floor area"]]
     .filter(([x, y]) => x != null && y != null && x !== y)
     .map(([x, y, unit]) => `${fmtNum(x)} ${unit} against ${fmtNum(y)}`);
-  return facts.length ? `A against B: ${facts.join(", ")}.` : "The two runs propose the same building.";
+  return facts.join(", ");
 }
 
 /* Two runs side by side: the pickers on the A and B columns, the four answers of each, then the rules whose status
@@ -1341,9 +1336,12 @@ function renderSideBySide(run) {
     ["Fits the funders", verdictCell(ans(A).funded.verdict), verdictCell(ans(B).funded.verdict)],
     ["Open items", openCell(A), openCell(B)],
   ];
+  // each run named by its revision on the site: A is this run, B the run compared
+  const ra = rev(run.run_id), rb = rev(state.compareRun);
+  const trade = tradeOff(A, B);
   const lead = kind === "rules"
-    ? `The same site and option read under the rules as of ${h(A.run.as_of)} (${h(rev(A.run.stamp.stamp))}) against ${h(B.run.as_of)} (${h(rev(B.run.stamp.stamp))}).`
-    : `${h(tradeOff(A, B))} Both read under the same rules, ${h(rev(A.run.stamp.stamp))}.`;
+    ? `The same site and option: ${h(ra)} reads the rules as of ${h(A.run.as_of)}, ${h(rb)} as of ${h(B.run.as_of)}.`
+    : `${trade ? `A, ${h(ra)}, against B, ${h(rb)}: ${h(trade)}.` : `A, ${h(ra)}, and B, ${h(rb)}, propose the same building.`} Both read the rules as of ${h(A.run.as_of)}.`;
   const byId = Object.fromEntries(B.results.map(r => [r.rule_id, r]));
   const rows = A.results.filter(r => r.status !== "not_applicable" || (byId[r.rule_id] && byId[r.rule_id].status !== "not_applicable")).map(r => {
     const b = byId[r.rule_id];
@@ -1361,19 +1359,19 @@ function renderSideBySide(run) {
   const table = list => `<table class="plain side-rules"><colgroup><col class="c-rule"><col class="c-ab"><col class="c-ab"></colgroup>
       <thead><tr><th>Rule</th><th>A</th><th>B</th></tr></thead><tbody>${list.map(row).join("")}</tbody></table>`;
   // each run's open items, with the person who resolves them, for the run that still has some
-  const openList = [["A", A], ["B", B]].filter(([, L]) => (ans(L).unsure || []).length).map(([k, L]) => `<details class="side-open">
-      <summary>${k} · ${h(optionName(L))}: ${ans(L).unsure.length} open item${ans(L).unsure.length === 1 ? "" : "s"}</summary>
+  const openList = [["A", A, ra], ["B", B, rb]].filter(([, L]) => (ans(L).unsure || []).length).map(([k, L, r]) => `<details class="side-open">
+      <summary>${k} · ${h(r)} · ${h(optionName(L))}: ${ans(L).unsure.length} open item${ans(L).unsure.length === 1 ? "" : "s"}</summary>
       <ul>${ans(L).unsure.map(u => `<li>${pill(u.status)} <b>${h(u.title)}</b> <span class="cont">${h(u.action || "")}</span></li>`).join("")}</ul>
     </details>`).join("");
   return `<section class="card section side" id="side-by-side" aria-labelledby="side-h">
     <h2 id="side-h">Side by side</h2>
     <div class="pick-row" role="group" aria-label="The two runs compared">
       <span class="pick-key" aria-hidden="true"></span>
-      <div class="pick" data-slot="open"><span class="pick-name">A · ${h(optionName(A))} <span class="cont">(as of ${h(A.run.as_of)})</span></span></div>
-      <div class="pick" data-slot="compare"><span class="pick-name">B · ${h(optionName(B))} <span class="cont">(as of ${h(B.run.as_of)})</span></span></div>
+      <div class="pick" data-slot="open"><span class="pick-name">A · ${h(ra)} · ${h(optionName(A))} <span class="cont">(as of ${h(A.run.as_of)})</span></span></div>
+      <div class="pick" data-slot="compare"><span class="pick-name">B · ${h(rb)} · ${h(optionName(B))} <span class="cont">(as of ${h(B.run.as_of)})</span></span></div>
     </div>
     <p class="side-lead">${lead}</p>
-    <table class="plain side-head"><thead><tr><th><span class="sr-only">Answer</span></th><th><span class="sr-only">A, ${h(optionName(A))}</span></th><th><span class="sr-only">B, ${h(optionName(B))}</span></th></tr></thead>
+    <table class="plain side-head"><thead><tr><th><span class="sr-only">Answer</span></th><th><span class="sr-only">A, ${h(ra)}, ${h(optionName(A))}</span></th><th><span class="sr-only">B, ${h(rb)}, ${h(optionName(B))}</span></th></tr></thead>
       <tbody>${head.map(([k, a, b]) => `<tr><th scope="row">${h(k)}</th><td>${a}</td><td>${b}</td></tr>`).join("")}</tbody></table>
     ${openList}
     <h3 class="side-sub">${differ.length ? `${differ.length} of ${rows.length} rules read differently` : `All ${rows.length} rules read the same in both`}</h3>
@@ -1453,13 +1451,13 @@ function renderSources(res, site, opt) {
   </section>`;
 }
 
-/* The memo's rules revision, and the fingerprint behind it: the one place the stamp's hash is shown. */
-function renderStamp(run) {
+/* The rules this memo read, and their fingerprint: the one place the stamp's hash is shown. */
+function renderStamp(run, runId) {
   const st = run.stamp;
   const files = Object.entries(st.rules_files || {}).map(([f, hsh]) => `<li><code>${h(f)}</code> <span class="hash">${h(hsh.slice(0, 16))}…</span></li>`).join("");
   return `<section class="card section stampbox">
-    <h2>Rules revision ${h(rev(st.stamp))}</h2>
-    <p>${h(rev(st.stamp))} is this reading of the rules: the rule files below and the versions in force on ${h(run.as_of)}. Change one number in one rule, or read the rules on a date when a version changes, and the memo is on a new revision. Revisions are numbered R1, R2 and so on by the earliest date each was read on, across the runs on file.</p>
+    <h2>Rules fingerprint</h2>
+    <p>This memo, ${h(rev(runId))} on this site, read the rule files below and the versions in force on ${h(run.as_of)}. Together they are fingerprinted, so the same inputs under the same fingerprint always give the same memo; change one number in one rule and the fingerprint changes. A site's memos are numbered as revisions, R1, R2 and so on, in the order they were written.</p>
     <p class="hash">Fingerprint ${h(st.stamp)} · rules hash (SHA-256 over all rule files) ${h(st.rules_hash)}</p>
     <ul>${files}</ul>
   </section>`;
@@ -2016,7 +2014,7 @@ function figSheet(run) {
   return `<figure class="card figure">
     <div class="eyebrow">FIG 03 · Revit sheet ${h(r.sheet_number || "")}</div>
     <a href="${base}/ffm_sheet.png" target="_blank" rel="noopener"><img src="${base}/ffm_sheet.png" alt="The Revit sheet exported by the massing script"></a>
-    <figcaption><b>${c.masses ?? "?"} masses</b>, ${c.floor_plates ?? "?"} floor plates, ${c.model_lines ?? "?"} model lines, ${c.views ?? "?"} views, ${c.dimensions ?? 0} dimensions and ${c.notes ?? 0} notes on sheet ${h(r.sheet_number || "")}; the fingerprint of rules ${h(rev(run.stamp))} in every element's Comments. Stages: ${h(stages)}.${r.sheet_pdf ? ` <a href="${base}/ffm_sheet.pdf" target="_blank" rel="noopener">PDF</a>.` : ""}${r.errors ? ` ${r.errors} stage error(s) recorded in the result file.` : ""}</figcaption>
+    <figcaption><b>${c.masses ?? "?"} masses</b>, ${c.floor_plates ?? "?"} floor plates, ${c.model_lines ?? "?"} model lines, ${c.views ?? "?"} views, ${c.dimensions ?? 0} dimensions and ${c.notes ?? 0} notes on sheet ${h(r.sheet_number || "")}; the rules fingerprint in every element's Comments. Stages: ${h(stages)}.${r.sheet_pdf ? ` <a href="${base}/ffm_sheet.pdf" target="_blank" rel="noopener">PDF</a>.` : ""}${r.errors ? ` ${r.errors} stage error(s) recorded in the result file.` : ""}</figcaption>
   </figure>`;
 }
 
@@ -2049,8 +2047,8 @@ function compareSummary(run) {
   const d = run.diff;
   if (!d) return "";
   return compareKind(d) === "rules"
-    ? `rules as of ${d.current_as_of} against ${d.previous_as_of}: ${changesPhrase(d)} · ${rev(d.previous_stamp)} → ${rev(d.current_stamp)}`
-    : `against ${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a run as of ${d.previous_as_of}`}: ${changesPhrase(d)}`;
+    ? `${rev(run.run_id)}, rules as of ${d.current_as_of}, against ${state.compareRun ? rev(state.compareRun) : "an earlier memo"}, rules as of ${d.previous_as_of}: ${changesPhrase(d)}`
+    : `${rev(run.run_id)} against ${state.compareRun ? `${rev(state.compareRun)}, ` : ""}${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a run as of ${d.previous_as_of}`}: ${changesPhrase(d)}`;
 }
 
 /* The note beside the pickers speaks only when the memo cannot: a comparison waiting for the next run, or a run
@@ -2060,7 +2058,7 @@ function setCompareNote(d) {
   const run = state.run;
   let note = "";
   if (!run && state.compareRun) note = "Applies to the next run.";
-  else if (run && d && !run.compareLedger) note = `This run was recorded against a run as of ${d.previous_as_of} (rules ${rev(d.previous_stamp)}); choose it under Compare with… to see the two side by side.`;
+  else if (run && d && !run.compareLedger) note = `This run was recorded against an earlier run as of ${d.previous_as_of}; choose it under Compare with… to see the two side by side.`;
   $("#compare-note").textContent = note;
 }
 
@@ -2091,7 +2089,7 @@ async function attachCause(run) {
 /* What changed. When the rules moved it is a revision: the delta in its heading, the version in force on each row.
    Between two options read under the same rules it is the options' numbers, so the version column goes. Rows are
    named by the rule's title, the status read from the compared run (B) to this one (A). */
-function renderChanges(d, L) {
+function renderChanges(d, L, run) {
   const kind = compareKind(d), rules = kind === "rules";
   const titles = Object.fromEntries(((L && L.results) || []).map(r => [r.rule_id, r.title]));
   const changes = d.changes || [];
@@ -2108,8 +2106,8 @@ function renderChanges(d, L) {
   const sameVerdict = changes.length && changes.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
   const cause = d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs");
   const lead = rules
-    ? `Rules <b>${h(rev(d.previous_stamp))}</b> → <b>${h(rev(d.current_stamp))}</b> · ${h(cause)}.`
-    : `Same rules, ${h(rev(d.current_stamp))}; ${h(cause.replace(/^same rule files(, same site and option)?; /, ""))}.`;
+    ? `<b>${h(state.compareRun ? rev(state.compareRun) : "The earlier memo")}</b> → <b>${h(rev(run && run.run_id))}</b> · ${h(cause)}.`
+    : `<b>${h(state.compareRun ? rev(state.compareRun) : "B")}</b> → <b>${h(rev(run && run.run_id))}</b> · same rules, as of ${h(d.current_as_of)}; ${h(cause.replace(/^same rule files(, same site and option)?; /, ""))}.`;
   return `<section class="card section changes" id="changes">
     <h2>${rules ? `${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}` : "What changed between the two options"}</h2>
     <p class="stamps">${lead}</p>
@@ -2121,13 +2119,13 @@ function renderChanges(d, L) {
 
 // ---------------------------------------------------------------- past runs: open, compare
 
-/* A past run, as a reader picks it: the date, then a named folder (as-approved, what-if-…) where there is one, the
-   option, the rules revision, and a timestamped folder last. A narrow picker still shows the first two. */
+/* A past run, as a reader picks it: its revision first, then the date, a named folder (as-approved, what-if-…) where
+   there is one, the option, and a timestamped folder last. A narrow picker still shows the first three. */
 function runLabel(r) {
   const option = r.option_name || r.option_id || "option";
   const named = r.folder && r.folder !== r.as_of && !/^\d{4}-\d\d-\d\d/.test(r.folder);
   const stamped = r.folder && r.folder !== r.as_of && !named;
-  return `${r.as_of} · ${named ? `${r.folder} · ` : ""}${option} · ${rev(r.stamp)}${stamped ? ` · ${r.folder}` : ""}${r.revit ? " · Revit" : ""}`;
+  return `${rev(r.run_id)} · ${r.as_of} · ${named ? `${r.folder} · ` : ""}${option}${stamped ? ` · ${r.folder}` : ""}${r.revit ? " · Revit" : ""}`;
 }
 
 function fillRunSelects() {
@@ -2147,12 +2145,11 @@ async function openRun(runId) {
   setStatus(`Opening the run ${runId}…`, "busy");
   const run = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
   state.run = run;
-  noteRevisions([run]);
   // the date in the top bar is the date of the memo on screen, and so of the next run
   $("#as-of").value = run.as_of;
-  showStamp(run.stamp);
   enableExports(run);
   await syncInputsTo(run);
+  showStamp(run);   // after the inputs follow the run, so its site's runs, and their revisions, are loaded
   // a run cannot be compared with itself; a run recorded against an earlier one opens compared with it, when the
   // list can tell which run that was
   const selfCompared = state.compareRun === runId;
@@ -2164,7 +2161,7 @@ async function openRun(runId) {
   setCompareNote(run.diff);
   setStep(3);
   closeExportPanel();
-  setStatus(`Opened the run as of ${run.as_of} (${rev(run.stamp)}) · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
+  setStatus(`Opened ${rev(run.run_id)}, the run as of ${run.as_of} ·${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
 }
 
 /* The run a stored comparison (diff.json) was made against. The diff names only that run's date and rules stamp,
@@ -2288,8 +2285,8 @@ async function checkRevit() {
   try {
     const r = await api(`/api/runs/${run.run_id}/ffm_revit_result.json`);
     if (r.stamp !== run.stamp) {
-      box.innerHTML = `<p class="err">A result exists in this folder but for rules ${h(rev(r.stamp))}, not this run's ${h(rev(run.stamp))}. Run the script again on this folder.</p>`;
-      setStatus(`The Revit result in this folder is for rules ${rev(r.stamp)}, not ${rev(run.stamp)}: run the script again on this folder.`, "error");
+      box.innerHTML = `<p class="err">A result exists in this folder, but it was built from another version of the rules than this memo's. Run the script again on this folder.</p>`;
+      setStatus(`The Revit result in this folder was built from another version of the rules than ${rev(run.run_id)}: run the script again on this folder.`, "error");
       return;
     }
     const refreshed = await postJSON(`/api/runs/${run.run_id}/memo`, {});   // memo gains its "Built in Revit" section
@@ -2331,7 +2328,7 @@ function revitResultHtml(r, run) {
 
 const TOUR = [
   { target: ".topbar-controls", title: "Rules as of",
-    text: "Pick the date the rules should be read on. The engine applies the versions in force that day, and the memo names that reading of the rules as a revision, R1, R2 and so on, so two memos can be told apart." },
+    text: "Pick the date the rules should be read on. The engine applies the versions in force that day, and each memo on a site is numbered as a revision, R1, R2 and so on, so two memos can be told apart." },
   { target: "#step-site", title: "Step 1 · Site",
     text: "Choose a site file; the card sums it up in a line. Edit opens the form: district, lot, policy areas, trees, owner. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
   { target: "#step-option", title: "Step 2 · Option",
@@ -2608,7 +2605,7 @@ async function init() {
     if (!panel.hidden) { closeExportPanel(); return; }
     renderExportPanel(state.run);
     setStep(4);
-    setStatus(`Export to Revit: the two lines that build sheet FFM-01 for this memo (rules ${rev(state.run.stamp)}).`, "info");
+    setStatus(`Export to Revit: the two lines that build sheet FFM-01 for this memo, ${rev(state.run.run_id)}.`, "info");
     panel.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   });
   // printing opens every ledger layer, and closes the ones it opened afterwards
@@ -2626,7 +2623,6 @@ async function init() {
   try {
     state.rules = await api(`/api/rules?as_of=${$("#as-of").value}`);
     await loadSites();
-    await loadRevisions();
     const first = state.sites.some(s => s.id === PRELOAD_SITE) ? PRELOAD_SITE : (state.sites[0] ? state.sites[0].id : "__new__");
     state.optionId = PRELOAD_OPTION;
     $("#site-select").value = first;

@@ -20,7 +20,7 @@ from typing import Any
 
 NOMINATIM = "https://nominatim.openstreetmap.org/search"
 OVERPASS = "https://overpass-api.de/api/interpreter"
-USER_AGENT = "funding-fit-memo/0.1 (ARCH 540, UBC; https://github.com/kailisun98/BC-Housing-Feasibility-Study)"
+USER_AGENT = "first-read/0.1 (ARCH 540, UBC; https://github.com/kailisun98/BC-Housing-Feasibility-Study)"
 ATTRIBUTION = "Map data © OpenStreetMap contributors, ODbL 1.0"
 DEFAULT_RADIUS_M = 120.0
 

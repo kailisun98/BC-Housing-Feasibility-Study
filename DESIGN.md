@@ -1,5 +1,5 @@
 ---
-name: Funding-Fit Memo
+name: First Read
 description: A compact drafting tool in the Lotwise language; slate ink on a cool grey page, white panels, dark buttons, statuses as marked words, drawings on white paper.
 colors:
   ink: "#2C3E50"
@@ -186,7 +186,7 @@ components:
     padding: "6px 16px"
 ---
 
-# Design System: Funding-Fit Memo
+# Design System: First Read
 
 ## Overview
 
@@ -337,7 +337,7 @@ is a verdict sentence at 18px weight 600 with its operative words in the status 
 - **Reading** (400, 14px, 1.6, a measure of 52ch, about 68 characters of Plex Sans): the home page's running prose only: the
   lede, the section paragraphs, the three steps, the close's paragraph. Its headline is 22px 600 (20px on a phone)
   and its section headings 18px; its cards, figures and labels stay at the sizes above.
-- **Revision** (600, 12.5px sans): the rules revision, R1, R2…, in a 1px Ink box in the top bar and
+- **Revision** (600, 12.5px sans): the memo's revision on its site, R1, R2…, in a 1px Ink box in the top bar and
   in bold in the title block.
 - **Drawing labels** (IBM Plex Sans, 11.5px on screen): the figures are drawn in metres and scale
   with their card, so their labels are refitted to 11.5px whatever the card's width; context labels
@@ -473,23 +473,27 @@ here, including opening a past run, a comparison and reading the Revit result; t
   ends the bar.
 - **Top bar:** the wordmark (a link back to the home page) and subtitle, then the as-of date in a
   mono field (the date of the memo on screen, and of the next run), the primary button (Ctrl+Enter),
-  the engine chip, and the memo's rules revision: a "Rules" key and R1, R2… in a small 1px Ink box.
+  the engine chip, and the memo's revision: a "Revision" key and R1, R2… in a small 1px Ink box.
   A skip link to the memo comes first in the tab order.
 
 ### Title block
 The memo's header: an 18px title over a row of cells, each a Key over a 12.5px value, keys aligned
-to the top, separated by 1px lines, under a 2px Ink rule; the Rules revision cell carries R1, R2… in
-bold and the engine version. A comparison adds a cell: Revised from (the delta, the earlier revision
-and its date)
-when the rules moved, Compared with (the other option's name and date) when two options were read
-under the same rules.
+to the top, separated by 1px lines, under a 2px Ink rule; the Revision cell carries R1, R2… in bold
+and the engine version. A comparison adds a cell: Revised from (the delta, the earlier memo's
+revision and its rules date) when the rules moved, Compared with (the other memo's revision, its
+option's name and date) when two options were read under the same rules.
 
-### Rules revision
-A memo's stamp (a hash of the rule files and the versions in force on its as-of date) is shown to the
-reader as a revision of the rules: R1, R2 and so on, the distinct stamps on file across every site,
-numbered by the earliest date each was read on (ties by the stamp, so every machine numbers them
-alike). The top bar, the title block, the comparison, the run pickers, the status strip and the print
-footer say the R-number; the hash appears once, as the fingerprint in the Rules revision card at the
+### Revision
+Every memo on a site is numbered as a revision, R1, R2 and so on, the way a drawing numbers its
+issues, so two memos compared always carry two numbers. The committed runs come first: the base runs,
+then the runs recorded against another (they carry a diff), each group by as-of date and folder; then
+the runs made in the tool in the order they were made, so a new run always takes the next number. On
+998 E 19th Ave the as-approved memo, which falls short, is R1, the funder-ready what-if that clears
+every question R2, and the as-approved option under the 27 Oct rules R3; on 1010 Expo Blvd the
+as-permitted memo is R1 and the 12-storey what-if R2. The top bar, the title block, the comparison,
+the run pickers (each label leads with it), the status strip and the print footer say the R-number. The
+rules stamp behind a memo (a hash of the rule files and the versions in force on its as-of date) is
+never in the reading path: it appears once, as the fingerprint in the Rules fingerprint card at the
 foot of the memo, and in the Revit elements' Comments. The downloadable memo files are written by the
 engine and still print the stamp.
 
@@ -500,8 +504,9 @@ A comparison opens with it, directly under the title block.
   a hidden phrase keeps what each does in its accessible name. A picker that had focus keeps it as
   the memo is redrawn, wherever the picker lands. On a phone the two stack across the card. In print
   and when presenting the pickers hide and each option's name stands in their place.
-- **Lead:** one sentence: for two options, what they trade (units, storeys, height, floor area, A
-  against B) and the shared revision; for two readings of the rules, the two dates and revisions.
+- **Lead:** one sentence naming each side by its revision ("A, R2, against B, R1"): for two options,
+  what they trade (units, storeys, height, floor area) and the shared rules date; for two readings of
+  the rules, each revision's rules date.
 - **Answers:** the four answers for each run as pills, open items included; under them, behind a
   disclosure, each run's open items with the person who resolves them.
 - **Rules:** "n of 14 rules read differently" over a table of only those rules, each status with
@@ -510,16 +515,16 @@ A comparison opens with it, directly under the title block.
 - The answer cards below carry no A | B strip; this card is the comparison's one place.
 - Choosing the same run for A and B clears the comparison, and the status strip says why. A run
   recorded against an earlier one opens compared with it, when the run list can tell which run that
-  was (same date, rules revision and option); otherwise the note beside the pickers says what it was recorded
+  was (same date, rules stamp and option); otherwise the note beside the pickers says what it was recorded
   against.
 
 ### What changed
-Under the Side by side card. When the rules moved: a 14px heading with the delta, the two revisions (R1 → R2) and
+Under the Side by side card. When the rules moved: a 14px heading with the delta, the two revisions (R1 → R3) and
 why they differ (the rule files, the as-of date, the site's or the option's inputs, read from the two
 ledgers), "Same verdict, new version" when only the version moved, and a table of Rule, Version in
 force (old struck through, then new), Status and Now reads; changed rows in the clauses and the
 ledger carry the delta and their layer opens. Between two options: "What changed between the two
-options", "Same rules, R1", no version column, the status read B → A, and "numbers changed"
+options", "R1 → R2 · same rules, as of …", no version column, the status read B → A, and "numbers changed"
 where the engine says a finding was reworded. Rows are named by the rule's title over its id. On a
 phone the table stacks, each value under its column's name.
 
@@ -577,7 +582,7 @@ returns focus to where it was.
 
 ### Print
 The memo prints alone, light whatever the theme, every ledger layer open, the figures without their
-switches, and a footer on every page with the address, the as-of date, the rules revision and the page
+switches, and a footer on every page with the address, the as-of date, the memo's revision and the page
 number. The home page prints light, its memo row and steps unbroken, with the tool's address in place
 of the buttons.
 
@@ -591,7 +596,7 @@ of the buttons.
 - **Do** keep panels at 6px radius, 12px by 14px padding, 1px Line and the one-pixel shadow, 12px apart.
 - **Do** keep the drawings on white paper in both themes with Lotwise's drawing tones.
 - **Do** mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.
-- **Do** name a reading of the rules by its revision, R1, R2…, and keep the stamp's hash to the Rules revision card.
+- **Do** number a site's memos as revisions, R1, R2…, and keep the rules stamp's hash to the Rules fingerprint card.
 - **Do** alternate the home page's sections between the page grey and the slate Band, edge to edge.
 - **Do** reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card.
 - **Do** draw explanatory figures in HTML, not SVG text, so they reflow on a phone and read at the page's own sizes.

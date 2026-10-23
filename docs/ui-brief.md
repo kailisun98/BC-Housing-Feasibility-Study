@@ -1,4 +1,4 @@
-# UI brief: a clean web front end for the Funding-Fit Memo
+# UI brief: a clean web front end for First Read
 
 For Claude Code. Target: working and presentable by Thursday evening 22 Oct 2026, demoed Friday
 23 Oct. Read `CLAUDE.md` and `README.md` first. The engine (`ffm/`) is finished and tested; the UI
@@ -39,7 +39,7 @@ screen the page is two panes: the left pane holds steps 1 and 2 (the inputs), th
 step 3 (the memo, with the massing drawing in a column of its own at ≥1600 px, otherwise below the
 three answers). Step 4 is the action bar at the foot of the right pane and a short Export section.
 
-Top bar: wordmark "Funding-Fit Memo" (serif), the *rules as of* date picker, the **Run the rules**
+Top bar: wordmark "First Read" (serif), the *rules as of* date picker, the **Run the rules**
 button, and after a run the stamp in monospace with a copy button.
 
 ### Step 1, Site

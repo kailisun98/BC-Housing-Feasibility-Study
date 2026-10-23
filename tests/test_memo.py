@@ -23,7 +23,7 @@ class MemoRenders(unittest.TestCase):
             self.assertIn(needle, md)
         html = memo.html_page(md, massing.svg(m))
         self.assertIn("<svg", html)
-        self.assertIn("Funding-fit memo", html)
+        self.assertIn("First Read memo", html)
         self.assertNotIn("<?", html)
 
     def test_revit_section_appears_only_for_a_matching_stamp(self):

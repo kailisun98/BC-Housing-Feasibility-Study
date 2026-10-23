@@ -1,4 +1,4 @@
-# Funding-Fit Memo
+# First Read
 
 A deterministic feasibility screen for non-profit housing in British Columbia. Give it a site and a
 building option; it returns a memo that answers three questions, a rule-derived massing, and a

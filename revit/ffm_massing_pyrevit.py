@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Funding-Fit Memo: build the rule-derived massing in Revit, put it on an annotated sheet,
+"""First Read: build the rule-derived massing in Revit, put it on an annotated sheet,
 and export the sheet, from one run folder (massing.json + ledger.json).
 
 Runs three ways, same code:
@@ -88,7 +88,7 @@ def pick_massing_file():
         return os.path.join(here, "massing.json")
     try:
         from pyrevit import forms
-        path = forms.pick_file(file_ext="json", title="Pick massing.json from the Funding-Fit Memo run")
+        path = forms.pick_file(file_ext="json", title="Pick massing.json from the First Read run")
         if path:
             return path
     except Exception:
@@ -592,7 +592,7 @@ def sheet_text_blocks(data, ledger, stamp):
     ans = ledger["summary"]["answers"]
     res = ledger["results"]
 
-    title = ["FUNDING-FIT MEMO  |  " + site.get("address", site.get("id", "")),
+    title = ["FIRST READ  |  " + site.get("address", site.get("id", "")),
              "Option: " + opt.get("name", opt.get("id", "")),
              "Rules as of {0}  |  stamp {1}  |  engine {2}".format(ledger["run"]["as_of"], ledger["run"]["stamp"]["stamp"], ledger["run"]["engine_version"])]
 
@@ -655,7 +655,7 @@ def set_project_info(doc, data, ledger):
     site, opt = ledger["inputs"]["site"], ledger["inputs"]["option"]
     pi = doc.ProjectInformation
     values = (
-        (BuiltInParameter.PROJECT_NAME, "Funding-fit memo: " + str(site.get("address", site.get("id", "")))),
+        (BuiltInParameter.PROJECT_NAME, "First Read memo: " + str(site.get("address", site.get("id", "")))),
         (BuiltInParameter.PROJECT_ADDRESS, str(site.get("address", ""))),
         (BuiltInParameter.PROJECT_NUMBER, "ffm " + str(data.get("stamp"))),
         (BuiltInParameter.CLIENT_NAME, str(opt.get("proponent", ""))),
@@ -744,7 +744,7 @@ def stage_sheet(doc, data, ledger, views, stamp, result):
             break
         except Exception:
             continue
-    sheet_title = "Funding-fit massing: " + str(data.get("site_id"))
+    sheet_title = "First Read massing: " + str(data.get("site_id"))
     safe_name(sheet, sheet_title)
     # Office title blocks often read a shared "sheet title" parameter rather than Sheet Name.
     try:

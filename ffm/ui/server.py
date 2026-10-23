@@ -443,7 +443,7 @@ def serve(port: int = 8765, open_browser: bool = True) -> int:
     except OSError as e:
         print(f"Could not listen on {url}: {e}. Try --port with another number.", file=sys.stderr)
         return 1
-    print(f"Funding-Fit Memo UI: {url}   (Ctrl+C stops it)")
+    print(f"First Read UI: {url}   (Ctrl+C stops it)")
     if open_browser:
         threading.Timer(0.6, lambda: webbrowser.open(url)).start()
     try:

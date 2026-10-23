@@ -1,4 +1,4 @@
-/* Funding-Fit Memo, the home page. The page reads without script; this only marks, in the top bar, the section the
+/* First Read, the home page. The page reads without script; this only marks, in the top bar, the section the
    reader is in, so a long page can be browsed by its four anchors. Nothing here calculates a rule. */
 
 (() => {

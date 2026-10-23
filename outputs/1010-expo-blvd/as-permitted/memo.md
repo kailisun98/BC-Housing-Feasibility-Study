@@ -1,4 +1,4 @@
-# Funding-fit memo: 1010 Expo Blvd (formerly 1050 Expo Blvd), Vancouver, BC
+# First Read memo: 1010 Expo Blvd (formerly 1050 Expo Blvd), Vancouver, BC
 
 **Option:** As permitted, DP issued 5 Feb 2025: 29-storey social housing tower (under construction, completion 2029)  
 **Proponent:** City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society (municipal housing provider)  

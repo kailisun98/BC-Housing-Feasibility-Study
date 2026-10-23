@@ -90,8 +90,10 @@ do not replace the record this tool leaves.
 
 ## Brand Commitments
 
-None beyond the UI brief (`docs/ui-brief.md`), confirmed 22 Oct 2026. The name is "Funding-Fit
-Memo". The voice is plain sentences: "not sure" rather than "N/A", buttons that say what they do.
+None beyond the UI brief (`docs/ui-brief.md`), confirmed 22 Oct 2026. The name is "First Read",
+subtitled "a funding-fit memo for BC non-profit housing" (decided 23 Oct 2026 for the mid review; it
+replaced "Lot by lot", which had replaced "Funding-Fit Memo" earlier that day); the document it writes
+is "the memo". The voice is plain sentences: "not sure" rather than "N/A", buttons that say what they do.
 No logo, no external identity to honour. The brief's visual direction (serif, sans, mono; paper
 and ink; one accent; six status colours used only for status) is the committed world for the UI
 and lives there, not here.

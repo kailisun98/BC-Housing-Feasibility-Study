@@ -1,4 +1,4 @@
-# Funding-fit memo: 998 E 19th Ave, Vancouver, BC V5V 1K7
+# First Read memo: 998 E 19th Ave, Vancouver, BC V5V 1K7
 
 **Option:** What-if (hypothetical, for the demo): five storeys inside the staff benchmark with every funder question answered  
 **Proponent:** Catalyst Community Developments Society (non profit society)  

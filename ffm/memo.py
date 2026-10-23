@@ -1,4 +1,4 @@
-"""Write the funding-fit memo from a ledger (+ massing, + optional diff). Markdown and HTML.
+"""Write the First Read memo from a ledger (+ massing, + optional diff). Markdown and HTML.
 
 The memo answers three questions in order, then shows its work:
 
@@ -56,7 +56,7 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     site, opt = ledger["inputs"]["site"], ledger["inputs"]["option"]
     ans = summ["answers"]
     L: list[str] = []
-    L.append(f"# Funding-fit memo: {site.get('address', site.get('id'))}")
+    L.append(f"# First Read memo: {site.get('address', site.get('id'))}")
     L.append("")
     L.append(f"**Option:** {opt.get('name', opt.get('id'))}  ")
     L.append(f"**Proponent:** {opt.get('proponent', '—')} ({str(opt.get('proponent_type', '')).replace('_', ' ')})  ")
@@ -323,7 +323,7 @@ def html_page(md: str, svg_text: str | None = None) -> str:
     li{margin:3px 0} a{color:var(--blue)}
     @media print{body{margin:0;max-width:none} h2{break-after:avoid}}
     """
-    return f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Funding-fit memo</title><style>{css}</style></head><body>{body}</body></html>"
+    return f"<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>First Read memo</title><style>{css}</style></head><body>{body}</body></html>"
 
 
 def load_revit_result(out_dir: Path, stamp: str) -> dict | None:

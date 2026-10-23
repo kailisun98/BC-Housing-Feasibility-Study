@@ -1,4 +1,4 @@
-# Funding-fit memo: 998 E 19th Ave, Vancouver, BC V5V 1K7
+# First Read memo: 998 E 19th Ave, Vancouver, BC V5V 1K7
 
 **Option:** As approved by Council, 25 Jul 2024: six-storey social housing  
 **Proponent:** Catalyst Community Developments Society (non profit society)  

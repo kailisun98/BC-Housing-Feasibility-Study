@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-10-23T00:57:50-07:00",
-  "title": "Design System: Funding-Fit Memo",
+  "generatedAt": "2026-10-23T01:13:14-07:00",
+  "title": "Design System: First Read",
   "extensions": {
     "colorMeta": {
       "ink": {
@@ -404,7 +404,7 @@
       },
       "revision": {
         "displayName": "Revision",
-        "purpose": "The rules revision, R1, R2…, in a 1px Ink box in the top bar and in bold in the title block."
+        "purpose": "The memo's revision on its site, R1, R2…, in a 1px Ink box in the top bar and in bold in the title block."
       }
     },
     "shadows": [
@@ -545,11 +545,11 @@
       "css": ".ds-steps { display: flex; gap: 4px; padding: 6px 12px; border-bottom: 1px solid #e1e5ea; background: #ffffff; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; font-size: 12.5px; font-weight: 500; } .ds-step { color: #5f6672; text-decoration: none; padding: 5px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; } .ds-step:hover { background: rgba(44, 62, 80, .1); color: #2c3e50; box-shadow: inset 0 -3px 0 rgba(44, 62, 80, .55); } .ds-n { width: 20px; height: 20px; border-radius: 50%; background: #e9eef4; color: #2c3e50; display: inline-grid; place-items: center; font-size: 11px; font-weight: 600; } .ds-active { background: #e9eef4; color: #2c3e50; } .ds-active .ds-n, .ds-done .ds-n { background: #2c3e50; color: #ffffff; }"
     },
     {
-      "name": "Rules revision",
+      "name": "Revision tag",
       "kind": "chip",
       "refersTo": null,
-      "description": "The memo's rules revision in the top bar: a Rules key and R1, R2… in a small 1px Ink box; the stamp's hash stays in the memo's Rules revision card.",
-      "html": "<span class=\"ds-rev-tag\"><span class=\"ds-rev-key\">Rules</span><b>R1</b></span>",
+      "description": "The memo's revision on its site in the top bar: a Revision key and R1, R2… in a small 1px Ink box; the rules stamp's hash stays in the memo's Rules fingerprint card.",
+      "html": "<span class=\"ds-rev-tag\"><span class=\"ds-rev-key\">Revision</span><b>R2</b></span>",
       "css": ".ds-rev-tag { display: inline-flex; align-items: center; gap: 6px; font-family: 'IBM Plex Sans', Helvetica, Arial, sans-serif; } .ds-rev-key { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5f6672; } .ds-rev-tag b { display: inline-block; min-width: 30px; padding: 2px 7px; border: 1px solid #2c3e50; border-radius: 3px; font: 600 12.5px/1.25 'IBM Plex Sans', sans-serif; color: #2c3e50; text-align: center; }"
     },
     {
@@ -631,7 +631,7 @@
       "Do keep panels at 6px radius, 12px by 14px padding, 1px Line and the one-pixel shadow, 12px apart.",
       "Do keep the drawings on white paper in both themes with Lotwise's drawing tones.",
       "Do mark a comparison as a drawing revision: a delta A beside each change, the answer under the title block.",
-      "Do name a reading of the rules by its revision, R1, R2…, and keep the stamp's hash to the Rules revision card.",
+      "Do number a site's memos as revisions, R1, R2…, and keep the rules stamp's hash to the Rules fingerprint card.",
       "Do alternate the home page's sections between the page grey and the slate Band, edge to edge.",
       "Do reach for the drawing set's own devices (title block, schedule, general notes, an issued sheet) before a generic card.",
       "Do draw explanatory figures in HTML, not SVG text, so they reflow on a phone and read at the page's own sizes."

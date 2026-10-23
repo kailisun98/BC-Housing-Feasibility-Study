@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Funding-Fit Memo</title>
-<meta name="description" content="A feasibility screen for BC non-profit housing: it checks a site and a building option against zoning, City policy, the tree by-law and the funders on day one, and shows its working.">
+<meta name="description" content="Will this non-profit housing scheme be allowed, and will a funder back it? Pick a site, describe the option, run the rules, read the memo.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -18,9 +18,8 @@
 <header class="topbar">
   <a class="wordmark" href="./">Funding-Fit Memo <em>a feasibility screen for BC non-profit housing</em></a>
   <nav class="topnav" aria-label="On this page">
-    <a href="#why">The problem</a>
-    <a href="#memo">The memo</a>
-    <a href="#change">Rule changes</a>
+    <a href="#how">How it works</a>
+    <a href="#memo">What you get</a>
     <a href="#try">Try it</a>
   </nav>
   <a class="btn btn-primary btn-small" href="app.html">Open the tool</a>
@@ -29,351 +28,97 @@
 <main id="main">
 
 <section class="hero wrap">
-  <h1>The first drawing usually comes before the first rule check.</h1>
-  <p class="lede">Whether a non-profit housing scheme in British Columbia is allowed, and whether a funder would back it, is written across zoning, provincial law, City policy, design standards and funding calls. Each has its own owner and gets read at its own time, usually after design has started. Funding-Fit Memo checks a site and a building option against all of them on day one, and shows its working.</p>
+  <h1>Will this housing scheme be allowed, and will a funder back it?</h1>
+  <p class="lede">Funding-Fit Memo checks a site and a building option against Vancouver's zoning, the Province's rules, City policy, design standards and the funding programs, all at once, before the first drawing. It writes a short memo with three answers and shows every rule it used.</p>
+  <p class="hero-actions">
+    <a class="btn btn-primary" href="app.html?tour=1">Open the tool with a walkthrough</a>
+    <a class="btn btn-quiet" href="app.html?run=998-e-19th-ave/funder-ready&amp;compare=998-e-19th-ave/2026-10-23">See two options compared</a>
+  </p>
 </section>
 
-<div class="wrap">
-  <figure class="sheet ruler" id="ruler" data-state="late" aria-labelledby="ruler-h">
-    <h2 class="sr-only" id="ruler-h">Six findings for 998 E 19th Ave, without the memo and with it</h2>
-    <div class="sheet-head">
-      <div class="switch" role="group" aria-label="Show the findings">
-        <button type="button" data-state="late" aria-pressed="true">Without the memo</button>
-        <button type="button" data-state="day1" aria-pressed="false">With the memo</button>
-      </div>
-      <p class="sheet-caption" id="ruler-caption" aria-live="polite">
-        <span data-when="late">Six findings for one real scheme, arriving one at a time, weeks into design. Switch to <b>With the memo</b> to see them on day one.</span>
-        <span data-when="day1">The same six on day one, each with its status, its rule and who resolves it.</span>
-      </p>
-    </div>
-
-    <div class="ruler-body">
-      <ol class="weeks" aria-hidden="true">
-        <li style="--k:0"><span data-when="late">WK 0</span><span data-when="day1">Day 1</span></li>
-        <li style="--k:1">1</li><li style="--k:2">2</li><li style="--k:3">3</li><li style="--k:4">4</li>
-        <li style="--k:5">5</li><li style="--k:6">6</li><li style="--k:7">7</li><li style="--k:8">8</li>
-        <li style="--k:9">9</li><li style="--k:10">10</li><li style="--k:11">11</li><li style="--k:12">WK 12</li>
-      </ol>
-
-      <div class="band" aria-hidden="true">
-        <span class="band-seg band-a"><i data-when="late">Design</i><i data-when="day1">Design<span class="band-more">, with every limit known and each open item assigned</span></i></span>
-        <span class="band-seg band-b"><i>Redraw<span class="band-more">: height and trees</span></i></span>
-        <span class="band-seg band-c"><i>Redraw<span class="band-more">: rent tiers and accessible units</span></i></span>
-      </div>
-      <p class="sr-only" data-when="late">Design runs from week 1 to about week 5; the scheme is then redrawn for height and trees until week 9, and again for rent tiers and accessible units until week 12.</p>
-
-      <ol class="pins">
-        <li class="pin" data-lane="1" style="--wk:1; --a:.357; --gap:1">
-          <p class="pin-when"><span data-when="late"><span class="mono">WK 1</span> · Planner, at pre-application</span><span data-when="day1" class="mono">A · cov.irp.social_housing_rezoning</span></p>
-          <p class="pin-head"><span class="pill pill-conditional">Conditional</span> <b>Interim Rezoning Policy</b></p>
-          <p class="pin-text">Eligible as 100% social housing, but 22.3 m is above the staff benchmark of 19.9 to 21.3 m.</p>
-          <p class="pin-who"><b>Who:</b> manager and architect. Expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case.</p>
-        </li>
-        <li class="pin" data-lane="2" style="--wk:3; --a:.5; --gap:2">
-          <p class="pin-when"><span data-when="late"><span class="mono">WK 3</span> · A question nobody has asked</span><span data-when="day1" class="mono">B · bc.toa.minimum_density</span></p>
-          <p class="pin-head"><span class="pill pill-uncertain">Uncertain</span> <b>Transit-oriented areas</b></p>
-          <p class="pin-text">Is the site in one of Vancouver's 29 transit-oriented areas? Not confirmed.</p>
-          <p class="pin-who"><b>Who:</b> architect. Check the City's transit-oriented areas map and record the tier.</p>
-        </li>
-        <li class="pin" data-lane="1" style="--wk:5; --a:.5; --gap:2">
-          <p class="pin-when"><span data-when="late"><span class="mono">WK 5</span> · The arborist's report</span><span data-when="day1" class="mono">C · cov.trees.replacement</span></p>
-          <p class="pin-head"><span class="pill pill-conditional">Conditional</span> <b>Protection of Trees By-law</b></p>
-          <p class="pin-text">Schedule C requires 20 trees on 2,811 m². The plan leaves 17: plant 3 more or pay $3,000 in lieu.</p>
-          <p class="pin-who"><b>Who:</b> architect. Find room for 3 trees at the by-law spacings, or budget the cash in lieu.</p>
-        </li>
-        <li class="pin" data-lane="2" style="--wk:7; --a:.5; --gap:2">
-          <p class="pin-when"><span data-when="late"><span class="mono">WK 7</span> · Reading the funding call</span><span data-when="day1" class="mono">E · bc.bcbuilds.eligibility</span></p>
-          <p class="pin-head"><span class="pill pill-uncertain">Uncertain</span> <b>BC Builds</b></p>
-          <p class="pin-text">Fit cannot be confirmed without the share of units at least 20% below market.</p>
-          <p class="pin-who"><b>Who:</b> manager. State the below-market share and discount; check the current Property Opportunity Notices.</p>
-        </li>
-        <li class="pin" data-lane="1" style="--wk:9; --a:.5; --gap:2">
-          <p class="pin-when"><span data-when="late"><span class="mono">WK 9</span> · BC Housing intake</span><span data-when="day1" class="mono">E · bch.chf.eligibility</span></p>
-          <p class="pin-head"><span class="pill pill-uncertain">Uncertain</span> <b>Community Housing Fund</b></p>
-          <p class="pin-text">Needs the rent-tier split, the accessible units (5% minimum) and a lease of at least 60 years.</p>
-          <p class="pin-who"><b>Who:</b> manager. Supply the missing figures; at 2025-26 rates the indicative grant is $17,977,155 for 105 units.</p>
-        </li>
-        <li class="pin" data-lane="2" style="--wk:11; --a:.643; --gap:2">
-          <p class="pin-when"><span data-when="late"><span class="mono">WK 11</span> · A City policy update</span><span data-when="day1" class="mono">C · cov.family_units</span></p>
-          <p class="pin-head"><span class="pill pill-pass">Pass</span> <b>Family-unit rule</b></p>
-          <p class="pin-text">A new version takes effect on 27 Oct 2026: 35% two-bedroom-plus, now with at least 5% three-bedroom-plus.</p>
-          <p class="pin-who"><b>Who:</b> nobody. 38 of 105 units (36.2%) have two bedrooms or more; the 27 Oct run passes the new version too, and names the version it used.</p>
-        </li>
-      </ol>
-    </div>
-
-    <figcaption class="titleblock">
-      <div><b>Site</b>998 E 19th Ave, Vancouver</div>
-      <div><b>Option</b>As approved by Council, 25 Jul 2024</div>
-      <div><b>Rules as of</b><span class="mono">2026-10-23</span></div>
-      <div><b>Timing</b>Illustrative. The findings are the tool's own.</div>
-      <div class="tb-stamp"><b>Stamp</b><code class="stamp">20e44f1445ecaff9</code></div>
-    </figcaption>
-  </figure>
-</div>
-
-<section class="section wrap" id="why" aria-labelledby="why-h">
+<section class="section wrap" id="how" aria-labelledby="how-h">
   <div class="section-intro">
-    <h2 id="why-h">The rules are public and dated. They sit in five layers, read by different people at different times.</h2>
-    <p>A scheme on church land in Vancouver answers to its zoning district, to provincial overrides, to the City's rezoning policies, to design standards and to the funding programs themselves. The tool's rule stack holds 17 rules from 13 public sources. On a small project nobody reads all of them before the first sketch, and nobody writes down which version they read.</p>
+    <h2 id="how-h">Three steps.</h2>
   </div>
-
-  <figure class="sheet schedule" aria-labelledby="schedule-label">
-  <div class="table-wrap">
-    <table class="layers">
-      <thead><tr><th scope="col">Layer</th><th scope="col">What it decides</th><th scope="col">Where it is written</th><th scope="col">Usually checked by</th></tr></thead>
-      <tbody>
-        <tr><th scope="row"><span class="layer-key">A</span> Zoning district</th><td data-label="What it decides">Outright density and height; the rezoning path; parking</td><td data-label="Where it is written">RM-1 District Schedule; Interim Rezoning Policy, amended 31 Mar 2026</td><td data-label="Usually checked by">City planning staff, at pre-application</td></tr>
-        <tr><th scope="row"><span class="layer-key">B</span> Province</th><td data-label="What it decides">Minimum units on small lots (Bill 44); transit-oriented areas (Bill 47)</td><td data-label="Where it is written">The Province's policy manuals</td><td data-label="Usually checked by">The architect, if someone asks</td></tr>
-        <tr><th scope="row"><span class="layer-key">C</span> City policy</th><td data-label="What it decides">Family units; the social housing definition; trees; levies</td><td data-label="Where it is written">Family housing guidelines; Zoning and Development By-law s.2; Protection of Trees By-law 9958</td><td data-label="Usually checked by">Planners and an arborist, once a site plan exists</td></tr>
-        <tr><th scope="row"><span class="layer-key">D</span> Design standards</th><td data-label="What it decides">Minimum unit areas; the building code basis</td><td data-label="Where it is written">BC Housing Design Guidelines; BC Building Code 2024; Vancouver Building By-law 2025</td><td data-label="Usually checked by">The architect, during design</td></tr>
-        <tr><th scope="row"><span class="layer-key">E</span> Funders</th><td data-label="What it decides">Community Housing Fund; BC Builds; pre-development loans; CMHC</td><td data-label="Where it is written">Funding calls, program pages and applicant guides</td><td data-label="Usually checked by">The development manager, when a call opens</td></tr>
-      </tbody>
-    </table>
+  <div class="answers">
+    <article class="answer" data-verdict="info">
+      <h3><span class="badge">1</span> Pick a site</h3>
+      <p class="cont">Choose one of the example sites or type in your own: the address, the zoning district, the lot size, the trees, who owns it. Each field has an (i) that explains what it is for.</p>
+    </article>
+    <article class="answer" data-verdict="info">
+      <h3><span class="badge">2</span> Describe the option</h3>
+      <p class="cont">Storeys, height, floor area, the unit mix, rents, who will own it, which funders you have in mind. "Not sure" is an honest answer: the memo marks it as uncertain instead of guessing.</p>
+    </article>
+    <article class="answer" data-verdict="info">
+      <h3><span class="badge">3</span> Run the rules</h3>
+      <p class="cont">Press <b>Run the rules</b>. The memo appears beside the form with its three answers, the massing drawn in plan, section and 3D, and a table of every clause that applied.</p>
+    </article>
   </div>
-
-  <div class="notes">
-    <b class="notes-key">Notes</b>
-    <ol>
-      <li><b>What a late rule costs.</b> Weeks of unpaid design, a scheme redrawn, or a project that stops.</li>
-      <li><b>What goes unrecorded.</b> Which version of which rule the scheme was checked against.</li>
-      <li><b>Why a chat answer does not fix it.</b> It cannot be cited, repeated or dated, and a board needs the opposite of a guess.</li>
-    </ol>
-  </div>
-  <figcaption class="fig-block" id="schedule-label"><span>Schedule · Rule layers</span><span>17 rules from 13 public sources, each dated and cited</span></figcaption>
-  </figure>
+  <p class="section-note">Change a number, run again, and compare the two runs side by side. Same inputs and the same rules always give the same memo; a stamp on each one says which version of each rule it read.</p>
 </section>
 
 <section class="section wrap" id="memo" aria-labelledby="memo-h">
   <div class="section-intro">
-    <h2 id="memo-h">Three answers, each with its working shown.</h2>
-    <p>Give it a site file and an option file, a page of JSON each. It returns a memo that answers three questions in order, and a ledger with one row per rule: the numbers it used, the clause it came from, the version in force on the date, and who resolves anything left open.</p>
+    <h2 id="memo-h">What the memo answers.</h2>
   </div>
-
   <div class="answers">
-    <article class="answer" data-verdict="uncertain">
+    <article class="answer" data-verdict="conditional">
       <h3><span class="badge">1</span> Is it allowed?</h3>
-      <p class="verdict">Not outright. By rezoning: <em>not yet confirmed</em>.</p>
-      <p class="cont">FSR 2.95 against an outright 1.20, and 22.3 m against 10.7 m, so it needs a rezoning. The Interim Rezoning Policy makes it eligible.</p>
+      <p class="verdict">Outright, or <em>by rezoning</em>.</p>
+      <p class="cont">Density and height against the district schedule, the rezoning policy that applies, the provincial transit rules, the family-unit and tree by-laws.</p>
     </article>
-    <article class="answer" data-verdict="uncertain">
+    <article class="answer" data-verdict="pass">
       <h3><span class="badge">2</span> Does it fit the funders?</h3>
-      <p class="verdict"><em>Not yet confirmed.</em></p>
-      <p class="cont">BC Builds and the Community Housing Fund each need figures the option does not state yet: the below-market share, the rent tiers, the accessible units.</p>
+      <p class="verdict"><em>Yes</em>, no, or what is missing.</p>
+      <p class="cont">The Community Housing Fund, BC Builds and the others, tested against their published criteria: proponent, rent mix, accessible units, site control, lease.</p>
     </article>
     <article class="answer" data-verdict="uncertain">
-      <h3><span class="badge">3</span> What is still unsure, and who resolves it?</h3>
-      <p class="verdict"><em>Five open items</em>, each with a named person.</p>
-      <p class="cont">Two for the architect, two for the development manager, one for both.</p>
+      <h3><span class="badge">3</span> What is still unsure?</h3>
+      <p class="verdict">Each open item, <em>with a named person</em>.</p>
+      <p class="cont">The architect, the development manager or the planner, and the document they need to check.</p>
     </article>
   </div>
-
-  <div class="proof">
-    <div class="row-anatomy card">
-      <h3 class="card-title">One ledger row, as the memo prints it</h3>
-      <dl class="anatomy">
-        <div class="a-row">
-          <dt>Rule</dt>
-          <dd><b>Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu</b> <span class="pill pill-conditional">Conditional</span></dd>
-          <dd class="a-note">The status, always as a word</dd>
-        </div>
-        <div class="a-row">
-          <dt>Finding</dt>
-          <dd>Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit.</dd>
-          <dd class="a-note">A plain sentence a board can read</dd>
-        </div>
-        <div class="a-row">
-          <dt>Numbers used</dt>
-          <dd class="nums">site area m2 = 2,810.7 · schedule c required = 20 · existing = 9 · retained = 1 · replacements proposed = 16 · trees after = 17 · shortfall = 3 · cash in lieu cad = 3000</dd>
-          <dd class="a-note">The arithmetic, every input named</dd>
-        </div>
-        <div class="a-row">
-          <dt>Source</dt>
-          <dd><a href="https://bylaws.vancouver.ca/9958c.PDF" target="_blank" rel="noopener">Protection of Trees By-law No. 9958, Schedule C, ss.5.1, 5.2, 6.2; s.6.2 cash in lieu</a></dd>
-          <dd class="a-note">The clause, linked to the published by-law</dd>
-        </div>
-        <div class="a-row">
-          <dt>Version</dt>
-          <dd class="nums">cov.trees.replacement · in force from 2023-01-01 · read as of 2026-10-23</dd>
-          <dd class="a-note">The version in force on the date</dd>
-        </div>
-        <div class="a-row">
-          <dt>Who / what</dt>
-          <dd>Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu.</dd>
-          <dd class="a-note">The person who resolves it</dd>
-        </div>
-      </dl>
-    </div>
-
-    <figure class="figure card">
-      <h3 class="card-title">Section through the lot, street on the left</h3>
-      <svg class="fig-wide" viewBox="0 0 448 284" role="img" aria-labelledby="fig-title fig-desc">
-        <title id="fig-title">Massing section for 998 E 19th Ave</title>
-        <desc id="fig-desc">The proposed building is 22.3 m and 6 storeys, above the outright 9.9 m and 3 storeys, and just above the staff benchmark band of 19.9 to 21.3 m.</desc>
-        <g class="d-dash">
-          <line x1="60" y1="143" x2="330" y2="143"/>
-        </g>
-        <text class="d-note" x="334" y="140">outright maximum</text>
-        <text class="d-note" x="334" y="153">10.7 m</text>
-        <rect class="d-outright" x="77" y="151" width="161.5" height="99"/>
-        <rect class="d-proposed" x="77" y="27" width="198.7" height="223"/>
-        <g class="d-floors">
-          <line x1="77" y1="217" x2="275.7" y2="217"/><line x1="77" y1="184" x2="275.7" y2="184"/>
-          <line x1="77" y1="151" x2="275.7" y2="151"/><line x1="77" y1="118" x2="275.7" y2="118"/>
-          <line x1="77" y1="85" x2="275.7" y2="85"/><line x1="77" y1="52" x2="275.7" y2="52"/>
-        </g>
-        <g class="d-bench">
-          <line x1="60" y1="51" x2="330" y2="51"/><line x1="60" y1="37" x2="330" y2="37"/>
-        </g>
-        <text class="d-bench-t" x="334" y="40">staff benchmark</text>
-        <text class="d-bench-t" x="334" y="54">19.9 to 21.3 m</text>
-        <text class="d-label d-strong" x="84" y="20">Proposed · 6 storeys · 22.3 m · FSR 2.95</text>
-        <text class="d-label" x="84" y="241">Outright · 3 storeys · 9.9 m</text>
-        <line class="d-ground" x1="8" y1="250" x2="440" y2="250"/>
-        <g class="d-lot">
-          <line x1="40" y1="250" x2="40" y2="262"/><line x1="412" y1="250" x2="412" y2="262"/>
-          <line x1="40" y1="258" x2="412" y2="258"/>
-          <line x1="77" y1="250" x2="77" y2="262"/><line x1="352" y1="250" x2="352" y2="262"/>
-        </g>
-        <g class="d-env">
-          <line x1="77" y1="250" x2="77" y2="8"/><line x1="352" y1="250" x2="352" y2="164"/>
-        </g>
-        <text class="d-note" x="12" y="244">street</text>
-        <text class="d-note" x="58.5" y="276" text-anchor="middle">3.7</text>
-        <text class="d-note" x="382" y="276" text-anchor="middle">6.0</text>
-        <text class="d-note" x="226" y="276" text-anchor="middle">lot depth 37.2 m</text>
-      </svg>
-      <!-- the same section for narrow screens, at 8 units to the metre so every label fits beside the masses -->
-      <svg class="fig-narrow" viewBox="0 0 360 270" role="img" aria-labelledby="fign-title fign-desc">
-        <title id="fign-title">Massing section for 998 E 19th Ave</title>
-        <desc id="fign-desc">The proposed building is 22.3 m and 6 storeys, above the outright 9.9 m and 3 storeys, and just above the staff benchmark band of 19.9 to 21.3 m.</desc>
-        <g class="d-dash">
-          <line x1="44" y1="150.4" x2="220" y2="150.4"/>
-        </g>
-        <text class="d-note" x="224" y="148">outright maximum</text>
-        <text class="d-note" x="224" y="161">10.7 m</text>
-        <rect class="d-outright" x="59.6" y="156.8" width="129.2" height="79.2"/>
-        <rect class="d-proposed" x="59.6" y="57.6" width="159" height="178.4"/>
-        <g class="d-floors">
-          <line x1="59.6" y1="209.6" x2="218.6" y2="209.6"/><line x1="59.6" y1="183.2" x2="218.6" y2="183.2"/>
-          <line x1="59.6" y1="156.8" x2="218.6" y2="156.8"/><line x1="59.6" y1="130.4" x2="218.6" y2="130.4"/>
-          <line x1="59.6" y1="104" x2="218.6" y2="104"/><line x1="59.6" y1="77.6" x2="218.6" y2="77.6"/>
-        </g>
-        <g class="d-bench">
-          <line x1="44" y1="76.8" x2="220" y2="76.8"/><line x1="44" y1="65.6" x2="220" y2="65.6"/>
-        </g>
-        <text class="d-bench-t" x="224" y="89">staff benchmark</text>
-        <text class="d-bench-t" x="224" y="102">19.9 to 21.3 m</text>
-        <text class="d-label d-strong" x="65" y="44">Proposed · 6 storeys · 22.3 m · FSR 2.95</text>
-        <text class="d-label" x="64" y="214">Outright</text>
-        <text class="d-label" x="64" y="228">3 storeys · 9.9 m</text>
-        <line class="d-ground" x1="2" y1="236" x2="356" y2="236"/>
-        <g class="d-lot">
-          <line x1="30" y1="236" x2="30" y2="248"/><line x1="327.6" y1="236" x2="327.6" y2="248"/>
-          <line x1="30" y1="244" x2="327.6" y2="244"/>
-          <line x1="59.6" y1="236" x2="59.6" y2="248"/><line x1="279.6" y1="236" x2="279.6" y2="248"/>
-        </g>
-        <g class="d-env">
-          <line x1="59.6" y1="236" x2="59.6" y2="10"/><line x1="279.6" y1="236" x2="279.6" y2="170"/>
-        </g>
-        <text class="d-note" x="2" y="230">street</text>
-        <text class="d-note" x="44.8" y="262" text-anchor="middle">3.7</text>
-        <text class="d-note" x="303.6" y="262" text-anchor="middle">6.0</text>
-        <text class="d-note" x="169.6" y="262" text-anchor="middle">lot depth 37.2 m</text>
-      </svg>
-      <figcaption>Proposed against outright (FSR 2.95 against 1.20), with the staff benchmark the rezoning will be tested against. The red dashed lines are the setback envelope; its 3.7 m front and 6.0 m rear setbacks are assumed placeholders. The same numbers make the massing: <code>massing.json</code> carries it to a pyRevit script that builds the masses on sheet FFM-01 in Revit, each element carrying the stamp.</figcaption>
-      <p class="fig-block"><span>FIG · Section</span><span>Rules as of <span class="mono">2026-10-23</span></span><code class="stamp">20e44f1445ecaff9</code></p>
-    </figure>
-  </div>
-</section>
-
-<section class="section wrap" id="change" aria-labelledby="change-h">
-  <div class="section-intro">
-    <h2 id="change-h">When a rule changes, the memo shows it and the stamp changes.</h2>
-    <p>Every rule carries dated versions. The engine applies the ones in force on the as-of date and stamps the memo with a hash of them, so two memos can be told apart and an old one can be reproduced. The City's family-unit rule gets a new version on 27 Oct 2026. Here is the same option, read on either side of that date.</p>
-  </div>
-
-  <div class="change card" id="change-view" data-asof="23">
-    <div class="switch" role="group" aria-label="Read the rules as of">
-      <button type="button" data-asof="23" aria-pressed="true">Rules as of 23 Oct 2026</button>
-      <button type="button" data-asof="27" aria-pressed="false">Rules as of 27 Oct 2026</button>
-    </div>
-
-    <div class="change-body" aria-live="polite">
-      <div class="memo-meta">
-        <div><b>Rule</b><span class="mono">cov.family_units</span></div>
-        <div><b>Version in force</b><span class="mono" data-asof="23">1992-01-01</span><span data-asof="27"><span class="mono">2026-10-27</span> <svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(revised)</span></span></div>
-        <div><b>Status</b><span><span class="pill pill-pass">Pass</span></span></div>
-        <div class="tb-stamp"><b>Stamp</b><code class="stamp" data-asof="23">20e44f1445ecaff9</code><span data-asof="27" class="stamp-rev"><code class="stamp">6d1b07fe59dd3775</code> <svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(revised)</span></span></div>
-      </div>
-      <p class="change-finding">
-        <span data-asof="23">38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum.</span>
-        <span data-asof="27">38 of 105 units (36.2%) have two or more bedrooms, against a 35.0% minimum; <mark class="rev-text">12 (11.4%) have three or more, against a 5.0% minimum.</mark> <svg class="rev" viewBox="0 0 16 14" aria-hidden="true"><path d="M8 1.2 15 12.8H1Z"/><text x="8" y="11.2" text-anchor="middle">A</text></svg><span class="sr-only">(added in revision A)</span></span>
-      </p>
-      <p class="change-source">
-        <span data-asof="23">Source: High-Density Housing for Families with Children Guidelines (1992), as stated in the <a href="https://council.vancouver.ca/20240625/documents/rr1.pdf" target="_blank" rel="noopener">998 E 19th Ave referral report</a>.</span>
-        <span data-asof="27">Source: City of Vancouver, <a href="https://vancouver.ca/people-programs/housing-options-for-families.aspx" target="_blank" rel="noopener">Housing options for families</a>, effective 27 Oct 2026.</span>
-      </p>
-    </div>
-
-    <p class="diffline">
-      <span data-asof="23"><b>What changed</b> nothing yet: read as of 23 Oct, the memo uses the 1992 version. The new version takes effect on 27 Oct 2026; switch the date to see the revision.</span>
-      <span data-asof="27"><b>Revision A</b> 1 rule, <code>cov.family_units</code>: version <code>1992-01-01</code> → <code>2026-10-27</code>, pass → pass, stamp <code>20e44f1445ecaff9</code> → <code>6d1b07fe59dd3775</code>.</span>
-    </p>
-    <p class="change-verdict" data-asof="27">Same verdict, new version: the memo names the version it used, and the new stamp tells the two memos apart.</p>
-    <p class="change-note">Same inputs and the same rules give the same ledger, byte for byte. No language model runs inside the engine: it is standard-library Python and plain JSON rule files a firm can read and maintain, and a rule change is recorded as a new dated version, so the old memo can still be reproduced.</p>
-  </div>
-</section>
-
-<section class="section wrap limits" aria-labelledby="limits-h">
-  <h2 id="limits-h">What it does not do</h2>
-  <ul>
-    <li><b>It does not decide.</b> Every conditional and uncertain finding is handed to a named person.</li>
-    <li><b>It does not read maps or PDFs.</b> The rule files were transcribed by hand from the cited documents, with notes where a figure should be re-checked. The transit-oriented area tier is read from the City's map by a person.</li>
-    <li><b>It is a screen, not advice.</b> Nothing in the memo is legal, planning or funding advice; every number links to the document it came from, so check it there.</li>
-    <li><b>Its demo has declared placeholders.</b> The red pine's diameter and the setbacks are assumed, the rent tiers and accessible units are left blank, and the what-if option is hypothetical and says so. The other inputs come from the City's referral report.</li>
-  </ul>
+  <p class="section-note">Under the answers: the drawings, the clauses applied with what the option proposes against what each clause permits, the full ledger with every number and its source, and the inputs as read. The memo downloads as a page you can print or send.</p>
 </section>
 
 <section class="section wrap close" id="try" aria-labelledby="try-h">
   <div class="sheet issue">
     <div class="issue-head">
-      <h2 id="try-h">See it work on a real case.</h2>
-      <p>998 E 19th Ave, Vancouver: six storeys of social housing over a rebuilt church, approved by Council on 25 Jul 2024. Its inputs come from the City's public referral report, apart from the declared placeholders; the rules come from the by-laws, policies and funding documents they cite.</p>
+      <h2 id="try-h">Try it on a real case.</h2>
+      <p>998 E 19th Ave, Vancouver: six storeys of social housing on church land, approved by Council in July 2024. The inputs come from the City's public report; the placeholders say they are placeholders.</p>
     </div>
     <ul class="issue-actions">
       <li>
         <b>Run</b>
         <a class="btn btn-primary" href="app.html?tour=1">Run the 998 E 19th Ave case</a>
-        <p>Opens the tool with a two-minute walkthrough that runs the rules for you. On the web the engine loads into your browser once, about 10 MB, and nothing is uploaded.</p>
+        <p>A two-minute walkthrough runs the rules for you. On the web the engine loads into your browser once (about 10 MB); nothing is uploaded.</p>
       </li>
       <li>
         <b>Compare</b>
-        <a class="btn btn-quiet" href="app.html?run=998-e-19th-ave/2026-10-27&amp;compare=998-e-19th-ave/2026-10-23">Watch a rule change</a>
-        <p>Opens the 23 and 27 Oct runs compared: one rule, two version dates, a new stamp.</p>
+        <a class="btn btn-quiet" href="app.html?run=998-e-19th-ave/funder-ready&amp;compare=998-e-19th-ave/2026-10-23">Find a fit that qualifies</a>
+        <p>The approved scheme beside a what-if that answers every funder question: the same site, two options, and the memo's three answers side by side.</p>
       </li>
       <li>
         <b>Read</b>
-        <a class="btn btn-quiet" href="data/runs/998-e-19th-ave/2026-10-27/memo.html">Read the memo it wrote</a>
-        <p>The 27 Oct memo, stamped <code>6d1b07fe59dd3775</code>, with its ledger and sources, as a document you can print.</p>
+        <a class="btn btn-quiet" href="data/runs/998-e-19th-ave/funder-ready/memo.html">Read a finished memo</a>
+        <p>The what-if's memo as a document, with its ledger and sources.</p>
       </li>
     </ul>
     <p class="print-only">Try it at kailisun98.github.io/BC-Housing-Feasibility-Study</p>
     <div class="titleblock">
-      <div><b>Issue</b>For review</div>
       <div><b>Site</b>998 E 19th Ave, Vancouver</div>
-      <div><b>Rules as of</b><span class="mono">2026-10-27</span></div>
-      <div class="tb-stamp"><b>Stamp</b><code class="stamp">6d1b07fe59dd3775</code></div>
+      <div><b>Rules</b>17 rules from 13 public sources, each dated and cited</div>
+      <div><b>Status</b>A feasibility screen, not legal, planning or funding advice</div>
     </div>
   </div>
-  <p class="close-aside">Doing feasibility work on a site of your own? <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study/issues/new?title=Request%3A%20a%2020-minute%20session&amp;body=Who%20I%20am%20and%20the%20kind%20of%20site%20I%20work%20on%3A%0A%0AA%20good%20time%20to%20talk%3A%0A">Ask for a 20-minute session</a>. To run it on your own machine: <code>python -m ffm ui</code></p>
+  <p class="close-aside">Working on a site of your own? <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study/issues/new?title=Request%3A%20a%2020-minute%20session&amp;body=Who%20I%20am%20and%20the%20kind%20of%20site%20I%20work%20on%3A%0A%0AA%20good%20time%20to%20talk%3A%0A">Ask for a 20-minute session</a>, or run it on your own machine with <code>python -m ffm ui</code>.</p>
 </section>
 
 </main>
 
 <footer class="foot wrap">
   <p>Funding-Fit Memo · ARCH 540, UBC School of Architecture and Landscape Architecture, fall 2026 · Kai · <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study">Source on GitHub</a> · MIT licence for the code; the cited documents belong to their publishers.</p>
-  <p>A feasibility screen, not legal, planning or funding advice.</p>
+  <p>It does not decide: every open finding is handed to a named person. It does not read maps or PDFs: the rules were transcribed from the cited documents by hand.</p>
 </footer>
 
 <script src="home.js"></script>

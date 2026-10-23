@@ -1037,8 +1037,17 @@ function renderMemo(run) {
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run));
+  // when two runs are compared, each answer opens with both verdicts, A (this run) beside B (the compared run)
+  const B = d && run.compareLedger ? run.compareLedger : null;
+  const ab = (html, rows) => (B ? html.replace("</h2>", "</h2>" + abBlock(rows, L, B)) : html);
+  const vp = w => `<span class="pill pill-${h(verdictStatus(w) || "na")}">${h(cap(w))}</span>`;
+  const a1 = ab(answerAllowed(L), [["Outright", vp(L.summary.answers.allowed.outright.verdict), vp(B && B.summary.answers.allowed.outright.verdict)],
+                                   ["By rezoning", vp(L.summary.answers.allowed.by_rezoning.verdict), vp(B && B.summary.answers.allowed.by_rezoning.verdict)]]);
+  const a2 = ab(answerFunders(L), [["Fits the funders", vp(L.summary.answers.funded.verdict), vp(B && B.summary.answers.funded.verdict)]]);
+  const openItems = X => { const n = ((X.summary.answers.unsure) || []).length; return n ? `<span class="pill pill-${X.summary.answers.unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${n} open</span>` : `<span class="pill pill-pass">Nothing open</span>`; };
+  const a3 = ab(answerUnsure(L), [["Open items", openItems(L), B ? openItems(B) : ""]]);
   parts.push(`<div class="memo-body">
-    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L)}</div>
+    <div class="answers">${a1}${a2}${a3}</div>
     ${renderFigures(run)}
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
@@ -1051,6 +1060,17 @@ function renderMemo(run) {
   wireFigures(run);
   wireLedger();
   setPrintFooter(run);
+}
+
+/* The A | B strip at the head of an answer card: this run's verdict beside the compared run's, each column named
+   by its option. */
+function abBlock(rows, A, B) {
+  const name = X => (X.inputs && X.inputs.option && (X.inputs.option.name || X.inputs.option.id)) || "option";
+  const short = s => (String(s).length > 60 ? String(s).slice(0, 57) + "…" : String(s));
+  return `<div class="ab" role="table" aria-label="This run beside the compared run">
+    <div class="ab-row ab-head" role="row"><span role="columnheader"></span><span role="columnheader"><b>A</b> ${h(short(name(A)))} <span class="cont">(${h(A.run.as_of)})</span></span><span role="columnheader"><b>B</b> ${h(short(name(B)))} <span class="cont">(${h(B.run.as_of)})</span></span></div>
+    ${rows.map(([k, a, b]) => `<div class="ab-row" role="row"><span role="rowheader">${h(k)}</span><span role="cell">${a}</span><span role="cell">${b}</span></div>`).join("")}
+  </div>`;
 }
 
 /* Every printed page carries the address, the date and the stamp in its footer, and its page number. */

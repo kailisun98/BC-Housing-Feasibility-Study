@@ -9,9 +9,8 @@
 ## 1. Is it allowed?
 **Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. Height 22.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated.
 
-**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): not yet confirmed.**
+**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): yes, with conditions.**
 - *Conditional* — Interim Rezoning Policy for Social Housing in Former Community Vision Areas: Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.
-- *Uncertain* — Transit-oriented area minimum allowable height and density: Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.
 - *Conditional* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit.
 
 ## 2. Does it fit the funders?
@@ -23,7 +22,6 @@
 | Item | Status | Who / what |
 |---|---|---|
 | Interim Rezoning Policy for Social Housing in Former Community Vision Areas | Conditional | Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case. |
-| Transit-oriented area minimum allowable height and density | Uncertain | Architect: check the City's transit-oriented areas map and record the tier. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Conditional | Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu. |
 | BC Builds: eligibility and below-market requirement | Uncertain | Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $17,977,155 for 105 units. |
@@ -101,7 +99,7 @@ Text placed on the sheet (quotable in the memo):
 | Rule | Status | Finding | Numbers used | Source |
 |---|---|---|---|---|
 | Small-scale multi-unit housing minimum unit counts (`bc.ssmuh.minimum_units`, v 2024-06-30) | Not applicable | Written for R1-1, RS, RT districts; this site is zoned RM-1. | district = RM-1 | [Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual, Bill 44; Local Government Act Part 14 Division 5; manual Packages A to D](https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf) |
-| Transit-oriented area minimum allowable height and density (`bc.toa.minimum_density`, v 2024-06-30) | Uncertain | Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed. |  | [Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024, Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
+| Transit-oriented area minimum allowable height and density (`bc.toa.minimum_density`, v 2024-06-30) | Not applicable | The site is outside the transit-oriented areas; no provincial minimum height applies. |  | [Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024, Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
 
 ### Layer C: City of Vancouver policies that attach to a rezoning
 
@@ -132,7 +130,7 @@ Text placed on the sheet (quotable in the memo):
 ## Inputs
 - Site `998-e-19th-ave`: RM-1, 2,810.7 m², 75.6 × 37.2 m; owner: Vancouver First Church of the Nazarene.
 - Option `998-e-19th-ave-as-approved`: 6 storeys, 22.3 m, 8,299.0 m² GFA; units studio 30, one bed 37, two bed 26, three bed plus 12; tenure social housing.
-- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.
+- Site notes: Transit-oriented area set to No from the designation's distances: the nearest SkyTrain stations (VCC-Clark, Broadway-City Hall, Main Street-Science World) are all more than 800 m away and no bus exchange is within 400 m; confirm on the City's TOA map. Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.
 - Option notes: Numbers are the City's as-submitted statistics from the referral report. Rent-tier split, accessible-unit count and setbacks are not in the report and are placeholders or left null so the engine marks them uncertain.
 
 ## Sources

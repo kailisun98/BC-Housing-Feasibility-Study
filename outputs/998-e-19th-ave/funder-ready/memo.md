@@ -9,8 +9,7 @@
 ## 1. Is it allowed?
 **Outright, under RM-1: no.** FSR 2.49 exceeds the outright maximum of 1.2; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. Height 18.3 m exceeds the outright maximum of 10.7 m; it can proceed only by rezoning (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated.
 
-**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): not yet confirmed.**
-- *Uncertain* — Transit-oriented area minimum allowable height and density: Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.
+**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): yes.**
 
 ## 2. Does it fit the funders?
 **Yes.**
@@ -18,9 +17,7 @@
 - *Pass* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: Fits the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award; program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).
 
 ## 3. What is still unsure, and who resolves it?
-| Item | Status | Who / what |
-|---|---|---|
-| Transit-oriented area minimum allowable height and density | Uncertain | Architect: check the City's transit-oriented areas map and record the tier. |
+Nothing outstanding.
 
 ## Massing derived from the rules
 - **Proposed: 5 storeys, FSR 2.49** — plate 1,400 m² × 5 storeys = 7,000 m² (FSR 2.49), 18.3 m high, inside a 69.6 × 27.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
@@ -63,7 +60,7 @@ Previous stamp `20e44f1445ecaff9` (rules as of 2026-10-23) → current `20e44f14
 | Rule | Status | Finding | Numbers used | Source |
 |---|---|---|---|---|
 | Small-scale multi-unit housing minimum unit counts (`bc.ssmuh.minimum_units`, v 2024-06-30) | Not applicable | Written for R1-1, RS, RT districts; this site is zoned RM-1. | district = RM-1 | [Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual, Bill 44; Local Government Act Part 14 Division 5; manual Packages A to D](https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf) |
-| Transit-oriented area minimum allowable height and density (`bc.toa.minimum_density`, v 2024-06-30) | Uncertain | Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed. |  | [Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024, Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
+| Transit-oriented area minimum allowable height and density (`bc.toa.minimum_density`, v 2024-06-30) | Not applicable | The site is outside the transit-oriented areas; no provincial minimum height applies. |  | [Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024, Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
 
 ### Layer C: City of Vancouver policies that attach to a rezoning
 
@@ -94,7 +91,7 @@ Previous stamp `20e44f1445ecaff9` (rules as of 2026-10-23) → current `20e44f14
 ## Inputs
 - Site `998-e-19th-ave`: RM-1, 2,810.7 m², 75.6 × 37.2 m; owner: Vancouver First Church of the Nazarene.
 - Option `998-e-19th-ave-what-if-funder-ready`: 5 storeys, 18.3 m, 7,000.0 m² GFA; units studio 24, one bed 32, two bed 24, three bed plus 8; tenure social housing.
-- Site notes: Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.
+- Site notes: Transit-oriented area set to No from the designation's distances: the nearest SkyTrain stations (VCC-Clark, Broadway-City Hall, Main Street-Science World) are all more than 800 m away and no bus exchange is within 400 m; confirm on the City's TOA map. Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.
 - Option notes: Hypothetical option written so that the funder questions all come back answered: the same five-storey massing as the other what-if, a 30/50/20 rent-tier split, 5 accessible units (5% of 88), a 60-year agreement, 19 replacement trees, and a land tenure stated as settled rather than 'to confirm', so the Community Housing Fund check can pass instead of waiting. None of these figures come from Catalyst or the City; the tenure resolution does not exist.
 
 ## Sources

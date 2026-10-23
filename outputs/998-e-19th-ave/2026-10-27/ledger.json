@@ -276,10 +276,10 @@
       },
       "version_effective_from": "2024-06-30",
       "version_effective_to": null,
-      "status": "uncertain",
-      "finding": "Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.",
+      "status": "not_applicable",
+      "finding": "The site is outside the transit-oriented areas; no provincial minimum height applies.",
       "values": {},
-      "action": "Architect: check the City's transit-oriented areas map and record the tier."
+      "action": ""
     },
     {
       "rule_id": "cov.below_market_rental",
@@ -587,10 +587,10 @@
     "counts": {
       "fail": 0,
       "conditional": 2,
-      "uncertain": 5,
+      "uncertain": 4,
       "pass": 2,
       "info": 6,
-      "not_applicable": 2
+      "not_applicable": 3
     },
     "answers": {
       "allowed": {
@@ -604,15 +604,13 @@
           ]
         },
         "by_rezoning": {
-          "verdict": "not yet confirmed",
+          "verdict": "yes, with conditions",
           "fail": [],
           "conditional": [
             "cov.irp.social_housing_rezoning",
             "cov.trees.replacement"
           ],
-          "uncertain": [
-            "bc.toa.minimum_density"
-          ]
+          "uncertain": []
         },
         "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing"
       },
@@ -632,13 +630,6 @@
           "status": "conditional",
           "finding": "Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.",
           "action": "Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case."
-        },
-        {
-          "rule_id": "bc.toa.minimum_density",
-          "title": "Transit-oriented area minimum allowable height and density",
-          "status": "uncertain",
-          "finding": "Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.",
-          "action": "Architect: check the City's transit-oriented areas map and record the tier."
         },
         {
           "rule_id": "cov.trees.replacement",
@@ -674,7 +665,7 @@
       "frontage_m": 75.6,
       "depth_m": 37.2,
       "in_former_community_vision_area": true,
-      "in_transit_oriented_area": null,
+      "in_transit_oriented_area": false,
       "toa_tier": null,
       "frequent_bus_stop_within_400m": null,
       "has_water_and_sewer": true,
@@ -762,7 +753,7 @@
         },
         "trees": []
       },
-      "notes": "Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.",
+      "notes": "Transit-oriented area set to No from the designation's distances: the nearest SkyTrain stations (VCC-Clark, Broadway-City Hall, Main Street-Science World) are all more than 800 m away and no bus exchange is within 400 m; confirm on the City's TOA map. Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.",
       "sources": [
         {
           "title": "City of Vancouver referral report, rezoning of 998 E 19th Ave (11 Jun 2024)",

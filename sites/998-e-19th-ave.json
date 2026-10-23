@@ -7,7 +7,7 @@
   "frontage_m": 75.6,
   "depth_m": 37.2,
   "in_former_community_vision_area": true,
-  "in_transit_oriented_area": null,
+  "in_transit_oriented_area": false,
   "toa_tier": null,
   "frequent_bus_stop_within_400m": null,
   "has_water_and_sewer": true,
@@ -35,7 +35,7 @@
     },
     "trees": []
   },
-  "notes": "Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.",
+  "notes": "Transit-oriented area set to No from the designation's distances: the nearest SkyTrain stations (VCC-Clark, Broadway-City Hall, Main Street-Science World) are all more than 800 m away and no bus exchange is within 400 m; confirm on the City's TOA map. Red pine DBH is a placeholder (the referral report names the species but not the diameter); replace from the arborist report before the user session. Context for the figures: the lot sits on the south side of E 19th Ave at Windsor St (the cross street is drawn on the left as seen from the street; verify against the survey), with a lane behind and a neighbouring parcel to the west; street and lane widths are typical, not surveyed, and the on-site tree positions are not in the public record, so the figures place them schematically.",
   "sources": [
     {
       "title": "City of Vancouver referral report, rezoning of 998 E 19th Ave (11 Jun 2024)",

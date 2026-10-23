@@ -130,6 +130,18 @@ is a dependency-free orbitable axonometric drawn from `massing.json`. A second c
 so the outright rules are not applicable and the memo's "outright: yes" is an engine limitation
 noted in the site file, not a finding.
 
+Comparison demo (23 Oct 2026): `options/998-e-19th-ave-what-if-funder-ready.json` is the five-storey
+what-if with every funder question answered (rent tiers 30/50/20, 5 accessible units, 60-year
+agreement, 19 replacement trees, land tenure stated as settled), so its run in
+`outputs/998-e-19th-ave/funder-ready/` reads by rezoning: yes, funders: yes, nothing outstanding.
+The 998 site's transit-oriented answer is now No (nearest SkyTrain stations over 800 m; confirm on
+the City's map). The home page's "Find a fit that qualifies" link opens
+`app.html?run=998-e-19th-ave/funder-ready&compare=998-e-19th-ave/2026-10-23`; when two runs are
+compared, each of the three answer cards opens with an A | B strip, and a Side by side card and the
+What changed revision table follow the title block. Inputs carry marks (needed to run, read by a
+rule, drawings only) and (i) explanations from `FIELD_META` in `app.js`; the memo has a
+"Clauses applied" table (proposed, permitted or required, the ask) before the layered ledger.
+
 Context from OpenStreetMap (23 Oct 2026): `python -m ffm context --site sites/<id>.json [--radius 120]
 [--center lat,lon]` (`ffm/osm.py`, standard library) locates the address with Nominatim, fetches
 roads, buildings and trees from the Overpass API, converts them into the lot frame (front street

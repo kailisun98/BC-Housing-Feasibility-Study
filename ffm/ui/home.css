@@ -257,6 +257,11 @@ button { font: inherit; color: inherit; }
 .answer { --tone: var(--ink); --wash: var(--panel); background: var(--wash); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; }
 .answer[data-verdict] { border-color: transparent; }
 .answer[data-verdict="uncertain"] { --tone: var(--s-uncertain-text); --wash: var(--s-uncertain-wash); }
+.answer[data-verdict="pass"] { --tone: var(--s-pass-text); --wash: var(--s-pass-wash); }
+.answer[data-verdict="conditional"] { --tone: var(--s-conditional-text); --wash: var(--s-conditional-wash); }
+.answer[data-verdict="info"] { --tone: var(--ink); --wash: var(--panel); border-color: var(--line); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; grid-column: 1 / -1; }
+.section-note { color: var(--muted); max-width: 80ch; margin-top: 12px; font-size: 12.5px; }
 .answer h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
 /* the numbered badge of the tool's answer cards: the three questions are answered in order */
 .badge { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; background: var(--group); color: var(--ink); flex: 0 0 20px; letter-spacing: 0; }

@@ -2993,11 +2993,28 @@ function ruleTitle(id) {
   return r ? r.title : id;
 }
 
-function renderGuide() {
+/* Re-rendering the card changes its height (a stop opens, another closes, a form folds below), and the browser would
+   leave the reader's scroll position pointing at whatever moved into it. So the head of one stop, the one the reader
+   acted on, is kept at the same place on screen across the render: measured before, matched after. */
+function renderGuide(anchorStop = guide.step, placeAtY = null) {
   const el = $("#guide");
   if (!el) return;
   if (state.mode !== "manager") { el.hidden = true; return; }
+  const anchorOf = () => (anchorStop && $(`.stop-head[data-stop="${anchorStop}"]`, el)) || el;
+  const wasHidden = el.hidden;
+  // where the anchored head should end up: where it was, or where the reader just acted (placeAtY), so the stop
+  // that opens next appears under the button they pressed rather than far above
+  const target = placeAtY != null ? placeAtY : (wasHidden ? null : anchorOf().getBoundingClientRect().top);
   el.hidden = false;
+  renderGuideInto(el);
+  if (target != null) {
+    const bars = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bars-h")) || 134;
+    const d = anchorOf().getBoundingClientRect().top - Math.max(bars + 12, Math.min(target, innerHeight - 160));
+    if (Math.abs(d) > 1) window.scrollBy(0, d);
+  }
+}
+
+function renderGuideInto(el) {
   const done = guideDone();
   const progs = state.rules.filter(r => r.layer === "E");
   const chosen = new Set(guide.programs || (state.option && state.option.target_programs) || []);
@@ -3118,10 +3135,10 @@ function takeAnswer(key, raw) {
 function wireGuide() {
   const el = $("#guide");
   $$("[data-answer]", el).forEach(c => {
-    if (c.tagName === "BUTTON") c.addEventListener("click", () => { takeAnswer(c.dataset.answer, c.dataset.value); renderGuide(); });
+    if (c.tagName === "BUTTON") c.addEventListener("click", () => { takeAnswer(c.dataset.answer, c.dataset.value); renderGuide(4); });
     else c.addEventListener("change", () => takeAnswer(c.dataset.answer, c.value));
   });
-  $$(".stop-head", el).forEach(b => b.addEventListener("click", () => { guide.step = Number(b.dataset.stop); renderGuide(); }));
+  $$(".stop-head", el).forEach(b => b.addEventListener("click", () => { const n = Number(b.dataset.stop); guide.step = guide.step === n ? 0 : n; renderGuide(n); }));
   const addr = $("#guide-address", el);
   if (addr) {
     addr.addEventListener("input", () => { guide.address = addr.value; });
@@ -3130,7 +3147,7 @@ function wireGuide() {
   const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
   on("#guide-lookup", guideLookup);
   on("#guide-use-site", guideUseSite);
-  on("#guide-programs", () => { guide.programs = $$(".guide-program:checked", el).map(x => x.value); if (state.option) { state.option.target_programs = guide.programs.slice(); onOptionChange("target_programs"); renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange); } guide.step = 3; renderGuide(); setStatus(`Programs chosen: ${guide.programs.map(ruleTitle).join("; ") || "none"}.`, "ok"); });
+  on("#guide-programs", () => { guide.programs = $$(".guide-program:checked", el).map(x => x.value); if (state.option) { state.option.target_programs = guide.programs.slice(); onOptionChange("target_programs"); renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange); } guide.step = 3; renderGuide(3, $("#guide-programs") ? $("#guide-programs").getBoundingClientRect().top : null); setStatus(`Programs chosen: ${guide.programs.map(ruleTitle).join("; ") || "none"}.`, "ok"); });
   on("#guide-read", guideReadSite);
   $$(".cands .segbtn", el).forEach(b => b.addEventListener("click", () => { guide.candidate = b.dataset.cand; guide.mine = {}; guideSuggest(); }));
   on("#guide-suggest", guideSuggest);
@@ -3194,10 +3211,9 @@ async function guideUseSite() {
   fillRunSelects();
   guide.reading = null; guide.suggestion = null; guide.mine = {};
   guide.step = 2;
-  renderGuide();
+  renderGuide(2, $("#guide-use-site") ? $("#guide-use-site").getBoundingClientRect().top : null);
   setStep(1);
-  setStatus("The site is in the Site card, unsaved. Answer the policy areas, water and sewer, trees and the owner, then choose the programs.", "ok");
-  $("#step-site").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+  setStatus("The site is in the Site card below, unsaved: answer the policy areas, water and sewer, trees and the owner there, then choose the programs.", "ok");
 }
 
 async function guideReadSite() {
@@ -3208,6 +3224,7 @@ async function guideReadSite() {
     guide.reading = await postJSON("/api/read-site", { site: state.site, as_of: $("#as-of").value || todayISO() });
     renderSiteReading(guide.reading);
     guide.step = 4;
+    renderGuide(4, $("#guide-read") ? $("#guide-read").getBoundingClientRect().top : null);
     setStatus(`Read the site as of ${guide.reading.as_of}: ${guide.reading.results.length} rules speak to it before any option.`, "ok");
   } catch (e) {
     toast(`Could not read the site: ${e.message}`, true);
@@ -3294,8 +3311,10 @@ function guideUseOptionNow() {
   $("#option-dirty").hidden = false;
   refreshSummary("option");
   setCollapsed("option", true);
+  const btn = $("#guide-use-option");
+  const y = btn ? btn.getBoundingClientRect().top : null;
   guide.step = 5;
-  renderGuide();
+  renderGuide(5, y);   // Run the rules opens where the button was, not far above or below
   setStep(2);
   setStatus(`The ${guide.candidate} option is in the Option card${chosen ? `, with ${chosen} of your own figures` : ""}. Run the rules when it reads right.`, "ok");
 }

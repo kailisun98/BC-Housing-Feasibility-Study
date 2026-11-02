@@ -35,6 +35,27 @@ def _write_json(path: Path, obj) -> None:
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
+ASSET_REFS = ("app.js", "app.css", "brand.css", "site.css", "site.js")
+
+
+def _build_version(static_dir: Path) -> str:
+    """A short hash of the scripts and styles the pages load: it changes when any of them does."""
+    import hashlib
+    h = hashlib.sha256()
+    for name in ASSET_REFS:
+        p = static_dir / name
+        if p.exists():
+            h.update(name.encode()); h.update(p.read_bytes())
+    return h.hexdigest()[:10]
+
+
+def _versioned(html: str, v: str) -> str:
+    """`src="app.js"` and `href="site.css"` become `app.js?v=<hash>`; the local server keeps the plain names."""
+    for name in ASSET_REFS:
+        html = html.replace(f'src="{name}"', f'src="{name}?v={v}"').replace(f'href="{name}"', f'href="{name}?v={v}"')
+    return html
+
+
 def _clear(out: Path) -> None:
     """Empty the output folder but keep a .git inside it, so a checkout of the gh-pages branch can
     be rebuilt in place and pushed."""
@@ -62,11 +83,17 @@ def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     if marker not in html:
         raise RuntimeError("index.html has no <!-- static-config --> marker")
     html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>")
-    (out / "app.html").write_text(html, encoding="utf-8")
-    shutil.copy(ui.STATIC_DIR / "home.html", out / "index.html")
+    # every page names its scripts and styles with the build's version, so a browser that cached the last
+    # deploy's app.js (Pages serves it with max-age=600, and browsers keep it longer) fetches the new one
+    v = _build_version(ui.STATIC_DIR)
+    (out / "app.html").write_text(_versioned(html, v), encoding="utf-8")
+    (out / "index.html").write_text(_versioned((ui.STATIC_DIR / "home.html").read_text(encoding="utf-8"), v), encoding="utf-8")
     n += 2
     for name in ui.SITE_PAGES[1:] + ui.SITE_FILES:
-        shutil.copy(ui.STATIC_DIR / name, out / name)
+        if name.endswith(".html"):
+            (out / name).write_text(_versioned((ui.STATIC_DIR / name).read_text(encoding="utf-8"), v), encoding="utf-8")
+        else:
+            shutil.copy(ui.STATIC_DIR / name, out / name)
         n += 1
     shutil.copytree(ui.STATIC_DIR / "brand", out / "brand")
     n += len(list((out / "brand").iterdir()))

@@ -184,7 +184,9 @@ ODbL attribution, which the figure caption and README repeat. Re-run the command
 reuses the saved centre, so Nominatim is asked once per site.
 
 The page also runs on GitHub Pages (https://kailisun98.github.io/BC-Housing-Feasibility-Study/):
-`python -m ffm pages` (`ffm/pages.py`) builds a static site whose `app.js` detects
+`python -m ffm pages` (`ffm/pages.py`) builds a static site (since 3 Nov 2026 every page names its scripts and
+styles with a hash of their contents, `app.js?v=…`, so a browser that cached the last deploy fetches the new
+one; Pages serves with max-age=600 and Edge kept the old app.js past that) whose `app.js` detects
 `window.FFM_STATIC`, reads the committed runs from `data/` and runs the engine in Pyodide from
 `engine/`. Published by the Actions workflow in `.github/workflows/pages.yml` on every push to
 `main` (Pages is set to build from Actions; the old `gh-pages` branch is no longer used). The gh

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How it works · First Read</title>
+<meta name="description" content="Address and option in; cited rules, a massing and a dated memo out. How First Read reads five layers of rules with a deterministic engine and no language model in the loop.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="site.css">
+<link rel="icon" href="brand/mark-tile.svg" type="image/svg+xml">
+</head>
+<body>
+<a class="skip" href="#main">Skip to the page</a>
+
+<header class="nav">
+  <a class="lockup" href="./"><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg>First Read <em>a funding-fit memo</em></a>
+  <nav class="nav-links" aria-label="Pages">
+    <a href="./">Home</a>
+    <a href="how.html">How it works</a>
+    <a href="who.html">Who it's for</a>
+    <a href="case.html">The case</a>
+  </nav>
+  <a class="btn btn-paper btn-small nav-cta" href="app.html">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+</header>
+
+<main id="main">
+
+<section class="hero page wrap" aria-labelledby="hero-h">
+  <div class="hero-text">
+    <p class="eyebrow">How it works</p>
+    <h1 id="hero-h">Address and option in.<br><span class="dim">Cited rules, a massing and a dated memo out.</span></h1>
+    <p class="lede">The rules are held as data, with a source and a date on every line. A deterministic engine reads them. A person confirms twice. No language model is in the loop.</p>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------ 01 inside the tool -->
+<section class="sec" id="inside" data-n="01" aria-labelledby="inside-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow"><span class="n">01</span>Inside the tool</p>
+      <h2 id="inside-h">Five inputs. Five layers of rules. Five outputs.</h2>
+      <p class="sub">Every rule in the stack is a structured clause with its source, its section and the date it took effect. From then on it is data, reused for every address and re-read only when a rule changes.</p>
+    </div>
+
+    <div class="diagram reveal" role="img" aria-label="Five inputs flow into the tool, which holds five layers of rules and three steps: the rules engine, the massing and the memo writer. Five outputs come out: a cited rule table, a massing, a funding-fit matrix, the two-page memo and a version ledger. A rule or program change reruns the tool with a new stamp.">
+      <div class="io">
+        <div class="col in">
+          <p class="col-title">What goes in</p>
+          <div class="node"><b>Address</b></div>
+          <div class="node"><b>Lot area and frontage</b></div>
+          <div class="node"><b>Option</b><span>storeys, floor area, units, tenure</span></div>
+          <div class="node"><b>Target programs</b></div>
+          <div class="node"><b>Tree survey</b><span>optional</span></div>
+        </div>
+        <div class="col mid">
+          <p class="col-title">Inside</p>
+          <div class="inside">
+            <div class="node band"><b><span class="lk">A</span>Zoning district</b><span>RM, C, CD-1, R1-1</span></div>
+            <div class="node band"><b><span class="lk">B</span>Provincial overrides</b><span>SSMUH, transit-oriented areas</span></div>
+            <div class="node band"><b><span class="lk">C</span>City policy</b><span>family mix, rents, trees, levies</span></div>
+            <div class="node band"><b><span class="lk">D</span>Code and design standards</b></div>
+            <div class="node band"><b><span class="lk">E</span>Funding programs</b><span>BC Builds, Community Housing Fund</span></div>
+            <div class="gap"></div>
+            <div class="node"><span class="kind">script</span><b>Rules engine</b><span>pass, conditional, fail, uncertain</span></div>
+            <div class="node"><span class="kind">script</span><b>Massing from the envelope</b><span>plan, section, 3D; then Revit</span></div>
+            <div class="node signal"><span class="kind">script · stamped</span><b>Memo with the revision</b><span>R1, R2… and a rules fingerprint</span></div>
+          </div>
+        </div>
+        <div class="col out">
+          <p class="col-title">What comes out</p>
+          <div class="node"><b>Rule table, cited</b></div>
+          <div class="node"><b>Massing</b></div>
+          <div class="node"><b>Funding-fit answer</b></div>
+          <div class="node"><b>Two-page memo</b></div>
+          <div class="node"><b>Version ledger</b></div>
+        </div>
+      </div>
+      <p class="loop"><span class="ret">↺</span> rule or program changes: rerun with a new revision, and the memo says what moved</p>
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------ 02 the logic -->
+<section class="sec slab" id="logic" data-n="02" aria-labelledby="logic-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow"><span class="n">02</span>The logic</p>
+      <h2 id="logic-h">The engine decides. A person confirms twice.</h2>
+      <p class="sub">Twelve steps: eight are script, one reads text once, three are checks that stop on failure, two belong to a person. A rule marked unsure stops that rule and is reported as uncertain, never passed.</p>
+    </div>
+
+    <div class="diagram logic reveal" role="img" aria-label="Twelve steps in three rows. Row one: inputs, look up the site, extract rules (a model, once, offline), verify the rule table (a person). Row two, right to left: test the option, is it cited and dated, draw the massing, does it match the rules. Row three: funding fit, write the memo from the ledger, do the numbers tie out and stamp the version, review and decide (a person).">
+      <div class="row four">
+        <div class="node"><span class="kind">data</span><b>Inputs</b><span>address, lot, option</span></div>
+        <div class="node"><span class="kind">script</span><b>Look up the site</b><span>district, SSMUH, TOA</span></div>
+        <div class="node signal"><span class="kind">model · once, offline</span><b>Extract rules</b><span>PDF to clause and date</span></div>
+        <div class="node person"><span class="kind">person</span><b>Verify the rule table</b><span>confirm; flag what is unsure</span></div>
+      </div>
+      <div class="down four"><i></i><i></i><i></i><i class="on"></i></div>
+      <div class="row four rtl">
+        <div class="node check"><span class="kind">check</span><b>Matches the rules?</b><span>area and height agree</span></div>
+        <div class="node"><span class="kind">script</span><b>Draw the massing</b><span>floor plates in the envelope</span></div>
+        <div class="node check"><span class="kind">check</span><b>Cited and dated?</b><span>a source and a date on all</span></div>
+        <div class="node"><span class="kind">script</span><b>Test the option</b><span>pass, fail, uncertain</span></div>
+      </div>
+      <div class="down four"><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="row four">
+        <div class="node"><span class="kind">script</span><b>Funding fit</b><span>each program's criteria</span></div>
+        <div class="node"><span class="kind">script</span><b>Write the memo</b><span>from the ledger, two plain pages</span></div>
+        <div class="node check"><span class="kind">check</span><b>Numbers tie out?</b><span>stamp the revision</span></div>
+        <div class="node person"><span class="kind">person</span><b>Review and decide</b><span>the board decides</span></div>
+      </div>
+      <div class="legend">
+        <span><i></i>script: deterministic code</span>
+        <span><i class="signal"></i>model: reads text into data, once, checked by a person</span>
+        <span><i class="check"></i>check: stops on failure</span>
+        <span><i class="person"></i>person</span>
+      </div>
+      <p class="diagram-cap">A massing that fails the "matches the rules" check is redrawn. When a rule or program changes, the run restarts at the rule table and the memo gets a new revision with a list of what changed. Every arrow carries a file: the rule table as data, the ledger, the massing, the memo with its stamp.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------ 03 the five layers -->
+<section class="sec" id="layers" data-n="03" aria-labelledby="layers-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow"><span class="n">03</span>The rule stack</p>
+      <h2 id="layers-h">Five layers apply to one address at the same time.</h2>
+      <p class="sub">Each is written by a different body and changes on its own date. Where two layers conflict on geometry the stricter governs; where the Province sets a floor, it overrides a lower local maximum.</p>
+    </div>
+    <ol class="items reveal">
+      <li class="item"><span class="n">A · 4 rules</span><span class="key">Zoning district</span><h3>The shape a building may take.</h3><p>Height, setbacks, floor space ratio, parking; a CD-1 site's limits are whatever the rezoning sets. Vancouver Zoning and Development By-law.</p></li>
+      <li class="item"><span class="n">B · 2 rules</span><span class="key">Province</span><h3>Floors a city cannot go below.</h3><p>Small-scale multi-unit minimums by lot size and bus stop; minimum heights near stations. Bills 44 and 47, in force since 2024.</p></li>
+      <li class="item"><span class="n">C · 5 rules</span><span class="key">City policy</span><h3>What attaches to a rezoning.</h3><p>Family units, social housing, below-market rents, the tree by-law, development charges. The family-unit rule changed on 27 Oct 2026.</p></li>
+      <li class="item"><span class="n">D · 2 rules</span><span class="key">Design standards</span><h3>What shapes the option itself.</h3><p>BC Housing's minimum unit areas; the code basis under the 2025 Vancouver Building By-law. Flags, not checks.</p></li>
+      <li class="item"><span class="n">E · 4 rules</span><span class="key">Funders</span><h3>Not law, but whether money flows.</h3><p>Community Housing Fund, BC Builds, the predevelopment loan, CMHC readiness: published criteria, applied as written.</p></li>
+      <li class="item"><span class="n">By design</span><span class="key">Left to a person</span><h3>Three things stay uncertain.</h3><p>Which transit-oriented tier a parcel falls in, what a CD-1 rezoning is negotiated to, and whether a council waives the charges.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------ 04 in the tool -->
+<section class="sec slab" id="steps" data-n="04" aria-labelledby="steps-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow"><span class="n">04</span>In the tool</p>
+      <h2 id="steps-h">Four steps on one page. The memo is on screen first.</h2>
+      <p class="sub">The tool opens on a memo, not a form. The inputs sit beside it and fold away; the step strip is a sense of progress, not a locked wizard.</p>
+    </div>
+    <div class="steps-strip reveal" aria-hidden="true">
+      <span class="on"><i>1</i> Site</span><span class="ln"></span>
+      <span class="on"><i>2</i> Option</span><span class="ln"></span>
+      <span class="on"><i>3</i> Run and read</span><span class="ln"></span>
+      <span><i>4</i> Export</span>
+    </div>
+    <ol class="items four reveal" style="margin-top: 36px">
+      <li class="item"><span class="n">01</span><span class="key">Site</span><h3>Pick a site, or start one.</h3><p>Address, district, lot, trees, owner. Every yes/no fact is Yes / No / Not sure.</p></li>
+      <li class="item"><span class="n">02</span><span class="key">Option</span><h3>Describe the building.</h3><p>Storeys, floor area, units, tenure, funders. The unit total and the family share update as you type.</p></li>
+      <li class="item"><span class="n">03</span><span class="key">Run and read</span><h3>Three answers, then the ledger.</h3><p>Under a second. Figures beside the answers; every rule with its numbers and its source; two runs side by side.</p></li>
+      <li class="item"><span class="n">04</span><span class="key">Export</span><h3>The PDF for the board. The massing for Revit.</h3><p>A paper memo for a reviewer; a pyRevit script puts the masses on an annotated sheet and the sheet comes back as FIG 03.</p></li>
+    </ol>
+    <div class="sec-foot reveal">
+      <a class="btn btn-paper" href="app.html?tour=1">Take the two-minute walkthrough <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+      <a class="text-link" href="who.html">Who does what, step by step <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot wrap">
+  <p>First Read · ARCH 540, UBC School of Architecture and Landscape Architecture, fall 2026 · Kai. A feasibility screen, not legal, planning or funding advice. The diagrams on this page are the research document's, redrawn.</p>
+  <div class="foot-links">
+    <a href="https://github.com/kailisun98/BC-Housing-Feasibility-Study">Source on GitHub</a>
+    <a href="brand.html">Brand</a>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+</body>
+</html>

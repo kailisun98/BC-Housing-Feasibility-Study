@@ -4,47 +4,37 @@
    numbered-badge step panels, status marks as small circles with a glyph, pills on tinted washes, a mono
    double-rule stamp, blue for links and focus, amber for what is pending, drawings on white paper. */
 
-/* ------------------------------------------------------------------ tokens: light first, dark under the OS setting */
+/* ------------------------------------------------------------------ tokens: the brand's (brand.css), named for this page.
+   Light first; dark under the OS setting. The chrome (top bar, step bar) is the brand's ink in both themes, so the tool
+   continues the site's top bar; the page itself is the paper the memo is read on. */
 :root {
-  --ink: #2c3e50; --muted: #5f6672; --page: #f5f6f8; --panel: #ffffff; --line: #e1e5ea; --field: #ffffff; --group: #e9eef4;
-  --amber: #c77d14; --amber-ink: #14181d; --blue: #2a6fb8; --red: #c81e1e; --teal: #2a9d8f; --ok: #2f7d4a; --warn: #d9a520;
+  --ink: var(--b-slate); --muted: #5f6672; --page: var(--b-page); --panel: var(--b-paper); --line: #e1e5ea; --field: #ffffff; --group: #e9eef4;
+  --amber: var(--b-amber); --amber-ink: #14181d; --blue: var(--b-signal-deep); --signal: var(--b-signal); --red: #c81e1e; --teal: #2a9d8f; --ok: #2f7d4a; --warn: #d9a520;
   --on-signal: #ffffff; --on-warn: #1f2933;
-  /* the six statuses: a mark colour, a text colour that clears 4.5:1 on its wash, and the wash */
-  --s-pass: var(--ok);        --s-pass-text: #246a3d;        --s-pass-wash: #e1f2e5;
-  --s-conditional: var(--warn); --s-conditional-text: #7a5a00; --s-conditional-wash: #fff1d6;
-  --s-fail: var(--red);       --s-fail-text: #a81a1a;        --s-fail-wash: #fbe1e1;
-  --s-uncertain: var(--amber); --s-uncertain-text: #8f5a0e;  --s-uncertain-wash: #fff1d6;
-  --s-na: #8a93a0;            --s-na-text: #5f6672;          --s-na-wash: var(--group);
-  --s-info: var(--blue);      --s-info-text: #245f9c;        --s-info-wash: #eaf0f8;
-  --status-info: #eaf0f8; --status-busy: #fff1d6; --status-ok: #e1f2e5; --status-error: #fbe1e1;
-  /* the drawing colours, the same in both themes (the drawings sit on white paper) */
-  --c-paper: #ffffff; --c-envelope: #3c8cdc; --c-envelope-line: #2a6fb8; --c-street: #8e8e8e; --c-lane: #bdbdbd; --c-bldg: #f4f4f2;
-  --c-drawink: #1f2933; --c-drawmuted: #5f6672; --c-drawnote: #7a5a00; --c-rule: #e1e5ea; --c-env: #c81e1e; --c-bench: #c77d14;
-  /* text drawn in those colours, dark enough to read at 4.5:1 on the paper: street names, the benchmark's label */
-  --c-street-text: #63635f; --c-bench-text: #8f5a0e;
-  /* the half tone the context is drawn in: roads, neighbouring buildings, their outlines, trees */
-  --c-half-road: #e9e9e6; --c-half-building: #e2e2df; --c-half-line: #c9c9c5; --c-tree: #9fb07f; --c-tree-line: #7f9664;
+  /* the chrome: the ink band the site and the tool share */
+  --chrome: var(--b-ink); --chrome-2: #1f262f; --chrome-line: rgba(255, 255, 255, .12); --on-chrome: #e8ecf1; --on-chrome-muted: #aab3bf;
+  /* the six statuses, from the brand: a mark colour, a text colour that clears 4.5:1 on its wash, and the wash */
+  --s-pass: var(--st-pass);               --s-pass-text: var(--st-pass-text);               --s-pass-wash: var(--st-pass-wash);
+  --s-conditional: var(--st-conditional); --s-conditional-text: var(--st-conditional-text); --s-conditional-wash: var(--st-conditional-wash);
+  --s-fail: var(--st-fail);               --s-fail-text: var(--st-fail-text);               --s-fail-wash: var(--st-fail-wash);
+  --s-uncertain: var(--st-uncertain);     --s-uncertain-text: var(--st-uncertain-text);     --s-uncertain-wash: var(--st-uncertain-wash);
+  --s-na: var(--st-na);                   --s-na-text: var(--st-na-text);                   --s-na-wash: var(--st-na-wash);
+  --s-info: var(--st-info);               --s-info-text: var(--st-info-text);               --s-info-wash: var(--st-info-wash);
+  --status-info: var(--st-info-wash); --status-busy: var(--st-uncertain-wash); --status-ok: var(--st-pass-wash); --status-error: var(--st-fail-wash);
+  /* the drawing colours come from brand.css (--c-*): the same in both themes, the drawings sit on white paper */
   --shadow: 0 1px 2px rgba(20, 30, 40, .06);
-  --sans: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
   --focus: 2px solid var(--blue);
-  --topbar-h: 46px;
+  --topbar-h: 52px;
   --strip-h: 36px;
-  --bars-h: 128px;   /* the three sticky bars together, for scroll margins */
+  --bars-h: 134px;   /* the three sticky bars together, for scroll margins */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
     --ink: #e6ebf1; --muted: #9aa4b1; --page: #14181d; --panel: #1c2128; --line: #2c343d; --field: #12161b; --group: #232c37;
-    --amber: #e0a03a; --amber-ink: #14181d; --blue: #5aa2ea; --red: #e0554f; --teal: #3fb3a4; --ok: #4cae6d; --warn: #e0b43a;
+    --amber: var(--b-amber-night); --amber-ink: #14181d; --blue: #5aa2ea; --signal: var(--b-signal-night); --red: #e0554f; --teal: #3fb3a4; --ok: #4cae6d; --warn: #e0b43a;
     --on-signal: #14181d; --on-warn: #14181d;
-    --s-pass-text: #6fcb8d; --s-pass-wash: #163121;
-    --s-conditional-text: #e8c56a; --s-conditional-wash: #3a2f14;
-    --s-fail-text: #ef8a85; --s-fail-wash: #3b1c1c;
-    --s-uncertain-text: #ebb45c; --s-uncertain-wash: #3a2f14;
-    --s-na: #6b7684; --s-na-text: #9aa4b1; --s-na-wash: #232c37;
-    --s-info-text: #8cc0f2; --s-info-wash: #1f2a3a;
-    --status-info: #1f2a3a; --status-busy: #3a2f14; --status-ok: #163121; --status-error: #3b1c1c;
+    --chrome: #0e1116; --chrome-2: #161b22;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   }
 }
@@ -73,45 +63,55 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ------------------------------------------------------------------ the bars: top bar, steps and status strip stick as one block */
 .bars { position: sticky; top: 0; z-index: 10; }
 
-/* top bar: the title, the as-of date, the run button, the stamp. It grows a row rather than overflow. */
+/* top bar: the brand's ink band, as on the site: the lockup, the as-of date, the one loud button, the revision.
+   It grows a row rather than overflow. */
 .topbar {
   min-height: var(--topbar-h);
-  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding: 4px 14px;
-  background: var(--panel); border-bottom: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding: 6px 16px;
+  background: var(--chrome); color: var(--on-chrome); color-scheme: dark;
 }
-.wordmark { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: 0; white-space: nowrap; }
-.wordmark a { color: var(--ink); text-decoration: none; }
-.wordmark a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
-.wordmark em { font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--muted); margin-left: 8px; letter-spacing: 0; }
-.topbar-controls { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+.wordmark { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; display: flex; align-items: center; }
+.wordmark a { color: var(--on-chrome); text-decoration: none; display: inline-flex; align-items: center; gap: 9px; }
+.wordmark a:hover { color: #fff; }
+.wordmark .fr-mark { width: 22px; height: 22px; }
+.wordmark em { font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--on-chrome-muted); margin-left: 10px; letter-spacing: 0; }
+.topbar-controls { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
+.topbar .eyebrow { color: var(--on-chrome-muted); }
 .asof { display: flex; align-items: center; gap: 8px; }
 .asof .eyebrow { margin: 0; }
-.asof input[type="date"] { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; font-family: var(--mono); }
+.asof input[type="date"] { border: 1px solid var(--chrome-line); background: var(--chrome-2); color: var(--on-chrome); border-radius: 6px; padding: 5px 8px; font-size: 12.5px; font-family: var(--mono); }
+/* the one loud button: Run the rules, in the signal blue */
+.topbar .btn-primary { background: var(--b-signal-deep); color: #fff; border-radius: 999px; padding: 6px 16px; }
+.topbar .btn-primary:hover:not([disabled]) { background: var(--b-signal); color: #fff; box-shadow: 0 2px 10px rgba(60, 140, 220, .35); }
 /* the memo's rules revision: a key, then R1, R2… in a small ruled box, the way a title block numbers revisions */
 .stamp { display: flex; align-items: center; gap: 6px; }
 .stamp .eyebrow { margin: 0; }
-.stamp b { display: inline-block; min-width: 30px; padding: 2px 7px; border: 1px solid var(--ink); border-radius: 3px; font: 600 12.5px/1.25 var(--sans); color: var(--ink); text-align: center; }
-.engine-chip { font: 500 11px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 5px 9px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); white-space: nowrap; }
-.engine-chip.ready { color: var(--ok); border-color: var(--ok); }
-.engine-chip.error { color: var(--red); border-color: var(--red); white-space: normal; }
-.engine-chip.loading { color: var(--s-uncertain-text); border-color: var(--amber); }
+.stamp b { display: inline-block; min-width: 30px; padding: 2px 8px; border: 1px solid var(--on-chrome); border-radius: 4px; font: 600 12.5px/1.25 var(--sans); color: var(--on-chrome); text-align: center; }
+.engine-chip { font: 500 11px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--on-chrome-muted); padding: 5px 10px; border: 1px solid var(--chrome-line); border-radius: 999px; background: transparent; white-space: nowrap; }
+.engine-chip.ready { color: #6fcb8d; border-color: #4cae6d; }
+.engine-chip.error { color: #ef8a85; border-color: #e0554f; white-space: normal; }
+.engine-chip.loading { color: #ebb45c; border-color: var(--b-amber-night); }
 .engine-chip.loading::before { content: ""; display: inline-block; width: 9px; height: 9px; border: 2px solid var(--amber); border-top-color: transparent; border-radius: 50%; margin-right: 6px; vertical-align: -1px; animation: ui-spin .9s linear infinite; }
 @keyframes ui-spin { to { transform: rotate(360deg); } }
 
 /* ------------------------------------------------------------------ steps: a tab strip; the status strip under it */
+/* the steps: a progress line, the flows' four stops joined by hairlines; the current stop sits on a tab */
 .steps {
-  display: flex; align-items: center; gap: 4px; padding: 6px 12px;
+  display: flex; align-items: center; gap: 0; padding: 6px 12px;
   background: var(--panel); border-bottom: 1px solid var(--line); font-size: 12.5px; font-weight: 500;
 }
-.steps a { color: var(--muted); text-decoration: none; padding: 5px 10px; border-radius: 4px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: background-color .12s ease-out, color .12s ease-out, box-shadow .12s ease-out; }
-.steps a:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--ink) 55%, transparent); }
+.steps a { color: var(--muted); text-decoration: none; padding: 5px 12px 5px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: background-color .12s ease-out, color .12s ease-out, box-shadow .12s ease-out; }
+.steps a[data-step] + a[data-step]::before { content: ""; width: 22px; height: 1px; background: var(--line); margin: 0 10px 0 -2px; flex: 0 0 22px; }
+.steps a:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); }
 .steps a.active { background: var(--group); color: var(--ink); }
-.steps a.active:hover { box-shadow: none; }
+.steps a.active::before, .steps a:hover::before { background: var(--line); }
 .step-n, .badge {
   display: inline-flex; width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 600; background: var(--group); color: var(--ink); flex: 0 0 20px; letter-spacing: 0;
+  font-size: 11px; font-weight: 600; background: var(--group); color: var(--ink); flex: 0 0 20px; letter-spacing: 0; border: 1px solid transparent;
 }
-.steps a.active .step-n, .steps a.done .step-n { background: var(--ink); color: var(--panel); }
+.steps .step-n { background: transparent; border-color: var(--line); color: var(--muted); }
+.steps a.done .step-n { background: var(--ink); border-color: var(--ink); color: var(--panel); }
+.steps a.active .step-n { background: var(--b-signal-deep); border-color: var(--b-signal-deep); color: #fff; }
 .steps .tour-link { margin-left: auto; color: var(--blue); font-weight: 500; }
 .steps .tour-link:hover { color: var(--ink); }
 
@@ -179,7 +179,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* ------------------------------------------------------------------ panels and forms */
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; box-shadow: var(--shadow); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); padding: 12px 14px; box-shadow: var(--shadow); }
 .card h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .input-card > .eyebrow { display: none; }
 /* an input card's head: the numbered heading and the Edit / Done toggle */
@@ -233,7 +233,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* one class, so the variants and the touch rule below can override it */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 30px;
-  font-weight: 500; padding: 6px 12px; border-radius: 5px; border: 1px solid transparent; cursor: pointer;
+  font-weight: 500; padding: 6px 12px; border-radius: var(--r-button); border: 1px solid transparent; cursor: pointer;
   background: var(--group); color: var(--ink); text-decoration: none; line-height: 1.25; white-space: nowrap; font-size: 13px;
   transition: background-color .12s ease-out, border-color .12s ease-out, color .12s ease-out, box-shadow .12s ease-out, transform .06s ease-out;
 }
@@ -280,7 +280,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .memo-head { padding: 12px 14px 12px; }
 .memo-head > .eyebrow { display: none; }
-.memo-head h1 { font-size: 18px; font-weight: 600; letter-spacing: -.01em; text-wrap: balance; margin: 0 0 10px; }
+.memo-head h1 { font-size: 22px; font-weight: 500; letter-spacing: -.015em; text-wrap: balance; margin: 0 0 10px; }
 /* the memo's own title block: keys over values, a stamp at the end */
 .memo-meta { display: flex; align-items: stretch; flex-wrap: wrap; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); background: var(--panel); margin: 0 0 10px; }
 .memo-meta > div { display: flex; flex-direction: column; justify-content: flex-start; gap: 1px; padding: 6px 12px 6px 0; border-right: 1px solid var(--line); margin-right: 12px; min-width: 0; flex: 1 1 140px; font-size: 12.5px; }
@@ -304,7 +304,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .answer[data-verdict="uncertain"] { --tone: var(--s-uncertain-text); --wash: var(--s-uncertain-wash); }
 .answer > .eyebrow { display: none; }
 .answer h2 { font-size: 14px; margin: 0 0 6px; }
-.verdict { font-size: 18px; line-height: 1.3; font-weight: 600; margin: 0 0 10px; letter-spacing: -.01em; }
+.verdict { font-size: 20px; line-height: 1.3; font-weight: 500; margin: 0 0 10px; letter-spacing: -.015em; }
 .verdict em { font-style: normal; color: var(--tone); }
 .verdict.quiet { font-size: 13px; color: var(--muted); font-weight: 400; }
 .finding { margin: 0 0 8px; font-size: 13px; }
@@ -429,7 +429,10 @@ table.plain td.status { white-space: nowrap; }
 }
 
 /* ------------------------------------------------------------------ export */
-.export { margin-top: 12px; padding: 12px 14px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--ink); box-shadow: var(--shadow); }
+.export { margin-top: 12px; padding: 12px 14px; border-radius: var(--r-panel); background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--ink); box-shadow: var(--shadow); }
+/* the PDF leads the export bar: it is the one the board gets */
+.export .action-bar #pdf-btn { background: var(--ink); color: var(--panel); }
+.export .action-bar #pdf-btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) 76%, var(--panel)); color: var(--panel); }
 /* the inputs the memo read: notes can run long, so the list keeps a reading measure */
 .inputs-used li { max-width: 80ch; }
 .export h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }

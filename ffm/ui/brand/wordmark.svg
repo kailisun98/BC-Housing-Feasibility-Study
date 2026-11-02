@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 32" width="150" height="32">
+  <!-- First Read, the wordmark: IBM Plex Sans 600 at the mark's cap height, tracked slightly tight. Uses the web
+       font where it is loaded; falls back to the system sans. -->
+  <text x="0" y="23" font-family="IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif" font-weight="600" font-size="22" letter-spacing="-0.4" fill="currentColor">First Read</text>
+</svg>

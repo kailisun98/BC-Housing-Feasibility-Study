@@ -63,10 +63,13 @@ def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>")
     (out / "app.html").write_text(html, encoding="utf-8")
     shutil.copy(ui.STATIC_DIR / "home.html", out / "index.html")
-    for name in ("app.js", "app.css", "home.js", "home.css", "hero-memo.jpg", "hero-memo-790.jpg"):
+    n += 2
+    for name in ui.SITE_PAGES[1:] + ui.SITE_FILES:
         shutil.copy(ui.STATIC_DIR / name, out / name)
+        n += 1
+    shutil.copytree(ui.STATIC_DIR / "brand", out / "brand")
+    n += len(list((out / "brand").iterdir()))
     (out / ".nojekyll").write_text("", encoding="utf-8")
-    n += 7
 
     # inputs
     sites = ui.list_sites()

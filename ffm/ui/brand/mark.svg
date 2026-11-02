@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- First Read, the mark: a timeline of five stages; the diamond sits on the second, where the first reliable
+       answer now arrives. Drawn in currentColor so it takes any ink. -->
+  <symbol id="mark" viewBox="0 0 32 32">
+    <rect x="3" y="15.25" width="26" height="1.5" rx=".75"/>
+    <rect x="4.25" y="12.5" width="1.5" height="7" rx=".75"/>
+    <rect x="16.25" y="12.5" width="1.5" height="7" rx=".75"/>
+    <rect x="22.25" y="12.5" width="1.5" height="7" rx=".75"/>
+    <rect x="28.25" y="12.5" width="1.5" height="7" rx=".75"/>
+    <path d="M11 9.4 17.6 16 11 22.6 4.4 16Z"/>
+  </symbol>
+  <use href="#mark" fill="currentColor"/>
+</svg>

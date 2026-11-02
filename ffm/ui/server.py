@@ -4,8 +4,10 @@ Started with `python -m ffm ui [--port 8765] [--no-browser]`. The page never cal
 this module loads inputs, calls the engine exactly as the command line does, writes the same run
 folder (ledger, memo, massing, diff) and hands the results back as JSON.
 
-    GET  /                                  the home page (home.html, home.css, home.js beside this file)
+    GET  /                                  the site's home page (home.html beside this file; how.html, who.html,
+                                            case.html and brand.html are its other pages, on site.css and site.js)
     GET  /app.html                          the tool (index.html, app.js, app.css beside this file)
+    GET  /brand/<file>.svg                  the brand's mark, wordmark and lockups; brand.css holds the tokens
     GET  /data/runs/<site>/<folder>/<file>  a run file at the path the GitHub Pages build gives it, so the
                                             home page's links work the same here and on the web
     GET  /api/rules?as_of=YYYY-MM-DD        [{id, layer, layer_title, title, version_effective_from}]
@@ -59,10 +61,13 @@ OUTPUTS_DIR = ROOT / "outputs"
 STATIC_DIR = Path(__file__).resolve().parent
 
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$")
-STATIC_FILES = {"index.html": "text/html; charset=utf-8", "app.js": "text/javascript; charset=utf-8",
-                "app.css": "text/css; charset=utf-8", "home.html": "text/html; charset=utf-8",
-                "home.js": "text/javascript; charset=utf-8", "home.css": "text/css; charset=utf-8",
-                "hero-memo.jpg": "image/jpeg", "hero-memo-790.jpg": "image/jpeg"}
+# the static files beside this module: the tool (index.html as /app.html), the site's pages, their styles and
+# scripts, and the brand's SVGs under brand/. Anything else in the folder is not served.
+STATIC_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+                ".svg": "image/svg+xml", ".jpg": "image/jpeg", ".png": "image/png"}
+STATIC_PATH = re.compile(r"^(?:brand/)?[A-Za-z0-9][A-Za-z0-9_-]*\.(?:html|js|css|svg|jpg|png)$")
+SITE_PAGES = ("home.html", "how.html", "who.html", "case.html", "brand.html")
+SITE_FILES = ("app.js", "app.css", "brand.css", "site.css", "site.js")
 RUN_FILES = {
     "memo.html": "text/html; charset=utf-8", "memo.md": "text/markdown; charset=utf-8",
     "ledger.json": "application/json; charset=utf-8", "massing.json": "application/json; charset=utf-8",
@@ -398,9 +403,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def _static(self, name: str) -> None:
         p = STATIC_DIR / name
-        if name not in STATIC_FILES or not p.exists():
+        if not STATIC_PATH.match(name) or not p.is_file():
             raise ApiError(404, "Not found.")
-        self._send(200, p.read_bytes(), STATIC_FILES[name])
+        self._send(200, p.read_bytes(), STATIC_TYPES[p.suffix])
 
     def _run_file(self, site_id: str, folder: str, name: str, download: bool) -> None:
         if name not in RUN_FILES:
@@ -440,14 +445,14 @@ class Handler(BaseHTTPRequestHandler):
         first = lambda key: (q.get(key) or [None])[0]  # noqa: E731
         try:
             if method == "GET":
-                if path in ("/", "/index.html"):
+                if path in ("/", "/index.html", "/home.html"):
                     return self._static("home.html")
                 if path in ("/app", "/app.html"):
                     return self._static("index.html")
-                if path in ("/app.js", "/app.css", "/home.js", "/home.css", "/hero-memo.jpg", "/hero-memo-790.jpg"):
-                    return self._static(path[1:])
                 if path == "/favicon.ico":
-                    return self._send(204, b"", "image/x-icon")
+                    return self._static("brand/mark-tile.svg")
+                if STATIC_PATH.match(path[1:]):
+                    return self._static(path[1:])
                 if path == "/api/rules":
                     return self._json(list_rules(first("as_of")))
                 if path == "/api/sites":

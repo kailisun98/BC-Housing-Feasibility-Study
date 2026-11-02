@@ -191,6 +191,30 @@ The page also runs on GitHub Pages (https://kailisun98.github.io/BC-Housing-Feas
 CLI login on this machine has the `workflow` scope since 22 Oct 2026. Never let the pages build
 copy office-template files; `pages.py` lists the run files it copies.
 
+## The site and the brand (2 Nov 2026)
+
+Kai asked for a landing site with fewer words, explained by diagrams and short blocks, after hamol.studio
+(the pinned example) and prime-exits.bigly.studio, with several pages, the user flows mapped, the tool's UI
+redesigned from those flows, and a brand package. State now:
+
+- `docs/user-flows.md`: the three readers' flows (manager, architect, board/planner/funder) and the site map.
+- The site, under `ffm/ui/`: `home.html` (served at `/`), `how.html`, `who.html`, `case.html`, `brand.html`,
+  on `site.css` and `site.js`; dark ("the desk at night"), IBM Plex Sans 300 display type, numbered sections,
+  the research document's diagrams redrawn in HTML (the gate, inputs to outputs, the tool logic, who reads
+  which layer when, the flows). The hero's isometric massing is an SVG generated from
+  `outputs/998-e-19th-ave/as-approved/massing.json` numbers (the generator was a scratch script; the SVG is
+  inline in `home.html`). All numbers on the site come from the committed ledgers.
+- The brand: `ffm/ui/brand.css` (tokens shared by site and tool), `ffm/ui/brand/` (mark, mark-tile,
+  wordmark, lockup, lockup-stacked SVGs); `brand.html` is the guidelines page. The mark is the research
+  diagrams' diamond on a five-stage timeline. `DESIGN.md` records the system.
+- The tool: `index.html` links `brand.css` before `app.css` and carries the mark; the top bar is the ink
+  chrome, Run the rules is signal blue, the steps are a progress line, Download PDF leads the export bar.
+  `app.js` was not touched; its DOM contract (ids, `.steps a[data-step]`, `.panes`) is unchanged.
+- `server.py` serves any `*.html|js|css|svg|jpg|png` beside it (and `brand/*`) by a whitelist pattern;
+  `pages.py` copies `SITE_PAGES`, `SITE_FILES` and `brand/`. `home.css`, `home.js` and the hero JPEGs were
+  deleted. `.claude/launch.json` in this folder starts the UI for the browser preview.
+- Not done: no screenshot of the tool is used anywhere (by design); the site is not yet pushed.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

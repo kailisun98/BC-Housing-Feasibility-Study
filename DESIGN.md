@@ -208,16 +208,24 @@ says info, busy, ok or error. The massing drawings sit on white paper in both th
 Lotwise's drawing tones: envelope blue for the proposed mass, lane grey for the outright one, a
 red dashed line for the setback envelope, amber dashes for the staff benchmark.
 
-Two things it is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake,
+Two things the tool is not, confirmed: not a dashboard (no gauges, KPI tiles, charts for their own sake,
 no icon-and-heading cards as page structure) and not a startup landing page (no gradients, glass,
-hero numbers, floating shadows or marketing voice).
+hero numbers, floating shadows or marketing voice). The site may use the display kit (large light
+type, big numbers, a glow behind the hero drawing, pill buttons) because it is read, not operated;
+the voice stays plain there too.
 
-The home page in front of the tool speaks the same language. It is read rather than operated, so its
-running prose sits at a reading size while everything else keeps the tool's density, and it is kept
-quiet: headings, short paragraphs, one table and one sheet of white paper (a row of the memo) below a
-capture of the memo itself; the stages and the steps sit on the page under hairlines, without boxes.
-When something changes between two readings of the rules, it is marked the way a drawing marks a
-revision.
+**Two surfaces (2 Nov 2026).** The site in front of the tool is a different surface in the same brand:
+the desk at night. Kai asked for a site that explains itself in diagrams and short blocks, after
+hamol.studio (the pinned example) and prime-exits.bigly.studio, with several pages and a brand package.
+So the site (`home.html`, `how.html`, `who.html`, `case.html`, `brand.html`, on `site.css` and `site.js`)
+sits on a near-black ground, sets its display type in IBM Plex Sans 300 at 40 to 74px, numbers its
+sections 01 to 05 under small tracked keys, and draws the research document's diagrams (the gate,
+inputs to outputs, the tool logic, who reads which layer when, the three flows) in HTML nodes and
+arrows. The memo always shows on white paper, so it is the brightest thing on any screen. The tool
+keeps the drafting language below, but its top bar is now the same ink band as the site's, with the
+brand's mark, and its one loud button, Run the rules, is the signal blue. The brand (mark, wordmark,
+lockups, tokens in `brand.css`) is documented on `brand.html`; the flows that shaped both surfaces are
+in `docs/user-flows.md`. The "not a landing page" rule below now applies to the tool only.
 
 **Key Characteristics:**
 - One sans at 13px with 11px uppercase keys; mono only for machine-written text.
@@ -557,7 +565,33 @@ label to its line; its note under the ground line starts at the lot's edge. The 
 height labels off the masses on leader lines, turns under a sideways drag (vertical swipes still
 scroll a phone) and under the arrow keys. FIG 03 is the Revit sheet image.
 
-### Home page devices
+### The brand
+- **Mark:** a timeline of five stages with the diamond on the second, where the first reliable answer
+  now arrives (the research document's own device). Drawn in currentColor; `brand/mark.svg` carries a
+  `<symbol id="mark">` so a page uses it as `<svg class="fr-mark"><use href="brand/mark.svg#mark"/></svg>`.
+  Never under 16px. `brand/mark-tile.svg` is the icon: the mark in white on an ink tile, the diamond in signal.
+- **Wordmark and lockups:** "First Read" in Plex Sans 600 at the mark's height, tracked −0.4; horizontal
+  (`brand/lockup.svg`) and stacked with the subtitle (`brand/lockup-stacked.svg`). Clear space is the mark's width.
+- **Palette, by name** (`brand.css`): Ink #14181D, Slate #2C3E50 (the tool's text), Paper, Page #F5F6F8,
+  Night #0E1116, Signal #3C8CDC (#6FB1F2 at night; the proposed mass, links, focus, the one loud button),
+  Amber #C77D14 (pending). The six statuses as `--st-*`, the drawing tones as `--c-*`.
+- **Type:** one family. Plex Sans 300 for display (site only), 400 reading, 500 controls, 600 headings
+  and keys; Plex Mono for what a machine wrote.
+- **Chrome:** the site's top bar and the tool's top bar are the same ink band with the same lockup, so
+  opening the tool reads as turning to the document.
+
+### Site devices
+HTML, never pictures of it, so everything reflows. Numbered sections (a mono number, a tracked key, a
+light display headline at most 18ch wide, a sub-paragraph at 16px beside it); numbered items (01 ·
+KEY · title · one sentence, three across); big numbers under hairlines; paper cards (14px corners,
+a deep shadow on the night) for the memo's title block, answers and open items; diagram nodes
+(rounded, a kind label: script, model, check, person, with signal, dashed and filled variants), arrows
+in the gaps, an amber badge for a pain point, the diamond for the first reliable answer; the
+who-reads-what grid with the memo's column lit in signal; flows as numbered steps down a line with the
+screen each lands on in mono. Sections reveal on scroll (0.5s, off under reduced motion, and never
+left hidden past 1.5s).
+
+### Home page devices (the tool's former home page, kept for reference)
 HTML, never pictures of it, so everything reflows and keeps the page's type sizes. Only the memo row
 sits on paper; the rest sits on the page.
 - **Stages:** five on one Line hairline, each a 9px dot over its name and, where it has one, a 12px

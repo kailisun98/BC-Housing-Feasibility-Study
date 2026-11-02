@@ -1,0 +1,80 @@
+/* First Read: the brand's tokens, shared by the site (site.css) and the tool (app.css).
+   One family, IBM Plex Sans, in four weights: 300 for display, 400 for reading, 500 for controls, 600 for
+   headings and keys; IBM Plex Mono for what a machine wrote. Ink and paper; one signal colour, the blue of the
+   proposed mass in the drawings; amber for what is pending; six status colours that never appear without
+   their word. Light is the page the memo is read on; night is the desk the site is set on. */
+
+:root {
+  /* type */
+  --sans: "IBM Plex Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: "IBM Plex Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  /* the palette, by name */
+  --b-ink: #14181d;        /* the brand's black: cool, not pure */
+  --b-slate: #2c3e50;      /* the tool's working ink */
+  --b-paper: #ffffff;
+  --b-page: #f5f6f8;
+  --b-night: #0e1116;      /* the site's ground */
+  --b-night-2: #161b22;    /* a raised surface on the night */
+  --b-night-3: #1f262f;
+  --b-signal: #3c8cdc;     /* the proposed mass; links, focus, the one loud button */
+  --b-signal-deep: #2a6fb8;
+  --b-signal-night: #6fb1f2;
+  --b-amber: #c77d14;      /* pending */
+  --b-amber-night: #e0a03a;
+
+  /* the six statuses: a mark, a text colour that clears 4.5:1 on its wash, a wash */
+  --st-pass: #2f7d4a;        --st-pass-text: #246a3d;        --st-pass-wash: #e1f2e5;
+  --st-conditional: #d9a520; --st-conditional-text: #7a5a00; --st-conditional-wash: #fff1d6;
+  --st-fail: #c81e1e;        --st-fail-text: #a81a1a;        --st-fail-wash: #fbe1e1;
+  --st-uncertain: #c77d14;   --st-uncertain-text: #8f5a0e;   --st-uncertain-wash: #fff1d6;
+  --st-na: #8a93a0;          --st-na-text: #5f6672;          --st-na-wash: #e9eef4;
+  --st-info: #2a6fb8;        --st-info-text: #245f9c;        --st-info-wash: #eaf0f8;
+
+  /* the drawings' own tones, fixed in both themes because the paper is always white */
+  --c-paper: #ffffff; --c-envelope: #3c8cdc; --c-envelope-line: #2a6fb8; --c-street: #8e8e8e; --c-lane: #bdbdbd; --c-bldg: #f4f4f2;
+  --c-drawink: #1f2933; --c-drawmuted: #5f6672; --c-drawnote: #7a5a00; --c-rule: #e1e5ea; --c-env: #c81e1e; --c-bench: #c77d14;
+  --c-street-text: #63635f; --c-bench-text: #8f5a0e;
+  --c-half-road: #e9e9e6; --c-half-building: #e2e2df; --c-half-line: #c9c9c5; --c-tree: #9fb07f; --c-tree-line: #7f9664;
+
+  /* shape */
+  --r-mark: 2px; --r-control: 4px; --r-button: 6px; --r-panel: 8px; --r-card: 10px; --r-pill: 999px;
+
+  /* motion */
+  --t-fast: .12s ease-out; --t-base: .18s ease-out;
+}
+
+/* ----------------------------------------------------------- the status set at night */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --st-pass: #4cae6d;        --st-pass-text: #6fcb8d;        --st-pass-wash: #163121;
+    --st-conditional: #e0b43a; --st-conditional-text: #e8c56a; --st-conditional-wash: #3a2f14;
+    --st-fail: #e0554f;        --st-fail-text: #ef8a85;        --st-fail-wash: #3b1c1c;
+    --st-uncertain: #e0a03a;   --st-uncertain-text: #ebb45c;   --st-uncertain-wash: #3a2f14;
+    --st-na: #6b7684;          --st-na-text: #9aa4b1;          --st-na-wash: #232c37;
+    --st-info: #5aa2ea;        --st-info-text: #8cc0f2;        --st-info-wash: #1f2a3a;
+  }
+}
+:root[data-theme="dark"] {
+  --st-pass: #4cae6d;        --st-pass-text: #6fcb8d;        --st-pass-wash: #163121;
+  --st-conditional: #e0b43a; --st-conditional-text: #e8c56a; --st-conditional-wash: #3a2f14;
+  --st-fail: #e0554f;        --st-fail-text: #ef8a85;        --st-fail-wash: #3b1c1c;
+  --st-uncertain: #e0a03a;   --st-uncertain-text: #ebb45c;   --st-uncertain-wash: #3a2f14;
+  --st-na: #6b7684;          --st-na-text: #9aa4b1;          --st-na-wash: #232c37;
+  --st-info: #5aa2ea;        --st-info-text: #8cc0f2;        --st-info-wash: #1f2a3a;
+}
+
+/* ----------------------------------------------------------- the mark, as a reusable inline SVG style */
+/* <svg class="fr-mark"><use href="brand/mark.svg#mark"/></svg> is the mark in currentColor: a timeline with
+   five stages and the diamond on the second, where the first reliable answer now arrives. */
+.fr-mark { display: inline-block; width: 1em; height: 1em; vertical-align: -0.15em; fill: currentColor; }
+
+/* ----------------------------------------------------------- the status pill, the brand's signature component */
+.pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px 2px 3px; border-radius: var(--r-pill); font: 600 11px/1.5 var(--sans); white-space: nowrap; vertical-align: middle; background: var(--st-na-wash); color: var(--st-na-text); letter-spacing: .01em; }
+.pill::before { content: "–"; display: inline-flex; width: 15px; height: 15px; border-radius: 50%; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 700; line-height: 1; color: #fff; background: var(--st-na); }
+.pill-pass { background: var(--st-pass-wash); color: var(--st-pass-text); } .pill-pass::before { content: "✓"; background: var(--st-pass); }
+.pill-conditional { background: var(--st-conditional-wash); color: var(--st-conditional-text); } .pill-conditional::before { content: "!"; background: var(--st-conditional); color: #1f2933; }
+.pill-fail { background: var(--st-fail-wash); color: var(--st-fail-text); } .pill-fail::before { content: "✗"; background: var(--st-fail); }
+.pill-uncertain { background: var(--st-uncertain-wash); color: var(--st-uncertain-text); border: 1px dashed var(--st-uncertain); padding-top: 1px; padding-bottom: 1px; } .pill-uncertain::before { content: "?"; background: var(--st-uncertain); color: #14181d; }
+.pill-not_applicable { background: var(--st-na-wash); color: var(--st-na-text); }
+.pill-info { background: var(--st-info-wash); color: var(--st-info-text); } .pill-info::before { content: "i"; background: var(--st-info); font-family: var(--mono); }

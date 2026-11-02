@@ -2373,28 +2373,43 @@ function revitResultHtml(r, run) {
 
 // ---------------------------------------------------------------- walkthrough: a spotlight over each step, in order
 
+/* The walkthrough follows the development manager's flow (docs/user-flows.md, flow 1) from the top bar to an issued
+   run, then shows the other two readers. A step's `before` sets the page up for it (a mode, a guide stop, a view) and
+   `action: "run"` runs the rules when the reader presses Next; the mode the reader started in comes back at the end. */
 const TOUR = [
-  { target: ".topbar-controls", title: "Rules as of",
-    text: "Pick the date the rules should be read on. The engine applies the versions in force that day, and each memo on a site is numbered as a revision, R1, R2 and so on, so two memos can be told apart." },
-  { target: "#step-site", title: "Step 1 · Site",
-    text: "Choose a site file; the card sums it up in a line. Edit opens the form: district, lot, policy areas, trees, owner. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
+  { target: ".mode", title: "For the manager, the architect, or a reader", before: () => setMode("manager", false, false),
+    text: "One page, three layouts. Manager: the memo first, the inputs beside it. Architect: the forms and every ledger layer open, Revit at hand. Reader: the memo alone, as on paper. This walkthrough follows the manager; the last stop shows the other two." },
+  { target: ".asof", title: "Rules as of",
+    text: "The date the rules are read on. The engine applies the versions in force that day, and each memo on a site is numbered as a revision, R1, R2 and so on, so two memos can be told apart and a rule change shows as a change." },
+  { target: "#guide", title: "Start from an address", before: () => { guide.step = 1; renderGuide(); },
+    text: "Six stops, one input at a time. Type an address: OpenStreetMap gives the point, the City's open data the zoning district and the parcel, and the lot's area and shape follow. Or pick a saved site in the Site card below." },
+  { target: "#guide", title: "Choose the programs, read the site", before: () => { guide.step = 3; renderGuide(); },
+    text: "Tick the funders in view. Then read the site alone against layers A to C, before any option exists: the outright limits, the rezoning path and its benchmark, transit, trees. The reading shows in the memo pane." },
+  { target: "#guide", title: "Shape the option", before: () => { guide.step = 4; renderGuide(); },
+    text: "Outright, Benchmark or Funder-ready, derived from the rules. Every figure shows the rule it came from, or says it is a placeholder, with a Suggested | Mine switch. What no rule settles, such as site control or the Community Vision map, is asked right here. Use this option writes it into the Option card." },
+  { target: "#step-site", title: "Step 1 · Site", before: () => { guide.step = 0; renderGuide(); },
+    text: "The site as a file: district, lot, policy areas, trees, owner. The card sums it up in a line; Edit opens the form. Where you are not sure, say so. The memo then reads uncertain instead of guessing." },
   { target: "#step-option", title: "Step 2 · Option",
-    text: "The building: storeys, floor area, the unit mix, tenure, the funders you aim at, and the rezoning path if there is one. Edit to change it; save it as a file to rerun the same thing from the command line." },
+    text: "The building: storeys, floor area, the unit mix, tenure, the funders, the rezoning path. Suggested figures land here too, and every one can still be edited. Save it as a file to rerun the same thing from the command line." },
   { target: "#run-btn", title: "Run the rules", action: "run",
-    text: "One click, or Ctrl+Enter. In under a second the engine writes the memo to the outputs folder and reads it here." },
+    text: "One click, or Ctrl+Enter. In under a second the engine writes the memo to the outputs folder and reads it here. The walkthrough runs the real case for you now." },
   { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers",
-    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from." },
-  { target: ".figures", fallback: "#memo", title: "The massing",
-    text: "Plan and section drawn from the same numbers as the memo, with the staff benchmark. When the Revit script has run on this folder, the sheet it built appears as a third figure." },
-  { target: ".ledger", fallback: "#memo", title: "The full ledger",
-    text: "Every rule the engine ran, by layer, collapsed until you open it: status, finding, numbers used and the source link." },
+    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item." },
+  { target: "#view-switch", title: "Summary, Detailed, 3D preview", before: () => setView("3d", false),
+    text: "How much of the memo to show. Summary is the title block, the answers and the figures; Detailed the whole memo; 3D preview the drawings, large. The page is switched to the preview for the next stop." },
+  { target: "#preview3d", fallback: ".figures", title: "The site plan, the section, the axonometric", before: () => setView("3d", false),
+    text: "Drawn from the same numbers as the memo: the plan with its dimension strings and the setback envelope, the section with the staff benchmark, and an axon you can turn. When the Revit script has run on this folder, the sheet it built joins the memo's figures." },
+  { target: ".ledger", fallback: "#memo", title: "The full ledger", before: () => setView("detailed", false),
+    text: "Back in the detailed view: every rule the engine ran, by layer, collapsed until you open it, with its status, finding, numbers used and source link. The architect's layout opens every layer." },
   { target: ".memo-tools:not([hidden]), #side-by-side .pick-row", title: "Past runs",
     text: "Open an earlier run, or compare two. The two runs then sit side by side under the title block, these pickers heading their columns, and What changed follows with a revision mark: the rule, its old and new version, and the new rules revision." },
-  { target: "#step-export", title: "Step 4 · Export",
-    text: "Download the memo as HTML or Markdown, print it, take the massing file, or open Export to Revit for the two lines that build the sheet." },
+  { target: "#step-export", title: "Step 4 · Export and issue",
+    text: "Download PDF is the memo for the board, laid out for paper. Issue to the architect hands this revision on with a note; they see an amber chip in their top bar and open it from there. The architect issues to the board the same way." },
+  { target: ".mode", title: "The architect and the reader",
+    text: "Switch to Architect and the Site and Option forms open, every ledger layer opens, the figures sit beside the answers and Export to Revit leads. Switch to Reader and the inputs, the steps and the run controls go; the memo stands alone in a reading column with Download PDF and Print. That is the whole page." },
 ];
 const TOUR_KEY = "ffm.walkthrough.seen";
-const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0, returnTo: null };
+const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0, returnTo: null, modeBefore: null, viewBefore: null };
 
 function tourTarget(step) {
   return document.querySelector(step.target) || (step.fallback ? document.querySelector(step.fallback) : null);
@@ -2407,6 +2422,8 @@ function reducedMotion() {
 function startTour(at = 0) {
   if (tour.active) endTour();
   tour.active = true;
+  tour.modeBefore = state.mode;
+  tour.viewBefore = state.view;
   tour.returnTo = document.activeElement && document.activeElement !== document.body ? document.activeElement : $("#tour-link");
   tour.spot = document.createElement("div");
   tour.spot.className = "tour-spot";
@@ -2434,6 +2451,10 @@ function endTour() {
   window.removeEventListener("resize", positionTourSoon);
   window.removeEventListener("scroll", positionTourSoon);
   document.removeEventListener("keydown", tourKeys);
+  // the page goes back to the layout and the view the reader had before the walkthrough set them up
+  if (tour.viewBefore && tour.viewBefore !== state.view) setView(tour.viewBefore, false);
+  if (tour.modeBefore && tour.modeBefore !== state.mode) setMode(tour.modeBefore, false, false);
+  tour.modeBefore = tour.viewBefore = null;
   try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* private window: fine */ }
   // focus goes back where it was before the walkthrough
   const back = tour.returnTo;
@@ -2473,9 +2494,10 @@ async function tourNext() {
 function showTourStep(i) {
   if (!tour.active) return;
   if (i < 0) i = 0;
-  if (i >= TOUR.length) { endTour(); toast("That is the whole page. Run the rules whenever you like."); return; }
+  if (i >= TOUR.length) { endTour(); toast("That is the whole page. Start from an address, or run the rules, whenever you like."); return; }
   tour.i = i;
   const step = TOUR[i];
+  if (step.before) step.before();
   // a step that points into the inputs opens a folded rail, without changing the reader's kept choice
   const aim = tourTarget(step);
   if (aim && aim.closest(".inputs-body") && $(".panes").classList.contains("no-inputs")) showInputs(true, false);

@@ -691,9 +691,14 @@ error (red), in the matching colour on a Line border.
 
 ### Walkthrough
 A spotlight cut from a dimmed page with a 2px blue ring, and a Panel card: a modal dialog named by
-its 14px heading, 12.5px text, Back / Next buttons and a Key counter ("3 of 9 · Esc closes"). Tab
+its 14px heading, 12.5px text, Back / Next buttons and a Key counter ("3 of 15 · Esc closes"). Tab
 stays inside the card, the arrows page through it except inside a field or the 3D view, and Esc
-returns focus to where it was.
+returns focus to where it was. Its fifteen stops follow the manager's flow (rebuilt 3 Nov 2026): the
+mode switch, the rules date, the guided start's address, programs-and-reading and shaping stops, the
+Site and Option cards, Run (the eighth stop runs the real case), the three answers, the view switch
+(the page is put into the 3D preview for the drawings stop and back to Detailed for the ledger), past
+runs, Export and Issue, and the architect's and reader's layouts. A stop may set the page up for
+itself; the layout and the view the reader started in come back when the walkthrough ends.
 
 ### The paper memo (PDF and Print)
 Download PDF and Print both lay the memo out for paper, for whoever reviews it, as one self-contained

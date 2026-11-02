@@ -25,7 +25,8 @@ from . import __version__
 from .ui import server as ui
 
 PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.js"
-ENGINE_FILES = ["ffm/__init__.py", "ffm/rules_loader.py", "ffm/checks.py", "ffm/engine.py", "ffm/massing.py", "ffm/memo.py"]
+ENGINE_FILES = ["ffm/__init__.py", "ffm/rules_loader.py", "ffm/checks.py", "ffm/engine.py", "ffm/massing.py", "ffm/memo.py",
+                "ffm/osm.py", "ffm/lookup.py", "ffm/suggest.py"]
 RUN_FILES_PUBLIC = ["ledger.json", "massing.json", "massing.svg", "diff.json", "memo.md", "memo.html", "ffm_sheet_notes.json"]
 
 

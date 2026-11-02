@@ -31,6 +31,14 @@
   --st-na: #8a93a0;          --st-na-text: #5f6672;          --st-na-wash: #e9eef4;
   --st-info: #2a6fb8;        --st-info-text: #245f9c;        --st-info-wash: #eaf0f8;
 
+  /* the same six statuses as constants that no theme flips, for text and washes on white paper set inside a dark page */
+  --lt-pass-text: #246a3d;        --lt-pass-wash: #e1f2e5;
+  --lt-conditional-text: #7a5a00; --lt-conditional-wash: #fff1d6;
+  --lt-fail-text: #a81a1a;        --lt-fail-wash: #fbe1e1;
+  --lt-uncertain-text: #8f5a0e;   --lt-uncertain-wash: #fff1d6;
+  --lt-na-text: #5f6672;          --lt-na-wash: #e9eef4;
+  --lt-info-text: #245f9c;        --lt-info-wash: #eaf0f8;
+
   /* the drawings' own tones, fixed in both themes because the paper is always white */
   --c-paper: #ffffff; --c-envelope: #3c8cdc; --c-envelope-line: #2a6fb8; --c-street: #8e8e8e; --c-lane: #bdbdbd; --c-bldg: #f4f4f2;
   --c-drawink: #1f2933; --c-drawmuted: #5f6672; --c-drawnote: #7a5a00; --c-rule: #e1e5ea; --c-env: #c81e1e; --c-bench: #c77d14;
@@ -62,6 +70,19 @@
   --st-uncertain: #e0a03a;   --st-uncertain-text: #ebb45c;   --st-uncertain-wash: #3a2f14;
   --st-na: #6b7684;          --st-na-text: #9aa4b1;          --st-na-wash: #232c37;
   --st-info: #5aa2ea;        --st-info-text: #8cc0f2;        --st-info-wash: #1f2a3a;
+}
+
+/* on paper, whatever the theme on screen: the selectors match the night blocks' specificity, so they win in print */
+@media print {
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+    --st-pass: #2f7d4a;        --st-pass-text: #246a3d;        --st-pass-wash: #fff;
+    --st-conditional: #d9a520; --st-conditional-text: #7a5a00; --st-conditional-wash: #fff;
+    --st-fail: #c81e1e;        --st-fail-text: #a81a1a;        --st-fail-wash: #fff;
+    --st-uncertain: #c77d14;   --st-uncertain-text: #8f5a0e;   --st-uncertain-wash: #fff;
+    --st-na: #8a93a0;          --st-na-text: #5f6672;          --st-na-wash: #fff;
+    --st-info: #2a6fb8;        --st-info-text: #245f9c;        --st-info-wash: #fff;
+  }
+  .pill, .pill::before { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
 
 /* ----------------------------------------------------------- the mark, as a reusable inline SVG style */

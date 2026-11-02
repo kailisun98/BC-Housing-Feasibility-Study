@@ -7,7 +7,7 @@
   --bg: var(--b-night); --bg-2: var(--b-night-2); --bg-3: var(--b-night-3);
   --fg: #e8ecf1; --fg-2: #aab3bf; --fg-3: #6f7a88;
   --line: rgba(255, 255, 255, .10); --line-2: rgba(255, 255, 255, .18);
-  --signal: var(--b-signal-night); --signal-deep: var(--b-signal);
+  --signal: var(--b-signal-night); --signal-deep: var(--b-signal-deep);   /* the deep signal is the only one that carries white text: 5.2:1 */
   --amber: var(--b-amber-night);
   --paper: #ffffff; --paper-ink: #14181d; --paper-muted: #5f6672; --paper-line: #e1e5ea; --paper-group: #eef1f5;
   --gutter: 24px; --max: 1280px;
@@ -47,8 +47,12 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .btn-ghost { background: rgba(255, 255, 255, .06); border-color: var(--line-2); color: var(--fg); }
 .btn-ghost:hover { background: rgba(255, 255, 255, .12); }
 .btn-signal { background: var(--signal-deep); color: #fff; }
-.btn-signal:hover { background: color-mix(in srgb, var(--signal-deep) 80%, #fff); }
+.btn-signal:hover { background: color-mix(in srgb, var(--signal-deep) 82%, var(--b-ink)); }
 .btn-small { min-height: 38px; padding: 0 16px; font-size: 13px; }
+/* a phone: a long button wraps inside the page rather than run past its edge */
+@media (max-width: 560px) { .btn { white-space: normal; text-align: center; line-height: 1.3; padding-block: 11px; } }
+/* a touch screen: the bar's links and every pill are 44px tall */
+@media (pointer: coarse) { .nav .nav-links a { padding: 16px 14px; } .btn-small { min-height: 44px; } }
 .text-link { display: inline-flex; align-items: center; min-height: 46px; font-weight: 500; color: var(--fg); border-bottom: 1px solid transparent; }
 .text-link:hover { color: var(--signal); }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
@@ -95,7 +99,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 /* the isometric massing: the proposed mass in signal blue, the outright envelope dashed inside it */
 .iso-street { fill: rgba(255, 255, 255, .03); }
 .iso-lot { fill: rgba(255, 255, 255, .04); stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.iso-env { fill: none; stroke: #e0554f; stroke-width: 1; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.iso-env { fill: none; stroke: var(--st-fail); stroke-width: 1; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
 .iso-outright polygon { fill: rgba(255, 255, 255, .05); }
 .iso-outright-edges line { stroke: #d3d9e0; stroke-width: 1.1; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .iso-proposed .face-top { fill: color-mix(in srgb, var(--signal) 70%, #fff); fill-opacity: .55; }
@@ -107,7 +111,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .iso-label text { font: 500 12.5px var(--sans); fill: var(--fg); }
 .iso-label .l2 { font-size: 11.5px; font-weight: 400; fill: var(--fg-2); }
 .iso-street-name, .iso-lot-name { font: 500 11px var(--sans); fill: var(--fg-3); letter-spacing: .04em; }
-.iso-street-name { text-transform: uppercase; letter-spacing: .14em; font-size: 9.5px; }
+.iso-street-name { text-transform: uppercase; letter-spacing: .14em; font-size: 11px; }
 
 /* an inner page's hero: one column, shorter */
 .hero.page { min-height: 0; grid-template-columns: 1fr; padding-top: calc(var(--nav-h) + 72px); padding-bottom: 56px; }
@@ -182,7 +186,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; list-style: none; margin: 0; padding: 0; }
 .stats li { padding: 22px 0 0; border-top: 1px solid var(--line-2); }
 .stats .v { font-size: clamp(40px, 5vw, 64px); line-height: 1; font-weight: 300; letter-spacing: -.03em; }
-.stats .v small { font-size: .45em; color: var(--fg-3); margin-left: 6px; letter-spacing: 0; }
+.stats .v small { font-size: max(14px, .45em); color: var(--fg-3); margin-left: 6px; letter-spacing: 0; }
 .stats .l { margin-top: 10px; font-size: 13.5px; color: var(--fg-2); max-width: 24ch; }
 @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
@@ -200,17 +204,19 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 /* the three answers on paper */
 .answers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
 .answer { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 8px; border: 1px solid var(--paper-line); }
-.answer[data-verdict="fail"] { background: #fbe1e1; border-color: transparent; }
-.answer[data-verdict="conditional"] { background: #fff1d6; border-color: transparent; }
-.answer[data-verdict="uncertain"] { background: #fff1d6; border-color: transparent; }
-.answer[data-verdict="pass"] { background: #e1f2e5; border-color: transparent; }
+/* an answer card takes its verdict's wash and ink from the brand's light status set (brand.css --lt-*), which the
+   page's dark theme never flips: the paper is light whatever the desk. Prose on a wash is set in that wash's deepened
+   ink, never grey (the Marked Word Rule's cousin: colour on a wash belongs to the status). */
+.answer[data-verdict] { border-color: transparent; --wash-ink: var(--paper-ink); }
+.answer[data-verdict="fail"] { background: var(--lt-fail-wash); --wash-ink: var(--lt-fail-text); }
+.answer[data-verdict="conditional"], .answer[data-verdict="uncertain"] { background: var(--lt-conditional-wash); --wash-ink: var(--lt-conditional-text); }
+.answer[data-verdict="pass"] { background: var(--lt-pass-wash); --wash-ink: var(--lt-pass-text); }
 .answer .q { font: 600 11px/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--paper-muted); }
+.answer[data-verdict] .q { color: var(--wash-ink); }
 .answer .v { font-size: 18px; line-height: 1.3; font-weight: 600; letter-spacing: -.01em; }
-.answer .v em { font-style: normal; }
-.answer[data-verdict="fail"] .v em { color: #a81a1a; }
-.answer[data-verdict="conditional"] .v em, .answer[data-verdict="uncertain"] .v em { color: #7a5a00; }
-.answer[data-verdict="pass"] .v em { color: #246a3d; }
+.answer .v em { font-style: normal; color: var(--wash-ink); }
 .answer .f { font-size: 13px; color: var(--paper-muted); line-height: 1.45; }
+.answer[data-verdict] .f { color: var(--wash-ink); }
 .answer .f b { color: var(--paper-ink); }
 /* open items on paper: a table with a Who column */
 .ptable { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
@@ -225,8 +231,8 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .memo-row > div { min-width: 0; font-size: 13px; line-height: 1.45; }
 .memo-row .key { display: block; padding-bottom: 6px; border-bottom: 1px solid var(--paper-line); margin-bottom: 8px; }
 .memo-row code { display: block; font-size: 11px; color: var(--paper-muted); margin-top: 4px; }
-.memo-row .ask { color: #7a5a00; font-weight: 500; }
-.memo-who { margin-top: 16px; padding: 10px 14px; border-radius: 6px; background: #fff1d6; font-size: 13px; color: #7a5a00; }
+.memo-row .ask { color: var(--lt-conditional-text); font-weight: 500; }
+.memo-who { margin-top: 16px; padding: 10px 14px; border-radius: 6px; background: var(--lt-conditional-wash); font-size: 13px; color: var(--lt-conditional-text); }
 .memo-who b { color: var(--paper-ink); }
 @media (max-width: 900px) { .answers { grid-template-columns: 1fr; } .memo-row { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .memo-row { grid-template-columns: 1fr; } .tblock { grid-template-columns: 1fr 1fr; } }
@@ -238,7 +244,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .node { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--bg-2); min-width: 0; }
 .node b { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
 .node span { font-size: 12.5px; color: var(--fg-2); line-height: 1.4; }
-.node .kind { font: 500 10.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 4px; }
+.node .kind { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 4px; }
 .node.signal { border-color: var(--signal); background: color-mix(in srgb, var(--signal-deep) 22%, var(--bg-2)); }
 .node.signal .kind { color: var(--signal); }
 .node.check { background: var(--bg-3); border-color: var(--bg-3); }
@@ -272,7 +278,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .marks.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .mark { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 12.5px; color: var(--fg-2); }
 .mark .dia { width: 14px; height: 14px; transform: rotate(45deg); border-radius: 2px; background: var(--fg-3); }
-.mark.late .dia { background: #e0554f; }
+.mark.late .dia { background: var(--st-fail); }
 .mark.early .dia { background: var(--signal); box-shadow: 0 0 0 6px color-mix(in srgb, var(--signal) 22%, transparent); }
 .mark.early { color: var(--fg); }
 .gate-row { margin-bottom: 36px; }
@@ -386,14 +392,47 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .foot p { max-width: 80ch; }
 @media (max-width: 760px) { .foot { grid-template-columns: 1fr; } }
 
-/* ------------------------------------------------------------------ reveal on scroll, kept short and optional */
-.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .5s ease-out, transform .5s ease-out; }
-.js .reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; transition: none; } }
+/* ------------------------------------------------------------------ motion
+   One authored moment: the hero's massing builds itself the way the tool derives it, the lot first, then the
+   dashed outright envelope, then the proposed mass rising floor by floor, then the labels. Everything else is
+   feedback: sections arrive with a short fade, lists arrive as lists, the gate's early diamond rings once. */
+:root { --ease-out: cubic-bezier(.16, 1, .3, 1); }
+
+/* the build: clip-path from the ground up, so the mass rises through its floor lines and the ground stays put */
+/* site.js adds .play when the page is first seen (a tab opened in the background would otherwise build unseen);
+   without script the drawing simply stands built */
+.hero-iso.play .iso-street, .hero-iso.play .iso-lot, .hero-iso.play .iso-env { animation: iso-ground .4s ease-out both; }
+.hero-iso.play .iso-outright, .hero-iso.play .iso-outright-edges { animation: iso-rise .45s var(--ease-out) .35s both; }
+.hero-iso.play .iso-proposed, .hero-iso.play .iso-floors { animation: iso-rise .8s var(--ease-out) .7s both; }
+.hero-iso.play .iso-label, .hero-iso.play .iso-street-name, .hero-iso.play .iso-lot-name { animation: iso-label .3s ease-out 1.35s both; }
+@keyframes iso-ground { from { opacity: 0; } to { opacity: 1; } }
+@keyframes iso-rise { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(-2% 0 0 0); } }
+@keyframes iso-label { from { opacity: 0; } to { opacity: 1; } }
+
+/* sections arrive: a short fade, no travel; a list's items follow one another by 50ms, four deep at most */
+.js .reveal { opacity: 0; transition: opacity .4s ease-out; }
+.js .reveal.in { opacity: 1; }
+.js .items.reveal > .item, .js .stats.reveal > li, .js .flows.reveal > .flow { opacity: 0; transform: translateY(8px); transition: opacity .4s var(--ease-out), transform .5s var(--ease-out); }
+.js .items.reveal.in > .item, .js .stats.reveal.in > li, .js .flows.reveal.in > .flow { opacity: 1; transform: none; }
+.js .reveal.in > :nth-child(2) { transition-delay: .05s; } .js .reveal.in > :nth-child(3) { transition-delay: .1s; } .js .reveal.in > :nth-child(n + 4) { transition-delay: .15s; }
+/* the first reliable answer, arriving early: the diamond rings once when the gate comes into view */
+.js .reveal.in .mark.early .dia { animation: ring .9s ease-out .35s 1 both; }
+@keyframes ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--signal) 55%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
+.js .reveal.in .mark.early .dia { box-shadow: 0 0 0 6px color-mix(in srgb, var(--signal) 22%, transparent); }
+
+@media (prefers-reduced-motion: reduce) {
+  /* the drawing is shown built; only the labels fade in, so the hero still reads as arriving */
+  .hero-iso.play .iso-street, .hero-iso.play .iso-lot, .hero-iso.play .iso-env, .hero-iso.play .iso-outright, .hero-iso.play .iso-outright-edges, .hero-iso.play .iso-proposed, .hero-iso.play .iso-floors { animation: none; }
+  .hero-iso.play .iso-label, .hero-iso.play .iso-street-name, .hero-iso.play .iso-lot-name { animation-delay: .2s; animation-duration: .4s; }
+  .js .reveal, .js .items.reveal > .item, .js .stats.reveal > li, .js .flows.reveal > .flow { transform: none; transition-duration: .25s; transition-delay: 0s !important; }
+  .js .reveal.in .mark.early .dia { animation: none; }
+  .arrow { transition: none; }
+}
 
 /* ------------------------------------------------------------------ print: light, the content only */
 @media print {
-  :root { color-scheme: light; --bg: #fff; --bg-2: #fff; --bg-3: #f0f2f5; --fg: #000; --fg-2: #333; --fg-3: #555; --line: #ccc; --line-2: #999; }
+  /* the selector matches the dark block's specificity, so a dark-mode browser prints light too */
+  :root, :root[data-theme="dark"], :root:not([data-theme="light"]) { color-scheme: light; --bg: #fff; --bg-2: #fff; --bg-3: #f0f2f5; --fg: #000; --fg-2: #333; --fg-3: #555; --line: #ccc; --line-2: #999; --signal: #2a6fb8; --signal-deep: #2a6fb8; }
   .nav, .hero-foot, .btn, .skip { display: none !important; }
   .hero { min-height: 0; padding-top: 20px; }
   .paper { box-shadow: none; border: 1px solid #ccc; }

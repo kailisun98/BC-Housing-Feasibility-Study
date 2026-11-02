@@ -222,7 +222,49 @@ redesigned from those flows, and a brand package. State now:
   controls, pickers, massing and Revit buttons hidden; the memo in a 980px reading column at 14px. The memo's
   answer headings are now the site's keys (a mono "01" and tracked caps) over a 24px light verdict; the memo
   title is 30px light; buttons are pills. The engine and the memo's content are the same in every mode.
+- Audit fixes (2 Nov 2026, `/impeccable audit` 17/20): white text sits only on the deep signal (#2A6FB8); long
+  buttons wrap under 560px; print blocks in app.css, site.css and brand.css use selectors that beat the dark-mode
+  block; 44px mode switch and nav links on touch; the who-reads-what grid is a `role="group"`; prose on a wash
+  takes the wash's ink via the never-flipped `--lt-*` constants in brand.css; the info popover lost its blue
+  side bar; DESIGN.md's frontmatter now lists the site's tokens. Still open, by choice: the site's kickers and
+  section numbers (the Hamol brief), the hero's 1.02 leading, and the stale `.impeccable/design.json` sidecar.
+- Motion (2 Nov 2026, `/impeccable animate`; DESIGN.md "Motion" has the timings): the site hero's massing builds
+  itself (clip-path rises in `site.css`); section reveals are fades with a short list stagger; the gate's early
+  diamond rings once. In the tool: the mode switch's `.seg-thumb` slides (`placeModeThumb` in `app.js`); the
+  Site and Option forms sit in a `.form-fold` grid row (index.html) that goes 0fr to 1fr instead of
+  `display: none`; the answers land staggered; the rail column and the status wash ease. Every effect has a
+  reduced-motion path. The preview pane throttles transitions while hidden, so measure after a wait.
 - Not done: no screenshot of the tool is used anywhere (by design).
+
+## Phase 1 of the workflows proposal (3 Nov 2026; `docs/proposal-workflows.md`)
+
+Built and verified in the browser:
+- `ffm/suggest.py`: rule-derived suggestions. `suggest(site, programs, on, candidate)` walks layers A to E and
+  returns an option plus `fields` (value, rule_id, note per dotted key), `unsure` (what a person settles),
+  `assumptions` (declared placeholders: floor to floor 3.3 m, setbacks 3.7/6.0/3.0, net efficiency 0.78,
+  10% over the BC Housing minimums, a starting mix). Candidates: outright, benchmark, funder-ready. On
+  998 E 19th Ave funder-ready gives 6 storeys, 19.8 m, FSR 3.0, 109 units, tiers 33/54/22, 19 trees.
+  `read_site(site, on)` runs layers A to C with a bare social-housing probe. Tests in `tests/test_suggest.py`.
+- `ffm/lookup.py`: `lookup(address)` geocodes with Nominatim and reads the zoning district and the parcel
+  polygon from City of Vancouver Open Data (`zoning-districts-and-labels`, `property-parcel-polygons`, the
+  Opendatasoft v2.1 records API with `within_distance`); `parcel_metrics` (pure) gives the area and an
+  equivalent rectangle; `assemble` is pure so the browser build fetches and hands the records in. Tests in
+  `tests/test_lookup.py` with the real parcel ring.
+- CLI: `python -m ffm lookup "<address>" [--out]`, `python -m ffm suggest --site … --programs … [--candidate] [--out]`.
+- Server: `GET /api/lookup?q=`, `POST /api/read-site`, `POST /api/suggest`, `GET /api/issues?site=`,
+  `POST /api/runs/<site>/<folder>/issue` (writes `issues.json` in the run folder). The static build runs
+  suggest and read-site in Pyodide and does the lookup's fetches in the browser; issuing needs the local server.
+- The tool, manager mode: a "Start from an address" card at the top of the rail (`#guide`, `renderGuide` and
+  the `guide*` functions in `app.js`) with six stops: find the site, choose the programs, read the site (the
+  reading renders in the memo pane), shape the option (candidates; every figure Suggested | Mine with its rule;
+  what is left to a person has its own control: Community Vision, transit area, bus stop, tenure, developer
+  partner, site control), run, issue. A Summary | Detailed | 3D preview switch above the memo (`setView`,
+  `renderPreview3D`: the plan with dimensions, the section and an orbitable axon, from the memo's own figure
+  functions). "Issue to the architect" / "Issue to the board" in the Export bar; the page polls the local
+  server every 15 s and shows an amber chip in the top bar for an issue addressed to the current role.
+- Not built yet: the pro-forma (phase 2, waits on the cost layer in the proposal), the architect's layout
+  tools (phase 3), hosting (phase 5), the Claude framework (phase 6). A restarted preview server is needed
+  after editing `server.py`; the Claude app's preview does not reload Python.
 
 ## Rules from the assignment brief (binding)
 

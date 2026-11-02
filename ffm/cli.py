@@ -5,6 +5,8 @@
     python -m ffm memo --out outputs/run1   rewrite the memo after the Revit script has run on that folder
     python -m ffm rules [--as-of DATE]      list the rules and the version in force
     python -m ffm stamp [--as-of DATE]      print the version stamp only
+    python -m ffm lookup "998 E 19th Ave, Vancouver, BC" [--out sites/x.json]   propose a site from an address
+    python -m ffm suggest --site sites/x.json --programs bch.chf.eligibility [--candidate funder-ready] [--out options/x.json]
     python -m ffm ui [--port 8765] [--no-browser]   the local web UI (ffm/ui/)
     python -m ffm pages [--out _site]       build the UI as a static site (GitHub Pages; engine runs in Pyodide)
 """
@@ -106,6 +108,36 @@ def cmd_context(a: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_lookup(a: argparse.Namespace) -> int:
+    """Propose a site file from an address: Nominatim for the point, the City's open data for the district and
+    the parcel. Prints the site JSON, or writes it with --out."""
+    from . import lookup
+    res = lookup.lookup(a.address)
+    text = json.dumps(res["site"], indent=2, ensure_ascii=False) + "\n"
+    if a.out:
+        Path(a.out).write_text(text, encoding="utf-8")
+        print(f"wrote {a.out}: {res['site']['zoning_district'] or 'district not found'}, {res['site']['site_area_m2'] or '?'} m²")
+    else:
+        print(text, end="")
+    return 0
+
+
+def cmd_suggest(a: argparse.Namespace) -> int:
+    """Derive an option from a site and the chosen programs, with the rule behind every figure."""
+    from . import suggest
+    site = engine.load_json(a.site)
+    programs = [p for p in (a.programs or "").split(",") if p]
+    res = suggest.suggest(site, programs, _date(a.as_of), a.candidate, rules_dir=Path(a.rules) if a.rules else RULES_DIR)
+    if a.out:
+        Path(a.out).write_text(json.dumps(res["option"], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+        print(f"wrote {a.out}")
+    o = res["option"]
+    print(f"{res['candidate']}: {o['storeys']} storeys, {o['height_m']} m, {o['gfa_m2']} m² GFA, units {o['units']}, tiers {o['rent_tiers_units']}, trees {o['replacement_trees_proposed']}")
+    for u in res["unsure"]:
+        print(f"  unsure · {u['key']}: {u['why']} ({u['who']})")
+    return 0
+
+
 def cmd_rules(a: argparse.Namespace) -> int:
     on = _date(a.as_of)
     rules = load_rules(Path(a.rules) if a.rules else RULES_DIR)
@@ -145,6 +177,20 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--radius", default=120, help="metres around the address (default 120)")
     c.add_argument("--center", help="lat,lon to use instead of geocoding the address")
     c.set_defaults(fn=cmd_context)
+
+    lk = sub.add_parser("lookup", help="propose a site file from an address (Nominatim + City of Vancouver open data; needs the network)")
+    lk.add_argument("address")
+    lk.add_argument("--out", help="write the site JSON here instead of printing it")
+    lk.set_defaults(fn=cmd_lookup)
+
+    sg = sub.add_parser("suggest", help="derive an option from a site and the chosen programs, every figure citing its rule")
+    sg.add_argument("--site", required=True)
+    sg.add_argument("--programs", help="comma-separated rule ids, e.g. bch.chf.eligibility,bc.bcbuilds.eligibility")
+    sg.add_argument("--candidate", default="funder-ready", choices=["outright", "benchmark", "funder-ready"])
+    sg.add_argument("--as-of", dest="as_of")
+    sg.add_argument("--rules")
+    sg.add_argument("--out", help="write the option JSON here")
+    sg.set_defaults(fn=cmd_suggest)
 
     l = sub.add_parser("rules", help="list rules and the version in force")
     l.add_argument("--as-of", dest="as_of")

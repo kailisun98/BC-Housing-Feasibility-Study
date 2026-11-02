@@ -45,43 +45,43 @@
       <p class="sub">The five stages of a non-profit housing project, and the five layers of rules. A dot is where a layer is usually read today, and by whom. The lit column is where the memo reads all five.</p>
     </div>
 
-    <div class="when reveal" role="table" aria-label="Rule layers by project stage: who reads each layer today, and the memo reading all five at feasibility">
-      <div class="h" role="columnheader">Rule layer</div>
-      <div class="h" role="columnheader">Site found</div>
-      <div class="h memo-col" role="columnheader">Feasibility · the memo</div>
-      <div class="h" role="columnheader">Pre-development</div>
-      <div class="h" role="columnheader">Funding bid</div>
-      <div class="h" role="columnheader">Design and build</div>
+    <div class="when reveal" role="group" aria-label="Rule layers by project stage: who reads each layer today, and the memo reading all five at feasibility">
+      <div class="h">Rule layer</div>
+      <div class="h">Site found</div>
+      <div class="h memo-col">Feasibility · the memo</div>
+      <div class="h">Pre-development</div>
+      <div class="h">Funding bid</div>
+      <div class="h">Design and build</div>
 
-      <div class="lay" role="rowheader"><span class="lk">A</span><div><b>Zoning district</b><span>density, height, the rezoning path</span></div></div>
+      <div class="lay"><span class="lk">A</span><div><b>Zoning district</b><span>density, height, the rezoning path</span></div></div>
       <div></div>
       <div class="memo-col"><p class="who"><b>First Read</b>day one, cited</p></div>
       <div><p class="who"><b>City planning staff</b>at pre-application</p></div>
       <div></div>
       <div></div>
 
-      <div class="lay" role="rowheader"><span class="lk">B</span><div><b>Province</b><span>small-scale minimums, transit-oriented areas</span></div></div>
+      <div class="lay"><span class="lk">B</span><div><b>Province</b><span>small-scale minimums, transit-oriented areas</span></div></div>
       <div></div>
       <div class="memo-col"><p class="who"><b>First Read</b>day one, cited</p></div>
       <div></div>
       <div></div>
       <div><p class="who"><b>The architect</b>if someone asks, during design</p></div>
 
-      <div class="lay" role="rowheader"><span class="lk">C</span><div><b>City policy</b><span>family units, social housing, trees, levies</span></div></div>
+      <div class="lay"><span class="lk">C</span><div><b>City policy</b><span>family units, social housing, trees, levies</span></div></div>
       <div></div>
       <div class="memo-col"><p class="who"><b>First Read</b>day one, cited</p></div>
       <div><p class="who"><b>Planners and an arborist</b>once a site plan exists</p></div>
       <div></div>
       <div></div>
 
-      <div class="lay" role="rowheader"><span class="lk">D</span><div><b>Design standards</b><span>unit areas, the code basis</span></div></div>
+      <div class="lay"><span class="lk">D</span><div><b>Design standards</b><span>unit areas, the code basis</span></div></div>
       <div></div>
       <div class="memo-col"><p class="who"><b>First Read</b>day one, as flags</p></div>
       <div></div>
       <div></div>
       <div><p class="who"><b>The architect</b>during design</p></div>
 
-      <div class="lay" role="rowheader"><span class="lk">E</span><div><b>Funders</b><span>Community Housing Fund, BC Builds, CMHC</span></div></div>
+      <div class="lay"><span class="lk">E</span><div><b>Funders</b><span>Community Housing Fund, BC Builds, CMHC</span></div></div>
       <div></div>
       <div class="memo-col"><p class="who"><b>First Read</b>day one, against each program</p></div>
       <div></div>
@@ -105,12 +105,12 @@
       <div class="flow">
         <div class="flow-head"><p class="eyebrow">Flow 1</p><h3>The development manager</h3><p>Site in, memo out. Before any money goes to design.</p><a class="text-link" href="app.html?mode=manager">Open the tool as the manager <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a></div>
         <ol>
-          <li><span class="sn">1</span><div class="st"><b>Opens the tool on a memo.</b> The real case is loaded; the answers are on screen before anything is typed.<span class="scr">app.html · memo pane</span></div></li>
-          <li><span class="sn">2</span><div class="st"><b>Describes the site.</b> Address, district, lot, trees, owner. Yes / No / Not sure; a blank is "not sure" too.<span class="scr">step 1 · Site card</span></div></li>
-          <li><span class="sn">3</span><div class="st"><b>Describes the option.</b> Storeys, floor area, units, rents, the programs in view.<span class="scr">step 2 · Option card</span></div></li>
-          <li class="key"><span class="sn">4</span><div class="st"><b>Runs the rules and reads the three answers.</b> Allowed, funded, unsure, in that order.<span class="scr">step 3 · the three answer cards</span></div></li>
+          <li><span class="sn">1</span><div class="st"><b>Types an address.</b> The point from OpenStreetMap, the zoning district and the parcel from the City's open data; the lot's area and shape follow.<span class="scr">Start from an address · 1 Find the site</span></div></li>
+          <li><span class="sn">2</span><div class="st"><b>Chooses the programs and reads the site.</b> Layers A to C on the site alone, before any option: outright limits, the rezoning path, transit, trees.<span class="scr">2 Choose the programs · 3 Read the site</span></div></li>
+          <li class="key"><span class="sn">3</span><div class="st"><b>Shapes the option from the rules, or their own.</b> Outright, Benchmark or Funder-ready; every figure Suggested | Mine with its rule beside it; what no rule settles is asked.<span class="scr">4 Shape the option</span></div></li>
+          <li><span class="sn">4</span><div class="st"><b>Runs the rules and reads the three answers.</b> Summary, Detailed or 3D preview: the plan with dimensions, the section, the axon.<span class="scr">5 Run the rules · Summary | Detailed | 3D</span></div></li>
           <li><span class="sn">5</span><div class="st"><b>Works the open items.</b> Each names the person who resolves it and what to do.<span class="scr">answer 3 · open items table</span></div></li>
-          <li><span class="sn">6</span><div class="st"><b>Downloads the PDF for the board.</b> Page one is the answers; page two the open items.<span class="scr">step 4 · Download PDF</span></div></li>
+          <li><span class="sn">6</span><div class="st"><b>Issues it to the architect, and the PDF to the board.</b> The architect sees the revision in their top bar.<span class="scr">6 Issue · Download PDF</span></div></li>
         </ol>
       </div>
       <div class="flow">

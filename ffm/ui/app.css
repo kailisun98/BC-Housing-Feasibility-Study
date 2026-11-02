@@ -86,10 +86,15 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* who is reading: a key and a three-way pill in the top bar; the pressed segment is paper */
 .mode { display: flex; align-items: center; gap: 8px; }
 .mode .eyebrow { margin: 0; }
-.seg-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .07); border: 1px solid var(--chrome-line); }
-.seg-mode button { border: 0; border-radius: 999px; background: transparent; color: var(--on-chrome-muted); font: 500 12.5px/1 var(--sans); padding: 6px 12px; min-height: 26px; cursor: pointer; transition: background-color var(--t-fast), color var(--t-fast); }
+.seg-mode { position: relative; display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .07); border: 1px solid var(--chrome-line); }
+/* the pressed segment is one paper thumb that slides to the chosen reader (app.js places it); the buttons sit over it */
+.seg-thumb { position: absolute; top: 3px; bottom: 3px; left: 0; width: 0; border-radius: 999px; background: var(--b-paper); transition: transform .22s cubic-bezier(.16, 1, .3, 1), width .22s cubic-bezier(.16, 1, .3, 1); }
+.seg-mode button { position: relative; z-index: 1; border: 0; border-radius: 999px; background: transparent; color: var(--on-chrome-muted); font: 500 12.5px/1 var(--sans); padding: 6px 12px; min-height: 26px; cursor: pointer; transition: background-color var(--t-fast), color var(--t-fast); }
 .seg-mode button:hover { color: var(--on-chrome); background: rgba(255, 255, 255, .08); }
-.seg-mode button[aria-pressed="true"] { background: var(--b-paper); color: var(--b-ink); }
+.seg-mode button[aria-pressed="true"] { color: var(--b-ink); background: transparent; }
+/* before the thumb is placed, and wherever script is off, the pressed button keeps its own paper */
+.seg-mode:not(.placed) button[aria-pressed="true"] { background: var(--b-paper); }
+@media (prefers-reduced-motion: reduce) { .seg-thumb { transition: none; } }
 .seg-mode button:focus-visible { outline: 2px solid var(--b-signal-night); outline-offset: 1px; }
 /* the memo's rules revision: a key, then R1, R2… in a small ruled box, the way a title block numbers revisions */
 .stamp { display: flex; align-items: center; gap: 6px; }
@@ -123,8 +128,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .steps .tour-link { margin-left: auto; color: var(--blue); font-weight: 500; }
 .steps .tour-link:hover { color: var(--ink); }
 
-.strip { display: flex; align-items: center; gap: 10px; padding: 6px 16px; font-size: 12.5px; border-bottom: 1px solid var(--line); background: var(--status-info); min-width: 0; min-height: var(--strip-h); }
-.strip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex: 0 0 9px; }
+.strip { display: flex; align-items: center; gap: 10px; padding: 6px 16px; font-size: 12.5px; border-bottom: 1px solid var(--line); background: var(--status-info); min-width: 0; min-height: var(--strip-h); transition: background-color .25s ease-out; }
+.strip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex: 0 0 9px; transition: background-color .25s ease-out; }
 .strip span:not(.dot) { min-width: 0; overflow-wrap: anywhere; }
 .strip.ok { background: var(--status-ok); } .strip.ok .dot { background: var(--ok); }
 .strip.error { background: var(--status-error); } .strip.error .dot { background: var(--red); }
@@ -134,7 +139,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .tour-offer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 16px 0; padding: 8px 12px; background: var(--status-info); border-radius: 4px; font-size: 12.5px; }
 
 /* ------------------------------------------------------------------ layout: the step rail and the stage */
-.panes { display: grid; grid-template-columns: min(420px, 36vw) minmax(0, 1fr); gap: 0; min-height: calc(100vh - var(--bars-h)); }
+.panes { display: grid; grid-template-columns: min(420px, 36vw) minmax(0, 1fr); gap: 0; min-height: calc(100vh - var(--bars-h)); transition: grid-template-columns .3s cubic-bezier(.16, 1, .3, 1); }
+@media (prefers-reduced-motion: reduce) { .panes { transition: none; } }
 .inputs { display: flex; flex-direction: column; gap: 8px; min-width: 0; padding: 8px 16px 24px; border-right: 1px solid var(--line); background: var(--page); align-self: stretch; }
 .inputs-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .memo-pane { min-width: 0; padding: 12px 20px 40px; background: var(--page); }
@@ -194,8 +200,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .card-head { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
 .card-head h2 { margin: 0; }
 .card-head .btn { margin-left: auto; }
-/* collapsed, a card shows its file and a one-line summary; the form opens on Edit */
-.input-card.collapsed .form, .input-card.collapsed .form-actions { display: none; }
+/* collapsed, a card shows its file and a one-line summary; the form opens on Edit. The fold is a grid row that goes
+   from 0fr to 1fr, so the form unfolds and folds (320ms) instead of appearing; folded, it leaves the tab order. */
+.form-fold { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .32s cubic-bezier(.16, 1, .3, 1); }
+.form-fold-in { min-height: 0; overflow: hidden; padding: 2px; margin: -2px; visibility: visible; transition: visibility 0s; }
+.input-card.collapsed .form-fold { grid-template-rows: 0fr; }
+.input-card.collapsed .form-fold-in { visibility: hidden; transition: visibility 0s .32s; }
+@media (prefers-reduced-motion: reduce) { .form-fold { transition: none; } .input-card.collapsed .form-fold-in { transition: none; } }
 .input-summary { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
 .input-summary b { color: var(--ink); font-weight: 600; }
 .input-card:not(.collapsed) .input-summary { display: none; }
@@ -282,9 +293,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .tool-note code { color: var(--ink); }
 
 .memo { display: flex; flex-direction: column; gap: 12px; }
+/* a memo lands: the page fades in at once, and the three answers follow one another, 60ms apart, as the list they are */
 .memo.landed { animation: land 150ms ease-out; }
-@keyframes land { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .memo.landed { animation: none; } }
+.memo.landed .answers > .answer { animation: land-answer .32s cubic-bezier(.16, 1, .3, 1) both; }
+.memo.landed .answers > .answer:nth-child(2) { animation-delay: .06s; }
+.memo.landed .answers > .answer:nth-child(3) { animation-delay: .12s; }
+@keyframes land { from { opacity: 0; } to { opacity: 1; } }
+@keyframes land-answer { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .memo.landed { animation: none; } .memo.landed .answers > .answer { animation: land .2s ease-out both; animation-delay: 0s; } }
 
 .memo-head { padding: 12px 14px 12px; }
 .memo-head > .eyebrow { display: none; }
@@ -478,7 +494,7 @@ table.plain td.status { white-space: nowrap; }
 
 /* ------------------------------------------------------------------ touch: 44px targets on a coarse pointer */
 @media (pointer: coarse) {
-  .btn, .steps a, .tri button, .segbtn, .rail-toggle { min-height: 44px; }
+  .btn, .steps a, .tri button, .segbtn, .rail-toggle, .seg-mode button { min-height: 44px; }
   .field input[type="text"], .field input[type="number"], .field select, .tool select, .asof input[type="date"] { min-height: 44px; }
   .tree-row { grid-template-columns: 40px 1fr 64px 84px 44px; }
   .tree-row input, .tree-row select, .tree-row .x { min-height: 44px; }
@@ -499,7 +515,7 @@ table.plain td.status { white-space: nowrap; }
 .label-line label, .label-line .label { flex: 1 1 auto; }
 .info-btn { flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--muted); background: transparent; color: var(--muted); font: 600 10px/1 var(--mono); padding: 0; cursor: pointer; min-height: 0; }
 .info-btn:hover, .info-btn[aria-expanded="true"] { background: var(--ink); border-color: var(--ink); color: var(--panel); }
-.pop { position: fixed; z-index: 40; margin: 0; padding: 8px 10px; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--blue); border-radius: 4px; box-shadow: 0 6px 20px rgba(20, 30, 40, .18); font-size: 12px; line-height: 1.5; color: var(--ink); pointer-events: none; }
+.pop { position: fixed; z-index: 40; margin: 0; padding: 8px 10px; background: var(--panel); border: 1px solid color-mix(in srgb, var(--ink) 40%, var(--line)); border-radius: 6px; box-shadow: 0 6px 20px rgba(20, 30, 40, .18); font-size: 12px; line-height: 1.5; color: var(--ink); pointer-events: none; }
 .pop p { margin: 0; }
 .field-row .field .label-line { gap: 4px; }
 @media (pointer: coarse) { .info-btn { width: 28px; height: 28px; font-size: 13px; } }
@@ -552,6 +568,85 @@ table.plain td.status { white-space: nowrap; }
   .clauses td { border: 0; padding: 2px 0; }
 }
 
+/* ------------------------------------------------------------------ the guided start: six stops down the rail (manager mode) */
+.guide { padding: 10px 14px 8px; }
+.guide .card-head { margin-bottom: 4px; }
+.guide .card-head .help { margin-left: auto; font-size: 11px; color: var(--muted); }
+.guide .stop { border-top: 1px solid var(--line); }
+.guide .stop-head { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 2px 10px; width: 100%; padding: 8px 2px; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; border-radius: 4px; transition: background-color var(--t-fast); }
+.guide .stop-head:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.guide .stop-head .badge { grid-row: 1 / 3; align-self: start; margin-top: 1px; }
+.guide .stop.done .stop-head .badge { background: var(--ink); color: var(--panel); }
+.guide .stop.open .stop-head .badge { background: var(--b-signal-deep); color: #fff; }
+.guide .stop-title { font-weight: 600; font-size: 13px; }
+.guide .stop-what { font-size: 12px; color: var(--muted); }
+.guide .stop.open .stop-what { display: none; }
+.guide .stop-body { padding: 2px 0 12px 30px; display: flex; flex-direction: column; gap: 8px; }
+.guide .stop-body .form-actions { margin-top: 2px; flex-wrap: wrap; }
+.guide .stop-body .help { font-size: 11.5px; color: var(--muted); max-width: 44ch; }
+.guide .stop-or { margin: 0; }
+.guide .field input[type="text"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; }
+.found-site { margin: 4px 0 0; display: grid; gap: 4px; font-size: 12.5px; }
+.found-site > div { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; }
+.found-site dt { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; padding-top: 2px; }
+.found-site dd { margin: 0; }
+.found-site .cont, .guide .cont { color: var(--muted); }
+.reading-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.reading-list li { display: flex; align-items: center; gap: 8px; }
+.cands { align-self: flex-start; }
+.sg-rows { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.sg-row { display: grid; grid-template-columns: minmax(0, 1.2fr) auto minmax(72px, .9fr); grid-template-areas: "label pick value" "note note note"; gap: 2px 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.sg-label { grid-area: label; font-size: 12.5px; font-weight: 500; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.sg-label code { font: 10.5px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+.sg-label code.ph { color: var(--s-uncertain-text); }
+.sg-pick { grid-area: pick; }
+.sg-pick .segbtn { padding: 2px 8px; min-height: 22px; font-size: 11px; }
+.sg-pick .segbtn[aria-pressed="true"]:last-child { background: var(--amber); color: var(--amber-ink); }
+.sg-value { grid-area: value; font-size: 12.5px; text-align: right; min-width: 0; }
+.sg-value .sg-input { width: 100%; border: 1px solid var(--amber); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12.5px; text-align: right; }
+.sg-note { grid-area: note; font-size: 11px; color: var(--muted); line-height: 1.4; }
+.sg-unsure { padding: 8px 10px; border-radius: 4px; background: var(--s-uncertain-wash); font-size: 12px; }
+.sg-unsure .eyebrow { color: var(--s-uncertain-text); margin-bottom: 4px; }
+.sg-unsure ul { margin: 0; padding-left: 16px; display: grid; gap: 3px; }
+.sg-unsure b { text-transform: capitalize; }
+.sg-unsure li { display: flex; flex-direction: column; gap: 4px; }
+.answer-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 2px 0 4px; }
+.answer-ctl .label { font-size: 11.5px; color: var(--ink); font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
+.answer-ctl .tri { font-size: 11.5px; }
+.answer-ctl .tri button { padding: 3px 8px; min-height: 24px; }
+.answer-ctl select, .answer-ctl input[type="text"] { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12px; min-width: 160px; }
+/* the site's reading in the memo pane */
+.reading-findings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.reading-findings .finding-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; }
+.reading-findings .pill { margin-top: 2px; }
+.reading-findings .rule-id { font: 11px var(--mono); color: var(--muted); margin-left: 6px; }
+.reading-findings .finding { margin: 2px 0 0; }
+.reading-findings .who { margin: 2px 0 0; font-size: 12px; }
+
+/* ------------------------------------------------------------------ the view: summary, detailed, 3D preview */
+.view-switch { margin-left: auto; align-self: center; }
+.memo-pane[data-view="summary"] .memo-rest, .memo-pane[data-view="summary"] #changes { display: none; }
+.memo-pane[data-view="3d"] .memo-body > .answers, .memo-pane[data-view="3d"] .memo-rest, .memo-pane[data-view="3d"] .memo-body > .figures, .memo-pane[data-view="3d"] #side-by-side, .memo-pane[data-view="3d"] #changes { display: none; }
+.preview3d { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 0 0 12px; }
+.preview3d .figure { padding: 10px 12px; background: var(--c-paper); border: 1px solid var(--line); border-radius: var(--r-panel); box-shadow: var(--shadow); margin: 0; }
+.preview3d .p3-axon { grid-column: 1 / -1; }
+.preview3d .fig-body svg, .preview3d .fig-section svg { max-height: 560px; }
+.preview3d .p3-axon svg { max-height: 640px; cursor: grab; touch-action: pan-y; user-select: none; }
+.preview3d figcaption { font-size: 12px; color: var(--c-drawmuted); margin-top: 8px; line-height: 1.45; }
+@media (max-width: 1100px) { .preview3d { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------ issuing, and the chip that says a run was issued to you */
+.issue-panel { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-panel); background: var(--field); display: flex; flex-direction: column; gap: 6px; max-width: 560px; }
+.issue-panel label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.issue-panel textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; resize: vertical; }
+.issue-panel .form-actions { margin-top: 2px; }
+.issue-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 9px; border-radius: 999px; border: 1px solid var(--b-amber-night); background: color-mix(in srgb, var(--b-amber-night) 18%, transparent); color: #ffe3a6; font: 500 12px/1 var(--sans); cursor: pointer; white-space: nowrap; transition: background-color var(--t-fast); }
+.issue-chip:hover { background: color-mix(in srgb, var(--b-amber-night) 32%, transparent); color: #fff; }
+.issue-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--b-amber-night); box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-amber-night) 30%, transparent); }
+@media (max-width: 760px) { .issue-chip { white-space: normal; text-align: left; } }
+[data-mode="reader"] #issue-btn, [data-mode="reader"] #issue-panel, [data-mode="reader"] #guide { display: none !important; }
+[data-mode="architect"] #guide { display: none !important; }
+
 /* ------------------------------------------------------------------ who is reading: the three flows as three layouts
    manager (the default) is the page as above. architect opens the drawings beside the answers sooner and leads the export
    bar with Revit. reader takes the inputs, the run controls and the steps away and sets the memo in a reading column. */
@@ -578,7 +673,8 @@ table.plain td.status { white-space: nowrap; }
 
 /* ------------------------------------------------------------------ print: the memo only, every ledger layer open */
 @media print {
-  :root { color-scheme: light; --page: #fff; --panel: #fff; --ink: #000; --muted: #444; --line: #ccc; --shadow: none; --amber: #c77d14; --amber-ink: #14181d;
+  /* the selector matches the dark block's specificity, so a dark-mode browser prints light too */
+  :root, :root:not([data-theme="light"]) { color-scheme: light; --page: #fff; --panel: #fff; --field: #fff; --group: #f0f2f5; --ink: #000; --muted: #444; --line: #ccc; --shadow: none; --amber: #c77d14; --amber-ink: #14181d; --blue: #2a6fb8;
           --s-pass: #2f7d4a; --s-conditional: #d9a520; --s-fail: #c81e1e; --s-uncertain: #c77d14; --s-na: #8a93a0; --s-info: #2a6fb8; --on-signal: #fff; --on-warn: #1f2933;
           --s-pass-text: #246a3d; --s-conditional-text: #7a5a00; --s-fail-text: #a81a1a; --s-uncertain-text: #8f5a0e; --s-na-text: #444; --s-info-text: #245f9c;
           --s-pass-wash: #fff; --s-conditional-wash: #fff; --s-fail-wash: #fff; --s-uncertain-wash: #fff; --s-na-wash: #fff; --s-info-wash: #fff; }

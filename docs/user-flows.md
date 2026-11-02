@@ -32,13 +32,20 @@ site (home) ──► the case ──► tool: memo on screen (R1)
 1. **Home.** Reads the three questions and one real finding. One click: *Run the real case*.
 2. **The tool opens on the memo, not on a form.** The real case is loaded; the answers are on screen
    before anything is typed. The inputs rail sits beside the memo and folds away.
-3. **Site.** Picks a site file or starts a new one. Every yes/no fact is Yes / No / Not sure; a blank
-   number is "not sure" too. Nothing stops the run.
-4. **Option.** Storeys, floor area, units, tenure, funders. The unit total and family share update
-   under the row as they type.
-5. **Run the rules.** Under a second. The three answers land in order: allowed, funded, unsure.
-6. **Open items.** The third answer is a table: item, status, who resolves it. This is the to-do list.
-7. **Export.** *Download PDF* is the one button that matters here; everything else is quieter.
+3. **Start from an address** (built 3 Nov 2026, the guided card at the top of the rail, six stops):
+   1. *Find the site*: an address; Nominatim gives the point, the City's open data the zoning district
+      and the parcel, which becomes the lot's area and an equivalent rectangle. Or a saved site.
+   2. *Choose the programs*: the funders in view.
+   3. *Read the site*: layers A to C on the site alone, shown in the memo pane before any option.
+   4. *Shape the option*: Outright, Benchmark or Funder-ready, derived from the rules; every figure
+      Suggested | Mine with its rule beside it; what no rule settles (Community Vision area, transit
+      area, tenure, developer partner, site control) answered right there.
+   5. *Run the rules*: under a second; the three answers land in order.
+   6. *Issue*: a note, and the architect sees the revision in their top bar.
+4. **Three views** of the result: Summary (title block, answers, figures), Detailed (the whole memo),
+   3D preview (the site plan with dimensions, the section, the axonometric, large).
+5. **Open items.** The third answer is a table: item, status, who resolves it. This is the to-do list.
+6. **Export.** *Download PDF* is the one button that matters here; everything else is quieter.
 
 Design consequences: the tool's first screen is a memo; *Run the rules* is the only loud button;
 the open-items table names a person in its own column; the PDF button leads the Export bar.

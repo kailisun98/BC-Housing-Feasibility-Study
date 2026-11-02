@@ -43,6 +43,8 @@ python -m ffm run --site sites/1010-expo-blvd.json \
 
 python -m ffm rules --as-of 2026-10-27     # which version of each rule is in force
 python -m ffm stamp                        # the version stamp alone
+python -m ffm lookup "998 E 19th Ave, Vancouver, BC" --out sites/new.json   # a site from an address: Nominatim + City open data
+python -m ffm suggest --site sites/998-e-19th-ave.json --programs bch.chf.eligibility,bc.bcbuilds.eligibility --out options/new.json   # a rule-derived option
 python -m ffm ui                           # the web UI: pick a site and option, run, read, export
 python -m unittest -v                      # evaluation cases (evals/cases.md) and the memo tests
 ```

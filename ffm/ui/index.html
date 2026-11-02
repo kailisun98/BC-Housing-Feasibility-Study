@@ -22,6 +22,7 @@
   <div class="mode" role="group" aria-label="Who is reading">
     <span class="eyebrow" id="mode-key">For the</span>
     <div class="seg-mode" id="mode-switch">
+      <span class="seg-thumb" aria-hidden="true"></span>
       <button type="button" data-mode="manager" aria-pressed="true" title="Development manager: site and option in, the three answers and the PDF for the board out">Manager</button>
       <button type="button" data-mode="architect" aria-pressed="false" title="Architect: the forms open, the ledger open, two runs compared, the massing to Revit">Architect</button>
       <button type="button" data-mode="reader" aria-pressed="false" title="Board, planner or funder: the memo alone, as on paper, with Download PDF and Print">Reader</button>
@@ -35,6 +36,7 @@
     </label>
     <button id="run-btn" class="btn btn-primary" type="button" title="Run the rules (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Run the rules</button>
     <span id="engine-chip" class="engine-chip" hidden></span>
+    <button id="issue-chip" class="issue-chip" type="button" hidden></button>
     <div id="stamp-box" class="stamp" hidden>
       <span class="eyebrow">Revision</span>
       <b id="stamp-text" title="The memo on screen, numbered among this site's memos"></b>
@@ -64,6 +66,7 @@
       <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5"/></svg>
     </button>
     <div id="inputs-body" class="inputs-body">
+    <section id="guide" class="card guide" aria-label="Guided start" hidden></section>
     <section id="step-site" class="card input-card" tabindex="-1">
       <div class="card-head">
         <h2><span class="badge">1</span> Site</h2>
@@ -74,11 +77,13 @@
         <select id="site-select"></select>
       </div>
       <p id="site-summary" class="input-summary"></p>
+      <div class="form-fold"><div class="form-fold-in">
       <form id="site-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
         <button id="save-site" class="btn btn-quiet" type="button">Save site as…</button>
         <span id="site-dirty" class="dirty" hidden>edited, not saved</span>
       </div>
+      </div></div>
     </section>
 
     <section id="step-option" class="card input-card" tabindex="-1">
@@ -91,11 +96,13 @@
         <select id="option-select"></select>
       </div>
       <p id="option-summary" class="input-summary"></p>
+      <div class="form-fold"><div class="form-fold-in">
       <form id="option-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
         <button id="save-option" class="btn btn-quiet" type="button">Save option as…</button>
         <span id="option-dirty" class="dirty" hidden>edited, not saved</span>
       </div>
+      </div></div>
     </section>
     </div>
   </aside>
@@ -111,6 +118,11 @@
         <select id="compare-run"><option value="">Nothing</option></select>
       </label>
       <span id="compare-note" class="tool-note"></span>
+      <div class="view-switch seg" id="view-switch" role="group" aria-label="How much of the memo to show">
+        <button class="segbtn" type="button" data-view="summary" aria-pressed="false" title="The title block, the three answers and the massing">Summary</button>
+        <button class="segbtn" type="button" data-view="detailed" aria-pressed="true" title="The whole memo: clauses, ledger, inputs, sources">Detailed</button>
+        <button class="segbtn" type="button" data-view="3d" aria-pressed="false" title="The site plan with dimensions, the section and the axonometric, large">3D preview</button>
+      </div>
     </div>
     <div id="memo" class="memo"></div>
 
@@ -123,7 +135,13 @@
         <a id="dl-md" class="btn btn-quiet" download aria-disabled="true">Download memo (Markdown)</a>
         <a id="dl-massing" class="btn btn-quiet" download aria-disabled="true">Download massing.json</a>
         <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
+        <button id="issue-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="issue-panel">Issue to the architect</button>
       </div>
+      <form id="issue-panel" class="issue-panel" hidden>
+        <label for="issue-note">A note for the reader who receives it</label>
+        <textarea id="issue-note" rows="2" placeholder="What changed, and what you want checked"></textarea>
+        <div class="form-actions"><button id="issue-send" class="btn btn-primary btn-small" type="submit">Issue</button><button id="issue-cancel" class="btn btn-quiet btn-small" type="button">Not now</button></div>
+      </form>
       <p class="export-note">The PDF is the one to send for review: every answer names the rules that decide it, every rule its numbers and its source, and the last section says how to reproduce the memo. Print gives the same pages. The HTML memo opens in any browser; the Markdown is the same text for a repository or a wiki.</p>
       <div id="export-panel" class="export-panel" hidden></div>
     </footer>

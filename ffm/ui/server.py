@@ -26,6 +26,12 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
                                             | diff.json | ffm_revit_result.json | ffm_sheet_notes.json
                                             | ffm_sheet.png | ffm_sheet.pdf   (?download=1 to attach)
     POST /api/runs/<site>/<folder>/memo     rewrite memo.md / memo.html for that run (picks up a Revit result)
+    GET  /api/lookup?q=<address>            a proposed site file from Nominatim and the City's open data (network)
+    POST /api/read-site                     body {site, as_of?}: the site alone against layers A to C, nothing written
+    POST /api/suggest                       body {site, programs, as_of?, candidate?}: a rule-derived option, every
+                                            figure with its rule (ffm/suggest.py)
+    GET  /api/issues?site=<id>              the issue notes on the site's runs, newest first
+    POST /api/runs/<site>/<folder>/issue    body {by, to, note}: hand the run from one reader to another
     POST /api/pdf                           body {html}: the page's paper memo, printed to PDF by a headless Edge
                                             or Chrome found on this machine (FFM_BROWSER names another); 501 when
                                             there is none, and the page falls back to its print dialog
@@ -51,7 +57,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from .. import engine, massing, memo
+from .. import engine, massing, memo, suggest
 from ..rules_loader import RULES_DIR, load_rules
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -333,6 +339,89 @@ def rewrite_memo(site_id: str, folder: str) -> dict:
     return {"run_id": f"{site_id}/{folder}", "revit": revit_summary(out, stamp)}
 
 
+# ---------------------------------------------------------------- the guided start: lookup, read the site, suggest
+
+def do_lookup(q: Any) -> dict:
+    """A proposed site file for an address, from Nominatim and the City's open data (needs the network)."""
+    if not isinstance(q, str) or len(q.strip()) < 4:
+        raise ApiError(400, "Give an address to look up.")
+    from .. import lookup
+    try:
+        return lookup.lookup(q.strip())
+    except ValueError as e:
+        raise ApiError(404, str(e))
+    except OSError as e:
+        raise ApiError(502, f"The lookup could not reach its sources: {e}")
+
+
+def _site_and_date(body: Any) -> tuple[dict, date]:
+    if not isinstance(body, dict) or not isinstance(body.get("site"), dict):
+        raise ApiError(400, "Send {site: {...}, as_of?: 'YYYY-MM-DD'}.")
+    try:
+        on = date.fromisoformat(body["as_of"]) if body.get("as_of") else date.today()
+    except ValueError:
+        raise ApiError(400, "as_of must be a date written YYYY-MM-DD.")
+    return body["site"], on
+
+
+def do_read_site(body: Any) -> dict:
+    """The site alone against layers A to C; nothing is written."""
+    site, on = _site_and_date(body)
+    return suggest.read_site(site, on)
+
+
+def do_suggest(body: Any) -> dict:
+    """A rule-derived option for the site and the chosen programs, every figure with its rule."""
+    site, on = _site_and_date(body)
+    programs = body.get("programs") or []
+    if not isinstance(programs, list):
+        raise ApiError(400, "programs must be a list of rule ids.")
+    return suggest.suggest(site, programs, on, body.get("candidate") or "funder-ready")
+
+
+# ---------------------------------------------------------------- issues: a run handed from one reader to the next
+
+ROLES = ("manager", "architect", "reader")
+
+
+def list_issues(site_id: str | None) -> list[dict]:
+    """Every issue note on the site's runs, newest first."""
+    if not site_id:
+        return []
+    if not _slug_ok(site_id):
+        raise ApiError(400, "Bad site id.")
+    base = OUTPUTS_DIR / site_id
+    out = []
+    if base.exists():
+        for p in base.iterdir():
+            f = p / "issues.json"
+            if p.is_dir() and f.exists():
+                try:
+                    for it in _read(f):
+                        out.append({**it, "run_id": f"{site_id}/{p.name}", "folder": p.name})
+                except Exception:
+                    continue
+    out.sort(key=lambda i: i.get("issued_at", ""), reverse=True)
+    return out
+
+
+def add_issue(site_id: str, folder: str, body: Any) -> dict:
+    """Record that a reader issued this run to another: who, to whom, a note, when."""
+    out = _run_folder(site_id, folder)
+    if not isinstance(body, dict):
+        raise ApiError(400, "Send {by, to, note}.")
+    by, to = body.get("by"), body.get("to")
+    if by not in ROLES or to not in ROLES:
+        raise ApiError(400, f"by and to must be one of {', '.join(ROLES)}.")
+    f = out / "issues.json"
+    items = _read(f) if f.exists() else []
+    item = {"id": datetime.now().strftime("%Y%m%dT%H%M%S%f"), "issued_at": datetime.now().isoformat(timespec="seconds"),
+            "by": by, "to": to, "note": str(body.get("note") or "")[:600]}
+    items.append(item)
+    f.write_text(json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8")
+    return {**item, "run_id": f"{site_id}/{folder}", "folder": folder}
+
+
 # ---------------------------------------------------------------- PDF
 
 def find_browser() -> str | None:
@@ -469,6 +558,10 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json(list_runs(first("site")))
                 if path == "/api/diff":
                     return self._json(diff_runs(first("from"), first("to")))
+                if path == "/api/lookup":
+                    return self._json(do_lookup(first("q")))
+                if path == "/api/issues":
+                    return self._json(list_issues(first("site")))
                 mm = re.match(r"^/api/runs/([^/]+)/([^/]+)$", path)
                 if mm:
                     return self._json(load_run(mm.group(1), mm.group(2)))
@@ -479,6 +572,13 @@ class Handler(BaseHTTPRequestHandler):
             body = self._body()
             if path == "/api/run":
                 return self._json(do_run(body))
+            if path == "/api/read-site":
+                return self._json(do_read_site(body))
+            if path == "/api/suggest":
+                return self._json(do_suggest(body))
+            mm = re.match(r"^/api/runs/([^/]+)/([^/]+)/issue$", path)
+            if mm:
+                return self._json(add_issue(mm.group(1), mm.group(2), body), 201)
             if path == "/api/options":
                 return self._json(save_new(OPTIONS_DIR, body, "option"), 201)
             if path == "/api/sites":

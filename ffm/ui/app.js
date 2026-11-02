@@ -161,6 +161,17 @@ def ffm_run(site_json, option_json, as_of, previous_json):
 
 def ffm_diff(a_json, b_json):
     return json.dumps(engine.diff(json.loads(a_json), json.loads(b_json)))
+
+from ffm import suggest, lookup
+
+def ffm_suggest(site_json, programs_json, as_of, candidate):
+    return json.dumps(suggest.suggest(json.loads(site_json), json.loads(programs_json), date.fromisoformat(as_of), candidate))
+
+def ffm_read_site(site_json, as_of):
+    return json.dumps(suggest.read_site(json.loads(site_json), date.fromisoformat(as_of)))
+
+def ffm_lookup_assemble(address, lat, lon, display, zoning_json, parcels_json):
+    return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json)))
 `;
 
 function loadEngine() {
@@ -179,7 +190,8 @@ function loadEngine() {
       pyodide.FS.writeFile(f, await r.text());
     }
     pyodide.runPython(ENGINE_SHIM);
-    engine = { pyodide, run: pyodide.globals.get("ffm_run"), diff: pyodide.globals.get("ffm_diff") };
+    engine = { pyodide, run: pyodide.globals.get("ffm_run"), diff: pyodide.globals.get("ffm_diff"),
+               suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
     return engine;
   })().catch(e => {
@@ -228,6 +240,19 @@ async function loadStaticRun(runId) {
   return { run_id: runId, folder: runId.split("/")[1], folder_abs: null, as_of: ledger.run.as_of, stamp: ledger.run.stamp.stamp,
            ledger, massing, svg, diff, massing_note: null, revit: null, files: {},
            downloads: { html: `${base}/memo.html`, md: `${base}/memo.md`, massing: massing ? `${base}/massing.json` : null } };
+}
+
+/* On the web the browser fetches the point and the City's records itself (both sources allow it) and the engine
+   assembles the site from them, as lookup.py does on the local server. */
+async function staticLookup(q) {
+  if (!q || q.trim().length < 4) throw new Error("Give an address to look up.");
+  const geo = await (await fetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({ q: q.trim(), format: "jsonv2", limit: "1" })}`, { headers: { Accept: "application/json" } })).json();
+  if (!geo.length) throw new Error(`Nominatim found nothing for "${q}".`);
+  const lat = Number(geo[0].lat), lon = Number(geo[0].lon), display = geo[0].display_name || "";
+  const cov = ds => fetch(`https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/${ds}/records?${new URLSearchParams({ where: `within_distance(geom, geom'POINT(${lon} ${lat})', 3m)`, limit: "3" })}`).then(r => r.ok ? r.json() : { results: [] }).then(j => j.results || []);
+  const [zoning, parcels] = await Promise.all([cov("zoning-districts-and-labels"), cov("property-parcel-polygons")]);
+  await loadEngine();
+  return JSON.parse(engine.lookupAssemble(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels)));
 }
 
 async function staticRun(body) {
@@ -288,9 +313,14 @@ async function staticApi(path, opts) {
       if (browserRuns.has(id)) throw new Error("A browser run keeps no files on disk.");
       return fetchJSON(`data/runs/${id}/${m[3]}`);
     }
+    if (p === "/api/issues") return [];   // issues live beside the runs on the local server
+    if (p === "/api/lookup") return staticLookup(q.get("q") || "");
     throw new Error(`The web version has no route for ${p}.`);
   }
   if (p === "/api/run") return staticRun(body);
+  if (p === "/api/suggest") { await loadEngine(); return JSON.parse(engine.suggest(JSON.stringify(body.site), JSON.stringify(body.programs || []), body.as_of || todayISO(), body.candidate || "funder-ready")); }
+  if (p === "/api/read-site") { await loadEngine(); return JSON.parse(engine.readSite(JSON.stringify(body.site), body.as_of || todayISO())); }
+  if (/^\/api\/runs\/[^/]+\/[^/]+\/issue$/.test(p)) throw new Error("Issuing a run to another reader needs the local server (python -m ffm ui).");
   if (p === "/api/options" || p === "/api/sites") { downloadJSON(body, `${body.id}.json`); return { id: body.id, file: `${body.id}.json`, downloaded: true }; }
   if (/^\/api\/runs\/[^/]+\/[^/]+\/memo$/.test(p)) return { revit: null };
   throw new Error(`The web version has no route for ${method} ${p}.`);
@@ -308,6 +338,9 @@ const state = {
   compareRun: null,     // run_id to diff against on the next run
   step: 1,              // the step the reader is on, for the step bar
   revisions: new Map(), // run_id -> "R1", "R2"…: the memo's revision on its site
+  mode: "manager",      // who is reading: manager, architect, reader (setMode)
+  view: "detailed",     // how much of the memo: summary, detailed, 3d (setView)
+  issues: [],           // the site's issue notes, from the local server
 };
 
 const PRELOAD_SITE = "998-e-19th-ave";
@@ -840,6 +873,9 @@ async function selectSite(id) {
   await loadRuns();
   fillRunSelects();
   setStep(state.step);
+  guide.reading = null; guide.suggestion = null; guide.mine = {};
+  renderGuide();
+  pollIssues();
 }
 
 function onSiteChange() {
@@ -971,6 +1007,7 @@ async function runRules() {
     closeExportPanel();
     fillRunSelects();
     setCompareNote(run.diff);
+    if (guide.step === 5) { guide.step = 6; renderGuide(); }
     const ms = Math.round(performance.now() - t0);
     toast(`Ran the rules as of ${run.as_of}: ${rev(run.run_id)}, in ${ms} ms ·${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}`);
     $("#step-run").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
@@ -1007,6 +1044,10 @@ function enableExports(run) {
   $("#print-btn").disabled = !on;
   $("#pdf-btn").disabled = !on;
   $("#revit-btn").disabled = !(on && run.massing);
+  $("#issue-btn").disabled = !on || !!STATIC;
+  if (!on) closeIssuePanel();
+  renderGuide();
+  if (state.view === "3d") renderPreview3D();
 }
 
 // ---------------------------------------------------------------- the memo
@@ -2887,6 +2928,457 @@ function printPaper(html, note = "") {
 
 // ---------------------------------------------------------------- wiring
 
+// ---------------------------------------------------------------- the guided start (manager mode): six stops, one input at a time
+/* Flow 1 in docs/user-flows.md. The card at the top of the inputs rail walks the manager from an address to an issued
+   run: find the site (Nominatim and the City's open data), choose the programs, read the site against layers A to C,
+   shape the option from rule-derived suggestions (each figure Suggested | Mine, with its rule beside it), run, issue.
+   The engine does every derivation (ffm/suggest.py); this only asks and shows. */
+const guide = { step: 1, address: "", lookup: null, programs: null, reading: null, suggestion: null, candidate: "funder-ready", mine: {}, loading: "" };
+
+const GUIDE_STOPS = [
+  { n: 1, title: "Find the site", what: "An address, or a saved site." },
+  { n: 2, title: "Choose the programs", what: "The funders in view." },
+  { n: 3, title: "Read the site", what: "What it allows before any option." },
+  { n: 4, title: "Shape the option", what: "Suggested from the rules, or yours." },
+  { n: 5, title: "Run the rules", what: "The three answers." },
+  { n: 6, title: "Issue", what: "Hand it to the architect." },
+];
+
+/* the suggested figures the manager decides on, in the order the memo reads them */
+const GUIDE_FIELDS = [
+  ["rezoning_path", "Rezoning path", "text"], ["storeys", "Storeys", "int"], ["height_m", "Height (m)", "number"], ["gfa_m2", "GFA (m²)", "number"],
+  ["units.studio", "Studio", "int"], ["units.one_bed", "1-bed", "int"], ["units.two_bed", "2-bed", "int"], ["units.three_bed_plus", "3-bed+", "int"],
+  ["rent_tiers_units.market", "Market units", "int"], ["rent_tiers_units.rgi", "RGI units", "int"], ["rent_tiers_units.deep_subsidy", "Deep-subsidy units", "int"],
+  ["accessible_units", "Accessible units", "int"], ["share_below_hils", "Share below HILs", "number"], ["housing_agreement_years", "Agreement (years)", "int"],
+  ["below_market_unit_share", "Below-market share", "number"], ["below_market_discount", "Discount to market", "number"],
+  ["replacement_trees_proposed", "Replacement trees", "int"], ["floor_to_floor_m", "Floor to floor (m)", "number"],
+  ["setbacks_m.front", "Setback, front (m)", "number"], ["setbacks_m.rear", "Setback, rear (m)", "number"], ["setbacks_m.side", "Setback, side (m)", "number"],
+];
+
+function guideDone() {
+  return {
+    1: !!(state.site && (state.siteId || state.site.zoning_district)),
+    2: !!guide.programs,
+    3: !!guide.reading,
+    4: !!(state.option && state.option.storeys != null && (guide.suggestion || state.optionId)),
+    5: !!state.run,
+    6: !!(state.run && state.run.issued),
+  };
+}
+
+function ruleTitle(id) {
+  const r = state.rules.find(x => x.id === id);
+  return r ? r.title : id;
+}
+
+function renderGuide() {
+  const el = $("#guide");
+  if (!el) return;
+  if (state.mode !== "manager") { el.hidden = true; return; }
+  el.hidden = false;
+  const done = guideDone();
+  const progs = state.rules.filter(r => r.layer === "E");
+  const chosen = new Set(guide.programs || (state.option && state.option.target_programs) || []);
+  const site = state.site || {};
+  const S = guide.suggestion;
+  const stop = (n, body) => {
+    const open = guide.step === n;
+    return `<section class="stop${open ? " open" : ""}${done[n] ? " done" : ""}">
+      <button class="stop-head" type="button" data-stop="${n}" aria-expanded="${open}">
+        <span class="badge">${done[n] && !open ? "✓" : n}</span><span class="stop-title">${h(GUIDE_STOPS[n - 1].title)}</span><span class="stop-what">${h(GUIDE_STOPS[n - 1].what)}</span>
+      </button>
+      ${open ? `<div class="stop-body">${body}</div>` : ""}
+    </section>`;
+  };
+
+  const lk = guide.lookup;
+  const stop1 = `
+    <label class="field"><span class="label">Address</span><input type="text" id="guide-address" value="${h(guide.address)}" placeholder="998 E 19th Ave, Vancouver, BC" autocomplete="street-address"></label>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-lookup"${guide.loading === "lookup" ? " disabled" : ""}>${guide.loading === "lookup" ? "Looking up…" : "Look up the site"}</button><span class="help">Nominatim for the point; the City's open data for the district and the parcel.</span></div>
+    ${lk ? `<dl class="found-site">
+      <div><dt>District</dt><dd>${lk.site.zoning_district ? `<b>${h(lk.site.zoning_district)}</b>` : "<i>not found: enter it</i>"}</dd></div>
+      <div><dt>Lot</dt><dd>${lk.site.site_area_m2 ? `<b>${h(fmtNum(lk.site.site_area_m2))} m²</b> · ${h(lk.site.frontage_m)} × ${h(lk.site.depth_m)} m <span class="cont">(${h(lk.fields.frontage_m.note)})</span>` : "<i>no parcel found</i>"}</dd></div>
+      <div><dt>Found as</dt><dd class="cont">${h(lk.site.address)}</dd></div>
+    </dl>
+    <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-site">Use this site</button><span class="help">Then answer what the data cannot: the policy areas, water and sewer, trees, the owner.</span></div>` : ""}
+    <p class="help stop-or">Or pick a saved site in the Site card below${done[1] ? `: <b>${h(site.address || site.id)}</b> is chosen` : ""}.</p>`;
+
+  const stop2 = `
+    <div class="checks">${progs.map(r => `<label><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-programs">Use these programs</button></div>`;
+
+  const R = guide.reading;
+  const stop3 = `
+    <p class="help">Layers A to C on the site alone: the outright limits, the rezoning path, transit, trees. Nothing is written.</p>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-read"${guide.loading === "read" ? " disabled" : ""}>${guide.loading === "read" ? "Reading…" : (R ? "Read it again" : "Read the site")}</button></div>
+    ${R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">The reading is in the memo pane.</p>` : ""}`;
+
+  const cands = S ? S.candidates : [{ id: "outright", title: "Outright", available: true, what: "what the district allows as of right" }, { id: "benchmark", title: "Benchmark", available: true, what: "the staff benchmark under the rezoning policy" }, { id: "funder-ready", title: "Funder-ready", available: true, what: "the benchmark with every funder question answered" }];
+  const rows = S ? GUIDE_FIELDS.filter(([k]) => S.fields[k]).map(([k, label, kind]) => {
+    const f = S.fields[k];
+    const mine = guide.mine[k];
+    const isMine = mine !== undefined;
+    const sv = f.value === null || f.value === undefined ? "—" : (typeof f.value === "number" ? fmtNum(f.value) : String(f.value));
+    return `<div class="sg-row" data-key="${h(k)}">
+      <div class="sg-label">${h(label)}${f.rule_id ? `<code title="${h(ruleTitle(f.rule_id))}">${h(f.rule_id)}</code>` : `<code class="ph">placeholder</code>`}</div>
+      <div class="sg-pick seg" role="group" aria-label="${h(label)}: suggested or mine">
+        <button class="segbtn" type="button" data-pick="suggested" aria-pressed="${!isMine}">Suggested</button>
+        <button class="segbtn" type="button" data-pick="mine" aria-pressed="${isMine}">Mine</button>
+      </div>
+      <div class="sg-value">${isMine ? `<input type="${kind === "text" ? "text" : "number"}" class="sg-input" value="${h(mine)}"${kind === "int" ? ' step="1"' : (kind === "number" ? ' step="any"' : "")} aria-label="${h(label)}, my figure">` : `<b>${h(sv)}</b>`}</div>
+      <div class="sg-note">${h(f.note || "")}</div>
+    </div>`;
+  }).join("") : "";
+  const stop4 = `
+    <div class="seg cands" role="group" aria-label="Start from">${cands.map(c => `<button class="segbtn" type="button" data-cand="${h(c.id)}" aria-pressed="${guide.candidate === c.id}"${c.available === false ? ` disabled title="${h(c.why)}"` : ` title="${h(c.what)}"`}>${h(c.title)}</button>`).join("")}</div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-suggest"${guide.loading === "suggest" ? " disabled" : ""}>${guide.loading === "suggest" ? "Deriving…" : (S ? "Derive again" : "Suggest from the rules")}</button><span class="help">Every figure cites the rule it came from; placeholders say so.</span></div>
+    ${S ? `<div class="sg-rows">${rows}</div>
+    ${S.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${S.unsure.map(u => `<li><b>${h(u.key.replace(/_/g, " "))}</b>: ${h(u.why)}. <span class="cont">${h(u.who)}.</span>${answerControl(u.key)}</li>`).join("")}</ul></div>` : ""}
+    <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-option">Use this option</button><span class="help">Writes it into the Option card, where every field can still be edited.</span></div>` : ""}`;
+
+  const stop5 = `
+    <p class="help">${done[4] ? `The option is ready${state.optionDirty ? " (unsaved: Save option as… keeps it reproducible)" : ""}.` : "Shape or pick an option first."} Rules as of <b>${h($("#as-of").value)}</b>.</p>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-run"${done[4] ? "" : " disabled"}>Run the rules</button><span class="help">Ctrl+Enter does the same.</span></div>
+    ${state.run ? `<p class="help">On screen: <b>${h(rev(state.run.run_id))}</b>, as of ${h(state.run.as_of)}. Summary, Detailed and 3D preview sit above the memo.</p>` : ""}`;
+
+  const stop6 = `
+    <p class="help">${state.run ? `Hand ${h(rev(state.run.run_id))} to the architect with a note; they see it in their top bar.` : "Run the rules first."}${STATIC ? " Issuing needs the local server." : ""}</p>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-issue"${state.run && !STATIC ? "" : " disabled"}>Issue to the architect</button></div>
+    ${state.run && state.run.issued ? `<p class="help">Issued ${h(state.run.issued.issued_at.replace("T", " ").slice(0, 16))}.</p>` : ""}`;
+
+  el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Start from an address</h2><span class="help">six stops</span></div>
+    ${stop(1, stop1)}${stop(2, stop2)}${stop(3, stop3)}${stop(4, stop4)}${stop(5, stop5)}${stop(6, stop6)}`;
+  wireGuide();
+}
+
+/* What the rules leave to a person can be answered here, in the flow. Site facts go to the Site card at once (the
+   benchmark may then apply: Derive again); option facts travel with Use this option. */
+const ANSWERS = {
+  in_former_community_vision_area: { on: "site", kind: "tri", label: "Inside a former Community Vision area?" },
+  in_transit_oriented_area: { on: "site", kind: "tri", label: "Inside a transit-oriented area?" },
+  frequent_bus_stop_within_400m: { on: "site", kind: "tri", label: "A frequent bus stop within 400 m?" },
+  land_tenure_plan: { on: "site", kind: "text", label: "Land tenure plan", placeholder: "e.g. 60-year lease at nominal rent from the church" },
+  developer_partner: { on: "option", kind: "tri", label: "Teamed with a developer or builder?" },
+  site_control: { on: "option", kind: "select", label: "Site control", options: [["", "Not sure"], ["letter_of_intent", "Letter of intent"], ["purchase_agreement", "Purchase agreement"], ["council_resolution", "Council resolution"], ["finalized", "Finalized"], ["none", "None yet"]] },
+};
+
+function answerControl(key) {
+  const a = ANSWERS[key];
+  if (!a) return "";
+  const cur = a.on === "site" ? getPath(state.site || {}, key) : (guide.answers || {})[key];
+  if (a.kind === "tri") {
+    const v = cur === true ? "yes" : cur === false ? "no" : "";
+    return `<div class="answer-ctl"><span class="label">${h(a.label)}</span><span class="tri" role="radiogroup" aria-label="${h(a.label)}">${[["yes", "Yes"], ["no", "No"], ["", "Not sure"]].map(([val, lab]) => `<button type="button" role="radio" class="${val === "" ? "unsure" : ""}" data-answer="${h(key)}" data-value="${val}" aria-checked="${v === val}">${lab}</button>`).join("")}</span></div>`;
+  }
+  if (a.kind === "select") {
+    return `<div class="answer-ctl"><label class="label">${h(a.label)}<select data-answer="${h(key)}">${a.options.map(([val, lab]) => `<option value="${h(val)}"${(cur || "") === val ? " selected" : ""}>${h(lab)}</option>`).join("")}</select></label></div>`;
+  }
+  return `<div class="answer-ctl"><label class="label">${h(a.label)}<input type="text" data-answer="${h(key)}" value="${h(cur || "")}" placeholder="${h(a.placeholder || "")}"></label></div>`;
+}
+
+function takeAnswer(key, raw) {
+  const a = ANSWERS[key];
+  if (!a) return;
+  const v = a.kind === "tri" ? (raw === "yes" ? true : raw === "no" ? false : null) : (raw === "" ? null : raw);
+  if (a.on === "site") {
+    if (!state.site) return;
+    setPath(state.site, key, v);
+    onSiteChange(key);
+    renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+    setStatus(`${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v || "not sure"}. Derive again to see what it changes.`, "info");
+  } else {
+    guide.answers = guide.answers || {};
+    guide.answers[key] = v;
+    setStatus(`${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v || "not sure"}; it travels with the option.`, "info");
+  }
+}
+
+function wireGuide() {
+  const el = $("#guide");
+  $$("[data-answer]", el).forEach(c => {
+    if (c.tagName === "BUTTON") c.addEventListener("click", () => { takeAnswer(c.dataset.answer, c.dataset.value); renderGuide(); });
+    else c.addEventListener("change", () => takeAnswer(c.dataset.answer, c.value));
+  });
+  $$(".stop-head", el).forEach(b => b.addEventListener("click", () => { guide.step = Number(b.dataset.stop); renderGuide(); }));
+  const addr = $("#guide-address", el);
+  if (addr) {
+    addr.addEventListener("input", () => { guide.address = addr.value; });
+    addr.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); guideLookup(); } });
+  }
+  const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
+  on("#guide-lookup", guideLookup);
+  on("#guide-use-site", guideUseSite);
+  on("#guide-programs", () => { guide.programs = $$(".guide-program:checked", el).map(x => x.value); if (state.option) { state.option.target_programs = guide.programs.slice(); onOptionChange("target_programs"); renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange); } guide.step = 3; renderGuide(); setStatus(`Programs chosen: ${guide.programs.map(ruleTitle).join("; ") || "none"}.`, "ok"); });
+  on("#guide-read", guideReadSite);
+  $$(".cands .segbtn", el).forEach(b => b.addEventListener("click", () => { guide.candidate = b.dataset.cand; guide.mine = {}; guideSuggest(); }));
+  on("#guide-suggest", guideSuggest);
+  $$(".sg-row", el).forEach(row => {
+    const key = row.dataset.key;
+    $$(".sg-pick .segbtn", row).forEach(b => b.addEventListener("click", () => {
+      if (b.dataset.pick === "mine") { if (guide.mine[key] === undefined) guide.mine[key] = guide.suggestion.fields[key].value ?? ""; }
+      else delete guide.mine[key];
+      renderGuide();
+      const inp = $(`.sg-row[data-key="${CSS.escape(key)}"] .sg-input`, $("#guide"));
+      if (inp) inp.focus();
+    }));
+    const inp = $(".sg-input", row);
+    if (inp) inp.addEventListener("input", () => { guide.mine[key] = inp.value; });
+  });
+  on("#guide-use-option", guideUseOption);
+  on("#guide-run", () => runRules());
+  on("#guide-issue", () => openIssuePanel());
+}
+
+async function guideLookup() {
+  const q = (guide.address || "").trim();
+  if (q.length < 4) { toast("Type an address first.", true); return; }
+  guide.loading = "lookup"; renderGuide();
+  setStatus(`Looking up ${q}…`, "busy");
+  try {
+    guide.lookup = await api(`/api/lookup?q=${encodeURIComponent(q)}`);
+    const s = guide.lookup.site;
+    setStatus(`Found ${s.address}: ${s.zoning_district || "district not found"}, ${s.site_area_m2 ? `${fmtNum(s.site_area_m2)} m²` : "no parcel"}. Check it, then use it.`, "ok");
+  } catch (e) {
+    guide.lookup = null;
+    toast(`Lookup failed: ${e.message}`, true);
+  } finally {
+    guide.loading = ""; renderGuide();
+  }
+}
+
+/* The found site becomes a new, unsaved site in the Site card, its form open for the answers the data cannot give. */
+async function guideUseSite() {
+  if (!guide.lookup) return;
+  if ((state.siteDirty || state.optionDirty) && !confirm("Use the found site? Unsaved edits to the site and option will be lost.")) return;
+  state.siteId = null;
+  state.site = Object.assign(blankSite(), guide.lookup.site);
+  state.siteDirty = true;
+  $("#site-select").value = "__new__";
+  renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+  $("#site-dirty").hidden = false;
+  refreshSummary("site");
+  setCollapsed("site", false);
+  await loadOptions();
+  await loadRuns();
+  fillRunSelects();
+  guide.reading = null; guide.suggestion = null; guide.mine = {};
+  guide.step = 2;
+  renderGuide();
+  setStep(1);
+  setStatus("The site is in the Site card, unsaved. Answer the policy areas, water and sewer, trees and the owner, then choose the programs.", "ok");
+  $("#step-site").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+}
+
+async function guideReadSite() {
+  if (!state.site) return;
+  guide.loading = "read"; renderGuide();
+  setStatus("Reading the site against layers A to C…", "busy");
+  try {
+    guide.reading = await postJSON("/api/read-site", { site: state.site, as_of: $("#as-of").value || todayISO() });
+    renderSiteReading(guide.reading);
+    guide.step = 4;
+    setStatus(`Read the site as of ${guide.reading.as_of}: ${guide.reading.results.length} rules speak to it before any option.`, "ok");
+  } catch (e) {
+    toast(`Could not read the site: ${e.message}`, true);
+  } finally {
+    guide.loading = ""; renderGuide();
+  }
+}
+
+/* The site's reading sits in the memo pane until a run replaces it. */
+function renderSiteReading(R) {
+  const site = R.site || state.site || {};
+  const rows = R.results.map(r => `<li class="finding-row">${pill(r.status)} <div><b>${h(r.title)}</b> <span class="rule-id">${h(r.rule_id)}</span><p class="finding">${leadCont(r.finding)}</p>${r.action ? `<p class="who">${h(r.action)}</p>` : ""}</div></li>`).join("");
+  $("#memo").innerHTML = `
+    <div class="card memo-head">
+      <h1>${h(site.address || site.id || "A site")}</h1>
+      <div class="memo-meta">
+        <div><b>District</b><span>${h(site.zoning_district || "—")}</span></div>
+        <div><b>Lot</b><span>${site.site_area_m2 ? `${h(fmtNum(site.site_area_m2))} m²` : "—"}${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}</span></div>
+        <div><b>Rules as of</b><span>${h(R.as_of)}</span></div>
+        <div><b>Reading</b><span>the site alone, layers A to C</span></div>
+      </div>
+      <p class="quiet">What the site allows and asks before any option exists. The option's own answers come with the run.</p>
+    </div>
+    <section class="card section reading"><h2><span class="badge">A–C</span> What the rules say about the site</h2><ul class="reading-findings">${rows}</ul></section>`;
+  $("#memo").className = "memo landed";
+}
+
+async function guideSuggest() {
+  if (!state.site) return;
+  guide.loading = "suggest"; renderGuide();
+  setStatus(`Deriving the ${guide.candidate} option from the rules…`, "busy");
+  try {
+    const programs = guide.programs || (state.option && state.option.target_programs) || [];
+    guide.suggestion = await postJSON("/api/suggest", { site: state.site, programs, as_of: $("#as-of").value || todayISO(), candidate: guide.candidate });
+    guide.candidate = guide.suggestion.candidate;
+    const o = guide.suggestion.option;
+    const cv = guide.suggestion.unsure.some(u => u.key === "in_former_community_vision_area") && guide.candidate !== "outright";
+    setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} units; ${guide.suggestion.unsure.length} left to a person.${cv ? " The benchmark needs the Community Vision answer in the Site card; until then this is the outright envelope." : ""}`, cv ? "info" : "ok");
+  } catch (e) {
+    toast(`Could not derive the option: ${e.message}`, true);
+  } finally {
+    guide.loading = ""; renderGuide();
+  }
+}
+
+/* The suggestion, with the manager's own figures where they chose Mine, becomes a new unsaved option in the Option card. */
+function guideUseOption() {
+  const S = guide.suggestion;
+  if (!S) return;
+  if (state.optionDirty && !confirm("Use the suggested option? Unsaved edits to the option will be lost.")) return;
+  const opt = Object.assign(blankOption(state.site && state.site.id), JSON.parse(JSON.stringify(S.option)));
+  for (const [k, label, kind] of GUIDE_FIELDS) {
+    if (guide.mine[k] === undefined) continue;
+    const raw = String(guide.mine[k]).trim();
+    const v = kind === "text" ? (raw || null) : (raw === "" ? null : (kind === "int" ? parseInt(raw, 10) : Number(raw)));
+    if (kind !== "text" && raw !== "" && !Number.isFinite(v)) { toast(`${label}: not a number.`, true); return; }
+    setPath(opt, k, v);
+  }
+  for (const [k, v] of Object.entries(guide.answers || {})) if (ANSWERS[k] && ANSWERS[k].on === "option") setPath(opt, k, v);
+  if (!opt.rent_tiers_units || Object.values(opt.rent_tiers_units).every(v => v == null)) opt.rent_tiers_units = null;
+  const chosen = Object.keys(guide.mine).length;
+  opt.notes = (opt.notes || "") + (chosen ? ` ${chosen} figure${chosen === 1 ? "" : "s"} replaced by the manager's own.` : "");
+  state.optionId = null;
+  state.option = opt;
+  state.optionDirty = true;
+  $("#option-select").value = "__new__";
+  renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+  $("#option-dirty").hidden = false;
+  refreshSummary("option");
+  setCollapsed("option", true);
+  guide.step = 5;
+  renderGuide();
+  setStep(2);
+  setStatus(`The ${guide.candidate} option is in the Option card${chosen ? `, with ${chosen} of your own figures` : ""}. Run the rules when it reads right.`, "ok");
+}
+
+// ---------------------------------------------------------------- the view: summary, detailed, 3D preview
+const VIEW_KEY = "ffm.view";
+
+function setView(v, remember = true) {
+  if (!["summary", "detailed", "3d"].includes(v)) v = "detailed";
+  state.view = v;
+  $(".memo-pane").dataset.view = v;
+  $$("#view-switch .segbtn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (v === "3d") renderPreview3D(); else { const p = $("#preview3d"); if (p) p.remove(); }
+  if (remember) { try { localStorage.setItem(VIEW_KEY, v); } catch (e) { /* fine */ } }
+}
+
+/* The 3D preview: the site plan with its dimension strings, the section, and the axonometric, each at full width,
+   drawn by the same functions as the memo's figures from the same massing.json. */
+function renderPreview3D() {
+  let box = $("#preview3d");
+  const run = state.run;
+  const memo = $("#memo");
+  if (!box) { box = document.createElement("div"); box.id = "preview3d"; box.className = "preview3d"; memo.parentNode.insertBefore(box, memo); }
+  if (!run || !run.massing) { box.innerHTML = `<div class="card figure"><p class="help">Run the rules, or open a run with a massing, to preview it.</p></div>`; return; }
+  const m = run.massing, ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
+  const [prop, outr] = [m.masses.find(x => x.name === "proposed"), m.masses.find(x => x.name === "outright")];
+  box.innerHTML = `
+    <figure class="figure p3-plan"><div class="fig-head"><span class="eyebrow">Site plan · dimensions in metres</span></div><div class="fig-body"></div><figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${h(fmtNum(m.lot.area_m2))} m²; setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m. ${prop ? massLine(prop) : ""}</figcaption></figure>
+    <figure class="figure p3-section"><div class="fig-head"><span class="eyebrow">Section · through the depth</span></div><div class="fig-section"></div><figcaption>${outr ? massLine(outr) : ""}</figcaption></figure>
+    <figure class="figure p3-axon"><div class="fig-head"><span class="eyebrow">Axonometric · drag to turn</span></div><div class="fig-body fig3d"></div><figcaption>The proposed mass over the outright envelope, from the same numbers as the plan and the section.</figcaption></figure>`;
+  fitLabels($(".p3-plan .fig-body", box), fs => figPlan(m, ctx, fs));
+  fitLabels($(".p3-section .fig-section", box), fs => figSection(m, fs));
+  const fs3 = fitLabels($(".p3-axon .fig-body", box), fs => fig3d(m, ctx, 35, 28, fs));
+  // a light orbit for the preview's axon: a drag turns it, as in the memo
+  const svg = $(".p3-axon svg", box);
+  if (svg) {
+    let az = 35, el = 28, drag = null;
+    const turn = (dx, dy) => { az = (az + dx) % 360; el = Math.max(8, Math.min(80, el + dy)); const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m, ctx, az, el, fs3); svg.innerHTML = fresh.firstElementChild.innerHTML; svg.setAttribute("viewBox", fresh.firstElementChild.getAttribute("viewBox")); };
+    const boxH = Math.round(svg.getBoundingClientRect().height); if (boxH > 0) { svg.style.width = "100%"; svg.style.height = `${boxH}px`; }
+    svg.addEventListener("pointerdown", e => { if (e.button > 0) return; drag = { x: e.clientX, y: e.clientY }; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+    svg.addEventListener("pointermove", e => { if (!drag) return; turn((e.clientX - drag.x) * 0.5, (e.clientY - drag.y) * 0.4); drag = { x: e.clientX, y: e.clientY }; });
+    for (const ev of ["pointerup", "pointercancel", "lostpointercapture"]) svg.addEventListener(ev, () => { drag = null; });
+  }
+}
+
+// ---------------------------------------------------------------- issuing a run to the next reader, and hearing of one
+const ISSUES_SEEN_KEY = "ffm.issues.seen";
+const ISSUE_TO = { manager: "architect", architect: "reader", reader: null };
+let issueTimer = 0;
+
+function seenIssues() { try { return new Set(JSON.parse(localStorage.getItem(ISSUES_SEEN_KEY) || "[]")); } catch (e) { return new Set(); } }
+function markIssueSeen(id) { const s = seenIssues(); s.add(id); try { localStorage.setItem(ISSUES_SEEN_KEY, JSON.stringify([...s].slice(-200))); } catch (e) { /* fine */ } }
+
+function openIssuePanel() {
+  const panel = $("#issue-panel");
+  if (!state.run || STATIC) return;
+  panel.hidden = false;
+  $("#issue-btn").setAttribute("aria-expanded", "true");
+  $("#issue-note").focus();
+  panel.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
+}
+
+function closeIssuePanel() {
+  $("#issue-panel").hidden = true;
+  $("#issue-btn").setAttribute("aria-expanded", "false");
+}
+
+async function sendIssue() {
+  const run = state.run;
+  const to = ISSUE_TO[state.mode];
+  if (!run || !to) return;
+  const [site, folder] = run.run_id.split("/");
+  try {
+    const it = await postJSON(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}/issue`, { by: state.mode, to, note: $("#issue-note").value });
+    run.issued = it;
+    markIssueSeen(it.id);
+    closeIssuePanel();
+    $("#issue-note").value = "";
+    renderGuide();
+    setStatus(`Issued ${rev(run.run_id)} to the ${to === "reader" ? "board, planner and funder" : to} at ${it.issued_at.replace("T", " ").slice(0, 16)}. They see it in their top bar.`, "ok");
+  } catch (e) {
+    toast(`Could not issue: ${e.message}`, true);
+  }
+}
+
+function issueButtonLabel() {
+  const to = ISSUE_TO[state.mode];
+  const btn = $("#issue-btn");
+  btn.hidden = !to;
+  btn.textContent = to === "architect" ? "Issue to the architect" : "Issue to the board";
+}
+
+/* Every 15 s the page asks the local server for the site's issue notes; a new one addressed to this reader becomes a
+   chip in the top bar, and a click opens that run. Nothing polls on the web build. */
+async function pollIssues() {
+  if (STATIC) return;
+  const sid = state.siteId || (state.site && state.site.id);
+  if (!sid) return;
+  try {
+    const issues = await api(`/api/issues?site=${encodeURIComponent(sid)}`);
+    state.issues = issues;
+    const seen = seenIssues();
+    const mine = issues.filter(i => i.to === state.mode && i.by !== state.mode && !seen.has(i.id));
+    showIssueChip(mine[0] || null, mine.length);
+  } catch (e) { /* the server is away: the chip simply stays as it was */ }
+}
+
+function showIssueChip(issue, count) {
+  const chip = $("#issue-chip");
+  if (!issue) { chip.hidden = true; return; }
+  const ago = (() => { const s = Math.max(0, (Date.now() - new Date(issue.issued_at).getTime()) / 1000); return s < 90 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`; })();
+  chip.hidden = false;
+  chip.innerHTML = `<span class="dot"></span>${h(rev(issue.run_id))} issued to you by the ${h(issue.by)} · ${h(ago)}${count > 1 ? ` · +${count - 1}` : ""}`;
+  chip.title = issue.note ? `"${issue.note}" · click to open` : "Click to open the run";
+  chip.onclick = async () => {
+    markIssueSeen(issue.id);
+    chip.hidden = true;
+    try { await openRun(issue.run_id); setStatus(`Opened ${rev(issue.run_id)}, issued by the ${issue.by}${issue.note ? `: "${issue.note}"` : ""}.`, "ok"); }
+    catch (e) { toast(e.message, true); }
+    pollIssues();
+  };
+}
+
+function startIssuePolling() {
+  clearInterval(issueTimer);
+  if (STATIC) return;
+  pollIssues();
+  issueTimer = setInterval(pollIssues, 15000);
+}
+
 /* The inputs rail folds to a strip with its own arrow and opens again on another click; the steps to Site or
    Option open it too. The reader's choice is kept for their next visit, where the browser allows it. */
 const RAIL_KEY = "ffm.inputs.collapsed";
@@ -2921,11 +3413,21 @@ const MODES = {
   reader: { who: "a reader", line: "the memo alone, as on paper, with Download PDF and Print. Switch to Manager or Architect to change anything." },
 };
 
+/* The switch's paper thumb slides under the pressed reader; it is measured, so it follows the fonts and the window. */
+function placeModeThumb() {
+  const sw = $("#mode-switch"), thumb = $(".seg-thumb", sw), on = $('button[aria-pressed="true"]', sw);
+  if (!thumb || !on) return;
+  thumb.style.width = `${on.offsetWidth}px`;
+  thumb.style.transform = `translateX(${on.offsetLeft}px)`;
+  sw.classList.add("placed");
+}
+
 function setMode(mode, remember = true, announce = true) {
   if (!MODES[mode]) mode = "manager";
   state.mode = mode;
   document.documentElement.dataset.mode = mode;
   $$("#mode-switch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  placeModeThumb();
   document.title = `First Read · for ${MODES[mode].who}`;
   const chosen = kind => (kind === "site" ? state.siteId : state.optionId) && (kind === "site" ? state.siteId : state.optionId) !== "__new__";
   if (mode === "reader") {
@@ -2936,8 +3438,11 @@ function setMode(mode, remember = true, announce = true) {
     for (const kind of ["site", "option"]) setCollapsed(kind, mode === "manager" && chosen(kind));
   }
   applyModeToMemo();
+  renderGuide();
+  issueButtonLabel();
+  closeIssuePanel();
   if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }
-  if (announce) setStatus(`Laid out for ${MODES[mode].who}: ${MODES[mode].line}`, "info");
+  if (announce) { setStatus(`Laid out for ${MODES[mode].who}: ${MODES[mode].line}`, "info"); pollIssues(); }
 }
 
 /* What a mode does to the memo on screen: the architect reads every ledger layer open, the others start closed. */
@@ -2981,6 +3486,10 @@ async function init() {
   // who is reading: the switch in the top bar; the mode from the link or the last visit applies before the inputs load
   $$("#mode-switch button").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
   setMode(initialMode(), false, false);
+  // the thumb is measured: again once the web font is in, and whenever the bar re-wraps
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeModeThumb);
+  let thumbFrame = 0;
+  window.addEventListener("resize", () => { if (!thumbFrame) thumbFrame = requestAnimationFrame(() => { thumbFrame = 0; placeModeThumb(); }); });
   $("#as-of").addEventListener("change", () => {
     if (!state.run) renderQuiet();
     else setStatus(`The next run will read the rules as of ${$("#as-of").value}; the memo on screen is as of ${state.run.as_of}.`, "info");
@@ -3010,6 +3519,11 @@ async function init() {
   $("#tour-link").addEventListener("click", e => { e.preventDefault(); startTour(0); });
   $("#tour-start").addEventListener("click", () => startTour(0));
   $("#tour-dismiss").addEventListener("click", () => { $("#tour-offer").hidden = true; try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* fine */ } });
+  $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the three answers and the figures." : "Detailed: the whole memo.", "info"); }));
+  try { setView(localStorage.getItem(VIEW_KEY) || "detailed", false); } catch (e) { setView("detailed", false); }
+  $("#issue-btn").addEventListener("click", () => { if ($("#issue-panel").hidden) openIssuePanel(); else closeIssuePanel(); });
+  $("#issue-panel").addEventListener("submit", e => { e.preventDefault(); sendIssue(); });
+  $("#issue-cancel").addEventListener("click", closeIssuePanel);
   $("#open-run").addEventListener("change", e => openRun(e.target.value).catch(err => toast(err.message, true)));
   $("#compare-run").addEventListener("change", e => { state.compareRun = e.target.value || null; applyCompare().catch(err => toast(err.message, true)); });
   document.addEventListener("keydown", e => {
@@ -3032,6 +3546,9 @@ async function init() {
   setStep(firstOpenStep());
   watchSteps();
   offerTour();
+  renderGuide();
+  issueButtonLabel();
+  startIssuePolling();
   if (STATIC) loadEngine().catch(() => { /* the chip says why; past runs still open */ });
   await followLink();
 }

@@ -12,6 +12,15 @@
     if (same) a.setAttribute("aria-current", "page");
   });
 
+  // the hero's massing builds itself the first time the page is actually seen: a tab opened in the background
+  // would otherwise run the build unwatched, so it waits for the page to become visible
+  const iso = document.querySelector(".hero-iso");
+  if (iso) {
+    const play = () => iso.classList.add("play");
+    if (document.visibilityState === "visible") play();
+    else document.addEventListener("visibilitychange", function once() { if (document.visibilityState === "visible") { document.removeEventListener("visibilitychange", once); play(); } });
+  }
+
   // sections arrive
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const items = Array.from(document.querySelectorAll(".reveal"));
@@ -20,8 +29,11 @@
       for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
     }, { rootMargin: "0px 0px -10% 0px", threshold: 0.08 });
     items.forEach(el => io.observe(el));
-    // whatever the observer does (a background tab, a print preview), nothing stays hidden for long
-    setTimeout(() => items.forEach(el => el.classList.add("in")), 1500);
+    // if the observer is slow (a background tab, a print preview), what is already on screen shows anyway;
+    // what is below the fold still waits to be scrolled to
+    const inView = el => el.getBoundingClientRect().top < window.innerHeight;
+    setTimeout(() => items.forEach(el => { if (inView(el)) el.classList.add("in"); }), 1500);
+    window.addEventListener("beforeprint", () => items.forEach(el => el.classList.add("in")));
   } else items.forEach(el => el.classList.add("in"));
 
   // the counter in the hero's foot follows the numbered section the reader is in

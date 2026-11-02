@@ -58,7 +58,51 @@ colors:
   band-line: "#D3DCE6"
   band-group: "#DBE4EE"
   night-band: "#191F26"
+  brand-ink: "#14181D"
+  night: "#0E1116"
+  night-2: "#161B22"
+  night-3: "#1F262F"
+  night-fg: "#E8ECF1"
+  night-fg-2: "#AAB3BF"
+  night-fg-3: "#6F7A88"
+  signal: "#3C8CDC"
+  signal-deep: "#2A6FB8"
+  signal-night: "#6FB1F2"
 typography:
+  display:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "clamp(40px, 5.4vw, 74px)"
+    fontWeight: 300
+    lineHeight: 1.02
+    letterSpacing: "-0.03em"
+  site-heading:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "clamp(30px, 4.2vw, 54px)"
+    fontWeight: 300
+    lineHeight: 1.05
+    letterSpacing: "-0.02em"
+  item-title:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "clamp(20px, 2vw, 26px)"
+    fontWeight: 400
+    lineHeight: 1.2
+    letterSpacing: "-0.015em"
+  site-body:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: 1.55
+  site-key:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "11px"
+    fontWeight: 600
+    letterSpacing: "0.14em"
+  verdict:
+    fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
+    fontSize: "24px"
+    fontWeight: 400
+    lineHeight: 1.22
+    letterSpacing: "-0.02em"
   title:
     fontFamily: "IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif"
     fontSize: "18px"
@@ -118,6 +162,10 @@ rounded:
   panel: "6px"
   card: "8px"
   pill: "10px"
+  node: "10px"
+  swatch: "12px"
+  paper: "14px"
+  button-pill: "999px"
   round: "50%"
 spacing:
   xs: "4px"
@@ -415,6 +463,24 @@ because it is genuinely above everything.
 ### Named Rules
 **The One Pixel Rule.** A panel's shadow is one pixel; it says "sheet on a desk", not "floating".
 Only something that is actually above the page casts more.
+
+## Motion
+
+One authored moment and a handful of acknowledgements; everything eases out on `cubic-bezier(.16, 1, .3, 1)`.
+- **The build (site hero):** the massing draws itself the way the tool derives it. The street, the lot and
+  the setback envelope fade in (0.4s); the outright envelope rises from the ground (0.45s, from 0.35s); the
+  proposed mass rises through its floor lines (0.8s, from 0.7s); the labels fade in last (1.35s). Each rise
+  is a `clip-path: inset()` from the bottom of its own group, so the ground never moves. Under reduced
+  motion the drawing is shown built and only the labels fade.
+- **Arrivals (site):** a section fades in over 0.4s with no travel; the items of a list follow one another
+  by 50ms, four deep at most, with 8px of rise. The gate's early diamond rings once (0.9s) when its section
+  arrives. Reduced motion keeps the fades, drops the travel and the ring.
+- **Feedback (tool):** the mode switch's paper thumb slides under the chosen reader (220ms, measured in
+  `placeModeThumb`); the Site and Option forms fold and unfold as a grid row, 0fr to 1fr (320ms), and leave
+  the tab order folded; the rail's column eases (300ms); the three answers land as a list, 60ms apart, after
+  the memo's own 150ms fade; the status strip's wash eases (250ms). Reduced motion keeps every fade and
+  state change, drops the slide, the fold and the stagger.
+- **Never:** parallax, a hover lift, a bounce, or a loop that runs while nothing changes.
 
 ## Shapes
 

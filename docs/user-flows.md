@@ -99,6 +99,19 @@ at a later stage (A: City planning staff at pre-application; B and D: the archit
 C: planners and an arborist once a site plan exists; E: the development manager when a call opens).
 The memo reads all five on day one.
 
+## The switch in the tool
+
+The three flows are three layouts of the same page, chosen with Manager · Architect · Reader in the
+tool's top bar (`?mode=manager|architect|reader` in a link; kept in the browser for the next visit):
+
+| Mode | Inputs rail | Forms | Ledger | Run controls | Export bar leads with |
+|---|---|---|---|---|---|
+| Manager | open, cards as summaries | on Edit | closed | yes | Download PDF |
+| Architect | open, forms open | open | every layer open | yes, with the pickers | Export to Revit, massing.json |
+| Reader | hidden | hidden | closed | none | Download PDF, Print |
+
+The engine, the memo and its numbers are the same in every mode.
+
 ## Site map
 
 | Page | Who it is for | What it holds |

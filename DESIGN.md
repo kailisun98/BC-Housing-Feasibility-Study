@@ -541,7 +541,8 @@ where the engine says a finding was reworded. Rows are named by the rule's title
 phone the table stacks, each value under its column's name.
 
 ### Answer cards
-The signature component. A badge-numbered 14px heading, the verdict at 18px 600 with the operative
+The signature component. A heading set as the site's key (a mono "01" then the question in 11px tracked
+caps), the verdict at 24px 400, light and large the way the site sets its headlines, with the operative
 words in the status text colour, then findings in lead-and-continuation prose or a pill-led list;
 the third card holds a table of open items with a Who / what column in Muted. Wash and tone come
 from one `data-verdict` attribute.
@@ -564,6 +565,16 @@ sit at their heights and are pushed apart where two would overprint, a thin lead
 label to its line; its note under the ground line starts at the lot's edge. The axonometric leads its
 height labels off the masses on leader lines, turns under a sideways drag (vertical swipes still
 scroll a phone) and under the arrow keys. FIG 03 is the Revit sheet image.
+
+### Who is reading
+The tool's top bar carries a three-way pill, Manager · Architect · Reader, after the lockup: the flows in
+`docs/user-flows.md` as three layouts of the same page. The pressed segment is paper on the ink bar. Manager
+(the default): the memo first, the inputs beside it as summaries, Download PDF leads the export bar.
+Architect: the Site and Option forms open, every ledger layer open, the figures beside the answers from
+1280px, Export to Revit and massing.json lead. Reader: the rail, the steps, the date, Run, the run pickers and
+the Revit buttons are gone; the memo alone sits in a 980px reading column at 14px with Download PDF and
+Print. The status strip says which layout is on; the page title says who it is for; a link can carry
+`?mode=` and the choice is kept for the next visit. Nothing in the engine or the memo changes with the mode.
 
 ### The brand
 - **Mark:** a timeline of five stages with the diamond on the second, where the first reliable answer

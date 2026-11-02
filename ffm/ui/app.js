@@ -835,7 +835,7 @@ async function selectSite(id) {
   renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
   $("#site-dirty").hidden = !state.siteDirty;
   refreshSummary("site");
-  setCollapsed("site", id !== "__new__");
+  setCollapsed("site", id !== "__new__" && state.mode !== "architect");
   await loadOptions();
   await loadRuns();
   fillRunSelects();
@@ -873,7 +873,7 @@ async function selectOption(id) {
   renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
   $("#option-dirty").hidden = !state.optionDirty;
   refreshSummary("option");
-  setCollapsed("option", id !== "__new__");
+  setCollapsed("option", id !== "__new__" && state.mode !== "architect");
   renderQuiet();
   setStep(state.step);
 }
@@ -1099,6 +1099,7 @@ function renderMemo(run) {
   if (focused && document.activeElement !== focused) focused.focus({ preventScroll: !!focused.closest("#side-by-side") });
   wireFigures(run);
   wireLedger();
+  applyModeToMemo();
   setPrintFooter(run);
 }
 
@@ -2496,7 +2497,7 @@ function offerTour() {
   try { seen = !!localStorage.getItem(TOUR_KEY); } catch (e) { seen = false; }
   // a reader who arrived on a link to a run or to the walkthrough already knows where they are going
   const q = new URLSearchParams(location.search);
-  $("#tour-offer").hidden = seen || q.has("run") || q.has("tour");
+  $("#tour-offer").hidden = seen || q.has("run") || q.has("tour") || state.mode === "reader";
 }
 
 // ---------------------------------------------------------------- steps
@@ -2907,6 +2908,51 @@ async function copyText(text) {
   }
 }
 
+/* Who is reading. The three flows in docs/user-flows.md each lay the same page out differently; the switch in the
+   top bar picks one, ?mode= in a link from the site picks it for a visitor, and the choice is kept for the next visit.
+     manager   the memo first; the inputs beside it as summaries; the PDF leads the export bar
+     architect the forms open; every ledger layer open; the figures beside the answers; Export to Revit leads
+     reader    no inputs, no run controls: the memo alone in a reading column, Download PDF and Print
+   The engine and the memo are the same in every mode; only what is shown first changes (app.css does the rest). */
+const MODE_KEY = "ffm.mode";
+const MODES = {
+  manager: { who: "the development manager", line: "the memo first, the site and option as summaries beside it, Download PDF for the board." },
+  architect: { who: "the architect", line: "the forms open, every ledger layer open, two runs compared, and the massing to Revit." },
+  reader: { who: "a reader", line: "the memo alone, as on paper, with Download PDF and Print. Switch to Manager or Architect to change anything." },
+};
+
+function setMode(mode, remember = true, announce = true) {
+  if (!MODES[mode]) mode = "manager";
+  state.mode = mode;
+  document.documentElement.dataset.mode = mode;
+  $$("#mode-switch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  document.title = `First Read · for ${MODES[mode].who}`;
+  const chosen = kind => (kind === "site" ? state.siteId : state.optionId) && (kind === "site" ? state.siteId : state.optionId) !== "__new__";
+  if (mode === "reader") {
+    showInputs(false, false);
+    closeExportPanel();
+  } else {
+    showInputs(true, false);
+    for (const kind of ["site", "option"]) setCollapsed(kind, mode === "manager" && chosen(kind));
+  }
+  applyModeToMemo();
+  if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }
+  if (announce) setStatus(`Laid out for ${MODES[mode].who}: ${MODES[mode].line}`, "info");
+}
+
+/* What a mode does to the memo on screen: the architect reads every ledger layer open, the others start closed. */
+function applyModeToMemo() {
+  const open = state.mode === "architect";
+  $$(".ledger details").forEach(d => { if (d.open !== open) d.open = open; });
+}
+
+function initialMode() {
+  const q = new URLSearchParams(location.search).get("mode");
+  if (q && MODES[q]) return q;
+  try { const m = localStorage.getItem(MODE_KEY); if (m && MODES[m]) return m; } catch (e) { /* fine */ }
+  return "manager";
+}
+
 async function init() {
   $("#as-of").value = todayISO();
   $("#run-btn").addEventListener("click", runRules);
@@ -2932,6 +2978,9 @@ async function init() {
   }
   $("#rail-toggle").addEventListener("click", () => showInputs($(".panes").classList.contains("no-inputs")));
   try { if (localStorage.getItem(RAIL_KEY) === "1") showInputs(false, false); } catch (e) { /* storage off: the rail starts open */ }
+  // who is reading: the switch in the top bar; the mode from the link or the last visit applies before the inputs load
+  $$("#mode-switch button").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+  setMode(initialMode(), false, false);
   $("#as-of").addEventListener("change", () => {
     if (!state.run) renderQuiet();
     else setStatus(`The next run will read the rules as of ${$("#as-of").value}; the memo on screen is as of ${state.run.as_of}.`, "info");
@@ -2974,7 +3023,9 @@ async function init() {
     state.optionId = PRELOAD_OPTION;
     $("#site-select").value = first;
     await selectSite(first);
-    setStatus("Pick a site and an option, set the date the rules should be read on, then run the rules.", "info");
+    setStatus(state.mode === "reader"
+      ? "The memo reads here as on paper. Open a run from a link, or switch to Manager to pick a site and run the rules."
+      : `Laid out for ${MODES[state.mode].who}. Pick a site and an option, set the date the rules should be read on, then run the rules.`, "info");
   } catch (e) {
     toast(`Could not load the inputs: ${e.message}`, true);
   }

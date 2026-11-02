@@ -213,7 +213,16 @@ redesigned from those flows, and a brand package. State now:
 - `server.py` serves any `*.html|js|css|svg|jpg|png` beside it (and `brand/*`) by a whitelist pattern;
   `pages.py` copies `SITE_PAGES`, `SITE_FILES` and `brand/`. `home.css`, `home.js` and the hero JPEGs were
   deleted. `.claude/launch.json` in this folder starts the UI for the browser preview.
-- Not done: no screenshot of the tool is used anywhere (by design); the site is not yet pushed.
+- Who is reading (2 Nov 2026, second pass): the tool's top bar carries a Manager · Architect · Reader switch
+  (`#mode-switch` in `index.html`; `setMode`, `MODES`, `applyModeToMemo`, `initialMode` in `app.js`; the
+  `[data-mode]` rules at the end of `app.css`). `?mode=` in a link picks it for a visitor (the site's flows and
+  case page link that way), localStorage `ffm.mode` keeps it. Manager: the rail open with the cards collapsed,
+  PDF leads Export. Architect: the forms open (selectSite/selectOption no longer collapse them), every ledger
+  layer open, the figures beside the answers from 1280px, Export to Revit leads. Reader: the rail, steps, run
+  controls, pickers, massing and Revit buttons hidden; the memo in a 980px reading column at 14px. The memo's
+  answer headings are now the site's keys (a mono "01" and tracked caps) over a 24px light verdict; the memo
+  title is 30px light; buttons are pills. The engine and the memo's content are the same in every mode.
+- Not done: no screenshot of the tool is used anywhere (by design).
 
 ## Rules from the assignment brief (binding)
 

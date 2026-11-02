@@ -83,6 +83,14 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* the one loud button: Run the rules, in the signal blue */
 .topbar .btn-primary { background: var(--b-signal-deep); color: #fff; border-radius: 999px; padding: 6px 16px; }
 .topbar .btn-primary:hover:not([disabled]) { background: var(--b-signal); color: #fff; box-shadow: 0 2px 10px rgba(60, 140, 220, .35); }
+/* who is reading: a key and a three-way pill in the top bar; the pressed segment is paper */
+.mode { display: flex; align-items: center; gap: 8px; }
+.mode .eyebrow { margin: 0; }
+.seg-mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .07); border: 1px solid var(--chrome-line); }
+.seg-mode button { border: 0; border-radius: 999px; background: transparent; color: var(--on-chrome-muted); font: 500 12.5px/1 var(--sans); padding: 6px 12px; min-height: 26px; cursor: pointer; transition: background-color var(--t-fast), color var(--t-fast); }
+.seg-mode button:hover { color: var(--on-chrome); background: rgba(255, 255, 255, .08); }
+.seg-mode button[aria-pressed="true"] { background: var(--b-paper); color: var(--b-ink); }
+.seg-mode button:focus-visible { outline: 2px solid var(--b-signal-night); outline-offset: 1px; }
 /* the memo's rules revision: a key, then R1, R2… in a small ruled box, the way a title block numbers revisions */
 .stamp { display: flex; align-items: center; gap: 6px; }
 .stamp .eyebrow { margin: 0; }
@@ -170,7 +178,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .bars { position: static; }
   .inputs-body { grid-template-columns: 1fr; }
   .topbar { padding: 8px 12px; }
-  .wordmark em { display: none; }
+  .wordmark em, .mode .eyebrow { display: none; }
   /* the step tabs wrap to a second line rather than hide Export and Walkthrough past the edge */
   .steps { flex-wrap: wrap; row-gap: 2px; }
   .input-card, .memo-pane, .memo .card, .export { scroll-margin-top: 8px; }
@@ -233,7 +241,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* one class, so the variants and the touch rule below can override it */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 30px;
-  font-weight: 500; padding: 6px 12px; border-radius: var(--r-button); border: 1px solid transparent; cursor: pointer;
+  font-weight: 500; padding: 6px 14px; border-radius: 999px; border: 1px solid transparent; cursor: pointer;
   background: var(--group); color: var(--ink); text-decoration: none; line-height: 1.25; white-space: nowrap; font-size: 13px;
   transition: background-color .12s ease-out, border-color .12s ease-out, color .12s ease-out, box-shadow .12s ease-out, transform .06s ease-out;
 }
@@ -280,7 +288,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 
 .memo-head { padding: 12px 14px 12px; }
 .memo-head > .eyebrow { display: none; }
-.memo-head h1 { font-size: 22px; font-weight: 500; letter-spacing: -.015em; text-wrap: balance; margin: 0 0 10px; }
+.memo-head h1 { font-size: 30px; font-weight: 300; letter-spacing: -.025em; line-height: 1.1; text-wrap: balance; margin: 0 0 12px; }
 /* the memo's own title block: keys over values, a stamp at the end */
 .memo-meta { display: flex; align-items: stretch; flex-wrap: wrap; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); background: var(--panel); margin: 0 0 10px; }
 .memo-meta > div { display: flex; flex-direction: column; justify-content: flex-start; gap: 1px; padding: 6px 12px 6px 0; border-right: 1px solid var(--line); margin-right: 12px; min-width: 0; flex: 1 1 140px; font-size: 12.5px; }
@@ -303,8 +311,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .answer[data-verdict="fail"] { --tone: var(--s-fail-text); --wash: var(--s-fail-wash); }
 .answer[data-verdict="uncertain"] { --tone: var(--s-uncertain-text); --wash: var(--s-uncertain-wash); }
 .answer > .eyebrow { display: none; }
-.answer h2 { font-size: 14px; margin: 0 0 6px; }
-.verdict { font-size: 20px; line-height: 1.3; font-weight: 500; margin: 0 0 10px; letter-spacing: -.015em; }
+/* an answer's heading is the site's key: a mono "01", then the question in small tracked caps; the verdict is the
+   loud line, set light and large the way the site sets its headlines */
+.answer h2 { font: 600 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
+.answer h2 .badge { width: auto; height: auto; border-radius: 0; background: transparent; color: var(--muted); font: 500 11px/1 var(--mono); letter-spacing: .08em; flex: 0 0 auto; border: 0; }
+.answer h2 .badge::before { content: "0"; }
+.verdict { font-size: 24px; line-height: 1.22; font-weight: 400; margin: 0 0 12px; letter-spacing: -.02em; max-width: 30ch; text-wrap: balance; }
 .verdict em { font-style: normal; color: var(--tone); }
 .verdict.quiet { font-size: 13px; color: var(--muted); font-weight: 400; }
 .finding { margin: 0 0 8px; font-size: 13px; }
@@ -539,6 +551,30 @@ table.plain td.status { white-space: nowrap; }
   .clauses tr { border-bottom: 1px solid var(--line); padding: 6px 0; }
   .clauses td { border: 0; padding: 2px 0; }
 }
+
+/* ------------------------------------------------------------------ who is reading: the three flows as three layouts
+   manager (the default) is the page as above. architect opens the drawings beside the answers sooner and leads the export
+   bar with Revit. reader takes the inputs, the run controls and the steps away and sets the memo in a reading column. */
+[data-mode="architect"] .export .action-bar #pdf-btn { background: var(--group); color: var(--ink); }
+[data-mode="architect"] .export .action-bar #revit-btn { order: -2; background: var(--ink); color: var(--panel); border-color: transparent; }
+[data-mode="architect"] .export .action-bar #dl-massing { order: -1; }
+@media (min-width: 1280px) {
+  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr) 400px; grid-template-areas: "answers figures" "rest rest"; align-items: start; }
+}
+[data-mode="reader"] { --bars-h: 92px; }
+[data-mode="reader"] .steps, [data-mode="reader"] #tour-offer, [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,
+[data-mode="reader"] .inputs, [data-mode="reader"] .memo-tools, [data-mode="reader"] #tool-open, [data-mode="reader"] #tool-compare, [data-mode="reader"] #compare-note,
+[data-mode="reader"] #dl-massing, [data-mode="reader"] #revit-btn, [data-mode="reader"] #export-panel, [data-mode="reader"] .ledger .tools { display: none !important; }
+[data-mode="reader"] .side .pick-name { display: block; }
+[data-mode="reader"] .panes, [data-mode="reader"] .panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
+[data-mode="reader"] .memo-pane { width: min(100%, 980px); margin-inline: auto; padding: 24px 24px 64px; }
+[data-mode="reader"] .memo { gap: 16px; }
+[data-mode="reader"] .memo-head h1 { font-size: 34px; }
+[data-mode="reader"] .finding, [data-mode="reader"] .answer table.plain, [data-mode="reader"] .section p, [data-mode="reader"] .section li { font-size: 14px; }
+[data-mode="reader"] .memo-head .quiet { font-size: 13px; }
+[data-mode="reader"] .export h2 { display: none; }
+[data-mode="reader"] .export { border-top: 1px solid var(--line); }
+[data-mode="reader"] .export .export-note { font-size: 12.5px; }
 
 /* ------------------------------------------------------------------ print: the memo only, every ledger layer open */
 @media print {

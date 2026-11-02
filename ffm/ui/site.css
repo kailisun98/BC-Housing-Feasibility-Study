@@ -355,6 +355,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .flow .flow-head { padding-bottom: 16px; border-bottom: 1px solid var(--line-2); margin-bottom: 8px; }
 .flow .flow-head h3 { font-size: 22px; font-weight: 400; letter-spacing: -.015em; }
 .flow .flow-head p { color: var(--fg-2); font-size: 13.5px; margin-top: 6px; }
+.flow .flow-head .text-link { min-height: 0; margin-top: 10px; font-size: 13.5px; color: var(--signal); }
 .flow ol { list-style: none; margin: 0; padding: 0; }
 .flow li { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding: 12px 0; }
 .flow li::before { content: ""; position: absolute; left: 13px; top: 0; bottom: 0; width: 1px; background: var(--line); }

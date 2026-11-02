@@ -3171,7 +3171,16 @@ async function guideLookup() {
 /* The found site becomes a new, unsaved site in the Site card, its form open for the answers the data cannot give. */
 async function guideUseSite() {
   if (!guide.lookup) return;
-  if ((state.siteDirty || state.optionDirty) && !confirm("Use the found site? Unsaved edits to the site and option will be lost.")) return;
+  // the same on-page confirmation as Use this option: a site that was typed into and never saved
+  const touched = state.siteDirty && state.site && (state.siteId || state.site.address);
+  if (touched && !guide.confirmSite) {
+    guide.confirmSite = true;
+    const b = $("#guide-use-site");
+    if (b) { b.textContent = "Replace the edited site"; b.classList.add("btn-primary"); }
+    setStatus("The Site card holds edits that were never saved. Click again to replace them with the found site, or Save site as… first.", "busy");
+    return;
+  }
+  guide.confirmSite = false;
   state.siteId = null;
   state.site = Object.assign(blankSite(), guide.lookup.site);
   state.siteDirty = true;
@@ -3246,9 +3255,25 @@ async function guideSuggest() {
 
 /* The suggestion, with the manager's own figures where they chose Mine, becomes a new unsaved option in the Option card. */
 function guideUseOption() {
+  try { guideUseOptionNow(); }
+  catch (e) { toast(`Could not use the option: ${e.message}`, true); console.error(e); }
+}
+
+function guideUseOptionNow() {
   const S = guide.suggestion;
   if (!S) return;
-  if (state.optionDirty && !confirm("Use the suggested option? Unsaved edits to the option will be lost.")) return;
+  // an option the manager typed into and never saved is asked about on the page itself (no browser dialog): the
+  // first click warns in the status strip and marks the button, the second goes ahead. A new, untouched option is
+  // replaced without asking.
+  const touched = state.optionDirty && state.option && (state.optionId || state.option.storeys != null || state.option.gfa_m2 != null);
+  if (touched && !guide.confirmUse) {
+    guide.confirmUse = true;
+    const b = $("#guide-use-option");
+    if (b) { b.textContent = "Replace the edited option"; b.classList.add("btn-primary"); }
+    setStatus("The Option card holds edits that were never saved. Click again to replace them with the suggestion, or Save option as… first.", "busy");
+    return;
+  }
+  guide.confirmUse = false;
   const opt = Object.assign(blankOption(state.site && state.site.id), JSON.parse(JSON.stringify(S.option)));
   for (const [k, label, kind] of GUIDE_FIELDS) {
     if (guide.mine[k] === undefined) continue;
@@ -3593,5 +3618,15 @@ async function followLink() {
   }
   if (q.get("tour")) startTour(0);
 }
+
+/* Nothing fails silently: an error the page did not expect is written to the status strip, with what to do. */
+window.addEventListener("error", e => {
+  const s = $("#status");
+  if (s && e.message) setStatus(`Something went wrong: ${e.message}${e.lineno ? ` (app.js line ${e.lineno})` : ""}. Reload the page; saved sites, options and runs are files and are kept.`, "error");
+});
+window.addEventListener("unhandledrejection", e => {
+  const s = $("#status"), msg = e.reason && e.reason.message ? e.reason.message : String(e.reason || "");
+  if (s && msg) setStatus(`Something went wrong: ${msg}. Reload the page; saved sites, options and runs are files and are kept.`, "error");
+});
 
 document.addEventListener("DOMContentLoaded", init);

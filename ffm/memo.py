@@ -39,6 +39,16 @@ def _src(r: dict) -> str:
     return f"[{label}]({u})" if u else label
 
 
+def _n(x: Any, unit: str = "") -> str:
+    """A figure with a thousands separator, or 'not given' where the input left it blank."""
+    if x is None or x == "":
+        return "not given"
+    try:
+        return f"{x:,}{unit}"
+    except (TypeError, ValueError):
+        return f"{x}{unit}"
+
+
 def _fmt_vals(v: dict) -> str:
     bits = []
     for k, x in v.items():
@@ -187,10 +197,10 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
 
     # ---------------- inputs and sources
     L.append("## Inputs")
-    L.append(f"- Site `{site.get('id')}`: {site.get('zoning_district')}, {site.get('site_area_m2'):,} m², {site.get('frontage_m')} × {site.get('depth_m')} m; owner: {site.get('owner', '—')}.")
+    L.append(f"- Site `{site.get('id')}`: {site.get('zoning_district') or 'district not given'}, {_n(site.get('site_area_m2'), ' m²')}, {_n(site.get('frontage_m'))} × {_n(site.get('depth_m'))} m; owner: {site.get('owner') or '—'}.")
     u = opt.get("units") or {}
-    units_txt = ", ".join("{0} {1}".format(k.replace("_", " "), v) for k, v in u.items())
-    L.append(f"- Option `{opt.get('id')}`: {opt.get('storeys')} storeys, {opt.get('height_m')} m, {opt.get('gfa_m2'):,} m² GFA; units {units_txt}; tenure {str(opt.get('tenure', '')).replace('_', ' ')}.")
+    units_txt = ", ".join("{0} {1}".format(k.replace("_", " "), "not given" if v is None else v) for k, v in u.items()) or "not given"
+    L.append(f"- Option `{opt.get('id')}`: {_n(opt.get('storeys'))} storeys, {_n(opt.get('height_m'))} m, {_n(opt.get('gfa_m2'), ' m²')} GFA; units {units_txt}; tenure {str(opt.get('tenure') or 'not given').replace('_', ' ')}.")
     if site.get("notes"):
         L.append(f"- Site notes: {site['notes']}")
     if opt.get("notes"):

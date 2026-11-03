@@ -261,7 +261,8 @@ Built and verified in the browser:
   the nearest road; 609 Heatley Ave: 37.2 m along Heatley, Keefer as the cross street). Overpass can take
   half a minute; the status strip says so. Tests in `tests/test_lookup.py` with the real parcel rings.
   Districts with no coded envelope (RT-3, CD-1) still show the storeys, height and GFA rows in the guide,
-  set to Mine, so the manager can enter them and run.
+  set to Mine, so the manager can enter them and run. `memo.markdown` prints "not given" for a blank site
+  or option figure (`_n`) instead of failing on a `:,` format of None (`tests/test_memo_blanks.py`).
 - CLI: `python -m ffm lookup "<address>" [--out]`, `python -m ffm suggest --site … --programs … [--candidate] [--out]`.
 - Server: `GET /api/lookup?q=`, `POST /api/read-site`, `POST /api/suggest`, `GET /api/issues?site=`,
   `POST /api/runs/<site>/<folder>/issue` (writes `issues.json` in the run folder). The static build runs

@@ -21,6 +21,9 @@ from pathlib import Path
 from typing import Any
 
 
+PLATE_MIN_DEPTH_M = 12.0   # a floor plate keeps at least this depth before it gives up any width (a double-loaded corridor)
+
+
 def _rect(x0: float, y0: float, w: float, d: float) -> list[list[float]]:
     return [[round(x0, 3), round(y0, 3)], [round(x0 + w, 3), round(y0, 3)],
             [round(x0 + w, 3), round(y0 + d, 3)], [round(x0, 3), round(y0 + d, 3)]]
@@ -67,6 +70,19 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
 
     masses: list[dict[str, Any]] = []
 
+    # Where a plate smaller than the envelope sits: it keeps a usable depth (a double-loaded floor wants about
+    # 12 m; a shallow envelope gives what it has) and gives up width instead, so a wide, shallow lot gets a block,
+    # not a strip. On a corner lot the block stands at the street corner: the side the cross street is on, read
+    # from the site's context frame where one has been fetched.
+    cross = (((site.get("osm") or {}).get("frame") or {}).get("snapped_m") or {}).get("cross_street") or {}
+    at_right = cross.get("side") == "right"
+
+    def footprint(plate_m2: float) -> tuple[list[list[float]], float, float]:
+        d = min(env_d, max(plate_m2 / env_w, min(env_d, PLATE_MIN_DEPTH_M)))
+        w = min(env_w, plate_m2 / d) if d else env_w
+        x0 = float(sb.get("side", 0)) + (env_w - w if at_right else 0.0)
+        return _rect(x0, sb.get("front", 0), w, d), w, d
+
     # Proposed mass: the option's GFA at its storey count.
     storeys = int(option.get("storeys") or 1)
     gfa = float(option.get("gfa_m2") or 0)
@@ -74,7 +90,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     if plate > env_area:
         warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds the setback envelope of {env_area:,.0f} m²; the mass fills the envelope and the shortfall must go into more storeys or smaller setbacks.")
         plate = env_area
-    depth = plate / env_w
+    p_ring, p_w, depth = footprint(plate)
     h = storeys * f2f
     parapet = option.get("height_m")
     if parapet and parapet > h:
@@ -82,7 +98,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         h = float(parapet)
     masses.append({
         "name": "proposed", "label": f"Proposed: {storeys} storeys, FSR {gfa / area:.2f}" if gfa else f"Proposed: {storeys} storeys",
-        "footprint": _rect(sb.get("side", 0), sb.get("front", 0), env_w, depth),
+        "footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "at_street_corner": "right" if at_right else "left",
         "base_z": 0.0, "height_m": round(h, 2), "storeys": storeys, "floor_to_floor_m": f2f,
         "plate_area_m2": round(plate, 1), "gfa_m2": round(plate * storeys, 1), "fsr": round(plate * storeys / area, 3),
         "derived_from": ["option.gfa_m2", "option.storeys", "option.setbacks_m", "option.floor_to_floor_m"],
@@ -94,9 +110,10 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         o_storeys = max(1, int(math.floor(max_h / f2f)))
         o_gfa = max_fsr * area
         o_plate = min(o_gfa / o_storeys, env_area)
+        o_ring, o_w, o_d = footprint(o_plate)
         masses.append({
             "name": "outright", "label": f"Outright: FSR {max_fsr}, {max_h} m",
-            "footprint": _rect(sb.get("side", 0), sb.get("front", 0), env_w, o_plate / env_w),
+            "footprint": o_ring, "plate_width_m": round(o_w, 2), "plate_depth_m": round(o_d, 2), "at_street_corner": "right" if at_right else "left",
             "base_z": 0.0, "height_m": round(min(o_storeys * f2f, max_h), 2), "storeys": o_storeys, "floor_to_floor_m": f2f,
             "plate_area_m2": round(o_plate, 1), "gfa_m2": round(o_plate * o_storeys, 1), "fsr": round(o_plate * o_storeys / area, 3),
             "derived_from": used + ["option.setbacks_m", "option.floor_to_floor_m"],

@@ -266,7 +266,12 @@ Built and verified in the browser:
   the nearest road; 609 Heatley Ave: 37.2 m along Heatley, Keefer as the cross street). Overpass can take
   half a minute; the status strip says so. Tests in `tests/test_lookup.py` with the real parcel rings.
   Districts with no coded envelope (RT-3, CD-1) still show the storeys, height and GFA rows in the guide,
-  set to Mine, so the manager can enter them and run. `memo.markdown` prints "not given" for a blank site
+  set to Mine, so the manager can enter them and run. The suggestion's placeholder setbacks scale to the lot
+  (`suggest.setbacks_for`: the committed 3.7 / 6.0 / 3.0 m capped at 12% and 20% of the depth and 8% of the
+  frontage), and `massing.build` lays a plate smaller than the envelope at a usable depth (at least 12 m where
+  the envelope allows, `PLATE_MIN_DEPTH_M`) giving up width instead, at the street corner the context frame
+  names (`at_street_corner`); on 609 Heatley Ave (37.2 × 15.2 m, Keefer on the right) that turns a 5 m strip
+  into a block at the corner. `tests/test_massing_shape.py`. `memo.markdown` prints "not given" for a blank site
   or option figure (`_n`) instead of failing on a `:,` format of None (`tests/test_memo_blanks.py`).
 - CLI: `python -m ffm lookup "<address>" [--out]`, `python -m ffm suggest --site … --programs … [--candidate] [--out]`.
 - Server: `GET /api/lookup?q=`, `POST /api/read-site`, `POST /api/suggest`, `GET /api/issues?site=`,

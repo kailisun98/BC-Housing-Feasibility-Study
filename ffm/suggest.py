@@ -35,7 +35,7 @@ from .rules_loader import RULES_DIR, Rule, load_rules, stamp
 # Declared placeholders, not rules: a person can change them, and the memo says they were used.
 ASSUMPTIONS = {
     "floor_to_floor_m": (3.3, "usual for wood-frame residential; the committed options use it"),
-    "setbacks_m": ({"front": 3.7, "rear": 6.0, "side": 3.0}, "not read from the district schedule; the committed options assume them"),
+    "setbacks_m": ({"front": 3.7, "rear": 6.0, "side": 3.0}, "not read from the district schedule; the committed options assume them on a 37 m deep lot, and a shallower or narrower lot gets them scaled down (front 12%, rear 20% of the depth, sides 8% of the frontage, each at most these)"),
     "net_efficiency": (0.78, "net residential floor area as a share of residential GFA; typical for a double-loaded corridor"),
     "design_allowance": (1.10, "units drawn 10% above the BC Housing minimum net areas"),
     "mix_shares": ({"studio": 0.20, "one_bed": 0.40, "two_bed": 0.32, "three_bed_plus": 0.08},
@@ -47,6 +47,17 @@ CANDIDATES = [
     {"id": "benchmark", "title": "Benchmark", "what": "the staff benchmark under the social housing rezoning policy"},
     {"id": "funder-ready", "title": "Funder-ready", "what": "the benchmark envelope with every funder question answered"},
 ]
+
+
+def setbacks_for(site: dict) -> dict[str, float]:
+    """The placeholder setbacks, scaled to the lot: the committed figures (3.7 / 6.0 / 3.0 m) on a lot as deep as
+    998 E 19th Ave, and no more than 12% of the depth in front, 20% behind and 8% of the frontage each side on a
+    smaller one, so a shallow corner lot keeps a buildable envelope. Still a placeholder, declared as such."""
+    base, _ = ASSUMPTIONS["setbacks_m"]
+    W, D = float(site.get("frontage_m") or 0), float(site.get("depth_m") or 0)
+    if not W or not D:
+        return dict(base)
+    return {"front": round(min(base["front"], D * 0.12), 1), "rear": round(min(base["rear"], D * 0.20), 1), "side": round(min(base["side"], W * 0.08), 1)}
 
 
 def _rule(rules: list[Rule], rule_id: str) -> Rule | None:
@@ -151,7 +162,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     unsure: list[dict] = []
     assumptions = [{"key": k, "value": v, "note": n} for k, (v, n) in ASSUMPTIONS.items()]
     f2f, _ = ASSUMPTIONS["floor_to_floor_m"]
-    sb, _ = ASSUMPTIONS["setbacks_m"]
+    sb = setbacks_for(site)
     eff, _ = ASSUMPTIONS["net_efficiency"]
     allowance, _ = ASSUMPTIONS["design_allowance"]
     shares, _ = ASSUMPTIONS["mix_shares"]
@@ -199,7 +210,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     fields["tenure"] = {"value": "social_housing", "rule_id": "cov.social_housing_definition", "note": "100% social housing: exempt from levies and the path the rezoning policy takes"}
     fields["floor_to_floor_m"] = {"value": f2f, "rule_id": None, "note": "placeholder"}
     for k in ("front", "rear", "side"):
-        fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule"}
+        fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")}
     fields["non_residential_gfa_m2"] = {"value": option["non_residential_gfa_m2"], "rule_id": "bc.bcbuilds.eligibility", "note": "none suggested; BC Builds caps it at 30% of the floor area"}
     fields["residential_gfa_m2"] = {"value": gfa, "rule_id": None, "note": "all of the floor area, with no non-residential space"}
 

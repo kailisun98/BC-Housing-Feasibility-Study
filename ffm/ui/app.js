@@ -169,6 +169,13 @@ def ffm_run(site_json, option_json, as_of, previous_json):
 def ffm_diff(a_json, b_json):
     return json.dumps(engine.diff(json.loads(a_json), json.loads(b_json)))
 
+def ffm_layout(site_json, option_json, as_of):
+    site, option = json.loads(site_json), json.loads(option_json)
+    L = engine.evaluate(site, option, date.fromisoformat(as_of))
+    m = massing.build(site, option, L)
+    lay = layout.solve(site, option, L, m)
+    return json.dumps({"layout": lay, "sheets": layout.sheets(lay, site, m, L), "massing": m})
+
 from ffm import suggest, lookup
 
 def ffm_suggest(site_json, programs_json, as_of, candidate):
@@ -234,7 +241,8 @@ function loadEngine() {
                parcelCenter: pyodide.globals.get("ffm_parcel_center"), cityElements: pyodide.globals.get("ffm_city_elements"),
                parseAddress: pyodide.globals.get("ffm_parse_address"), civicAddress: pyodide.globals.get("ffm_civic_address"),
                lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from"),
-               proposeRequest: pyodide.globals.get("ffm_propose_request"), proposalFromResponse: pyodide.globals.get("ffm_proposal_from_response") };
+               proposeRequest: pyodide.globals.get("ffm_propose_request"), proposalFromResponse: pyodide.globals.get("ffm_proposal_from_response"),
+               layout: pyodide.globals.get("ffm_layout") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
     return engine;
   })().catch(e => {
@@ -429,6 +437,7 @@ async function staticApi(path, opts) {
   }
   if (p === "/api/run") return staticRun(body);
   if (p === "/api/suggest") { await loadEngine(); return JSON.parse(engine.suggest(JSON.stringify(body.site), JSON.stringify(body.programs || []), body.as_of || todayISO(), body.candidate || "funder-ready")); }
+  if (p === "/api/layout") { await loadEngine(); return JSON.parse(engine.layout(JSON.stringify(body.site), JSON.stringify(body.option), body.as_of || todayISO())); }
   if (p === "/api/read-site") { await loadEngine(); return JSON.parse(engine.readSite(JSON.stringify(body.site), body.as_of || todayISO())); }
   if (/^\/api\/runs\/[^/]+\/[^/]+\/issue$/.test(p)) throw new Error("Issuing a run to another reader needs the local server (python -m ffm ui).");
   if (p === "/api/options" || p === "/api/sites") { downloadJSON(body, `${body.id}.json`); return { id: body.id, file: `${body.id}.json`, downloaded: true }; }
@@ -2221,18 +2230,22 @@ function renderFigures(run) {
    floors on a tab, the stacking, the elevations and the code site plan. Every one carries the stamp. */
 function renderSheets(run, n0) {
   const L = run.layout, S = run.sheets;
+  editor.open = false;   // a re-rendered memo starts with the editor closed; its state lives in the option once applied
   const fig = k => `FIG ${String(k).padStart(2, "0")}`;
   const rules = (L.adjacencies || []).filter(c => c.status !== "info");
   const prog = (L.program || []).map(b => `${b.count > 1 ? `${b.count} ` : ""}${b.label.toLowerCase()} ${fmtNum(Math.round(b.area_m2))} m²`).join(", ");
   const short = (L.shortfall || []).length ? ` Did not fit: ${L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()} (${fmtNum(Math.round(s.area_m2))} m²)`).join("; ")}; more storeys, a larger plate or a smaller program.` : "";
   const out = [];
+  const broken = (L.geometry || []).map(g => `<li>${pill("fail")}<span><span class="title">broken:</span> <span class="cont">${h(g.note)}.</span></span></li>`).join("");
   out.push(`<figure class="card figure sheet" data-sheet="plans">
-    <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program</div>
-      <div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div></div>
+    <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>
+      <div class="fig-tools"><div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div>
+      ${state.mode === "architect" ? `<button type="button" class="btn btn-small" id="edit-blocks" aria-expanded="false">Edit blocks</button>` : ""}</div></div>
     <div class="sheet-body" data-view="plans">${S.plans || ""}</div>
     <div class="sheet-body" data-view="axon" hidden>${S.axon || ""}</div>
-    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep. Program: ${h(prog)}.${h(short)}</figcaption>
-    <ul class="finding-list sheet-rules">${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
+    <div class="sheet-editor" id="sheet-editor" hidden></div>
+    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
+    <ul class="finding-list sheet-rules">${broken}${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
   </figure>`);
   out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div><div class="sheet-body">${S.stacking || ""}</div>
     <figcaption>One bar per floor, top first; each segment the share of the plate a block takes. Core and corridor are the same on every floor; what is left after the units is spare, dashed.</figcaption></figure>`);
@@ -2247,8 +2260,228 @@ function wireSheets() {
   $$(".figure.sheet [data-sheet-view]").forEach(b => b.addEventListener("click", () => {
     const fig = b.closest(".figure");
     $$("[data-sheet-view]", fig).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    if (editor.open) closeEditor();
     $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== b.dataset.sheetView; });
   }));
+  const eb = $("#edit-blocks");
+  if (eb) eb.addEventListener("click", () => (editor.open ? closeEditor() : openEditor()));
+}
+
+// ---------------------------------------------------------------- the block editor: the same blocks on the same plates, by hand
+
+/* The architect drags the blocks the solver placed, or adds and removes them, one floor at a time, in the plan;
+   the engine measures every move (POST /api/layout, or the engine in the browser) and says what broke and
+   which rules still hold; the other sheets redraw from the same check. Apply writes the placement into the
+   option (`layout.zones`), so Run the rules reproduces it and the memo says it was placed by hand. */
+const editor = { open: false, level: 0, zones: null, sel: null, dirty: false, result: null, timer: 0, busy: false, applied: false };
+const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"]];
+const ZONE_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a" };
+const ZONE_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res" };
+
+function zonesFromLayout(L) {
+  const out = {};
+  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}) }));
+  return out;
+}
+
+function openEditor() {
+  const run = state.run;
+  if (!run || !run.layout) return;
+  const fromOption = state.option && state.option.layout && state.option.layout.zones;
+  editor.open = true; editor.level = 0; editor.sel = null; editor.dirty = false; editor.applied = !!fromOption;
+  editor.zones = JSON.parse(JSON.stringify(fromOption || zonesFromLayout(run.layout)));
+  editor.result = run.layout;
+  const fig = $('.figure.sheet[data-sheet="plans"]');
+  $$(".sheet-body", fig).forEach(x => { x.hidden = true; });
+  $("#edit-blocks").setAttribute("aria-expanded", "true");
+  $("#edit-blocks").textContent = "Close the editor";
+  $("#sheet-editor").hidden = false;
+  renderEditor();
+  setStatus("Block editor: drag a block, pull its right or bottom edge to resize, add or remove blocks; the engine checks every move. Apply writes the placement into the option.", "info");
+}
+
+function closeEditor() {
+  editor.open = false;
+  const fig = $('.figure.sheet[data-sheet="plans"]');
+  if (!fig) return;
+  const view = ($('[data-sheet-view][aria-pressed="true"]', fig) || {}).dataset?.sheetView || "plans";
+  $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== view; });
+  $("#sheet-editor").hidden = true;
+  const b = $("#edit-blocks"); if (b) { b.setAttribute("aria-expanded", "false"); b.textContent = "Edit blocks"; }
+  if (editor.dirty && !editor.applied) setStatus("The editor closed with changes not applied to the option; open it again to apply them.", "info");
+}
+
+function renderEditor() {
+  const box = $("#sheet-editor");
+  const L = editor.result || state.run.layout, p = L.plate;
+  const zs = editor.zones[String(editor.level)] || (editor.zones[String(editor.level)] = []);
+  const width = Math.max(320, box.clientWidth || 600) - 4;
+  const scale = (width - 40) / p.width_m;
+  const H = p.depth_m * scale + 40;
+  const rect = z => { const x = 20 + (z.x - p.x) * scale, y = 20 + (z.y - p.y) * scale, w = Math.max(1, z.w * scale), d = Math.max(1, z.d * scale); return { x, y, w, d }; };
+  const floorsBtns = L.floors.map(fl => `<button type="button" class="segbtn" data-ed-level="${fl.level}" aria-pressed="${fl.level === editor.level}">${h(fl.level === 0 ? "Ground" : `L${fl.level + 1}`)}</button>`).join("");
+  const sel = editor.sel != null ? zs[editor.sel] : null;
+  const floorChecks = (L.geometry || []).filter(g => g.level === editor.level);
+  const svgZones = zs.map((z, i) => {
+    const r = rect(z);
+    const isSel = i === editor.sel;
+    return `<g class="ed-zone${isSel ? " sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(ZONE_SHORT[z.block] || z.block)} at ${z.x}, ${z.y} m">
+      <rect x="${r.x.toFixed(1)}" y="${r.y.toFixed(1)}" width="${r.w.toFixed(1)}" height="${r.d.toFixed(1)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="${isSel ? "#245f9c" : "#5f6672"}" stroke-width="${isSel ? 2 : 0.8}"/>
+      ${z.accessible ? `<circle cx="${(r.x + 7).toFixed(1)}" cy="${(r.y + 7).toFixed(1)}" r="3.2" fill="#245f9c"/>` : ""}
+      ${r.w > 24 && r.d > 12 ? `<text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(ZONE_SHORT[z.block] || z.block)}</text>` : ""}
+      ${isSel ? `<rect class="ed-handle ed-handle-w" x="${(r.x + r.w - 4).toFixed(1)}" y="${(r.y + r.d / 2 - 6).toFixed(1)}" width="8" height="12" fill="#245f9c"/><rect class="ed-handle ed-handle-d" x="${(r.x + r.w / 2 - 6).toFixed(1)}" y="${(r.y + r.d - 4).toFixed(1)}" width="12" height="8" fill="#245f9c"/>` : ""}
+    </g>`;
+  }).join("");
+  box.innerHTML = `
+    <div class="ed-bar">
+      <div class="seg" role="group" aria-label="Floor">${floorsBtns}</div>
+      <label class="field inline"><span class="label">Add</span><select id="ed-add"><option value="">a block…</option>${EDIT_BLOCKS.map(([k, l]) => `<option value="${k}">${h(l)}</option>`).join("")}</select></label>
+      ${sel ? `<span class="ed-sel">${h(EDIT_BLOCKS.find(([k]) => k === sel.block)?.[1] || sel.block)} · ${h(sel.w)} × ${h(sel.d)} m, ${h(fmtNum(Math.round(sel.w * sel.d)))} m²
+        <label class="field inline"><span class="label">to floor</span><select id="ed-move">${L.floors.map(fl => `<option value="${fl.level}"${fl.level === editor.level ? " selected" : ""}>${h(fl.level === 0 ? "Ground" : `L${fl.level + 1}`)}</option>`).join("")}</select></label>
+        ${sel.block in ZONE_TONE && ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(sel.block) ? `<label class="ed-acc"><input type="checkbox" id="ed-acc"${sel.accessible ? " checked" : ""}> accessible</label>` : ""}
+        <button type="button" class="btn btn-small btn-quiet" id="ed-del">Remove</button></span>` : `<span class="help">Click a block to select it; drag to move, pull the handles to resize.</span>`}
+    </div>
+    <svg class="ed-canvas" viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="application" aria-label="Block editor, ${h(L.floors[editor.level].name)}">
+      <rect x="20" y="20" width="${(p.width_m * scale).toFixed(1)}" height="${(p.depth_m * scale).toFixed(1)}" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+      <text x="${(20 + p.width_m * scale / 2).toFixed(1)}" y="14" font-size="10" text-anchor="middle" fill="#5f6672">street · ${h(p.width_m)} m</text>
+      ${svgZones}
+    </svg>
+    <div class="ed-status">
+      ${editor.busy ? `<span class="help">Checking…</span>` : ""}
+      ${floorChecks.length ? `<ul class="finding-list">${floorChecks.map(g => `<li>${pill("fail")}<span>${h(g.note)}</span></li>`).join("")}</ul>` : `<span class="help">${editor.result ? `Nothing broken on this floor. ${(L.geometry || []).length ? `${L.geometry.length} on other floors.` : ""}` : ""}</span>`}
+      <span class="help">${h(L.units_placed)} of ${h(L.units_total)} units placed${(L.shortfall || []).length ? `; missing: ${h(L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()}`).join(", "))}` : ""} · ${h((L.adjacencies || []).filter(c => c.status === "pass").length)} rules hold, ${h((L.adjacencies || []).filter(c => c.status === "conditional").length)} conditional</span>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn btn-primary btn-small" id="ed-apply"${editor.dirty || !editor.applied ? "" : " disabled"}>Apply to the option</button>
+      <button type="button" class="btn btn-small btn-quiet" id="ed-reset">Back to the solver's</button>
+      <span class="help">${editor.applied && !editor.dirty ? "Applied: Run the rules reproduces this placement; Save option as… keeps it." : "Nothing is in the option until you apply."}</span>
+    </div>`;
+  wireEditor(box, scale, p);
+}
+
+function wireEditor(box, scale, p) {
+  $$("[data-ed-level]", box).forEach(b => b.addEventListener("click", () => { editor.level = Number(b.dataset.edLevel); editor.sel = null; renderEditor(); }));
+  const zs = editor.zones[String(editor.level)];
+  const L = editor.result || state.run.layout;
+  const strip = L.plate.unit_depth_m;
+  $("#ed-add", box).addEventListener("change", e => {
+    const k = e.target.value; if (!k) return;
+    const prog = (L.program || []).find(b => b.key === k);
+    const d = ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(k) ? strip : (k === "corridor" ? 1.8 : (k === "core" ? p.depth_m : Math.min(8, p.depth_m)));
+    const w = prog && prog.gross_m2_each ? Math.round(prog.gross_m2_each / d * 10) / 10 : (k === "corridor" ? p.width_m : (k === "core" ? 7 : 8));
+    zs.push({ block: k, x: p.x, y: p.y, w: Math.min(w, p.width_m), d: Math.min(d, p.depth_m) });
+    editor.sel = zs.length - 1; editor.dirty = true; renderEditor(); scheduleCheck();
+  });
+  const sel = editor.sel != null ? zs[editor.sel] : null;
+  if (sel) {
+    $("#ed-del", box).addEventListener("click", () => { zs.splice(editor.sel, 1); editor.sel = null; editor.dirty = true; renderEditor(); scheduleCheck(); });
+    $("#ed-move", box).addEventListener("change", e => {
+      const to = String(e.target.value); if (to === String(editor.level)) return;
+      zs.splice(editor.sel, 1); (editor.zones[to] = editor.zones[to] || []).push(sel);
+      editor.level = Number(to); editor.sel = editor.zones[to].length - 1; editor.dirty = true; renderEditor(); scheduleCheck();
+    });
+    const acc = $("#ed-acc", box);
+    if (acc) acc.addEventListener("change", () => { if (acc.checked) sel.accessible = true; else delete sel.accessible; editor.dirty = true; renderEditor(); scheduleCheck(); });
+  }
+  $("#ed-apply", box).addEventListener("click", applyEditor);
+  $("#ed-reset", box).addEventListener("click", () => {
+    if (state.option && state.option.layout) { delete state.option.layout.zones; if (!Object.keys(state.option.layout).length) delete state.option.layout; }
+    editor.applied = false; editor.dirty = false; editor.sel = null;
+    state.optionDirty = true; $("#option-dirty").hidden = false;
+    checkPlacement(true);
+  });
+  // dragging and resizing, by pointer; the plate's edges are the limit; 0.1 m steps
+  const svg = $(".ed-canvas", box);
+  let drag = null;
+  const snap = v => Math.round(v * 10) / 10;
+  const toM = (dx, dy) => [dx / scale, dy / scale];
+  svg.addEventListener("pointerdown", e => {
+    const g = e.target.closest(".ed-zone"); if (!g) { editor.sel = null; renderEditor(); return; }
+    const i = Number(g.dataset.i);
+    if (editor.sel !== i) { editor.sel = i; renderEditor(); const g2 = $(`.ed-zone[data-i="${i}"]`, $("#sheet-editor")); if (g2) g2.focus({ preventScroll: true }); return; }
+    const z = zs[i];
+    const mode = e.target.classList.contains("ed-handle-w") ? "w" : e.target.classList.contains("ed-handle-d") ? "d" : "move";
+    drag = { i, mode, x0: e.clientX, y0: e.clientY, z0: { ...z } };
+    svg.setPointerCapture(e.pointerId); e.preventDefault();
+  });
+  svg.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const [dx, dy] = toM(e.clientX - drag.x0, e.clientY - drag.y0);
+    const z = zs[drag.i], z0 = drag.z0;
+    if (drag.mode === "move") {
+      z.x = snap(Math.max(p.x, Math.min(p.x + p.width_m - z.w, z0.x + dx)));
+      z.y = snap(Math.max(p.y, Math.min(p.y + p.depth_m - z.d, z0.y + dy)));
+    } else if (drag.mode === "w") {
+      z.w = snap(Math.max(1, Math.min(p.x + p.width_m - z.x, z0.w + dx)));
+    } else {
+      z.d = snap(Math.max(1, Math.min(p.y + p.depth_m - z.y, z0.d + dy)));
+    }
+    const g = $(`.ed-zone[data-i="${drag.i}"]`, svg);
+    const r = g.querySelector("rect");
+    r.setAttribute("x", (20 + (z.x - p.x) * scale).toFixed(1)); r.setAttribute("y", (20 + (z.y - p.y) * scale).toFixed(1));
+    r.setAttribute("width", Math.max(1, z.w * scale).toFixed(1)); r.setAttribute("height", Math.max(1, z.d * scale).toFixed(1));
+  });
+  const end = () => { if (!drag) return; drag = null; editor.dirty = true; renderEditor(); scheduleCheck(); };
+  for (const ev of ["pointerup", "pointercancel", "lostpointercapture"]) svg.addEventListener(ev, end);
+  // keyboard: arrows move the selected block 0.5 m; Delete removes it
+  svg.addEventListener("keydown", e => {
+    if (editor.sel == null) return;
+    const z = zs[editor.sel];
+    const step = e.shiftKey ? 2 : 0.5;
+    const k = e.key;
+    if (k === "ArrowLeft") z.x = snap(Math.max(p.x, z.x - step)); else if (k === "ArrowRight") z.x = snap(Math.min(p.x + p.width_m - z.w, z.x + step));
+    else if (k === "ArrowUp") z.y = snap(Math.max(p.y, z.y - step)); else if (k === "ArrowDown") z.y = snap(Math.min(p.y + p.depth_m - z.d, z.y + step));
+    else if (k === "Delete" || k === "Backspace") { zs.splice(editor.sel, 1); editor.sel = null; }
+    else return;
+    e.preventDefault(); editor.dirty = true; renderEditor(); scheduleCheck();
+    const g2 = $(`.ed-zone[data-i="${editor.sel}"]`, $("#sheet-editor")); if (g2) g2.focus({ preventScroll: true });
+  });
+}
+
+function scheduleCheck() {
+  clearTimeout(editor.timer);
+  editor.timer = setTimeout(() => checkPlacement(false), 350);
+}
+
+/* The engine measures the placement: the option with these zones is read under the rules exactly as a run would
+   read it; the result redraws the editor's status and the other sheets. */
+async function checkPlacement(fromSolver) {
+  if (!editor.open || !state.site || !state.option) return;
+  const opt = JSON.parse(JSON.stringify(tidyOption(JSON.parse(JSON.stringify(state.option)))));
+  if (fromSolver) { if (opt.layout) delete opt.layout.zones; }
+  else { opt.layout = Object.assign({}, opt.layout || {}, { zones: editor.zones }); }
+  editor.busy = true; renderEditor();
+  try {
+    const res = await postJSON("/api/layout", { site: state.site, option: opt, as_of: $("#as-of").value || todayISO() });
+    editor.result = res.layout;
+    if (fromSolver) editor.zones = zonesFromLayout(res.layout);
+    // the other sheets follow the check
+    const fig = $('.figure.sheet[data-sheet="plans"]');
+    if (fig && res.sheets) {
+      const ax = $('.sheet-body[data-view="axon"]', fig); if (ax) ax.innerHTML = res.sheets.axon || "";
+      const pl = $('.sheet-body[data-view="plans"]', fig); if (pl) pl.innerHTML = res.sheets.plans || "";
+      const bodies = $$(".figure.sheet .sheet-body");
+      for (const b of bodies) {
+        const card = b.closest(".figure"); const eb = card && $(".eyebrow", card); const t = eb ? eb.textContent : "";
+        if (/Stacking/.test(t)) b.innerHTML = res.sheets.stacking || ""; else if (/elevations/i.test(t)) b.innerHTML = res.sheets.elevations || ""; else if (/site plan/i.test(t)) b.innerHTML = res.sheets["site-plan"] || "";
+      }
+    }
+  } catch (e) {
+    toast(`The engine could not check the placement: ${e.message}`, true);
+  } finally {
+    editor.busy = false; renderEditor();
+  }
+}
+
+function applyEditor() {
+  if (!state.option) return;
+  state.option.layout = Object.assign({}, state.option.layout || {}, { zones: JSON.parse(JSON.stringify(editor.zones)) });
+  state.optionDirty = true; $("#option-dirty").hidden = false;
+  editor.applied = true; editor.dirty = false;
+  renderEditor();
+  refreshSummary("option");
+  const n = Object.values(editor.zones).reduce((t, a) => t + a.length, 0);
+  setStatus(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones. Run the rules to make the memo from them; Save option as… keeps them.`, "ok");
 }
 
 function figSheet(run, n = 3) {

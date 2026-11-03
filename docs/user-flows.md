@@ -63,7 +63,15 @@ site (home) ──► the case ──► tool: memo on screen (R1)
 Design consequences: the tool's first screen is a memo; *Run the rules* is the only loud button;
 the open-items table names a person in its own column; the PDF button leads the Export bar.
 
-## Flow 2: the architect (option in, comparison and massing out)
+## Flow 2: the architect (option in, layouts, comparison and massing out)
+
+Built 3 Nov 2026 (phases 3 and 4): the run carries the architect's first layout, derived from the option.
+FIG 03 Plans by program (Plan | Axon), FIG 04 Stacking, FIG 05 Preliminary elevations, FIG 06 Code site
+plan, each with the stamp, and the adjacency rules read back from the plates. In architect mode *Edit
+blocks* opens the block editor on FIG 03: the same blocks on the same plates, dragged, resized, moved
+between floors, added or removed; the engine measures every move and says what broke; *Apply to the
+option* writes the placement into the option (`layout.zones`), so a run reproduces it and the memo says
+it was placed by hand. The reader's sheets are the same figures, after the answers.
 
 ```
 tool: memo R1 ─► Option: Edit ─► change storeys / units / setbacks ─► Run ─► memo R2

@@ -444,6 +444,24 @@ table.plain td.status { white-space: nowrap; }
 .figure.sheet .sheet-body[hidden] { display: none; }
 .sheet-rules { margin-top: 8px; font-size: 12px; }
 .sheet-rules .cont { color: var(--c-drawmuted); }
+.fig-tools { display: flex; align-items: center; gap: 8px; }
+/* the block editor: a toolbar, the plate as a canvas, what the engine says under it */
+.sheet-editor { display: flex; flex-direction: column; gap: 8px; }
+.sheet-editor[hidden] { display: none; }
+.ed-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12px; }
+.ed-bar .field.inline { display: inline-flex; align-items: center; gap: 6px; }
+.ed-bar .field.inline .label { font-size: 11px; }
+.ed-bar select { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.ed-sel { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--field); }
+.ed-acc { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+.ed-canvas { display: block; width: 100%; height: auto; touch-action: none; border: 1px solid var(--line); background: var(--c-paper); user-select: none; }
+.ed-canvas .ed-zone { cursor: grab; }
+.ed-canvas .ed-zone:focus { outline: none; }
+.ed-canvas .ed-zone:focus-visible rect:first-child { stroke: var(--amber); stroke-width: 2; }
+.ed-canvas .ed-handle-w { cursor: ew-resize; }
+.ed-canvas .ed-handle-d { cursor: ns-resize; }
+.ed-status { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+.ed-status .finding-list { gap: 3px; }
 .seg { display: inline-flex; border: 1px solid var(--c-rule); border-radius: 4px; overflow: hidden; background: var(--c-paper); }
 .segbtn { border: 0; border-radius: 0; background: var(--c-paper); color: var(--c-drawmuted); font-size: 11.5px; font-weight: 500; padding: 3px 10px; min-height: 24px; cursor: pointer; transition: background-color .12s ease-out, color .12s ease-out; }
 .segbtn + .segbtn { border-left: 1px solid var(--c-rule); }

@@ -285,8 +285,28 @@ Built and verified in the browser:
   `renderPreview3D`: the plan with dimensions, the section and an orbitable axon, from the memo's own figure
   functions). "Issue to the architect" / "Issue to the board" in the Export bar; the page polls the local
   server every 15 s and shows an amber chip in the top bar for an issue addressed to the current role.
-- Not built yet: the block editor (phase 4), hosting (phase 5). A restarted preview server is needed after
-  editing `server.py`; the Claude app's preview does not reload Python.
+- Not built yet: hosting (phase 5). A restarted preview server is needed after editing `server.py`; the Claude
+  app's preview does not reload Python.
+
+## Phase 4 (3 Nov 2026): the block editor over the solver
+
+- Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,
+  y, w, d, accessible?}], "1": …}): nothing is moved, every zone is measured (area, side), the rules are read
+  back as before, and `geometry` lists what broke (`outside` the plate, `overlap` between zones other than
+  corridor × core, `undersized` unit under its gross area, `no_corridor`, `no_core`, `bad_zone`); `shortfall`
+  is the program still lacking, extra units a warning. `edited: true`, `derived_from` names the zones, the
+  memo section says "Placed by hand in the block editor"; `zones_of(L)` is the solver's placement in that form.
+  `tests/test_layout_editor.py`.
+- Server `POST /api/layout` {site, option, as_of} → {layout, sheets, massing} (nothing written); the shim's
+  `ffm_layout` does the same in Pyodide, so the editor works on the web too.
+- Tool: "Edit blocks" on FIG 03 in architect mode (`openEditor`, `renderEditor`, `wireEditor`, `checkPlacement`,
+  `applyEditor`): floor buttons, Add a block, the plate as an SVG canvas; click selects, drag moves, the right
+  and bottom handles resize, arrows move 0.5 m (shift 2 m), Delete removes; "to floor" moves a block; a unit
+  can be marked accessible. Every change is debounced 350 ms into `/api/layout`; the status lists what broke
+  on this floor and the counts; the axon, stacking, elevations and site plan redraw from the same check. "Apply
+  to the option" writes `state.option.layout.zones` (dirty, saved with the option; Run the rules reproduces it);
+  "Back to the solver's" clears it. The plate's edges clamp the drag; the engine still reports `outside` for
+  zones that arrive by file.
 
 ## Phase 3 of the workflows proposal (3 Nov 2026): the architect's first layout
 

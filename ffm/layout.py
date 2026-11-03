@@ -128,17 +128,23 @@ def adjacencies_for(option: dict) -> list[dict]:
     return rules
 
 
-def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, Any]:
-    """Place the blocks on the proposed mass's plates, floor by floor, and say what held and what did not."""
-    prog = blocks(option, ledger)
+def _plate(massing: dict) -> tuple[dict, float, float, float, float, int, float]:
     pm = next((x for x in massing["masses"] if x["name"] == "proposed"), None)
     if pm is None:
         raise ValueError("The massing has no proposed mass to lay out.")
     ring = pm["footprint"]
-    x0, y0 = float(ring[0][0]), float(ring[0][1])
-    W, D = float(pm["plate_width_m"]), float(pm["plate_depth_m"])
-    storeys = int(pm["storeys"])
-    f2f = float(pm["floor_to_floor_m"])
+    return pm, float(ring[0][0]), float(ring[0][1]), float(pm["plate_width_m"]), float(pm["plate_depth_m"]), int(pm["storeys"]), float(pm["floor_to_floor_m"])
+
+
+def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, Any]:
+    """Place the blocks on the proposed mass's plates, floor by floor, and say what held and what did not. Where
+    the option carries a placement of its own (`layout.zones`, written by the block editor), that placement is
+    re-checked instead, so a run reproduces what a person drew."""
+    zones = (option.get("layout") or {}).get("zones")
+    if zones:
+        return place_zones(site, option, ledger, massing, zones)
+    prog = blocks(option, ledger)
+    pm, x0, y0, W, D, storeys, f2f = _plate(massing)
     corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
     core_w, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
     warnings: list[str] = []
@@ -246,12 +252,15 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         fl["spare_m2"] = round(spare, 1)
         del fl["runs"]
 
-    # the checks: does each rule hold, read back from the zones
-    checks = []
-    for rule in adjacencies_for(option):
-        checks.append(_check(rule, floors, prog, shortfall))
+    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
+    return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
+
+
+def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited, geometry) -> dict[str, Any]:
+    """The layout record both paths return: the rules read back from the zones, the totals, the log."""
+    checks = [_check(rule, floors, prog, shortfall) for rule in adjacencies_for(option)]
     placed_units = sum(1 for fl in floors for z in fl["zones"] if z.get("unit"))
-    gross_plates = round(W * D * storeys, 1)
+    gross_plates = round(plate["width_m"] * plate["depth_m"] * plate["storeys"], 1)
     fsr_rule = _find(ledger["results"], check="district_outright_fsr")
     h_rule = _find(ledger["results"], check="district_outright_height")
     outright = {"fsr": (fsr_rule or {}).get("values", {}).get("max_fsr_outright"), "height_m": (h_rule or {}).get("values", {}).get("max_height_m_outright"),
@@ -259,14 +268,100 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     used = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] != "spare"), 1)
     return {
         "site_id": site.get("id"), "option_id": option.get("id"), "as_of": ledger["run"]["as_of"], "stamp": ledger["run"]["stamp"]["stamp"],
-        "units": "m", "origin": massing.get("origin"),
-        "plate": {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)},
+        "units": "m", "origin": massing.get("origin"), "edited": edited,
+        "plate": plate,
         "program": prog["blocks"], "parking": prog["parking"], "units_total": prog["units_total"], "units_placed": placed_units,
-        "adjacencies": checks, "floors": floors, "shortfall": shortfall, "outright": outright,
+        "adjacencies": checks, "geometry": geometry, "floors": floors, "shortfall": shortfall, "outright": outright,
         "totals": {"plates_m2": gross_plates, "used_m2": used, "spare_m2": round(gross_plates - used, 1), "gfa_m2": massing["masses"][0].get("gfa_m2")},
         "assumptions": prog["assumptions"], "warnings": warnings + list(massing.get("warnings") or []),
-        "derived_from": ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
+        "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
     }
+
+
+# ---------------------------------------------------------------- a placement drawn by hand, re-checked
+
+EDITABLE_BLOCKS = ("studio", "one_bed", "two_bed", "three_bed_plus", "non_residential", "amenity", "services", "core", "corridor")
+
+
+def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_level: dict | list) -> dict[str, Any]:
+    """The block editor's placement: `zones_by_level` maps a level ("0", "1", …) to zones {block, x, y, w, d,
+    accessible?}. The engine does not move anything: it measures every zone, reads the rules back, and lists
+    what broke (a zone outside the plate, two zones overlapping, a unit smaller than its area, a floor without
+    a corridor), and what the program still lacks. Same record as solve(), with `edited: true`."""
+    prog = blocks(option, ledger)
+    pm, x0, y0, W, D, storeys, f2f = _plate(massing)
+    corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
+    double = D >= corr + 8.0
+    strip = max(0.0, (D - corr) / 2) if double else max(0.0, D - corr)
+    by_key = {b["key"]: b for b in prog["blocks"]}
+    geometry: list[dict] = []
+    warnings: list[str] = []
+    levels = {int(k): v for k, v in (zones_by_level.items() if isinstance(zones_by_level, dict) else enumerate(zones_by_level))}
+    floors: list[dict] = []
+    for lv in range(storeys):
+        raw = levels.get(lv) or []
+        zones: list[dict] = []
+        for i, z in enumerate(raw):
+            try:
+                block = str(z.get("block"))
+                x, y, w, d = (round(float(z.get(k)), 2) for k in ("x", "y", "w", "d"))
+            except (TypeError, ValueError):
+                geometry.append({"kind": "bad_zone", "level": lv, "note": f"zone {i + 1} on {'the ground floor' if lv == 0 else f'level {lv + 1}'} has no usable coordinates and was ignored"})
+                continue
+            if block not in EDITABLE_BLOCKS or w <= 0 or d <= 0:
+                geometry.append({"kind": "bad_zone", "level": lv, "note": f"zone {i + 1} ({block}) on {'the ground floor' if lv == 0 else f'level {lv + 1}'} is not a block the editor knows, or has no size, and was ignored"})
+                continue
+            side = "front" if (y + d / 2) < (y0 + D / 2) else "rear"
+            zone = {"block": block, "label": BLOCK_LABEL.get(block, block), "x": x, "y": y, "w": w, "d": d, "area_m2": round(w * d, 1), "side": side}
+            if block in UNIT_KEYS:
+                zone["unit"] = block
+                zone["accessible"] = bool(z.get("accessible"))
+            if block == "corridor":
+                zone["through"] = "core"
+            zones.append(zone)
+            # inside the plate?
+            if x < x0 - 0.05 or y < y0 - 0.05 or x + w > x0 + W + 0.05 or y + d > y0 + D + 0.05:
+                geometry.append({"kind": "outside", "level": lv, "block": block, "note": f"{zone['label']} at {x:.1f}, {y:.1f} m runs past the plate ({W:.1f} × {D:.1f} m) on {'the ground floor' if lv == 0 else f'level {lv + 1}'}"})
+            if block in UNIT_KEYS and block in by_key and w * d + 0.5 < by_key[block]["gross_m2_each"]:
+                geometry.append({"kind": "undersized", "level": lv, "block": block, "note": f"a {zone['label'].lower()} on {'the ground floor' if lv == 0 else f'level {lv + 1}'} is {w * d:.0f} m², under its {by_key[block]['gross_m2_each']:.0f} m² gross"})
+        # overlaps: units and uses may not share floor area; the corridor and the core are the circulation and may cross each other only
+        for i, a in enumerate(zones):
+            for b in zones[i + 1:]:
+                if {a["block"], b["block"]} == {"corridor", "core"}:
+                    continue
+                if not (a["x"] + a["w"] <= b["x"] + 0.01 or b["x"] + b["w"] <= a["x"] + 0.01 or a["y"] + a["d"] <= b["y"] + 0.01 or b["y"] + b["d"] <= a["y"] + 0.01):
+                    geometry.append({"kind": "overlap", "level": lv, "block": a["block"], "note": f"{a['label']} and {b['label']} overlap on {'the ground floor' if lv == 0 else f'level {lv + 1}'}"})
+        if zones and not any(z["block"] == "corridor" for z in zones) and any(z.get("unit") for z in zones):
+            geometry.append({"kind": "no_corridor", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has units but no corridor"})
+        if zones and not any(z["block"] == "core" for z in zones):
+            geometry.append({"kind": "no_core", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has no core: the stairs and the elevator must land on every floor"})
+        used = sum(z["area_m2"] for z in zones if z["block"] != "spare")
+        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "spare_m2": round(max(0.0, W * D - used), 1)})
+
+    # what the program still lacks, and what was placed beyond it
+    shortfall: list[dict] = []
+    for b in prog["blocks"]:
+        if b["key"] in UNIT_KEYS:
+            n = sum(1 for fl in floors for z in fl["zones"] if z.get("unit") == b["key"])
+            if n < b["count"]:
+                shortfall.append({"block": b["key"], "label": b["label"], "units": b["count"] - n, "area_m2": round((b["count"] - n) * b["gross_m2_each"], 1)})
+            elif n > b["count"]:
+                warnings.append(f"{n - b['count']} more {b['label'].lower()} unit{'s' if n - b['count'] != 1 else ''} drawn than the option counts ({b['count']}): the option's unit mix is what the rules read")
+        else:
+            placed = sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] == b["key"])
+            if placed + 1.0 < b["area_m2"]:
+                shortfall.append({"block": b["key"], "label": b["label"], "area_m2": round(b["area_m2"] - placed, 1)})
+    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
+    return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
+
+
+def zones_of(L: dict) -> dict[str, list[dict]]:
+    """A layout's placement in the form the option keeps (`layout.zones`): the editor starts from the solver's."""
+    out: dict[str, list[dict]] = {}
+    for fl in L["floors"]:
+        out[str(fl["level"])] = [{k: z[k] for k in ("block", "x", "y", "w", "d")} | ({"accessible": True} if z.get("accessible") else {})
+                                 for z in fl["zones"] if z["block"] != "spare"]
+    return out
 
 
 def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) -> dict:
@@ -676,10 +771,15 @@ def markdown(L: dict) -> list[str]:
     if L["parking"]["spaces"]:
         M.append(f"| Parking | {L['parking']['spaces']} | {L['parking']['area_m2']:,.0f} m² | placeholder: {L['parking']['where']} |")
     M.append("")
+    if L.get("edited"):
+        M.append("Placed by hand in the block editor and re-checked by the engine; the option file carries the placement under `layout.zones`, so this run reproduces it.")
+        M.append("")
     M.append("Adjacency rules, in plain words, read back from the plates:")
     M.append("")
     for c in L["adjacencies"]:
         M.append(f"- *{c['status']}* — {c['block'].replace('_', ' ')}: {c['rule']}. {c['note'][0].upper() + c['note'][1:] if c['note'] else ''}")
+    for g in L.get("geometry") or []:
+        M.append(f"- *broken* — {g['note']}.")
     if L["shortfall"]:
         M.append("")
         M.append("Did not fit on the plates: " + "; ".join(f"{s['label']}{' × ' + str(s['units']) if s.get('units') else ''} ({s['area_m2']:,.0f} m²)" for s in L["shortfall"]) + ". More storeys, a larger plate or a smaller program.")

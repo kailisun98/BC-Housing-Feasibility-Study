@@ -31,6 +31,8 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
     POST /api/read-site                     body {site, as_of?}: the site alone against layers A to C, nothing written
     POST /api/suggest                       body {site, programs, as_of?, candidate?}: a rule-derived option, every
                                             figure with its rule (ffm/suggest.py)
+    POST /api/layout                        body {site, option, as_of?}: the block editor's check; the option's
+                                            layout.zones are measured and the rules read back; nothing written
     GET  /api/capabilities                  {claude: bool, model, accepts_key, writes_rules}: whether FFM_CLAUDE_KEY is
                                             set on this machine; a person's own key may come with each request instead
     POST /api/propose/site                  body {site, api_key?, document?}: Claude proposes the site's fields with
@@ -486,6 +488,23 @@ def do_read_site(body: Any) -> dict:
     return suggest.read_site(site, on)
 
 
+def do_layout(body: Any) -> dict:
+    """The block editor's check: the site and the option (with `layout.zones` where a person has placed blocks)
+    are read under the rules, the massing built, the placement measured and the rules read back; nothing is
+    written. Returns the layout record and the five sheets drawn from it."""
+    site, on = _site_and_date(body)
+    option = body.get("option")
+    if not isinstance(option, dict):
+        raise ApiError(400, "Send {site, option, as_of?}.")
+    ledger = engine.evaluate(site, option, on)
+    try:
+        m = massing.build(site, option, ledger)
+        lay = layout.solve(site, option, ledger, m)
+    except ValueError as e:
+        raise ApiError(422, str(e))
+    return {"layout": lay, "sheets": layout.sheets(lay, site, m, ledger), "massing": m}
+
+
 def do_suggest(body: Any) -> dict:
     """A rule-derived option for the site and the chosen programs, every figure with its rule."""
     site, on = _site_and_date(body)
@@ -694,6 +713,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(do_read_site(body))
             if path == "/api/suggest":
                 return self._json(do_suggest(body))
+            if path == "/api/layout":
+                return self._json(do_layout(body))
             if path == "/api/propose/site":
                 return self._json(do_propose_site(body))
             if path == "/api/propose/rule":

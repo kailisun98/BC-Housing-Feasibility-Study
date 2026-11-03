@@ -749,7 +749,8 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] { --bars-h: 92px; }
 [data-mode="reader"] .steps, [data-mode="reader"] #tour-offer, [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,
 [data-mode="reader"] .inputs, [data-mode="reader"] .memo-tools, [data-mode="reader"] #tool-open, [data-mode="reader"] #tool-compare, [data-mode="reader"] #compare-note,
-[data-mode="reader"] #dl-massing, [data-mode="reader"] #revit-btn, [data-mode="reader"] #export-panel, [data-mode="reader"] .ledger .tools { display: none !important; }
+[data-mode="reader"] #dl-massing, [data-mode="reader"] #revit-btn, [data-mode="reader"] #export-panel, [data-mode="reader"] .ledger .tools,
+[data-mode="reader"] #edit-blocks, [data-mode="reader"] #sheet-editor { display: none !important; }
 [data-mode="reader"] .side .pick-name { display: block; }
 [data-mode="reader"] .panes, [data-mode="reader"] .panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
 [data-mode="reader"] .memo-pane { width: min(100%, 980px); margin-inline: auto; padding: 24px 24px 64px; }

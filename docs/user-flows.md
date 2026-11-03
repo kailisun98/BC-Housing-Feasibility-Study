@@ -67,8 +67,8 @@ the open-items table names a person in its own column; the PDF button leads the 
 
 Built 3 Nov 2026 (phases 3 and 4): the run carries the architect's first layout, derived from the option.
 FIG 03 Plans by program (Plan | Axon), FIG 04 Stacking, FIG 05 Preliminary elevations, FIG 06 Code site
-plan, each with the stamp, and the adjacency rules read back from the plates. In architect mode *Edit
-blocks* opens the block editor on FIG 03: the same blocks on the same plates, dragged, resized, moved
+plan, each with the stamp, and the adjacency rules read back from the plates. *Edit blocks* on FIG 03 (in
+manager and architect modes) opens the block editor: the same blocks on the same plates, dragged, resized, moved
 between floors, added or removed; the engine measures every move and says what broke; *Apply to the
 option* writes the placement into the option (`layout.zones`), so a run reproduces it and the memo says
 it was placed by hand. The reader's sheets are the same figures, after the answers.

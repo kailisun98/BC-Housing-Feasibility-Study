@@ -299,7 +299,9 @@ Built and verified in the browser:
   `tests/test_layout_editor.py`.
 - Server `POST /api/layout` {site, option, as_of} → {layout, sheets, massing} (nothing written); the shim's
   `ffm_layout` does the same in Pyodide, so the editor works on the web too.
-- Tool: "Edit blocks" on FIG 03 in architect mode (`openEditor`, `renderEditor`, `wireEditor`, `checkPlacement`,
+- Tool: "Edit blocks" on FIG 03 in manager and architect modes (hidden in reader mode by CSS; it was architect-only
+  at first, and a reader who switched modes after a run saw no button because the figures do not re-render on a
+  mode change) (`openEditor`, `renderEditor`, `wireEditor`, `checkPlacement`,
   `applyEditor`): floor buttons, Add a block, the plate as an SVG canvas; click selects, drag moves, the right
   and bottom handles resize, arrows move 0.5 m (shift 2 m), Delete removes; "to floor" moves a block; a unit
   can be marked accessible. Every change is debounced 350 ms into `/api/layout`; the status lists what broke

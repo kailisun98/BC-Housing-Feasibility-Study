@@ -2260,7 +2260,7 @@ function renderSheets(run, n0) {
   out.push(`<figure class="card figure sheet" data-sheet="plans">
     <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>
       <div class="fig-tools"><div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div>
-      ${state.mode === "architect" ? `<button type="button" class="btn btn-small" id="edit-blocks" aria-expanded="false">Edit blocks</button>` : ""}</div></div>
+      <button type="button" class="btn btn-small" id="edit-blocks" aria-expanded="false" title="Drag, resize, add or remove the blocks; the engine checks every move">Edit blocks</button></div></div>
     <div class="sheet-body" data-view="plans">${S.plans || ""}</div>
     <div class="sheet-body" data-view="axon" hidden>${S.axon || ""}</div>
     <div class="sheet-editor" id="sheet-editor" hidden></div>

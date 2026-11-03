@@ -186,9 +186,12 @@ function loadEngine() {
     setEngineChip("Loading the rules engine, about 10 MB, once", "loading");
     await loadScript(STATIC.pyodide_url);
     const pyodide = await window.loadPyodide({ indexURL: STATIC.pyodide_url.replace(/pyodide\.js(\?.*)?$/, "") });
-    const files = await (await fetch("data/engine-files.json")).json();
+    // the engine's files are named with the build's time, so a browser never pairs this page with the last deploy's
+    // engine out of its cache (Pages serves them with max-age=600)
+    const v = encodeURIComponent((STATIC && STATIC.built_at) || "");
+    const files = await (await fetch(`data/engine-files.json?v=${v}`)).json();
     for (const f of files) {
-      const r = await fetch(`engine/${f}`);
+      const r = await fetch(`engine/${f}?v=${v}`);
       if (!r.ok) throw new Error(`engine file ${f}: ${r.status}`);
       const dir = f.split("/").slice(0, -1).join("/");
       if (dir) pyodide.FS.mkdirTree(dir);

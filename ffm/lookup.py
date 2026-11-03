@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import math
+import re
 import urllib.parse
 import urllib.request
 from typing import Any
@@ -22,6 +23,13 @@ from .osm import DEFAULT_RADIUS_M, MINOR, USER_AGENT, build as build_context, ge
 COV_RECORDS = "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/{dataset}/records"
 ZONING_DATASET = "zoning-districts-and-labels"
 PARCEL_DATASET = "property-parcel-polygons"
+ADDRESS_DATASET = "property-addresses"      # the City's own address points: civic_number, std_street, site_id, geo_point_2d
+# Nominatim, as the fallback for an address the City's list lacks, is kept to Metro Vancouver: without this
+# "609 heatley" is a street in South Carolina
+NOMINATIM_VIEWBOX = "-123.45,49.00,-122.40,49.45"
+STREET_STD = {"AVENUE": "AV", "AVE": "AV", "STREET": "ST", "BOULEVARD": "BLVD", "DRIVE": "DR", "ROAD": "RD", "PLACE": "PL",
+              "CRESCENT": "CRES", "HIGHWAY": "HWY", "LANE": "LANE", "COURT": "CRT", "EAST": "E", "WEST": "W", "NORTH": "N", "SOUTH": "S"}
+STREET_SUFFIXES = {"AV", "ST", "BLVD", "DR", "RD", "PL", "CRES", "HWY", "LANE", "CRT", "WAY", "MEWS", "DIVERSION", "CONNECTOR"}
 # the surroundings from the City too: street centrelines, the 2009 LiDAR building footprints (with heights) and
 # the public trees. Three requests of a second or so, against half a minute from the public Overpass server.
 CITY_CONTEXT = {"streets": "public-streets", "buildings": "building-footprints-2009", "trees": "public-trees"}
@@ -33,6 +41,7 @@ SOURCES = {
     "parcel": {"title": "City of Vancouver Open Data: property parcel polygons", "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"},
     "context": {"title": "City of Vancouver Open Data: public streets, building footprints 2009, public trees (Open Government Licence – Vancouver)", "url": "https://opendata.vancouver.ca/explore/"},
     "geocode": {"title": "OpenStreetMap Nominatim", "url": "https://nominatim.openstreetmap.org/"},
+    "address": {"title": "City of Vancouver Open Data: property addresses", "url": "https://opendata.vancouver.ca/explore/dataset/property-addresses/"},
 }
 
 
@@ -46,6 +55,80 @@ def records_at(dataset: str, lat: float, lon: float, within_m: float = 3) -> lis
     """The dataset's records whose geometry lies within a few metres of the point."""
     res = _get(COV_RECORDS.format(dataset=dataset), {"where": f"within_distance(geom, geom'POINT({lon} {lat})', {within_m}m)", "limit": 3})
     return res.get("results") or []
+
+
+def records_where(dataset: str, where: str, limit: int = 5) -> list[dict]:
+    """The dataset's records matching an ODSQL where clause."""
+    res = _get(COV_RECORDS.format(dataset=dataset), {"where": where, "limit": limit})
+    return res.get("results") or []
+
+
+def parse_address(address: str) -> dict[str, Any]:
+    """'609 heatley', '998 E 19th Ave, Vancouver, BC' -> the civic number and the street as the City writes it
+    ('HEATLEY', 'E 19TH AV'), plus a prefix for a like-match without the suffix. Pure."""
+    head = address.split(",", 1)[0].strip()
+    m = re.match(r"^\s*(\d+)\s*[-–]?\s*(.*)$", head)
+    if not m:
+        return {"civic_number": None, "street": "", "like": "", "suffix": None}
+    number = int(m.group(1))
+    words = [w for w in re.sub(r"[^A-Za-z0-9 ]", " ", m.group(2)).upper().split() if w not in ("VANCOUVER", "BC", "BRITISH", "COLUMBIA", "CANADA")]
+    words = [STREET_STD.get(w, w) for w in words]
+    suffix = words[-1] if words and words[-1] in STREET_SUFFIXES else None
+    core = words[:-1] if suffix else words
+    return {"civic_number": number, "street": " ".join(words), "like": " ".join(core), "suffix": suffix}
+
+
+def city_geocode(address: str) -> dict[str, Any] | None:
+    """The City's address point for a civic address, with the parcel it belongs to; None when the City's list has no
+    such address (a wrong number, a street outside Vancouver, a new building)."""
+    p = parse_address(address)
+    if not p["civic_number"] or not p["like"]:
+        return None
+    like = p["like"].replace('"', "")
+    rows = records_where(ADDRESS_DATASET, f'civic_number={p["civic_number"]} AND std_street like "{like}%"', 10)
+    if not rows:
+        return None
+    if p["suffix"]:
+        exact = [r for r in rows if str(r.get("std_street") or "").upper() == p["street"]]
+        rows = exact or rows
+    r = rows[0]
+    pt = r.get("geo_point_2d") or {}
+    if pt.get("lat") is None:
+        return None
+    return {"lat": float(pt["lat"]), "lon": float(pt["lon"]), "civic_number": r.get("civic_number"), "std_street": r.get("std_street"),
+            "site_id": r.get("site_id"), "local_area": r.get("geo_local_area"),
+            "display": f"{civic_address(r.get('civic_number'), r.get('std_street'))}, Vancouver, BC (City of Vancouver property address{', ' + r['geo_local_area'] if r.get('geo_local_area') else ''})"}
+
+
+def geocode_vancouver(address: str) -> tuple[float, float, str]:
+    """Nominatim, kept inside Metro Vancouver and preferring a building over a street; the address is tried as typed
+    and then with ', Vancouver, BC' added."""
+    import time
+    tries = [address] if re.search(r"vancouver", address, re.I) else [address, address.rstrip(" ,") + ", Vancouver, BC"]
+    for i, q in enumerate(tries):
+        if i:
+            time.sleep(1.1)
+        res = _get("https://nominatim.openstreetmap.org/search", {"q": q, "format": "jsonv2", "limit": 5, "countrycodes": "ca", "viewbox": NOMINATIM_VIEWBOX, "bounded": 1})
+        if res:
+            number = (parse_address(address).get("civic_number"))
+            best = next((r for r in res if number and str(r.get("display_name", "")).startswith(f"{number},")), None) or res[0]
+            return float(best["lat"]), float(best["lon"]), str(best.get("display_name", ""))
+    raise ValueError(f"Nothing in Metro Vancouver matched {address!r}; try the civic number, the street and its suffix (998 E 19th Ave).")
+
+
+def pick_parcel(parcels: list[dict], address: str) -> dict:
+    """Among parcels near a point, the one whose civic number matches the address, else the first."""
+    if not parcels:
+        return {}
+    number = parse_address(address).get("civic_number")
+    if number is not None:
+        for p in parcels:
+            try:
+                if int(str(p.get("civic_number") or "").strip()) == number:
+                    return p
+            except ValueError:
+                continue
+    return parcels[0]
 
 
 def records_within(dataset: str, lat: float, lon: float, radius_m: float, max_pages: int = 4) -> list[dict]:
@@ -245,13 +328,25 @@ def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_
     or from OpenStreetMap's Overpass API where the City has nothing (outside Vancouver; half a minute), so the
     figures draw the real surroundings and the frontage is the side on the street."""
     from concurrent.futures import ThreadPoolExecutor
-    lat, lon, display = geocode(address)
-    with ThreadPoolExecutor(max_workers=2) as pool:
-        fz, fp = pool.submit(records_at, ZONING_DATASET, lat, lon), pool.submit(records_at, PARCEL_DATASET, lat, lon)
-        zoning, parcels = fz.result(), fp.result()
+    # the point: the City's own address list first (exact, and it names the parcel), Nominatim within Metro
+    # Vancouver otherwise
+    found = city_geocode(address)
+    if found:
+        lat, lon, display = found["lat"], found["lon"], found["display"]
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            fz = pool.submit(records_at, ZONING_DATASET, lat, lon)
+            fp = pool.submit(records_where, PARCEL_DATASET, f'site_id="{found["site_id"]}"', 3) if found.get("site_id") else pool.submit(records_at, PARCEL_DATASET, lat, lon, 15)
+            zoning, parcels = fz.result(), fp.result()
+        if not parcels:
+            parcels = records_at(PARCEL_DATASET, lat, lon, 15)
+    else:
+        lat, lon, display = geocode_vancouver(address)
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            fz, fp = pool.submit(records_at, ZONING_DATASET, lat, lon), pool.submit(records_at, PARCEL_DATASET, lat, lon, 15)
+            zoning, parcels = fz.result(), fp.result()
     elements, q, source, note = None, "", "osm", ""
     if context:
-        c = _parcel_center(parcels) or (lat, lon)
+        c = _parcel_center(parcels, address) or (lat, lon)
         try:
             recs = city_records(c[0], c[1], radius_m)
             if recs["streets"]:
@@ -270,8 +365,8 @@ def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_
     return res
 
 
-def _parcel_center(parcels: list[dict]) -> tuple[float, float] | None:
-    p = parcels[0] if parcels else {}
+def _parcel_center(parcels: list[dict], address: str = "") -> tuple[float, float] | None:
+    p = pick_parcel(parcels, address)
     poly = (((p.get("geom") or {}).get("geometry") or {}).get("coordinates") or [[]])[0]
     if len(poly) < 3:
         return None
@@ -286,7 +381,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     is the side parallel to the parcel's street and the site gets its `osm` context block, credited to `source`;
     without them the longer side is called the frontage, to confirm."""
     z = zoning[0] if zoning else {}
-    p = parcels[0] if parcels else {}
+    p = pick_parcel(parcels, address)
     poly = (((p.get("geom") or {}).get("geometry") or {}).get("coordinates") or [[]])[0]
     civic = civic_address(p.get("civic_number"), p.get("streetname"))
     street_name = civic.split(" ", 1)[1] if civic and " " in civic else None
@@ -297,7 +392,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         metrics = parcel_metrics(poly, street["bearing_deg"])
     district = z.get("zoning_district") or None
     cd1 = z.get("cd_1_number") or None
-    notes = [f"Found by First Read on the address {address!r}: geocoded by Nominatim as {display!r}."]
+    notes = [f"Found by First Read on the address {address!r}: " + (f"the City's property address {display!r}." if "property address" in display else f"geocoded by Nominatim as {display!r}.")]
     if district:
         notes.append(f"Zoning district {district}" + (f" (CD-1 by-law {cd1})" if cd1 else "") + " from the City's zoning districts dataset at that point.")
     else:
@@ -325,7 +420,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         "parcel": {"polygon_lonlat": poly, "civic_number": p.get("civic_number"), "streetname": p.get("streetname"),
                    "site_id": p.get("site_id"), "metrics": metrics, "street": street, "source": SOURCES["parcel"]} if poly else None,
         "lookup": {"center": {"lat": lat, "lon": lon}, "geocoded_as": display, "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
-        "sources": [SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
+        "sources": [SOURCES["address"] if "property address" in display else SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
     }
     if site["context"] is None:
         del site["context"]

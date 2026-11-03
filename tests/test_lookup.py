@@ -40,6 +40,18 @@ class ParcelMetrics(unittest.TestCase):
     def test_slug(self):
         self.assertEqual(lookup._slug("998 E 19th Ave"), "998-e-19th-ave")
 
+    def test_parse_address_as_the_city_writes_streets(self):
+        self.assertEqual(lookup.parse_address("609 heatley"), {"civic_number": 609, "street": "HEATLEY", "like": "HEATLEY", "suffix": None})
+        self.assertEqual(lookup.parse_address("998 E 19th Ave, Vancouver, BC"), {"civic_number": 998, "street": "E 19TH AV", "like": "E 19TH", "suffix": "AV"})
+        self.assertEqual(lookup.parse_address("1010 Expo Boulevard")["street"], "EXPO BLVD")
+        self.assertEqual(lookup.parse_address("East 20th Avenue")["civic_number"], None)
+
+    def test_pick_parcel_by_civic_number(self):
+        near = [{"civic_number": "305", "streetname": "HEATLEY AV"}, {"civic_number": "609", "streetname": "HEATLEY AV"}]
+        self.assertEqual(lookup.pick_parcel(near, "609 Heatley Ave")["civic_number"], "609")
+        self.assertEqual(lookup.pick_parcel(near, "Heatley Ave")["civic_number"], "305")
+        self.assertEqual(lookup.pick_parcel([], "609 Heatley Ave"), {})
+
     def test_civic_address_reads_like_a_person_wrote_it(self):
         self.assertEqual(lookup.civic_address("998", "E 19TH AV"), "998 E 19th Ave")
         self.assertEqual(lookup.civic_address(1010, "EXPO BLVD"), "1010 Expo Blvd")

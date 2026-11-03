@@ -247,9 +247,14 @@ Built and verified in the browser:
   10% over the BC Housing minimums, a starting mix). Candidates: outright, benchmark, funder-ready. On
   998 E 19th Ave funder-ready gives 6 storeys, 19.8 m, FSR 3.0, 109 units, tiers 33/54/22, 19 trees.
   `read_site(site, on)` runs layers A to C with a bare social-housing probe. Tests in `tests/test_suggest.py`.
-- `ffm/lookup.py`: `lookup(address)` geocodes with Nominatim and reads the zoning district and the parcel
-  polygon from City of Vancouver Open Data (`zoning-districts-and-labels`, `property-parcel-polygons`, the
-  Opendatasoft v2.1 records API with `within_distance`); `parcel_metrics` (pure) gives the area and an
+- `ffm/lookup.py`: `lookup(address)` finds the point in the City's own `property-addresses` dataset first
+  (`parse_address` turns "609 heatley" into civic number 609 and street "HEATLEY" for an ODSQL `like`; the
+  record's `site_id` names the parcel, fetched by id) and only otherwise geocodes with Nominatim kept inside
+  Metro Vancouver (`geocode_vancouver`: countrycodes, a bounded viewbox, a building preferred over a street,
+  ", Vancouver, BC" tried second; without this "609 heatley" was a street in South Carolina and the full
+  address once landed on the 300 block). The zoning district comes from `zoning-districts-and-labels` at the
+  point and the parcel polygon from `property-parcel-polygons` (by `site_id`, else within 15 m with
+  `pick_parcel` matching the civic number); `parcel_metrics` (pure) gives the area and an
   equivalent rectangle; `assemble` is pure so the browser build fetches and hands the records in. Since
   3 Nov 2026 it also fetches the surroundings around the parcel's centre and builds the site's `osm` block
   with `osm.build`: first from the City's own datasets (`public-streets`, `building-footprints-2009` with

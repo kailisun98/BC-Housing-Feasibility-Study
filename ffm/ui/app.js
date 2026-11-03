@@ -174,9 +174,15 @@ def ffm_lookup_assemble(address, lat, lon, display, zoning_json, parcels_json, e
     elements = json.loads(elements_json) if elements_json else None
     return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json), elements, radius_m, query))
 
-def ffm_parcel_center(parcels_json):
-    c = lookup._parcel_center(json.loads(parcels_json))
+def ffm_parcel_center(parcels_json, address=""):
+    c = lookup._parcel_center(json.loads(parcels_json), address)
     return json.dumps(list(c) if c else None)
+
+def ffm_parse_address(address):
+    return json.dumps(lookup.parse_address(address))
+
+def ffm_civic_address(number, street):
+    return json.dumps(lookup.civic_address(number, street))
 
 def ffm_city_elements(streets_json, buildings_json, trees_json):
     return json.dumps(lookup.city_elements(json.loads(streets_json), json.loads(buildings_json), json.loads(trees_json)))
@@ -208,6 +214,7 @@ function loadEngine() {
     engine = { pyodide, run: pyodide.globals.get("ffm_run"), diff: pyodide.globals.get("ffm_diff"),
                suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble"),
                parcelCenter: pyodide.globals.get("ffm_parcel_center"), cityElements: pyodide.globals.get("ffm_city_elements"),
+               parseAddress: pyodide.globals.get("ffm_parse_address"), civicAddress: pyodide.globals.get("ffm_civic_address"),
                lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
     return engine;
@@ -263,17 +270,41 @@ async function loadStaticRun(runId) {
    assembles the site from them, as lookup.py does on the local server. */
 async function staticLookup(q) {
   if (!q || q.trim().length < 4) throw new Error("Give an address to look up.");
-  const geo = await (await fetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({ q: q.trim(), format: "jsonv2", limit: "1" })}`, { headers: { Accept: "application/json" } })).json();
-  if (!geo.length) throw new Error(`Nominatim found nothing for "${q}".`);
-  const lat = Number(geo[0].lat), lon = Number(geo[0].lon), display = geo[0].display_name || "";
-  const cov = ds => fetch(`https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/${ds}/records?${new URLSearchParams({ where: `within_distance(geom, geom'POINT(${lon} ${lat})', 3m)`, limit: "3" })}`).then(r => r.ok ? r.json() : { results: [] }).then(j => j.results || []);
-  const [zoning, parcels] = await Promise.all([cov("zoning-districts-and-labels"), cov("property-parcel-polygons")]);
   await loadEngine();
+  const cov = (ds, params) => fetch(`https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/${ds}/records?${new URLSearchParams(params)}`).then(r => r.ok ? r.json() : { results: [] }).then(j => j.results || []);
+  // the point: the City's own address list first (exact, and it names the parcel), Nominatim within Metro Vancouver
+  // otherwise, preferring a building over a street
+  let lat, lon, display, parcels;
+  const parsed = JSON.parse(engine.parseAddress(q.trim()));
+  let found = null;
+  if (parsed.civic_number && parsed.like) {
+    const rows = await cov("property-addresses", { where: `civic_number=${parsed.civic_number} AND std_street like "${parsed.like.replace(/"/g, "")}%"`, limit: "10" });
+    const exact = parsed.suffix ? rows.filter(r => String(r.std_street || "").toUpperCase() === parsed.street) : [];
+    found = (exact.length ? exact : rows)[0] || null;
+  }
+  if (found && found.geo_point_2d && found.geo_point_2d.lat != null) {
+    lat = Number(found.geo_point_2d.lat); lon = Number(found.geo_point_2d.lon);
+    display = `${JSON.parse(engine.civicAddress(String(found.civic_number), String(found.std_street)))}, Vancouver, BC (City of Vancouver property address${found.geo_local_area ? `, ${found.geo_local_area}` : ""})`;
+    parcels = found.site_id ? await cov("property-parcel-polygons", { where: `site_id="${found.site_id}"`, limit: "3" }) : [];
+    if (!parcels.length) parcels = await cov("property-parcel-polygons", { where: `within_distance(geom, geom'POINT(${lon} ${lat})', 15m)`, limit: "5" });
+  } else {
+    const tries = /vancouver/i.test(q) ? [q.trim()] : [q.trim(), q.trim().replace(/[ ,]+$/, "") + ", Vancouver, BC"];
+    let geo = [];
+    for (const t of tries) {
+      geo = await (await fetch(`https://nominatim.openstreetmap.org/search?${new URLSearchParams({ q: t, format: "jsonv2", limit: "5", countrycodes: "ca", viewbox: "-123.45,49.00,-122.40,49.45", bounded: "1" })}`, { headers: { Accept: "application/json" } })).json();
+      if (geo.length) break;
+    }
+    if (!geo.length) throw new Error(`Nothing in Metro Vancouver matched "${q}"; try the civic number, the street and its suffix (998 E 19th Ave).`);
+    const best = (parsed.civic_number && geo.find(r => String(r.display_name || "").startsWith(`${parsed.civic_number},`))) || geo[0];
+    lat = Number(best.lat); lon = Number(best.lon); display = best.display_name || "";
+    parcels = await cov("property-parcel-polygons", { where: `within_distance(geom, geom'POINT(${lon} ${lat})', 15m)`, limit: "5" });
+  }
+  const zoning = await cov("zoning-districts-and-labels", { where: `within_distance(geom, geom'POINT(${lon} ${lat})', 3m)`, limit: "3" });
   // the surroundings around the parcel's centre: the City's streets, 2009 building footprints and public trees
   // (three quick requests, paged by a hundred), else the Overpass API as python -m ffm context queries it; if
   // neither answers, the site still comes back, without its context
   const radius = 120;
-  const c = JSON.parse(engine.parcelCenter(JSON.stringify(parcels))) || [lat, lon];
+  const c = JSON.parse(engine.parcelCenter(JSON.stringify(parcels), q.trim())) || [lat, lon];
   const within = async ds => {
     const out = [];
     for (let page = 0; page < 4; page++) {

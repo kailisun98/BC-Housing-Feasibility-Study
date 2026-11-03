@@ -12,9 +12,13 @@ A proposal is a JSON file in proposals/: every item carries `source: "claude"`, 
 excerpt, and the call is logged beside it (model id, date, prompt hash, usage). Nothing enters rules/ or sites/
 until `confirm(proposal, by)` is run by a person; the rule or site then records who confirmed it and when.
 
-The model is reached only when FFM_CLAUDE_KEY is set in the environment (never in the repository); without it
-every call raises NoKey and the UI offers rule-derived values only. The official SDK is imported lazily, so the
-engine and the tests stay standard-library:  uv run --with anthropic python -m ffm propose ...
+The model is reached only with a key: FFM_CLAUDE_KEY in the environment (never in the repository), or a person's
+own key typed into the tool, kept in their browser and sent with each request (the local server passes it
+straight to the SDK and never stores it; the static site calls the Messages API from the page itself with
+`browser_request` / `browser_proposal`). Without a key every call raises NoKey and the tool offers rule-derived
+values only. The official SDK is used when it is installed (uv run --with anthropic python -m ffm propose ...;
+it adds the server-side refusal fallback); without it the same request goes over plain HTTPS with urllib, so the
+engine, the local server and the tests stay standard-library.
 
 Public-repository rules hold: a practitioner's survey is read locally and only the proposal and, once confirmed,
 the site file are kept. The document's bytes are sent to the model and nowhere else.
@@ -119,27 +123,65 @@ SITE_SYSTEM = (
 
 # ---------------------------------------------------------------- the call
 
-def _client():
-    key = os.environ.get(KEY_ENV)
+API_URL = "https://api.anthropic.com/v1/messages"
+API_VERSION = "2023-06-01"
+
+
+def _key(api_key: str | None) -> str:
+    """The key handed in (a person's own, typed into the tool and sent with the request) or the environment's.
+    Never read from a file, never written to one."""
+    key = api_key or os.environ.get(KEY_ENV)
     if not key:
         raise NoKey()
+    return key
+
+
+def _client(api_key: str | None = None):
+    """The SDK client, when the official SDK is installed (uv run --with anthropic …); ImportError otherwise."""
+    key = _key(api_key)
     import anthropic  # the official SDK, imported only here
     return anthropic.Anthropic(api_key=key)
 
 
-def _document_block(path: Path) -> tuple[dict, dict]:
-    """A content block for the document (PDF as a document, an image as an image, text inline) and its record."""
-    data = path.read_bytes()
-    rec = {"name": path.name, "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
-    ext = path.suffix.lower()
+def _send_http(req: dict, api_key: str | None = None) -> dict:
+    """The same request over plain HTTPS with the standard library, for a local server started without the SDK
+    (the engine is standard-library by design). The response is the API's JSON, read by proposal_from_response as
+    the browser's is. API errors are raised with the API's own message."""
+    import urllib.error
+    import urllib.request
+    key = _key(api_key)
+    data = json.dumps(req).encode("utf-8")
+    r = urllib.request.Request(API_URL, data=data, method="POST",
+                               headers={"content-type": "application/json", "x-api-key": key, "anthropic-version": API_VERSION})
+    try:
+        with urllib.request.urlopen(r, timeout=600) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        try:
+            err = json.loads(e.read().decode("utf-8")).get("error") or {}
+            msg = f"{err.get('type') or e.code}: {err.get('message') or e.reason}"
+        except Exception:
+            msg = f"{e.code} {e.reason}"
+        raise OSError(msg)
+
+
+def _document_block(document: Path | tuple[bytes, str]) -> tuple[dict, dict]:
+    """A content block for the document (PDF as a document, an image as an image, text inline) and its record:
+    the name, size and hash, never the bytes. `document` is a path, or (bytes, name) when the page sent it."""
+    if isinstance(document, tuple):
+        data, name = document
+    else:
+        data, name = Path(document).read_bytes(), Path(document).name
+    rec = {"name": name, "bytes": len(data), "sha256": hashlib.sha256(data).hexdigest()}
+    ext = Path(name).suffix.lower()
     if ext == ".pdf":
         return {"type": "document", "source": {"type": "base64", "media_type": "application/pdf", "data": base64.standard_b64encode(data).decode("ascii")},
-                "title": path.name, "cache_control": {"type": "ephemeral"}}, dict(rec, media_type="application/pdf")
+                "title": name, "cache_control": {"type": "ephemeral"}}, dict(rec, media_type="application/pdf")
     if ext in MEDIA:
         return {"type": "image", "source": {"type": "base64", "media_type": MEDIA[ext], "data": base64.standard_b64encode(data).decode("ascii")}}, dict(rec, media_type=MEDIA[ext])
     if ext in TEXT_EXT:
-        return {"type": "text", "text": f"<document name=\"{path.name}\">\n{data.decode('utf-8', errors='replace')}\n</document>"}, dict(rec, media_type="text/plain")
-    raise ValueError(f"Cannot read {path.name}: give a PDF, an image (png, jpg, gif, webp) or a text file.")
+        return {"type": "text", "text": f"<document name=\"{name}\">\n{data.decode('utf-8', errors='replace')}\n</document>"}, dict(rec, media_type="text/plain")
+    raise ValueError(f"Cannot read {name}: give a PDF, an image (png, jpg, gif, webp) or a text file.")
 
 
 def _request(system: str, blocks: list[dict], tool: dict, model: str) -> dict:
@@ -148,40 +190,74 @@ def _request(system: str, blocks: list[dict], tool: dict, model: str) -> dict:
             "messages": [{"role": "user", "content": blocks}], "tools": [tool]}
 
 
-def _send(req: dict, client=None, caller: Callable[[dict], Any] | None = None):
+def _prompt_hash(system: str, blocks: list[dict], tool: dict) -> str:
+    return hashlib.sha256(json.dumps({"system": system, "tool": tool["name"], "text": [b.get("text", "") for b in blocks if b.get("type") == "text"]}, sort_keys=True).encode("utf-8")).hexdigest()
+
+
+def _send(req: dict, client=None, caller: Callable[[dict], Any] | None = None, api_key: str | None = None):
     """One Messages call. `caller` (tests, or another transport) takes the request dict and returns a response with
     .content, .stop_reason, .model, .usage. Otherwise the SDK: the beta endpoint with the server-side fallback on a
     safety refusal where the SDK knows it, else the plain endpoint."""
     if caller is not None:
         return caller(req)
-    client = client or _client()
+    if client is None:
+        try:
+            client = _client(api_key)
+        except ImportError:   # no SDK on this machine: the standard library speaks to the same endpoint
+            return _send_http(req, api_key)
     try:
         return client.beta.messages.create(betas=["server-side-fallback-2026-07-01"], fallbacks="default", **req)
     except TypeError:  # an SDK that predates the fallbacks parameter
         return client.messages.create(**req)
 
 
-def _run(kind: str, system: str, blocks: list[dict], tool: dict, model: str | None, client=None, caller=None) -> dict[str, Any]:
-    model = model or os.environ.get(MODEL_ENV) or DEFAULT_MODEL
-    req = _request(system, blocks, tool, model)
-    prompt_hash = hashlib.sha256(json.dumps({"system": system, "tool": tool["name"], "text": [b.get("text", "") for b in blocks if b.get("type") == "text"]}, sort_keys=True).encode("utf-8")).hexdigest()
-    resp = _send(req, client, caller)
-    if getattr(resp, "stop_reason", None) == "refusal":
-        det = getattr(resp, "stop_details", None)
-        raise Refused(f"The model declined this document ({getattr(det, 'category', None) or 'no category'}): {getattr(det, 'explanation', '') or ''}".strip())
-    tool_use = next((b for b in resp.content if getattr(b, "type", None) == "tool_use" and getattr(b, "name", None) == tool["name"]), None)
+def _as_dict(resp: Any) -> dict:
+    """A Messages response as plain data: the SDK's model, a test stub, or a dict the browser passed through."""
+    if isinstance(resp, dict):
+        return resp
+    if hasattr(resp, "to_dict"):
+        return resp.to_dict()
+    out: dict[str, Any] = {}
+    for k in ("content", "stop_reason", "stop_details", "model", "usage"):
+        v = getattr(resp, k, None)
+        if k == "content" and v is not None:
+            v = [c if isinstance(c, dict) else {kk: getattr(c, kk) for kk in ("type", "name", "input", "text") if hasattr(c, kk)} for c in v]
+        elif v is not None and not isinstance(v, (str, int, float, dict)):
+            v = {kk: getattr(v, kk) for kk in ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "category", "explanation") if hasattr(v, kk)}
+        out[k] = v
+    return out
+
+
+def proposal_from_response(kind: str, resp: Any, tool_name: str, model: str, prompt_hash: str) -> dict[str, Any]:
+    """The proposal record from a response: the items normalised, the call logged. A refusal is raised, never
+    an empty proposal; so is a response without the tool call."""
+    r = _as_dict(resp)
+    if r.get("stop_reason") == "refusal":
+        det = r.get("stop_details") or {}
+        raise Refused(f"The model declined this document ({det.get('category') or 'no category'}): {det.get('explanation') or ''}".strip())
+    content = r.get("content") or []
+    tool_use = next((b for b in content if b.get("type") == "tool_use" and b.get("name") == tool_name), None)
     if tool_use is None:
-        text = " ".join(getattr(b, "text", "") for b in resp.content if getattr(b, "type", None) == "text").strip()
+        text = " ".join(b.get("text", "") for b in content if b.get("type") == "text").strip()
         raise RuntimeError("The model returned no proposal" + (f": {text[:300]}" if text else "."))
-    inp = tool_use.input if isinstance(tool_use.input, dict) else json.loads(tool_use.input)
+    inp = tool_use.get("input")
+    if not isinstance(inp, dict):
+        inp = json.loads(inp or "{}")
     items = [_norm_item(it) for it in (inp.get("items") or [])]
-    usage = getattr(resp, "usage", None)
+    usage = r.get("usage") or {}
     return {
-        "kind": kind, "model": getattr(resp, "model", model), "requested_at": datetime.now().isoformat(timespec="seconds"),
-        "prompt_sha256": prompt_hash, "stop_reason": getattr(resp, "stop_reason", None),
-        "usage": {k: getattr(usage, k, None) for k in ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")} if usage else None,
+        "kind": kind, "model": r.get("model") or model, "requested_at": datetime.now().isoformat(timespec="seconds"),
+        "prompt_sha256": prompt_hash, "stop_reason": r.get("stop_reason"),
+        "usage": {k: usage.get(k) for k in ("input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")} if usage else None,
         "items": items, "status": "proposed",
     }
+
+
+def _run(kind: str, system: str, blocks: list[dict], tool: dict, model: str | None, client=None, caller=None, api_key: str | None = None) -> dict[str, Any]:
+    model = model or os.environ.get(MODEL_ENV) or DEFAULT_MODEL
+    req = _request(system, blocks, tool, model)
+    resp = _send(req, client, caller, api_key)
+    return proposal_from_response(kind, resp, tool["name"], model, _prompt_hash(system, blocks, tool))
 
 
 def _norm_item(it: dict) -> dict:
@@ -199,16 +275,14 @@ def _norm_item(it: dict) -> dict:
 
 # ---------------------------------------------------------------- the two jobs
 
-def propose_rule(document: Path, district: str, url: str | None = None, model: str | None = None, client=None, caller=None) -> dict[str, Any]:
-    block, rec = _document_block(Path(document))
+def _rule_blocks(document: Path | tuple[bytes, str], district: str) -> tuple[list[dict], dict]:
+    block, rec = _document_block(document)
     ask = {"type": "text", "text": f"This is the City of Vancouver district schedule for {district} (or a program guide). Propose its clauses for the {district} district: "
            f"the outright maximum floor space ratio and height, the minimum yards, site coverage, the effective date printed on it, and the conditions attached to any increase."}
-    res = _run("rule", RULE_SYSTEM, [block, ask], RULE_TOOL, model, client, caller)
-    res.update({"district": district, "slug": f"rule-{_slug(district)}-{date.today().isoformat()}", "document": rec, "url": url or ""})
-    return res
+    return [block, ask], rec
 
 
-def propose_site(site: dict, document: Path | None = None, model: str | None = None, client=None, caller=None) -> dict[str, Any]:
+def _site_blocks(site: dict, document: Path | tuple[bytes, str] | None) -> tuple[list[dict], dict | None]:
     public = {k: v for k, v in site.items() if k not in ("osm",)}   # the context block is long; its frame and counts go instead
     osm = site.get("osm") or {}
     if osm:
@@ -218,11 +292,57 @@ def propose_site(site: dict, document: Path | None = None, model: str | None = N
     blocks: list[dict] = [{"type": "text", "text": "<site_file>\n" + json.dumps(public, indent=1, ensure_ascii=False) + "\n</site_file>"}]
     rec = None
     if document:
-        block, rec = _document_block(Path(document))
+        block, rec = _document_block(document)
         blocks.append(block)
     blocks.append({"type": "text", "text": "Propose the site file's fields from this evidence: confirm or correct the district, the area, the frontage and depth (the equivalent rectangle for an odd lot, and why), the street it fronts, whether it is a corner lot with a lane behind, and what is odd about it. Trees and easements only where the document shows them."})
-    res = _run("site", SITE_SYSTEM, blocks, SITE_TOOL, model, client, caller)
+    return blocks, rec
+
+
+def propose_rule(document: Path | tuple[bytes, str], district: str, url: str | None = None, model: str | None = None, client=None, caller=None,
+                 api_key: str | None = None) -> dict[str, Any]:
+    blocks, rec = _rule_blocks(document, district)
+    res = _run("rule", RULE_SYSTEM, blocks, RULE_TOOL, model, client, caller, api_key)
+    res.update({"district": district, "slug": f"rule-{_slug(district)}-{date.today().isoformat()}", "document": rec, "url": url or ""})
+    return res
+
+
+def propose_site(site: dict, document: Path | tuple[bytes, str] | None = None, model: str | None = None, client=None, caller=None,
+                 api_key: str | None = None) -> dict[str, Any]:
+    blocks, rec = _site_blocks(site, document)
+    res = _run("site", SITE_SYSTEM, blocks, SITE_TOOL, model, client, caller, api_key)
     res.update({"site_id": site.get("id"), "slug": f"site-{_slug(str(site.get('id') or 'site'))}-{date.today().isoformat()}", "document": rec})
+    return res
+
+
+# ---------------------------------------------------------------- the browser's path: the page holds the key and calls the API itself
+
+def browser_request(kind: str, site: dict | None = None, document_b64: str | None = None, document_name: str | None = None,
+                    district: str | None = None, model: str | None = None) -> dict[str, Any]:
+    """The request body the page sends to the Messages API with the person's own key (the static site has no
+    server to hold one), and what the page needs to log it: the tool name, the prompt hash, the document record."""
+    model = model or DEFAULT_MODEL
+    doc = (base64.standard_b64decode(document_b64), document_name or "document.pdf") if document_b64 else None
+    if kind == "rule":
+        if not district or doc is None:
+            raise ValueError("A rule reading needs the district and the document.")
+        blocks, rec = _rule_blocks(doc, district)
+        system, tool = RULE_SYSTEM, RULE_TOOL
+    else:
+        blocks, rec = _site_blocks(site or {}, doc)
+        system, tool = SITE_SYSTEM, SITE_TOOL
+    return {"request": _request(system, blocks, tool, model), "tool": tool["name"], "prompt_sha256": _prompt_hash(system, blocks, tool),
+            "document": rec, "model": model}
+
+
+def browser_proposal(kind: str, response: dict, tool: str, model: str, prompt_sha256: str, site: dict | None = None,
+                     district: str | None = None, url: str | None = None, document: dict | None = None) -> dict[str, Any]:
+    """The proposal record from the API's JSON response, as propose_rule / propose_site would have made it."""
+    res = proposal_from_response(kind, response, tool, model, prompt_sha256)
+    if kind == "rule":
+        res.update({"district": district, "slug": f"rule-{_slug(district or 'x')}-{date.today().isoformat()}", "document": document, "url": url or ""})
+    else:
+        res.update({"site_id": (site or {}).get("id"), "slug": f"site-{_slug(str((site or {}).get('id') or 'site'))}-{date.today().isoformat()}", "document": document})
+    res["in_browser"] = True
     return res
 
 

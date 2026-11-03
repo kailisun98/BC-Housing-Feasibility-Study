@@ -11,3 +11,5 @@ outputs/**/*.0001.rvt
 outputs/**/ffm_revit_result.json
 outputs/**/ffm_sheet.png
 outputs/**/ffm_sheet.pdf
+# documents saved by hand for the proposer to read (district schedules, surveys): read locally, never committed
+inbox/

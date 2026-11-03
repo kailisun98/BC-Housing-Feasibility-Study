@@ -35,11 +35,15 @@ site (home) ──► the case ──► tool: memo on screen (R1)
 3. **Start from an address** (built 3 Nov 2026, the guided card at the top of the rail, seven stops):
    1. *Find the site*: an address; the City's address list gives the point, its open data the zoning
       district and the parcel, which becomes the lot's area and an equivalent rectangle. Or a saved site.
-      With a key on the local machine, *Ask Claude about this site*: the model proposes the odd lot's
-      rectangle, its frontage street and what is odd, with evidence and a confidence; the manager confirms
-      each field by name, and the site file records it.
+      *Ask Claude about this site*, with a key (the local server's, or the manager's own typed into the
+      fold and kept in their browser only): the model proposes the odd lot's rectangle, its frontage street
+      and what is odd, with evidence and a confidence; the manager confirms each field by name, and the
+      site file records it.
    2. *Choose the programs*: the funders in view.
-   3. *Read the site*: layers A to C on the site alone, shown in the memo pane before any option.
+   3. *Read the site*: layers A to C on the site alone, shown in the memo pane before any option. Where
+      the stack has no schedule for the district (RT-3), *Read the district schedule with Claude*: the
+      manager saves the City's PDF, chooses it, the model proposes its clauses with the quote behind each,
+      and the manager confirms them into the rules under their name; the site is then read again.
    4. *Shape the option*: Outright, Benchmark or Funder-ready, derived from the rules; every figure
       Suggested | Mine with its rule beside it; what no rule settles (Community Vision area, transit
       area, tenure, developer partner, site control) answered right there.

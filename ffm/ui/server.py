@@ -30,9 +30,14 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
     POST /api/read-site                     body {site, as_of?}: the site alone against layers A to C, nothing written
     POST /api/suggest                       body {site, programs, as_of?, candidate?}: a rule-derived option, every
                                             figure with its rule (ffm/suggest.py)
-    GET  /api/capabilities                  {claude: bool, model}: whether FFM_CLAUDE_KEY is set on this machine
-    POST /api/propose/site                  body {site}: Claude proposes the site's fields with evidence and a
-                                            confidence (ffm/propose.py); logged in proposals/; 503 without a key
+    GET  /api/capabilities                  {claude: bool, model, accepts_key, writes_rules}: whether FFM_CLAUDE_KEY is
+                                            set on this machine; a person's own key may come with each request instead
+    POST /api/propose/site                  body {site, api_key?, document?}: Claude proposes the site's fields with
+                                            evidence and a confidence (ffm/propose.py); logged in proposals/; 503 without a key
+    POST /api/propose/rule                  body {district, document: {name, data_b64}, url?, api_key?}: Claude reads a
+                                            district schedule the page sent and proposes its clauses; logged, not stored
+    POST /api/confirm                       body {file, by, only?}: a named person confirms a logged rule proposal into
+                                            rules/a_zoning_district.json
     GET  /api/issues?site=<id>              the issue notes on the site's runs, newest first
     POST /api/runs/<site>/<folder>/issue    body {by, to, note}: hand the run from one reader to another
     POST /api/pdf                           body {html}: the page's paper memo, printed to PDF by a headless Edge
@@ -171,7 +176,7 @@ def list_rules(as_of: str | None) -> list[dict]:
     for r in load_rules(RULES_DIR):
         v = r.version_on(on)
         out.append({"id": r.id, "layer": r.layer, "layer_title": r.layer_title, "title": r.title, "jurisdiction": r.jurisdiction,
-                    "applies_to_districts": r.applies_to_districts,
+                    "applies_to_districts": r.applies_to_districts, "check": r.check,
                     "version_effective_from": v.effective_from.isoformat() if v else None})
     return out
 
@@ -322,7 +327,49 @@ def do_run(body: Any) -> dict:
 
 def capabilities() -> dict:
     from .. import propose
-    return {**propose.available(), "static": False}
+    return {**propose.available(), "static": False, "accepts_key": True, "writes_rules": True}
+
+
+def _key_of(body: dict) -> str | None:
+    """A person's own key, typed into the page and sent with this request only: passed to the SDK, never logged,
+    never written."""
+    k = body.get("api_key")
+    return k.strip() if isinstance(k, str) and k.strip() else None
+
+
+def _document_of(body: dict) -> tuple[bytes, str] | None:
+    """A document the page read from the person's disk and sent as base64: bytes and name, never written here."""
+    import base64
+    d = body.get("document")
+    if not isinstance(d, dict) or not d.get("data_b64"):
+        return None
+    name = str(d.get("name") or "document.pdf")
+    if "/" in name or "\\" in name:
+        name = name.replace("\\", "/").split("/")[-1]
+    try:
+        return base64.standard_b64decode(d["data_b64"]), name
+    except Exception:
+        raise ApiError(400, "The document is not valid base64.")
+
+
+def _propose(fn, body: dict, **kw) -> dict:
+    from .. import propose
+    try:
+        res = fn(**kw, api_key=_key_of(body))
+    except propose.NoKey as e:
+        raise ApiError(503, str(e))
+    except propose.Refused as e:
+        raise ApiError(422, str(e))
+    except ValueError as e:
+        raise ApiError(400, str(e))
+    except OSError as e:
+        raise ApiError(502, f"The model could not be reached: {e}")
+    except Exception as e:  # the SDK's own errors (a bad key, a rate limit): said plainly
+        raise ApiError(502, f"{type(e).__name__}: {str(e)[:300]}")
+    out = propose.PROPOSALS_DIR / f"{res['slug']}-{datetime.now().strftime('%H%M%S')}.json"
+    propose.save(res, out)
+    res["file"] = out.name
+    return res
 
 
 def do_propose_site(body: Any) -> dict:
@@ -331,19 +378,39 @@ def do_propose_site(body: Any) -> dict:
     The site's own bytes are the only thing sent; nothing is written to the site here."""
     from .. import propose
     if not isinstance(body, dict) or not isinstance(body.get("site"), dict):
-        raise ApiError(400, "Send {site: {...}}.")
+        raise ApiError(400, "Send {site: {...}, api_key?}.")
+    return _propose(propose.propose_site, body, site=body["site"], document=_document_of(body))
+
+
+def do_propose_rule(body: Any) -> dict:
+    """The model reads a district schedule the page sent (a PDF from the person's disk) and proposes its clauses;
+    logged in proposals/ with the document's name and hash, never its bytes."""
+    from .. import propose
+    if not isinstance(body, dict) or not body.get("district"):
+        raise ApiError(400, "Send {district, document: {name, data_b64}, url?, api_key?}.")
+    doc = _document_of(body)
+    if doc is None:
+        raise ApiError(400, "Send the schedule as document: {name, data_b64}.")
+    return _propose(propose.propose_rule, body, document=doc, district=str(body["district"]).strip().upper(), url=body.get("url") or None)
+
+
+def do_confirm(body: Any) -> dict:
+    """A named person confirms a logged proposal: a rule proposal into rules/a_zoning_district.json."""
+    from .. import propose
+    if not isinstance(body, dict) or not body.get("file") or not str(body.get("by") or "").strip():
+        raise ApiError(400, "Send {file, by, only?}.")
+    name = str(body["file"])
+    if not _slug_ok(name.replace(".json", "")) or not name.endswith(".json"):
+        raise ApiError(400, "Bad proposal file name.")
+    path = propose.PROPOSALS_DIR / name
+    if not path.exists():
+        raise ApiError(404, "No such proposal.")
+    only = body.get("only") if isinstance(body.get("only"), list) else None
     try:
-        res = propose.propose_site(body["site"])
-    except propose.NoKey as e:
-        raise ApiError(503, str(e))
-    except propose.Refused as e:
-        raise ApiError(422, str(e))
-    except OSError as e:
-        raise ApiError(502, f"The model could not be reached: {e}")
-    out = propose.PROPOSALS_DIR / f"{res['slug']}-{datetime.now().strftime('%H%M%S')}.json"
-    propose.save(res, out)
-    res["file"] = out.name
-    return res
+        rep = propose.confirm(path, str(body["by"]).strip(), only=only)
+    except ValueError as e:
+        raise ApiError(400, str(e))
+    return rep
 
 
 def load_run(site_id: str, folder: str) -> dict:
@@ -618,6 +685,10 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(do_suggest(body))
             if path == "/api/propose/site":
                 return self._json(do_propose_site(body))
+            if path == "/api/propose/rule":
+                return self._json(do_propose_rule(body))
+            if path == "/api/confirm":
+                return self._json(do_confirm(body))
             mm = re.match(r"^/api/runs/([^/]+)/([^/]+)/issue$", path)
             if mm:
                 return self._json(add_issue(mm.group(1), mm.group(2), body), 201)

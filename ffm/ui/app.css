@@ -615,6 +615,20 @@ table.plain td.status { white-space: nowrap; }
 .fin-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
 .fin-rows .field .label { font-size: 11px; }
 .fin-rows input { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
+/* the model behind a fold: a person's own key, kept in the browser; the schedule reader's small form */
+.claude-fold { border-top: 1px solid var(--line); padding-top: 6px; font-size: 12px; }
+.claude-fold > summary { cursor: pointer; font-weight: 500; color: var(--ink); padding: 4px 0; }
+.claude-fold > summary .cont { font-weight: 400; }
+.claude-fold[open] > summary { margin-bottom: 6px; }
+.keybox { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: 4px; margin: 2px 0 8px; }
+.keybox .field .label { font-size: 11px; }
+.keybox .key-input { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font: 12.5px var(--mono); }
+.keybox code { font: 11px var(--mono); }
+.keybox-note { margin: 2px 0 6px; }
+.sched-form { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 8px; }
+.sched-form .field .label { font-size: 11px; }
+.sched-form input[type="text"], .sched-form input[type="url"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
+.sched-form input[type="file"] { font-size: 12px; max-width: 100%; }
 /* stop 1: what the model proposes, each line confirmed on its own */
 .proposal { border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .prop-top { display: flex; flex-direction: column; gap: 2px; }

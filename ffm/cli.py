@@ -212,8 +212,10 @@ def _propose_eval(a: argparse.Namespace, propose) -> int:
     for case in sorted(p for p in base.iterdir() if p.is_dir() and (p / "expected.json").exists()):
         exp = json.loads((case / "expected.json").read_text(encoding="utf-8"))
         doc = next((p for p in case.iterdir() if p.stem == "document"), None)
-        if doc is None:
-            print(f"{case.name}: no document")
+        if doc is None and exp.get("document_path"):   # a document saved by hand outside the repository (inbox/)
+            doc = base.parent.parent / exp["document_path"]
+        if doc is None or not doc.exists():
+            print(f"{case.name}: no document" + (f" at {exp.get('document_path')}" if exp.get("document_path") else ""))
             continue
         if exp.get("kind") == "rule":
             res = propose.propose_rule(doc, exp["district"], model=a.model)

@@ -191,6 +191,17 @@ def ffm_city_elements(streets_json, buildings_json, trees_json):
 def ffm_lookup_assemble_from(address, lat, lon, display, zoning_json, parcels_json, elements_json, radius_m, query, source):
     elements = json.loads(elements_json) if elements_json else None
     return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json), elements, radius_m, query, source))
+
+from ffm import propose
+
+def ffm_propose_request(kind, site_json, document_b64, document_name, district, model):
+    site = json.loads(site_json) if site_json else None
+    return json.dumps(propose.browser_request(kind, site, document_b64 or None, document_name or None, district or None, model or None))
+
+def ffm_proposal_from_response(kind, response_json, tool, model, prompt_sha256, site_json, district, url, document_json):
+    site = json.loads(site_json) if site_json else None
+    doc = json.loads(document_json) if document_json else None
+    return json.dumps(propose.browser_proposal(kind, json.loads(response_json), tool, model, prompt_sha256, site, district or None, url or None, doc))
 `;
 
 function loadEngine() {
@@ -216,7 +227,8 @@ function loadEngine() {
                suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble"),
                parcelCenter: pyodide.globals.get("ffm_parcel_center"), cityElements: pyodide.globals.get("ffm_city_elements"),
                parseAddress: pyodide.globals.get("ffm_parse_address"), civicAddress: pyodide.globals.get("ffm_civic_address"),
-               lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from") };
+               lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from"),
+               proposeRequest: pyodide.globals.get("ffm_propose_request"), proposalFromResponse: pyodide.globals.get("ffm_proposal_from_response") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
     return engine;
   })().catch(e => {
@@ -371,7 +383,8 @@ async function staticApi(path, opts) {
   let m;
   if (method === "GET") {
     if (p === "/api/rules") return fetchJSON("data/rules.json");
-    if (p === "/api/capabilities") return { claude: false, model: null, static: true };   // the model is called from the local server only
+    // no server holds a key on the web; a person's own key, kept in this browser, calls the API from the page
+    if (p === "/api/capabilities") return { claude: false, model: CLAUDE_MODEL, static: true, accepts_key: true, writes_rules: false };
     if (p === "/api/sites") return fetchJSON("data/sites.json");
     if ((m = p.match(/^\/api\/sites\/([^/]+)$/))) return fetchJSON(`data/sites/${decodeURIComponent(m[1])}.json`);
     if (p === "/api/options") {
@@ -3186,17 +3199,32 @@ function renderGuideInto(el) {
     </dl>
     <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-site">Use this site</button><span class="help">Then answer what the data cannot: the policy areas, water and sewer, trees, the owner.</span></div>` : ""}
     <p class="help stop-or">Or pick a saved site in the Site card below${done[1] ? `: <b>${h(site.address || site.id)}</b> is chosen` : ""}.</p>
-    ${state.caps && state.caps.claude ? `<div class="form-actions"><button class="btn btn-small" type="button" id="guide-ask-claude"${done[1] && guide.loading !== "claude" ? "" : " disabled"}>${guide.loading === "claude" ? "Reading…" : "Ask Claude about this site"}</button><span class="help">For an odd lot: the model proposes the equivalent rectangle, the frontage street and what is odd, with evidence; you confirm each field.</span></div>${renderProposal(guide.proposal)}` : ""}`;
+    <details class="claude-fold"${hasClaude() || guide.proposal ? " open" : ""}><summary>Ask Claude about this site <span class="cont">(with a key; optional)</span></summary>
+      ${renderKeyBox("keybox-site")}
+      ${hasClaude() ? `<div class="form-actions"><button class="btn btn-small" type="button" id="guide-ask-claude"${done[1] && guide.loading !== "claude" ? "" : " disabled"}>${guide.loading === "claude" ? "Reading…" : "Ask Claude about this site"}</button><span class="help">For an odd lot: the model proposes the equivalent rectangle, the frontage street and what is odd, with evidence; you confirm each field.</span></div>${renderProposal(guide.proposal)}` : ""}
+    </details>`;
 
   const stop2 = `
     <div class="checks">${progs.map(r => `<label><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-programs">Use these programs</button></div>`;
 
   const R = guide.reading;
+  const district = (site.zoning_district || "").toUpperCase();
+  const scheduleKnown = state.rules.some(r => r.check === "district_outright_fsr" && (r.applies_to_districts || []).some(d => d.toUpperCase() === district || (district.startsWith(d.toUpperCase() + "-") && !d.includes("-"))));
   const stop3 = `
     <p class="help">Layers A to C on the site alone: the outright limits, the rezoning path, transit, trees. Nothing is written.</p>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-read"${guide.loading === "read" ? " disabled" : ""}>${guide.loading === "read" ? "Reading…" : (R ? "Read it again" : "Read the site")}</button></div>
-    ${R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">The reading is in the memo pane.</p>` : ""}`;
+    ${R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">The reading is in the memo pane.</p>` : ""}
+    <details class="claude-fold"${(district && !scheduleKnown && hasClaude()) || guide.ruleProposal ? " open" : ""}><summary>Read the district schedule with Claude <span class="cont">(${district ? (scheduleKnown ? `${h(district)} is in the stack` : `no outright schedule for ${h(district)} in the stack`) : "no district yet"}; with a key)</span></summary>
+      <p class="help">Save the schedule's PDF from the City's by-law site (it refuses scripts), choose it here, and the model proposes its clauses with the quote behind each. You check the quotes against the PDF and confirm under your name; the rules file then cites the schedule, the model and you.</p>
+      ${renderKeyBox("keybox-rule")}
+      ${hasClaude() ? `<div class="sched-form">
+        <label class="field"><span class="label">Schedule PDF</span><input type="file" id="sched-file" accept=".pdf,.png,.jpg,.jpeg,.txt"></label>
+        <label class="field"><span class="label">District</span><input type="text" id="sched-district" value="${h(guide.scheduleDistrict || district)}" placeholder="RT-3"></label>
+        <label class="field"><span class="label">Its address on the City's site</span><input type="url" id="sched-url" value="${h(guide.scheduleUrl || (district ? `https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-${district.toLowerCase()}.pdf` : ""))}" placeholder="https://bylaws.vancouver.ca/zoning/…"></label>
+        <div class="form-actions"><button class="btn btn-small" type="button" id="guide-read-schedule"${guide.loading === "schedule" ? " disabled" : ""}>${guide.loading === "schedule" ? "Reading…" : "Read the schedule"}</button><span class="help">The PDF goes to the model and nowhere else; the log keeps its name and hash.</span></div>
+      </div>${renderRuleProposal(guide.ruleProposal)}` : ""}
+    </details>`;
 
   const cands = S ? S.candidates : [{ id: "outright", title: "Outright", available: true, what: "what the district allows as of right" }, { id: "benchmark", title: "Benchmark", available: true, what: "the staff benchmark under the rezoning policy" }, { id: "funder-ready", title: "Funder-ready", available: true, what: "the benchmark with every funder question answered" }];
   // the envelope rows always show: where no rule in the stack derives them for this district (RT-3, CD-1…), the
@@ -3341,27 +3369,161 @@ function wireGuide() {
   on("#guide-rerun", () => { guide.step = 6; runRules(); });
   on("#guide-ask-claude", guideAskClaude);
   $$("[data-confirm-key]", el).forEach(b => b.addEventListener("click", () => confirmProposal(b.dataset.confirmKey, b.dataset.confirmAll === "1")));
+  wireKeyBoxes(el);
+  on("#guide-read-schedule", guideReadSchedule);
+  on("#confirm-rules", confirmRuleProposal);
+  $$(".claude-fold", el).forEach(d => d.addEventListener("toggle", () => { if (d.open) { const i = $(".key-input", d); if (i) i.focus({ preventScroll: true }); } }));
   on("#guide-issue", () => openIssuePanel());
 }
 
-/* Claude proposes, the person confirms: offered only when the local server reports a key on this machine. The
-   site's public fields go to the model; the proposal comes back with evidence and a confidence, and each field
-   enters the Site card only when its Confirm is pressed, marked with who confirmed it and when. */
+/* Claude proposes, the person confirms. The model is reached with a key: the local server's own (FFM_CLAUDE_KEY
+   on that machine) or the person's, typed into the page and kept in this browser only (localStorage), sent with
+   each request to the local server (which hands it to the SDK and never stores it) or, on the web, straight to
+   the Messages API from the page. The site's public fields go to the model; the proposal comes back with evidence
+   and a confidence, and each field enters the Site card only when its Confirm is pressed, marked with who
+   confirmed it and when. */
+const KEY_STORE = "ffm.claude.key";
+const CLAUDE_MODEL = "claude-sonnet-5-5";
+const CLAUDE_API = "https://api.anthropic.com/v1/messages";
+
+function claudeKey() { try { return localStorage.getItem(KEY_STORE) || ""; } catch (e) { return ""; } }
+function setClaudeKey(k) { try { if (k) localStorage.setItem(KEY_STORE, k); else localStorage.removeItem(KEY_STORE); } catch (e) { /* storage off: the key lasts this page only */ guide.sessionKey = k || ""; } }
+function keyInHand() { return claudeKey() || guide.sessionKey || ""; }
+function hasClaude() { return !!((state.caps && state.caps.claude) || keyInHand()); }
+const keyTail = k => (k ? `…${k.slice(-4)}` : "");
+
+/* The key box: typed once, kept in this browser, forgotten with one click. Shown wherever the model is offered. */
+function renderKeyBox(id) {
+  const serverHas = state.caps && state.caps.claude;
+  const mine = keyInHand();
+  if (serverHas && !mine) return `<p class="help keybox-note">The local server holds a key (${h(state.caps.model || "")}); your own is not needed.</p>`;
+  if (mine) return `<div class="keybox" id="${id}"><span class="help">Your key <code>${h(keyTail(mine))}</code> is kept in this browser only and sent ${STATIC ? "straight to Anthropic from this page" : "to the local server, which passes it on and never stores it"}.</span><button class="btn btn-small" type="button" data-forget-key="1">Forget it</button></div>`;
+  return `<div class="keybox" id="${id}">
+    <label class="field"><span class="label">Your Anthropic API key</span><input type="password" class="key-input" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" aria-describedby="${id}-help"></label>
+    <div class="form-actions"><button class="btn btn-small" type="button" data-save-key="1">Use this key</button><span class="help" id="${id}-help">Kept in this browser only (localStorage), never in a file or the repository; sent ${STATIC ? "straight to Anthropic from this page" : "to the local server with each request, which passes it to the SDK and does not store it"}. A few cents a reading.</span></div>
+  </div>`;
+}
+
+function wireKeyBoxes(el) {
+  $$("[data-save-key]", el).forEach(b => b.addEventListener("click", () => {
+    const inp = b.closest(".keybox").querySelector(".key-input");
+    const k = (inp.value || "").trim();
+    if (k.length < 20) { toast("That does not look like a key.", true); inp.focus(); return; }
+    setClaudeKey(k);
+    renderGuide();
+    setStatus(`Key ${keyTail(k)} kept in this browser. Ask Claude is on.`, "ok");
+  }));
+  $$("[data-forget-key]", el).forEach(b => b.addEventListener("click", () => { setClaudeKey(""); guide.sessionKey = ""; renderGuide(); setStatus("Key forgotten.", "info"); }));
+  $$(".key-input", el).forEach(i => i.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); const b = i.closest(".keybox").querySelector("[data-save-key]"); if (b) b.click(); } }));
+}
+
+/* One call to the model, either way: the local server (its key or the person's) or, on the web, the Messages
+   API from the page with the person's key; the engine builds the request and reads the response in both cases. */
+async function callClaude(kind, args) {
+  const key = keyInHand();
+  if (!STATIC) {
+    const body = Object.assign({}, args);
+    if (key) body.api_key = key;
+    return postJSON(kind === "rule" ? "/api/propose/rule" : "/api/propose/site", body);
+  }
+  if (!key) throw new Error("no key: type your Anthropic key first.");
+  await loadEngine();
+  const doc = args.document || {};
+  const made = JSON.parse(engine.proposeRequest(kind, args.site ? JSON.stringify(args.site) : "", doc.data_b64 || "", doc.name || "", args.district || "", CLAUDE_MODEL));
+  const r = await fetch(CLAUDE_API, { method: "POST", headers: { "content-type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" }, body: JSON.stringify(made.request) });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && j.error && j.error.message) || `${r.status} ${r.statusText}`);
+  const res = JSON.parse(engine.proposalFromResponse(kind, JSON.stringify(j), made.tool, made.model, made.prompt_sha256, args.site ? JSON.stringify(args.site) : "", args.district || "", args.url || "", made.document ? JSON.stringify(made.document) : ""));
+  res.file = null;   // nothing is written on the web; the proposal lives in this tab
+  return res;
+}
+
 async function guideAskClaude() {
   if (!state.site) { toast("Look up or pick a site first.", true); return; }
   const who = ($("#confirm-by") && $("#confirm-by").value.trim()) || "";
   guide.loading = "claude"; renderGuide("#guide-ask-claude");
-  setStatus(`Asking ${(state.caps && state.caps.model) || "the model"} to read the site… nothing enters the site until you confirm it.`, "busy");
+  setStatus(`Asking ${(state.caps && state.caps.model) || CLAUDE_MODEL} to read the site… nothing enters the site until you confirm it.`, "busy");
   try {
-    guide.proposal = await postJSON("/api/propose/site", { site: state.site });
+    guide.proposal = await callClaude("site", { site: state.site });
     guide.proposal.by = who;
-    setStatus(`${guide.proposal.items.length} proposed item${guide.proposal.items.length === 1 ? "" : "s"} from ${guide.proposal.model}, logged as proposals/${guide.proposal.file}. Confirm the ones that are right.`, "ok");
+    setStatus(`${guide.proposal.items.length} proposed item${guide.proposal.items.length === 1 ? "" : "s"} from ${guide.proposal.model}${guide.proposal.file ? `, logged as proposals/${guide.proposal.file}` : ", kept in this tab"}. Confirm the ones that are right.`, "ok");
   } catch (e) {
     guide.proposal = null;
     toast(`The model could not read the site: ${e.message}`, true);
   } finally {
     guide.loading = ""; renderGuide("#guide-ask-claude");
   }
+}
+
+/* Reading a district schedule from the page: a PDF chosen from the person's disk goes to the model (through the
+   local server, which neither stores it nor writes it); the clauses come back with their quotes; a named person
+   confirms them into the rules, and the site is read again under them. On the web the proposal can be made and
+   read but not confirmed, since the rules there are the published files. */
+function readFileB64(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(String(fr.result).split(",")[1] || "");
+    fr.onerror = () => reject(new Error("could not read the file"));
+    fr.readAsDataURL(file);
+  });
+}
+
+async function guideReadSchedule() {
+  const el = $("#guide");
+  const file = ($("#sched-file", el) || {}).files && $("#sched-file", el).files[0];
+  const district = (($("#sched-district", el) || {}).value || "").trim().toUpperCase();
+  const url = (($("#sched-url", el) || {}).value || "").trim();
+  if (!file) { toast("Choose the schedule's PDF first.", true); return; }
+  if (!district) { toast("Name the district the schedule is for.", true); return; }
+  if (file.size > 12 * 1024 * 1024) { toast("The file is over 12 MB; a district schedule is a few hundred KB.", true); return; }
+  guide.loading = "schedule"; guide.scheduleDistrict = district; guide.scheduleUrl = url; renderGuide("#guide-read-schedule");
+  setStatus(`Reading ${file.name} for ${district}… the PDF goes to the model and nowhere else; nothing enters the rules until you confirm.`, "busy");
+  try {
+    const data_b64 = await readFileB64(file);
+    guide.ruleProposal = await callClaude("rule", { district, url, document: { name: file.name, data_b64 } });
+    setStatus(`${guide.ruleProposal.items.length} clause item${guide.ruleProposal.items.length === 1 ? "" : "s"} proposed for ${district} from ${guide.ruleProposal.model}${guide.ruleProposal.file ? `, logged as proposals/${guide.ruleProposal.file}` : ""}. Check each quote against the PDF, then confirm under your name.`, "ok");
+  } catch (e) {
+    guide.ruleProposal = null;
+    toast(`The model could not read the schedule: ${e.message}`, true);
+  } finally {
+    guide.loading = ""; renderGuide("#guide-read-schedule");
+  }
+}
+
+async function confirmRuleProposal() {
+  const P = guide.ruleProposal;
+  if (!P || !P.file) { toast(STATIC ? "On the web the rules are the published files; confirm on the local server." : "Read a schedule first.", true); return; }
+  const by = (($("#confirm-rules-by") || {}).value || "").trim();
+  if (!by) { toast("Say who confirms: your name goes on each rule's source.", true); const i = $("#confirm-rules-by"); if (i) i.focus(); return; }
+  setStatus("Writing the confirmed clauses into the rules…", "busy");
+  try {
+    const rep = await postJSON("/api/confirm", { file: P.file, by });
+    P.confirmedRules = rep.confirmed;
+    P.by = by;
+    state.rules = await api(`/api/rules?as_of=${encodeURIComponent($("#as-of").value || todayISO())}`);
+    guide.reading = null; guide.suggestion = null;
+    renderGuide("#guide-rule-proposal");
+    setStatus(`${rep.confirmed.length} rule${rep.confirmed.length === 1 ? "" : "s"} confirmed by ${by} for ${P.district}: ${rep.confirmed.join(", ")}. Read the site again: the schedule now applies.`, "ok");
+  } catch (e) {
+    toast(`Could not confirm: ${e.message}`, true);
+  }
+}
+
+function renderRuleProposal(P) {
+  if (!P) return "";
+  const show = it => (it.value == null ? "—" : typeof it.value === "boolean" ? (it.value ? "yes" : "no") : String(it.value));
+  const rows = P.items.map(it => `<li class="prop-row">
+      <div class="prop-head"><b>${h(it.key.replace(/_/g, " "))}</b> <span class="prop-val">${h(show(it))}</span> <span class="conf" title="the model's confidence">${h(Math.round(it.confidence * 100))}%</span>${it.section ? ` <span class="rule-id">${h(it.section)}</span>` : ""}${it.page != null ? ` <span class="cont">p. ${h(it.page)}</span>` : ""}</div>
+      ${it.evidence ? `<div class="cont prop-ev">“${h(it.evidence)}”</div>` : ""}
+    </li>`).join("");
+  const done = P.confirmedRules && P.confirmedRules.length;
+  return `<div class="proposal" id="guide-rule-proposal">
+    <div class="prop-top"><span class="eyebrow">${h(P.district)} schedule, proposed by ${h(P.model)}</span><span class="cont">source: claude · ${P.document ? `${h(P.document.name)}, sha256 ${h(String(P.document.sha256).slice(0, 12))}…` : ""}${P.file ? ` · logged as proposals/${h(P.file)}` : " · kept in this tab"} · the base maximums become the outright rules, the Director's increases go in the verify note</span></div>
+    <ul class="prop-list">${rows}</ul>
+    ${done ? `<p class="help">Confirmed by <b>${h(P.by)}</b>: ${P.confirmedRules.map(id => `<code>${h(id)}</code>`).join(" ")}. Read the site again; the suggestion now takes its envelope and yards from the schedule.</p>`
+      : (P.file ? `<div class="form-actions"><label class="field inline"><span class="label">Confirmed by</span><input type="text" id="confirm-rules-by" value="${h(P.by || "")}" placeholder="your name"></label><button class="btn btn-small btn-primary" type="button" id="confirm-rules">Confirm all into the rules</button><span class="help">Check every quote against the PDF first; the rules file names you.</span></div>`
+        : `<p class="help">On the web the rules are the published files: run the local server to confirm a reading into them.</p>`)}
+  </div>`;
 }
 
 const SITE_PROPOSAL_KEYS = { zoning_district: "zoning_district", site_area_m2: "site_area_m2", frontage_m: "frontage_m", depth_m: "depth_m",

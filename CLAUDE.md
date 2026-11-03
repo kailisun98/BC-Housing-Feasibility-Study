@@ -354,9 +354,24 @@ Phase 6, Claude in the loop (the model proposes, a person confirms, the engine d
   field (`propose.score`). The first case is a synthetic RT-9 schedule (not a real district). The real RT-3
   schedule is not in the repo: `bylaws.vancouver.ca` refuses automated downloads, so a person saves the PDF and
   runs `propose rule --from <pdf> --district RT-3 --url <its address>`, then `confirm`.
-- The tool, stop 1: "Ask Claude about this site" appears only when the local server reports a key
-  (`state.caps`); the proposal renders with confidence and evidence, each field has Confirm (a name is required:
-  it goes on the site file), and "Confirm all". The static build never calls the model.
+- A person's own key (3 Nov 2026, "allow users to input their own tokens"): stops 1 and 3 hold a fold "Ask
+  Claude …" with a key box (`renderKeyBox`, `KEY_STORE = "ffm.claude.key"` in localStorage, shown as its last
+  four characters, "Forget it"). `callClaude(kind, args)` sends the key with each request to the local server
+  (`api_key` in the body; `server._key_of` hands it to `propose` and never stores or logs it) or, on the web,
+  calls the Messages API straight from the page (`CLAUDE_API`, header `anthropic-dangerous-direct-browser-access`)
+  with the request the engine builds in Pyodide (`propose.browser_request`) and parses (`propose.browser_proposal`;
+  the shim's `ffm_propose_request` / `ffm_proposal_from_response`). `GET /api/capabilities` says `accepts_key`
+  and `writes_rules`. Without the SDK on the machine `propose._send` falls back to `_send_http` (urllib, the
+  same request), so `python -m ffm ui` needs no extra package; API errors come back as the API's own words
+  (a bad key: "authentication_error: invalid x-api-key", status 502 from the server).
+- Stop 1: "Ask Claude about this site"; the proposal renders with confidence and evidence, each field has
+  Confirm (a name is required: it goes on the site file), and "Confirm all". Stop 3: "Read the district
+  schedule with Claude", open by itself when the stack has no outright schedule for the site's district
+  (`list_rules` now carries `check`): a PDF chosen from disk goes base64 to `POST /api/propose/rule` (the server
+  passes the bytes to the model and writes nothing but the proposal's log with the name and hash); the clauses
+  render with their quotes; "Confirm all into the rules" under a name calls `POST /api/confirm` (→
+  `propose.confirm` into `rules/a_zoning_district.json`), reloads the rules and asks for the site to be read
+  again. On the web the schedule can be read but not confirmed (the rules are the published files).
 - The site pages say six layers and 24 rules and assumptions from 25 sources (home.html, how.html).
 - The committed runs under `outputs/` predate layer F (their fingerprint `20e44f1445ecaff9` is quoted on
   case.html and keys the Revit result on the as-approved run), so they carry no `proforma.json` and the card

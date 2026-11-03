@@ -1,0 +1,14 @@
+{
+  "kind": "rule",
+  "district": "RT-3",
+  "document_path": "inbox/zoning-by-law-district-schedule-rt-3.pdf",
+  "note": "The City of Vancouver RT-3 District Schedule, consolidated June 2026 (15 pages). The PDF is not kept in the repository: save it from https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf into inbox/ (gitignored). Expected values read by hand from section 3.1 on 3 Nov 2026: the base FSR of 0.60 (3.1.1.1; the Director's 0.75 and 0.95 and the 1.00 for multiple dwelling with 25% non-profit units under 3.1.1.2 are conditions, not the maximum); height 10.7 m and 3 storeys (3.1.2.3); the minimum front yard is the average of the adjacent sites, so no number is expected; side yard 1.5 m where the site exceeds 15 m, else 10% of the width (3.1.2.6); rear yard 20.0 m (3.1.2.7); site coverage 45% (3.1.2.8).",
+  "expected": {
+    "max_fsr": 0.60,
+    "max_height_m": 10.7,
+    "max_storeys": 3,
+    "min_side_yard_m": 1.5,
+    "min_rear_yard_m": 20.0,
+    "max_site_coverage": 0.45
+  }
+}

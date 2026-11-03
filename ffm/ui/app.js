@@ -170,8 +170,13 @@ def ffm_suggest(site_json, programs_json, as_of, candidate):
 def ffm_read_site(site_json, as_of):
     return json.dumps(suggest.read_site(json.loads(site_json), date.fromisoformat(as_of)))
 
-def ffm_lookup_assemble(address, lat, lon, display, zoning_json, parcels_json):
-    return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json)))
+def ffm_lookup_assemble(address, lat, lon, display, zoning_json, parcels_json, elements_json, radius_m, query):
+    elements = json.loads(elements_json) if elements_json else None
+    return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json), elements, radius_m, query))
+
+def ffm_parcel_center(parcels_json):
+    c = lookup._parcel_center(json.loads(parcels_json))
+    return json.dumps(list(c) if c else None)
 `;
 
 function loadEngine() {
@@ -191,7 +196,8 @@ function loadEngine() {
     }
     pyodide.runPython(ENGINE_SHIM);
     engine = { pyodide, run: pyodide.globals.get("ffm_run"), diff: pyodide.globals.get("ffm_diff"),
-               suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble") };
+               suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble"),
+               parcelCenter: pyodide.globals.get("ffm_parcel_center") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
     return engine;
   })().catch(e => {
@@ -252,7 +258,19 @@ async function staticLookup(q) {
   const cov = ds => fetch(`https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/${ds}/records?${new URLSearchParams({ where: `within_distance(geom, geom'POINT(${lon} ${lat})', 3m)`, limit: "3" })}`).then(r => r.ok ? r.json() : { results: [] }).then(j => j.results || []);
   const [zoning, parcels] = await Promise.all([cov("zoning-districts-and-labels"), cov("property-parcel-polygons")]);
   await loadEngine();
-  return JSON.parse(engine.lookupAssemble(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels)));
+  // the surroundings from the Overpass API, around the parcel's centre, the same query python -m ffm context sends;
+  // if Overpass is slow or away, the site still comes back, without its context
+  const radius = 120;
+  const c = JSON.parse(engine.parcelCenter(JSON.stringify(parcels))) || [lat, lon];
+  const ov = `[out:json][timeout:60];(way(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["highway"];way(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["building"];node(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["natural"="tree"];);out tags geom;`;
+  let elements = null;
+  try {
+    const r = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(ov), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+    if (r.ok) elements = (await r.json()).elements || [];
+  } catch (e) { elements = null; }
+  const res = JSON.parse(engine.lookupAssemble(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels), elements ? JSON.stringify(elements) : "", radius, ov));
+  if (!elements) res.site.notes += " The OpenStreetMap context could not be fetched in the browser; the plan draws a schematic context.";
+  return res;
 }
 
 async function staticRun(body) {
@@ -3053,8 +3071,12 @@ function renderGuideInto(el) {
     ${R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">The reading is in the memo pane.</p>` : ""}`;
 
   const cands = S ? S.candidates : [{ id: "outright", title: "Outright", available: true, what: "what the district allows as of right" }, { id: "benchmark", title: "Benchmark", available: true, what: "the staff benchmark under the rezoning policy" }, { id: "funder-ready", title: "Funder-ready", available: true, what: "the benchmark with every funder question answered" }];
-  const rows = S ? GUIDE_FIELDS.filter(([k]) => S.fields[k]).map(([k, label, kind]) => {
-    const f = S.fields[k];
+  // the envelope rows always show: where no rule in the stack derives them for this district (RT-3, CD-1…), the
+  // row says so and waits for the manager's own figure
+  const CORE = new Set(["storeys", "height_m", "gfa_m2"]);
+  const rows = S ? GUIDE_FIELDS.filter(([k]) => S.fields[k] || CORE.has(k)).map(([k, label, kind]) => {
+    const f = S.fields[k] || { value: null, rule_id: null, note: `no rule in the stack derives this for ${state.site && state.site.zoning_district ? state.site.zoning_district : "this district"}: enter it` };
+    if (guide.mine[k] === undefined && (f.value === null || f.value === undefined) && CORE.has(k)) guide.mine[k] = "";
     const mine = guide.mine[k];
     const isMine = mine !== undefined;
     const sv = f.value === null || f.value === undefined ? "—" : (typeof f.value === "number" ? fmtNum(f.value) : String(f.value));
@@ -3172,7 +3194,7 @@ async function guideLookup() {
   const q = (guide.address || "").trim();
   if (q.length < 4) { toast("Type an address first.", true); return; }
   guide.loading = "lookup"; renderGuide();
-  setStatus(`Looking up ${q}…`, "busy");
+  setStatus(`Looking up ${q}: the point, the district, the parcel, then the surroundings from OpenStreetMap, which can take half a minute…`, "busy");
   try {
     guide.lookup = await api(`/api/lookup?q=${encodeURIComponent(q)}`);
     const s = guide.lookup.site;

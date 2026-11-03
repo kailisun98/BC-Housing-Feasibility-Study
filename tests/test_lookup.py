@@ -45,6 +45,39 @@ class ParcelMetrics(unittest.TestCase):
         self.assertEqual(lookup.civic_address(1010, "EXPO BLVD"), "1010 Expo Blvd")
         self.assertEqual(lookup.civic_address(None, "EXPO BLVD"), "")
 
+    def test_the_street_decides_the_frontage(self):
+        # 609 Heatley Ave: a 15.2 × 37.2 m parcel, its long side along Heatley Ave, which runs north-south
+        parcel = [[-123.08996199873619, 49.2792120018887], [-123.089976239477, 49.27887771187751],
+                  [-123.08976691960697, 49.27887376388247], [-123.08975269125037, 49.27920808084372], [-123.08996199873619, 49.2792120018887]]
+        c = lookup.parcel_metrics(parcel)["center"]
+        heatley = {"type": "way", "id": 1, "tags": {"highway": "residential", "name": "Heatley Avenue"},
+                   "geometry": [{"lat": c["lat"] - 0.001, "lon": c["lon"] - 0.00028}, {"lat": c["lat"] + 0.001, "lon": c["lon"] - 0.00028}]}
+        georgia = {"type": "way", "id": 2, "tags": {"highway": "residential", "name": "East Georgia Street"},
+                   "geometry": [{"lat": c["lat"] - 0.00025, "lon": c["lon"] - 0.001}, {"lat": c["lat"] - 0.00025, "lon": c["lon"] + 0.001}]}
+        s = lookup.street_bearing([heatley, georgia], (c["lat"], c["lon"]), "Heatley Ave")
+        self.assertTrue(s["matched_by_name"])
+        self.assertAlmostEqual(s["bearing_deg"], 90, delta=3)
+        along = lookup.parcel_metrics(parcel, s["bearing_deg"])
+        self.assertGreater(along["frontage_m"], along["depth_m"])          # 37.2 m on Heatley
+        g = lookup.street_bearing([heatley, georgia], (c["lat"], c["lon"]), "E Georgia St")
+        self.assertAlmostEqual(g["bearing_deg"], 0, delta=3)
+        self.assertLess(lookup.parcel_metrics(parcel, g["bearing_deg"])["frontage_m"], 16)   # 15.2 m on Georgia
+        self.assertIsNone(lookup.street_bearing([], (c["lat"], c["lon"]), "Heatley Ave"))
+
+    def test_assemble_with_context_places_the_osm_block(self):
+        parcels = [{"civic_number": "998", "streetname": "E 19TH AV", "geom": {"geometry": {"type": "Polygon", "coordinates": [PARCEL_998]}}}]
+        c = lookup.parcel_metrics(PARCEL_998)["center"]
+        road = {"type": "way", "id": 7, "tags": {"highway": "residential", "name": "East 19th Avenue"},
+                "geometry": [{"lat": c["lat"] - 0.00027, "lon": c["lon"] - 0.002}, {"lat": c["lat"] - 0.00027, "lon": c["lon"] + 0.002}]}
+        res = lookup.assemble("998 E 19th Ave", c["lat"], c["lon"], "998 East 19th Avenue, Vancouver", [{"zoning_district": "RM-1"}], parcels, [road], 120, "q")
+        s = res["site"]
+        self.assertIn("osm", s)
+        self.assertEqual(s["osm"]["frame"]["front_street"], "East 19th Avenue")
+        self.assertTrue(s["osm"]["frame"]["front_street_matched_by_name"])
+        self.assertEqual(s["context"]["street"]["name"], "East 19th Avenue")
+        self.assertAlmostEqual(s["frontage_m"], 75.6, delta=0.6)
+        self.assertTrue(res["found"]["context"])
+
     def test_assemble_without_the_network(self):
         zoning = [{"zoning_district": "RM-1", "zoning_category": "RM", "cd_1_number": None}]
         parcels = [{"civic_number": "998", "streetname": "E 19TH AV", "site_id": "007998546", "geom": {"geometry": {"type": "Polygon", "coordinates": [PARCEL_998]}}}]

@@ -17,7 +17,7 @@ import urllib.parse
 import urllib.request
 from typing import Any
 
-from .osm import USER_AGENT, geocode
+from .osm import DEFAULT_RADIUS_M, MINOR, USER_AGENT, build as build_context, geocode, norm_name, overpass
 
 COV_RECORDS = "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/{dataset}/records"
 ZONING_DATASET = "zoning-districts-and-labels"
@@ -125,20 +125,81 @@ def parcel_metrics(polygon_lonlat: list[list[float]], street_bearing_deg: float 
 
 # ---------------------------------------------------------------- the lookup
 
-def lookup(address: str) -> dict[str, Any]:
-    """A proposed site file for the address, with every field's source, for a person to confirm."""
+def street_bearing(elements: list[dict], center_latlon: tuple[float, float], street_name: str | None = None) -> dict[str, Any] | None:
+    """The street in front of a parcel, from OpenStreetMap ways around its centre: the named road matching the
+    parcel's street where there is one, else the nearest road that is not a path. Returns its bearing in the
+    parcel_metrics frame (degrees from east, counter-clockwise, mod 180), its name and its distance; None when
+    no road comes within 60 m. Pure."""
+    lat0, lon0 = center_latlon
+    P = project(lat0, lon0)
+    want = norm_name(street_name or "")
+    best = None
+    for e in elements or []:
+        tags = e.get("tags") or {}
+        if e.get("type") != "way" or "highway" not in tags or not e.get("geometry"):
+            continue
+        pts = [P(g["lon"], g["lat"]) for g in e["geometry"]]
+        name = tags.get("name", "")
+        rank = 0 if want and norm_name(name) == want else (1 if name and tags.get("highway") not in MINOR else 2)
+        for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
+            dx, dy = x2 - x1, y2 - y1
+            l2 = dx * dx + dy * dy
+            if l2 == 0:
+                continue
+            t = max(0.0, min(1.0, (-x1 * dx - y1 * dy) / l2))
+            d = math.hypot(x1 + t * dx, y1 + t * dy)
+            key = (rank, d)
+            if best is None or key < best[0]:
+                best = (key, math.degrees(math.atan2(dy, dx)) % 180, name)
+    if best is None or best[0][1] > 60:
+        return None
+    return {"bearing_deg": round(best[1], 1), "name": best[2] or None, "matched_by_name": best[0][0] == 0, "distance_m": round(best[0][1], 1)}
+
+
+def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_M) -> dict[str, Any]:
+    """A proposed site file for the address, with every field's source, for a person to confirm. With `context`
+    the roads, buildings and trees around the parcel come from OpenStreetMap too, as `python -m ffm context`
+    fetches them, so the figures draw the real surroundings and the frontage is the side on the street."""
     lat, lon, display = geocode(address)
     zoning = records_at(ZONING_DATASET, lat, lon)
     parcels = records_at(PARCEL_DATASET, lat, lon)
-    return assemble(address, lat, lon, display, zoning, parcels)
+    elements, q, note = None, "", ""
+    if context:
+        c = _parcel_center(parcels) or (lat, lon)
+        try:
+            elements, q = overpass(c[0], c[1], radius_m)
+        except (OSError, ValueError) as e:
+            note = f"The OpenStreetMap context could not be fetched ({e}); run python -m ffm context later."
+    res = assemble(address, lat, lon, display, zoning, parcels, elements, radius_m, q)
+    if note:
+        res["site"]["notes"] += " " + note
+    return res
 
 
-def assemble(address: str, lat: float, lon: float, display: str, zoning: list[dict], parcels: list[dict]) -> dict[str, Any]:
-    """The proposed site from the fetched records. Pure, so the browser build can fetch and hand the records in."""
+def _parcel_center(parcels: list[dict]) -> tuple[float, float] | None:
+    p = parcels[0] if parcels else {}
+    poly = (((p.get("geom") or {}).get("geometry") or {}).get("coordinates") or [[]])[0]
+    if len(poly) < 3:
+        return None
+    m = parcel_metrics(poly)
+    return (m["center"]["lat"], m["center"]["lon"])
+
+
+def assemble(address: str, lat: float, lon: float, display: str, zoning: list[dict], parcels: list[dict],
+             elements: list[dict] | None = None, radius_m: float = DEFAULT_RADIUS_M, query: str = "") -> dict[str, Any]:
+    """The proposed site from the fetched records. Pure, so the browser build can fetch and hand the records in.
+    With OpenStreetMap `elements` around the parcel, the frontage is the side parallel to the parcel's street and
+    the site gets its `osm` context block; without them the longer side is called the frontage, to confirm."""
     z = zoning[0] if zoning else {}
     p = parcels[0] if parcels else {}
     poly = (((p.get("geom") or {}).get("geometry") or {}).get("coordinates") or [[]])[0]
+    civic = civic_address(p.get("civic_number"), p.get("streetname"))
+    street_name = civic.split(" ", 1)[1] if civic and " " in civic else None
     metrics = parcel_metrics(poly) if len(poly) >= 3 else None
+    center = (metrics["center"]["lat"], metrics["center"]["lon"]) if metrics else (lat, lon)
+    street = street_bearing(elements, center, street_name) if (elements and metrics) else None
+    if street:
+        metrics = parcel_metrics(poly, street["bearing_deg"])
     district = z.get("zoning_district") or None
     cd1 = z.get("cd_1_number") or None
     notes = [f"Found by First Read on the address {address!r}: geocoded by Nominatim as {display!r}."]
@@ -147,11 +208,11 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     else:
         notes.append("No zoning district found at that point in the City's dataset; enter it by hand.")
     if metrics:
-        notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon ({metrics['vertices']} vertices" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"); frontage taken as {metrics['frontage_from']}.")
+        front_how = (f"the side along {street['name']}" + ("" if street["matched_by_name"] else ", the nearest road") + f" from OpenStreetMap, {street['distance_m']} m away") if street else metrics["frontage_from"]
+        notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon ({metrics['vertices']} vertices" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"); frontage taken as {front_how}.")
     else:
         notes.append("No parcel polygon found at that point; enter the area, frontage and depth by hand.")
     notes.append("Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'.")
-    civic = civic_address(p.get("civic_number"), p.get("streetname"))
     site = {
         "id": _slug(civic or address),
         "address": f"{civic}, Vancouver, BC" if civic else (display.split(", Metro Vancouver")[0] if display else address),
@@ -163,21 +224,31 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         "in_former_community_vision_area": None, "in_transit_oriented_area": None, "toa_tier": None,
         "frequent_bus_stop_within_400m": None, "has_water_and_sewer": True,
         "owner_type": None, "owner": None, "land_tenure_plan": None,
-        "existing_trees_on_site": [], "street_trees": {"count": None},
+        "existing_trees_on_site": [], "street_trees": {"count": None, "street": (street or {}).get("name") or street_name},
+        "context": {"street": {"name": (street or {}).get("name") or street_name}} if (street or street_name) else None,
         "notes": " ".join(notes),
         "parcel": {"polygon_lonlat": poly, "civic_number": p.get("civic_number"), "streetname": p.get("streetname"),
-                   "site_id": p.get("site_id"), "metrics": metrics, "source": SOURCES["parcel"]} if poly else None,
+                   "site_id": p.get("site_id"), "metrics": metrics, "street": street, "source": SOURCES["parcel"]} if poly else None,
         "lookup": {"center": {"lat": lat, "lon": lon}, "geocoded_as": display, "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
         "sources": [SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
     }
+    if site["context"] is None:
+        del site["context"]
+    # the surroundings, as python -m ffm context stores them, so the plan draws the real streets and buildings
+    if elements and metrics:
+        try:
+            site["osm"] = build_context(site, elements, center, radius_m, query, display)
+            site["sources"].append({"title": "OpenStreetMap contributors, ODbL (the roads, buildings and trees drawn around the lot)", "url": "https://www.openstreetmap.org/copyright"})
+        except ValueError as e:
+            site["notes"] += f" The OpenStreetMap context was not placed: {e}"
     fields = {
         "zoning_district": {"value": district, "source": "zoning", "note": "the district polygon at the geocoded point"},
         "site_area_m2": {"value": site["site_area_m2"], "source": "parcel", "note": "from the parcel polygon"},
-        "frontage_m": {"value": site["frontage_m"], "source": "parcel", "note": metrics["frontage_from"] if metrics else ""},
+        "frontage_m": {"value": site["frontage_m"], "source": "parcel", "note": (f"the side along {street['name']}" if street and street.get("name") else metrics["frontage_from"]) if metrics else ""},
         "depth_m": {"value": site["depth_m"], "source": "parcel", "note": "the equivalent rectangle's other side" if metrics else ""},
         "has_water_and_sewer": {"value": True, "source": None, "note": "assumed for a City of Vancouver lot"},
     }
-    return {"site": site, "fields": fields, "found": {"geocoded": bool(display), "zoning": bool(district), "parcel": bool(poly)}}
+    return {"site": site, "fields": fields, "found": {"geocoded": bool(display), "zoning": bool(district), "parcel": bool(poly), "context": bool(site.get("osm"))}}
 
 
 def civic_address(number: Any, street: Any) -> str:

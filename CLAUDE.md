@@ -250,8 +250,14 @@ Built and verified in the browser:
 - `ffm/lookup.py`: `lookup(address)` geocodes with Nominatim and reads the zoning district and the parcel
   polygon from City of Vancouver Open Data (`zoning-districts-and-labels`, `property-parcel-polygons`, the
   Opendatasoft v2.1 records API with `within_distance`); `parcel_metrics` (pure) gives the area and an
-  equivalent rectangle; `assemble` is pure so the browser build fetches and hands the records in. Tests in
-  `tests/test_lookup.py` with the real parcel ring.
+  equivalent rectangle; `assemble` is pure so the browser build fetches and hands the records in. Since
+  3 Nov 2026 it also fetches the Overpass elements around the parcel's centre and builds the site's `osm`
+  block with `osm.build`, so the figures draw the real context, and `street_bearing` (pure) takes the
+  frontage as the parcel side parallel to the street the parcel is named for (OSM way matched by name, else
+  the nearest road; 609 Heatley Ave: 37.2 m along Heatley, Keefer as the cross street). Overpass can take
+  half a minute; the status strip says so. Tests in `tests/test_lookup.py` with the real parcel rings.
+  Districts with no coded envelope (RT-3, CD-1) still show the storeys, height and GFA rows in the guide,
+  set to Mine, so the manager can enter them and run.
 - CLI: `python -m ffm lookup "<address>" [--out]`, `python -m ffm suggest --site … --programs … [--candidate] [--out]`.
 - Server: `GET /api/lookup?q=`, `POST /api/read-site`, `POST /api/suggest`, `GET /api/issues?site=`,
   `POST /api/runs/<site>/<folder>/issue` (writes `issues.json` in the run folder). The static build runs

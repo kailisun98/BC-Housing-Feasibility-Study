@@ -129,6 +129,26 @@ function setEngineChip(text, kind) {
   chip.className = "engine-chip " + (kind || "");
 }
 
+/* On the web the page itself can come from a cache that predates the last deploy (GitHub Pages keeps HTML for
+   ten minutes, browsers longer), while its data is already new. The page asks for the build's own record with
+   the cache bypassed; a newer build reloads the page once (a session mark stops a loop), and if that still
+   shows the old page a chip says so and offers the reload. */
+async function checkForNewerBuild() {
+  if (!STATIC || !STATIC.built_at) return;
+  let fresh = null;
+  try { fresh = await (await fetch("data/build.json", { cache: "no-store" })).json(); } catch (e) { return; }
+  if (!fresh || !fresh.built_at || fresh.built_at <= STATIC.built_at) return;
+  const key = "ffm.reloaded-for";
+  let done = "";
+  try { done = sessionStorage.getItem(key) || ""; } catch (e) { /* storage off */ }
+  if (done !== fresh.built_at) {
+    try { sessionStorage.setItem(key, fresh.built_at); } catch (e) { /* storage off */ }
+    location.reload();
+    return;
+  }
+  setStatus(`A newer version of this page was published ${fresh.built_at.replace("T", " ")}; the one on screen is from ${STATIC.built_at.replace("T", " ")}. Press Ctrl+F5 (Cmd+Shift+R) to load it.`, "busy");
+}
+
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const s = document.createElement("script");
@@ -4241,6 +4261,7 @@ async function init() {
   // what this machine can offer beyond the rules: a model behind a key on the local server, never on the web
   state.caps = { claude: false, model: null };
   api("/api/capabilities").then(c => { state.caps = c || state.caps; if (state.caps.claude) renderGuide(); }).catch(() => { /* an older server: rules only */ });
+  checkForNewerBuild();
   $("#run-btn").addEventListener("click", runRules);
   $("#print-btn").addEventListener("click", () => { if (state.run) printPaper(paperDocument(state.run)); });
   $("#pdf-btn").addEventListener("click", () => exportPdf().catch(err => toast(err.message, true)));

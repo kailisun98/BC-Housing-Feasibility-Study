@@ -84,6 +84,9 @@ def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     if marker not in html:
         raise RuntimeError("index.html has no <!-- static-config --> marker")
     html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>")
+    # the build's own record, fetched by the page with the cache bypassed: a page served from an old cache
+    # (Pages keeps HTML for ten minutes, browsers longer) sees a newer build here and reloads itself once
+    _write_json(out / "data" / "build.json", {"built_at": config["built_at"], "engine_version": __version__})
     # every page names its scripts and styles with the build's version, so a browser that cached the last
     # deploy's app.js (Pages serves it with max-age=600, and browsers keep it longer) fetches the new one
     v = _build_version(ui.STATIC_DIR)

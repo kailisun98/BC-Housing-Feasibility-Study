@@ -1,0 +1,246 @@
+{
+  "grade": "feasibility",
+  "available": true,
+  "inputs": {
+    "units": {
+      "studio": 30,
+      "one_bed": 42,
+      "two_bed": 36,
+      "three_bed_plus": 12
+    },
+    "units_total": 120,
+    "gfa_m2": 9600.0,
+    "rent_tiers_units": {
+      "market": 36,
+      "rgi": 60,
+      "deep_subsidy": 24
+    },
+    "finance": {}
+  },
+  "capital": {
+    "hard": 46368342,
+    "escalation": 1.0292,
+    "soft": 11592086,
+    "contingency": 4636834,
+    "land": 0.0,
+    "total": 62597262
+  },
+  "operating": {
+    "revenue": {
+      "market": 899856,
+      "rgi": 963270,
+      "deep_subsidy": 144000
+    },
+    "gross": 2007126,
+    "vacancy": 74264,
+    "operating_cost": 780000,
+    "reserve": 72000,
+    "noi": 1080862
+  },
+  "funding": {
+    "grants": [
+      {
+        "program": "bch.chf.eligibility",
+        "label": "Community Housing Fund provisional grant",
+        "value": 20545320,
+        "note": "$171,211 per unit × 120 (2025-26 provisional; the program is between calls)"
+      }
+    ],
+    "equity": 0.0,
+    "debt": {
+      "supportable": 14530829,
+      "rate_pct": 6.19,
+      "amortization_years": 40,
+      "dcr": 1.1,
+      "annual_service": 982602
+    },
+    "total": 35076149
+  },
+  "gap": {
+    "value": 27521113,
+    "share_of_capital": 0.44
+  },
+  "verdict": {
+    "word": "unlikely",
+    "why": [
+      "the gap is $27,521,113, 44% of the capital cost, more than the 15% a feasibility screen can call close",
+      "placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve"
+    ],
+    "unsure": []
+  },
+  "lines": [
+    {
+      "key": "hard_rate",
+      "label": "Hard cost base",
+      "value": 4693.0,
+      "unit": "$/m²",
+      "rule_id": "f.hard_cost_base",
+      "note": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf)",
+      "placeholder": false
+    },
+    {
+      "key": "escalation",
+      "label": "Escalation to the latest index",
+      "value": 1.0292,
+      "unit": "×",
+      "rule_id": "f.escalation_bcpi",
+      "note": "BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01)",
+      "placeholder": false
+    },
+    {
+      "key": "hard",
+      "label": "Hard cost",
+      "value": 46368342,
+      "unit": "$",
+      "rule_id": "f.hard_cost_base",
+      "note": "9,600 m² × $4,693 × 1.0292",
+      "placeholder": false
+    },
+    {
+      "key": "soft",
+      "label": "Soft costs",
+      "value": 11592086,
+      "unit": "$",
+      "rule_id": "f.soft_costs",
+      "note": "25% of hard cost",
+      "placeholder": true
+    },
+    {
+      "key": "contingency",
+      "label": "Contingency",
+      "value": 4636834,
+      "unit": "$",
+      "rule_id": "f.soft_costs",
+      "note": "10% of hard cost",
+      "placeholder": true
+    },
+    {
+      "key": "land",
+      "label": "Land",
+      "value": 0.0,
+      "unit": "$",
+      "rule_id": "f.land",
+      "note": "nominal: the owner is a municipality and the tenure plan is a long lease or a transfer",
+      "placeholder": false
+    },
+    {
+      "key": "capital",
+      "label": "Capital cost",
+      "value": 62597262,
+      "unit": "$",
+      "rule_id": null,
+      "note": "hard + soft + contingency + land",
+      "placeholder": false
+    },
+    {
+      "key": "rev_market",
+      "label": "Market rent",
+      "value": 899856,
+      "unit": "$/yr",
+      "rule_id": "f.rents",
+      "note": "CMHC October 2025, 36 units; some unit types priced at the CMHC all-units average: the table has no figure for them",
+      "placeholder": false
+    },
+    {
+      "key": "rev_rgi",
+      "label": "Rent-geared-to-income",
+      "value": 963270,
+      "unit": "$/yr",
+      "rule_id": "f.rents",
+      "note": "30% of a household income taken at 50% of the fund's income limit (placeholder)",
+      "placeholder": true
+    },
+    {
+      "key": "rev_deep",
+      "label": "Deep-subsidy rent",
+      "value": 144000,
+      "unit": "$/yr",
+      "rule_id": "f.rents",
+      "note": "the shelter rate, $500 a month",
+      "placeholder": false
+    },
+    {
+      "key": "vacancy",
+      "label": "Vacancy",
+      "value": 74264,
+      "unit": "$/yr",
+      "rule_id": "f.rents",
+      "note": "3.7% of gross rent, the CMHC survey's rate",
+      "placeholder": false
+    },
+    {
+      "key": "opex",
+      "label": "Operating cost",
+      "value": 780000,
+      "unit": "$/yr",
+      "rule_id": "f.operating",
+      "note": "$6,500 per unit",
+      "placeholder": true
+    },
+    {
+      "key": "reserve",
+      "label": "Replacement reserve",
+      "value": 72000,
+      "unit": "$/yr",
+      "rule_id": "f.operating",
+      "note": "$600 per unit",
+      "placeholder": true
+    },
+    {
+      "key": "noi",
+      "label": "Net operating income",
+      "value": 1080862,
+      "unit": "$/yr",
+      "rule_id": null,
+      "note": "gross rent less vacancy, operating cost and reserve",
+      "placeholder": false
+    },
+    {
+      "key": "grant_chf",
+      "label": "Community Housing Fund grant",
+      "value": 20545320,
+      "unit": "$",
+      "rule_id": "bch.chf.eligibility",
+      "note": "$171,211 per unit × 120; indicative, the fund is between calls",
+      "placeholder": false
+    },
+    {
+      "key": "equity",
+      "label": "Equity",
+      "value": 0.0,
+      "unit": "$",
+      "rule_id": null,
+      "note": "none entered",
+      "placeholder": false
+    },
+    {
+      "key": "debt",
+      "label": "Supportable debt",
+      "value": 14530829,
+      "unit": "$",
+      "rule_id": "f.mortgage",
+      "note": "NOI over a 1.10 coverage ratio, at 6.19% over 40 years (annual service $982,602)",
+      "placeholder": false
+    },
+    {
+      "key": "funding",
+      "label": "Funding",
+      "value": 35076149,
+      "unit": "$",
+      "rule_id": null,
+      "note": "grants + equity + supportable debt",
+      "placeholder": false
+    },
+    {
+      "key": "gap",
+      "label": "Gap",
+      "value": 27521113,
+      "unit": "$",
+      "rule_id": null,
+      "note": "capital cost less funding; a negative gap is headroom",
+      "placeholder": false
+    }
+  ],
+  "as_of": "2026-10-23",
+  "stamp": "e51e3a0350b87718"
+}

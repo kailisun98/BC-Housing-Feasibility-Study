@@ -428,10 +428,10 @@ Phase 6, Claude in the loop (the model proposes, a person confirms, the engine d
   `propose.confirm` into `rules/a_zoning_district.json`), reloads the rules and asks for the site to be read
   again. On the web the schedule can be read but not confirmed (the rules are the published files).
 - The site pages say six layers and 24 rules and assumptions from 25 sources (home.html, how.html).
-- The committed runs under `outputs/` predate layer F (their fingerprint `20e44f1445ecaff9` is quoted on
-  case.html and keys the Revit result on the as-approved run), so they carry no `proforma.json` and the card
-  does not show for them; a run made in the tool, locally or in the browser, does. Rerun them only together
-  with the Revit sheet and the case page.
+- The committed runs under `outputs/` were regenerated on 3 Nov 2026 with layer F and the layouts (their
+  original as-of dates kept): the fingerprint for 23 Oct 2026 is now `e51e3a0350b87718` (quoted on case.html)
+  and for 27 Oct `83993057d297734a`. The local Revit result on the as-approved run still carries the old stamp
+  `20e44f1445ecaff9`, so its section stays out of that memo until the pyRevit script is run again on the folder.
 
 ## Rules from the assignment brief (binding)
 

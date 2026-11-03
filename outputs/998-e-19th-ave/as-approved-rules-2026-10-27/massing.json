@@ -4,7 +4,7 @@
   "site_id": "998-e-19th-ave",
   "option_id": "998-e-19th-ave-as-approved",
   "as_of": "2026-10-27",
-  "stamp": "6d1b07fe59dd3775",
+  "stamp": "83993057d297734a",
   "lot": {
     "polygon": [
       [
@@ -79,6 +79,9 @@
           23.573
         ]
       ],
+      "plate_width_m": 69.6,
+      "plate_depth_m": 19.87,
+      "at_street_corner": "left",
       "base_z": 0.0,
       "height_m": 22.3,
       "storeys": 6,
@@ -114,6 +117,9 @@
           19.853
         ]
       ],
+      "plate_width_m": 69.6,
+      "plate_depth_m": 16.15,
+      "at_street_corner": "left",
       "base_z": 0.0,
       "height_m": 9.9,
       "storeys": 3,

@@ -1,0 +1,164 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="696" height="616" viewBox="0 0 696 616" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Stacking diagram">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Stacking · top floor first, each bar one plate</text>
+<text x="48" y="89.0" font-size="11" fill="#5f6672">Level 12</text>
+<rect x="128.0" y="72" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="89.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="72" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="89.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="72" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="89.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="72" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="89.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="72" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="89.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="123.0" font-size="11" fill="#5f6672">Level 11</text>
+<rect x="128.0" y="106" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="123.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="106" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="123.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="106" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="123.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="106" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="123.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="106" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="123.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="157.0" font-size="11" fill="#5f6672">Level 10</text>
+<rect x="128.0" y="140" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="157.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="140" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="157.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="140" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="157.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="140" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="157.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="140" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="157.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="191.0" font-size="11" fill="#5f6672">Level 9</text>
+<rect x="128.0" y="174" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="191.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="174" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="191.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="174" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="191.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="174" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="191.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="174" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="191.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="225.0" font-size="11" fill="#5f6672">Level 8</text>
+<rect x="128.0" y="208" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="225.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="208" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="225.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="208" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="225.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="208" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="225.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="208" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="225.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="259.0" font-size="11" fill="#5f6672">Level 7</text>
+<rect x="128.0" y="242" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="259.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="242" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="259.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="242" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="259.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="242" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="259.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="242" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="259.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="293.0" font-size="11" fill="#5f6672">Level 6</text>
+<rect x="128.0" y="276" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="293.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="276" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="293.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="276" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="293.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="276" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="293.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="276" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="293.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="327.0" font-size="11" fill="#5f6672">Level 5</text>
+<rect x="128.0" y="310" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="327.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="310" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="327.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="310" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="327.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="310" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="327.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="310" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="327.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="361.0" font-size="11" fill="#5f6672">Level 4</text>
+<rect x="128.0" y="344" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="361.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="344" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="361.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="344" width="196.2" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="361.0" font-size="10" fill="#1f2933">Three-bedroom+ × 3</text>
+<rect x="454.7" y="344" width="50.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="458.7" y="361.0" font-size="10" fill="#1f2933">Two-bedroom × 1</text>
+<rect x="505.6" y="344" width="37.2" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="509.6" y="361.0" font-size="10" fill="#1f2933">One-bedroom × 1</text>
+<rect x="542.8" y="344" width="75.2" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="546.8" y="361.0" font-size="10" fill="#1f2933">Studio × 3</text>
+<rect x="618.1" y="344" width="29.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="48" y="395.0" font-size="11" fill="#5f6672">Level 3</text>
+<rect x="128.0" y="378" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="395.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="378" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="395.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="378" width="261.5" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="395.0" font-size="10" fill="#1f2933">Three-bedroom+ × 4</text>
+<rect x="520.0" y="378" width="100.3" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="524.0" y="395.0" font-size="10" fill="#1f2933">Studio × 4</text>
+<rect x="620.4" y="378" width="27.6" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="48" y="429.0" font-size="11" fill="#5f6672">Level 2</text>
+<rect x="128.0" y="412" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="429.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="412" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="429.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="412" width="261.5" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="429.0" font-size="10" fill="#1f2933">Three-bedroom+ × 4</text>
+<rect x="520.0" y="412" width="100.3" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="524.0" y="429.0" font-size="10" fill="#1f2933">Studio × 4</text>
+<rect x="620.4" y="412" width="27.6" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="48" y="463.0" font-size="11" fill="#5f6672">Ground floor</text>
+<rect x="128.0" y="446" width="115.2" height="26" fill="#f6e7c1" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="463.0" font-size="10" fill="#1f2933">Amenity</text>
+<rect x="243.2" y="446" width="166.4" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
+<text x="247.2" y="463.0" font-size="10" fill="#1f2933">Services, bicycles</text>
+<rect x="409.6" y="446" width="53.8" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="413.6" y="463.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="463.3" y="446" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="467.3" y="463.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="540.1" y="446" width="65.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="544.1" y="463.0" font-size="10" fill="#1f2933">Three-bedroom+ × 1</text>
+<rect x="605.5" y="446" width="25.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<rect x="630.6" y="446" width="17.4" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<rect x="128.0" y="489.0" width="12" height="12" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<text x="144.0" y="499.0" fill="#5f6672" font-size="11">Non-residential</text>
+<rect x="267.0" y="489.0" width="12" height="12" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="283.0" y="499.0" fill="#5f6672" font-size="11">Amenity</text>
+<rect x="350.0" y="489.0" width="12" height="12" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="366.0" y="499.0" fill="#5f6672" font-size="11">Services, bicycles</text>
+<rect x="510.0" y="489.0" width="12" height="12" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="526.0" y="499.0" fill="#5f6672" font-size="11">Core (stairs, elevator)</text>
+<rect x="705.0" y="489.0" width="12" height="12" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="721.0" y="499.0" fill="#5f6672" font-size="11">Corridor</text>
+<rect x="795.0" y="489.0" width="12" height="12" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<text x="811.0" y="499.0" fill="#5f6672" font-size="11">Three-bedroom+</text>
+<rect x="927.0" y="489.0" width="12" height="12" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="943.0" y="499.0" fill="#5f6672" font-size="11">Two-bedroom</text>
+<rect x="1038.0" y="489.0" width="12" height="12" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1054.0" y="499.0" fill="#5f6672" font-size="11">One-bedroom</text>
+<rect x="1149.0" y="489.0" width="12" height="12" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1165.0" y="499.0" fill="#5f6672" font-size="11">Studio</text>
+<rect x="1225.0" y="489.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1241.0" y="499.0" fill="#5f6672" font-size="11">Spare</text>
+<text x="48.0" y="528.0" fill="#1f2933">90 of 120 units placed on 12 floors of 66.67 × 12.0 m (800 m² each)</text>
+<text x="48.0" y="544.0" fill="#1f2933">Did not fit: Two-bedroom × 3, 239 m²</text>
+<text x="48.0" y="560.0" fill="#1f2933">Did not fit: One-bedroom × 9, 524 m²</text>
+<text x="48.0" y="576.0" fill="#1f2933">Did not fit: Studio × 18, 706 m²</text>
+<text x="48.0" y="592.0" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg>

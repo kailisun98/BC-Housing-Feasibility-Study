@@ -2,7 +2,7 @@
 
 **Option:** As permitted, DP issued 5 Feb 2025: 29-storey social housing tower (under construction, completion 2029)  
 **Proponent:** City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society (municipal housing provider)  
-**Rules as of:** 2026-10-23 · **version stamp:** `20e44f1445ecaff9` · engine 0.1.0  
+**Rules as of:** 2026-10-23 · **version stamp:** `e51e3a0350b87718` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there.
 
@@ -30,12 +30,73 @@
 | BC Builds: eligibility and below-market requirement | Uncertain | Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply the missing figures; the indicative grant at 2025-26 rates would be set by unit count. |
 
+## 4. Does the money work? (feasibility grade)
+**Unlikely.** The gap is $151,374,523, 100% of the capital cost, more than the 15% a feasibility screen can call close. Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.
+
+- Capital cost **$151,374,523**: hard $112,129,276 (escalated ×1.0292), soft $28,032,319, contingency $11,212,928, land $0.
+- Net operating income **not given a year**: rent not given less vacancy not given, operating cost not given and reserve not given.
+- Funding **$0**: grants $0, equity $0, supportable debt not given at 6.19% over 40 years, 1.10 coverage.
+- Gap **$151,374,523** (100% of the capital cost).
+
+| Line | Figure | From | Note |
+|---|---|---|---|
+| Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf) |
+| Escalation to the latest index | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01) |
+| Hard cost | $112,129,276 | `f.hard_cost_base` | 23,215 m² × $4,693 × 1.0292 |
+| Soft costs | $28,032,319 | `f.soft_costs` (placeholder) | 25% of hard cost |
+| Contingency | $11,212,928 | `f.soft_costs` (placeholder) | 10% of hard cost |
+| Land | $0 | `f.land` | nominal: the owner is a municipality and the tenure plan is a long lease or a transfer |
+| Capital cost | $151,374,523 | the option | hard + soft + contingency + land |
+| Market rent | not given a year | `f.rents` | CMHC October 2025, 0 units |
+| Rent-geared-to-income | not given a year | `f.rents` (placeholder) | 30% of a household income taken at 50% of the fund's income limit (placeholder) |
+| Deep-subsidy rent | not given a year | `f.rents` | the shelter rate, $500 a month |
+| Vacancy | not given a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
+| Operating cost | not given a year | `f.operating` (placeholder) | $6,500 per unit |
+| Replacement reserve | not given a year | `f.operating` (placeholder) | $600 per unit |
+| Net operating income | not given a year | the option | gross rent less vacancy, operating cost and reserve |
+| Equity | $0 | the option | none entered |
+| Supportable debt | not given | `f.mortgage` | no net operating income to carry debt |
+| Funding | $0 | the option | grants + equity + supportable debt |
+| Gap | $151,374,523 | the option | capital cost less funding; a negative gap is headroom |
+
+> A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
+
 ## Massing derived from the rules
 - **Proposed: 29 storeys, FSR 5.94** — plate 800 m² × 29 storeys = 23,215 m² (FSR 5.94), 88.45 m high, inside a 72.2 × 44.0 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
 
 ![Massing plan and section](massing.svg)
 
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
+
+## Layouts derived from the option
+29 floors of 66.71 × 12.0 m (801 m² each); a double-loaded corridor, units 5.1 m deep; 0 of 0 units placed.
+
+| Block | Count | Area | From |
+|---|---|---|---|
+| Services, bicycles | 1 | 576 m² | placeholder: 40 m² services + 536 bicycle spaces × 1.0 m² |
+| Parking | 63 | 1,890 m² | placeholder: below grade, not on the plates |
+
+Adjacency rules, in plain words, read back from the plates:
+
+- *info* — non residential: on the ground floor, facing the street. No non-residential space in the option
+- *info* — amenity: on the ground floor, next to the entry. No amenity in the program
+- *conditional* — services: on the ground floor, away from the street. On the ground floor but facing the street: the plate is single-loaded
+- *pass* — core: at the centre of every floor, the corridor through it. One core bay at the centre of every floor, the corridor through it
+- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on the street side only: the plate is too shallow for a double-loaded corridor
+- *info* — three bed plus: on the lowest residential floors. No three-bedroom units in the mix
+- *info* — accessible: next to the core, on the lowest residential floor. No accessible units stated on the option
+
+![Stacking diagram](stacking.svg)
+
+![Plans by program](plans.svg)
+
+![Preliminary elevations](elevations.svg)
+
+![The floors stacked](axon.svg)
+
+![Code site plan](site-plan.svg)
+
+`layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.
 
 ## Full ledger
 
@@ -81,9 +142,21 @@
 | BC Housing Project Development Fund (pre-development loans) (`bch.pdf.predevelopment_loan`, v 2025-01-01) | Info | max loan cad: 250000; eligible costs: due diligence, feasibility and design. | max loan cad = 250000; eligible costs = due diligence, feasibility and design | [UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000), Provincial response](https://www.ubcm.ca/node/111136) |
 | CMHC Affordable Housing Fund: readiness and submission mechanics (`cmhc.ahf.readiness`, v 2024-03-13) | Info | construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding. | construction start months after approval = 6; intake = continuous; submission = online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note = Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding | [CMHC, Affordable Housing Fund applicant guide, Minimum submission requirements; readiness](https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx) |
 
+### Layer F: Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)
+
+| Rule | Status | Finding | Numbers used | Source |
+|---|---|---|---|---|
+| Construction price escalation (Statistics Canada BCPI, Vancouver, residential) (`f.escalation_bcpi`, v 2024-08-21) | Info | Building construction price index, Vancouver, residential buildings, division composite (2023=100): 109.4 in the third quarter of 2026, from 106.1 in the third quarter of 2024, the hard-cost base period; escalation 1.031 (a memo run on an earlier date uses the last quarter published on or before that date). | table = 18-10-0289-01; product id = 18100289; coordinate = 24.1.1.0.0.0.0.0.0.0; vector = v1617916836; series = Vancouver, British Columbia; Residential buildings; Division composite; base = 2023=100; latest period = 2026-07-01; latest value = 109.4; released = 2026-10-29 | [Statistics Canada, Table 18-10-0289-01 Building construction price indexes, by type of building and division (quarterly, 2023=100), released 29 Oct 2026, Vancouver, British Columbia; residential buildings; division composite (vector v1617916836)](https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901) |
+| Hard construction cost, base ($/m², Vancouver) (`f.hard_cost_base`, v 2024-08-21) | Info | Hard cost base $4,693 per m² ($436 per build sq ft): the average of the three four-unit wood-frame designs in the Class D estimate for the Province's standardized housing designs, Vancouver baseline, August 2024, hard costs only. | value per m2 cad = 4693; value per sqft cad = 436; base period = 2024-07-01; basis = average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); the catalogue's ten designs run $401 to $585 per build sq ft; the report's regional review gives Vancouver $350 to $475 per sq ft; excludes = soft costs, utility connections, existing buildings, rock or shoring, pad-mounted transformers (the report's stated assumptions) | [SHP Class D Estimate Report, V3 (Chris Hill, CPA CMA, for the BC Ministry of Housing Standardized Designs Catalogue), 21 Aug 2024, Cost Estimate Summary (per build sf); Region Review; Assumptions](https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/reports/bc_std_des_class_d_estimates_v1.pdf) |
+| Land: nominal lease from a church, a society or a government; else the assessed value, entered (`f.land`, v 2026-10-01) | Info | Land is carried at a nominal value where the owner is a church, a non-profit society, a co-operative, a First Nation, the City or the Province and the tenure plan is a long lease or a transfer; otherwise the BC Assessment value or the agreed price is entered by hand, and until it is the pro-forma is unsure. | nominal value cad = 0 | [BC Assessment, property assessment search (assessed value of the parcel); the owner's tenure plan, Assessed value as of 1 July of the previous year](https://www.bcassessment.ca/) |
+| Mortgage rate, amortization and debt coverage (Bank of Canada; CMHC MLI Select) (`f.mortgage`, v 2026-10-14) | Info | Conventional 5-year mortgage rate 6.19% (chartered banks, Bank of Canada series V80691335, 28 Oct 2026) as the ceiling; CMHC MLI Select terms for the debt test: a 1.10 debt coverage ratio and a 40-year amortization (50 years is available at 100 affordability points). | rate pct = 6.19; rate series = V80691335; rate date = 2026-10-28; amortization years = 40; debt coverage ratio = 1.1; insured rate note = an insured multi-unit loan is usually priced below the posted conventional rate; the posted rate is the conservative ceiling | [Bank of Canada, Valet API, series V80691335 Conventional mortgage, 5-year (weekly); CMHC, MLI Select product sheet, Conventional mortgage, 5-year; MLI Select: minimum debt coverage ratio 1.10 for standard rental, amortization to 50 years at 100 points](https://www.bankofcanada.ca/valet/observations/V80691335/json?recent=1) |
+| Operating cost and replacement reserve per unit (`f.operating`, v 2026-10-01) | Info | Operating cost $6,500 per unit a year (management, maintenance, utilities, insurance, property tax where not exempt) and a $600 per unit replacement reserve: declared placeholders until the operator's budget replaces them. | operating cost per unit year cad = 6500; replacement reserve per unit year cad = 600 | Declared placeholder (no public source): to be replaced by the operator's budget or BC Housing's operating benchmarks where published |
+| Rents by tier: CMHC average market rent, rent-geared-to-income, the shelter rate (`f.rents`, v 2026-01-29) | Info | Market rent from the CMHC Rental Market Survey of October 2025, Vancouver CMA, purpose-built apartments: two-bedroom $2,363 a month, all unit types $1,963, vacancy 3.7% (the other bedroom types are left to be typed from the CMHC data tables); rent-geared-to-income at 30% of a household income taken, as a placeholder, at half the Community Housing Fund's low-to-moderate income limit for the unit size; the deep-subsidy rent at the income assistance shelter rate of $500. | survey = October 2025; vacancy rate = 0.037; rgi rent share of income = 0.3; rgi income share of chf limit = 0.5; deep subsidy rent monthly cad = 500 | [CMHC, Rental Market Report, January 2026 (October 2025 survey), Vancouver CMA; Province of BC, income assistance shelter allowance (single person, maximum $500 from 1 Dec 2025), Vancouver: purpose-built rental vacancy 3.7%, average two-bedroom rent $2,363; summary by zone, all units $1,963](https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres) |
+| Soft costs and contingency, as shares of hard cost (`f.soft_costs`, v 2026-10-01) | Info | Soft costs 25% of hard cost (design, permits, levies where they apply, financing, legal, insurance, marketing) and a 10% contingency: declared placeholders until a practitioner gives this project's figures. | soft cost share of hard = 0.25; contingency share of hard = 0.1 | Declared placeholder (no public source): to be replaced by the proponent's development budget |
+
 ## Inputs
 - Site `1010-expo-blvd`: CD-1, 3,908.0 m², 78.2 × 50.0 m; owner: City of Vancouver (site transferred by Concord Pacific under the False Creek North social housing agreement, 2023).
-- Option `1010-expo-blvd-as-permitted`: 29 storeys, 88.4 m, 23,215.0 m² GFA; units studio None, one bed None, two bed None, three bed plus None; tenure social housing.
+- Option `1010-expo-blvd-as-permitted`: 29 storeys, 88.4 m, 23,215.0 m² GFA; units studio not given, one bed not given, two bed not given, three bed plus not given; tenure social housing.
 - Site notes: A triangular surface parking lot between Expo Blvd, Pacific Blvd and the Cambie Bridge, inside the False Creek North ODP area (CD-1; by-law number to confirm). Site area is derived from the development application's floor area and FSR (23,215 m² at 5.94) and the frontage and depth are an equivalent rectangle, so the plan figure is a stand-in for the real triangle. No tree survey is in the public record; the lot is paved. Transit-oriented area tier is left null until the City's TOA map is checked (Stadium-Chinatown and Yaletown-Roundhouse stations are both within about 800 m). The rule stack has no CD-1 outright schedule, so the memo's 'outright: yes' means no coded outright limit was tested, not that a 29-storey tower is permitted outright: the ODP and CD-1 amendments of July 2023 were the rezoning.
 - Option notes: Storeys, height, floor area, FSR and the 299 units are the City's application figures; 63 vehicle and 536 bicycle spaces, 112 family units and 15 accessible units are the architect's published figures. The bedroom mix is not public, so the unit counts are left null and the engine marks the family-unit rule uncertain; the referral report required 20% of units (60) at shelter rate but the share below HILs is not published. Setbacks and the 3.05 m floor-to-floor (88.4 m over 29 storeys) are placeholders for the massing only. Funding on the public record: federal Affordable Housing Fund and provincial Community Housing Fund (amounts reported jointly with 450 Pacific St) plus City DCC waivers and land.
 
@@ -105,6 +178,13 @@
 - BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page — https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf
 - UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000) — https://www.ubcm.ca/node/111136
 - CMHC, Affordable Housing Fund applicant guide — https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx
+- Statistics Canada, Table 18-10-0289-01 Building construction price indexes, by type of building and division (quarterly, 2023=100), released 29 Oct 2026 — https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901
+- SHP Class D Estimate Report, V3 (Chris Hill, CPA CMA, for the BC Ministry of Housing Standardized Designs Catalogue), 21 Aug 2024 — https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/reports/bc_std_des_class_d_estimates_v1.pdf *(verify: The catalogue's designs are two- to four-unit, three-storey wood-frame buildings; a six-storey apartment sits outside it. Replace with a quantity surveyor's Class D figure for the actual building type when one exists, and keep this as the floor.)*
+- BC Assessment, property assessment search (assessed value of the parcel); the owner's tenure plan — https://www.bcassessment.ca/
+- Bank of Canada, Valet API, series V80691335 Conventional mortgage, 5-year (weekly); CMHC, MLI Select product sheet — https://www.bankofcanada.ca/valet/observations/V80691335/json?recent=1 *(verify: Confirm the DCR and amortization against the current MLI Select guide before a submission.)*
+- Declared placeholder (no public source): to be replaced by the operator's budget or BC Housing's operating benchmarks where published
+- CMHC, Rental Market Report, January 2026 (October 2025 survey), Vancouver CMA; Province of BC, income assistance shelter allowance (single person, maximum $500 from 1 Dec 2025) — https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres *(verify: Type the bachelor, one-bedroom and three-bedroom averages from the CMHC Rental Market Survey data tables (Vancouver CMA, Table 1.1.2); the rent-geared-to-income income placeholder is declared, not sourced: replace it with the operator's tenant income profile.)*
+- Declared placeholder (no public source): to be replaced by the proponent's development budget
 - Shape Your City, 1050 Expo Boulevard development application DP-2023-00629 (29 storeys, 88.4 m, 23,215 m², FSR 5.94, 299 social housing units; DP issued 5 Feb 2025) — https://www.shapeyourcity.ca/1050-expo-blvd
 - Shape Your City, False Creek North social housing (ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; 29 storeys, 88.1 m at 1050 Expo Blvd) — https://www.shapeyourcity.ca/false-creek-north-non-market-housing
 - City of Vancouver, non-market housing projects (1010 Expo Blvd: 299 units, BC Indigenous Housing Society, under construction, completion 2029) — https://vancouver.ca/people-programs/non-market-housing-projects.aspx
@@ -114,10 +194,11 @@
 - Daily Hive, construction starts on two social housing towers next to Cambie Bridge's north end (6 Dec 2025; operator and funding) — https://dailyhive.com/vancouver/1050-expo-boulevard-95-nelson-street-vancouver-social-housing-firehall-8-tower-construction
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `14450d4face5e50cd1cccd94ba3236ecd49379484bbeb612cf300342bdc9fe9c`
+- Rules hash (SHA-256 over all rule files): `9209630adb35220b8e7e9d43f4b0b8c636e9557b8f7d61a6111e6aed3d9a7823`
 - `a_zoning_district.json`: `ef2791008abaf57c…`
 - `b_provincial.json`: `0fede33e5d62b1bd…`
 - `c_city_policies.json`: `961f8f2e91ce2d3f…`
 - `d_design_standards.json`: `dc53a9b24d809090…`
 - `e_funding_programs.json`: `9267a33722068790…`
-- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `20e44f1445ecaff9`
+- `f_assumptions.json`: `942a6dbab04d93fc…`
+- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `e51e3a0350b87718`

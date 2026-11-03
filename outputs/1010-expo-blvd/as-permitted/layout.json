@@ -1,0 +1,2107 @@
+{
+  "site_id": "1010-expo-blvd",
+  "option_id": "1010-expo-blvd-as-permitted",
+  "as_of": "2026-10-23",
+  "stamp": "e51e3a0350b87718",
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "edited": false,
+  "plate": {
+    "x": 3.0,
+    "y": 3.0,
+    "width_m": 66.71,
+    "depth_m": 12.0,
+    "storeys": 29,
+    "floor_to_floor_m": 3.05,
+    "double_loaded": true,
+    "unit_depth_m": 5.1
+  },
+  "program": [
+    {
+      "key": "services",
+      "label": "Services, bicycles",
+      "count": 1,
+      "area_m2": 576.0,
+      "source": "placeholder",
+      "note": "40 m² services + 536 bicycle spaces × 1.0 m²"
+    }
+  ],
+  "parking": {
+    "spaces": 63,
+    "area_m2": 1890.0,
+    "where": "below grade, not on the plates",
+    "source": "placeholder"
+  },
+  "units_total": 0,
+  "units_placed": 0,
+  "adjacencies": [
+    {
+      "id": "non_residential_street",
+      "block": "non_residential",
+      "rule": "on the ground floor, facing the street",
+      "status": "info",
+      "note": "no non-residential space in the option"
+    },
+    {
+      "id": "amenity_entry",
+      "block": "amenity",
+      "rule": "on the ground floor, next to the entry",
+      "status": "info",
+      "note": "no amenity in the program"
+    },
+    {
+      "id": "services_lane",
+      "block": "services",
+      "rule": "on the ground floor, away from the street",
+      "status": "conditional",
+      "note": "on the ground floor but facing the street: the plate is single-loaded"
+    },
+    {
+      "id": "core_centre",
+      "block": "core",
+      "rule": "at the centre of every floor, the corridor through it",
+      "status": "pass",
+      "note": "one core bay at the centre of every floor, the corridor through it"
+    },
+    {
+      "id": "units_both_sides",
+      "block": "units",
+      "rule": "on both sides of the corridor, above whatever the ground floor gives to other uses",
+      "status": "conditional",
+      "note": "units on the street side only: the plate is too shallow for a double-loaded corridor"
+    },
+    {
+      "id": "family_low",
+      "block": "three_bed_plus",
+      "rule": "on the lowest residential floors",
+      "status": "info",
+      "note": "no three-bedroom units in the mix"
+    },
+    {
+      "id": "accessible_core",
+      "block": "accessible",
+      "rule": "next to the core, on the lowest residential floor",
+      "status": "info",
+      "note": "no accessible units stated on the option"
+    }
+  ],
+  "geometry": [],
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground floor",
+      "z": 0.0,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 23.38,
+          "d": 5.1,
+          "area_m2": 119.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 63.23,
+          "y": 3.0,
+          "w": 6.48,
+          "d": 5.1,
+          "area_m2": 33.0,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 33.0
+    },
+    {
+      "level": 1,
+      "name": "Level 2",
+      "z": 3.05,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 2,
+      "name": "Level 3",
+      "z": 6.1,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 3,
+      "name": "Level 4",
+      "z": 9.15,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 4,
+      "name": "Level 5",
+      "z": 12.2,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 5,
+      "name": "Level 6",
+      "z": 15.25,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 6,
+      "name": "Level 7",
+      "z": 18.3,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 7,
+      "name": "Level 8",
+      "z": 21.35,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 8,
+      "name": "Level 9",
+      "z": 24.4,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 9,
+      "name": "Level 10",
+      "z": 27.45,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 10,
+      "name": "Level 11",
+      "z": 30.5,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 11,
+      "name": "Level 12",
+      "z": 33.55,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 12,
+      "name": "Level 13",
+      "z": 36.6,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 13,
+      "name": "Level 14",
+      "z": 39.65,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 14,
+      "name": "Level 15",
+      "z": 42.7,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 15,
+      "name": "Level 16",
+      "z": 45.75,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 16,
+      "name": "Level 17",
+      "z": 48.8,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 17,
+      "name": "Level 18",
+      "z": 51.85,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 18,
+      "name": "Level 19",
+      "z": 54.9,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 19,
+      "name": "Level 20",
+      "z": 57.95,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 20,
+      "name": "Level 21",
+      "z": 61.0,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 21,
+      "name": "Level 22",
+      "z": 64.05,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 22,
+      "name": "Level 23",
+      "z": 67.1,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 23,
+      "name": "Level 24",
+      "z": 70.15,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 24,
+      "name": "Level 25",
+      "z": 73.2,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 25,
+      "name": "Level 26",
+      "z": 76.25,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 26,
+      "name": "Level 27",
+      "z": 79.3,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 27,
+      "name": "Level 28",
+      "z": 82.35,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    },
+    {
+      "level": 28,
+      "name": "Level 29",
+      "z": 85.4,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 32.85,
+          "y": 3.0,
+          "w": 7.0,
+          "d": 12.0,
+          "area_m2": 84.0
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 3.0,
+          "y": 8.1,
+          "w": 66.71,
+          "d": 1.8,
+          "area_m2": 120.1,
+          "through": "core"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 3.0,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 3.0,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 39.85,
+          "y": 9.9,
+          "w": 29.85,
+          "d": 5.1,
+          "area_m2": 152.3,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 609.0
+    }
+  ],
+  "shortfall": [],
+  "outright": {
+    "fsr": null,
+    "height_m": null,
+    "rule_ids": []
+  },
+  "totals": {
+    "plates_m2": 23215.1,
+    "used_m2": 6495.0,
+    "spare_m2": 16720.1,
+    "gfa_m2": 23215.0
+  },
+  "assumptions": [
+    {
+      "key": "partition_allowance",
+      "value": 1.08,
+      "note": "gross unit area over net: walls and the entry, 8% at this stage (the net areas already carry the suggestion's 10% design allowance)"
+    },
+    {
+      "key": "corridor_width_m",
+      "value": 1.8,
+      "note": "a double-loaded corridor, the wider of the two usual widths"
+    },
+    {
+      "key": "core_bay_m",
+      "value": 7.0,
+      "note": "one bay across the plate at its centre for two stairs, the elevator and risers"
+    },
+    {
+      "key": "services_base_m2",
+      "value": 40.0,
+      "note": "mechanical, electrical, garbage and recycling on the ground floor"
+    },
+    {
+      "key": "bicycle_m2_per_space",
+      "value": 1.0,
+      "note": "a bicycle space with its aisle share"
+    },
+    {
+      "key": "amenity_m2_per_unit",
+      "value": 1.5,
+      "note": "indoor amenity, at least 40 m²; a placeholder until the operator's brief"
+    },
+    {
+      "key": "parking_m2_per_space",
+      "value": 30.0,
+      "note": "a below-grade stall with its aisle share; not on the plates"
+    },
+    {
+      "key": "window_width_m",
+      "value": 1.5,
+      "note": "one window per unit on the elevation, the unit module as the rhythm"
+    }
+  ],
+  "warnings": [],
+  "derived_from": [
+    "option.units",
+    "option.non_residential_gfa_m2",
+    "option.accessible_units",
+    "option.bicycle_spaces",
+    "massing.masses[proposed]",
+    "bch.design_guidelines.unit_areas"
+  ]
+}

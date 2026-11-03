@@ -12,7 +12,7 @@
     </style></head><body><h1>First Read memo: 1010 Expo Blvd (formerly 1050 Expo Blvd), Vancouver, BC</h1>
 <p><strong>Option:</strong> What-if (hypothetical, for the demo): twelve storeys with the full funder data supplied</p>
 <p><strong>Proponent:</strong> City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society (municipal housing provider)</p>
-<p><strong>Rules as of:</strong> 2026-10-23 · <strong>version stamp:</strong> <code>20e44f1445ecaff9</code> · engine 0.1.0</p>
+<p><strong>Rules as of:</strong> 2026-10-23 · <strong>version stamp:</strong> <code>e51e3a0350b87718</code> · engine 0.1.0</p>
 <blockquote>
 <p>Deterministic output of the rule stack listed under <em>Sources</em>. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there.</p>
 </blockquote>
@@ -35,6 +35,38 @@
 <tr><td>Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street).</td></tr>
 <tr><td>BC Housing Community Housing Fund: eligibility and unit mix</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $20,545,320 for 120 units.</td></tr>
 </tbody></table>
+<h2>4. Does the money work? (feasibility grade)</h2>
+<p><strong>Unlikely.</strong> The gap is $27,521,113, 44% of the capital cost, more than the 15% a feasibility screen can call close. Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.</p>
+<ul>
+<li>Capital cost <strong>$62,597,262</strong>: hard $46,368,342 (escalated ×1.0292), soft $11,592,086, contingency $4,636,834, land $0.</li>
+<li>Net operating income <strong>$1,080,862 a year</strong>: rent $2,007,126 less vacancy $74,264, operating cost $780,000 and reserve $72,000.</li>
+<li>Funding <strong>$35,076,149</strong>: grants $20,545,320, equity $0, supportable debt $14,530,829 at 6.19% over 40 years, 1.10 coverage.</li>
+<li>Gap <strong>$27,521,113</strong> (44% of the capital cost).</li>
+</ul>
+<table><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>
+<tr><td>Hard cost base</td><td>$4,693 per m²</td><td><code>f.hard_cost_base</code></td><td>average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf)</td></tr>
+<tr><td>Escalation to the latest index</td><td>×1.0292</td><td><code>f.escalation_bcpi</code></td><td>BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01)</td></tr>
+<tr><td>Hard cost</td><td>$46,368,342</td><td><code>f.hard_cost_base</code></td><td>9,600 m² × $4,693 × 1.0292</td></tr>
+<tr><td>Soft costs</td><td>$11,592,086</td><td><code>f.soft_costs</code> (placeholder)</td><td>25% of hard cost</td></tr>
+<tr><td>Contingency</td><td>$4,636,834</td><td><code>f.soft_costs</code> (placeholder)</td><td>10% of hard cost</td></tr>
+<tr><td>Land</td><td>$0</td><td><code>f.land</code></td><td>nominal: the owner is a municipality and the tenure plan is a long lease or a transfer</td></tr>
+<tr><td>Capital cost</td><td>$62,597,262</td><td>the option</td><td>hard + soft + contingency + land</td></tr>
+<tr><td>Market rent</td><td>$899,856 a year</td><td><code>f.rents</code></td><td>CMHC October 2025, 36 units; some unit types priced at the CMHC all-units average: the table has no figure for them</td></tr>
+<tr><td>Rent-geared-to-income</td><td>$963,270 a year</td><td><code>f.rents</code> (placeholder)</td><td>30% of a household income taken at 50% of the fund's income limit (placeholder)</td></tr>
+<tr><td>Deep-subsidy rent</td><td>$144,000 a year</td><td><code>f.rents</code></td><td>the shelter rate, $500 a month</td></tr>
+<tr><td>Vacancy</td><td>$74,264 a year</td><td><code>f.rents</code></td><td>3.7% of gross rent, the CMHC survey's rate</td></tr>
+<tr><td>Operating cost</td><td>$780,000 a year</td><td><code>f.operating</code> (placeholder)</td><td>$6,500 per unit</td></tr>
+<tr><td>Replacement reserve</td><td>$72,000 a year</td><td><code>f.operating</code> (placeholder)</td><td>$600 per unit</td></tr>
+<tr><td>Net operating income</td><td>$1,080,862 a year</td><td>the option</td><td>gross rent less vacancy, operating cost and reserve</td></tr>
+<tr><td>Community Housing Fund grant</td><td>$20,545,320</td><td><code>bch.chf.eligibility</code></td><td>$171,211 per unit × 120; indicative, the fund is between calls</td></tr>
+<tr><td>Equity</td><td>$0</td><td>the option</td><td>none entered</td></tr>
+<tr><td>Supportable debt</td><td>$14,530,829</td><td><code>f.mortgage</code></td><td>NOI over a 1.10 coverage ratio, at 6.19% over 40 years (annual service $982,602)</td></tr>
+<tr><td>Funding</td><td>$35,076,149</td><td>the option</td><td>grants + equity + supportable debt</td></tr>
+<tr><td>Gap</td><td>$27,521,113</td><td>the option</td><td>capital cost less funding; a negative gap is headroom</td></tr>
+</tbody></table>
+<blockquote>
+<p>A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.</p>
+</blockquote>
 <h2>Massing derived from the rules</h2>
 <ul>
 <li><strong>Proposed: 12 storeys, FSR 2.46</strong> — plate 800 m² × 12 storeys = 9,600 m² (FSR 2.46), 36.6 m high, inside a 72.2 × 44.0 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.</li>
@@ -45,7 +77,7 @@
 <text x="48" y="44" font-size="14" font-weight="600">Plan · 1010-expo-blvd · 78.2 × 50.0 m, 3,908 m²</text>
 <polygon points="48.0,72.0 468.0,72.0 468.0,340.5 48.0,340.5" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
 <polygon points="64.1,88.1 451.9,88.1 451.9,324.4 64.1,324.4" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
-<polygon points="64.1,88.1 451.9,88.1 451.9,147.6 64.1,147.6" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<polygon points="64.1,88.1 422.2,88.1 422.2,152.6 64.1,152.6" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
 <text x="48" y="356.542199488491" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope 72.2 × 44.0 m</text>
 <text x="528.0" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
 <line x1="528.0" y1="340.542199488491" x2="948.0" y2="340.542199488491" stroke="#1f2933" stroke-width="1.5"/>
@@ -64,11 +96,650 @@
 <text x="550.1" y="138.0" fill="#2a6fb8" font-weight="600">Proposed: 12 storeys, FSR 2.46 · 36.6 m</text>
 <text x="48" y="380.542199488491" fill="#1f2933">Proposed: 12 storeys, FSR 2.46: plate 800 m² × 12 = 9,600 m² (FSR 2.46), 36.6 m high</text>
 <text x="48" y="396.542199488491" fill="#1f2933">Trees: Schedule C requires 43, plan leaves 43 (shortfall 0); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
-<text x="48" y="412.542199488491" fill="#1f2933">Rules as of 2026-10-23 · stamp 20e44f1445ecaff9 · generated by ffm, not a survey</text>
+<text x="48" y="412.542199488491" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · generated by ffm, not a survey</text>
 </svg><figcaption>Rule-derived massing: plan and section, to scale.</figcaption></figure>
 <p><code>massing.json</code> carries the same geometry for the Revit script (<code>revit/ffm_massing_pyrevit.py</code>).</p>
+<h2>Layouts derived from the option</h2>
+<p>12 floors of 66.67 × 12.0 m (800 m² each); a double-loaded corridor, units 5.1 m deep; 90 of 120 units placed.</p>
+<table><thead><tr><th>Block</th><th>Count</th><th>Area</th><th>From</th></tr></thead><tbody>
+<tr><td>Three-bedroom+</td><td>12</td><td>1,226 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 12 × 94.6 m² net (86 m² minimum + 10%), 102.2 m² gross with partitions</td></tr>
+<tr><td>Two-bedroom</td><td>36</td><td>2,866 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 36 × 73.7 m² net (67 m² minimum + 10%), 79.6 m² gross with partitions</td></tr>
+<tr><td>One-bedroom</td><td>42</td><td>2,444 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 42 × 53.9 m² net (49 m² minimum + 10%), 58.2 m² gross with partitions</td></tr>
+<tr><td>Studio</td><td>30</td><td>1,176 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 30 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions</td></tr>
+<tr><td>Amenity</td><td>1</td><td>180 m²</td><td>placeholder: 1.5 m² per unit, at least 40 m²</td></tr>
+<tr><td>Services, bicycles</td><td>1</td><td>260 m²</td><td>placeholder: 40 m² services + 220 bicycle spaces × 1.0 m²</td></tr>
+<tr><td>Parking</td><td>30</td><td>900 m²</td><td>placeholder: below grade, not on the plates</td></tr>
+</tbody></table>
+<p>Adjacency rules, in plain words, read back from the plates:</p>
+<ul>
+<li><em>info</em> — non residential: on the ground floor, facing the street. No non-residential space in the option</li>
+<li><em>pass</em> — amenity: on the ground floor, next to the entry. On the ground floor beside the core, where the entry is</li>
+<li><em>pass</em> — services: on the ground floor, away from the street. On the ground floor, lane side</li>
+<li><em>pass</em> — core: at the centre of every floor, the corridor through it. One core bay at the centre of every floor, the corridor through it</li>
+<li><em>conditional</em> — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 3 two-bedroom (239 m²) did not fit, 9 one-bedroom (524 m²) did not fit, 18 studio (706 m²) did not fit: more storeys, a larger plate or a smaller program</li>
+<li><em>conditional</em> — three bed plus: on the lowest residential floors. Three-bedroom units on levels 1 to 4, above some smaller units</li>
+<li><em>pass</em> — accessible: next to the core, on the lowest residential floor. 6 accessible units on the ground floor, nearest the core</li>
+</ul>
+<p>Did not fit on the plates: Two-bedroom × 3 (239 m²); One-bedroom × 9 (524 m²); Studio × 18 (706 m²). More storeys, a larger plate or a smaller program.</p>
+<ul>
+<li>Note: Option height 36.6 m exceeds 12 x 3.05 m = 36.6 m; the extra 0.0 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.</li>
+</ul>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="696" height="616" viewBox="0 0 696 616" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Stacking diagram">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Stacking · top floor first, each bar one plate</text>
+<text x="48" y="89.0" font-size="11" fill="#5f6672">Level 12</text>
+<rect x="128.0" y="72" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="89.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="72" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="89.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="72" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="89.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="72" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="89.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="72" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="89.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="123.0" font-size="11" fill="#5f6672">Level 11</text>
+<rect x="128.0" y="106" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="123.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="106" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="123.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="106" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="123.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="106" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="123.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="106" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="123.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="157.0" font-size="11" fill="#5f6672">Level 10</text>
+<rect x="128.0" y="140" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="157.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="140" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="157.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="140" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="157.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="140" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="157.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="140" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="157.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="191.0" font-size="11" fill="#5f6672">Level 9</text>
+<rect x="128.0" y="174" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="191.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="174" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="191.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="174" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="191.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="174" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="191.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="174" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="191.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="225.0" font-size="11" fill="#5f6672">Level 8</text>
+<rect x="128.0" y="208" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="225.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="208" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="225.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="208" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="225.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="208" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="225.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="208" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="225.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="259.0" font-size="11" fill="#5f6672">Level 7</text>
+<rect x="128.0" y="242" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="259.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="242" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="259.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="242" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="259.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="242" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="259.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="242" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="259.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="293.0" font-size="11" fill="#5f6672">Level 6</text>
+<rect x="128.0" y="276" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="293.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="276" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="293.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="276" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="293.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="276" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="293.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="276" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="293.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="327.0" font-size="11" fill="#5f6672">Level 5</text>
+<rect x="128.0" y="310" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="327.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="310" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="327.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="310" width="203.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="327.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="462.2" y="310" width="148.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="466.2" y="327.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
+<rect x="611.1" y="310" width="36.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="615.1" y="327.0" font-size="10" fill="#1f2933">Spare</text>
+<text x="48" y="361.0" font-size="11" fill="#5f6672">Level 4</text>
+<rect x="128.0" y="344" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="361.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="344" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="361.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="344" width="196.2" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="361.0" font-size="10" fill="#1f2933">Three-bedroom+ × 3</text>
+<rect x="454.7" y="344" width="50.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="458.7" y="361.0" font-size="10" fill="#1f2933">Two-bedroom × 1</text>
+<rect x="505.6" y="344" width="37.2" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="509.6" y="361.0" font-size="10" fill="#1f2933">One-bedroom × 1</text>
+<rect x="542.8" y="344" width="75.2" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="546.8" y="361.0" font-size="10" fill="#1f2933">Studio × 3</text>
+<rect x="618.1" y="344" width="29.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="48" y="395.0" font-size="11" fill="#5f6672">Level 3</text>
+<rect x="128.0" y="378" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="395.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="378" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="395.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="378" width="261.5" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="395.0" font-size="10" fill="#1f2933">Three-bedroom+ × 4</text>
+<rect x="520.0" y="378" width="100.3" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="524.0" y="395.0" font-size="10" fill="#1f2933">Studio × 4</text>
+<rect x="620.4" y="378" width="27.6" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="48" y="429.0" font-size="11" fill="#5f6672">Level 2</text>
+<rect x="128.0" y="412" width="53.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="429.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="181.7" y="412" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="185.7" y="429.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="258.5" y="412" width="261.5" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="262.5" y="429.0" font-size="10" fill="#1f2933">Three-bedroom+ × 4</text>
+<rect x="520.0" y="412" width="100.3" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="524.0" y="429.0" font-size="10" fill="#1f2933">Studio × 4</text>
+<rect x="620.4" y="412" width="27.6" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="48" y="463.0" font-size="11" fill="#5f6672">Ground floor</text>
+<rect x="128.0" y="446" width="115.2" height="26" fill="#f6e7c1" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="463.0" font-size="10" fill="#1f2933">Amenity</text>
+<rect x="243.2" y="446" width="166.4" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
+<text x="247.2" y="463.0" font-size="10" fill="#1f2933">Services, bicycles</text>
+<rect x="409.6" y="446" width="53.8" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="413.6" y="463.0" font-size="10" fill="#1f2933">Core (stairs, elevator)</text>
+<rect x="463.3" y="446" width="76.8" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="467.3" y="463.0" font-size="10" fill="#1f2933">Corridor</text>
+<rect x="540.1" y="446" width="65.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="544.1" y="463.0" font-size="10" fill="#1f2933">Three-bedroom+ × 1</text>
+<rect x="605.5" y="446" width="25.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<rect x="630.6" y="446" width="17.4" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<rect x="128.0" y="489.0" width="12" height="12" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<text x="144.0" y="499.0" fill="#5f6672" font-size="11">Non-residential</text>
+<rect x="267.0" y="489.0" width="12" height="12" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="283.0" y="499.0" fill="#5f6672" font-size="11">Amenity</text>
+<rect x="350.0" y="489.0" width="12" height="12" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="366.0" y="499.0" fill="#5f6672" font-size="11">Services, bicycles</text>
+<rect x="510.0" y="489.0" width="12" height="12" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="526.0" y="499.0" fill="#5f6672" font-size="11">Core (stairs, elevator)</text>
+<rect x="705.0" y="489.0" width="12" height="12" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="721.0" y="499.0" fill="#5f6672" font-size="11">Corridor</text>
+<rect x="795.0" y="489.0" width="12" height="12" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<text x="811.0" y="499.0" fill="#5f6672" font-size="11">Three-bedroom+</text>
+<rect x="927.0" y="489.0" width="12" height="12" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="943.0" y="499.0" fill="#5f6672" font-size="11">Two-bedroom</text>
+<rect x="1038.0" y="489.0" width="12" height="12" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1054.0" y="499.0" fill="#5f6672" font-size="11">One-bedroom</text>
+<rect x="1149.0" y="489.0" width="12" height="12" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1165.0" y="499.0" fill="#5f6672" font-size="11">Studio</text>
+<rect x="1225.0" y="489.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1241.0" y="499.0" fill="#5f6672" font-size="11">Spare</text>
+<text x="48.0" y="528.0" fill="#1f2933">90 of 120 units placed on 12 floors of 66.67 × 12.0 m (800 m² each)</text>
+<text x="48.0" y="544.0" fill="#1f2933">Did not fit: Two-bedroom × 3, 239 m²</text>
+<text x="48.0" y="560.0" fill="#1f2933">Did not fit: One-bedroom × 9, 524 m²</text>
+<text x="48.0" y="576.0" fill="#1f2933">Did not fit: Studio × 18, 706 m²</text>
+<text x="48.0" y="592.0" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg><figcaption>Stacking diagram, derived from the option; to scale.</figcaption></figure>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="686" height="516" viewBox="0 0 686 516" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Floor plans by program">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plans by program · metres, street at the top</text>
+<text x="78.0" y="78.0" font-size="13" font-weight="600">Ground floor: 1 three-bedroom+, 1 studio · 27 m² spare</text>
+<rect x="78.0" y="86.0" width="560.0" height="100.8" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="328.6" y="86.0" width="58.8" height="100.8" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="358.0" y="139.9" font-size="9.5" text-anchor="middle" fill="#1f2933">core</text>
+<rect x="78.0" y="128.8" width="560.0" height="15.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="358.0" y="139.9" font-size="9.5" text-anchor="middle" fill="#1f2933">corridor</text>
+<rect x="387.4" y="86.0" width="250.6" height="42.8" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="512.8" y="110.9" font-size="9.5" text-anchor="middle" fill="#1f2933">amenity</text>
+<rect x="282.8" y="86.0" width="45.9" height="42.8" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="305.7" y="110.9" font-size="9.5" text-anchor="middle" fill="#1f2933">amenity</text>
+<rect x="78.0" y="144.0" width="250.6" height="42.8" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="203.3" y="168.9" font-size="9.5" text-anchor="middle" fill="#1f2933">services</text>
+<rect x="387.4" y="144.0" width="177.7" height="42.8" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="476.3" y="168.9" font-size="9.5" text-anchor="middle" fill="#1f2933">services</text>
+<rect x="114.5" y="86.0" width="168.3" height="42.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<circle cx="121.5" cy="93.0" r="3.2" fill="#245f9c"/>
+<text x="198.6" y="110.9" font-size="9.5" text-anchor="middle" fill="#1f2933">3b</text>
+<rect x="565.0" y="144.0" width="64.6" height="42.8" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="597.3" y="168.9" font-size="9.5" text-anchor="middle" fill="#1f2933">st</text>
+<rect x="78.0" y="86.0" width="36.5" height="42.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<text x="96.2" y="110.9" font-size="9.5" text-anchor="middle" fill="#1f2933">spare</text>
+<rect x="629.6" y="144.0" width="8.4" height="42.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<line x1="78.0" y1="200.8" x2="638.0" y2="200.8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="358.0" y="212.8" font-size="10" text-anchor="middle" fill="#5f6672">66.67 m · street side</text>
+<line x1="66.0" y1="86.0" x2="66.0" y2="186.8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="136.4" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 136.4)">12.0 m</text>
+<text x="78.0" y="242.8" font-size="13" font-weight="600">Level 5: 4 two-bedroom, 4 one-bedroom · 57 m² spare</text>
+<rect x="78.0" y="250.8" width="560.0" height="100.8" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="328.6" y="250.8" width="58.8" height="100.8" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="358.0" y="304.7" font-size="9.5" text-anchor="middle" fill="#1f2933">core</text>
+<rect x="78.0" y="293.6" width="560.0" height="15.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="358.0" y="304.7" font-size="9.5" text-anchor="middle" fill="#1f2933">corridor</text>
+<rect x="197.5" y="250.8" width="131.1" height="42.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="263.1" y="275.7" font-size="9.5" text-anchor="middle" fill="#1f2933">2b</text>
+<rect x="387.4" y="250.8" width="131.1" height="42.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="453.0" y="275.7" font-size="9.5" text-anchor="middle" fill="#1f2933">2b</text>
+<rect x="197.5" y="308.8" width="131.1" height="42.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="263.1" y="333.7" font-size="9.5" text-anchor="middle" fill="#1f2933">2b</text>
+<rect x="387.4" y="308.8" width="131.1" height="42.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="453.0" y="333.7" font-size="9.5" text-anchor="middle" fill="#1f2933">2b</text>
+<rect x="101.7" y="250.8" width="95.8" height="42.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="149.6" y="275.7" font-size="9.5" text-anchor="middle" fill="#1f2933">1b</text>
+<rect x="518.5" y="250.8" width="95.8" height="42.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="566.4" y="275.7" font-size="9.5" text-anchor="middle" fill="#1f2933">1b</text>
+<rect x="101.7" y="308.8" width="95.8" height="42.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="149.6" y="333.7" font-size="9.5" text-anchor="middle" fill="#1f2933">1b</text>
+<rect x="518.5" y="308.8" width="95.8" height="42.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="566.4" y="333.7" font-size="9.5" text-anchor="middle" fill="#1f2933">1b</text>
+<rect x="78.0" y="250.8" width="23.7" height="42.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="614.3" y="250.8" width="23.7" height="42.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="308.8" width="23.7" height="42.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="614.3" y="308.8" width="23.7" height="42.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<line x1="78.0" y1="365.6" x2="638.0" y2="365.6" stroke="#5f6672" stroke-width="0.8"/>
+<text x="358.0" y="377.6" font-size="10" text-anchor="middle" fill="#5f6672">66.67 m · street side</text>
+<line x1="66.0" y1="250.8" x2="66.0" y2="351.6" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="301.2" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 301.2)">12.0 m</text>
+<rect x="48.0" y="406.6" width="12" height="12" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="416.6" fill="#5f6672" font-size="11">Non-residential</text>
+<rect x="187.0" y="406.6" width="12" height="12" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="203.0" y="416.6" fill="#5f6672" font-size="11">Amenity</text>
+<rect x="270.0" y="406.6" width="12" height="12" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="286.0" y="416.6" fill="#5f6672" font-size="11">Services, bicycles</text>
+<rect x="430.0" y="406.6" width="12" height="12" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="446.0" y="416.6" fill="#5f6672" font-size="11">Core (stairs, elevator)</text>
+<rect x="625.0" y="406.6" width="12" height="12" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="641.0" y="416.6" fill="#5f6672" font-size="11">Corridor</text>
+<rect x="715.0" y="406.6" width="12" height="12" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<text x="731.0" y="416.6" fill="#5f6672" font-size="11">Three-bedroom+</text>
+<rect x="847.0" y="406.6" width="12" height="12" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="863.0" y="416.6" fill="#5f6672" font-size="11">Two-bedroom</text>
+<rect x="958.0" y="406.6" width="12" height="12" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="974.0" y="416.6" fill="#5f6672" font-size="11">One-bedroom</text>
+<rect x="1069.0" y="406.6" width="12" height="12" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1085.0" y="416.6" fill="#5f6672" font-size="11">Studio</text>
+<rect x="1145.0" y="406.6" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
+<text x="1161.0" y="416.6" fill="#5f6672" font-size="11">Spare</text>
+<circle cx="54" cy="433.6" r="3.2" fill="#245f9c"/><text x="64" y="437.6" font-size="11" fill="#5f6672">accessible unit</text>
+<text x="48.0" y="461.6" fill="#1f2933">Unit depth 5.1 m either side of a 1.8 m corridor; core bay 7.0 m;</text>
+<text x="48.0" y="477.6" fill="#1f2933">partitions +8% over net areas (declared placeholders). The rules read back from the plates are listed with the figure.</text>
+<text x="48.0" y="493.6" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg><figcaption>Plans by program, derived from the option; to scale.</figcaption></figure>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="720" height="391" viewBox="0 0 720 391" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Preliminary elevations">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Elevations · metres</text>
+<text x="48.0" y="62.0" font-size="12" font-weight="600">Front elevation · from the street</text>
+<line x1="38.0" y1="280.6" x2="438.0" y2="280.6" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="48.0" y="72.0" width="380.0" height="208.6" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="260.0" y="266.1" width="166.1" height="12.3" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="189.0" y="266.1" width="27.1" height="12.3" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="125.6" y="268.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="263.2" x2="428.0" y2="263.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="156.7" y="251.0" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="310.8" y="251.0" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="77.7" y="251.0" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="389.8" y="251.0" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="245.8" x2="428.0" y2="245.8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="156.7" y="233.6" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="310.8" y="233.6" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="77.7" y="233.6" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="389.8" y="233.6" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="228.5" x2="428.0" y2="228.5" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="156.7" y="216.2" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="310.8" y="216.2" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="77.7" y="216.2" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="389.8" y="216.2" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="211.1" x2="428.0" y2="211.1" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="198.8" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="198.8" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="198.8" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="198.8" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="193.7" x2="428.0" y2="193.7" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="181.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="181.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="181.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="181.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="176.3" x2="428.0" y2="176.3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="164.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="164.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="164.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="164.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="158.9" x2="428.0" y2="158.9" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="146.7" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="146.7" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="146.7" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="146.7" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="141.5" x2="428.0" y2="141.5" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="129.3" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="129.3" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="129.3" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="129.3" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="124.2" x2="428.0" y2="124.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="111.9" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="111.9" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="111.9" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="111.9" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="106.8" x2="428.0" y2="106.8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="94.5" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="94.5" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="94.5" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="94.5" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="89.4" x2="428.0" y2="89.4" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="169.3" y="77.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="298.2" y="77.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="92.3" y="77.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="375.1" y="77.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<text x="440.0" y="76.0" font-size="10" fill="#1f2933">36.6 m</text>
+<text x="538.0" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
+<line x1="528.0" y1="280.6" x2="616.4" y2="280.6" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="538.0" y="72.0" width="68.4" height="208.6" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="548.3" y="268.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="268.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="263.2" x2="606.4" y2="263.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="251.0" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="251.0" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="245.8" x2="606.4" y2="245.8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="233.6" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="233.6" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="228.5" x2="606.4" y2="228.5" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="216.2" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="216.2" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="211.1" x2="606.4" y2="211.1" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="198.8" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="198.8" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="193.7" x2="606.4" y2="193.7" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="181.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="181.4" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="176.3" x2="606.4" y2="176.3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="164.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="164.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="158.9" x2="606.4" y2="158.9" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="146.7" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="146.7" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="141.5" x2="606.4" y2="141.5" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="129.3" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="129.3" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="124.2" x2="606.4" y2="124.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="111.9" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="111.9" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="106.8" x2="606.4" y2="106.8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="94.5" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="94.5" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="89.4" x2="606.4" y2="89.4" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="548.3" y="77.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="587.6" y="77.1" width="8.5" height="7.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<text x="618.4" y="76.0" font-size="10" fill="#1f2933">36.6 m</text>
+<text x="48.0" y="310.6" fill="#1f2933">12 storeys × 3.05 m = 36.6 m to the top floor level</text>
+<text x="48.0" y="326.6" fill="#1f2933">No outright height in the stack for this district</text>
+<text x="48.0" y="342.6" fill="#1f2933">Windows: one per unit on its side, 1.5 m wide, the unit module as the rhythm; a placeholder for the elevation study</text>
+<text x="48.0" y="358.6" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg><figcaption>Preliminary elevations, derived from the option; to scale.</figcaption></figure>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="640" height="358" viewBox="0 0 640 358" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Axonometric of the stacked floors">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Axonometric · the floors lifted apart, street at the front</text>
+<polygon points="74.0,255.3 408.0,255.3 382.0,270.4 48.0,270.4" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,255.3 258.6,255.3 232.5,270.4 197.5,270.4" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,264.0 208.5,264.0 197.5,270.4 48.0,270.4" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,264.0 349.6,264.0 338.5,270.4 232.5,270.4" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="349.5,264.0 388.0,264.0 377.0,270.4 338.4,270.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="388.0,264.0 393.0,264.0 382.0,270.4 377.0,270.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,261.7 396.9,261.7 393.0,264.0 59.1,264.0" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,255.3 408.1,255.3 397.0,261.7 247.5,261.7" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="196.2,255.3 223.5,255.3 212.4,261.7 185.1,261.7" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="95.8,255.3 196.2,255.3 185.1,261.7 84.7,261.7" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,255.3 95.8,255.3 84.7,261.7 63.0,261.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="268.4" font-size="10" fill="#5f6672">Ground floor</text>
+<polygon points="74.0,240.1 408.0,240.1 382.0,255.1 48.0,255.1" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,240.1 258.6,240.1 232.5,255.1 197.5,255.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="108.2,248.7 208.5,248.7 197.5,255.1 97.1,255.1" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,248.7 344.0,248.7 332.9,255.1 232.5,255.1" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="69.6,248.7 108.2,248.7 97.1,255.1 58.6,255.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="343.9,248.7 382.5,248.7 371.4,255.1 332.9,255.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,248.7 69.6,248.7 58.6,255.1 48.0,255.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="382.5,248.7 393.0,248.7 382.0,255.1 371.4,255.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,246.4 396.9,246.4 393.0,248.7 59.1,248.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="123.1,240.1 223.5,240.1 212.4,246.4 112.1,246.4" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,240.1 359.0,240.1 347.9,246.4 247.5,246.4" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="84.6,240.1 123.1,240.1 112.1,246.4 73.5,246.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="358.9,240.1 397.4,240.1 386.4,246.4 347.8,246.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,240.1 84.6,240.1 73.5,246.4 63.0,246.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="397.4,240.1 408.0,240.1 396.9,246.4 386.4,246.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="253.1" font-size="10" fill="#5f6672">Level 2</text>
+<polygon points="74.0,224.8 408.0,224.8 382.0,239.8 48.0,239.8" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,224.8 258.6,224.8 232.5,239.8 197.5,239.8" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="108.2,233.4 208.5,233.4 197.5,239.8 97.1,239.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,233.4 344.0,233.4 332.9,239.8 232.5,239.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="69.6,233.4 108.2,233.4 97.1,239.8 58.6,239.8" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="343.9,233.4 382.5,233.4 371.4,239.8 332.9,239.8" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,233.4 69.6,233.4 58.6,239.8 48.0,239.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="382.5,233.4 393.0,233.4 382.0,239.8 371.4,239.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,231.2 396.9,231.2 393.0,233.4 59.1,233.4" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="123.1,224.8 223.5,224.8 212.4,231.2 112.1,231.2" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,224.8 359.0,224.8 347.9,231.2 247.5,231.2" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="84.6,224.8 123.1,224.8 112.1,231.2 73.5,231.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="358.9,224.8 397.4,224.8 386.4,231.2 347.8,231.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,224.8 84.6,224.8 73.5,231.2 63.0,231.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="397.4,224.8 408.0,224.8 396.9,231.2 386.4,231.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="237.8" font-size="10" fill="#5f6672">Level 3</text>
+<polygon points="74.0,209.5 408.0,209.5 382.0,224.5 48.0,224.5" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,209.5 258.6,209.5 232.5,224.5 197.5,224.5" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="108.2,218.1 208.5,218.1 197.5,224.5 97.1,224.5" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,218.1 321.8,218.1 310.7,224.5 232.5,224.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,218.1 378.9,218.1 367.8,224.5 310.7,224.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="69.6,218.1 108.2,218.1 97.1,224.5 58.6,224.5" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,218.1 69.6,218.1 58.6,224.5 48.0,224.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,218.1 393.0,218.1 382.0,224.5 367.8,224.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,215.9 396.9,215.9 393.0,218.1 59.1,218.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="123.1,209.5 223.5,209.5 212.4,215.9 112.1,215.9" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,209.5 359.0,209.5 347.9,215.9 247.5,215.9" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="84.6,209.5 123.1,209.5 112.1,215.9 73.5,215.9" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="358.9,209.5 397.4,209.5 386.4,215.9 347.8,215.9" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,209.5 84.6,209.5 73.5,215.9 63.0,215.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="397.4,209.5 408.0,209.5 396.9,215.9 386.4,215.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="222.5" font-size="10" fill="#5f6672">Level 4</text>
+<polygon points="74.0,194.2 408.0,194.2 382.0,209.3 48.0,209.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,194.2 258.6,194.2 232.5,209.3 197.5,209.3" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,202.9 208.5,202.9 197.5,209.3 119.3,209.3" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,202.9 321.8,202.9 310.7,209.3 232.5,209.3" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,202.9 130.3,202.9 119.3,209.3 62.1,209.3" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,202.9 378.9,202.9 367.8,209.3 310.7,209.3" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,202.9 73.2,202.9 62.1,209.3 48.0,209.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,202.9 393.0,202.9 382.0,209.3 367.8,209.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,200.6 396.9,200.6 393.0,202.9 59.1,202.9" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,194.2 223.5,194.2 212.4,200.6 134.2,200.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,194.2 336.8,194.2 325.7,200.6 247.5,200.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,194.2 145.3,194.2 134.2,200.6 77.1,200.6" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,194.2 393.9,194.2 382.8,200.6 325.7,200.6" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,194.2 88.2,194.2 77.1,200.6 63.0,200.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,194.2 408.0,194.2 396.9,200.6 382.8,200.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="207.3" font-size="10" fill="#5f6672">Level 5</text>
+<polygon points="74.0,178.9 408.0,178.9 382.0,194.0 48.0,194.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,178.9 258.6,178.9 232.5,194.0 197.5,194.0" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,187.6 208.5,187.6 197.5,194.0 119.3,194.0" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,187.6 321.8,187.6 310.7,194.0 232.5,194.0" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,187.6 130.3,187.6 119.3,194.0 62.1,194.0" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,187.6 378.9,187.6 367.8,194.0 310.7,194.0" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,187.6 73.2,187.6 62.1,194.0 48.0,194.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,187.6 393.0,187.6 382.0,194.0 367.8,194.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,185.3 396.9,185.3 393.0,187.6 59.1,187.6" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,178.9 223.5,178.9 212.4,185.3 134.2,185.3" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,178.9 336.8,178.9 325.7,185.3 247.5,185.3" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,178.9 145.3,178.9 134.2,185.3 77.1,185.3" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,178.9 393.9,178.9 382.8,185.3 325.7,185.3" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,178.9 88.2,178.9 77.1,185.3 63.0,185.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,178.9 408.0,178.9 396.9,185.3 382.8,185.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="192.0" font-size="10" fill="#5f6672">Level 6</text>
+<polygon points="74.0,163.7 408.0,163.7 382.0,178.7 48.0,178.7" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,163.7 258.6,163.7 232.5,178.7 197.5,178.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,172.3 208.5,172.3 197.5,178.7 119.3,178.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,172.3 321.8,172.3 310.7,178.7 232.5,178.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,172.3 130.3,172.3 119.3,178.7 62.1,178.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,172.3 378.9,172.3 367.8,178.7 310.7,178.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,172.3 73.2,172.3 62.1,178.7 48.0,178.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,172.3 393.0,172.3 382.0,178.7 367.8,178.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,170.1 396.9,170.1 393.0,172.3 59.1,172.3" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,163.7 223.5,163.7 212.4,170.1 134.2,170.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,163.7 336.8,163.7 325.7,170.1 247.5,170.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,163.7 145.3,163.7 134.2,170.1 77.1,170.1" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,163.7 393.9,163.7 382.8,170.1 325.7,170.1" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,163.7 88.2,163.7 77.1,170.1 63.0,170.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,163.7 408.0,163.7 396.9,170.1 382.8,170.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="176.7" font-size="10" fill="#5f6672">Level 7</text>
+<polygon points="74.0,148.4 408.0,148.4 382.0,163.4 48.0,163.4" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,148.4 258.6,148.4 232.5,163.4 197.5,163.4" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,157.0 208.5,157.0 197.5,163.4 119.3,163.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,157.0 321.8,157.0 310.7,163.4 232.5,163.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,157.0 130.3,157.0 119.3,163.4 62.1,163.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,157.0 378.9,157.0 367.8,163.4 310.7,163.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,157.0 73.2,157.0 62.1,163.4 48.0,163.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,157.0 393.0,157.0 382.0,163.4 367.8,163.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,154.8 396.9,154.8 393.0,157.0 59.1,157.0" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,148.4 223.5,148.4 212.4,154.8 134.2,154.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,148.4 336.8,148.4 325.7,154.8 247.5,154.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,148.4 145.3,148.4 134.2,154.8 77.1,154.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,148.4 393.9,148.4 382.8,154.8 325.7,154.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,148.4 88.2,148.4 77.1,154.8 63.0,154.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,148.4 408.0,148.4 396.9,154.8 382.8,154.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="161.4" font-size="10" fill="#5f6672">Level 8</text>
+<polygon points="74.0,133.1 408.0,133.1 382.0,148.1 48.0,148.1" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,133.1 258.6,133.1 232.5,148.1 197.5,148.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,141.8 208.5,141.8 197.5,148.1 119.3,148.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,141.8 321.8,141.8 310.7,148.1 232.5,148.1" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,141.8 130.3,141.8 119.3,148.1 62.1,148.1" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,141.8 378.9,141.8 367.8,148.1 310.7,148.1" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,141.8 73.2,141.8 62.1,148.1 48.0,148.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,141.8 393.0,141.8 382.0,148.1 367.8,148.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,139.5 396.9,139.5 393.0,141.8 59.1,141.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,133.1 223.5,133.1 212.4,139.5 134.2,139.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,133.1 336.8,133.1 325.7,139.5 247.5,139.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,133.1 145.3,133.1 134.2,139.5 77.1,139.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,133.1 393.9,133.1 382.8,139.5 325.7,139.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,133.1 88.2,133.1 77.1,139.5 63.0,139.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,133.1 408.0,133.1 396.9,139.5 382.8,139.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="146.1" font-size="10" fill="#5f6672">Level 9</text>
+<polygon points="74.0,117.8 408.0,117.8 382.0,132.9 48.0,132.9" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,117.8 258.6,117.8 232.5,132.9 197.5,132.9" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,126.5 208.5,126.5 197.5,132.9 119.3,132.9" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,126.5 321.8,126.5 310.7,132.9 232.5,132.9" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,126.5 130.3,126.5 119.3,132.9 62.1,132.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,126.5 378.9,126.5 367.8,132.9 310.7,132.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,126.5 73.2,126.5 62.1,132.9 48.0,132.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,126.5 393.0,126.5 382.0,132.9 367.8,132.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,124.2 396.9,124.2 393.0,126.5 59.1,126.5" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,117.8 223.5,117.8 212.4,124.2 134.2,124.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,117.8 336.8,117.8 325.7,124.2 247.5,124.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,117.8 145.3,117.8 134.2,124.2 77.1,124.2" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,117.8 393.9,117.8 382.8,124.2 325.7,124.2" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,117.8 88.2,117.8 77.1,124.2 63.0,124.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,117.8 408.0,117.8 396.9,124.2 382.8,124.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="130.9" font-size="10" fill="#5f6672">Level 10</text>
+<polygon points="74.0,102.6 408.0,102.6 382.0,117.6 48.0,117.6" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,102.6 258.6,102.6 232.5,117.6 197.5,117.6" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,111.2 208.5,111.2 197.5,117.6 119.3,117.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,111.2 321.8,111.2 310.7,117.6 232.5,117.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,111.2 130.3,111.2 119.3,117.6 62.1,117.6" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,111.2 378.9,111.2 367.8,117.6 310.7,117.6" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,111.2 73.2,111.2 62.1,117.6 48.0,117.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,111.2 393.0,111.2 382.0,117.6 367.8,117.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,108.9 396.9,108.9 393.0,111.2 59.1,111.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,102.6 223.5,102.6 212.4,108.9 134.2,108.9" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,102.6 336.8,102.6 325.7,108.9 247.5,108.9" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,102.6 145.3,102.6 134.2,108.9 77.1,108.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,102.6 393.9,102.6 382.8,108.9 325.7,108.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,102.6 88.2,102.6 77.1,108.9 63.0,108.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,102.6 408.0,102.6 396.9,108.9 382.8,108.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="115.6" font-size="10" fill="#5f6672">Level 11</text>
+<polygon points="74.0,87.3 408.0,87.3 382.0,102.3 48.0,102.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
+<polygon points="223.5,87.3 258.6,87.3 232.5,102.3 197.5,102.3" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.3,95.9 208.5,95.9 197.5,102.3 119.3,102.3" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="243.6,95.9 321.8,95.9 310.7,102.3 232.5,102.3" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="73.2,95.9 130.3,95.9 119.3,102.3 62.1,102.3" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="321.8,95.9 378.9,95.9 367.8,102.3 310.7,102.3" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="59.1,95.9 73.2,95.9 62.1,102.3 48.0,102.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="378.9,95.9 393.0,95.9 382.0,102.3 367.8,102.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="63.0,93.7 396.9,93.7 393.0,95.9 59.1,95.9" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="145.3,87.3 223.5,87.3 212.4,93.7 134.2,93.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="258.6,87.3 336.8,87.3 325.7,93.7 247.5,93.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="88.2,87.3 145.3,87.3 134.2,93.7 77.1,93.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="336.7,87.3 393.9,87.3 382.8,93.7 325.7,93.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="74.0,87.3 88.2,87.3 77.1,93.7 63.0,93.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="393.9,87.3 408.0,87.3 396.9,93.7 382.8,93.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<text x="414.0" y="100.3" font-size="10" fill="#5f6672">Level 12</text>
+<text x="48.0" y="298.4" fill="#1f2933">12 floors of 66.67 × 12.0 m, lifted one storey apart to show the program</text>
+<text x="48.0" y="314.4" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg><figcaption>The floors stacked, derived from the option; to scale.</figcaption></figure>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="888" height="587" viewBox="0 0 888 587" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Code site plan">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Code site plan · metres, street at the top</text>
+<rect x="78" y="72" width="380.0" height="243.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="92.6" y="86.6" width="350.8" height="213.8" fill="none" stroke="#c81e1e" stroke-width="1.2" stroke-dasharray="6 4"/>
+<rect x="92.6" y="86.6" width="324.0" height="58.3" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
+<text x="98.6" y="100.6" font-size="10" fill="#1f2933">66.67 × 12.0 m, 12 storeys</text>
+<line x1="268.0" y1="72.0" x2="268.0" y2="86.6" stroke="#c81e1e" stroke-width="0.8"/>
+<text x="272.0" y="82.3" font-size="9.5" fill="#c81e1e">front 3.0 m</text>
+<line x1="268.0" y1="300.4" x2="268.0" y2="315.0" stroke="#c81e1e" stroke-width="0.8"/>
+<text x="272.0" y="310.7" font-size="9.5" fill="#c81e1e">rear 3.0 m</text>
+<line x1="78.0" y1="193.5" x2="92.6" y2="193.5" stroke="#c81e1e" stroke-width="0.8"/>
+<text x="85.3" y="189.5" font-size="9.5" text-anchor="middle" fill="#c81e1e">side 3.0 m</text>
+<line x1="443.4" y1="193.5" x2="458.0" y2="193.5" stroke="#c81e1e" stroke-width="0.8"/>
+<text x="450.7" y="189.5" font-size="9.5" text-anchor="middle" fill="#c81e1e">side 3.0 m</text>
+<text x="78" y="331.0" font-size="11" fill="#5f6672">lot 78.2 × 50.0 m · dashed red: setback envelope 72.2 × 44.0 m · blue: footprint</text>
+<text x="518.0" y="84" font-size="12" font-weight="600">What the plan checker reads</text>
+<line x1="518.0" y1="111" x2="898.0" y2="111" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="106" font-size="11" fill="#5f6672">Site area</text>
+<text x="628.0" y="106" font-size="11">3,908.0 m²</text>
+<text x="768.0" y="106" font-size="11" fill="#5f6672"></text>
+<line x1="518.0" y1="129" x2="898.0" y2="129" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="124" font-size="11" fill="#5f6672">Floor space ratio</text>
+<text x="628.0" y="124" font-size="11">2.46 (9,600 m²)</text>
+<text x="768.0" y="124" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="848.0" y="124" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="518.0" y1="147" x2="898.0" y2="147" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="142" font-size="11" fill="#5f6672">Height</text>
+<text x="628.0" y="142" font-size="11">36.6 m, 12 storeys</text>
+<text x="768.0" y="142" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="848.0" y="142" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="518.0" y1="165" x2="898.0" y2="165" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="160" font-size="11" fill="#5f6672">Site coverage</text>
+<text x="628.0" y="160" font-size="11">20% (800 m²)</text>
+<text x="768.0" y="160" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="848.0" y="160" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="518.0" y1="183" x2="898.0" y2="183" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="178" font-size="11" fill="#5f6672">Front yard</text>
+<text x="628.0" y="178" font-size="11">3.0 m</text>
+<text x="768.0" y="178" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="848.0" y="178" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="518.0" y1="201" x2="898.0" y2="201" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="196" font-size="11" fill="#5f6672">Rear yard</text>
+<text x="628.0" y="196" font-size="11">3.0 m</text>
+<text x="768.0" y="196" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="848.0" y="196" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="518.0" y1="219" x2="898.0" y2="219" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="214" font-size="11" fill="#5f6672">Side yard</text>
+<text x="628.0" y="214" font-size="11">3.0 m</text>
+<text x="768.0" y="214" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="848.0" y="214" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="518.0" y1="237" x2="898.0" y2="237" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="232" font-size="11" fill="#5f6672">Trees</text>
+<text x="628.0" y="232" font-size="11">43 after development</text>
+<text x="768.0" y="232" font-size="11" fill="#5f6672">Schedule C requires 43</text>
+<text x="848.0" y="232" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
+<line x1="518.0" y1="255" x2="898.0" y2="255" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="518.0" y="250" font-size="11" fill="#5f6672">Allowed</text>
+<text x="628.0" y="250" font-size="11">outright: yes; by rezoning: not yet confirmed</text>
+<text x="768.0" y="250" font-size="11" fill="#5f6672">False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program</text>
+<text x="48.0" y="547.0" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg><figcaption>Code site plan, derived from the option; to scale.</figcaption></figure>
+<p><code>layout.json</code> carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under <code>assumptions</code>.</p>
 <h2>What changed since the previous memo</h2>
-<p>Previous stamp <code>20e44f1445ecaff9</code> (rules as of 2026-10-23) → current <code>20e44f1445ecaff9</code> (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.</p>
+<p>Previous stamp <code>e51e3a0350b87718</code> (rules as of 2026-10-23) → current <code>e51e3a0350b87718</code> (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.</p>
 <table><thead><tr><th>Rule</th><th>Change</th><th>From</th><th>To</th><th>Now reads</th></tr></thead><tbody>
 <tr><td>bc.bcbuilds.eligibility</td><td>changed</td><td><span class="pill" style="background:#a3640c">uncertain</span></td><td><span class="pill" style="background:#2f7d4a">pass</span></td><td>BC Builds: fits the published criteria: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.</td></tr>
 <tr><td>bc.code_basis</td><td>finding changed</td><td><span class="pill" style="background:#2a6fb8">info</span></td><td><span class="pill" style="background:#2a6fb8">info</span></td><td>12 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15.</td></tr>
@@ -111,6 +782,16 @@
 <tr><td>BC Housing Project Development Fund (pre-development loans) (<code>bch.pdf.predevelopment_loan</code>, v 2025-01-01)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>max loan cad: 250000; eligible costs: due diligence, feasibility and design.</td><td>max loan cad = 250000; eligible costs = due diligence, feasibility and design</td><td><a href="https://www.ubcm.ca/node/111136">UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000), Provincial response</a></td></tr>
 <tr><td>CMHC Affordable Housing Fund: readiness and submission mechanics (<code>cmhc.ahf.readiness</code>, v 2024-03-13)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding.</td><td>construction start months after approval = 6; intake = continuous; submission = online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note = Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding</td><td><a href="https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx">CMHC, Affordable Housing Fund applicant guide, Minimum submission requirements; readiness</a></td></tr>
 </tbody></table>
+<h3>Layer F: Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)</h3>
+<table><thead><tr><th>Rule</th><th>Status</th><th>Finding</th><th>Numbers used</th><th>Source</th></tr></thead><tbody>
+<tr><td>Construction price escalation (Statistics Canada BCPI, Vancouver, residential) (<code>f.escalation_bcpi</code>, v 2024-08-21)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Building construction price index, Vancouver, residential buildings, division composite (2023=100): 109.4 in the third quarter of 2026, from 106.1 in the third quarter of 2024, the hard-cost base period; escalation 1.031 (a memo run on an earlier date uses the last quarter published on or before that date).</td><td>table = 18-10-0289-01; product id = 18100289; coordinate = 24.1.1.0.0.0.0.0.0.0; vector = v1617916836; series = Vancouver, British Columbia; Residential buildings; Division composite; base = 2023=100; latest period = 2026-07-01; latest value = 109.4; released = 2026-10-29</td><td><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901">Statistics Canada, Table 18-10-0289-01 Building construction price indexes, by type of building and division (quarterly, 2023=100), released 29 Oct 2026, Vancouver, British Columbia; residential buildings; division composite (vector v1617916836)</a></td></tr>
+<tr><td>Hard construction cost, base ($/m², Vancouver) (<code>f.hard_cost_base</code>, v 2024-08-21)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Hard cost base $4,693 per m² ($436 per build sq ft): the average of the three four-unit wood-frame designs in the Class D estimate for the Province's standardized housing designs, Vancouver baseline, August 2024, hard costs only.</td><td>value per m2 cad = 4693; value per sqft cad = 436; base period = 2024-07-01; basis = average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); the catalogue's ten designs run $401 to $585 per build sq ft; the report's regional review gives Vancouver $350 to $475 per sq ft; excludes = soft costs, utility connections, existing buildings, rock or shoring, pad-mounted transformers (the report's stated assumptions)</td><td><a href="https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/reports/bc_std_des_class_d_estimates_v1.pdf">SHP Class D Estimate Report, V3 (Chris Hill, CPA CMA, for the BC Ministry of Housing Standardized Designs Catalogue), 21 Aug 2024, Cost Estimate Summary (per build sf); Region Review; Assumptions</a></td></tr>
+<tr><td>Land: nominal lease from a church, a society or a government; else the assessed value, entered (<code>f.land</code>, v 2026-10-01)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Land is carried at a nominal value where the owner is a church, a non-profit society, a co-operative, a First Nation, the City or the Province and the tenure plan is a long lease or a transfer; otherwise the BC Assessment value or the agreed price is entered by hand, and until it is the pro-forma is unsure.</td><td>nominal value cad = 0</td><td><a href="https://www.bcassessment.ca/">BC Assessment, property assessment search (assessed value of the parcel); the owner's tenure plan, Assessed value as of 1 July of the previous year</a></td></tr>
+<tr><td>Mortgage rate, amortization and debt coverage (Bank of Canada; CMHC MLI Select) (<code>f.mortgage</code>, v 2026-10-14)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Conventional 5-year mortgage rate 6.19% (chartered banks, Bank of Canada series V80691335, 28 Oct 2026) as the ceiling; CMHC MLI Select terms for the debt test: a 1.10 debt coverage ratio and a 40-year amortization (50 years is available at 100 affordability points).</td><td>rate pct = 6.19; rate series = V80691335; rate date = 2026-10-28; amortization years = 40; debt coverage ratio = 1.1; insured rate note = an insured multi-unit loan is usually priced below the posted conventional rate; the posted rate is the conservative ceiling</td><td><a href="https://www.bankofcanada.ca/valet/observations/V80691335/json?recent=1">Bank of Canada, Valet API, series V80691335 Conventional mortgage, 5-year (weekly); CMHC, MLI Select product sheet, Conventional mortgage, 5-year; MLI Select: minimum debt coverage ratio 1.10 for standard rental, amortization to 50 years at 100 points</a></td></tr>
+<tr><td>Operating cost and replacement reserve per unit (<code>f.operating</code>, v 2026-10-01)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Operating cost $6,500 per unit a year (management, maintenance, utilities, insurance, property tax where not exempt) and a $600 per unit replacement reserve: declared placeholders until the operator's budget replaces them.</td><td>operating cost per unit year cad = 6500; replacement reserve per unit year cad = 600</td><td>Declared placeholder (no public source): to be replaced by the operator's budget or BC Housing's operating benchmarks where published</td></tr>
+<tr><td>Rents by tier: CMHC average market rent, rent-geared-to-income, the shelter rate (<code>f.rents</code>, v 2026-01-29)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Market rent from the CMHC Rental Market Survey of October 2025, Vancouver CMA, purpose-built apartments: two-bedroom $2,363 a month, all unit types $1,963, vacancy 3.7% (the other bedroom types are left to be typed from the CMHC data tables); rent-geared-to-income at 30% of a household income taken, as a placeholder, at half the Community Housing Fund's low-to-moderate income limit for the unit size; the deep-subsidy rent at the income assistance shelter rate of $500.</td><td>survey = October 2025; vacancy rate = 0.037; rgi rent share of income = 0.3; rgi income share of chf limit = 0.5; deep subsidy rent monthly cad = 500</td><td><a href="https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres">CMHC, Rental Market Report, January 2026 (October 2025 survey), Vancouver CMA; Province of BC, income assistance shelter allowance (single person, maximum $500 from 1 Dec 2025), Vancouver: purpose-built rental vacancy 3.7%, average two-bedroom rent $2,363; summary by zone, all units $1,963</a></td></tr>
+<tr><td>Soft costs and contingency, as shares of hard cost (<code>f.soft_costs</code>, v 2026-10-01)</td><td><span class="pill" style="background:#2a6fb8">Info</span></td><td>Soft costs 25% of hard cost (design, permits, levies where they apply, financing, legal, insurance, marketing) and a 10% contingency: declared placeholders until a practitioner gives this project's figures.</td><td>soft cost share of hard = 0.25; contingency share of hard = 0.1</td><td>Declared placeholder (no public source): to be replaced by the proponent's development budget</td></tr>
+</tbody></table>
 <h2>Inputs</h2>
 <ul>
 <li>Site <code>1010-expo-blvd</code>: CD-1, 3,908.0 m², 78.2 × 50.0 m; owner: City of Vancouver (site transferred by Concord Pacific under the False Creek North social housing agreement, 2023).</li>
@@ -137,6 +818,13 @@
 <li>BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page — https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf</li>
 <li>UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000) — https://www.ubcm.ca/node/111136</li>
 <li>CMHC, Affordable Housing Fund applicant guide — https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx</li>
+<li>Statistics Canada, Table 18-10-0289-01 Building construction price indexes, by type of building and division (quarterly, 2023=100), released 29 Oct 2026 — https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901</li>
+<li>SHP Class D Estimate Report, V3 (Chris Hill, CPA CMA, for the BC Ministry of Housing Standardized Designs Catalogue), 21 Aug 2024 — https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/reports/bc_std_des_class_d_estimates_v1.pdf <em>(verify: The catalogue's designs are two- to four-unit, three-storey wood-frame buildings; a six-storey apartment sits outside it. Replace with a quantity surveyor's Class D figure for the actual building type when one exists, and keep this as the floor.)</em></li>
+<li>BC Assessment, property assessment search (assessed value of the parcel); the owner's tenure plan — https://www.bcassessment.ca/</li>
+<li>Bank of Canada, Valet API, series V80691335 Conventional mortgage, 5-year (weekly); CMHC, MLI Select product sheet — https://www.bankofcanada.ca/valet/observations/V80691335/json?recent=1 <em>(verify: Confirm the DCR and amortization against the current MLI Select guide before a submission.)</em></li>
+<li>Declared placeholder (no public source): to be replaced by the operator's budget or BC Housing's operating benchmarks where published</li>
+<li>CMHC, Rental Market Report, January 2026 (October 2025 survey), Vancouver CMA; Province of BC, income assistance shelter allowance (single person, maximum $500 from 1 Dec 2025) — https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres <em>(verify: Type the bachelor, one-bedroom and three-bedroom averages from the CMHC Rental Market Survey data tables (Vancouver CMA, Table 1.1.2); the rent-geared-to-income income placeholder is declared, not sourced: replace it with the operator's tenant income profile.)</em></li>
+<li>Declared placeholder (no public source): to be replaced by the proponent's development budget</li>
 <li>Shape Your City, 1050 Expo Boulevard development application DP-2023-00629 (29 storeys, 88.4 m, 23,215 m², FSR 5.94, 299 social housing units; DP issued 5 Feb 2025) — https://www.shapeyourcity.ca/1050-expo-blvd</li>
 <li>Shape Your City, False Creek North social housing (ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; 29 storeys, 88.1 m at 1050 Expo Blvd) — https://www.shapeyourcity.ca/false-creek-north-non-market-housing</li>
 <li>City of Vancouver, non-market housing projects (1010 Expo Blvd: 299 units, BC Indigenous Housing Society, under construction, completion 2029) — https://vancouver.ca/people-programs/non-market-housing-projects.aspx</li>
@@ -145,11 +833,12 @@
 </ul>
 <h2>Version stamp</h2>
 <ul>
-<li>Rules hash (SHA-256 over all rule files): <code>14450d4face5e50cd1cccd94ba3236ecd49379484bbeb612cf300342bdc9fe9c</code></li>
+<li>Rules hash (SHA-256 over all rule files): <code>9209630adb35220b8e7e9d43f4b0b8c636e9557b8f7d61a6111e6aed3d9a7823</code></li>
 <li><code>a_zoning_district.json</code>: <code>ef2791008abaf57c…</code></li>
 <li><code>b_provincial.json</code>: <code>0fede33e5d62b1bd…</code></li>
 <li><code>c_city_policies.json</code>: <code>961f8f2e91ce2d3f…</code></li>
 <li><code>d_design_standards.json</code>: <code>dc53a9b24d809090…</code></li>
 <li><code>e_funding_programs.json</code>: <code>9267a33722068790…</code></li>
-<li>Stamp (hash of rules hash + rule versions in force on 2026-10-23): <code>20e44f1445ecaff9</code></li>
+<li><code>f_assumptions.json</code>: <code>942a6dbab04d93fc…</code></li>
+<li>Stamp (hash of rules hash + rule versions in force on 2026-10-23): <code>e51e3a0350b87718</code></li>
 </ul></body></html>

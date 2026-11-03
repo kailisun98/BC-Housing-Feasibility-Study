@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="314" viewBox="0 0 720 314" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Preliminary elevations">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Elevations · metres</text>
+<text x="48.0" y="62.0" font-size="12" font-weight="600">Front elevation · from the street</text>
+<line x1="38.0" y1="188.3" x2="438.0" y2="188.3" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="48.0" y="98.2" width="380.0" height="90.1" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="50.0" y="173.0" width="166.9" height="13.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="259.1" y="173.0" width="166.9" height="13.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="170.3" x2="428.0" y2="170.3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="259.1" y="155.0" width="47.2" height="13.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="184.3" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="123.3" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="334.6" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="69.2" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="388.8" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="152.3" x2="428.0" y2="152.3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="184.3" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="123.3" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="283.5" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="69.2" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="337.7" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="385.2" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="134.2" x2="428.0" y2="134.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="191.1" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="143.6" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="96.1" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="276.7" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="324.2" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="371.7" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="60.7" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="407.1" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="116.2" x2="428.0" y2="116.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="197.4" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="162.8" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="128.0" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="93.3" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="270.4" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="305.1" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="339.8" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="374.5" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="64.3" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="403.5" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="38.0" y1="129.9" x2="438.0" y2="129.9" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
+<text x="440.0" y="133.9" font-size="10" fill="#8e8e8e">outright 10.7 m</text>
+<line x1="38.0" y1="79.6" x2="438.0" y2="79.6" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="38.0" y1="72.0" x2="438.0" y2="72.0" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="440.0" y="76.0" font-size="10" fill="#c77d14">benchmark 19.9–21.3 m</text>
+<text x="440.0" y="102.2" font-size="10" fill="#1f2933">16.5 m</text>
+<text x="538.0" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
+<line x1="528.0" y1="188.3" x2="657.8" y2="188.3" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="538.0" y="98.2" width="109.8" height="90.1" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="538.0" y1="170.3" x2="647.8" y2="170.3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="558.9" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="618.7" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="152.3" x2="647.8" y2="152.3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="558.9" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="618.7" y="139.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="134.2" x2="647.8" y2="134.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="558.9" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="618.7" y="121.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="538.0" y1="116.2" x2="647.8" y2="116.2" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="558.9" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="618.7" y="103.1" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="528.0" y1="129.9" x2="657.8" y2="129.9" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
+<text x="659.8" y="133.9" font-size="10" fill="#8e8e8e">outright 10.7 m</text>
+<line x1="528.0" y1="79.6" x2="657.8" y2="79.6" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
+<line x1="528.0" y1="72.0" x2="657.8" y2="72.0" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="659.8" y="76.0" font-size="10" fill="#c77d14">benchmark 19.9–21.3 m</text>
+<text x="659.8" y="102.2" font-size="10" fill="#1f2933">16.5 m</text>
+<text x="48.0" y="218.3" fill="#1f2933">5 storeys × 3.3 m = 16.5 m to the top floor level; the option states 18.3 m</text>
+<text x="48.0" y="234.3" fill="#1f2933">Outright maximum height 10.7 m, dashed grey</text>
+<text x="48.0" y="250.3" fill="#1f2933">Staff benchmark 19.9 to 21.3 m, amber</text>
+<text x="48.0" y="266.3" fill="#1f2933">Windows: one per unit on its side, 1.5 m wide, the unit module as the rhythm; a placeholder for the elevation study</text>
+<text x="48.0" y="282.3" fill="#1f2933">Rules as of 2026-10-23 · stamp e51e3a0350b87718 · derived by ffm from the option and the massing, not a design</text>
+</svg>

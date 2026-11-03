@@ -6,15 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-10-23",
-      "rules_hash": "14450d4face5e50cd1cccd94ba3236ecd49379484bbeb612cf300342bdc9fe9c",
+      "rules_hash": "9209630adb35220b8e7e9d43f4b0b8c636e9557b8f7d61a6111e6aed3d9a7823",
       "rules_files": {
         "a_zoning_district.json": "ef2791008abaf57c509921f14d0601c146e3dcf6fd4c637eccb2bb2b46aa01d3",
         "b_provincial.json": "0fede33e5d62b1bd85ea63435ef0012ef3c0772df8c0192d1e74b8a29f807cb8",
         "c_city_policies.json": "961f8f2e91ce2d3ff3924b839b5a40bcdf6eb702d5cc528e82dc8c7e6aee8ea0",
         "d_design_standards.json": "dc53a9b24d8090907c86f9da969579022518645d7dae1e09cfda67cac3b81302",
-        "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb"
+        "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb",
+        "f_assumptions.json": "942a6dbab04d93fca08a7cb84f3af5ce4d95eb22ba165262176185aac691ae26"
       },
-      "stamp": "20e44f1445ecaff9",
+      "stamp": "e51e3a0350b87718",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -134,6 +135,55 @@
           "version_effective_from": "2024-03-13",
           "version_effective_to": null,
           "source_url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx"
+        },
+        {
+          "rule_id": "f.hard_cost_base",
+          "layer": "F",
+          "version_effective_from": "2024-08-21",
+          "version_effective_to": null,
+          "source_url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/reports/bc_std_des_class_d_estimates_v1.pdf"
+        },
+        {
+          "rule_id": "f.escalation_bcpi",
+          "layer": "F",
+          "version_effective_from": "2024-08-21",
+          "version_effective_to": null,
+          "source_url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901"
+        },
+        {
+          "rule_id": "f.soft_costs",
+          "layer": "F",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": ""
+        },
+        {
+          "rule_id": "f.land",
+          "layer": "F",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bcassessment.ca/"
+        },
+        {
+          "rule_id": "f.mortgage",
+          "layer": "F",
+          "version_effective_from": "2026-10-14",
+          "version_effective_to": null,
+          "source_url": "https://www.bankofcanada.ca/valet/observations/V80691335/json?recent=1"
+        },
+        {
+          "rule_id": "f.rents",
+          "layer": "F",
+          "version_effective_from": "2026-01-29",
+          "version_effective_to": null,
+          "source_url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres"
+        },
+        {
+          "rule_id": "f.operating",
+          "layer": "F",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": ""
         }
       ]
     }
@@ -564,6 +614,211 @@
         "criteria_note": "Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding"
       },
       "action": ""
+    },
+    {
+      "rule_id": "f.escalation_bcpi",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Construction price escalation (Statistics Canada BCPI, Vancouver, residential)",
+      "jurisdiction": "Statistics Canada",
+      "check": "assumption",
+      "source": {
+        "title": "Statistics Canada, Table 18-10-0289-01 Building construction price indexes, by type of building and division (quarterly, 2023=100), released 29 Oct 2026",
+        "url": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1810028901",
+        "section": "Vancouver, British Columbia; residential buildings; division composite (vector v1617916836)",
+        "refresh": "python -m ffm refresh (Web Data Service, getDataFromCubePidCoordAndLatestNPeriods)"
+      },
+      "version_effective_from": "2024-08-21",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Building construction price index, Vancouver, residential buildings, division composite (2023=100): 109.4 in the third quarter of 2026, from 106.1 in the third quarter of 2024, the hard-cost base period; escalation 1.031 (a memo run on an earlier date uses the last quarter published on or before that date).",
+      "values": {
+        "table": "18-10-0289-01",
+        "product_id": 18100289,
+        "coordinate": "24.1.1.0.0.0.0.0.0.0",
+        "vector": "v1617916836",
+        "series": "Vancouver, British Columbia; Residential buildings; Division composite",
+        "base": "2023=100",
+        "latest_period": "2026-07-01",
+        "latest_value": 109.4,
+        "released": "2026-10-29"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "f.hard_cost_base",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Hard construction cost, base ($/m², Vancouver)",
+      "jurisdiction": "BC Ministry of Housing / BC Housing (standardized designs)",
+      "check": "assumption",
+      "source": {
+        "title": "SHP Class D Estimate Report, V3 (Chris Hill, CPA CMA, for the BC Ministry of Housing Standardized Designs Catalogue), 21 Aug 2024",
+        "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/construction-industry/building-codes-and-standards/reports/bc_std_des_class_d_estimates_v1.pdf",
+        "section": "Cost Estimate Summary (per build sf); Region Review; Assumptions",
+        "verify": "The catalogue's designs are two- to four-unit, three-storey wood-frame buildings; a six-storey apartment sits outside it. Replace with a quantity surveyor's Class D figure for the actual building type when one exists, and keep this as the floor."
+      },
+      "version_effective_from": "2024-08-21",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Hard cost base $4,693 per m² ($436 per build sq ft): the average of the three four-unit wood-frame designs in the Class D estimate for the Province's standardized housing designs, Vancouver baseline, August 2024, hard costs only.",
+      "values": {
+        "value_per_m2_cad": 4693,
+        "value_per_sqft_cad": 436,
+        "base_period": "2024-07-01",
+        "basis": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); the catalogue's ten designs run $401 to $585 per build sq ft; the report's regional review gives Vancouver $350 to $475 per sq ft",
+        "excludes": "soft costs, utility connections, existing buildings, rock or shoring, pad-mounted transformers (the report's stated assumptions)",
+        "design_range_per_sqft_cad": [
+          401,
+          585
+        ],
+        "regional_range_per_sqft_cad": [
+          350,
+          475
+        ]
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "f.land",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Land: nominal lease from a church, a society or a government; else the assessed value, entered",
+      "jurisdiction": "BC Assessment / the owner",
+      "check": "assumption",
+      "source": {
+        "title": "BC Assessment, property assessment search (assessed value of the parcel); the owner's tenure plan",
+        "url": "https://www.bcassessment.ca/",
+        "section": "Assessed value as of 1 July of the previous year"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Land is carried at a nominal value where the owner is a church, a non-profit society, a co-operative, a First Nation, the City or the Province and the tenure plan is a long lease or a transfer; otherwise the BC Assessment value or the agreed price is entered by hand, and until it is the pro-forma is unsure.",
+      "values": {
+        "nominal_lease_owner_types": [
+          "church",
+          "society",
+          "non_profit",
+          "non_profit_society",
+          "co-op",
+          "cooperative",
+          "first_nation",
+          "municipality",
+          "city",
+          "province",
+          "government"
+        ],
+        "nominal_value_cad": 0
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "f.mortgage",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Mortgage rate, amortization and debt coverage (Bank of Canada; CMHC MLI Select)",
+      "jurisdiction": "Bank of Canada / CMHC",
+      "check": "assumption",
+      "source": {
+        "title": "Bank of Canada, Valet API, series V80691335 Conventional mortgage, 5-year (weekly); CMHC, MLI Select product sheet",
+        "url": "https://www.bankofcanada.ca/valet/observations/V80691335/json?recent=1",
+        "section": "Conventional mortgage, 5-year; MLI Select: minimum debt coverage ratio 1.10 for standard rental, amortization to 50 years at 100 points",
+        "cmhc_url": "https://assets.cmhc-schl.gc.ca/sites/cmhc/professional/project-funding-and-mortgage-financing/mortgage-loan-insurance/multi-unit-insurance/mliselect/mli-select.pdf",
+        "refresh": "python -m ffm refresh (the rate; the CMHC terms by hand)",
+        "verify": "Confirm the DCR and amortization against the current MLI Select guide before a submission."
+      },
+      "version_effective_from": "2026-10-14",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Conventional 5-year mortgage rate 6.19% (chartered banks, Bank of Canada series V80691335, 28 Oct 2026) as the ceiling; CMHC MLI Select terms for the debt test: a 1.10 debt coverage ratio and a 40-year amortization (50 years is available at 100 affordability points).",
+      "values": {
+        "rate_pct": 6.19,
+        "rate_series": "V80691335",
+        "rate_date": "2026-10-28",
+        "amortization_years": 40,
+        "debt_coverage_ratio": 1.1,
+        "insured_rate_note": "an insured multi-unit loan is usually priced below the posted conventional rate; the posted rate is the conservative ceiling"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "f.operating",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Operating cost and replacement reserve per unit",
+      "jurisdiction": "Declared placeholder",
+      "check": "assumption",
+      "source": {
+        "title": "Declared placeholder (no public source): to be replaced by the operator's budget or BC Housing's operating benchmarks where published",
+        "url": "",
+        "placeholder": true
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Operating cost $6,500 per unit a year (management, maintenance, utilities, insurance, property tax where not exempt) and a $600 per unit replacement reserve: declared placeholders until the operator's budget replaces them.",
+      "values": {
+        "operating_cost_per_unit_year_cad": 6500,
+        "replacement_reserve_per_unit_year_cad": 600
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "f.rents",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Rents by tier: CMHC average market rent, rent-geared-to-income, the shelter rate",
+      "jurisdiction": "CMHC / BC Housing / Province of BC",
+      "check": "assumption",
+      "source": {
+        "title": "CMHC, Rental Market Report, January 2026 (October 2025 survey), Vancouver CMA; Province of BC, income assistance shelter allowance (single person, maximum $500 from 1 Dec 2025)",
+        "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres",
+        "section": "Vancouver: purpose-built rental vacancy 3.7%, average two-bedroom rent $2,363; summary by zone, all units $1,963",
+        "shelter_rate_url": "https://www2.gov.bc.ca/gov/content/governments/policies-for-government/bcea-policy-and-procedure-manual/support-and-shelter/support-shelter-and-special-care-facilities",
+        "verify": "Type the bachelor, one-bedroom and three-bedroom averages from the CMHC Rental Market Survey data tables (Vancouver CMA, Table 1.1.2); the rent-geared-to-income income placeholder is declared, not sourced: replace it with the operator's tenant income profile."
+      },
+      "version_effective_from": "2026-01-29",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Market rent from the CMHC Rental Market Survey of October 2025, Vancouver CMA, purpose-built apartments: two-bedroom $2,363 a month, all unit types $1,963, vacancy 3.7% (the other bedroom types are left to be typed from the CMHC data tables); rent-geared-to-income at 30% of a household income taken, as a placeholder, at half the Community Housing Fund's low-to-moderate income limit for the unit size; the deep-subsidy rent at the income assistance shelter rate of $500.",
+      "values": {
+        "survey": "October 2025",
+        "market_rent_monthly_cad": {
+          "studio": null,
+          "one_bed": null,
+          "two_bed": 2363,
+          "three_bed_plus": null,
+          "all_units": 1963
+        },
+        "vacancy_rate": 0.037,
+        "rgi_rent_share_of_income": 0.3,
+        "rgi_income_share_of_chf_limit": 0.5,
+        "deep_subsidy_rent_monthly_cad": 500
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "f.soft_costs",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Soft costs and contingency, as shares of hard cost",
+      "jurisdiction": "Declared placeholder",
+      "check": "assumption",
+      "source": {
+        "title": "Declared placeholder (no public source): to be replaced by the proponent's development budget",
+        "url": "",
+        "placeholder": true
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Soft costs 25% of hard cost (design, permits, levies where they apply, financing, legal, insurance, marketing) and a 10% contingency: declared placeholders until a practitioner gives this project's figures.",
+      "values": {
+        "soft_cost_share_of_hard": 0.25,
+        "contingency_share_of_hard": 0.1
+      },
+      "action": ""
     }
   ],
   "summary": {
@@ -572,7 +827,7 @@
       "conditional": 0,
       "uncertain": 3,
       "pass": 3,
-      "info": 6,
+      "info": 13,
       "not_applicable": 5
     },
     "answers": {

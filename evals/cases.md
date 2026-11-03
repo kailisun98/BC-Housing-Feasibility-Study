@@ -53,7 +53,7 @@ a 5% three-bedroom-plus minimum from 2026-10-27 (City of Vancouver, Housing opti
 `--as-of 2026-10-26` and `--as-of 2026-10-27`:
 
 - picks the right version each time (the memo prints the version date next to the rule);
-- changes the stamp (`20e44f1445ecaff9` → `6d1b07fe59dd3775` on the current rule files);
+- changes the stamp (`e51e3a0350b87718` → `83993057d297734a` on the rule files as of 3 Nov 2026, with layer F; before layer F the pair was `20e44f1445ecaff9` → `6d1b07fe59dd3775`);
 - the `--previous` diff lists exactly one changed rule, `cov.family_units`;
 - an option with 3.8% three-bedroom units passes on the 26th and fails on the 27th.
 

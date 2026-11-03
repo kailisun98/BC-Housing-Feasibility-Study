@@ -2856,7 +2856,7 @@ const TOUR = [
   { target: "#step-export", title: "Step 4 · Export and issue",
     text: "Download PDF is the memo for the board, laid out for paper. Issue to the architect hands this revision on with a note; they see an amber chip in their top bar and open it from there. The architect issues to the board the same way." },
   { target: ".mode", title: "The architect and the reader",
-    text: "Switch to Architect and the Site and Option forms open, every ledger layer opens, the figures sit beside the answers and Export to Revit leads. Switch to Reader and the inputs, the steps and the run controls go; the memo stands alone in a reading column with Download PDF and Print. That is the whole page." },
+    text: "Switch to Architect and the Site and Option forms open, every ledger layer opens, the figures sit beside the answers, Edit blocks appears on FIG 03 and Export to Revit leads. Switch to Reader and the inputs, the steps and the run controls go; the memo stands alone in a reading column with Download PDF and Print. That is the whole page." },
 ];
 const TOUR_KEY = "ffm.walkthrough.seen";
 const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0, returnTo: null, modeBefore: null, viewBefore: null };
@@ -4203,7 +4203,7 @@ async function copyText(text) {
 const MODE_KEY = "ffm.mode";
 const MODES = {
   manager: { who: "the development manager", line: "the memo first, the site and option as summaries beside it, Download PDF for the board." },
-  architect: { who: "the architect", line: "the forms open, every ledger layer open, two runs compared, and the massing to Revit." },
+  architect: { who: "the architect", line: "the forms open, every ledger layer open, two runs compared, the block editor on FIG 03, and the massing to Revit." },
   reader: { who: "a reader", line: "the memo alone, as on paper, with Download PDF and Print. Switch to Manager or Architect to change anything." },
 };
 
@@ -4235,6 +4235,7 @@ function setMode(mode, remember = true, announce = true) {
     for (const kind of ["site", "option"]) setCollapsed(kind, (mode === "manager" || stacked) && chosen(kind));
   }
   applyModeToMemo();
+  if (editor.open && mode !== "architect") closeEditor();   // the editor is the architect's; leaving the mode closes it
   renderGuide();
   guideProgress();
   issueButtonLabel();

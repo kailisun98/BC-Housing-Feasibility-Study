@@ -437,14 +437,16 @@ table.plain td.status { white-space: nowrap; }
 .fig-building { background: var(--c-half-building); border-color: var(--c-half-line) !important; }
 .figure .note { font-size: 12px; color: var(--c-drawnote); margin: 8px 0 0; }
 /* a figure's head: the label and, for the plan, the Plan | 3D segmented control */
-.fig-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.fig-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; margin-bottom: 6px; }
 .fig-head .eyebrow { margin: 0; }
 /* the architect's sheets: the engine's SVGs at the card's width, a Plan | Axon tab on the plans, the rules under them */
 .figure.sheet .sheet-body svg { display: block; width: 100%; height: auto; }
 .figure.sheet .sheet-body[hidden] { display: none; }
 .sheet-rules { margin-top: 8px; font-size: 12px; }
 .sheet-rules .cont { color: var(--c-drawmuted); }
-.fig-tools { display: flex; align-items: center; gap: 8px; }
+.fig-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-left: auto; }
+/* the block editor is the architect's tool: the manager and the reader see the sheets without it */
+[data-mode="manager"] #edit-blocks, [data-mode="manager"] #sheet-editor { display: none !important; }
 /* the block editor: a toolbar, the plate as a canvas, what the engine says under it */
 .sheet-editor { display: flex; flex-direction: column; gap: 8px; }
 .sheet-editor[hidden] { display: none; }

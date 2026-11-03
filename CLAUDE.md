@@ -251,8 +251,12 @@ Built and verified in the browser:
   polygon from City of Vancouver Open Data (`zoning-districts-and-labels`, `property-parcel-polygons`, the
   Opendatasoft v2.1 records API with `within_distance`); `parcel_metrics` (pure) gives the area and an
   equivalent rectangle; `assemble` is pure so the browser build fetches and hands the records in. Since
-  3 Nov 2026 it also fetches the Overpass elements around the parcel's centre and builds the site's `osm`
-  block with `osm.build`, so the figures draw the real context, and `street_bearing` (pure) takes the
+  3 Nov 2026 it also fetches the surroundings around the parcel's centre and builds the site's `osm` block
+  with `osm.build`: first from the City's own datasets (`public-streets`, `building-footprints-2009` with
+  `hgt_agl` heights, `public-trees`; `city_records` pages them a hundred at a time in parallel threads and
+  `city_elements` converts them to Overpass-shaped elements, about 2 s in all; the block's `source` and
+  `attribution` then name the Open Government Licence – Vancouver), and only where the City has no streets
+  from Overpass (half a minute). The figures draw the real context, and `street_bearing` (pure) takes the
   frontage as the parcel side parallel to the street the parcel is named for (OSM way matched by name, else
   the nearest road; 609 Heatley Ave: 37.2 m along Heatley, Keefer as the cross street). Overpass can take
   half a minute; the status strip says so. Tests in `tests/test_lookup.py` with the real parcel rings.

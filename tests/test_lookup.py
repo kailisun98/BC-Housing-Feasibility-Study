@@ -78,6 +78,34 @@ class ParcelMetrics(unittest.TestCase):
         self.assertAlmostEqual(s["frontage_m"], 75.6, delta=0.6)
         self.assertTrue(res["found"]["context"])
 
+    def test_city_records_become_context_elements(self):
+        streets = [{"hblock": "700 HEATLEY AV", "streetuse": "Residential", "geom": {"geometry": {"type": "LineString", "coordinates": [[-123.0902, 49.2785], [-123.0902, 49.2795]]}}},
+                   {"hblock": "LANE", "streetuse": "Lane", "geom": {"geometry": {"type": "LineString", "coordinates": [[-123.0896, 49.2785], [-123.0896, 49.2795]]}}}]
+        buildings = [{"bldgid": 1, "hgt_agl": 7.26, "geom": {"geometry": {"type": "Polygon", "coordinates": [[[-123.0899, 49.2790], [-123.0898, 49.2790], [-123.0898, 49.2791], [-123.0899, 49.2791], [-123.0899, 49.2790]]]}}}]
+        trees = [{"common_name": "PIN OAK", "height_m": 4.6, "diameter_cm": 15.2, "geom": {"geometry": {"type": "Point", "coordinates": [-123.0901, 49.2790]}}}]
+        els = lookup.city_elements(streets, buildings, trees)
+        ways = [e for e in els if e["type"] == "way"]
+        self.assertEqual(ways[0]["tags"], {"highway": "residential", "name": "Heatley Ave"})
+        self.assertEqual(ways[1]["tags"], {"highway": "service"})            # a lane: minor, unnamed
+        self.assertEqual(ways[2]["tags"], {"building": "yes", "height": "7.3"})
+        self.assertEqual(len(ways[2]["geometry"]), 5)
+        node = next(e for e in els if e["type"] == "node")
+        self.assertEqual(node["tags"]["species"], "Pin Oak")
+        self.assertAlmostEqual(float(node["tags"]["diameter_crown"]), 2.8, places=1)
+        self.assertEqual(lookup.street_name_from_hblock("700 E 19TH AV"), "E 19th Ave")
+
+    def test_assemble_credits_the_city_context(self):
+        parcels = [{"civic_number": "998", "streetname": "E 19TH AV", "geom": {"geometry": {"type": "Polygon", "coordinates": [PARCEL_998]}}}]
+        c = lookup.parcel_metrics(PARCEL_998)["center"]
+        street = {"hblock": "900 E 19TH AV", "streetuse": "Residential", "geom": {"geometry": {"type": "LineString", "coordinates": [[c["lon"] - 0.002, c["lat"] - 0.00027], [c["lon"] + 0.002, c["lat"] - 0.00027]]}}}
+        els = lookup.city_elements([street], [], [])
+        res = lookup.assemble("998 E 19th Ave", c["lat"], c["lon"], "998 East 19th Avenue, Vancouver", [{"zoning_district": "RM-1"}], parcels, els, 120, "city", "city")
+        s = res["site"]
+        self.assertEqual(s["osm"]["frame"]["front_street"], "E 19th Ave")
+        self.assertTrue(s["osm"]["frame"]["front_street_matched_by_name"])
+        self.assertIn("Open Government Licence", s["osm"]["attribution"])
+        self.assertTrue(any("public streets" in x["title"] for x in s["sources"]))
+
     def test_assemble_without_the_network(self):
         zoning = [{"zoning_district": "RM-1", "zoning_category": "RM", "cd_1_number": None}]
         parcels = [{"civic_number": "998", "streetname": "E 19TH AV", "site_id": "007998546", "geom": {"geometry": {"type": "Polygon", "coordinates": [PARCEL_998]}}}]

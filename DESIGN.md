@@ -630,7 +630,8 @@ street names in Street Text. The section's height labels (benchmark in Bench Tex
 sit at their heights and are pushed apart where two would overprint, a thin leader joining a moved
 label to its line; its note under the ground line starts at the lot's edge. The axonometric leads its
 height labels off the masses on leader lines, turns under a sideways drag (vertical swipes still
-scroll a phone) and under the arrow keys. FIG 03 is the Revit sheet image.
+scroll a phone) and under the arrow keys; its frame is the largest extent the drawing can reach at any
+azimuth and any tilt, so a drag never rescales it. FIG 03 is the Revit sheet image.
 
 ### Who is reading
 The tool's top bar carries a three-way pill, Manager · Architect · Reader, after the lockup: the flows in

@@ -177,6 +177,13 @@ def ffm_lookup_assemble(address, lat, lon, display, zoning_json, parcels_json, e
 def ffm_parcel_center(parcels_json):
     c = lookup._parcel_center(json.loads(parcels_json))
     return json.dumps(list(c) if c else None)
+
+def ffm_city_elements(streets_json, buildings_json, trees_json):
+    return json.dumps(lookup.city_elements(json.loads(streets_json), json.loads(buildings_json), json.loads(trees_json)))
+
+def ffm_lookup_assemble_from(address, lat, lon, display, zoning_json, parcels_json, elements_json, radius_m, query, source):
+    elements = json.loads(elements_json) if elements_json else None
+    return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json), elements, radius_m, query, source))
 `;
 
 function loadEngine() {
@@ -200,7 +207,8 @@ function loadEngine() {
     pyodide.runPython(ENGINE_SHIM);
     engine = { pyodide, run: pyodide.globals.get("ffm_run"), diff: pyodide.globals.get("ffm_diff"),
                suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble"),
-               parcelCenter: pyodide.globals.get("ffm_parcel_center") };
+               parcelCenter: pyodide.globals.get("ffm_parcel_center"), cityElements: pyodide.globals.get("ffm_city_elements"),
+               lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");
     return engine;
   })().catch(e => {
@@ -261,18 +269,40 @@ async function staticLookup(q) {
   const cov = ds => fetch(`https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/${ds}/records?${new URLSearchParams({ where: `within_distance(geom, geom'POINT(${lon} ${lat})', 3m)`, limit: "3" })}`).then(r => r.ok ? r.json() : { results: [] }).then(j => j.results || []);
   const [zoning, parcels] = await Promise.all([cov("zoning-districts-and-labels"), cov("property-parcel-polygons")]);
   await loadEngine();
-  // the surroundings from the Overpass API, around the parcel's centre, the same query python -m ffm context sends;
-  // if Overpass is slow or away, the site still comes back, without its context
+  // the surroundings around the parcel's centre: the City's streets, 2009 building footprints and public trees
+  // (three quick requests, paged by a hundred), else the Overpass API as python -m ffm context queries it; if
+  // neither answers, the site still comes back, without its context
   const radius = 120;
   const c = JSON.parse(engine.parcelCenter(JSON.stringify(parcels))) || [lat, lon];
-  const ov = `[out:json][timeout:60];(way(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["highway"];way(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["building"];node(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["natural"="tree"];);out tags geom;`;
-  let elements = null;
+  const within = async ds => {
+    const out = [];
+    for (let page = 0; page < 4; page++) {
+      const r = await fetch(`https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/${ds}/records?${new URLSearchParams({ where: `within_distance(geom, geom'POINT(${c[1]} ${c[0]})', ${radius}m)`, limit: "100", offset: String(page * 100) })}`);
+      if (!r.ok) break;
+      const j = await r.json();
+      out.push(...(j.results || []));
+      if ((j.results || []).length < 100 || out.length >= (j.total_count || 0)) break;
+    }
+    return out;
+  };
+  let elements = null, source = "osm", query = "";
   try {
-    const r = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(ov), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
-    if (r.ok) elements = (await r.json()).elements || [];
+    const [streets, buildings, trees] = await Promise.all([within("public-streets"), within("building-footprints-2009"), within("public-trees")]);
+    if (streets.length) {
+      elements = JSON.parse(engine.cityElements(JSON.stringify(streets), JSON.stringify(buildings), JSON.stringify(trees)));
+      source = "city";
+      query = `City of Vancouver Open Data within ${radius} m: ${streets.length} streets, ${buildings.length} buildings, ${trees.length} trees`;
+    }
   } catch (e) { elements = null; }
-  const res = JSON.parse(engine.lookupAssemble(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels), elements ? JSON.stringify(elements) : "", radius, ov));
-  if (!elements) res.site.notes += " The OpenStreetMap context could not be fetched in the browser; the plan draws a schematic context.";
+  if (!elements) {
+    const ov = `[out:json][timeout:60];(way(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["highway"];way(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["building"];node(around:${radius},${c[0].toFixed(6)},${c[1].toFixed(6)})["natural"="tree"];);out tags geom;`;
+    try {
+      const r = await fetch("https://overpass-api.de/api/interpreter", { method: "POST", body: "data=" + encodeURIComponent(ov), headers: { "Content-Type": "application/x-www-form-urlencoded" } });
+      if (r.ok) { elements = (await r.json()).elements || []; query = ov; }
+    } catch (e) { elements = null; }
+  }
+  const res = JSON.parse(engine.lookupAssembleFrom(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels), elements ? JSON.stringify(elements) : "", radius, query, source));
+  if (!elements) res.site.notes += " The context could not be fetched in the browser; the plan draws a schematic context.";
   return res;
 }
 
@@ -1925,12 +1955,13 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
       + `<circle cx="${t.x.toFixed(2)}" cy="${t.y.toFixed(2)}" r="${(fs * 0.18).toFixed(2)}" fill="${colour}"/>`
       + `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" font-size="${fs.toFixed(2)}" font-weight="${weight}" fill="${colour}" text-anchor="${side < 0 ? "end" : "start"}" ${halo(fs)}>${h(x.height_m)} m · ${name}</text>`);
   }
-  // a steady frame: the largest extent the drawing can reach at any azimuth for this tilt, so turning never
-  // rescales it (only a change of tilt re-frames, and gently)
+  // a steady frame: the largest extent the drawing can reach at any azimuth and any tilt the orbit allows (8° to
+  // 80°), so neither turning nor tilting ever rescales it; a drag reads as one object turning in a fixed window
   const corners = [[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]];
   const R = ctx.frameRadius || Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy)));
   const zmax = Math.max(...m.masses.map(x => (x.base_z || 0) + x.height_m), 1);
-  const top = zmax * ce + R * se, bottom = R * se;
+  const tilts = [8, 20, 35, 50, 65, 80].map(t => t * Math.PI / 180);
+  const top = Math.max(...tilts.map(t => zmax * Math.cos(t) + R * Math.sin(t))), bottom = R * Math.sin(tilts[tilts.length - 1]);
   const pad = fs * 1.5;
   const x0 = -R - pad - fs * 3, x1 = R + pad + fs * 3, y0 = -top - pad - fs, y1 = bottom + pad;
   return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, its surroundings in half tone, the setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${labels.join("")}</svg>`;
@@ -3017,20 +3048,26 @@ function ruleTitle(id) {
 /* Re-rendering the card changes its height (a stop opens, another closes, a form folds below), and the browser would
    leave the reader's scroll position pointing at whatever moved into it. So the head of one stop, the one the reader
    acted on, is kept at the same place on screen across the render: measured before, matched after. */
-function renderGuide(anchorStop = guide.step, placeAtY = null) {
+function renderGuide(anchor = guide.step, placeAtY = null) {
   const el = $("#guide");
   if (!el) return;
   if (state.mode !== "manager") { el.hidden = true; return; }
-  const anchorOf = () => (anchorStop && $(`.stop-head[data-stop="${anchorStop}"]`, el)) || el;
+  // the anchor is a stop's head (a number) or any element inside the card (a selector, e.g. the control just used)
+  const anchorOf = () => (typeof anchor === "string" ? $(anchor, el) : (anchor && $(`.stop-head[data-stop="${anchor}"]`, el))) || el;
   const wasHidden = el.hidden;
-  // where the anchored head should end up: where it was, or where the reader just acted (placeAtY), so the stop
-  // that opens next appears under the button they pressed rather than far above
-  const target = placeAtY != null ? placeAtY : (wasHidden ? null : anchorOf().getBoundingClientRect().top);
+  const before = wasHidden ? null : anchorOf().getBoundingClientRect().top;
   el.hidden = false;
   renderGuideInto(el);
-  if (target != null) {
+  let target = null;
+  if (placeAtY != null) {
+    // where the reader just acted: the stop that opens next appears under the button they pressed, kept on screen
     const bars = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--bars-h")) || 134;
-    const d = anchorOf().getBoundingClientRect().top - Math.max(bars + 12, Math.min(target, innerHeight - 160));
+    target = Math.max(bars + 12, Math.min(placeAtY, innerHeight - 160));
+  } else if (before != null) {
+    target = before;   // exactly where it was, above the fold or not: nothing moves under the reader
+  }
+  if (target != null) {
+    const d = anchorOf().getBoundingClientRect().top - target;
     if (Math.abs(d) > 1) window.scrollBy(0, d);
   }
 }
@@ -3160,7 +3197,7 @@ function takeAnswer(key, raw) {
 function wireGuide() {
   const el = $("#guide");
   $$("[data-answer]", el).forEach(c => {
-    if (c.tagName === "BUTTON") c.addEventListener("click", () => { takeAnswer(c.dataset.answer, c.dataset.value); renderGuide(4); });
+    if (c.tagName === "BUTTON") c.addEventListener("click", () => { takeAnswer(c.dataset.answer, c.dataset.value); renderGuide(`.answer-ctl:has([data-answer="${c.dataset.answer}"])`); });
     else c.addEventListener("change", () => takeAnswer(c.dataset.answer, c.value));
   });
   $$(".stop-head", el).forEach(b => b.addEventListener("click", () => { const n = Number(b.dataset.stop); guide.step = guide.step === n ? 0 : n; renderGuide(n); }));
@@ -3197,7 +3234,7 @@ async function guideLookup() {
   const q = (guide.address || "").trim();
   if (q.length < 4) { toast("Type an address first.", true); return; }
   guide.loading = "lookup"; renderGuide();
-  setStatus(`Looking up ${q}: the point, the district, the parcel, then the surroundings from OpenStreetMap, which can take half a minute…`, "busy");
+  setStatus(`Looking up ${q}: the point, the district, the parcel, and the streets, buildings and trees around it…`, "busy");
   try {
     guide.lookup = await api(`/api/lookup?q=${encodeURIComponent(q)}`);
     const s = guide.lookup.site;

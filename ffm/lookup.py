@@ -22,9 +22,16 @@ from .osm import DEFAULT_RADIUS_M, MINOR, USER_AGENT, build as build_context, ge
 COV_RECORDS = "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/{dataset}/records"
 ZONING_DATASET = "zoning-districts-and-labels"
 PARCEL_DATASET = "property-parcel-polygons"
+# the surroundings from the City too: street centrelines, the 2009 LiDAR building footprints (with heights) and
+# the public trees. Three requests of a second or so, against half a minute from the public Overpass server.
+CITY_CONTEXT = {"streets": "public-streets", "buildings": "building-footprints-2009", "trees": "public-trees"}
+CITY_ATTRIBUTION = "Contains information licensed under the Open Government Licence – Vancouver (streets, building footprints 2009, public trees)"
+STREETUSE_HIGHWAY = {"arterial": "primary", "secondary arterial": "secondary", "collector": "tertiary", "residential": "residential",
+                     "lane": "service", "private": "service", "leased": "service", "recreational": "path", "closed": "service"}
 SOURCES = {
     "zoning": {"title": "City of Vancouver Open Data: zoning districts and labels", "url": "https://opendata.vancouver.ca/explore/dataset/zoning-districts-and-labels/"},
     "parcel": {"title": "City of Vancouver Open Data: property parcel polygons", "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"},
+    "context": {"title": "City of Vancouver Open Data: public streets, building footprints 2009, public trees (Open Government Licence – Vancouver)", "url": "https://opendata.vancouver.ca/explore/"},
     "geocode": {"title": "OpenStreetMap Nominatim", "url": "https://nominatim.openstreetmap.org/"},
 }
 
@@ -39,6 +46,82 @@ def records_at(dataset: str, lat: float, lon: float, within_m: float = 3) -> lis
     """The dataset's records whose geometry lies within a few metres of the point."""
     res = _get(COV_RECORDS.format(dataset=dataset), {"where": f"within_distance(geom, geom'POINT({lon} {lat})', {within_m}m)", "limit": 3})
     return res.get("results") or []
+
+
+def records_within(dataset: str, lat: float, lon: float, radius_m: float, max_pages: int = 4) -> list[dict]:
+    """Every record of the dataset within the radius, a hundred at a time (the API's page), up to max_pages."""
+    out: list[dict] = []
+    for page in range(max_pages):
+        res = _get(COV_RECORDS.format(dataset=dataset), {"where": f"within_distance(geom, geom'POINT({lon} {lat})', {radius_m:.0f}m)", "limit": 100, "offset": page * 100})
+        rows = res.get("results") or []
+        out.extend(rows)
+        if len(rows) < 100 or len(out) >= int(res.get("total_count") or 0):
+            break
+    return out
+
+
+def city_records(lat: float, lon: float, radius_m: float) -> dict[str, list[dict]]:
+    """The three context datasets around a point, fetched side by side."""
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=3) as pool:
+        futs = {k: pool.submit(records_within, ds, lat, lon, radius_m) for k, ds in CITY_CONTEXT.items()}
+        return {k: f.result() for k, f in futs.items()}
+
+
+def street_name_from_hblock(hblock: Any) -> str:
+    """'700 HEATLEY AV' as the streets dataset writes a block becomes 'Heatley Ave'."""
+    words = str(hblock or "").split()
+    while words and words[0].replace("-", "").isdigit():
+        words.pop(0)
+    civic = civic_address("0", " ".join(words)) if words else ""
+    return civic[2:] if civic.startswith("0 ") else civic
+
+
+def city_elements(streets: list[dict], buildings: list[dict], trees: list[dict]) -> list[dict]:
+    """The City's records in the shape the context builder reads (Overpass elements: ways with a geometry of
+    lat/lon points and tags; nodes for trees). Pure. Streets carry a highway class from their use and their name
+    from the block; buildings their height above ground; trees their species and a crown from their height."""
+    out: list[dict] = []
+    for i, s in enumerate(streets):
+        geom = ((s.get("geom") or {}).get("geometry") or {})
+        coords = geom.get("coordinates") or []
+        if geom.get("type") == "MultiLineString":
+            coords = [p for line in coords for p in line]
+        if len(coords) < 2:
+            continue
+        use = str(s.get("streetuse") or "").strip().lower()
+        hw = STREETUSE_HIGHWAY.get(use, "residential")
+        name = "" if use == "lane" else street_name_from_hblock(s.get("hblock"))
+        tags = {"highway": hw}
+        if name:
+            tags["name"] = name
+        out.append({"type": "way", "id": 1_000_000 + i, "tags": tags, "geometry": [{"lat": float(p[1]), "lon": float(p[0])} for p in coords]})
+    for i, b in enumerate(buildings):
+        geom = ((b.get("geom") or {}).get("geometry") or {})
+        rings = geom.get("coordinates") or []
+        if geom.get("type") == "MultiPolygon":
+            rings = [r for poly in rings for r in poly[:1]]
+        ring = rings[0] if rings else []
+        if len(ring) < 3:
+            continue
+        h = b.get("hgt_agl") or b.get("avght_m") or b.get("maxht_m")
+        tags = {"building": "yes"}
+        if h:
+            tags["height"] = str(round(float(h), 1))
+        out.append({"type": "way", "id": 2_000_000 + i, "tags": tags, "geometry": [{"lat": float(p[1]), "lon": float(p[0])} for p in ring]})
+    for i, t in enumerate(trees):
+        geom = ((t.get("geom") or {}).get("geometry") or {})
+        c = geom.get("coordinates") or []
+        if len(c) < 2:
+            continue
+        tags = {"natural": "tree"}
+        name = " ".join(w.capitalize() for w in str(t.get("common_name") or "").split())
+        if name and name.lower() != "none":
+            tags["species"] = name
+        if t.get("height_m"):
+            tags["diameter_crown"] = str(round(float(t["height_m"]) * 0.6, 1))   # a crown about six tenths of the height
+        out.append({"type": "node", "id": 3_000_000 + i, "lat": float(c[1]), "lon": float(c[0]), "tags": tags})
+    return out
 
 
 # ---------------------------------------------------------------- geometry, pure
@@ -158,21 +241,32 @@ def street_bearing(elements: list[dict], center_latlon: tuple[float, float], str
 
 def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_M) -> dict[str, Any]:
     """A proposed site file for the address, with every field's source, for a person to confirm. With `context`
-    the roads, buildings and trees around the parcel come from OpenStreetMap too, as `python -m ffm context`
-    fetches them, so the figures draw the real surroundings and the frontage is the side on the street."""
+    the streets, buildings and trees around the parcel come too, from the City's open data (a second or two),
+    or from OpenStreetMap's Overpass API where the City has nothing (outside Vancouver; half a minute), so the
+    figures draw the real surroundings and the frontage is the side on the street."""
+    from concurrent.futures import ThreadPoolExecutor
     lat, lon, display = geocode(address)
-    zoning = records_at(ZONING_DATASET, lat, lon)
-    parcels = records_at(PARCEL_DATASET, lat, lon)
-    elements, q, note = None, "", ""
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        fz, fp = pool.submit(records_at, ZONING_DATASET, lat, lon), pool.submit(records_at, PARCEL_DATASET, lat, lon)
+        zoning, parcels = fz.result(), fp.result()
+    elements, q, source, note = None, "", "osm", ""
     if context:
         c = _parcel_center(parcels) or (lat, lon)
         try:
-            elements, q = overpass(c[0], c[1], radius_m)
+            recs = city_records(c[0], c[1], radius_m)
+            if recs["streets"]:
+                elements, source = city_elements(recs["streets"], recs["buildings"], recs["trees"]), "city"
+                q = f"City of Vancouver Open Data within {radius_m:.0f} m: " + ", ".join(f"{len(recs[k])} {k}" for k in recs)
         except (OSError, ValueError) as e:
-            note = f"The OpenStreetMap context could not be fetched ({e}); run python -m ffm context later."
-    res = assemble(address, lat, lon, display, zoning, parcels, elements, radius_m, q)
-    if note:
-        res["site"]["notes"] += " " + note
+            note = f"The City's context datasets could not be fetched ({e})."
+        if elements is None:
+            try:
+                elements, q = overpass(c[0], c[1], radius_m)
+            except (OSError, ValueError) as e:
+                note += f" The OpenStreetMap context could not be fetched either ({e}); run python -m ffm context later."
+    res = assemble(address, lat, lon, display, zoning, parcels, elements, radius_m, q, source)
+    if note.strip():
+        res["site"]["notes"] += " " + note.strip()
     return res
 
 
@@ -186,10 +280,11 @@ def _parcel_center(parcels: list[dict]) -> tuple[float, float] | None:
 
 
 def assemble(address: str, lat: float, lon: float, display: str, zoning: list[dict], parcels: list[dict],
-             elements: list[dict] | None = None, radius_m: float = DEFAULT_RADIUS_M, query: str = "") -> dict[str, Any]:
+             elements: list[dict] | None = None, radius_m: float = DEFAULT_RADIUS_M, query: str = "", source: str = "osm") -> dict[str, Any]:
     """The proposed site from the fetched records. Pure, so the browser build can fetch and hand the records in.
-    With OpenStreetMap `elements` around the parcel, the frontage is the side parallel to the parcel's street and
-    the site gets its `osm` context block; without them the longer side is called the frontage, to confirm."""
+    With context `elements` around the parcel (the City's, converted by city_elements, or Overpass's), the frontage
+    is the side parallel to the parcel's street and the site gets its `osm` context block, credited to `source`;
+    without them the longer side is called the frontage, to confirm."""
     z = zoning[0] if zoning else {}
     p = parcels[0] if parcels else {}
     poly = (((p.get("geom") or {}).get("geometry") or {}).get("coordinates") or [[]])[0]
@@ -237,10 +332,17 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     # the surroundings, as python -m ffm context stores them, so the plan draws the real streets and buildings
     if elements and metrics:
         try:
-            site["osm"] = build_context(site, elements, center, radius_m, query, display)
-            site["sources"].append({"title": "OpenStreetMap contributors, ODbL (the roads, buildings and trees drawn around the lot)", "url": "https://www.openstreetmap.org/copyright"})
+            block = build_context(site, elements, center, radius_m, query, display)
+            if source == "city":
+                block["source"] = "City of Vancouver Open Data: public streets, building footprints 2009, public trees"
+                block["attribution"] = CITY_ATTRIBUTION
+                block["licence_url"] = "https://opendata.vancouver.ca/pages/licence/"
+                site["sources"].append(SOURCES["context"])
+            else:
+                site["sources"].append({"title": "OpenStreetMap contributors, ODbL (the roads, buildings and trees drawn around the lot)", "url": "https://www.openstreetmap.org/copyright"})
+            site["osm"] = block
         except ValueError as e:
-            site["notes"] += f" The OpenStreetMap context was not placed: {e}"
+            site["notes"] += f" The context was not placed: {e}"
     fields = {
         "zoning_district": {"value": district, "source": "zoning", "note": "the district polygon at the geocoded point"},
         "site_area_m2": {"value": site["site_area_m2"], "source": "parcel", "note": "from the parcel polygon"},

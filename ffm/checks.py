@@ -377,7 +377,32 @@ def info_only(site, option, p) -> Result:
     return _r(INFO, "; ".join(bits) + ".", dict(p))
 
 
+def district_setbacks(site, option, p) -> Result:
+    """A district schedule's minimum yards against the option's setbacks: pass where the option keeps them,
+    conditional where it sits inside one (a relaxation to ask for), info where the option states none."""
+    mins = {k: p.get(f"min_{k}_yard_m") for k in ("front", "rear", "side")}
+    sb = option.get("setbacks_m") or {}
+    vals = {f"min_{k}_yard_m": v for k, v in mins.items()} | {f"setback_{k}_m": sb.get(k) for k in mins}
+    said = "; ".join(f"{k} {v} m" for k, v in mins.items() if v is not None) or "no minimum yards given"
+    if not any(v is not None for v in sb.values()):
+        return _r(INFO, f"The schedule's minimum yards are {said}; the option states no setbacks yet.", vals)
+    short = [f"{k} {sb[k]} m against a {mins[k]} m minimum" for k in mins if mins[k] is not None and sb.get(k) is not None and sb[k] + 1e-9 < mins[k]]
+    if short:
+        return _r(COND, f"The option sits inside the schedule's minimum yards: {'; '.join(short)}. A relaxation is needed or the envelope moves in.",
+                  vals, action="Architect: move the mass to the minimum yards or state the relaxation to ask for.")
+    return _r(PASS, f"The option's setbacks keep the schedule's minimum yards ({said}).", vals)
+
+
+def assumption(site, option, p) -> Result:
+    """Layer F: a dated, cited assumption the pro-forma reads. Always information; the finding is the assumption's
+    own summary, and the values carry the figures so the pro-forma cites the rule by id."""
+    vals = {k: v for k, v in p.items() if k not in ("summary", "observations")}
+    return _r(INFO, (p.get("summary") or "assumption") + ".", vals)
+
+
 CHECKS: dict[str, Callable[[Site, Option, Params], Result]] = {
+    "district_setbacks": district_setbacks,
+    "assumption": assumption,
     "district_outright_fsr": district_outright_fsr,
     "district_outright_height": district_outright_height,
     "rezoning_policy_social_housing": rezoning_policy_social_housing,

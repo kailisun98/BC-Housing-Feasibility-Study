@@ -174,11 +174,11 @@ real practitioner sites stay local, as the brief requires.
 | Phase | What | Depends on |
 |---|---|---|
 | 1 | `ffm/suggest.py` with tests; the guided six-stop manager flow with Suggested \| Mine; the site lookup from City Open Data; Summary \| Detailed \| 3D; issuing with local polling | **Built 3 Nov 2026** (approved the same day) |
-| 2 | Layer F and `refresh`; `ffm/proforma.py` with tests; the Pro-forma stop and its view | Section 3 approved; a first pass of figures |
+| 2 | Layer F and `refresh`; `ffm/proforma.py` with tests; the Pro-forma stop and its view | **Built 3 Nov 2026.** The hard-cost base is the Province's Class D catalogue figure (2- to 4-unit designs; a six-storey figure should replace it); soft, contingency, operating and the RGI income are declared placeholders; StatCan and the Bank of Canada refresh by command; CMHC rents by hand from the data tables |
 | 3 | Program blocks, adjacency rules, the stacking solver; stacking, plans, elevations, code site plan; Plan \| Axon; the board's sheets in reader mode and the PDF | Phase 1 |
 | 4 | The block editor over the solver | Phase 3 |
 | 5 | Hosting: the subdomain, then the Cloudflare issue store | Kai's DNS access |
-| 6 | The Claude framework behind a key, with its eval set | Section 4 approved; an API key |
+| 6 | The Claude framework behind a key, with its eval set | **Built 3 Nov 2026** (`ffm/propose.py`, `propose` and `confirm` commands, Ask Claude in stop 1, a synthetic eval case). Waits on Kai's `FFM_CLAUDE_KEY` to run against the real RT-3 schedule, which the City's by-law site will not hand to a script: save the PDF, then `propose rule --from … --district RT-3`, then `confirm` |
 
 Each phase lands as its own commit with its tests, and the site's "Who it's for" page is updated as the
 flows grow.

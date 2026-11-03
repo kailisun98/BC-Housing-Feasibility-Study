@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How it works · First Read</title>
-<meta name="description" content="Address and option in; cited rules, a massing and a dated memo out. How First Read reads five layers of rules with a deterministic engine and no language model in the loop.">
+<meta name="description" content="Address and option in; cited rules, a massing, a pro-forma and a dated memo out. How First Read reads six layers of rules with a deterministic engine; a model only proposes, and a person confirms.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -41,11 +41,11 @@
   <div class="wrap">
     <div class="sec-head reveal">
       <p class="eyebrow"><span class="n">01</span>Inside the tool</p>
-      <h2 id="inside-h">Five inputs. Five layers of rules. Five outputs.</h2>
+      <h2 id="inside-h">Five inputs. Six layers of rules. Six outputs.</h2>
       <p class="sub">Every rule in the stack is a structured clause with its source, its section and the date it took effect. From then on it is data, reused for every address and re-read only when a rule changes.</p>
     </div>
 
-    <div class="diagram reveal" role="img" aria-label="Five inputs flow into the tool, which holds five layers of rules and three steps: the rules engine, the massing and the memo writer. Five outputs come out: a cited rule table, a massing, a funding-fit matrix, the two-page memo and a version ledger. A rule or program change reruns the tool with a new stamp.">
+    <div class="diagram reveal" role="img" aria-label="Five inputs flow into the tool, which holds six layers of rules and four steps: the rules engine, the massing, the pro-forma and the memo writer. Six outputs come out: a cited rule table, a massing, a funding-fit matrix, a feasibility pro-forma, the two-page memo and a version ledger. A rule or program change reruns the tool with a new stamp.">
       <div class="io">
         <div class="col in">
           <p class="col-title">What goes in</p>
@@ -63,9 +63,11 @@
             <div class="node band"><b><span class="lk">C</span>City policy</b><span>family mix, rents, trees, levies</span></div>
             <div class="node band"><b><span class="lk">D</span>Code and design standards</b></div>
             <div class="node band"><b><span class="lk">E</span>Funding programs</b><span>BC Builds, Community Housing Fund</span></div>
+            <div class="node band"><b><span class="lk">F</span>Assumptions</b><span>costs, rents, rates; dated, refreshed</span></div>
             <div class="gap"></div>
             <div class="node"><span class="kind">script</span><b>Rules engine</b><span>pass, conditional, fail, uncertain</span></div>
             <div class="node"><span class="kind">script</span><b>Massing from the envelope</b><span>plan, section, 3D; then Revit</span></div>
+            <div class="node"><span class="kind">script</span><b>Pro-forma, feasibility grade</b><span>capital, income, funding, the gap</span></div>
             <div class="node signal"><span class="kind">script · stamped</span><b>Memo with the revision</b><span>R1, R2… and a rules fingerprint</span></div>
           </div>
         </div>
@@ -74,6 +76,7 @@
           <div class="node"><b>Rule table, cited</b></div>
           <div class="node"><b>Massing</b></div>
           <div class="node"><b>Funding-fit answer</b></div>
+          <div class="node"><b>Pro-forma, every line cited</b></div>
           <div class="node"><b>Two-page memo</b></div>
           <div class="node"><b>Version ledger</b></div>
         </div>
@@ -124,12 +127,12 @@
   </div>
 </section>
 
-<!-- ------------------------------------------------------------ 03 the five layers -->
+<!-- ------------------------------------------------------------ 03 the six layers -->
 <section class="sec" id="layers" data-n="03" aria-labelledby="layers-h">
   <div class="wrap">
     <div class="sec-head reveal">
       <p class="eyebrow"><span class="n">03</span>The rule stack</p>
-      <h2 id="layers-h">Five layers apply to one address at the same time.</h2>
+      <h2 id="layers-h">Six layers apply to one address at the same time.</h2>
       <p class="sub">Each is written by a different body and changes on its own date. Where two layers conflict on geometry the stricter governs; where the Province sets a floor, it overrides a lower local maximum.</p>
     </div>
     <ol class="items reveal">
@@ -138,7 +141,8 @@
       <li class="item"><span class="n">C · 5 rules</span><span class="key">City policy</span><h3>What attaches to a rezoning.</h3><p>Family units, social housing, below-market rents, the tree by-law, development charges. The family-unit rule changed on 27 Oct 2026.</p></li>
       <li class="item"><span class="n">D · 2 rules</span><span class="key">Design standards</span><h3>What shapes the option itself.</h3><p>BC Housing's minimum unit areas; the code basis under the 2025 Vancouver Building By-law. Flags, not checks.</p></li>
       <li class="item"><span class="n">E · 4 rules</span><span class="key">Funders</span><h3>Not law, but whether money flows.</h3><p>Community Housing Fund, BC Builds, the predevelopment loan, CMHC readiness: published criteria, applied as written.</p></li>
-      <li class="item"><span class="n">By design</span><span class="key">Left to a person</span><h3>Three things stay uncertain.</h3><p>Which transit-oriented tier a parcel falls in, what a CD-1 rezoning is negotiated to, and whether a council waives the charges.</p></li>
+      <li class="item"><span class="n">F · 7 assumptions</span><span class="key">Assumptions</span><h3>What the pro-forma counts with.</h3><p>A Class D hard cost, the Statistics Canada price index, the Bank of Canada rate, CMHC rents, CMHC's coverage ratio: dated, cited, refreshed by a command. Placeholders say so.</p></li>
+      <li class="item"><span class="n">By design</span><span class="key">Left to a person</span><h3>Four things stay uncertain.</h3><p>Which transit-oriented tier a parcel falls in, what a CD-1 rezoning is negotiated to, whether a council waives the charges, and the land price on a private site.</p></li>
     </ol>
   </div>
 </section>
@@ -160,7 +164,7 @@
     <ol class="items four reveal" style="margin-top: 36px">
       <li class="item"><span class="n">01</span><span class="key">Site</span><h3>Pick a site, or start one.</h3><p>Address, district, lot, trees, owner. Every yes/no fact is Yes / No / Not sure.</p></li>
       <li class="item"><span class="n">02</span><span class="key">Option</span><h3>Describe the building.</h3><p>Storeys, floor area, units, tenure, funders. The unit total and the family share update as you type.</p></li>
-      <li class="item"><span class="n">03</span><span class="key">Run and read</span><h3>Three answers, then the ledger.</h3><p>Under a second. Figures beside the answers; every rule with its numbers and its source; two runs side by side.</p></li>
+      <li class="item"><span class="n">03</span><span class="key">Run and read</span><h3>Three answers, the money, then the ledger.</h3><p>Under a second. Figures beside the answers; a fourth card on whether the money works; every rule with its numbers and its source; two runs side by side.</p></li>
       <li class="item"><span class="n">04</span><span class="key">Export</span><h3>The PDF for the board. The massing for Revit.</h3><p>A paper memo for a reviewer; a pyRevit script puts the masses on an annotated sheet and the sheet comes back as FIG 03.</p></li>
     </ol>
     <div class="sec-foot reveal">

@@ -23,13 +23,16 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
     GET  /api/runs/<site>/<folder>          a past run as /api/run returns it (ledger, massing, svg, diff, revit)
     GET  /api/diff?from=<run_id>&to=<run_id>  engine.diff between two existing runs' ledgers
     GET  /api/runs/<site>/<folder>/<file>   memo.html | memo.md | ledger.json | massing.json | massing.svg
-                                            | diff.json | ffm_revit_result.json | ffm_sheet_notes.json
+                                            | diff.json | proforma.json | ffm_revit_result.json | ffm_sheet_notes.json
                                             | ffm_sheet.png | ffm_sheet.pdf   (?download=1 to attach)
     POST /api/runs/<site>/<folder>/memo     rewrite memo.md / memo.html for that run (picks up a Revit result)
     GET  /api/lookup?q=<address>            a proposed site file from Nominatim and the City's open data (network)
     POST /api/read-site                     body {site, as_of?}: the site alone against layers A to C, nothing written
     POST /api/suggest                       body {site, programs, as_of?, candidate?}: a rule-derived option, every
                                             figure with its rule (ffm/suggest.py)
+    GET  /api/capabilities                  {claude: bool, model}: whether FFM_CLAUDE_KEY is set on this machine
+    POST /api/propose/site                  body {site}: Claude proposes the site's fields with evidence and a
+                                            confidence (ffm/propose.py); logged in proposals/; 503 without a key
     GET  /api/issues?site=<id>              the issue notes on the site's runs, newest first
     POST /api/runs/<site>/<folder>/issue    body {by, to, note}: hand the run from one reader to another
     POST /api/pdf                           body {html}: the page's paper memo, printed to PDF by a headless Edge
@@ -57,7 +60,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from .. import engine, massing, memo, suggest
+from .. import engine, massing, memo, proforma, suggest
 from ..rules_loader import RULES_DIR, load_rules
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -77,7 +80,7 @@ SITE_FILES = ("app.js", "app.css", "brand.css", "site.css", "site.js")
 RUN_FILES = {
     "memo.html": "text/html; charset=utf-8", "memo.md": "text/markdown; charset=utf-8",
     "ledger.json": "application/json; charset=utf-8", "massing.json": "application/json; charset=utf-8",
-    "massing.svg": "image/svg+xml", "diff.json": "application/json; charset=utf-8",
+    "massing.svg": "image/svg+xml", "diff.json": "application/json; charset=utf-8", "proforma.json": "application/json; charset=utf-8",
     "ffm_revit_result.json": "application/json; charset=utf-8", "ffm_sheet_notes.json": "application/json; charset=utf-8",
     "ffm_sheet.png": "image/png", "ffm_sheet.pdf": "application/pdf",
 }
@@ -249,10 +252,15 @@ def list_runs(site_id: str | None) -> list[dict]:
 
 
 def run_payload(out: Path, site_id: str, ledger: dict, m: dict | None, svg: str | None, d: dict | None,
-                massing_note: str | None = None) -> dict:
+                massing_note: str | None = None, pf: dict | None = None) -> dict:
     stamp = ledger["run"]["stamp"]["stamp"]
+    if pf is None and (out / "proforma.json").exists():
+        try:
+            pf = _read(out / "proforma.json")
+        except Exception:
+            pf = None
     return {"run_id": f"{site_id}/{out.name}", "folder": out.name, "folder_abs": str(out),
-            "as_of": ledger["run"]["as_of"], "stamp": stamp, "ledger": ledger, "massing": m, "svg": svg, "diff": d,
+            "as_of": ledger["run"]["as_of"], "stamp": stamp, "ledger": ledger, "massing": m, "svg": svg, "diff": d, "proforma": pf,
             "massing_note": massing_note, "revit": revit_summary(out, stamp),
             "files": {"massing_json": str(out / "massing.json") if m else None, "ledger_json": str(out / "ledger.json"),
                       "script": str(ROOT / "revit" / "ffm_massing_pyrevit.py")}}
@@ -304,8 +312,38 @@ def do_run(body: Any) -> dict:
         d = engine.diff(_read(_run_folder(ps_id, pf) / "ledger.json"), ledger)
         (out / "diff.json").write_text(json.dumps(d, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    memo.write(ledger, out, m, d, svg)
-    return run_payload(out, site_id, ledger, m, svg, d, massing_note)
+    pfm = proforma.build(site, option, ledger)
+    (out / "proforma.json").write_text(json.dumps(pfm, indent=2, ensure_ascii=False), encoding="utf-8")
+    memo.write(ledger, out, m, d, svg, proforma=pfm)
+    return run_payload(out, site_id, ledger, m, svg, d, massing_note, pfm)
+
+
+# ---------------------------------------------------------------- Claude proposes (only with a key on this machine)
+
+def capabilities() -> dict:
+    from .. import propose
+    return {**propose.available(), "static": False}
+
+
+def do_propose_site(body: Any) -> dict:
+    """The model reads the site file (its public fields and the context frame) and proposes fields with evidence
+    and a confidence; the proposal is logged in proposals/ and handed back for the person to confirm on the page.
+    The site's own bytes are the only thing sent; nothing is written to the site here."""
+    from .. import propose
+    if not isinstance(body, dict) or not isinstance(body.get("site"), dict):
+        raise ApiError(400, "Send {site: {...}}.")
+    try:
+        res = propose.propose_site(body["site"])
+    except propose.NoKey as e:
+        raise ApiError(503, str(e))
+    except propose.Refused as e:
+        raise ApiError(422, str(e))
+    except OSError as e:
+        raise ApiError(502, f"The model could not be reached: {e}")
+    out = propose.PROPOSALS_DIR / f"{res['slug']}-{datetime.now().strftime('%H%M%S')}.json"
+    propose.save(res, out)
+    res["file"] = out.name
+    return res
 
 
 def load_run(site_id: str, folder: str) -> dict:
@@ -544,6 +582,8 @@ class Handler(BaseHTTPRequestHandler):
                     return self._static(path[1:])
                 if path == "/api/rules":
                     return self._json(list_rules(first("as_of")))
+                if path == "/api/capabilities":
+                    return self._json(capabilities())
                 if path == "/api/sites":
                     return self._json(list_sites())
                 mm = re.match(r"^/api/sites/([^/]+)$", path)
@@ -576,6 +616,8 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(do_read_site(body))
             if path == "/api/suggest":
                 return self._json(do_suggest(body))
+            if path == "/api/propose/site":
+                return self._json(do_propose_site(body))
             mm = re.match(r"^/api/runs/([^/]+)/([^/]+)/issue$", path)
             if mm:
                 return self._json(add_issue(mm.group(1), mm.group(2), body), 201)

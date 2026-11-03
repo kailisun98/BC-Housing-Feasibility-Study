@@ -45,6 +45,11 @@ python -m ffm rules --as-of 2026-10-27     # which version of each rule is in fo
 python -m ffm stamp                        # the version stamp alone
 python -m ffm lookup "998 E 19th Ave, Vancouver, BC" --out sites/new.json   # a site from an address: Nominatim + City open data
 python -m ffm suggest --site sites/998-e-19th-ave.json --programs bch.chf.eligibility,bc.bcbuilds.eligibility --out options/new.json   # a rule-derived option
+python -m ffm proforma --site sites/998-e-19th-ave.json --option options/998-e-19th-ave-what-if-funder-ready.json   # the feasibility pro-forma, every line cited
+python -m ffm refresh --write        # fetch the StatCan price index and the Bank of Canada rate behind layer F; append dated versions
+# Claude proposes, a person confirms (needs FFM_CLAUDE_KEY in the shell, never in the repo; the SDK is optional):
+uv run --with anthropic python -m ffm propose rule --from path/to/RT-3.pdf --district RT-3 --url https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf
+python -m ffm confirm --proposal proposals/rule-rt-3-2026-11-03.json --by "Your name"   # into rules/a_zoning_district.json, naming who confirmed
 python -m ffm ui                           # the web UI: pick a site and option, run, read, export
 python -m unittest -v                      # evaluation cases (evals/cases.md) and the memo tests
 ```
@@ -83,6 +88,7 @@ Each run writes to `--out`:
 | `memo.md`, `memo.html` | The memo: three answers, massing, change log, full ledger, inputs, sources, stamp. The HTML is self-contained and prints. |
 | `ledger.json` | Machine-readable results: one record per rule with status, finding, numbers used, action, source, rule version. |
 | `massing.json`, `massing.svg` | The rule-derived masses (proposed and outright) in metres; plan and section to scale. |
+| `proforma.json` | The feasibility-grade pro-forma: capital cost, net operating income, funding, the gap, a verdict, and every line with the assumption (layer F) or program (layer E) it came from. |
 | `diff.json` | With `--previous`: what changed between two ledgers and whether the rule files changed. |
 
 ## The massing in Revit

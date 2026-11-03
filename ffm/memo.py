@@ -61,7 +61,7 @@ def _fmt_vals(v: dict) -> str:
 
 
 def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None, title: str | None = None,
-             revit: dict | None = None) -> str:
+             revit: dict | None = None, proforma: dict | None = None) -> str:
     run, res, summ = ledger["run"], ledger["results"], ledger["summary"]
     site, opt = ledger["inputs"]["site"], ledger["inputs"]["option"]
     ans = summ["answers"]
@@ -103,6 +103,11 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     else:
         L.append("Nothing outstanding.")
     L.append("")
+
+    # ---------------- the pro-forma, feasibility grade (layer F and layer E)
+    if proforma:
+        from . import proforma as _pf
+        L.extend(_pf.markdown(proforma))
 
     # ---------------- massing
     if massing:
@@ -359,11 +364,16 @@ def load_revit_result(out_dir: Path, stamp: str) -> dict | None:
 
 
 def write(ledger: dict, out_dir: Path, massing: dict | None = None, diff: dict | None = None, svg_text: str | None = None,
-          revit: dict | None = None) -> tuple[Path, Path]:
+          revit: dict | None = None, proforma: dict | None = None) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     if revit is None:
         revit = load_revit_result(out_dir, ledger["run"]["stamp"]["stamp"])
-    md = markdown(ledger, massing, diff, revit=revit)
+    if proforma is None and (out_dir / "proforma.json").exists():
+        try:
+            proforma = json.loads((out_dir / "proforma.json").read_text(encoding="utf-8"))
+        except Exception:
+            proforma = None
+    md = markdown(ledger, massing, diff, revit=revit, proforma=proforma)
     pm = out_dir / "memo.md"
     ph = out_dir / "memo.html"
     pm.write_text(md, encoding="utf-8")

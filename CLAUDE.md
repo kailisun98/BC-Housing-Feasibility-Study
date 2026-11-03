@@ -285,9 +285,83 @@ Built and verified in the browser:
   `renderPreview3D`: the plan with dimensions, the section and an orbitable axon, from the memo's own figure
   functions). "Issue to the architect" / "Issue to the board" in the Export bar; the page polls the local
   server every 15 s and shows an amber chip in the top bar for an issue addressed to the current role.
-- Not built yet: the pro-forma (phase 2, waits on the cost layer in the proposal), the architect's layout
-  tools (phase 3), hosting (phase 5), the Claude framework (phase 6). A restarted preview server is needed
-  after editing `server.py`; the Claude app's preview does not reload Python.
+- Not built yet: the architect's layout tools (phase 3), the block editor (phase 4), hosting (phase 5). A
+  restarted preview server is needed after editing `server.py`; the Claude app's preview does not reload Python.
+
+## Phases 2 and 6 of the workflows proposal (3 Nov 2026)
+
+Phase 2, the cost layer and the pro-forma:
+- `rules/f_assumptions.json` is **layer F**: seven dated, cited assumptions with the check `assumption`
+  (always `info`; the ledger carries them, the stamp covers them, `engine.LAYER_ORDER` ends in F). Hard cost
+  base $4,693/m² from the Province's Class D estimate for its standardized designs (Aug 2024; the catalogue is
+  2- to 4-unit wood frame, so the source's `verify` says a six-storey figure should replace it); escalation
+  from Statistics Canada table 18-10-0289-01 (Vancouver, residential, division composite, 2023=100; the
+  observations sit in the rule params and are kept out of the ledger values); soft costs 25% and contingency
+  10% (placeholders, `source.placeholder: true`); land nominal where the owner is a church, a society or a
+  government, else entered; the Bank of Canada conventional 5-year rate (6.19%, series V80691335) with CMHC MLI
+  Select's 1.10 coverage ratio and a 40-year amortization; CMHC rents (October 2025 survey: two-bedroom $2,363,
+  all units $1,963, vacancy 3.7%; the other bedroom types are null until typed from the data tables), RGI at
+  30% of an income taken at half the fund's limit (placeholder), the $500 shelter rate; operating $6,500 and
+  reserve $600 per unit (placeholders). Nothing in it is invented silently: a placeholder says so in the memo.
+- `ffm/proforma.py`: `build(site, option, ledger)` is arithmetic over layers F and E read from the ledger.
+  Capital = hard × escalation + soft + contingency + land; the escalation uses the last quarter published by the
+  run date (`BCPI_PUBLISHING_LAG_DAYS` = 120, so a memo as of 23 Oct 2026 uses the second quarter's index);
+  revenue by tier from `rent_tiers_units`; NOI less vacancy, operating cost and reserve; funding = the CHF
+  provisional grant (when targeted) + `option.finance.equity_cad` + supportable debt (NOI over the DCR at the
+  mortgage constant); the gap; a verdict **likely / unlikely / unsure** (gap ≤ 0; gap above 15% of capital,
+  `GAP_UNLIKELY_SHARE`; or a missing land price, floor area or an assumption not in force). `lines` carry every
+  figure with its rule id, note and placeholder flag. `markdown(pf)` is the memo's section "4. Does the money
+  work? (feasibility grade)". The option's `finance` block (land_cost_cad, equity_cad, other_grants_cad) is the
+  manager's; the Option form has a Finance group. The real funder-ready what-if reads unlikely: $45.7M capital,
+  $25.4M funding, a $20.3M gap. `tests/test_proforma.py`.
+- `python -m ffm refresh [--write]` (`ffm/refresh.py`): fetches the StatCan series through the WDS
+  (`getDataFromCubePidCoordAndLatestNPeriods`) and the Bank of Canada Valet series, reports moved / current /
+  unreached, lists what is by hand (the Class D PDF, the CMHC tables, the placeholders), and with `--write`
+  appends a new dated version (never edits one). `plan()` and `apply()` are pure; `tests/test_refresh.py`.
+- `python -m ffm proforma --site … --option … [--as-of] [--json]` prints it; `run` writes `proforma.json`
+  beside the ledger and the memo picks it up; the server's run payload and the static build carry `proforma`.
+- The tool: a fourth answer card "Does the money work?" (`answerMoney` in `app.js`; verdict, the four lines,
+  "Every line and its source" folded) in Summary and Detailed; the paper memo's answers table gets a row; the
+  guide has **seven stops** (6 is Pro-forma: the five lines from the run, the three finance inputs, "Run again
+  with these"; 7 is Issue).
+
+Phase 6, Claude in the loop (the model proposes, a person confirms, the engine decides):
+- `ffm/propose.py`, behind `FFM_CLAUDE_KEY` in the environment (never in the repository; `available()` is what
+  the server reports at `GET /api/capabilities`; without the key every call raises `NoKey`). The official SDK is
+  imported lazily, so the engine and tests stay standard library: `uv run --with anthropic python -m ffm
+  propose …`. Model `claude-sonnet-5-5` as the proposal chose for extraction, `FFM_CLAUDE_MODEL` overrides.
+  One strict tool per job (`propose_rule_clauses`, `propose_site_facts`): a list of items {key, value,
+  confidence, evidence, section, page}; the beta Messages endpoint with `fallbacks: "default"` where the SDK
+  knows it, the plain one otherwise; a `refusal` stop raises `Refused`, never silently empty. A PDF goes as a
+  document block (cached), an image as an image, text inline.
+- `propose_rule(document, district, url)` → a proposal with `source: "claude"` on every item and the call
+  logged (model, date, prompt hash, usage, the document's name and sha256, never its bytes); `clauses_from`
+  turns the items into engine rules: `cov.<district>.outright_fsr` (`district_outright_fsr`),
+  `.outright_height` (with `max_storeys`), `.setbacks` (the new check `district_setbacks`: pass / conditional
+  against the option's setbacks), `.site_coverage` (`info_only`). The base maximum is the outright figure; the
+  Director's conditional increases travel in the source's `verify` note.
+- `propose_site(site, document=None)` sends the site's public fields and the context frame (not the long
+  `osm` block) plus an optional survey or plan; items: district, area, frontage, depth, frontage street, corner
+  lot, lane behind, the equivalent-rectangle reasoning, easements / buildings / slope / trees notes.
+- `python -m ffm confirm --proposal … --by "Name" [--only key,key]`: a person moves a rule proposal into
+  `rules/a_zoning_district.json` (a new rule, or a new version of an existing id; the source title names the
+  model and who confirmed it and when; `source.confirmed` records the proposal file and the confidence) or a
+  site proposal into the site file (`site.confirmed[key] = {by, on, source, proposal, confidence, evidence}`).
+  `suggest._district_rule` finds any district's outright and setback rules by check, so a confirmed RT-3
+  schedule drives the suggestion (and replaces the placeholder setbacks, citing the rule). `tests/test_propose.py`
+  runs it all on a stub model.
+- Eval set: `evals/propose/<case>/document.* + expected.json`; `python -m ffm propose eval` scores field by
+  field (`propose.score`). The first case is a synthetic RT-9 schedule (not a real district). The real RT-3
+  schedule is not in the repo: `bylaws.vancouver.ca` refuses automated downloads, so a person saves the PDF and
+  runs `propose rule --from <pdf> --district RT-3 --url <its address>`, then `confirm`.
+- The tool, stop 1: "Ask Claude about this site" appears only when the local server reports a key
+  (`state.caps`); the proposal renders with confidence and evidence, each field has Confirm (a name is required:
+  it goes on the site file), and "Confirm all". The static build never calls the model.
+- The site pages say six layers and 24 rules and assumptions from 25 sources (home.html, how.html).
+- The committed runs under `outputs/` predate layer F (their fingerprint `20e44f1445ecaff9` is quoted on
+  case.html and keys the Revit result on the as-approved run), so they carry no `proforma.json` and the card
+  does not show for them; a run made in the tool, locally or in the browser, does. Rerun them only together
+  with the Revit sheet and the case page.
 
 ## Rules from the assignment brief (binding)
 
@@ -307,3 +381,7 @@ Built and verified in the browser:
   as-approved option; the what-if option is hypothetical and labelled as such.
 - RM-1 outright figures (FSR 1.20, 10.7 m) are cited from the referral report; verify against the
   consolidated district schedule when convenient.
+- `rules/f_assumptions.json`: soft costs 25%, contingency 10%, operating $6,500 and reserve $600 per unit,
+  the RGI income at half the fund's limit are declared placeholders (`placeholder: true`); the hard-cost base
+  is a 2- to 4-unit catalogue figure; bachelor, one-bedroom and three-bedroom rents are null until typed from
+  the CMHC data tables.

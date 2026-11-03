@@ -143,7 +143,7 @@ const ENGINE_SHIM = `
 import json, sys
 from datetime import date
 sys.path.insert(0, ".")
-from ffm import engine, massing, memo
+from ffm import engine, massing, memo, proforma
 
 def ffm_run(site_json, option_json, as_of, previous_json):
     site, option = json.loads(site_json), json.loads(option_json)
@@ -155,8 +155,9 @@ def ffm_run(site_json, option_json, as_of, previous_json):
     except ValueError as e:
         note = str(e)
     d = engine.diff(json.loads(previous_json), L) if previous_json else None
-    md = memo.markdown(L, m, d)
-    return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note,
+    pf = proforma.build(site, option, L)
+    md = memo.markdown(L, m, d, proforma=pf)
+    return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note, "proforma": pf,
                        "memo_md": md, "memo_html": memo.html_page(md, svg)})
 
 def ffm_diff(a_json, b_json):
@@ -256,13 +257,14 @@ async function ledgerOf(runId) {
 
 async function loadStaticRun(runId) {
   if (browserRuns.has(runId)) return browserRuns.get(runId).payload;
-  const [ledger, massing, svg, diff] = await Promise.all([
+  const [ledger, massing, svg, diff, proforma] = await Promise.all([
     fetchJSON(`data/runs/${runId}/ledger.json`), fetchJSON(`data/runs/${runId}/massing.json`, true),
     fetchText(`data/runs/${runId}/massing.svg`, true), fetchJSON(`data/runs/${runId}/diff.json`, true),
+    fetchJSON(`data/runs/${runId}/proforma.json`, true),
   ]);
   const base = `data/runs/${runId}`;
   return { run_id: runId, folder: runId.split("/")[1], folder_abs: null, as_of: ledger.run.as_of, stamp: ledger.run.stamp.stamp,
-           ledger, massing, svg, diff, massing_note: null, revit: null, files: {},
+           ledger, massing, svg, diff, proforma, massing_note: null, revit: null, files: {},
            downloads: { html: `${base}/memo.html`, md: `${base}/memo.md`, massing: massing ? `${base}/massing.json` : null } };
 }
 
@@ -350,7 +352,7 @@ async function staticRun(body) {
   const runId = `${siteId}/${folder}`;
   const L = out.ledger, ans = L.summary.answers;
   const payload = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp,
-    ledger: L, massing: out.massing, svg: out.svg, diff: out.diff, massing_note: out.massing_note, revit: null, files: {}, in_browser: true,
+    ledger: L, massing: out.massing, svg: out.svg, diff: out.diff, proforma: out.proforma, massing_note: out.massing_note, revit: null, files: {}, in_browser: true,
     downloads: { html: blobUrl(out.memo_html, "text/html"), md: blobUrl(out.memo_md, "text/markdown"),
                  massing: out.massing ? blobUrl(JSON.stringify(out.massing, null, 2), "application/json") : null } };
   const summary = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp, option_id: L.run.option_id,
@@ -369,6 +371,7 @@ async function staticApi(path, opts) {
   let m;
   if (method === "GET") {
     if (p === "/api/rules") return fetchJSON("data/rules.json");
+    if (p === "/api/capabilities") return { claude: false, model: null, static: true };   // the model is called from the local server only
     if (p === "/api/sites") return fetchJSON("data/sites.json");
     if ((m = p.match(/^\/api\/sites\/([^/]+)$/))) return fetchJSON(`data/sites/${decodeURIComponent(m[1])}.json`);
     if (p === "/api/options") {
@@ -533,6 +536,13 @@ const OPTION_FIELDS = [
   { group: "Trees", fields: [
     { key: "replacement_trees_proposed", label: "Replacement trees proposed", type: "number", int: true },
   ]},
+  { group: "Finance", fields: [
+    { row: true, fields: [
+      { key: "finance.land_cost_cad", label: "Land ($)", type: "number" },
+      { key: "finance.equity_cad", label: "Equity ($)", type: "number" },
+      { key: "finance.other_grants_cad", label: "Other grants ($)", type: "number" },
+    ]},
+  ]},
   { group: "Rezoning path", fields: [
     { key: "rezoning_path", label: "Rezoning path", type: "text", help: "Empty means outright only." },
   ]},
@@ -586,6 +596,9 @@ const FIELD_META = {
   "accessible_units": { need: "rule", info: "The Community Housing Fund needs at least 5% of units accessible (adaptable units are counted separately by the design guidelines)." },
   "below_market_unit_share": { need: "rule", info: "BC Builds: at least 20% of the units at least 20% below market rent; 1.0 means every unit. The City's below-market rental policy for secured market rental counts floor area instead." },
   "below_market_discount": { need: "rule", info: "The discount of those units to market: at least 20% for BC Builds (0.20)." },
+  "finance.land_cost_cad": { need: "rule", info: "The pro-forma's land line. Leave it blank where the owner is a church, a society or a government on a long lease: the assumptions layer carries the land at a nominal value. On a private site enter the BC Assessment value or the agreed price; blank there leaves the money answer unsure." },
+  "finance.equity_cad": { need: "rule", info: "Cash the proponent brings. Blank means none; the funding stack is then grants plus the debt the net operating income can carry." },
+  "finance.other_grants_cad": { need: "rule", info: "Grants beyond the Community Housing Fund's provisional per-unit grant, which the pro-forma counts on its own when the fund is targeted." },
   "site_control": { need: "rule", info: "Readiness for a funding call. The Community Housing Fund accepts a finalized deal, a purchase agreement, a letter of intent or a council resolution; 'none yet' fails the readiness bar. Construction must also be able to start within 18 months of an award." },
   "replacement_trees_proposed": { need: "rule", info: "Trees planted after construction. Retained plus replacement trees must reach Schedule C's minimum for the site area; each tree short is $1,000 cash in lieu." },
   "parking_spaces": { need: "", info: "No minimum off-street parking applies in Vancouver since June 2024; the count is reported as information. Bicycle spaces are set by the Parking By-law at the development permit stage." },
@@ -1154,6 +1167,7 @@ function renderQuiet() {
       ${quietCard("01 · Is it allowed", "Is it allowed?", "Outright under the district, then by rezoning under the City policy that applies.")}
       ${quietCard("02 · Does it fit the funders", "Does it fit the funders?", "The programs the option targets, tested against their published criteria.")}
       ${quietCard("03 · Still unsure", "What is still unsure, and who resolves it?", "Every open item names the person and the document.")}
+      ${quietCard("04 · Does the money work", "Does the money work?", "Capital cost, net operating income, the funding stack and the gap, feasibility grade, every line citing its assumption.")}
     </div>`;
 }
 
@@ -1205,7 +1219,7 @@ function renderMemo(run) {
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));
   parts.push(`<div class="memo-body">
-    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L)}</div>
+    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L)}${answerMoney(run)}</div>
     ${renderFigures(run)}
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
@@ -1306,6 +1320,42 @@ function answerUnsure(L) {
     <h2><span class="badge">3</span> What is still unsure, and who resolves it?</h2>
     <p class="verdict">${verdict}</p>
     ${table}
+  </section>`;
+}
+
+/* The fourth answer: the feasibility-grade pro-forma from layer F and layer E, four lines and the verdict; the
+   line-by-line table with every source opens under it. */
+const money = x => (x === null || x === undefined ? "not given" : `$${fmtNum(Math.round(x))}`);
+const MONEY_STATUS = { likely: "pass", unlikely: "fail", unsure: "uncertain" };
+
+function answerMoney(run) {
+  const pf = run.proforma;
+  if (!pf) return "";
+  if (!pf.available) {
+    return `<section class="card answer" data-verdict="uncertain">
+      <h2><span class="badge">4</span> Does the money work?</h2>
+      <p class="verdict"><em>Not computed.</em></p><p class="finding">${h(pf.why || "")}</p></section>`;
+  }
+  const v = pf.verdict, c = pf.capital, o = pf.operating, f = pf.funding, g = pf.gap;
+  const grants = (f.grants || []).reduce((t, x) => t + (x.value || 0), 0);
+  const unit = u => (u === "$/yr" ? " a year" : u === "$/m²" ? " per m²" : "");
+  const shown = ln => (ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + unit(ln.unit) : (ln.value == null ? "not given" : fmtNum(ln.value)));
+  const rows = (pf.lines || []).map(ln => `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${ln.rule_id ? `<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>` : "<span class=\"cont\">the option</span>"}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont">${h(ln.note || "")}</td></tr>`).join("");
+  return `<section class="card answer money" data-verdict="${MONEY_STATUS[v.word] || "uncertain"}">
+    <h2><span class="badge">4</span> Does the money work?</h2>
+    <p class="verdict"><em>${h(cap(v.word))}.</em> ${h(v.why[0] ? v.why[0][0].toUpperCase() + v.why[0].slice(1) + "." : "")}</p>
+    <dl class="pf-four">
+      <div><dt>Capital cost</dt><dd><b>${h(money(c.total))}</b><span class="cont">hard ${h(money(c.hard))} ×${h(c.escalation)}, soft ${h(money(c.soft))}, contingency ${h(money(c.contingency))}, land ${h(money(c.land))}</span></dd></div>
+      <div><dt>Net operating income</dt><dd><b>${h(money(o.noi))} a year</b><span class="cont">rent ${h(money(o.gross))} less vacancy, operating cost and reserve</span></dd></div>
+      <div><dt>Funding</dt><dd><b>${h(money(f.total))}</b><span class="cont">grants ${h(money(grants))}, equity ${h(money(f.equity))}, debt ${h(money(f.debt.supportable))} at ${h(f.debt.rate_pct)}% over ${h(f.debt.amortization_years)} years, ${h(Number(f.debt.dcr).toFixed(2))} coverage</span></dd></div>
+      <div><dt>Gap</dt><dd><b>${h(money(g.value))}</b><span class="cont">${g.share_of_capital != null ? `${h(Math.round(g.share_of_capital * 100))}% of the capital cost; a negative gap is headroom` : ""}</span></dd></div>
+    </dl>
+    ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
+    ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
+    <details class="pf-lines"><summary>Every line and its source</summary>
+      <table class="plain"><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="cont">A feasibility screen, not a lender's model. Hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked.</p>
+    </details>
   </section>`;
 }
 
@@ -2465,7 +2515,7 @@ const TOUR = [
   { target: ".asof", title: "Rules as of",
     text: "The date the rules are read on. The engine applies the versions in force that day, and each memo on a site is numbered as a revision, R1, R2 and so on, so two memos can be told apart and a rule change shows as a change." },
   { target: "#guide", title: "Start from an address", before: () => { guide.step = 1; renderGuide(); },
-    text: "Six stops, one input at a time. Type an address: OpenStreetMap gives the point, the City's open data the zoning district and the parcel, and the lot's area and shape follow. Or pick a saved site in the Site card below." },
+    text: "Seven stops, one input at a time. Type an address: the City's address list gives the point, its open data the zoning district and the parcel, and the lot's area and shape follow. Or pick a saved site in the Site card below. With a key on the local machine, Ask Claude reads an odd lot and proposes; you confirm." },
   { target: "#guide", title: "Choose the programs, read the site", before: () => { guide.step = 3; renderGuide(); },
     text: "Tick the funders in view. Then read the site alone against layers A to C, before any option exists: the outright limits, the rezoning path and its benchmark, transit, trees. The reading shows in the memo pane." },
   { target: "#guide", title: "Shape the option", before: () => { guide.step = 4; renderGuide(); },
@@ -2476,8 +2526,8 @@ const TOUR = [
     text: "The building: storeys, floor area, the unit mix, tenure, the funders, the rezoning path. Suggested figures land here too, and every one can still be edited. Save it as a file to rerun the same thing from the command line." },
   { target: "#run-btn", title: "Run the rules", action: "run",
     text: "One click, or Ctrl+Enter. In under a second the engine writes the memo to the outputs folder and reads it here. The walkthrough runs the real case for you now." },
-  { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers",
-    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item." },
+  { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers, and the money",
+    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item. A fourth card asks whether the money works: capital cost, net operating income, the funding stack and the gap, feasibility grade, every line citing its dated assumption." },
   { target: "#view-switch", title: "Summary, Detailed, 3D preview", before: () => setView("3d", false),
     text: "How much of the memo to show. Summary is the title block, the answers and the figures; Detailed the whole memo; 3D preview the drawings, large. The page is switched to the preview for the next stop." },
   { target: "#preview3d", fallback: ".figures", title: "The site plan, the section, the axonometric", before: () => setView("3d", false),
@@ -2769,6 +2819,7 @@ function paperDocument(run) {
         <tr><th scope="row">Is it allowed by rezoning?</th><td>${vmark(ans.allowed.by_rezoning.verdict)}</td><td>${decidedBy(ans.allowed.by_rezoning)}${ans.allowed.rezoning_path ? `<p class="note">Path: ${h(ans.allowed.rezoning_path)}.</p>` : ""}</td></tr>
         <tr><th scope="row">Does it fit the funders?</th><td>${vmark(ans.funded.verdict)}</td><td>${decidedBy(ans.funded)}${(opt.target_programs || []).length ? `<p class="note">Programs the option targets: ${h(opt.target_programs.map(id => titleOf[id] ? `${ref(id)} ${titleOf[id]}` : id).join("; "))}.</p>` : ""}</td></tr>
         <tr><th scope="row">What is still unsure?</th><td>${unsure.length ? `<span class="st st-${unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${unsure.length} open item${unsure.length === 1 ? "" : "s"}</span>` : `<span class="st st-pass">Nothing open</span>`}</td><td>${unsure.length ? `Each with the person who resolves it, in section 2: ${unsure.map(u => refTag(u.rule_id)).join(", ")}.` : `<span class="muted">Every rule that applies is settled.</span>`}</td></tr>
+        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(cap(run.proforma.verdict.word))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Every line and its source are in the memo on screen.</td></tr>` : ""}
       </tbody></table>`;
 
   // 2. open items
@@ -3033,7 +3084,7 @@ function printPaper(html, note = "") {
 
 // ---------------------------------------------------------------- wiring
 
-// ---------------------------------------------------------------- the guided start (manager mode): six stops, one input at a time
+// ---------------------------------------------------------------- the guided start (manager mode): seven stops, one input at a time
 /* Flow 1 in docs/user-flows.md. The card at the top of the inputs rail walks the manager from an address to an issued
    run: find the site (Nominatim and the City's open data), choose the programs, read the site against layers A to C,
    shape the option from rule-derived suggestions (each figure Suggested | Mine, with its rule beside it), run, issue.
@@ -3046,8 +3097,12 @@ const GUIDE_STOPS = [
   { n: 3, title: "Read the site", what: "What it allows before any option." },
   { n: 4, title: "Shape the option", what: "Suggested from the rules, or yours." },
   { n: 5, title: "Run the rules", what: "The three answers." },
-  { n: 6, title: "Issue", what: "Hand it to the architect." },
+  { n: 6, title: "Pro-forma", what: "Does the money work, and on what." },
+  { n: 7, title: "Issue", what: "Hand it to the architect." },
 ];
+
+/* the pro-forma inputs the manager can give at stop 6; everything else comes from layers E and F */
+const FINANCE_FIELDS = [["finance.land_cost_cad", "Land ($)"], ["finance.equity_cad", "Equity ($)"], ["finance.other_grants_cad", "Other grants ($)"]];
 
 /* the suggested figures the manager decides on, in the order the memo reads them */
 const GUIDE_FIELDS = [
@@ -3067,7 +3122,8 @@ function guideDone() {
     3: !!guide.reading,
     4: !!(state.option && state.option.storeys != null && (guide.suggestion || state.optionId)),
     5: !!state.run,
-    6: !!(state.run && state.run.issued),
+    6: !!(state.run && state.run.proforma && state.run.proforma.available),
+    7: !!(state.run && state.run.issued),
   };
 }
 
@@ -3129,7 +3185,8 @@ function renderGuideInto(el) {
       <div><dt>Found as</dt><dd class="cont">${h(lk.site.address)}</dd></div>
     </dl>
     <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-site">Use this site</button><span class="help">Then answer what the data cannot: the policy areas, water and sewer, trees, the owner.</span></div>` : ""}
-    <p class="help stop-or">Or pick a saved site in the Site card below${done[1] ? `: <b>${h(site.address || site.id)}</b> is chosen` : ""}.</p>`;
+    <p class="help stop-or">Or pick a saved site in the Site card below${done[1] ? `: <b>${h(site.address || site.id)}</b> is chosen` : ""}.</p>
+    ${state.caps && state.caps.claude ? `<div class="form-actions"><button class="btn btn-small" type="button" id="guide-ask-claude"${done[1] && guide.loading !== "claude" ? "" : " disabled"}>${guide.loading === "claude" ? "Reading…" : "Ask Claude about this site"}</button><span class="help">For an odd lot: the model proposes the equivalent rectangle, the frontage street and what is odd, with evidence; you confirm each field.</span></div>${renderProposal(guide.proposal)}` : ""}`;
 
   const stop2 = `
     <div class="checks">${progs.map(r => `<label><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
@@ -3173,13 +3230,29 @@ function renderGuideInto(el) {
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-run"${done[4] ? "" : " disabled"}>Run the rules</button><span class="help">Ctrl+Enter does the same.</span></div>
     ${state.run ? `<p class="help">On screen: <b>${h(rev(state.run.run_id))}</b>, as of ${h(state.run.as_of)}. Summary, Detailed and 3D preview sit above the memo.</p>` : ""}`;
 
+  const pf = state.run && state.run.proforma;
+  const fin = (state.option && state.option.finance) || {};
   const stop6 = `
+    <p class="help">${pf ? "From the run: capital cost, net operating income, the funding stack and the gap, every line citing its assumption (layer F) or program (layer E)." : "Run the rules first: the pro-forma is computed with the run, from the same dated rule set."}</p>
+    ${pf && pf.available ? `<dl class="found-site pf-mini">
+      <div><dt>Verdict</dt><dd>${pill(MONEY_STATUS[pf.verdict.word] || "uncertain")} <b>${h(cap(pf.verdict.word))}</b> <span class="cont">${h(pf.verdict.why[0] || "")}</span></dd></div>
+      <div><dt>Capital</dt><dd><b>${h(money(pf.capital.total))}</b></dd></div>
+      <div><dt>NOI</dt><dd><b>${h(money(pf.operating.noi))}</b> <span class="cont">a year</span></dd></div>
+      <div><dt>Funding</dt><dd><b>${h(money(pf.funding.total))}</b></dd></div>
+      <div><dt>Gap</dt><dd><b>${h(money(pf.gap.value))}</b>${pf.gap.share_of_capital != null ? ` <span class="cont">${h(Math.round(pf.gap.share_of_capital * 100))}% of the capital cost</span>` : ""}</dd></div>
+    </dl>
+    ${pf.verdict.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${pf.verdict.unsure.map(u => `<li>${h(u)}</li>`).join("")}</ul></div>` : ""}
+    <p class="help">The fourth answer in the memo holds every line and its source.</p>` : (pf ? `<p class="help">Not computed: ${h(pf.why || "")}</p>` : "")}
+    <div class="fin-rows">${FINANCE_FIELDS.map(([k, label]) => `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? "blank: nominal where the owner allows it" : "blank: none"}"></label>`).join("")}</div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-rerun"${done[4] ? "" : " disabled"}>${pf ? "Run again with these" : "Run the rules"}</button><span class="help">Land, equity and other grants are the manager's; the rest is layers E and F.</span></div>`;
+
+  const stop7 = `
     <p class="help">${state.run ? `Hand ${h(rev(state.run.run_id))} to the architect with a note; they see it in their top bar.` : "Run the rules first."}${STATIC ? " Issuing needs the local server." : ""}</p>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-issue"${state.run && !STATIC ? "" : " disabled"}>Issue to the architect</button></div>
     ${state.run && state.run.issued ? `<p class="help">Issued ${h(state.run.issued.issued_at.replace("T", " ").slice(0, 16))}.</p>` : ""}`;
 
-  el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Start from an address</h2><span class="help">six stops</span></div>
-    ${stop(1, stop1)}${stop(2, stop2)}${stop(3, stop3)}${stop(4, stop4)}${stop(5, stop5)}${stop(6, stop6)}`;
+  el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Start from an address</h2><span class="help">seven stops</span></div>
+    ${stop(1, stop1)}${stop(2, stop2)}${stop(3, stop3)}${stop(4, stop4)}${stop(5, stop5)}${stop(6, stop6)}${stop(7, stop7)}`;
   wireGuide();
 }
 
@@ -3258,7 +3331,78 @@ function wireGuide() {
   });
   on("#guide-use-option", guideUseOption);
   on("#guide-run", () => runRules());
+  $$(".fin-input", el).forEach(inp => inp.addEventListener("input", () => {
+    if (!state.option) return;
+    const raw = inp.value.trim();
+    setPath(state.option, inp.dataset.key, raw === "" ? null : Number(raw));
+    state.optionDirty = true;
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+  }));
+  on("#guide-rerun", () => { guide.step = 6; runRules(); });
+  on("#guide-ask-claude", guideAskClaude);
+  $$("[data-confirm-key]", el).forEach(b => b.addEventListener("click", () => confirmProposal(b.dataset.confirmKey, b.dataset.confirmAll === "1")));
   on("#guide-issue", () => openIssuePanel());
+}
+
+/* Claude proposes, the person confirms: offered only when the local server reports a key on this machine. The
+   site's public fields go to the model; the proposal comes back with evidence and a confidence, and each field
+   enters the Site card only when its Confirm is pressed, marked with who confirmed it and when. */
+async function guideAskClaude() {
+  if (!state.site) { toast("Look up or pick a site first.", true); return; }
+  const who = ($("#confirm-by") && $("#confirm-by").value.trim()) || "";
+  guide.loading = "claude"; renderGuide("#guide-ask-claude");
+  setStatus(`Asking ${(state.caps && state.caps.model) || "the model"} to read the site… nothing enters the site until you confirm it.`, "busy");
+  try {
+    guide.proposal = await postJSON("/api/propose/site", { site: state.site });
+    guide.proposal.by = who;
+    setStatus(`${guide.proposal.items.length} proposed item${guide.proposal.items.length === 1 ? "" : "s"} from ${guide.proposal.model}, logged as proposals/${guide.proposal.file}. Confirm the ones that are right.`, "ok");
+  } catch (e) {
+    guide.proposal = null;
+    toast(`The model could not read the site: ${e.message}`, true);
+  } finally {
+    guide.loading = ""; renderGuide("#guide-ask-claude");
+  }
+}
+
+const SITE_PROPOSAL_KEYS = { zoning_district: "zoning_district", site_area_m2: "site_area_m2", frontage_m: "frontage_m", depth_m: "depth_m",
+                             frontage_street: "context.street.name", corner_lot: "context.corner_lot", lane_behind: "context.lane_behind" };
+
+function confirmProposal(key, all) {
+  const P = guide.proposal;
+  if (!P || !state.site) return;
+  const by = ($("#confirm-by") && $("#confirm-by").value.trim()) || "";
+  if (!by) { toast("Say who confirms: your name goes on the site file beside each confirmed field.", true); const i = $("#confirm-by"); if (i) i.focus(); return; }
+  const items = all ? P.items : P.items.filter(it => it.key === key);
+  const today = todayISO();
+  state.site.confirmed = state.site.confirmed || {};
+  const notes = [];
+  for (const it of items) {
+    if (SITE_PROPOSAL_KEYS[it.key]) setPath(state.site, SITE_PROPOSAL_KEYS[it.key], it.value);
+    else if (it.value) notes.push(`${it.key.replace(/_note$/, "").replace(/_/g, " ")}: ${it.value}`);
+    state.site.confirmed[it.key] = { by, on: today, source: "claude", proposal: P.file, confidence: it.confidence, evidence: String(it.evidence || "").slice(0, 300) };
+    it.confirmed = true;
+  }
+  if (notes.length) state.site.notes = `${state.site.notes || ""} Confirmed by ${by} on ${today} from a model reading: ${notes.join("; ")}.`.trim();
+  state.siteDirty = true;
+  $("#site-dirty").hidden = false;
+  renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+  refreshSummary("site");
+  renderGuide("#guide-proposal");
+  setStatus(`${items.length} field${items.length === 1 ? "" : "s"} confirmed by ${by}; the site file records it. Save site as… keeps it.`, "ok");
+}
+
+function renderProposal(P) {
+  if (!P) return "";
+  const rows = P.items.map(it => `<li class="prop-row${it.confirmed ? " confirmed" : ""}">
+      <div class="prop-head"><b>${h(it.key.replace(/_/g, " "))}</b> <span class="prop-val">${h(typeof it.value === "boolean" ? (it.value ? "yes" : "no") : (it.value == null ? "—" : String(it.value)))}</span> <span class="conf" title="the model's confidence">${h(Math.round(it.confidence * 100))}%</span></div>
+      ${it.evidence ? `<div class="cont prop-ev">“${h(it.evidence)}”${it.section ? ` <span class="rule-id">${h(it.section)}</span>` : ""}</div>` : ""}
+      ${it.confirmed ? `<span class="cont">confirmed</span>` : `<button class="btn btn-small" type="button" data-confirm-key="${h(it.key)}">Confirm</button>`}
+    </li>`).join("");
+  return `<div class="proposal" id="guide-proposal">
+    <div class="prop-top"><span class="eyebrow">Proposed by ${h(P.model)}</span><span class="cont">source: claude · logged as proposals/${h(P.file || "")} · nothing is in the site until confirmed</span></div>
+    <ul class="prop-list">${rows}</ul>
+    <div class="form-actions"><label class="field inline"><span class="label">Confirmed by</span><input type="text" id="confirm-by" value="${h(P.by || "")}" placeholder="your name"></label><button class="btn btn-small" type="button" data-confirm-key="*" data-confirm-all="1">Confirm all</button></div>
+  </div>`;
 }
 
 async function guideLookup() {
@@ -3302,7 +3446,7 @@ async function guideUseSite() {
   await loadOptions();
   await loadRuns();
   fillRunSelects();
-  guide.reading = null; guide.suggestion = null; guide.mine = {};
+  guide.reading = null; guide.suggestion = null; guide.mine = {}; guide.proposal = null;
   guide.step = 2;
   renderGuide(2, $("#guide-use-site") ? $("#guide-use-site").getBoundingClientRect().top : null);
   setStep(1);
@@ -3619,6 +3763,9 @@ function initialMode() {
 
 async function init() {
   $("#as-of").value = todayISO();
+  // what this machine can offer beyond the rules: a model behind a key on the local server, never on the web
+  state.caps = { claude: false, model: null };
+  api("/api/capabilities").then(c => { state.caps = c || state.caps; if (state.caps.claude) renderGuide(); }).catch(() => { /* an older server: rules only */ });
   $("#run-btn").addEventListener("click", runRules);
   $("#print-btn").addEventListener("click", () => { if (state.run) printPaper(paperDocument(state.run)); });
   $("#pdf-btn").addEventListener("click", () => exportPdf().catch(err => toast(err.message, true)));

@@ -24,7 +24,7 @@ from . import __version__
 from .checks import CHECKS, COND, FAIL, INFO, NA, PASS, UNSURE
 from .rules_loader import RULES_DIR, Rule, load_rules, stamp
 
-LAYER_ORDER = ["A", "B", "C", "D", "E"]
+LAYER_ORDER = ["A", "B", "C", "D", "E", "F"]
 STATUS_ORDER = [FAIL, COND, UNSURE, PASS, INFO, NA]
 
 

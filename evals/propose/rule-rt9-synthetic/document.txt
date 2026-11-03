@@ -1,0 +1,35 @@
+RT-9 DISTRICT SCHEDULE (SYNTHETIC EVALUATION DOCUMENT)
+
+This document is written by hand for evaluating First Read's rule reader. It is modelled on the layout of a
+City of Vancouver district schedule but RT-9 is not a real district and no figure below is a real regulation.
+Consolidated to 15 March 2026.
+
+1 Intent
+This schedule is intended to encourage the retention of character buildings and to permit two-family and
+multiple dwellings compatible with the scale of the neighbourhood.
+
+4 Regulations
+
+4.3 Height
+4.3.1 The maximum height of a building shall be 10.7 m, and a building shall not exceed 3 storeys.
+4.3.2 The Director of Planning may permit a height of up to 12.2 m where a character house is retained and
+the additional height does not cast shadow on a neighbouring yard.
+
+4.4 Front Yard
+4.4.1 A front yard with a minimum depth of 6.1 m shall be provided, except that where a lane does not abut
+the rear of the site the minimum depth shall be 7.3 m.
+
+4.5 Side Yards
+4.5.1 A side yard with a minimum width of 1.5 m shall be provided on each side of the building.
+
+4.6 Rear Yard
+4.6.1 A rear yard with a minimum depth of 10.7 m shall be provided.
+
+4.7 Floor Space Ratio
+4.7.1 The floor space ratio shall not exceed 0.60.
+4.7.2 The Director of Planning may permit an increase in the floor space ratio to a maximum of 0.75 where a
+character house is retained and renovated, and to 0.85 where the character house is also designated as
+protected heritage property.
+
+4.8 Site Coverage
+4.8.1 The maximum site coverage for buildings shall be 45 percent of the site area.

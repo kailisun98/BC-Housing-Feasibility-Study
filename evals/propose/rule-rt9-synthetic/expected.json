@@ -1,0 +1,15 @@
+{
+  "kind": "rule",
+  "district": "RT-9",
+  "note": "Hand-made expected values for the synthetic RT-9 schedule in document.txt. The base maximums are expected in max_fsr and max_height_m; the Director's conditional increases must not be. Scored by ffm.propose.score: numbers within 1%, strings ignoring case and spacing.",
+  "expected": {
+    "max_fsr": 0.60,
+    "max_height_m": 10.7,
+    "max_storeys": 3,
+    "min_front_yard_m": 6.1,
+    "min_rear_yard_m": 10.7,
+    "min_side_yard_m": 1.5,
+    "max_site_coverage": 0.45,
+    "effective_from": "2026-03-15"
+  }
+}

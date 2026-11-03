@@ -73,6 +73,17 @@ def _params(rules: list[Rule], on: date, rule_id: str, district: str = "*") -> d
     return v.params if v else None
 
 
+def _district_rule(rules: list[Rule], on: date, check: str, district: str) -> tuple[str, dict] | None:
+    """The rule with this check that applies to the district and is in force (any district's schedule, once it
+    is in the stack: RM-1 by hand, RT-3 once a reading of its schedule is confirmed). Returns (rule id, params)."""
+    for r in rules:
+        if r.check == check and r.applies_to(district) and "*" not in r.applies_to_districts:
+            v = r.version_on(on)
+            if v:
+                return r.id, v.params
+    return None
+
+
 def _largest_remainder(total: int, shares: dict[str, float]) -> dict[str, int]:
     raw = {k: total * s for k, s in shares.items()}
     out = {k: int(math.floor(v)) for k, v in raw.items()}
@@ -105,8 +116,10 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
     area = float(site.get("site_area_m2") or 0)
     f2f, _ = ASSUMPTIONS["floor_to_floor_m"]
     out: dict[str, Any] = {"storeys": None, "height_m": None, "gfa_m2": None, "fsr": None}
-    p_fsr = _params(rules, on, "cov.rm1.outright_fsr", district)
-    p_h = _params(rules, on, "cov.rm1.outright_height", district)
+    r_fsr = _district_rule(rules, on, "district_outright_fsr", district)
+    r_h = _district_rule(rules, on, "district_outright_height", district)
+    p_fsr, id_fsr = (r_fsr[1], r_fsr[0]) if r_fsr else (None, None)
+    p_h, id_h = (r_h[1], r_h[0]) if r_h else (None, None)
     p_irp = _params(rules, on, "cov.irp.social_housing_rezoning", district)
     p_ssmuh = _params(rules, on, "bc.ssmuh.minimum_units", district)
     p_wood = _params(rules, on, "bch.design_guidelines.unit_areas", district) or {}
@@ -130,11 +143,13 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
         # fall through to outright
     if p_fsr and p_h:
         storeys = min(int(math.floor(p_h["max_height_m"] / f2f)), wood_max)
+        if p_h.get("max_storeys"):
+            storeys = min(storeys, int(p_h["max_storeys"]))
         out.update({"storeys": storeys, "height_m": round(min(storeys * f2f, p_h["max_height_m"]), 1), "fsr": p_fsr["max_fsr"], "gfa_m2": round(p_fsr["max_fsr"] * area, 0)})
-        fields["storeys"] = {"value": storeys, "rule_id": "cov.rm1.outright_height", "note": f"the most storeys of {f2f} m under the outright maximum of {p_h['max_height_m']} m"}
-        fields["height_m"] = {"value": out["height_m"], "rule_id": "cov.rm1.outright_height", "note": f"{storeys} storeys × {f2f} m, under {p_h['max_height_m']} m"}
-        fields["gfa_m2"] = {"value": out["gfa_m2"], "rule_id": "cov.rm1.outright_fsr", "note": f"the outright FSR of {p_fsr['max_fsr']} × the site area {area:,.0f} m²"}
-        fields["rezoning_path"] = {"value": None, "rule_id": "cov.rm1.outright_fsr", "note": "outright: no rezoning"}
+        fields["storeys"] = {"value": storeys, "rule_id": id_h, "note": f"the most storeys of {f2f} m under the outright maximum of {p_h['max_height_m']} m" + (f", at most {p_h['max_storeys']} storeys" if p_h.get("max_storeys") else "")}
+        fields["height_m"] = {"value": out["height_m"], "rule_id": id_h, "note": f"{storeys} storeys × {f2f} m, under {p_h['max_height_m']} m"}
+        fields["gfa_m2"] = {"value": out["gfa_m2"], "rule_id": id_fsr, "note": f"the outright FSR of {p_fsr['max_fsr']} × the site area {area:,.0f} m²"}
+        fields["rezoning_path"] = {"value": None, "rule_id": id_fsr, "note": "outright: no rezoning"}
         return out
     if p_ssmuh and area and area < p_ssmuh["exempt_lot_min_m2"] and site.get("has_water_and_sewer") is not False and site.get("in_transit_oriented_area") is not True:
         near = site.get("frequent_bus_stop_within_400m")
@@ -163,13 +178,19 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     assumptions = [{"key": k, "value": v, "note": n} for k, (v, n) in ASSUMPTIONS.items()]
     f2f, _ = ASSUMPTIONS["floor_to_floor_m"]
     sb = setbacks_for(site)
+    # a confirmed district schedule's yards replace the placeholders, and the rows cite it
+    r_sb = _district_rule(rules, on, "district_setbacks", district)
+    sb_rule: str | None = None
+    if r_sb:
+        sb_rule, p_sb = r_sb
+        sb = {k: float(p_sb.get(f"min_{k}_yard_m", sb[k])) for k in ("front", "rear", "side")}
     eff, _ = ASSUMPTIONS["net_efficiency"]
     allowance, _ = ASSUMPTIONS["design_allowance"]
     shares, _ = ASSUMPTIONS["mix_shares"]
 
     # which candidates the site can take
     p_irp = _params(rules, on, "cov.irp.social_housing_rezoning", district)
-    has_outright = _params(rules, on, "cov.rm1.outright_fsr", district) is not None or _params(rules, on, "bc.ssmuh.minimum_units", district) is not None
+    has_outright = _district_rule(rules, on, "district_outright_fsr", district) is not None or _params(rules, on, "bc.ssmuh.minimum_units", district) is not None
     cands = []
     for c in CANDIDATES:
         if c["id"] == "outright":
@@ -210,7 +231,8 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     fields["tenure"] = {"value": "social_housing", "rule_id": "cov.social_housing_definition", "note": "100% social housing: exempt from levies and the path the rezoning policy takes"}
     fields["floor_to_floor_m"] = {"value": f2f, "rule_id": None, "note": "placeholder"}
     for k in ("front", "rear", "side"):
-        fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")}
+        fields[f"setbacks_m.{k}"] = ({"value": sb[k], "rule_id": sb_rule, "note": "the schedule's minimum yard"} if sb_rule else
+                                     {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")})
     fields["non_residential_gfa_m2"] = {"value": option["non_residential_gfa_m2"], "rule_id": "bc.bcbuilds.eligibility", "note": "none suggested; BC Builds caps it at 30% of the floor area"}
     fields["residential_gfa_m2"] = {"value": gfa, "rule_id": None, "note": "all of the floor area, with no non-residential space"}
 

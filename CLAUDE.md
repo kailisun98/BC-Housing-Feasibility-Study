@@ -285,8 +285,43 @@ Built and verified in the browser:
   `renderPreview3D`: the plan with dimensions, the section and an orbitable axon, from the memo's own figure
   functions). "Issue to the architect" / "Issue to the board" in the Export bar; the page polls the local
   server every 15 s and shows an amber chip in the top bar for an issue addressed to the current role.
-- Not built yet: the architect's layout tools (phase 3), the block editor (phase 4), hosting (phase 5). A
-  restarted preview server is needed after editing `server.py`; the Claude app's preview does not reload Python.
+- Not built yet: the block editor (phase 4), hosting (phase 5). A restarted preview server is needed after
+  editing `server.py`; the Claude app's preview does not reload Python.
+
+## Phase 3 of the workflows proposal (3 Nov 2026): the architect's first layout
+
+- `ffm/layout.py`, standard library, deterministic. `blocks(option, ledger)`: units by type at the BC Housing
+  minimum net areas (layer D) plus the suggestion's 10% design allowance and an 8% partition allowance
+  (`LAYOUT_ASSUMPTIONS`, declared); non-residential from the option; amenity 1.5 m²/unit (at least 40 m²);
+  services 40 m² plus 1 m² per bicycle space; parking 30 m² per stall below grade, reported not placed.
+  `ADJACENCIES`: seven rules in plain words (non-residential on the ground floor facing the street; amenity on the
+  ground floor by the entry; services on the lane side; one core bay at the centre; units both sides of the
+  corridor; three-bedroom units lowest; accessible units nearest the core), overridden or extended by
+  `option.layout.adjacencies` (matched by id). `solve(site, option, ledger, massing)`: the proposed mass's plate
+  (`plate_width_m` × `plate_depth_m`, `storeys`) gets a 1.8 m corridor and a 7 m core bay per floor and four runs
+  (front/rear × left/right); the ground floor takes the other uses first (a hall may run through to the lane);
+  every unit is placed whole in the first run with room, family units bottom up to studios at the top, the
+  accessible ones first; what does not fit goes to `shortfall`, never squeezed; spare run length is drawn white.
+  `adjacencies` are read back from the zones as pass / conditional / info with a note. A plate under 9.8 m deep
+  is single-loaded and says so. `L["outright"]` carries the schedule's maximum FSR and height for the elevation.
+- Five sheets as SVG (`svg_stacking`, `svg_plans` with the ground, a typical and the top floor, `svg_elevations`
+  front and side with a window per unit, `svg_axon` oblique stacked floors, `svg_site_plan` with the yards
+  dimensioned, the envelope, the footprint, tree barriers where `site.context.trees` has positions, and a
+  table against the schedule); `sheets()` returns them, `write()` puts `layout.json` and the five beside the
+  ledger; `markdown()` is the memo's "Layouts derived from the option" section (`memo.html_page` now inlines
+  any SVG in its `svgs` dict). `python -m ffm run` writes them; the server's `do_run` and `run_payload` carry
+  `layout` and `sheets`; the static build runs the solver in Pyodide (`ffm_run` returns them) and fetches the
+  files for committed runs. The tool shows FIG 03 Plans by program (Plan | Axon tab) with the rules as a list,
+  FIG 04 Stacking, FIG 05 Elevations, FIG 06 Code site plan (`renderSheets`, `wireSheets`); the Revit sheet
+  numbers after them; the paper memo has Figures 3 to 6. Tests in `tests/test_layout.py` (overlaps, counts,
+  rules, SVG well-formedness, determinism, an override, the shallow corner lot).
+- Flow fixes from the 3 Nov audit of all three modes: in manager mode the four step links give way to the
+  guide's own progress (`#guide-progress`, "Stop n of 7 · title · k done"); the guide's stops are now 5 Money in
+  (land, equity, other grants, before the run) → 6 Run the rules (the four answers as a list, Run again) → 7
+  Issue, so one run answers everything; after a run on a stacked (≤1100 px) window the page scrolls to the memo;
+  the architect's forms start folded on a stacked window; the export bar shows four actions and folds the
+  three file formats behind "More formats"; the key box and the proposal box lost their 3 px side tab (a
+  hairline and a faint amber wash instead); stop heads and inputs reach 40 to 44 px under a coarse pointer.
 
 ## Phases 2 and 6 of the workflows proposal (3 Nov 2026)
 

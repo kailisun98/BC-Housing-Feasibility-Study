@@ -24,7 +24,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from . import engine, massing, memo, proforma
+from . import engine, layout, massing, memo, proforma
 from .rules_loader import RULES_DIR, load_rules, stamp
 
 
@@ -42,7 +42,7 @@ def cmd_run(a: argparse.Namespace) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "ledger.json").write_text(json.dumps(ledger, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    m = svg_text = None
+    m = svg_text = lay = None
     if not a.no_massing:
         try:
             m = massing.build(site, option, ledger)
@@ -50,6 +50,12 @@ def cmd_run(a: argparse.Namespace) -> int:
             svg_text = ps.read_text(encoding="utf-8")
         except ValueError as e:
             print(f"massing skipped: {e}", file=sys.stderr)
+        if m is not None:
+            try:
+                lay = layout.solve(site, option, ledger, m)
+                layout.write(lay, site, m, ledger, out)
+            except ValueError as e:
+                print(f"layout skipped: {e}", file=sys.stderr)
 
     d = None
     if a.previous:
@@ -59,14 +65,16 @@ def cmd_run(a: argparse.Namespace) -> int:
     pf = proforma.build(site, option, ledger)
     (out / "proforma.json").write_text(json.dumps(pf, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    pm, ph = memo.write(ledger, out, m, d, svg_text, proforma=pf)
+    pm, ph = memo.write(ledger, out, m, d, svg_text, proforma=pf, layout=lay)
 
     s = ledger["summary"]
     print(f"as of {ledger['run']['as_of']} · stamp {ledger['run']['stamp']['stamp']}")
     print(f"allowed outright: {s['answers']['allowed']['outright']['verdict']} · by rezoning: {s['answers']['allowed']['by_rezoning']['verdict']} · funders: {s['answers']['funded']['verdict']}"
           + (f" · money: {pf['verdict']['word']}" if pf.get("available") else ""))
     print("counts: " + ", ".join(f"{k} {v}" for k, v in s["counts"].items() if v))
-    print(f"wrote {out / 'ledger.json'}, {pm.name}, {ph.name}, proforma.json" + (", massing.json, massing.svg" if m else "") + (", diff.json" if d else ""))
+    if lay:
+        print(f"layout: {lay['units_placed']} of {lay['units_total']} units on {len(lay['floors'])} floors; " + ", ".join(f"{c['block'].replace('_', ' ')} {c['status']}" for c in lay["adjacencies"] if c["status"] != "info"))
+    print(f"wrote {out / 'ledger.json'}, {pm.name}, {ph.name}, proforma.json" + (", massing.json, massing.svg" if m else "") + (", layout.json and five sheets" if lay else "") + (", diff.json" if d else ""))
     return 0
 
 

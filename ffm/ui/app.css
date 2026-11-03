@@ -439,6 +439,11 @@ table.plain td.status { white-space: nowrap; }
 /* a figure's head: the label and, for the plan, the Plan | 3D segmented control */
 .fig-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .fig-head .eyebrow { margin: 0; }
+/* the architect's sheets: the engine's SVGs at the card's width, a Plan | Axon tab on the plans, the rules under them */
+.figure.sheet .sheet-body svg { display: block; width: 100%; height: auto; }
+.figure.sheet .sheet-body[hidden] { display: none; }
+.sheet-rules { margin-top: 8px; font-size: 12px; }
+.sheet-rules .cont { color: var(--c-drawmuted); }
 .seg { display: inline-flex; border: 1px solid var(--c-rule); border-radius: 4px; overflow: hidden; background: var(--c-paper); }
 .segbtn { border: 0; border-radius: 0; background: var(--c-paper); color: var(--c-drawmuted); font-size: 11.5px; font-weight: 500; padding: 3px 10px; min-height: 24px; cursor: pointer; transition: background-color .12s ease-out, color .12s ease-out; }
 .segbtn + .segbtn { border-left: 1px solid var(--c-rule); }
@@ -480,7 +485,19 @@ table.plain td.status { white-space: nowrap; }
 .inputs-used li { max-width: 80ch; }
 .export h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .export .export-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); max-width: 80ch; }
-.action-bar { display: flex; flex-wrap: wrap; gap: 6px; }
+.action-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+/* the three file formats fold behind one word; the bar shows the four actions a reader decides between */
+.more-formats { flex: 0 0 auto; }
+.more-formats[open] { flex-basis: 100%; }
+.more-formats > summary { list-style: none; cursor: pointer; display: inline-flex; }
+.more-formats > summary::-webkit-details-marker { display: none; }
+.more-formats[open] > summary { background: var(--field); }
+.more-formats > .action-bar { padding-top: 6px; }
+/* in manager mode the guide is the progress; the four steps give way to its stop count */
+[data-mode="manager"] .steps a[data-step] { display: none; }
+.guide-progress { font: 500 12px/1.4 var(--sans); color: var(--muted); padding: 5px 0; }
+.guide-progress:empty { display: none; }
+[data-mode="manager"] .guide-progress { margin-right: auto; }
 .export-panel { margin-top: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
 .export-panel h3 { font-size: 14px; }
 .export-panel .block { display: flex; flex-direction: column; gap: 4px; }
@@ -620,7 +637,13 @@ table.plain td.status { white-space: nowrap; }
 .claude-fold > summary { cursor: pointer; font-weight: 500; color: var(--ink); padding: 4px 0; }
 .claude-fold > summary .cont { font-weight: 400; }
 .claude-fold[open] > summary { margin-bottom: 6px; }
-.keybox { display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: 4px; margin: 2px 0 8px; }
+.keybox { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 7%, var(--panel)); border-radius: 4px; margin: 2px 0 8px; }
+.keybox .key-input, .fin-rows input, .sched-form input[type="text"], .sched-form input[type="url"], .proposal .field.inline input { min-height: 32px; }
+@media (pointer: coarse) {
+  .guide .stop-head { min-height: 44px; }
+  .keybox .key-input, .fin-rows input, .sched-form input[type="text"], .sched-form input[type="url"], .proposal .field.inline input, .guide .sg-input { min-height: 40px; }
+  .pf-lines summary, .claude-fold > summary { min-height: 40px; display: flex; align-items: center; }
+}
 .keybox .field .label { font-size: 11px; }
 .keybox .key-input { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font: 12.5px var(--mono); }
 .keybox code { font: 11px var(--mono); }
@@ -630,7 +653,7 @@ table.plain td.status { white-space: nowrap; }
 .sched-form input[type="text"], .sched-form input[type="url"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
 .sched-form input[type="file"] { font-size: 12px; max-width: 100%; }
 /* stop 1: what the model proposes, each line confirmed on its own */
-.proposal { border: 1px solid var(--line); border-left: 3px solid var(--amber); border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.proposal { border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 5%, var(--panel)); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .prop-top { display: flex; flex-direction: column; gap: 2px; }
 .prop-top .cont { font-size: 11px; }
 .prop-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }

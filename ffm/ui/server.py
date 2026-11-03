@@ -23,7 +23,8 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
     GET  /api/runs/<site>/<folder>          a past run as /api/run returns it (ledger, massing, svg, diff, revit)
     GET  /api/diff?from=<run_id>&to=<run_id>  engine.diff between two existing runs' ledgers
     GET  /api/runs/<site>/<folder>/<file>   memo.html | memo.md | ledger.json | massing.json | massing.svg
-                                            | diff.json | proforma.json | ffm_revit_result.json | ffm_sheet_notes.json
+                                            | diff.json | proforma.json | layout.json | stacking.svg | plans.svg
+                                            | elevations.svg | axon.svg | site-plan.svg | ffm_revit_result.json | ffm_sheet_notes.json
                                             | ffm_sheet.png | ffm_sheet.pdf   (?download=1 to attach)
     POST /api/runs/<site>/<folder>/memo     rewrite memo.md / memo.html for that run (picks up a Revit result)
     GET  /api/lookup?q=<address>            a proposed site file from Nominatim and the City's open data (network)
@@ -65,7 +66,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
-from .. import engine, massing, memo, proforma, suggest
+from .. import engine, layout, massing, memo, proforma, suggest
 from ..rules_loader import RULES_DIR, load_rules
 
 ROOT = Path(__file__).resolve().parent.parent.parent
@@ -86,6 +87,8 @@ RUN_FILES = {
     "memo.html": "text/html; charset=utf-8", "memo.md": "text/markdown; charset=utf-8",
     "ledger.json": "application/json; charset=utf-8", "massing.json": "application/json; charset=utf-8",
     "massing.svg": "image/svg+xml", "diff.json": "application/json; charset=utf-8", "proforma.json": "application/json; charset=utf-8",
+    "layout.json": "application/json; charset=utf-8", "stacking.svg": "image/svg+xml", "plans.svg": "image/svg+xml",
+    "elevations.svg": "image/svg+xml", "axon.svg": "image/svg+xml", "site-plan.svg": "image/svg+xml",
     "ffm_revit_result.json": "application/json; charset=utf-8", "ffm_sheet_notes.json": "application/json; charset=utf-8",
     "ffm_sheet.png": "image/png", "ffm_sheet.pdf": "application/pdf",
 }
@@ -264,8 +267,11 @@ def run_payload(out: Path, site_id: str, ledger: dict, m: dict | None, svg: str 
             pf = _read(out / "proforma.json")
         except Exception:
             pf = None
+    lay = _read(out / "layout.json") if (out / "layout.json").exists() else None
+    sheets = {name: (out / f"{name}.svg").read_text(encoding="utf-8") for name in layout.SHEETS if (out / f"{name}.svg").exists()} if lay else None
     return {"run_id": f"{site_id}/{out.name}", "folder": out.name, "folder_abs": str(out),
             "as_of": ledger["run"]["as_of"], "stamp": stamp, "ledger": ledger, "massing": m, "svg": svg, "diff": d, "proforma": pf,
+            "layout": lay, "sheets": sheets,
             "massing_note": massing_note, "revit": revit_summary(out, stamp),
             "files": {"massing_json": str(out / "massing.json") if m else None, "ledger_json": str(out / "ledger.json"),
                       "script": str(ROOT / "revit" / "ffm_massing_pyrevit.py")}}
@@ -309,6 +315,11 @@ def do_run(body: Any) -> dict:
         svg = ps.read_text(encoding="utf-8")
     except ValueError as e:
         massing_note = str(e)
+    if m is not None:
+        try:
+            layout.write(layout.solve(site, option, ledger, m), site, m, ledger, out)
+        except ValueError as e:
+            massing_note = (massing_note + " " if massing_note else "") + f"Layout skipped: {e}"
 
     d = None
     prev = body.get("previous_run")

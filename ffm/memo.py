@@ -61,7 +61,7 @@ def _fmt_vals(v: dict) -> str:
 
 
 def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None, title: str | None = None,
-             revit: dict | None = None, proforma: dict | None = None) -> str:
+             revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None) -> str:
     run, res, summ = ledger["run"], ledger["results"], ledger["summary"]
     site, opt = ledger["inputs"]["site"], ledger["inputs"]["option"]
     ans = summ["answers"]
@@ -126,6 +126,11 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
         L.append("")
         L.append("`massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).")
         L.append("")
+
+    # ---------------------------------------------------------------- the architect's first layout, from the option
+    if layout:
+        from . import layout as _layout
+        L.extend(_layout.markdown(layout))
 
     # ---------------- Revit, when the script has run on this exact stamp
     if revit:
@@ -253,9 +258,13 @@ def _md_inline(s: str) -> str:
     return s
 
 
-def html_page(md: str, svg_text: str | None = None) -> str:
+def html_page(md: str, svg_text: str | None = None, svgs: dict[str, str] | None = None) -> str:
     """Render the memo markdown to a self-contained HTML page (headings, paragraphs, lists, tables,
-    blockquote, image replaced by the inline SVG). No external assets."""
+    blockquote, images replaced by the inline SVGs: the massing's, and any sheet in `svgs` keyed by file name).
+    No external assets."""
+    svgs = dict(svgs or {})
+    if svg_text:
+        svgs.setdefault("massing.svg", svg_text)
     lines = md.split("\n")
     out: list[str] = []
     i = 0
@@ -313,8 +322,9 @@ def html_page(md: str, svg_text: str | None = None) -> str:
             import re as _re
             mm = _re.match(r"!\[([^\]]*)\]\(([^)]+)\)", ln)
             alt, src = (mm.group(1), mm.group(2)) if mm else ("", "")
-            if alt.startswith("Massing") and svg_text:
-                out.append(f'<figure>{svg_text}<figcaption>Rule-derived massing: plan and section, to scale.</figcaption></figure>')
+            if src in svgs:
+                cap = "Rule-derived massing: plan and section, to scale." if alt.startswith("Massing") else f"{alt}, derived from the option; to scale."
+                out.append(f'<figure>{svgs[src]}<figcaption>{html.escape(cap)}</figcaption></figure>')
             else:
                 out.append(f'<figure><img src="{html.escape(src, quote=True)}" alt="{html.escape(alt, quote=True)}" style="max-width:100%;border:1px solid #e5e5e5"><figcaption>{html.escape(alt)}</figcaption></figure>')
         elif ln.strip() == "":
@@ -364,7 +374,7 @@ def load_revit_result(out_dir: Path, stamp: str) -> dict | None:
 
 
 def write(ledger: dict, out_dir: Path, massing: dict | None = None, diff: dict | None = None, svg_text: str | None = None,
-          revit: dict | None = None, proforma: dict | None = None) -> tuple[Path, Path]:
+          revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     if revit is None:
         revit = load_revit_result(out_dir, ledger["run"]["stamp"]["stamp"])
@@ -373,9 +383,20 @@ def write(ledger: dict, out_dir: Path, massing: dict | None = None, diff: dict |
             proforma = json.loads((out_dir / "proforma.json").read_text(encoding="utf-8"))
         except Exception:
             proforma = None
-    md = markdown(ledger, massing, diff, revit=revit, proforma=proforma)
+    if layout is None and (out_dir / "layout.json").exists():
+        try:
+            layout = json.loads((out_dir / "layout.json").read_text(encoding="utf-8"))
+        except Exception:
+            layout = None
+    # the sheets beside the ledger go inline, so the HTML memo stands alone
+    svgs = {}
+    for name in ("stacking", "plans", "elevations", "axon", "site-plan"):
+        p = out_dir / f"{name}.svg"
+        if p.exists():
+            svgs[p.name] = p.read_text(encoding="utf-8")
+    md = markdown(ledger, massing, diff, revit=revit, proforma=proforma, layout=layout)
     pm = out_dir / "memo.md"
     ph = out_dir / "memo.html"
     pm.write_text(md, encoding="utf-8")
-    ph.write_text(html_page(md, svg_text), encoding="utf-8")
+    ph.write_text(html_page(md, svg_text, svgs), encoding="utf-8")
     return pm, ph

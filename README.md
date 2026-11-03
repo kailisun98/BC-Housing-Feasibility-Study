@@ -90,6 +90,7 @@ Each run writes to `--out`:
 | `ledger.json` | Machine-readable results: one record per rule with status, finding, numbers used, action, source, rule version. |
 | `massing.json`, `massing.svg` | The rule-derived masses (proposed and outright) in metres; plan and section to scale. |
 | `proforma.json` | The feasibility-grade pro-forma: capital cost, net operating income, funding, the gap, a verdict, and every line with the assumption (layer F) or program (layer E) it came from. |
+| `layout.json`, `stacking.svg`, `plans.svg`, `elevations.svg`, `axon.svg`, `site-plan.svg` | The architect's first layout from the option: program blocks with their sources, adjacency rules read back from the plates, every zone's coordinates; the stacking diagram, plans by program, preliminary elevations, the floors stacked in axonometric, and the code site plan, each with the stamp. |
 | `diff.json` | With `--previous`: what changed between two ledgers and whether the rule files changed. |
 
 ## The massing in Revit

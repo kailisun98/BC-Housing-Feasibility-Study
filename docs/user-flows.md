@@ -47,11 +47,14 @@ site (home) ──► the case ──► tool: memo on screen (R1)
    4. *Shape the option*: Outright, Benchmark or Funder-ready, derived from the rules; every figure
       Suggested | Mine with its rule beside it; what no rule settles (Community Vision area, transit
       area, tenure, developer partner, site control) answered right there.
-   5. *Run the rules*: under a second; the three answers land in order, then a fourth: does the money
+   5. *Money in*: land, equity and other grants, the three figures only the manager knows; everything
+      else the pro-forma counts with is a dated, cited assumption (layer F) or a declared placeholder.
+   6. *Run the rules*: under a second; the three answers land in order, then a fourth: does the money
       work (capital cost, net operating income, the funding stack, the gap; likely / unlikely / unsure).
-   6. *Pro-forma*: the five lines from the run; land, equity and other grants are the manager's; *Run
-      again with these*. Every line cites its assumption (layer F) or program (layer E).
+      The stop lists the four answers and offers *Run again*.
    7. *Issue*: a note, and the architect sees the revision in their top bar.
+   In manager mode the four step links give way to the guide's own progress line ("Stop 6 of 7 · Run the
+   rules · 4 done"), so one progress system is on screen.
 4. **Three views** of the result: Summary (title block, answers, figures), Detailed (the whole memo),
    3D preview (the site plan with dimensions, the section, the axonometric, large).
 5. **Open items.** The third answer is a table: item, status, who resolves it. This is the to-do list.

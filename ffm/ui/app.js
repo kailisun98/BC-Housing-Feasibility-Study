@@ -143,22 +143,28 @@ const ENGINE_SHIM = `
 import json, sys
 from datetime import date
 sys.path.insert(0, ".")
-from ffm import engine, massing, memo, proforma
+from ffm import engine, layout, massing, memo, proforma
 
 def ffm_run(site_json, option_json, as_of, previous_json):
     site, option = json.loads(site_json), json.loads(option_json)
     L = engine.evaluate(site, option, date.fromisoformat(as_of))
-    m = svg = note = None
+    m = svg = note = lay = sheets = None
     try:
         m = massing.build(site, option, L)
         svg = massing.svg(m)
     except ValueError as e:
         note = str(e)
+    if m is not None:
+        try:
+            lay = layout.solve(site, option, L, m)
+            sheets = layout.sheets(lay, site, m, L)
+        except ValueError as e:
+            note = (note + " " if note else "") + "Layout skipped: " + str(e)
     d = engine.diff(json.loads(previous_json), L) if previous_json else None
     pf = proforma.build(site, option, L)
-    md = memo.markdown(L, m, d, proforma=pf)
-    return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note, "proforma": pf,
-                       "memo_md": md, "memo_html": memo.html_page(md, svg)})
+    md = memo.markdown(L, m, d, proforma=pf, layout=lay)
+    return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note, "proforma": pf, "layout": lay, "sheets": sheets,
+                       "memo_md": md, "memo_html": memo.html_page(md, svg, {k + ".svg": v for k, v in (sheets or {}).items()})})
 
 def ffm_diff(a_json, b_json):
     return json.dumps(engine.diff(json.loads(a_json), json.loads(b_json)))
@@ -269,14 +275,20 @@ async function ledgerOf(runId) {
 
 async function loadStaticRun(runId) {
   if (browserRuns.has(runId)) return browserRuns.get(runId).payload;
-  const [ledger, massing, svg, diff, proforma] = await Promise.all([
+  const [ledger, massing, svg, diff, proforma, layout] = await Promise.all([
     fetchJSON(`data/runs/${runId}/ledger.json`), fetchJSON(`data/runs/${runId}/massing.json`, true),
     fetchText(`data/runs/${runId}/massing.svg`, true), fetchJSON(`data/runs/${runId}/diff.json`, true),
-    fetchJSON(`data/runs/${runId}/proforma.json`, true),
+    fetchJSON(`data/runs/${runId}/proforma.json`, true), fetchJSON(`data/runs/${runId}/layout.json`, true),
   ]);
+  let sheets = null;
+  if (layout) {
+    const names = ["stacking", "plans", "elevations", "axon", "site-plan"];
+    const texts = await Promise.all(names.map(n => fetchText(`data/runs/${runId}/${n}.svg`, true)));
+    sheets = Object.fromEntries(names.map((n, i) => [n, texts[i]]).filter(([, t]) => t));
+  }
   const base = `data/runs/${runId}`;
   return { run_id: runId, folder: runId.split("/")[1], folder_abs: null, as_of: ledger.run.as_of, stamp: ledger.run.stamp.stamp,
-           ledger, massing, svg, diff, proforma, massing_note: null, revit: null, files: {},
+           ledger, massing, svg, diff, proforma, layout, sheets, massing_note: null, revit: null, files: {},
            downloads: { html: `${base}/memo.html`, md: `${base}/memo.md`, massing: massing ? `${base}/massing.json` : null } };
 }
 
@@ -364,7 +376,7 @@ async function staticRun(body) {
   const runId = `${siteId}/${folder}`;
   const L = out.ledger, ans = L.summary.answers;
   const payload = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp,
-    ledger: L, massing: out.massing, svg: out.svg, diff: out.diff, proforma: out.proforma, massing_note: out.massing_note, revit: null, files: {}, in_browser: true,
+    ledger: L, massing: out.massing, svg: out.svg, diff: out.diff, proforma: out.proforma, layout: out.layout, sheets: out.sheets, massing_note: out.massing_note, revit: null, files: {}, in_browser: true,
     downloads: { html: blobUrl(out.memo_html, "text/html"), md: blobUrl(out.memo_md, "text/markdown"),
                  massing: out.massing ? blobUrl(JSON.stringify(out.massing, null, 2), "application/json") : null } };
   const summary = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp, option_id: L.run.option_id,
@@ -1115,10 +1127,12 @@ async function runRules() {
     closeExportPanel();
     fillRunSelects();
     setCompareNote(run.diff);
-    if (guide.step === 5) { guide.step = 6; renderGuide(); }
+    if (guide.step === 5 || guide.step === 6) { guide.step = 6; renderGuide(); }
     const ms = Math.round(performance.now() - t0);
     toast(`Ran the rules as of ${run.as_of}: ${rev(run.run_id)}, in ${ms} ms ·${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}`);
-    $("#step-run").scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+    // where the answers are: beside the rail on a wide window, below it on a narrow one, where the memo is what to scroll to
+    const stacked = matchMedia("(max-width: 1100px)").matches;
+    (stacked ? $("#memo") : $("#step-run")).scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   } catch (e) {
     toast(e.message, true);
   } finally {
@@ -2077,6 +2091,7 @@ function figOne(m, ctx, fs = null) {
 let figWatch = null;   // the ResizeObserver that refits the drawings' labels when their cards change width
 
 function wireFigures(run) {
+  wireSheets();
   const fig = $("#fig-01");
   if (!fig || !run.massing) return;
   const m = run.massing;
@@ -2195,17 +2210,53 @@ function renderFigures(run) {
   } else if (run.massing_note) {
     out.push(`<div class="card figure"><div class="eyebrow">Massing</div><p class="note">${h(run.massing_note)}</p></div>`);
   }
+  let n = m ? 3 : 1;
+  if (run.layout && run.sheets) { out.push(...renderSheets(run, n)); n += 4; }
   const r = run.revit;
-  if (r && r.sheet_png) out.push(figSheet(run));
+  if (r && r.sheet_png) out.push(figSheet(run, n));
   return `<aside class="figures">${out.join("")}</aside>`;
 }
 
-function figSheet(run) {
+/* The architect's sheets, drawn by the engine from the option: the plans by program with an axon of the same
+   floors on a tab, the stacking, the elevations and the code site plan. Every one carries the stamp. */
+function renderSheets(run, n0) {
+  const L = run.layout, S = run.sheets;
+  const fig = k => `FIG ${String(k).padStart(2, "0")}`;
+  const rules = (L.adjacencies || []).filter(c => c.status !== "info");
+  const prog = (L.program || []).map(b => `${b.count > 1 ? `${b.count} ` : ""}${b.label.toLowerCase()} ${fmtNum(Math.round(b.area_m2))} m²`).join(", ");
+  const short = (L.shortfall || []).length ? ` Did not fit: ${L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()} (${fmtNum(Math.round(s.area_m2))} m²)`).join("; ")}; more storeys, a larger plate or a smaller program.` : "";
+  const out = [];
+  out.push(`<figure class="card figure sheet" data-sheet="plans">
+    <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program</div>
+      <div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div></div>
+    <div class="sheet-body" data-view="plans">${S.plans || ""}</div>
+    <div class="sheet-body" data-view="axon" hidden>${S.axon || ""}</div>
+    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep. Program: ${h(prog)}.${h(short)}</figcaption>
+    <ul class="finding-list sheet-rules">${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
+  </figure>`);
+  out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div><div class="sheet-body">${S.stacking || ""}</div>
+    <figcaption>One bar per floor, top first; each segment the share of the plate a block takes. Core and corridor are the same on every floor; what is left after the units is spare, dashed.</figcaption></figure>`);
+  out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 2)} · Preliminary elevations</div><div class="sheet-body">${S.elevations || ""}</div>
+    <figcaption>Storeys × floor to floor; one window per unit on its side as the rhythm, the ground floor glazed where the non-residential space is; the outright height dashed grey${run.massing && run.massing.policy_benchmark && run.massing.policy_benchmark.height_m ? ", the staff benchmark amber" : ""}. A placeholder for the elevation study, not a design.</figcaption></figure>`);
+  out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 3)} · Code site plan</div><div class="sheet-body">${S["site-plan"] || ""}</div>
+    <figcaption>The lot, the yards dimensioned, the setback envelope dashed red, the footprint blue, tree protection barriers where the survey gives positions; the table reads FSR, height, coverage and yards against the schedule where the stack has one.</figcaption></figure>`);
+  return out;
+}
+
+function wireSheets() {
+  $$(".figure.sheet [data-sheet-view]").forEach(b => b.addEventListener("click", () => {
+    const fig = b.closest(".figure");
+    $$("[data-sheet-view]", fig).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== b.dataset.sheetView; });
+  }));
+}
+
+function figSheet(run, n = 3) {
   const r = run.revit, c = r.counts || {};
   const base = `/api/runs/${run.run_id}`;
   const stages = Object.entries(r.stages || {}).map(([k, v]) => `${k} ${v}`).join(", ");
   return `<figure class="card figure">
-    <div class="eyebrow">FIG 03 · Revit sheet ${h(r.sheet_number || "")}</div>
+    <div class="eyebrow">FIG ${String(n).padStart(2, "0")} · Revit sheet ${h(r.sheet_number || "")}</div>
     <a href="${base}/ffm_sheet.png" target="_blank" rel="noopener"><img src="${base}/ffm_sheet.png" alt="The Revit sheet exported by the massing script"></a>
     <figcaption><b>${c.masses ?? "?"} masses</b>, ${c.floor_plates ?? "?"} floor plates, ${c.model_lines ?? "?"} model lines, ${c.views ?? "?"} views, ${c.dimensions ?? 0} dimensions and ${c.notes ?? 0} notes on sheet ${h(r.sheet_number || "")}; the rules fingerprint in every element's Comments. Stages: ${h(stages)}.${r.sheet_pdf ? ` <a href="${base}/ffm_sheet.pdf" target="_blank" rel="noopener">PDF</a>.` : ""}${r.errors ? ` ${r.errors} stage error(s) recorded in the result file.` : ""}</figcaption>
   </figure>`;
@@ -2899,6 +2950,18 @@ function paperDocument(run) {
   } else if (run.massing_note) {
     figures = `<p class="note">${h(run.massing_note)}</p>`;
   }
+  // the architect's sheets follow the massing figures: plans by program, stacking, elevations, the code site plan
+  if (run.layout && run.sheets) {
+    const Lay = run.layout, S = run.sheets;
+    const rules = (Lay.adjacencies || []).filter(c => c.status !== "info").map(c => `${c.block.replace(/_/g, " ")}: ${c.rule} (${c.status}${c.note ? `, ${c.note}` : ""})`).join("; ");
+    const short = (Lay.shortfall || []).length ? ` Did not fit: ${Lay.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()} (${fmtNum(Math.round(s.area_m2))} m²)`).join("; ")}.` : "";
+    figures += `
+      <figure class="fig"><div class="draw sheet">${S.plans || ""}</div>
+        <figcaption><b>Figure 3 · Plans by program.</b> ${h(Lay.units_placed)} of ${h(Lay.units_total)} units on ${h(Lay.floors.length)} floors of ${h(Lay.plate.width_m)} × ${h(Lay.plate.depth_m)} m. Adjacency rules read back from the plates: ${h(rules)}.${h(short)}</figcaption></figure>
+      <figure class="fig"><div class="draw sheet">${S.stacking || ""}</div><figcaption><b>Figure 4 · Stacking.</b> One bar per floor, top first; each segment the share of the plate a block takes.</figcaption></figure>
+      <figure class="fig"><div class="draw sheet">${S.elevations || ""}</div><figcaption><b>Figure 5 · Preliminary elevations.</b> Storeys × floor to floor, one window per unit as the rhythm, the outright height dashed. A placeholder for the elevation study, not a design.</figcaption></figure>
+      <figure class="fig"><div class="draw sheet">${S["site-plan"] || ""}</div><figcaption><b>Figure 6 · Code site plan.</b> The yards dimensioned, the setback envelope, the footprint, the tree barriers where surveyed, and the table a plan checker reads.</figcaption></figure>`;
+  }
 
   // 6. the full ledger, layer by layer, each rule with its numbers and its source
   const layers = [];
@@ -3109,8 +3172,8 @@ const GUIDE_STOPS = [
   { n: 2, title: "Choose the programs", what: "The funders in view." },
   { n: 3, title: "Read the site", what: "What it allows before any option." },
   { n: 4, title: "Shape the option", what: "Suggested from the rules, or yours." },
-  { n: 5, title: "Run the rules", what: "The three answers." },
-  { n: 6, title: "Pro-forma", what: "Does the money work, and on what." },
+  { n: 5, title: "Money in", what: "Land, equity, other grants; the rest is assumed and cited." },
+  { n: 6, title: "Run the rules", what: "Three answers, then the money." },
   { n: 7, title: "Issue", what: "Hand it to the architect." },
 ];
 
@@ -3134,10 +3197,20 @@ function guideDone() {
     2: !!guide.programs,
     3: !!guide.reading,
     4: !!(state.option && state.option.storeys != null && (guide.suggestion || state.optionId)),
-    5: !!state.run,
-    6: !!(state.run && state.run.proforma && state.run.proforma.available),
+    5: !!(state.run || (state.option && state.option.finance && Object.values(state.option.finance).some(v => v != null))),
+    6: !!state.run,
     7: !!(state.run && state.run.issued),
   };
+}
+
+/* The step strip in manager mode reads the guide's own progress, so one progress system is on screen, not two. */
+function guideProgress() {
+  const el = $("#guide-progress");
+  if (!el) return;
+  const done = guideDone();
+  const n = Math.max(1, Math.min(7, guide.step || 1));
+  const doneCount = [1, 2, 3, 4, 5, 6, 7].filter(k => done[k]).length;
+  el.textContent = state.mode === "manager" ? `Stop ${n} of 7 · ${GUIDE_STOPS[n - 1].title}${doneCount ? ` · ${doneCount} done` : ""}` : "";
 }
 
 function ruleTitle(id) {
@@ -3253,26 +3326,28 @@ function renderGuideInto(el) {
     ${S.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${S.unsure.map(u => `<li><b>${h(u.key.replace(/_/g, " "))}</b>: ${h(u.why)}. <span class="cont">${h(u.who)}.</span>${answerControl(u.key)}</li>`).join("")}</ul></div>` : ""}
     <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-option">Use this option</button><span class="help">Writes it into the Option card, where every field can still be edited.</span></div>` : ""}`;
 
-  const stop5 = `
-    <p class="help">${done[4] ? `The option is ready${state.optionDirty ? " (unsaved: Save option as… keeps it reproducible)" : ""}.` : "Shape or pick an option first."} Rules as of <b>${h($("#as-of").value)}</b>.</p>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-run"${done[4] ? "" : " disabled"}>Run the rules</button><span class="help">Ctrl+Enter does the same.</span></div>
-    ${state.run ? `<p class="help">On screen: <b>${h(rev(state.run.run_id))}</b>, as of ${h(state.run.as_of)}. Summary, Detailed and 3D preview sit above the memo.</p>` : ""}`;
-
-  const pf = state.run && state.run.proforma;
+  // 5: the money the rules cannot know comes before the run, so one run answers everything
   const fin = (state.option && state.option.finance) || {};
+  const ownerType = String(site.owner_type || "").toLowerCase();
+  const nominal = /church|society|non.?profit|co-?op|first.?nation|municipal|city|province|government/.test(ownerType);
+  const stop5 = `
+    <p class="help">${done[4] ? "Three figures only you know; everything else the pro-forma counts with is a dated, cited assumption (hard cost, escalation, rents, the rate) or a declared placeholder, and the memo says which." : "Shape or pick an option first."}</p>
+    <div class="fin-rows">${FINANCE_FIELDS.map(([k, label]) => `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}"${done[4] ? "" : " disabled"} placeholder="${k.endsWith("land_cost_cad") ? (nominal ? "blank: nominal, the owner is a " + ownerType.replace(/_/g, " ") : "blank leaves the money answer unsure") : "blank: none"}"></label>`).join("")}</div>
+    <p class="help">${nominal ? `Land: the owner is a ${h(ownerType.replace(/_/g, " "))}, so a blank carries it at a nominal value on a long lease.` : (site.owner_type ? "Land: enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Land: name the owner type in the Site card, or enter a price here.")} The Community Housing Fund's provisional grant is counted on its own when the fund is targeted.</p>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-run"${done[4] ? "" : " disabled"}>Run the rules</button><span class="help">Blanks are allowed. Ctrl+Enter does the same.</span></div>`;
+
+  // 6: the run and what it said, the money beside the three answers
+  const pf = state.run && state.run.proforma;
   const stop6 = `
-    <p class="help">${pf ? "From the run: capital cost, net operating income, the funding stack and the gap, every line citing its assumption (layer F) or program (layer E)." : "Run the rules first: the pro-forma is computed with the run, from the same dated rule set."}</p>
-    ${pf && pf.available ? `<dl class="found-site pf-mini">
-      <div><dt>Verdict</dt><dd>${pill(MONEY_STATUS[pf.verdict.word] || "uncertain")} <b>${h(cap(pf.verdict.word))}</b> <span class="cont">${h(pf.verdict.why[0] || "")}</span></dd></div>
-      <div><dt>Capital</dt><dd><b>${h(money(pf.capital.total))}</b></dd></div>
-      <div><dt>NOI</dt><dd><b>${h(money(pf.operating.noi))}</b> <span class="cont">a year</span></dd></div>
-      <div><dt>Funding</dt><dd><b>${h(money(pf.funding.total))}</b></dd></div>
-      <div><dt>Gap</dt><dd><b>${h(money(pf.gap.value))}</b>${pf.gap.share_of_capital != null ? ` <span class="cont">${h(Math.round(pf.gap.share_of_capital * 100))}% of the capital cost</span>` : ""}</dd></div>
-    </dl>
-    ${pf.verdict.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${pf.verdict.unsure.map(u => `<li>${h(u)}</li>`).join("")}</ul></div>` : ""}
-    <p class="help">The fourth answer in the memo holds every line and its source.</p>` : (pf ? `<p class="help">Not computed: ${h(pf.why || "")}</p>` : "")}
-    <div class="fin-rows">${FINANCE_FIELDS.map(([k, label]) => `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? "blank: nominal where the owner allows it" : "blank: none"}"></label>`).join("")}</div>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-rerun"${done[4] ? "" : " disabled"}>${pf ? "Run again with these" : "Run the rules"}</button><span class="help">Land, equity and other grants are the manager's; the rest is layers E and F.</span></div>`;
+    ${state.run ? `<p class="help">On screen: <b>${h(rev(state.run.run_id))}</b>, rules as of ${h(state.run.as_of)}${state.optionDirty ? " (the option is unsaved: Save option as… keeps it reproducible)" : ""}. Summary, Detailed and 3D preview sit above the memo.</p>` : `<p class="help">${done[4] ? "Not run yet." : "Shape or pick an option first."} Rules as of <b>${h($("#as-of").value)}</b>.</p>`}
+    ${state.run ? `<ul class="reading-list">
+      <li>${pill(verdictStatus(state.run.ledger.summary.answers.allowed.rezoning_path ? state.run.ledger.summary.answers.allowed.by_rezoning.verdict : state.run.ledger.summary.answers.allowed.outright.verdict))} <span>Allowed: ${h(state.run.ledger.summary.answers.allowed.rezoning_path ? state.run.ledger.summary.answers.allowed.by_rezoning.verdict + " by rezoning" : state.run.ledger.summary.answers.allowed.outright.verdict + " outright")}</span></li>
+      <li>${pill(verdictStatus(state.run.ledger.summary.answers.funded.verdict))} <span>Funders: ${h(state.run.ledger.summary.answers.funded.verdict)}</span></li>
+      <li>${pill((state.run.ledger.summary.answers.unsure || []).length ? "uncertain" : "pass")} <span>${(state.run.ledger.summary.answers.unsure || []).length || "No"} open item${(state.run.ledger.summary.answers.unsure || []).length === 1 ? "" : "s"}, each with a person</span></li>
+      ${pf && pf.available ? `<li>${pill(MONEY_STATUS[pf.verdict.word] || "uncertain")} <span>Money: ${h(pf.verdict.word)} · capital ${h(money(pf.capital.total))}, funding ${h(money(pf.funding.total))}, gap ${h(money(pf.gap.value))}</span></li>` : (pf ? `<li>${pill("uncertain")} <span>Money: not computed (${h(pf.why || "")})</span></li>` : "")}
+    </ul>
+    ${pf && pf.available && pf.verdict.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${pf.verdict.unsure.map(u => `<li>${h(u)}</li>`).join("")}</ul></div>` : ""}
+    <div class="form-actions"><button class="btn btn-small" type="button" id="guide-run-again"${done[4] ? "" : " disabled"}>Run again</button><span class="help">After a change in the Site or Option card, or in Money in.</span></div>` : `<div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-run-again"${done[4] ? "" : " disabled"}>Run the rules</button></div>`}`;
 
   const stop7 = `
     <p class="help">${state.run ? `Hand ${h(rev(state.run.run_id))} to the architect with a note; they see it in their top bar.` : "Run the rules first."}${STATIC ? " Issuing needs the local server." : ""}</p>
@@ -3282,6 +3357,7 @@ function renderGuideInto(el) {
   el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Start from an address</h2><span class="help">seven stops</span></div>
     ${stop(1, stop1)}${stop(2, stop2)}${stop(3, stop3)}${stop(4, stop4)}${stop(5, stop5)}${stop(6, stop6)}${stop(7, stop7)}`;
   wireGuide();
+  guideProgress();
 }
 
 /* What the rules leave to a person can be answered here, in the flow. Site facts go to the Site card at once (the
@@ -3366,7 +3442,7 @@ function wireGuide() {
     state.optionDirty = true;
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
   }));
-  on("#guide-rerun", () => { guide.step = 6; runRules(); });
+  on("#guide-run-again", () => runRules());
   on("#guide-ask-claude", guideAskClaude);
   $$("[data-confirm-key]", el).forEach(b => b.addEventListener("click", () => confirmProposal(b.dataset.confirmKey, b.dataset.confirmAll === "1")));
   wireKeyBoxes(el);
@@ -3900,10 +3976,14 @@ function setMode(mode, remember = true, announce = true) {
     closeExportPanel();
   } else {
     showInputs(true, false);
-    for (const kind of ["site", "option"]) setCollapsed(kind, mode === "manager" && chosen(kind));
+    // the architect's forms open on a desk; stacked over the memo on a narrow window they would bury it, so
+    // there they start folded like the manager's and Edit opens them
+    const stacked = matchMedia("(max-width: 1100px)").matches;
+    for (const kind of ["site", "option"]) setCollapsed(kind, (mode === "manager" || stacked) && chosen(kind));
   }
   applyModeToMemo();
   renderGuide();
+  guideProgress();
   issueButtonLabel();
   closeIssuePanel();
   if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }

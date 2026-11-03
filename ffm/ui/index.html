@@ -49,6 +49,7 @@
   <a href="#step-option" data-step="2"><span class="step-n">2</span> Option</a>
   <a href="#step-run" data-step="3"><span class="step-n">3</span> Run and read</a>
   <a href="#step-export" data-step="4"><span class="step-n">4</span> Export</a>
+  <span id="guide-progress" class="guide-progress" aria-live="polite"></span>
   <a href="#" id="tour-link" class="tour-link">Walkthrough</a>
 </nav>
 <div id="status" class="strip" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Loading the sites, options and rules…</span></div>
@@ -131,11 +132,15 @@
       <div class="action-bar">
         <button id="pdf-btn" class="btn" type="button" disabled>Download PDF</button>
         <button id="print-btn" class="btn" type="button" disabled>Print</button>
-        <a id="dl-html" class="btn btn-quiet" download aria-disabled="true">Download memo (HTML)</a>
-        <a id="dl-md" class="btn btn-quiet" download aria-disabled="true">Download memo (Markdown)</a>
-        <a id="dl-massing" class="btn btn-quiet" download aria-disabled="true">Download massing.json</a>
         <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
         <button id="issue-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="issue-panel">Issue to the architect</button>
+        <details class="more-formats"><summary class="btn btn-quiet">More formats</summary>
+          <div class="action-bar">
+            <a id="dl-html" class="btn btn-quiet" download aria-disabled="true">Memo as HTML</a>
+            <a id="dl-md" class="btn btn-quiet" download aria-disabled="true">Memo as Markdown</a>
+            <a id="dl-massing" class="btn btn-quiet" download aria-disabled="true">massing.json</a>
+          </div>
+        </details>
       </div>
       <form id="issue-panel" class="issue-panel" hidden>
         <label for="issue-note">A note for the reader who receives it</label>

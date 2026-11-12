@@ -30,28 +30,36 @@ site (home) ──► the case ──► tool: memo on screen (R1)
 ```
 
 1. **Home.** Reads the three questions and one real finding. One click: *Run the real case*.
-2. **The tool opens on the memo, not on a form.** The real case is loaded; the answers are on screen
-   before anything is typed. The inputs rail sits beside the memo and folds away.
-3. **Start from an address** (built 3 Nov 2026, the guided card at the top of the rail, seven stops):
-   1. *Find the site*: an address; the City's address list gives the point, its open data the zoning
-      district and the parcel, which becomes the lot's area and an equivalent rectangle. Or a saved site.
+2. **The tool opens blank, on the guide** (11 Nov 2026; before that it opened on the real case). Stop 1 is
+   open and the memo pane is the stage: one card per stop, each saying what it holds or which stop fills
+   it. The real case loads only from a link (`?run=`, `?tour=`, `?demo=1`) or the "Load the demo case"
+   button on the stage. The inputs rail sits beside the memo and folds away.
+3. **Set up the run** (built 3 Nov 2026, the guided card at the top of the rail, seven stops):
+   1. *Find the site*: one way in at a time, an address or a saved site. The City's address list gives the
+      point, its open data the zoning district and the parcel, which becomes the lot's area and an
+      equivalent rectangle. The stage then shows the parcel on an OpenStreetMap map with its district, lot,
+      street, owner and the "not sure" fields; the Site card appears below the guide only now.
       *Ask Claude about this site*, with a key (the local server's, or the manager's own typed into the
       fold and kept in their browser only): the model proposes the odd lot's rectangle, its frontage street
       and what is odd, with evidence and a confidence; the manager confirms each field by name, and the
       site file records it.
-   2. *Choose the programs*: the funders in view.
-   3. *Read the site*: layers A to C on the site alone, shown in the memo pane before any option. Where
+   2. *Choose the programs*: the funders in view; the stage shows each program's published terms (mix,
+      lease, limits, status) with its source, from the rule file in force on the date.
+   3. *Read the site*: layers A to C on the site alone, shown on the stage before any option. Where
       the stack has no schedule for the district (RT-3), *Read the district schedule with Claude*: the
       manager saves the City's PDF, chooses it, the model proposes its clauses with the quote behind each,
       and the manager confirms them into the rules under their name; the site is then read again.
-   4. *Shape the option*: Outright, Benchmark or Funder-ready, derived from the rules; every figure
-      Suggested | Mine with its rule beside it; what no rule settles (Community Vision area, transit
-      area, tenure, developer partner, site control) answered right there.
+   4. *Shape the option*: a saved option of the site's, or Outright, Benchmark or Funder-ready derived
+      from the rules; every figure Suggested | Mine with its rule beside it; what no rule settles
+      (Community Vision area, transit area, tenure, developer partner, site control) answered right
+      there. The stage shows the option's envelope, units, tiers and tenure with their rule ids.
    5. *Money in*: land, equity and other grants, the three figures only the manager knows; everything
-      else the pro-forma counts with is a dated, cited assumption (layer F) or a declared placeholder.
+      else the pro-forma counts with is a dated, cited assumption (layer F) or a declared placeholder,
+      listed on the stage with its source before the run.
    6. *Run the rules*: under a second; the three answers land in order, then a fourth: does the money
-      work (capital cost, net operating income, the funding stack, the gap; likely / unlikely / unsure).
-      The stop lists the four answers and offers *Run again*.
+      work (capital cost, net operating income, the funding stack, the gap; likely / unlikely / unsure),
+      every line of it naming its rule and linking its source. The stop lists the four answers and
+      offers *Run again*.
    7. *Issue*: a note, and the architect sees the revision in their top bar.
    In manager mode the four step links give way to the guide's own progress line ("Stop 6 of 7 · Run the
    rules · 4 done"), so one progress system is on screen.
@@ -96,8 +104,10 @@ tool: memo R1 ─► Option: Edit ─► change storeys / units / setbacks ─�
    *Check Revit result* brings the sheet back as FIG 03.
 
 Design consequences: the input cards collapse to a summary line and open on Edit, so the memo keeps
-its width; revisions are numbered R1, R2… everywhere a run is named; the figures sit beside the
-answers on a wide screen; the Export panel is instructions plus a result check, never a launcher.
+its width; revisions are numbered R1, R2… everywhere a run is named; in architect mode the answers
+come first and the drawings run full width under them, two to a row, the plans sheet and the block
+editor spanning both (11 Nov 2026; before that the sheets sat in a 400 px column); the Export panel
+is instructions plus a result check, never a launcher.
 
 ## Flow 3: the board, the planner, the funder's officer (PDF in, decision out)
 

@@ -288,6 +288,35 @@ Built and verified in the browser:
 - Not built yet: hosting (phase 5). A restarted preview server is needed after editing `server.py`; the Claude
   app's preview does not reload Python.
 
+## The manager's stage (11 Nov 2026): one way in, feedback per stop, cited money
+
+- Manager mode opens blank: nothing loaded, stop 1 open. The demo case (998 E 19th Ave, as approved) comes
+  only with `?run=`, `?tour=`, `?demo=1`, the "Load the demo case" button (`loadDemo`), or the architect and
+  reader modes, which still land on it. `init()` decides (`wantsDemo`).
+- Stop 1 is one way in at a time: "An address" (the lookup) or "A saved site" (`guide.way`); once a site is
+  chosen the stop collapses to a line with "Change the site" (`guide.changing`). The Site and Option cards are
+  hidden in manager mode until a site or an option exists (`syncCards()`, called from `refreshSummary`,
+  `setMode`, `init`), so the guide and the cards never offer the same choice twice. Stop 4 offers the site's
+  saved options in a select above "Or derive one from the rules".
+- Before a run the memo pane is the stage (`renderStage`, routed from `renderQuiet` in manager mode; `STAGE`):
+  one card per stop, the current stop marked, empty ones saying which stop fills them. 01 The site: the parcel
+  on an OpenStreetMap map (Leaflet 1.9.4 from cdnjs, loaded only when a site is on the stage, OSM tiles with
+  attribution; the parcel ring from `site.parcel.polygon_lonlat` when the lookup found one, else a marker at
+  `site.lookup.center`), district, lot, street, owner, the "not sure" fields, the sources. 02 The programs:
+  each chosen layer-E rule's `params` and `source` as the rule file has them (`server.list_rules` now returns
+  `params` minus `observations`, and `source`). 03 The reading (A to C). 04 The option with its rule ids.
+  05 The layer-F assumptions with their sources and the three figures that are the manager's. A signature
+  (`stageSig`) stops a guide re-render from rebuilding the map for nothing; `renderSiteReading` defers to the
+  stage in manager mode.
+- The pro-forma's "Every line" table opens by default and its From column names the rule and links the
+  source the ledger carries for it (title, section, URL); the option's own figures say so.
+- Form rows (`.field-row`) wrap on narrow columns (`auto-fit, minmax(108px, 1fr)`) instead of squeezing three
+  labels into 400 px; the (i) buttons sit on the label line.
+- Architect mode: answers on top, then the drawings full width two per row (`[data-mode="architect"]
+  .memo-body` / `.figures`), the plans sheet and the block editor spanning both columns, the ledger after.
+- The parcel survey (odd sites at city scale, `ffm/parcel_shapes.py`, `evals/parcels/`) and the polygon-aware
+  massing and boundary editor are the next piece of work; see the proposal's item 5.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

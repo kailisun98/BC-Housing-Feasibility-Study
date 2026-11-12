@@ -954,7 +954,32 @@ function setCollapsed(kind, collapsed) {
 }
 
 function refreshSummary(kind) {
-  $(`#${kind}-summary`).innerHTML = kind === "site" ? siteSummary(state.site) : optionSummary(state.option);
+  const obj = kind === "site" ? state.site : state.option;
+  $(`#${kind}-summary`).innerHTML = obj ? (kind === "site" ? siteSummary(obj) : optionSummary(obj)) : "";
+  syncCards();
+}
+
+/* The Site and Option cards exist once there is a site or an option to show: the manager reaches them through the
+   guide (one way in at a time), the architect and the reader always have both. */
+function syncCards() {
+  const manager = state.mode === "manager";
+  const siteCard = $("#step-site"), optCard = $("#step-option");
+  if (!siteCard || !optCard) return;
+  siteCard.hidden = manager && !state.site;
+  optCard.hidden = manager && !(state.option && (state.optionId || state.option.storeys != null || state.option.gfa_m2 != null));
+}
+
+/* Load the demo case from the guide: the committed site and its as-approved option. */
+async function loadDemo() {
+  const first = state.sites.some(s => s.id === PRELOAD_SITE) ? PRELOAD_SITE : (state.sites[0] ? state.sites[0].id : null);
+  if (!first) { toast("No saved site to load.", true); return; }
+  state.optionId = PRELOAD_OPTION;
+  $("#site-select").value = first;
+  await selectSite(first);
+  guide.step = 2; guide.way = "saved";
+  syncCards();
+  renderGuide(2);
+  setStatus(`The demo case is loaded: ${state.site.address}. Choose the programs, or run the rules as the case stands.`, "ok");
 }
 
 /* rent_tiers_units: all three blank means "not stated" (null), which the engine reads as unsure. */
@@ -1205,6 +1230,7 @@ function enableExports(run) {
 
 function renderQuiet() {
   if (state.run) return;  // a run is on screen: leave it
+  if (state.mode === "manager") { renderStage(); return; }   // the manager's pane answers each stop as it is taken
   const site = state.site || {}, opt = state.option || {};
   const n = state.rules.length;
   placeRunTools(false);
@@ -1225,6 +1251,165 @@ function renderQuiet() {
       ${quietCard("03 · Still unsure", "What is still unsure, and who resolves it?", "Every open item names the person and the document.")}
       ${quietCard("04 · Does the money work", "Does the money work?", "Capital cost, net operating income, the funding stack and the gap, feasibility grade, every line citing its assumption.")}
     </div>`;
+}
+
+// ---------------------------------------------------------------- the manager's stage: what each stop found, in the memo pane
+
+/* Before a run, the memo pane answers the guide stop by stop: the site on a map with its facts, the programs' terms,
+   the site's reading, the option's figures, the assumptions the money will count with. Each card says what it holds
+   or which stop fills it; the current stop's card is marked. */
+const STAGE = [
+  { n: 1, key: "site", title: "The site", empty: "Stop 1: look up an address or pick a saved site. The parcel is drawn on a map with its district, area and shape." },
+  { n: 2, key: "programs", title: "The programs", empty: "Stop 2: tick the funders in view. Their published terms come here with their sources." },
+  { n: 3, key: "reading", title: "What the site allows", empty: "Stop 3: layers A to C on the site alone, before any option." },
+  { n: 4, key: "option", title: "The option", empty: "Stop 4: the envelope, the units and the tiers, each with the rule it came from." },
+  { n: 5, key: "money", title: "What the money counts with", empty: "Stop 5: the dated, cited assumptions behind the pro-forma, and the three figures only you know." },
+  { n: 6, key: "run", title: "The memo", empty: "Stop 6: run the rules. The four answers land here, then the drawings and the ledger." },
+];
+
+let stageSig = "";   // what the stage last drew, so a re-render of the guide does not rebuild the map for nothing
+function renderStage() {
+  if (state.run || state.mode !== "manager") return;
+  const memo = $("#memo");
+  if (!memo) return;
+  const site = state.site;
+  const cur = guide.step || 1;
+  const o = state.option || {};
+  const sig = JSON.stringify([site && [site.id, site.address, site.site_area_m2, site.zoning_district, site.owner, site.parcel && site.parcel.polygon_lonlat && site.parcel.polygon_lonlat.length],
+    guide.programs || o.target_programs, guide.reading && [guide.reading.as_of, guide.reading.results.length], guide.suggestion && [guide.suggestion.candidate, Object.keys(guide.mine || {})],
+    cur, o.storeys, o.gfa_m2, o.units, o.rent_tiers_units, o.tenure, o.finance, memo.dataset.stage]);
+  if (sig === stageSig && memo.dataset.stage === "1") return;
+  stageSig = sig;
+  placeRunTools(false);
+  const cards = STAGE.map(s => {
+    let body = "";
+    if (s.key === "site" && site) body = stageSite(site);
+    else if (s.key === "programs" && (guide.programs || (state.option && state.option.target_programs))) body = stagePrograms(guide.programs || state.option.target_programs);
+    else if (s.key === "reading" && guide.reading) body = stageReading(guide.reading);
+    else if (s.key === "option" && (guide.suggestion || (state.option && state.option.storeys != null))) body = stageOption();
+    else if (s.key === "money" && (cur >= 5 || (state.option && state.option.finance))) body = stageMoney();
+    const open = !!body;
+    return `<section class="card stage${cur === s.n ? " current" : ""}${open ? "" : " empty"}" data-stage="${s.n}">
+      <h2><span class="badge">${s.n}</span> ${h(s.title)}</h2>
+      ${open ? body : `<p class="quiet">${h(s.empty)}</p>`}
+    </section>`;
+  });
+  memo.innerHTML = `<div class="card memo-head stage-head">
+      <h1>${site ? h(site.address || site.id) : "A site, a funder, an option, a memo"}</h1>
+      <p class="quiet">${site ? "What each stop found so far. Run the rules at stop 6 and the memo takes this pane." : "Seven stops on the left, one input at a time. Each stop puts what it found here, so the memo is read before it is written."}</p>
+      ${site ? "" : `<div class="form-actions"><button type="button" class="btn btn-small" id="stage-demo">Load the demo case</button><span class="help">998 E 19th Ave as approved by Council, 25 Jul 2024, from the City's public referral report.</span></div>`}
+    </div>
+    <div class="stage-list">${cards.join("")}</div>`;
+  memo.className = "memo landed";
+  memo.dataset.stage = "1";
+  const demo = $("#stage-demo"); if (demo) demo.addEventListener("click", () => loadDemo().catch(e => toast(e.message, true)));
+  if (site) mountStageMap(site);
+}
+
+function stageSite(site) {
+  const notSure = SITE_FIELDS.flatMap(g => g.fields).filter(f => f.type === TRI && getPath(site, f.key) == null).map(f => f.label);
+  const p = site.parcel || {};
+  const m = p.metrics || {};
+  const srcs = (site.sources || []).slice(0, 3);
+  return `
+    <div class="stage-site">
+      <div class="stage-map" id="stage-map" aria-label="The parcel on a map"><p class="help">Map loading…</p></div>
+      <dl class="found-site">
+        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>` : "<i>not found: enter it in the Site card</i>"}</dd></div>
+        <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel: enter the area</i>"}${m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the figures use the equivalent rectangle"})</span>` : ""}</dd></div>
+        <div><dt>Street</dt><dd>${h(((site.context || {}).street || {}).name || (site.osm && site.osm.frame && site.osm.frame.front_street) || "not known")}</dd></div>
+        <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) + (site.owner_type ? ` <span class="cont">(${h(String(site.owner_type).replace(/_/g, " "))})</span>` : "") : "<i>not given</i>"}</dd></div>
+        ${notSure.length ? `<div><dt>Not sure</dt><dd class="cont">${h(notSure.join("; "))}. The rules read these as uncertain until answered in the Site card.</dd></div>` : ""}
+      </dl>
+    </div>
+    ${srcs.length ? `<p class="stage-src">${srcs.map(s => s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.title)}</a>` : h(s.title)).join(" · ")}</p>` : ""}`;
+}
+
+/* The programs' published terms, from the rule files themselves (the version in force on the as-of date). */
+function stagePrograms(ids) {
+  const rules = state.rules.filter(r => r.layer === "E" && ids.includes(r.id));
+  if (!rules.length) return `<p class="quiet">No program chosen: the funders' answer will list every program as information.</p>`;
+  const human = k => k.replace(/_cad(_\d{4}_\d{2})?$/, " ($)").replace(/_m2$/, " (m²)").replace(/_/g, " ");
+  const val = v => Array.isArray(v) ? v.map(val).join(", ") : (v && typeof v === "object" ? Object.entries(v).map(([k, x]) => `${k.replace(/_/g, " ")} ${typeof x === "number" && x <= 1 ? Math.round(x * 100) + "%" : fmtNum(x)}`).join(" / ") : (typeof v === "number" ? (v <= 1 && String(v).includes(".") ? Math.round(v * 100) + "%" : fmtNum(v)) : String(v)));
+  return rules.map(r => {
+    const p = r.params || {}, s = r.source || {};
+    const rows = Object.entries(p).filter(([k, v]) => !["status", "submission", "criteria_note"].includes(k) && v !== null && v !== undefined && typeof v !== "string").slice(0, 7)
+      .map(([k, v]) => `<div><dt>${h(human(k))}</dt><dd>${h(val(v))}</dd></div>`).join("");
+    return `<div class="stage-program">
+      <h3>${h(r.title)} <span class="cont">· ${h(r.jurisdiction)} · in force from ${h(r.version_effective_from || "—")}</span></h3>
+      <dl class="found-site">${rows}${p.status ? `<div><dt>Status</dt><dd class="cont">${h(p.status)}</dd></div>` : ""}</dl>
+      <p class="stage-src">${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.title || s.url)}</a>` : h(s.title || "")}${s.section ? ` <span class="cont">· ${h(s.section)}</span>` : ""}</p>
+    </div>`;
+  }).join("");
+}
+
+function stageReading(R) {
+  return `<ul class="reading-findings">${R.results.map(r => `<li class="finding-row">${pill(r.status)} <div><b>${h(r.title)}</b> <span class="rule-id">${h(r.rule_id)}</span><p class="finding">${leadCont(r.finding)}</p>${r.action ? `<p class="who">${h(r.action)}</p>` : ""}</div></li>`).join("")}</ul>
+    <p class="help">Rules as of ${h(R.as_of)}; the option's own answers come with the run.</p>`;
+}
+
+function stageOption() {
+  const S = guide.suggestion, o = state.option || (S && S.option) || {};
+  const units = o.units || {};
+  const n = Object.values(units).reduce((t, v) => t + (v || 0), 0);
+  const tiers = o.rent_tiers_units;
+  const f = k => (S && S.fields && S.fields[k]) || null;
+  const cite = k => { const x = f(k); return x && x.rule_id ? ` <code title="${h(ruleTitle(x.rule_id))}">${h(x.rule_id)}</code>` : (x ? ` <code class="ph">placeholder</code>` : ""); };
+  return `<dl class="found-site">
+      <div><dt>Candidate</dt><dd>${S ? `<b>${h(cap(S.candidate))}</b>${Object.keys(guide.mine || {}).length ? ` <span class="cont">· ${Object.keys(guide.mine).length} figure${Object.keys(guide.mine).length === 1 ? "" : "s"} yours</span>` : ""}` : `<b>${h(o.name || o.id || "saved option")}</b>`}</dd></div>
+      <div><dt>Envelope</dt><dd>${o.storeys != null ? `<b>${h(o.storeys)} storeys · ${h(o.height_m)} m · ${h(fmtNum(o.gfa_m2))} m²</b>${cite("storeys")}` : "<i>not set</i>"}${o.rezoning_path ? `<div class="cont">${h(o.rezoning_path)}</div>` : ""}</dd></div>
+      <div><dt>Units</dt><dd>${n ? `<b>${h(n)}</b> · ${Object.entries(units).map(([k, v]) => `${v || 0} ${UNIT_WORD[k] || k}`).join(", ")}${cite("units.two_bed")}` : "<i>not set</i>"}</dd></div>
+      <div><dt>Tiers</dt><dd>${tiers ? `${h(tiers.market || 0)} market · ${h(tiers.rgi || 0)} RGI · ${h(tiers.deep_subsidy || 0)} deep subsidy${cite("rent_tiers_units.market")}` : "<i>not split</i>"}</dd></div>
+      <div><dt>Tenure</dt><dd>${h(String(o.tenure || "not set").replace(/_/g, " "))}${o.housing_agreement_years ? ` · ${h(o.housing_agreement_years)}-year agreement` : ""}${cite("tenure")}</dd></div>
+      <div><dt>Trees</dt><dd>${o.replacement_trees_proposed != null ? `${h(o.replacement_trees_proposed)} replacements${cite("replacement_trees_proposed")}` : "<i>not set</i>"}</dd></div>
+    </dl>
+    ${S && S.unsure && S.unsure.length ? `<p class="help">Left to a person: ${h(S.unsure.map(u => u.key.replace(/_/g, " ")).join("; "))}. Answer them in stop 4.</p>` : ""}`;
+}
+
+/* The assumptions the pro-forma reads, from layer F as it stands on the as-of date, each with its source. */
+function stageMoney() {
+  const F = state.rules.filter(r => r.layer === "F");
+  const fin = (state.option && state.option.finance) || {};
+  return `<dl class="found-site stage-money">
+      <div><dt>Yours</dt><dd>land ${fin.land_cost_cad != null ? "$" + fmtNum(fin.land_cost_cad) : "<i>blank</i>"} · equity ${fin.equity_cad != null ? "$" + fmtNum(fin.equity_cad) : "<i>blank</i>"} · other grants ${fin.other_grants_cad != null ? "$" + fmtNum(fin.other_grants_cad) : "<i>blank</i>"}</dd></div>
+    </dl>
+    <ul class="stage-assumptions">${F.map(r => `<li><b>${h(r.title)}</b>${(r.source || {}).placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}<div class="cont">${h((r.params || {}).summary || "")}</div><div class="stage-src">${(r.source || {}).url ? `<a href="${h(r.source.url)}" target="_blank" rel="noopener">${h(r.source.title)}</a>` : h((r.source || {}).title || "")}</div></li>`).join("")}</ul>`;
+}
+
+/* The parcel on an OpenStreetMap map (Leaflet from a CDN, OSM tiles, loaded only when a site is on the stage). */
+const LEAFLET_JS = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+const LEAFLET_CSS = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+let leafletPromise = null;
+function loadLeaflet() {
+  if (window.L) return Promise.resolve();
+  if (leafletPromise) return leafletPromise;
+  leafletPromise = new Promise((resolve, reject) => {
+    if (!document.querySelector(`link[href="${LEAFLET_CSS}"]`)) { const l = document.createElement("link"); l.rel = "stylesheet"; l.href = LEAFLET_CSS; document.head.appendChild(l); }
+    loadScript(LEAFLET_JS).then(resolve, reject);
+  });
+  return leafletPromise;
+}
+
+async function mountStageMap(site) {
+  const box = $("#stage-map");
+  if (!box) return;
+  const ring = site.parcel && site.parcel.polygon_lonlat;
+  const c = (site.lookup && site.lookup.center) || (site.osm && site.osm.center) || ((site.context || {}).center) || null;
+  if (!ring && !c) { box.innerHTML = `<p class="help">No coordinates for this site: look it up by address to place it on the map.</p>`; return; }
+  try { await loadLeaflet(); } catch (e) { box.innerHTML = `<p class="help">The map could not load (${h(e.message)}); the plan still draws the lot.</p>`; return; }
+  box.innerHTML = "";
+  const map = L.map(box, { zoomControl: true, attributionControl: true, scrollWheelZoom: false });
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
+  if (ring && ring.length >= 3) {
+    const latlngs = ring.map(p => [p[1], p[0]]);
+    const poly = L.polygon(latlngs, { color: "#2a6fb8", weight: 2, fillColor: "#3c8cdc", fillOpacity: 0.25 }).addTo(map);
+    poly.bindTooltip(`${site.address || site.id} · ${site.site_area_m2 ? fmtNum(site.site_area_m2) + " m²" : "parcel"}`);
+    map.fitBounds(poly.getBounds().pad(0.6));
+  } else {
+    map.setView([c.lat, c.lon], 17);
+    L.circleMarker([c.lat, c.lon], { radius: 6, color: "#2a6fb8" }).addTo(map);
+  }
+  setTimeout(() => map.invalidateSize(), 50);
 }
 
 function quietCard(eyebrow, title, line) {
@@ -1396,7 +1581,13 @@ function answerMoney(run) {
   const grants = (f.grants || []).reduce((t, x) => t + (x.value || 0), 0);
   const unit = u => (u === "$/yr" ? " a year" : u === "$/m²" ? " per m²" : "");
   const shown = ln => (ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + unit(ln.unit) : (ln.value == null ? "not given" : fmtNum(ln.value)));
-  const rows = (pf.lines || []).map(ln => `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${ln.rule_id ? `<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>` : "<span class=\"cont\">the option</span>"}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont">${h(ln.note || "")}</td></tr>`).join("");
+  // every line names the rule it came from and links the rule's source, as the ledger carries it
+  const srcOf = id => { const r = (run.ledger && run.ledger.results || []).find(x => x.rule_id === id); return r && r.source ? r.source : null; };
+  const rows = (pf.lines || []).map(ln => {
+    const s = ln.rule_id ? srcOf(ln.rule_id) : null;
+    const from = ln.rule_id ? `<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>${s ? `<div class="cont">${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.title || s.url)}</a>` : h(s.title || "")}${s.section ? `, ${h(s.section)}` : ""}</div>` : ""}` : `<span class="cont">the option's own figures</span>`;
+    return `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${from}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont">${h(ln.note || "")}</td></tr>`;
+  }).join("");
   return `<section class="card answer money" data-verdict="${MONEY_STATUS[v.word] || "uncertain"}">
     <h2><span class="badge">4</span> Does the money work?</h2>
     <p class="verdict"><em>${h(cap(v.word))}.</em> ${h(v.why[0] ? v.why[0][0].toUpperCase() + v.why[0].slice(1) + "." : "")}</p>
@@ -1408,7 +1599,7 @@ function answerMoney(run) {
     </dl>
     ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
     ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
-    <details class="pf-lines"><summary>Every line and its source</summary>
+    <details class="pf-lines" open><summary>Every line, where it came from, and its source</summary>
       <table class="plain"><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="cont">A feasibility screen, not a lender's model. Hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked.</p>
     </details>
@@ -3515,16 +3706,25 @@ function renderGuideInto(el) {
   };
 
   const lk = guide.lookup;
-  const stop1 = `
+  // one way in at a time: an address to look up, or a saved site; a chosen site shows as a line with Change
+  const way = guide.way || "address";
+  const siteChosen = done[1] && !guide.changing;
+  const savedList = state.sites.map(s => `<option value="${h(s.id)}"${state.siteId === s.id ? " selected" : ""}>${h(s.address || s.id)} · ${h(s.zoning_district || "?")}</option>`).join("");
+  const stop1 = siteChosen ? `
+    <dl class="found-site"><div><dt>Site</dt><dd><b>${h(site.address || site.id)}</b>${site.zoning_district ? ` · ${h(site.zoning_district)}` : ""}${site.site_area_m2 ? ` · ${h(fmtNum(site.site_area_m2))} m²` : ""} <span class="cont">${state.siteId ? "(saved)" : "(from the lookup, unsaved)"}</span></dd></div></dl>
+    <div class="form-actions"><button class="btn btn-small btn-quiet" type="button" id="guide-change-site">Change the site</button><span class="help">The Site card below holds its facts; answer what the data could not.</span></div>` : `
+    <div class="seg way" role="group" aria-label="How to find the site"><button type="button" class="segbtn" data-way="address" aria-pressed="${way === "address"}">An address</button><button type="button" class="segbtn" data-way="saved" aria-pressed="${way === "saved"}">A saved site</button></div>
+    ${way === "address" ? `
     <label class="field"><span class="label">Address</span><input type="text" id="guide-address" value="${h(guide.address)}" placeholder="998 E 19th Ave, Vancouver, BC" autocomplete="street-address"></label>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-lookup"${guide.loading === "lookup" ? " disabled" : ""}>${guide.loading === "lookup" ? "Looking up…" : "Look up the site"}</button><span class="help">Nominatim for the point; the City's open data for the district and the parcel.</span></div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-lookup"${guide.loading === "lookup" ? " disabled" : ""}>${guide.loading === "lookup" ? "Looking up…" : "Look up the site"}</button><span class="help">The City's address list for the point, its open data for the district and the parcel.</span></div>
     ${lk ? `<dl class="found-site">
       <div><dt>District</dt><dd>${lk.site.zoning_district ? `<b>${h(lk.site.zoning_district)}</b>` : "<i>not found: enter it</i>"}</dd></div>
       <div><dt>Lot</dt><dd>${lk.site.site_area_m2 ? `<b>${h(fmtNum(lk.site.site_area_m2))} m²</b> · ${h(lk.site.frontage_m)} × ${h(lk.site.depth_m)} m <span class="cont">(${h(lk.fields.frontage_m.note)})</span>` : "<i>no parcel found</i>"}</dd></div>
       <div><dt>Found as</dt><dd class="cont">${h(lk.site.address)}</dd></div>
     </dl>
-    <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-site">Use this site</button><span class="help">Then answer what the data cannot: the policy areas, water and sewer, trees, the owner.</span></div>` : ""}
-    <p class="help stop-or">Or pick a saved site in the Site card below${done[1] ? `: <b>${h(site.address || site.id)}</b> is chosen` : ""}.</p>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-use-site">Use this site</button><span class="help">Then answer what the data cannot: the policy areas, water and sewer, trees, the owner.</span></div>` : ""}` : `
+    <label class="field"><span class="label">Saved site</span><select id="guide-saved-site">${savedList || `<option value="">none saved yet</option>`}</select></label>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-use-saved"${state.sites.length ? "" : " disabled"}>Use this site</button><span class="help">A site file in sites/, with its facts and context already answered.</span></div>`}
     <details class="claude-fold"${hasClaude() || guide.proposal ? " open" : ""}><summary>Ask Claude about this site <span class="cont">(with a key; optional)</span></summary>
       ${renderKeyBox("keybox-site")}
       ${hasClaude() ? `<div class="form-actions"><button class="btn btn-small" type="button" id="guide-ask-claude"${done[1] && guide.loading !== "claude" ? "" : " disabled"}>${guide.loading === "claude" ? "Reading…" : "Ask Claude about this site"}</button><span class="help">For an odd lot: the model proposes the equivalent rectangle, the frontage street and what is odd, with evidence; you confirm each field.</span></div>${renderProposal(guide.proposal)}` : ""}
@@ -3572,7 +3772,13 @@ function renderGuideInto(el) {
       <div class="sg-note">${h(f.note || "")}</div>
     </div>`;
   }).join("") : "";
+  // a saved option can be the one, or the rules derive one; a derived option replaces the saved one in the card
+  const savedOpts = (state.options || []).filter(o => o.for_site);
+  const optLoaded = !!(state.optionId && state.option);
   const stop4 = `
+    ${savedOpts.length ? `<label class="field"><span class="label">A saved option</span><select id="guide-saved-option"><option value="">none: derive one from the rules</option>${savedOpts.map(o => `<option value="${h(o.id)}"${state.optionId === o.id ? " selected" : ""}>${h(o.name || o.id)}</option>`).join("")}</select></label>
+    ${optLoaded && !S ? `<p class="help">${optionSummary(state.option)}. Its figures are in the Option card below, where each can be edited.</p>` : ""}
+    <p class="help stop-or">Or derive one from the rules:</p>` : ""}
     <div class="seg cands" role="group" aria-label="Start from">${cands.map(c => `<button class="segbtn" type="button" data-cand="${h(c.id)}" aria-pressed="${guide.candidate === c.id}"${c.available === false ? ` disabled title="${h(c.why)}"` : ` title="${h(c.what)}"`}>${h(c.title)}</button>`).join("")}</div>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-suggest"${guide.loading === "suggest" ? " disabled" : ""}>${guide.loading === "suggest" ? "Deriving…" : (S ? "Derive again" : "Suggest from the rules")}</button><span class="help">Every figure cites the rule it came from; placeholders say so.</span></div>
     ${S ? `<div class="sg-rows">${rows}</div>
@@ -3607,10 +3813,11 @@ function renderGuideInto(el) {
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-issue"${state.run && !STATIC ? "" : " disabled"}>Issue to the architect</button></div>
     ${state.run && state.run.issued ? `<p class="help">Issued ${h(state.run.issued.issued_at.replace("T", " ").slice(0, 16))}.</p>` : ""}`;
 
-  el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Start from an address</h2><span class="help">seven stops</span></div>
+  el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Set up the run</h2><span class="help">seven stops</span></div>
     ${stop(1, stop1)}${stop(2, stop2)}${stop(3, stop3)}${stop(4, stop4)}${stop(5, stop5)}${stop(6, stop6)}${stop(7, stop7)}`;
   wireGuide();
   guideProgress();
+  if (!state.run) renderStage();
 }
 
 /* What the rules leave to a person can be answered here, in the flow. Site facts go to the Site card at once (the
@@ -3670,8 +3877,38 @@ function wireGuide() {
   const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
   on("#guide-lookup", guideLookup);
   on("#guide-use-site", guideUseSite);
+  $$(".way .segbtn", el).forEach(b => b.addEventListener("click", () => { guide.way = b.dataset.way; renderGuide(1); }));
+  on("#guide-use-saved", async () => {
+    const id = ($("#guide-saved-site", el) || {}).value;
+    if (!id) return;
+    if ((state.siteDirty || state.optionDirty) && state.site && !confirm("Switch the site? Unsaved edits to the site and option will be lost.")) return;
+    try {
+      $("#site-select").value = id;
+      await selectSite(id);
+      guide.changing = false; guide.way = "saved"; guide.step = 2;
+      syncCards();
+      renderGuide(2);
+      renderStage();
+      setStatus(`${state.site.address || id} is the site. Its parcel is on the map; choose the programs next.`, "ok");
+    } catch (e) { toast(e.message, true); }
+  });
+  on("#guide-change-site", () => { guide.changing = true; guide.step = 1; renderGuide(1); });
   on("#guide-programs", () => { guide.programs = $$(".guide-program:checked", el).map(x => x.value); if (state.option) { state.option.target_programs = guide.programs.slice(); onOptionChange("target_programs"); renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange); } guide.step = 3; renderGuide(3, $("#guide-programs") ? $("#guide-programs").getBoundingClientRect().top : null); setStatus(`Programs chosen: ${guide.programs.map(ruleTitle).join("; ") || "none"}.`, "ok"); });
   on("#guide-read", guideReadSite);
+  const savedOpt = $("#guide-saved-option", el);
+  if (savedOpt) savedOpt.addEventListener("change", async () => {
+    const id = savedOpt.value || "__new__";
+    if (state.optionDirty && state.option && id !== "__new__" && !confirm("Switch the option? Unsaved edits to the option will be lost.")) { savedOpt.value = state.optionId || ""; return; }
+    try {
+      $("#option-select").value = id;
+      await selectOption(id);
+      guide.suggestion = null; guide.mine = {};
+      if (id !== "__new__") guide.step = 5;
+      syncCards();
+      renderGuide(id === "__new__" ? 4 : 5);
+      setStatus(id === "__new__" ? "No saved option: derive one from the rules, or fill the Option card." : `${state.option.name || id} is the option. Enter the money the rules cannot know, then run.`, "ok");
+    } catch (e) { toast(e.message, true); }
+  });
   $$(".cands .segbtn", el).forEach(b => b.addEventListener("click", () => { guide.candidate = b.dataset.cand; guide.mine = {}; guideSuggest(); }));
   on("#guide-suggest", guideSuggest);
   $$(".sg-row", el).forEach(row => {
@@ -3938,10 +4175,12 @@ async function guideUseSite() {
   await loadRuns();
   fillRunSelects();
   guide.reading = null; guide.suggestion = null; guide.mine = {}; guide.proposal = null;
-  guide.step = 2;
+  guide.step = 2; guide.changing = false; guide.way = "address";
+  syncCards();
   renderGuide(2, $("#guide-use-site") ? $("#guide-use-site").getBoundingClientRect().top : null);
+  renderStage();
   setStep(1);
-  setStatus("The site is in the Site card below, unsaved: answer the policy areas, water and sewer, trees and the owner there, then choose the programs.", "ok");
+  setStatus("The site is in the Site card below, unsaved, and on the map: answer the policy areas, water and sewer, trees and the owner in the card, then choose the programs.", "ok");
 }
 
 async function guideReadSite() {
@@ -3963,6 +4202,7 @@ async function guideReadSite() {
 
 /* The site's reading sits in the memo pane until a run replaces it. */
 function renderSiteReading(R) {
+  if (state.mode === "manager") { stageSig = ""; renderStage(); return; }   // the stage carries the reading in its third card
   const site = R.site || state.site || {};
   const rows = R.results.map(r => `<li class="finding-row">${pill(r.status)} <div><b>${h(r.title)}</b> <span class="rule-id">${h(r.rule_id)}</span><p class="finding">${leadCont(r.finding)}</p>${r.action ? `<p class="who">${h(r.action)}</p>` : ""}</div></li>`).join("");
   $("#memo").innerHTML = `
@@ -4236,8 +4476,10 @@ function setMode(mode, remember = true, announce = true) {
   }
   applyModeToMemo();
   if (editor.open && mode !== "architect") closeEditor();   // the editor is the architect's; leaving the mode closes it
+  syncCards();
   renderGuide();
   guideProgress();
+  if (!state.run) renderQuiet();   // the manager's stage, or the quiet cards for the other modes
   issueButtonLabel();
   closeIssuePanel();
   if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }
@@ -4336,13 +4578,30 @@ async function init() {
   try {
     state.rules = await api(`/api/rules?as_of=${$("#as-of").value}`);
     await loadSites();
-    const first = state.sites.some(s => s.id === PRELOAD_SITE) ? PRELOAD_SITE : (state.sites[0] ? state.sites[0].id : "__new__");
-    state.optionId = PRELOAD_OPTION;
-    $("#site-select").value = first;
-    await selectSite(first);
+    // the manager starts with nothing loaded and the guide's first stop open; the demo case comes only with a
+    // link (?run=, ?tour=, ?demo=1) or the "Load the demo case" button. The architect and the reader arrive on
+    // a run (an issued revision, a link) and otherwise see the demo, as before.
+    const q = new URLSearchParams(location.search);
+    const wantsDemo = q.has("run") || q.has("tour") || q.has("demo") || state.mode !== "manager";
+    if (wantsDemo) {
+      const first = state.sites.some(s => s.id === PRELOAD_SITE) ? PRELOAD_SITE : (state.sites[0] ? state.sites[0].id : "__new__");
+      state.optionId = PRELOAD_OPTION;
+      $("#site-select").value = first;
+      await selectSite(first);
+      if (state.mode === "manager" && state.site && !q.has("run")) { guide.step = 2; guide.way = "saved"; renderGuide(2); }
+    } else {
+      state.site = null; state.siteId = null; state.option = null; state.optionId = null;
+      $("#site-select").value = "__new__";
+      await loadRuns();
+      fillRunSelects();
+      renderStage();
+    }
+    syncCards();
     setStatus(state.mode === "reader"
       ? "The memo reads here as on paper. Open a run from a link, or switch to Manager to pick a site and run the rules."
-      : `Laid out for ${MODES[state.mode].who}. Pick a site and an option, set the date the rules should be read on, then run the rules.`, "info");
+      : (state.mode === "manager" && !wantsDemo
+        ? "Start at stop 1: look up an address, or pick a saved site. Each stop puts what it found in the memo pane."
+        : `Laid out for ${MODES[state.mode].who}. Pick a site and an option, set the date the rules should be read on, then run the rules.`), "info");
   } catch (e) {
     toast(`Could not load the inputs: ${e.message}`, true);
   }

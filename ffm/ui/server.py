@@ -180,9 +180,13 @@ def list_rules(as_of: str | None) -> list[dict]:
     out = []
     for r in load_rules(RULES_DIR):
         v = r.version_on(on)
+        # the version's parameters and source travel too (without the long BCPI series), so the page can show a
+        # program's terms or an assumption's figure and cite it before any run
+        params = {k: x for k, x in (v.params if v else {}).items() if k != "observations"}
         out.append({"id": r.id, "layer": r.layer, "layer_title": r.layer_title, "title": r.title, "jurisdiction": r.jurisdiction,
                     "applies_to_districts": r.applies_to_districts, "check": r.check,
-                    "version_effective_from": v.effective_from.isoformat() if v else None})
+                    "version_effective_from": v.effective_from.isoformat() if v else None,
+                    "params": params, "source": (v.source if v else {})})
     return out
 
 

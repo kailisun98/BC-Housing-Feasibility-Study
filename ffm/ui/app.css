@@ -223,8 +223,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
   width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; line-height: 1.35;
 }
 .field textarea { min-height: 56px; resize: vertical; }
-.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); gap: 8px; }
+/* a row of related fields: three across where the rail allows about 110 px each, else two, else one; a label may
+   take two lines and its (i) stays on the first */
+.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 8px 10px; align-items: end; }
 .field-row .field { min-width: 0; }
+.field-row .field .label-line { align-items: flex-start; }
+.field-row .field .label-line label, .field-row .field .label-line .label { line-height: 1.3; }
+.field-row .field .info-btn { margin-top: 1px; }
 .live { font-size: 12px; color: var(--muted); }
 .live b { color: var(--ink); font-weight: 600; }
 
@@ -564,7 +569,7 @@ table.plain td.status { white-space: nowrap; }
 .need-rule { background: transparent; }
 .need-figure { background: transparent; border-color: var(--muted); border-style: dashed; }
 .label-line { display: flex; align-items: center; gap: 6px; }
-.label-line label, .label-line .label { flex: 1 1 auto; }
+.label-line label, .label-line .label { flex: 1 1 auto; min-width: 0; }
 .info-btn { flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--muted); background: transparent; color: var(--muted); font: 600 10px/1 var(--mono); padding: 0; cursor: pointer; min-height: 0; }
 .info-btn:hover, .info-btn[aria-expanded="true"] { background: var(--ink); border-color: var(--ink); color: var(--panel); }
 .pop { position: fixed; z-index: 40; margin: 0; padding: 8px 10px; background: var(--panel); border: 1px solid color-mix(in srgb, var(--ink) 40%, var(--line)); border-radius: 6px; box-shadow: 0 6px 20px rgba(20, 30, 40, .18); font-size: 12px; line-height: 1.5; color: var(--ink); pointer-events: none; }
@@ -672,6 +677,40 @@ table.plain td.status { white-space: nowrap; }
 .sched-form .field .label { font-size: 11px; }
 .sched-form input[type="text"], .sched-form input[type="url"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
 .sched-form input[type="file"] { font-size: 12px; max-width: 100%; }
+/* the manager's stage: one card per stop in the memo pane before a run, the current stop marked, empty ones quiet */
+.stage-head h1 { font-size: 26px; }
+.stage-list { display: flex; flex-direction: column; gap: 12px; }
+.stage h2 { font: 600 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
+.stage h2 .badge { width: auto; height: auto; border-radius: 0; background: transparent; color: var(--muted); font: 500 11px/1 var(--mono); letter-spacing: .08em; flex: 0 0 auto; border: 0; }
+.stage h2 .badge::before { content: "0"; }
+.stage.current { border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent), var(--shadow); }
+.stage.current h2 { color: var(--ink); }
+.stage.empty { background: var(--page); box-shadow: none; }
+.stage.empty .quiet { margin: 0; color: var(--muted); font-size: 12.5px; max-width: 60ch; }
+.stage .found-site { font-size: 12.5px; }
+.stage .found-site > div { grid-template-columns: 88px minmax(0, 1fr); }
+.stage-site { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 900px) { .stage-site { grid-template-columns: minmax(280px, 1.1fr) minmax(0, 1fr); align-items: start; } }
+.stage-map { height: 260px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--field); }
+.stage-map .help { padding: 12px; }
+.stage-src { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
+.stage-src a { color: var(--blue, #2a6fb8); }
+.stage-program { padding: 8px 0; border-top: 1px solid var(--line); }
+.stage-program:first-child { border-top: 0; padding-top: 0; }
+.stage-program .found-site > div { grid-template-columns: 150px minmax(0, 1fr); }
+.stage-program h3 { font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+.memo-tools .tool select, .memo-tools select { max-width: 340px; }
+.stage-program h3 .cont { font-weight: 400; font-size: 11.5px; }
+.stage-assumptions { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; font-size: 12.5px; }
+.stage-assumptions li { border-top: 1px solid var(--line); padding-top: 6px; }
+.stage-assumptions li:first-child { border-top: 0; padding-top: 0; }
+.stage-assumptions .cont { font-size: 12px; }
+.stage-assumptions .stage-src { margin-top: 2px; }
+.stage code.ph { color: var(--s-uncertain-text); }
+.stage code { font: 10.5px var(--mono); color: var(--muted); }
+.stage dd .cont { color: var(--muted); }
+.guide .way { align-self: flex-start; margin-bottom: 2px; }
+.guide .stop-or { margin: 6px 0 2px; font-weight: 500; color: var(--ink); }
 /* stop 1: what the model proposes, each line confirmed on its own */
 .proposal { border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 5%, var(--panel)); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .prop-top { display: flex; flex-direction: column; gap: 2px; }
@@ -745,8 +784,17 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="architect"] .export .action-bar #pdf-btn { background: var(--group); color: var(--ink); }
 [data-mode="architect"] .export .action-bar #revit-btn { order: -2; background: var(--ink); color: var(--panel); border-color: transparent; }
 [data-mode="architect"] .export .action-bar #dl-massing { order: -1; }
-@media (min-width: 1280px) {
-  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr) 400px; grid-template-areas: "answers figures" "rest rest"; align-items: start; }
+/* the architect reads the four answers, then the drawings at full width, two sheets to a row, the plans (and the
+   block editor on them) across the whole width; the ledger follows */
+[data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; }
+@media (min-width: 1100px) {
+  [data-mode="architect"] .figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  [data-mode="architect"] .figure.sheet[data-sheet="plans"] { grid-column: 1 / -1; }
+  [data-mode="architect"] .figure.sheet .sheet-body svg { max-height: none; }
+}
+@media (min-width: 1600px) {
+  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; }
+  [data-mode="architect"] .memo-body > .answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
 }
 [data-mode="reader"] { --bars-h: 92px; }
 [data-mode="reader"] .steps, [data-mode="reader"] #tour-offer, [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,

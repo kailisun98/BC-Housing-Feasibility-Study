@@ -81,6 +81,12 @@ between floors, added or removed; the engine measures every move and says what b
 option* writes the placement into the option (`layout.zones`), so a run reproduces it and the memo says
 it was placed by hand. The reader's sheets are the same figures, after the answers.
 
+On an odd site (11 Nov 2026) the lot is the City's parcel polygon, not an equivalent rectangle: FIG 01 draws
+it, the setback envelope follows its lines and the masses stand in the largest rectangle inside (the plate box,
+dotted). Where the parcel is not the development site, or there is no parcel, *Edit boundary* on FIG 01 puts
+handles on the lot's corners: drag, add on an edge, Delete; *Use this boundary* writes it into the site and
+rebuilds the massing and the sheets at once; the next run and the memo carry "boundary drawn by hand".
+
 ```
 tool: memo R1 ─► Option: Edit ─► change storeys / units / setbacks ─► Run ─► memo R2
                                                                             │

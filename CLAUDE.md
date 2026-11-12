@@ -314,8 +314,46 @@ Built and verified in the browser:
   labels into 400 px; the (i) buttons sit on the label line.
 - Architect mode: answers on top, then the drawings full width two per row (`[data-mode="architect"]
   .memo-body` / `.figures`), the plans sheet and the block editor spanning both columns, the ledger after.
-- The parcel survey (odd sites at city scale, `ffm/parcel_shapes.py`, `evals/parcels/`) and the polygon-aware
-  massing and boundary editor are the next piece of work; see the proposal's item 5.
+- The committed Expo runs were regenerated on 11 Nov 2026 with the polygon massing (below); the 998 runs are
+  unchanged (a rectangle). Browser-test runs (timestamp folders) are deleted before a commit, as before.
+
+## The lot as a polygon (11 Nov 2026): odd sites, the parcel survey, the boundary editor
+
+- `ffm/parcel_shapes.py` (written by a survey agent, reviewed): shape metrics and a class for one parcel
+  polygon (rectangle, near_rectangle, trapezoid, l_shape, flag_lot, irregular, multi_part), a `confidence` from
+  nudged re-runs and an `alternative`. `evals/parcels/` holds the survey of all 99,680 City parcels
+  (`shape-survey.json`: 89.7% rectangles, 3.4% irregular, 2.0% trapezoids, 0.2% L shapes, 41 flag lots, 2
+  multi-part; its README has the thresholds and what surprised the survey), `uncertain.json` (the 40 parcels
+  the classifier is least sure of, thumbnails included, `label` and `labels_by` null for a person), and
+  `label.html` (built by `make_label_page.py`: a page to label them in a browser and download labels.json).
+  The 53.6 MB export and the fetch/survey scripts stay outside the repository; the README says how it was run.
+- `ffm/boundary.py`: `lot_ring(site)` gives the lot's outline in the lot frame from `site.boundary_m` (drawn in
+  the tool) or `site.parcel.polygon_lonlat` placed in the site's context frame (`osm.center`, `frame.
+  x_axis_bearing_deg`, `snapped_m`, reconstructed as `osm.build` made it) or, without a frame, turned so the
+  frontage runs along x with the street side assumed. `inset(ring, setbacks)` moves each edge inward by its
+  kind (front faces the street, rear faces away, side otherwise), dropping edges that collapse (acute tips,
+  short edges); `largest_rect(polygon)` finds the plate box on a 0.5 m grid, a cell counting only when inside
+  at its top and bottom edge so the box never overhangs a slanted line. `tests/test_boundary.py`.
+- `massing.build`: with a ring, `lot` carries `polygon` (the ring), `corners` (simplified, what a hand would
+  draw), `bbox`, `source` (parcel | drawn), `frame`, `polygon_area_m2`, `shape` and `note`; `envelope` is the
+  inset polygon with `box` {x, y, w, d, area_m2}, and the masses stand in the box (`plate_cap` = its area, a
+  warning when the plate exceeds it). A polygon area more than 5% off the recorded site area is a warning
+  (1010 Expo: the parcel is 2,690 m² in the context frame against the 3,908 m² the application implies; the
+  site file now carries the City's ring and says so). Rectangular sites are unchanged (no `bbox`, no `box`).
+  `massing.svg`, `layout.svg_site_plan` and the UI's FIG 01, FIG 02 and the 3D view draw the polygon, the
+  envelope and the dotted plate box on the polygon's own extent.
+- The lookup records `parcel.shape` (class, note, confidence) for a found parcel; the manager's stage says it
+  on the Lot line.
+- The boundary editor (architect mode, FIG 01 plan, `bnd` in app.js): "Edit boundary" puts handles on the lot's
+  corners (`lot.corners`); drag moves one, a square on an edge adds one, Delete removes the selected, the arrow
+  keys nudge 0.5 m; "Use this boundary" writes `site.boundary_m` (site dirty, Save site as… keeps it) and
+  rebuilds the massing, the layout and the sheets through `POST /api/layout` (`rerenderFigures`); "Back to the
+  parcel" clears it. The next run reproduces the drawn lot and the memo says "boundary drawn by hand". The
+  handles are wired to the SVG each time it is refitted (`wireBoundaryCanvas` from `fit`), because a refit
+  replaces the element.
+- Still open: the five most ambiguous parcels (2303 Wall St, 2055 Glen Dr, 4411 Brakenridge St, 1568 W 32nd
+  Ave, 4788 Hudson St) and the rest of `uncertain.json` wait for Kai's labels; the thresholds are then checked
+  against them. Which of 2,712 and 3,908 m² is the Expo development site is a question for a person.
 
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 

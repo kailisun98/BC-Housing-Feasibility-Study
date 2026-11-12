@@ -62,14 +62,15 @@
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
 ## Massing derived from the rules
-- **Proposed: 29 storeys, FSR 5.94** — plate 800 m² × 29 storeys = 23,215 m² (FSR 5.94), 88.45 m high, inside a 72.2 × 44.0 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- **Proposed: 29 storeys, FSR 5.94** — plate 800 m² × 29 storeys = 23,215 m² (FSR 5.94), 88.45 m high, inside a 31.5 × 27.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 
 ![Massing plan and section](massing.svg)
 
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
 
 ## Layouts derived from the option
-29 floors of 66.71 × 12.0 m (801 m² each); a double-loaded corridor, units 5.1 m deep; 0 of 0 units placed.
+29 floors of 31.5 × 25.41 m (800 m² each); a double-loaded corridor, units 11.8 m deep; 0 of 0 units placed.
 
 | Block | Count | Area | From |
 |---|---|---|---|
@@ -85,6 +86,7 @@ Adjacency rules, in plain words, read back from the plates:
 - *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on the street side only: the plate is too shallow for a double-loaded corridor
 - *info* — three bed plus: on the lowest residential floors. No three-bedroom units in the mix
 - *info* — accessible: next to the core, on the lowest residential floor. No accessible units stated on the option
+- Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 
 ![Stacking diagram](stacking.svg)
 
@@ -189,6 +191,7 @@ Adjacency rules, in plain words, read back from the plates:
 - Shape Your City, False Creek North social housing (ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; 29 storeys, 88.1 m at 1050 Expo Blvd) — https://www.shapeyourcity.ca/false-creek-north-non-market-housing
 - City of Vancouver, non-market housing projects (1010 Expo Blvd: 299 units, BC Indigenous Housing Society, under construction, completion 2029) — https://vancouver.ca/people-programs/non-market-housing-projects.aspx
 - Journal of Commerce, Vancouver approves 661 new social housing units across three sites in North False Creek (Jul 2023) — https://canada.constructconnect.com/joc/news/government/2023/07/vancouver-approves-661-new-social-housing-units-across-three-sites-in-north-false-creek
+- City of Vancouver Open Data, property-parcel-polygons: the parcel at 1010 Expo Boulevard (site_id 032354185), Open Government Licence - Vancouver — https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/
 - Shape Your City, 1050 Expo Boulevard development application DP-2023-00629 — https://www.shapeyourcity.ca/1050-expo-blvd
 - Public Architecture + Design, 1010 Expo Boulevard (299 units, 112 family, 15 accessible; 63 vehicle and 536 bicycle spaces; Step Code 3) — https://www.publicarchitecture.ca/work/1010-expo-boulevard/
 - Daily Hive, construction starts on two social housing towers next to Cambie Bridge's north end (6 Dec 2025; operator and funding) — https://dailyhive.com/vancouver/1050-expo-boulevard-95-nelson-street-vancouver-social-housing-firehall-8-tower-construction

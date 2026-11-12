@@ -6,8 +6,11 @@ Two masses are produced so the memo can show the gap the rezoning has to close:
                outright height), filled from the front setback back
     proposed   the option's gross floor area at its storey count, same envelope
 
-Everything is a rectangle on a rectangular lot. That is deliberate: this is the feasibility stage,
-and the point is that the numbers in the memo and the box in Revit are the same numbers.
+Every mass is a rectangle. That is deliberate: this is the feasibility stage, and the point is that the
+numbers in the memo and the box in Revit are the same numbers. The lot is the equivalent rectangle unless
+the site carries its parcel polygon or a drawn boundary (`ffm.boundary`): then the lot is that shape, the
+setback envelope is the shape inset by the setbacks, and the masses stand in the largest rectangle inside
+the envelope (the plate box).
 
 Coordinates: metres, origin at the front-left lot corner, x along the frontage, y into the lot
 (away from the street), z up. massing.json is what the pyRevit script reads.
@@ -20,8 +23,11 @@ import math
 from pathlib import Path
 from typing import Any
 
+from . import boundary
+
 
 PLATE_MIN_DEPTH_M = 12.0   # a floor plate keeps at least this depth before it gives up any width (a double-loaded corridor)
+PLATE_GRID_M = 0.5         # the grid the plate box is found on inside a polygon envelope
 
 
 def _rect(x0: float, y0: float, w: float, d: float) -> list[list[float]]:
@@ -63,33 +69,59 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     if abs(W * D - area) / area > 0.05:
         warnings.append(f"Lot is not a clean rectangle: frontage x depth = {W * D:,.0f} m² against a recorded {area:,.0f} m²; the plan uses the rectangle, the FSR uses the recorded area.")
 
-    env_w = W - 2 * float(sb.get("side", 0))
-    env_d = D - float(sb.get("front", 0)) - float(sb.get("rear", 0))
-    env_area = env_w * env_d
-    env = {"polygon": _rect(sb.get("side", 0), sb.get("front", 0), env_w, env_d), "width_m": round(env_w, 2), "depth_m": round(env_d, 2), "area_m2": round(env_area, 1), "setbacks_m": sb}
+    # the lot: the equivalent rectangle, or the parcel polygon / drawn boundary where the site carries one
+    lot = {"polygon": _rect(0, 0, W, D), "frontage_m": W, "depth_m": D, "area_m2": area, "street_side": "y = 0"}
+    ring = boundary.lot_ring(site)
+    box = None   # the plate box: x, y, w, d of the rectangle the masses stand in
+    if ring:
+        poly_area = boundary.area(ring["ring"])
+        corners = boundary.simplify([tuple(p) for p in ring["ring"]], 3.0, 0.5)    # the corners a hand would draw: no curve segments
+        lot.update({"polygon": ring["ring"], "corners": [[round(x, 2), round(y, 2)] for x, y in corners],
+                    "bbox": boundary.bbox(ring["ring"]), "source": ring["source"], "frame": ring["frame"],
+                    "polygon_area_m2": round(poly_area, 1), "shape": boundary.shape_summary(ring["ring"]), "note": ring["note"]})
+        if area and abs(poly_area - area) / area > 0.05:
+            warnings.append(f"The lot polygon measures {poly_area:,.0f} m² against a recorded site area of {area:,.0f} m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.")
+        env_poly = boundary.inset(ring["ring"], sb)
+        box = boundary.largest_rect(env_poly, PLATE_GRID_M) if env_poly else None
+        if not box:
+            warnings.append("The setbacks leave no envelope inside the lot polygon that a rectangular plate fits; the equivalent rectangle is used for the envelope.")
+    if box:
+        env_w, env_d = box["w"], box["d"]
+        env_area = boundary.area(env_poly)
+        env = {"polygon": env_poly, "width_m": round(env_w, 2), "depth_m": round(env_d, 2), "area_m2": round(env_area, 1), "setbacks_m": sb,
+               "box": box, "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"}
+        plate_cap = box["area_m2"]
+    else:
+        env_w = W - 2 * float(sb.get("side", 0))
+        env_d = D - float(sb.get("front", 0)) - float(sb.get("rear", 0))
+        env_area = env_w * env_d
+        env = {"polygon": _rect(sb.get("side", 0), sb.get("front", 0), env_w, env_d), "width_m": round(env_w, 2), "depth_m": round(env_d, 2), "area_m2": round(env_area, 1), "setbacks_m": sb}
+        box = {"x": float(sb.get("side", 0)), "y": float(sb.get("front", 0)), "w": env_w, "d": env_d, "area_m2": round(env_area, 1)}
+        plate_cap = env_area
 
     masses: list[dict[str, Any]] = []
 
-    # Where a plate smaller than the envelope sits: it keeps a usable depth (a double-loaded floor wants about
-    # 12 m; a shallow envelope gives what it has) and gives up width instead, so a wide, shallow lot gets a block,
+    # Where a plate smaller than the plate box sits: it keeps a usable depth (a double-loaded floor wants about
+    # 12 m; a shallow box gives what it has) and gives up width instead, so a wide, shallow lot gets a block,
     # not a strip. On a corner lot the block stands at the street corner: the side the cross street is on, read
     # from the site's context frame where one has been fetched.
     cross = (((site.get("osm") or {}).get("frame") or {}).get("snapped_m") or {}).get("cross_street") or {}
     at_right = cross.get("side") == "right"
 
     def footprint(plate_m2: float) -> tuple[list[list[float]], float, float]:
-        d = min(env_d, max(plate_m2 / env_w, min(env_d, PLATE_MIN_DEPTH_M)))
+        d = min(env_d, max(plate_m2 / env_w, min(env_d, PLATE_MIN_DEPTH_M))) if env_w else env_d
         w = min(env_w, plate_m2 / d) if d else env_w
-        x0 = float(sb.get("side", 0)) + (env_w - w if at_right else 0.0)
-        return _rect(x0, sb.get("front", 0), w, d), w, d
+        x0 = box["x"] + (env_w - w if at_right else 0.0)
+        return _rect(x0, box["y"], w, d), w, d
 
     # Proposed mass: the option's GFA at its storey count.
     storeys = int(option.get("storeys") or 1)
     gfa = float(option.get("gfa_m2") or 0)
-    plate = gfa / storeys if gfa else env_area
-    if plate > env_area:
-        warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds the setback envelope of {env_area:,.0f} m²; the mass fills the envelope and the shortfall must go into more storeys or smaller setbacks.")
-        plate = env_area
+    plate = gfa / storeys if gfa else plate_cap
+    if plate > plate_cap:
+        where = f"the plate box of {plate_cap:,.0f} m² (the largest rectangle inside the {env_area:,.0f} m² envelope)" if ring and env.get("box") else f"the setback envelope of {env_area:,.0f} m²"
+        warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}; the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.")
+        plate = plate_cap
     p_ring, p_w, depth = footprint(plate)
     h = storeys * f2f
     parapet = option.get("height_m")
@@ -109,7 +141,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     if max_fsr and max_h:
         o_storeys = max(1, int(math.floor(max_h / f2f)))
         o_gfa = max_fsr * area
-        o_plate = min(o_gfa / o_storeys, env_area)
+        o_plate = min(o_gfa / o_storeys, plate_cap)
         o_ring, o_w, o_d = footprint(o_plate)
         masses.append({
             "name": "outright", "label": f"Outright: FSR {max_fsr}, {max_h} m",
@@ -137,8 +169,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     return {
         "units": "m", "origin": "front-left lot corner; x along frontage, y into the lot, z up",
         "site_id": site.get("id"), "option_id": option.get("id"), "as_of": ledger["run"]["as_of"], "stamp": ledger["run"]["stamp"]["stamp"],
-        "lot": {"polygon": _rect(0, 0, W, D), "frontage_m": W, "depth_m": D, "area_m2": area, "street_side": "y = 0"},
-        "envelope": env, "masses": masses, "policy_benchmark": bench, "trees": tree_note, "warnings": warnings,
+        "lot": lot, "envelope": env, "masses": masses, "policy_benchmark": bench, "trees": tree_note, "warnings": warnings,
     }
 
 
@@ -157,14 +188,16 @@ DRAWING_COLOURS = {
 def svg(m: dict[str, Any]) -> str:
     """Plan (left) and section (right) of the masses, to scale, with the numbers printed."""
     W, D = m["lot"]["frontage_m"], m["lot"]["depth_m"]
+    bb = m["lot"].get("bbox") or [0, 0, W, D]    # a polygon lot can run past the equivalent rectangle
+    bw, bd = bb[2] - bb[0], bb[3] - bb[1]
     masses = {x["name"]: x for x in m["masses"]}
     hmax = max(x["height_m"] for x in m["masses"])
     if m.get("policy_benchmark") and m["policy_benchmark"].get("height_m"):
         hmax = max(hmax, m["policy_benchmark"]["height_m"][1])
     pad, gap = 48, 60
-    scale = min(420 / W, 320 / D, 260 / max(hmax, 1))
+    scale = min(420 / bw, 320 / bd, 260 / max(hmax, 1))
     scale = max(scale, 3.0)
-    plan_w, plan_h = W * scale, D * scale
+    plan_w, plan_h = bw * scale, bd * scale
     sec_w, sec_h = W * scale, hmax * scale
     width = pad + plan_w + gap + sec_w + pad
     lines = []
@@ -179,7 +212,7 @@ def svg(m: dict[str, Any]) -> str:
     sx, sy = pad + plan_w + gap, pad + 24 + max(plan_h, sec_h)  # section baseline
 
     def P(pts, fill, stroke, dash="", op=1.0):
-        d = " ".join(f"{ox + x * scale:.1f},{oy + y * scale:.1f}" for x, y in pts)
+        d = " ".join(f"{ox + (x - bb[0]) * scale:.1f},{oy + (y - bb[1]) * scale:.1f}" for x, y in pts)
         return f'<polygon points="{d}" fill="{fill}" stroke="{stroke}" stroke-width="1.5" stroke-dasharray="{dash}" fill-opacity="{op}"/>'
 
     C = DRAWING_COLOURS
@@ -192,12 +225,12 @@ def svg(m: dict[str, Any]) -> str:
         out.append(P(masses["outright"]["footprint"], C["outright"], C["outright_line"], op=0.9))
     if "proposed" in masses:
         out.append(P(masses["proposed"]["footprint"], C["proposed"], C["proposed_line"], op=0.5))
-    out.append(f'<text x="{ox}" y="{oy + plan_h + 16}" fill="{C["muted"]}">street (y = 0 is the top edge) · dashed = setback envelope {m["envelope"]["width_m"]} × {m["envelope"]["depth_m"]} m</text>')
+    out.append(f'<text x="{ox}" y="{oy + plan_h + 16}" fill="{C["muted"]}">street (y = 0 is the top edge) · dashed = setback envelope{", plate box" if m["envelope"].get("box") and m["lot"].get("bbox") else ""} {m["envelope"]["width_m"]} × {m["envelope"]["depth_m"]} m</text>')
 
     # Section
     out.append(f'<text x="{sx}" y="{pad - 4}" font-size="14" font-weight="600">Section across the frontage · heights in m</text>')
     out.append(f'<line x1="{sx}" y1="{sy}" x2="{sx + sec_w}" y2="{sy}" stroke="{C["ink"]}" stroke-width="1.5"/>')
-    env_x0 = m["envelope"]["setbacks_m"].get("side", 0) * scale
+    env_x0 = ((m["envelope"].get("box") or {}).get("x", m["envelope"]["setbacks_m"].get("side", 0)) - bb[0]) * scale
     env_w = m["envelope"]["width_m"] * scale
     if "outright" in masses:
         o = masses["outright"]

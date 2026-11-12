@@ -2,69 +2,69 @@
 <rect width="100%" height="100%" fill="#ffffff"/>
 <text x="48" y="44" font-size="14" font-weight="600">Elevations · metres</text>
 <text x="48.0" y="62.0" font-size="12" font-weight="600">Front elevation · from the street</text>
-<line x1="38.0" y1="337.3" x2="258.1" y2="337.3" stroke="#1f2933" stroke-width="1.5"/>
-<rect x="48.0" y="72.0" width="200.1" height="265.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-<line x1="48.0" y1="328.2" x2="248.1" y2="328.2" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="319.0" x2="248.1" y2="319.0" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="309.9" x2="248.1" y2="309.9" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="300.8" x2="248.1" y2="300.8" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="291.6" x2="248.1" y2="291.6" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="282.4" x2="248.1" y2="282.4" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="273.3" x2="248.1" y2="273.3" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="264.1" x2="248.1" y2="264.1" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="255.0" x2="248.1" y2="255.0" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="245.8" x2="248.1" y2="245.8" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="236.7" x2="248.1" y2="236.7" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="227.5" x2="248.1" y2="227.5" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="218.4" x2="248.1" y2="218.4" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="209.2" x2="248.1" y2="209.2" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="200.1" x2="248.1" y2="200.1" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="190.9" x2="248.1" y2="190.9" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="181.8" x2="248.1" y2="181.8" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="172.6" x2="248.1" y2="172.6" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="163.5" x2="248.1" y2="163.5" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="154.3" x2="248.1" y2="154.3" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="145.2" x2="248.1" y2="145.2" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="136.0" x2="248.1" y2="136.0" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="126.9" x2="248.1" y2="126.9" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="117.7" x2="248.1" y2="117.7" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="108.6" x2="248.1" y2="108.6" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="99.4" x2="248.1" y2="99.4" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="90.3" x2="248.1" y2="90.3" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="48.0" y1="81.1" x2="248.1" y2="81.1" stroke="#5f6672" stroke-width="0.6"/>
-<text x="260.1" y="76.0" font-size="10" fill="#1f2933">88.4 m</text>
-<text x="358.1" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
-<line x1="348.1" y1="337.3" x2="404.1" y2="337.3" stroke="#1f2933" stroke-width="1.5"/>
-<rect x="358.1" y="72.0" width="36.0" height="265.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-<line x1="358.1" y1="328.2" x2="394.1" y2="328.2" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="319.0" x2="394.1" y2="319.0" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="309.9" x2="394.1" y2="309.9" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="300.8" x2="394.1" y2="300.8" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="291.6" x2="394.1" y2="291.6" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="282.4" x2="394.1" y2="282.4" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="273.3" x2="394.1" y2="273.3" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="264.1" x2="394.1" y2="264.1" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="255.0" x2="394.1" y2="255.0" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="245.8" x2="394.1" y2="245.8" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="236.7" x2="394.1" y2="236.7" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="227.5" x2="394.1" y2="227.5" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="218.4" x2="394.1" y2="218.4" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="209.2" x2="394.1" y2="209.2" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="200.1" x2="394.1" y2="200.1" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="190.9" x2="394.1" y2="190.9" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="181.8" x2="394.1" y2="181.8" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="172.6" x2="394.1" y2="172.6" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="163.5" x2="394.1" y2="163.5" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="154.3" x2="394.1" y2="154.3" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="145.2" x2="394.1" y2="145.2" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="136.0" x2="394.1" y2="136.0" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="126.9" x2="394.1" y2="126.9" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="117.7" x2="394.1" y2="117.7" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="108.6" x2="394.1" y2="108.6" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="99.4" x2="394.1" y2="99.4" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="90.3" x2="394.1" y2="90.3" stroke="#5f6672" stroke-width="0.6"/>
-<line x1="358.1" y1="81.1" x2="394.1" y2="81.1" stroke="#5f6672" stroke-width="0.6"/>
-<text x="406.1" y="76.0" font-size="10" fill="#1f2933">88.4 m</text>
+<line x1="38.0" y1="337.3" x2="152.5" y2="337.3" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="48.0" y="72.0" width="94.5" height="265.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="48.0" y1="328.2" x2="142.5" y2="328.2" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="319.0" x2="142.5" y2="319.0" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="309.9" x2="142.5" y2="309.9" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="300.8" x2="142.5" y2="300.8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="291.6" x2="142.5" y2="291.6" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="282.4" x2="142.5" y2="282.4" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="273.3" x2="142.5" y2="273.3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="264.1" x2="142.5" y2="264.1" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="255.0" x2="142.5" y2="255.0" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="245.8" x2="142.5" y2="245.8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="236.7" x2="142.5" y2="236.7" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="227.5" x2="142.5" y2="227.5" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="218.4" x2="142.5" y2="218.4" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="209.2" x2="142.5" y2="209.2" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="200.1" x2="142.5" y2="200.1" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="190.9" x2="142.5" y2="190.9" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="181.8" x2="142.5" y2="181.8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="172.6" x2="142.5" y2="172.6" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="163.5" x2="142.5" y2="163.5" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="154.3" x2="142.5" y2="154.3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="145.2" x2="142.5" y2="145.2" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="136.0" x2="142.5" y2="136.0" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="126.9" x2="142.5" y2="126.9" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="117.7" x2="142.5" y2="117.7" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="108.6" x2="142.5" y2="108.6" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="99.4" x2="142.5" y2="99.4" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="90.3" x2="142.5" y2="90.3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="48.0" y1="81.1" x2="142.5" y2="81.1" stroke="#5f6672" stroke-width="0.6"/>
+<text x="154.5" y="76.0" font-size="10" fill="#1f2933">88.4 m</text>
+<text x="252.5" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
+<line x1="242.5" y1="337.3" x2="338.7" y2="337.3" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="252.5" y="72.0" width="76.2" height="265.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="252.5" y1="328.2" x2="328.7" y2="328.2" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="319.0" x2="328.7" y2="319.0" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="309.9" x2="328.7" y2="309.9" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="300.8" x2="328.7" y2="300.8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="291.6" x2="328.7" y2="291.6" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="282.4" x2="328.7" y2="282.4" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="273.3" x2="328.7" y2="273.3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="264.1" x2="328.7" y2="264.1" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="255.0" x2="328.7" y2="255.0" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="245.8" x2="328.7" y2="245.8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="236.7" x2="328.7" y2="236.7" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="227.5" x2="328.7" y2="227.5" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="218.4" x2="328.7" y2="218.4" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="209.2" x2="328.7" y2="209.2" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="200.1" x2="328.7" y2="200.1" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="190.9" x2="328.7" y2="190.9" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="181.8" x2="328.7" y2="181.8" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="172.6" x2="328.7" y2="172.6" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="163.5" x2="328.7" y2="163.5" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="154.3" x2="328.7" y2="154.3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="145.2" x2="328.7" y2="145.2" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="136.0" x2="328.7" y2="136.0" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="126.9" x2="328.7" y2="126.9" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="117.7" x2="328.7" y2="117.7" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="108.6" x2="328.7" y2="108.6" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="99.4" x2="328.7" y2="99.4" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="90.3" x2="328.7" y2="90.3" stroke="#5f6672" stroke-width="0.6"/>
+<line x1="252.5" y1="81.1" x2="328.7" y2="81.1" stroke="#5f6672" stroke-width="0.6"/>
+<text x="340.7" y="76.0" font-size="10" fill="#1f2933">88.4 m</text>
 <text x="48.0" y="367.3" fill="#1f2933">29 storeys × 3.05 m = 88.4 m to the top floor level</text>
 <text x="48.0" y="383.3" fill="#1f2933">No outright height in the stack for this district</text>
 <text x="48.0" y="399.3" fill="#1f2933">Windows: one per unit on its side, 1.5 m wide, the unit module as the rhythm; a placeholder for the elevation study</text>

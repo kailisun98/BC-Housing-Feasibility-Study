@@ -451,7 +451,12 @@ table.plain td.status { white-space: nowrap; }
 .sheet-rules .cont { color: var(--c-drawmuted); }
 .fig-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-left: auto; }
 /* the block editor is the architect's tool: the manager and the reader see the sheets without it */
-[data-mode="manager"] #edit-blocks, [data-mode="manager"] #sheet-editor { display: none !important; }
+[data-mode="manager"] #edit-blocks, [data-mode="manager"] #sheet-editor, [data-mode="manager"] .bnd-tools { display: none !important; }
+/* the boundary editor on FIG 01: handles on the lot line, the tools beside the Plan | 3D control */
+.bnd-tools .bnd-note { font-size: 11.5px; }
+.bnd .bnd-v, .bnd .bnd-mid { cursor: grab; }
+.bnd .bnd-v.sel { cursor: grabbing; }
+.fig-body svg:focus-visible { outline: 2px solid var(--b-signal-night, #2a6fb8); outline-offset: 2px; }
 /* the block editor: a toolbar, the plate as a canvas, what the engine says under it */
 .sheet-editor { display: flex; flex-direction: column; gap: 8px; }
 .sheet-editor[hidden] { display: none; }
@@ -800,7 +805,7 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .steps, [data-mode="reader"] #tour-offer, [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,
 [data-mode="reader"] .inputs, [data-mode="reader"] .memo-tools, [data-mode="reader"] #tool-open, [data-mode="reader"] #tool-compare, [data-mode="reader"] #compare-note,
 [data-mode="reader"] #dl-massing, [data-mode="reader"] #revit-btn, [data-mode="reader"] #export-panel, [data-mode="reader"] .ledger .tools,
-[data-mode="reader"] #edit-blocks, [data-mode="reader"] #sheet-editor { display: none !important; }
+[data-mode="reader"] #edit-blocks, [data-mode="reader"] #sheet-editor, [data-mode="reader"] .bnd-tools { display: none !important; }
 [data-mode="reader"] .side .pick-name { display: block; }
 [data-mode="reader"] .panes, [data-mode="reader"] .panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
 [data-mode="reader"] .memo-pane { width: min(100%, 980px); margin-inline: auto; padding: 24px 24px 64px; }

@@ -88,7 +88,7 @@ Each run writes to `--out`:
 |---|---|
 | `memo.md`, `memo.html` | The memo: three answers, massing, change log, full ledger, inputs, sources, stamp. The HTML is self-contained and prints. |
 | `ledger.json` | Machine-readable results: one record per rule with status, finding, numbers used, action, source, rule version. |
-| `massing.json`, `massing.svg` | The rule-derived masses (proposed and outright) in metres; plan and section to scale. |
+| `massing.json`, `massing.svg` | The rule-derived masses (proposed and outright) in metres; plan and section to scale. On a site with its parcel polygon (or a boundary drawn in the tool) the lot is that shape, the envelope is the shape inset by the setbacks, and the masses stand in the largest rectangle inside it. |
 | `proforma.json` | The feasibility-grade pro-forma: capital cost, net operating income, funding, the gap, a verdict, and every line with the assumption (layer F) or program (layer E) it came from. |
 | `layout.json`, `stacking.svg`, `plans.svg`, `elevations.svg`, `axon.svg`, `site-plan.svg` | The architect's first layout from the option: program blocks with their sources, adjacency rules read back from the plates, every zone's coordinates; the stacking diagram, plans by program, preliminary elevations, the floors stacked in axonometric, and the code site plan, each with the stamp. |
 | `diff.json` | With `--previous`: what changed between two ledgers and whether the rule files changed. |
@@ -131,7 +131,11 @@ rules/      the rule stack, one JSON file per layer, every rule dated and cited
 sites/      one JSON per site (zoning, area, dimensions, trees, owner, tenure plan)
 options/    one JSON per building option (storeys, GFA, unit mix, tenure, funder targets, setbacks)
 ffm/        the engine: rules_loader (versions + stamp), checks (the arithmetic), engine (ledger + diff),
-            massing (envelope + extrusions + SVG), memo (Markdown + HTML), cli
+            massing (envelope + extrusions + SVG), boundary (the lot as a polygon: the parcel ring in the lot
+            frame, the setback envelope by inset, the plate box), parcel_shapes (what shape a parcel is),
+            memo (Markdown + HTML), cli
+evals/parcels/  a survey of every City parcel polygon by shape, the parcels the classifier is unsure of, and
+            label.html to label them by hand
 revit/      the pyRevit script
 tests/      unittest cases; evals/cases.md explains them
 docs/       the 150-word proposal and the pitch outline

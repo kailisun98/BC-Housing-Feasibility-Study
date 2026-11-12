@@ -58,7 +58,8 @@
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
 ## Massing derived from the rules
-- **Proposed: 12 storeys, FSR 2.46** — plate 800 m² × 12 storeys = 9,600 m² (FSR 2.46), 36.6 m high, inside a 72.2 × 44.0 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- **Proposed: 12 storeys, FSR 2.46** — plate 800 m² × 12 storeys = 9,600 m² (FSR 2.46), 36.6 m high, inside a 31.5 × 27.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 - Note: Option height 36.6 m exceeds 12 x 3.05 m = 36.6 m; the extra 0.0 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.
 
 ![Massing plan and section](massing.svg)
@@ -66,7 +67,7 @@
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
 
 ## Layouts derived from the option
-12 floors of 66.67 × 12.0 m (800 m² each); a double-loaded corridor, units 5.1 m deep; 90 of 120 units placed.
+12 floors of 31.5 × 25.4 m (800 m² each); a double-loaded corridor, units 11.8 m deep; 89 of 120 units placed.
 
 | Block | Count | Area | From |
 |---|---|---|---|
@@ -84,11 +85,12 @@ Adjacency rules, in plain words, read back from the plates:
 - *pass* — amenity: on the ground floor, next to the entry. On the ground floor beside the core, where the entry is
 - *pass* — services: on the ground floor, away from the street. On the ground floor, lane side
 - *pass* — core: at the centre of every floor, the corridor through it. One core bay at the centre of every floor, the corridor through it
-- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 3 two-bedroom (239 m²) did not fit, 9 one-bedroom (524 m²) did not fit, 18 studio (706 m²) did not fit: more storeys, a larger plate or a smaller program
+- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 3 two-bedroom (239 m²) did not fit, 9 one-bedroom (524 m²) did not fit, 19 studio (745 m²) did not fit: more storeys, a larger plate or a smaller program
 - *conditional* — three bed plus: on the lowest residential floors. Three-bedroom units on levels 1 to 4, above some smaller units
 - *pass* — accessible: next to the core, on the lowest residential floor. 6 accessible units on the ground floor, nearest the core
 
-Did not fit on the plates: Two-bedroom × 3 (239 m²); One-bedroom × 9 (524 m²); Studio × 18 (706 m²). More storeys, a larger plate or a smaller program.
+Did not fit on the plates: Two-bedroom × 3 (239 m²); One-bedroom × 9 (524 m²); Studio × 19 (745 m²). More storeys, a larger plate or a smaller program.
+- Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 - Note: Option height 36.6 m exceeds 12 x 3.05 m = 36.6 m; the extra 0.0 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.
 
 ![Stacking diagram](stacking.svg)
@@ -207,6 +209,7 @@ Previous stamp `e51e3a0350b87718` (rules as of 2026-10-23) → current `e51e3a03
 - Shape Your City, False Creek North social housing (ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; 29 storeys, 88.1 m at 1050 Expo Blvd) — https://www.shapeyourcity.ca/false-creek-north-non-market-housing
 - City of Vancouver, non-market housing projects (1010 Expo Blvd: 299 units, BC Indigenous Housing Society, under construction, completion 2029) — https://vancouver.ca/people-programs/non-market-housing-projects.aspx
 - Journal of Commerce, Vancouver approves 661 new social housing units across three sites in North False Creek (Jul 2023) — https://canada.constructconnect.com/joc/news/government/2023/07/vancouver-approves-661-new-social-housing-units-across-three-sites-in-north-false-creek
+- City of Vancouver Open Data, property-parcel-polygons: the parcel at 1010 Expo Boulevard (site_id 032354185), Open Government Licence - Vancouver — https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/
 - Derived by hand from the as-permitted option for demonstration — https://www.shapeyourcity.ca/1050-expo-blvd
 
 ## Version stamp

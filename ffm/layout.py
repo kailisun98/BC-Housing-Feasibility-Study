@@ -664,8 +664,11 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     pm = next(m for m in massing["masses"] if m["name"] == "proposed")
     results = ledger["results"]
     pad = 48
-    scale = max(3.0, min(380 / W, 300 / D))
-    pw, pd = W * scale, D * scale
+    bb = lot.get("bbox") or [0, 0, W, D]      # a polygon lot is drawn as itself, in its own extent
+    polygon_lot = bool(lot.get("bbox"))
+    bw, bd = bb[2] - bb[0], bb[3] - bb[1]
+    scale = max(3.0, min(380 / bw, 300 / bd))
+    pw, pd = bw * scale, bd * scale
     foot = pm["plate_width_m"] * pm["plate_depth_m"]
     rows = [("Site area", f'{lot["area_m2"]:,.1f} m²', "", "")]
     fsr = _find(results, check="district_outright_fsr")
@@ -689,14 +692,19 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     out = _svg_open(width, height, "Code site plan")
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the top</text>')
     ox, oy = pad + 30, pad + 24
-    out.append(f'<rect x="{ox}" y="{oy}" width="{pw:.1f}" height="{pd:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
-    ex, ey = ox + sb.get("side", 0) * scale, oy + sb.get("front", 0) * scale
-    out.append(f'<rect x="{ex:.1f}" y="{ey:.1f}" width="{env["width_m"] * scale:.1f}" height="{env["depth_m"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="1.2" stroke-dasharray="6 4"/>')
-    fx, fy = ox + pm["footprint"][0][0] * scale, oy + pm["footprint"][0][1] * scale
+    T = lambda x, y: (ox + (x - bb[0]) * scale, oy + (y - bb[1]) * scale)
+    pts = lambda ring: " ".join(f"{T(x, y)[0]:.1f},{T(x, y)[1]:.1f}" for x, y in ring)
+    out.append(f'<polygon points="{pts(lot["polygon"])}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
+    out.append(f'<polygon points="{pts(env["polygon"])}" fill="none" stroke="{TONES["envelope"]}" stroke-width="1.2" stroke-dasharray="6 4"/>')
+    if polygon_lot and env.get("box"):
+        bx = env["box"]
+        out.append(f'<rect x="{T(bx["x"], bx["y"])[0]:.1f}" y="{T(bx["x"], bx["y"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
+    fx, fy = T(pm["footprint"][0][0], pm["footprint"][0][1])
     out.append(f'<rect x="{fx:.1f}" y="{fy:.1f}" width="{pm["plate_width_m"] * scale:.1f}" height="{pm["plate_depth_m"] * scale:.1f}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
     out.append(f'<text x="{fx + 6:.1f}" y="{fy + 14:.1f}" font-size="10" fill="{TONES["ink"]}">{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys</text>')
-    # the yards, dimensioned
-    dims = [(ox + pw / 2, oy, oy + sb.get("front", 0) * scale, f'front {sb.get("front")} m', True),
+    # the yards, dimensioned on a rectangular lot; on a polygon the envelope's own line shows the setbacks
+    dims = [] if polygon_lot else [
+            (ox + pw / 2, oy, oy + sb.get("front", 0) * scale, f'front {sb.get("front")} m', True),
             (ox + pw / 2, oy + pd - sb.get("rear", 0) * scale, oy + pd, f'rear {sb.get("rear")} m', True),
             (oy + pd / 2, ox, ox + sb.get("side", 0) * scale, f'side {sb.get("side")} m', False),
             (oy + pd / 2, ox + pw - sb.get("side", 0) * scale, ox + pw, f'side {sb.get("side")} m', False)]
@@ -715,12 +723,14 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
         if t.get("x") is None or t.get("y") is None:
             continue
         r = barriers.get(t.get("id"))
-        cx, cy = ox + float(t["x"]) * scale, oy + float(t["y"]) * scale
+        cx, cy = T(float(t["x"]), float(t["y"]))
         out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{max(3, 1.5 * scale / 2):.1f}" fill="{TONES["tree"]}" stroke="{TONES["tree_line"]}" stroke-width="0.8"/>')
         if r:
             out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{float(r) * scale:.1f}" fill="none" stroke="{TONES["tree_line"]}" stroke-width="0.8" stroke-dasharray="3 2"/>')
             drawn += 1
-    out.append(f'<text x="{ox}" y="{oy + pd + 16:.1f}" font-size="11" fill="{TONES["muted"]}">lot {W} × {D} m · dashed red: setback envelope {env["width_m"]} × {env["depth_m"]} m · blue: footprint' + (f' · {drawn} protection barrier{"s" if drawn != 1 else ""} (By-law 9958, Schedule A)' if drawn else (' · retained trees have no surveyed position: barriers not drawn' if barriers else "")) + '</text>')
+    lot_words = (f'lot polygon {lot.get("polygon_area_m2", lot["area_m2"]):,.0f} m² ({(lot.get("shape") or {}).get("class", "polygon").replace("_", " ")}) · dashed red: setback envelope, dotted: plate box {env["width_m"]} × {env["depth_m"]} m'
+                 if polygon_lot else f'lot {W} × {D} m · dashed red: setback envelope {env["width_m"]} × {env["depth_m"]} m')
+    out.append(f'<text x="{ox}" y="{oy + pd + 16:.1f}" font-size="11" fill="{TONES["muted"]}">{lot_words} · blue: footprint' + (f' · {drawn} protection barrier{"s" if drawn != 1 else ""} (By-law 9958, Schedule A)' if drawn else (' · retained trees have no surveyed position: barriers not drawn' if barriers else "")) + '</text>')
     # the table
     tx, ty = ox + pw + 60, oy
     out.append(f'<text x="{tx}" y="{ty + 12}" font-size="12" font-weight="600">What the plan checker reads</text>')

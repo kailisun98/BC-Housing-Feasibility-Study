@@ -1065,7 +1065,8 @@ async function loadOptions() {
   const forSite = state.options.filter(o => o.for_site);
   const others = state.options.filter(o => !o.for_site);
   const items = forSite.map(o => ({ value: o.id, label: o.name })).concat(others.map(o => ({ value: o.id, label: `(other site) ${o.name}` })));
-  const current = (state.optionId && state.options.some(o => o.id === state.optionId)) ? state.optionId : (forSite[0] ? forSite[0].id : "__new__");
+  // the option stays only if it is the site's own: a site switch takes the new site's first option, not the old site's
+  const current = (state.optionId && forSite.some(o => o.id === state.optionId)) ? state.optionId : (forSite[0] ? forSite[0].id : "__new__");
   fillSelect($("#option-select"), items, current, "New option…");
   await selectOption(current);
 }
@@ -1316,7 +1317,7 @@ function stageSite(site) {
       <div class="stage-map" id="stage-map" aria-label="The parcel on a map"><p class="help">Map loading…</p></div>
       <dl class="found-site">
         <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>` : "<i>not found: enter it in the Site card</i>"}</dd></div>
-        <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel: enter the area</i>"}${m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the figures use the equivalent rectangle"})</span>` : ""}</dd></div>
+        <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel: enter the area</i>"}${p.shape ? ` <span class="cont">· ${h(p.shape.note)}${p.shape.class !== "rectangle" ? " The massing follows the polygon." : ""}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand in the tool</span>' : ""}</dd></div>
         <div><dt>Street</dt><dd>${h(((site.context || {}).street || {}).name || (site.osm && site.osm.frame && site.osm.frame.front_street) || "not known")}</dd></div>
         <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) + (site.owner_type ? ` <span class="cont">(${h(String(site.owner_type).replace(/_/g, " "))})</span>` : "") : "<i>not given</i>"}</dd></div>
         ${notSure.length ? `<div><dt>Not sure</dt><dd class="cont">${h(notSure.join("; "))}. The rules read these as uncertain until answered in the Site card.</dd></div>` : ""}
@@ -1985,7 +1986,8 @@ function siteContext(site, m) {
   const left = cross.find(x => x.side === "left"), right = cross.find(x => x.side === "right");
   const nl = neighbours.find(n => n.side === "left"), nr = neighbours.find(n => n.side === "right");
   const ext = { left: left ? left.width : nl ? nl.width : 0, right: right ? right.width : nr ? nr.width : 0 };
-  const xmin = -ext.left, xmax = W + ext.right, ymin = -street.width, ymax = D + (lane ? lane.width : 0);
+  const bbL = m.lot.bbox || [0, 0, W, D];     // a polygon lot may run past the equivalent rectangle
+  const xmin = Math.min(0, bbL[0]) - ext.left, xmax = Math.max(W, bbL[2]) + ext.right, ymin = Math.min(0, bbL[1]) - street.width, ymax = Math.max(D, bbL[3]) + (lane ? lane.width : 0);
   // the ground shapes, in lot coordinates (x along the frontage, y into the lot; the street is y < 0)
   const ground = [];
   ground.push({ ring: [[xmin, ymin], [xmax, ymin], [xmax, 0], [xmin, 0]], fill: HALF.street, label: street.name, at: [W / 2, -street.width / 2] });
@@ -2069,15 +2071,19 @@ function osmContext(site, m, base) {
 
 function figPlan(m, ctx, fsIn = null) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
+  // a polygon lot is dimensioned on its own extent; the boundary editor's ring stands in for the lot while open
+  const lotRing = bnd.open && bnd.ring ? bnd.ring : m.lot.polygon;
+  const bb = m.lot.bbox || bnd.open ? ringBox(lotRing) : [0, 0, W, D];
+  const bW = bb[2] - bb[0], bD = bb[3] - bb[1];
   const pad = Math.max(3, W * 0.05);
   const fs = fsIn || Math.max(2.2, W / 34);
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
-  const x0 = ctx.xmin - pad, x1 = Math.max(ctx.xmax + pad, W + fs * 2.6 + pad), y0 = ctx.ymin - pad, y1 = ctx.ymax + pad;
+  const x0 = Math.min(ctx.xmin, bb[0]) - pad, x1 = Math.max(ctx.xmax + pad, bb[2] + fs * 2.6 + pad), y0 = Math.min(ctx.ymin, bb[1]) - pad, y1 = Math.max(ctx.ymax, bb[3]) + pad;
   const Y = y => y1 - y;                                // the street (y < 0) drawn at the bottom
   const X = x => x - x0;
   const P = pts => pts.map(([x, y]) => [X(x), Y(y)]);
   const vbW = x1 - x0, vbH = y1 - y0;
-  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Plan: the lot with its streets, buildings and trees in half tone, the setback envelope and the two massing footprints">`;
+  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" data-x0="${x0.toFixed(3)}" data-y1="${y1.toFixed(3)}" aria-label="Plan: the lot with its streets, buildings and trees in half tone, the setback envelope and the two massing footprints">`;
   s += `<rect x="0" y="0" width="${vbW.toFixed(2)}" height="${vbH.toFixed(2)}" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
   for (const g of ctx.ground) s += polyEl(P(g.ring), g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
   for (const b of ctx.buildings) s += polyEl(P(b.polygon), `fill="${HALF.building}" stroke="${HALF.line}" stroke-width="0.6"`);
@@ -2086,8 +2092,9 @@ function figPlan(m, ctx, fsIn = null) {
     s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${l.strong ? FIG.grey : HALF.text}"${l.strong ? ` font-weight="600"` : ""} ${halo(fs)}${l.angle ? ` transform="rotate(${(-l.angle).toFixed(1)} ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(l.text)}</text>`;
   }
   for (const t of ctx.streetTrees.concat(ctx.osmTrees)) s += `<circle cx="${X(t.x).toFixed(2)}" cy="${Y(t.y).toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
-  s += polyEl(P(m.lot.polygon), `fill="${FIG.paper}" stroke="${FIG.lot}" stroke-width="1.2"`);
+  s += polyEl(P(lotRing), `id="lot-poly" fill="${FIG.paper}" stroke="${FIG.lot}" stroke-width="1.2"`);
   s += polyEl(P(m.envelope.polygon), `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
+  if (m.envelope.box && m.lot.bbox) { const b = m.envelope.box; s += polyEl(P([[b.x, b.y], [b.x + b.w, b.y], [b.x + b.w, b.y + b.d], [b.x, b.y + b.d]]), `fill="none" stroke="${FIG.env}" stroke-width="0.6" stroke-dasharray="1.5 1.5"`); }
   // the proposed footprint, then the outright one drawn over it as a heavy dashed outline, so both read in plan
   if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.5"`);
   if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" fill-opacity="${masses.proposed ? 0.35 : 0.9}" stroke="${FIG.outrightStroke}" stroke-width="2" stroke-dasharray="6 3"`);
@@ -2102,25 +2109,158 @@ function figPlan(m, ctx, fsIn = null) {
   }
   // dimension strings: the frontage along the front line, the depth along the right-hand lot line, each with ticks
   const tick = fs * 0.35;
-  const fy = Y(0) + fs * 0.55;
-  s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${X(0).toFixed(2)}" y1="${fy.toFixed(2)}" x2="${X(W).toFixed(2)}" y2="${fy.toFixed(2)}"/>`
-     + `<line x1="${(X(0) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(0) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/>`
-     + `<line x1="${(X(W) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(W) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/></g>`;
-  s += `<text x="${X(W / 2).toFixed(2)}" y="${(fy + fs * 1.2).toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>frontage ${h(W)} m</text>`;
-  const dx = X(W) + fs * 0.6;
-  s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${dx.toFixed(2)}" y1="${Y(0).toFixed(2)}" x2="${dx.toFixed(2)}" y2="${Y(D).toFixed(2)}"/>`
-     + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(0) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(0) - tick).toFixed(2)}"/>`
-     + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(D) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(D) - tick).toFixed(2)}"/></g>`;
-  const rx = dx + fs * 0.95, ry = Y(D / 2);
-  s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)} transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">depth ${h(D)} m</text>`;
+  const poly = !!(m.lot.bbox || bnd.open);
+  const [bx0, by0, bx1, by1] = bb;
+  const fy = Y(by0) + fs * 0.55;
+  s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${X(bx0).toFixed(2)}" y1="${fy.toFixed(2)}" x2="${X(bx1).toFixed(2)}" y2="${fy.toFixed(2)}"/>`
+     + `<line x1="${(X(bx0) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(bx0) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/>`
+     + `<line x1="${(X(bx1) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(bx1) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/></g>`;
+  s += `<text x="${X((bx0 + bx1) / 2).toFixed(2)}" y="${(fy + fs * 1.2).toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>${poly ? `extent ${h(Math.round(bW * 10) / 10)} m · equivalent frontage ${h(W)} m` : `frontage ${h(W)} m`}</text>`;
+  const dx = X(bx1) + fs * 0.6;
+  s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${dx.toFixed(2)}" y1="${Y(by0).toFixed(2)}" x2="${dx.toFixed(2)}" y2="${Y(by1).toFixed(2)}"/>`
+     + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(by0) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(by0) - tick).toFixed(2)}"/>`
+     + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(by1) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(by1) - tick).toFixed(2)}"/></g>`;
+  const rx = dx + fs * 0.95, ry = Y((by0 + by1) / 2);
+  s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)} transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">${poly ? `extent ${h(Math.round(bD * 10) / 10)} m` : `depth ${h(D)} m`}</text>`;
   s += scaleBar(fs * 1.4, vbH - fs * 0.9, x1 - x0, fs);
   if (ctx.osm && ctx.osm.bearing != null) s += northArrow(vbW - fs * 2.2, fs * 2.4, ctx.osm.bearing, fs);
+  if (bnd.open && bnd.ring) s += boundaryHandles(bnd.ring, X, Y, fs);
   s += `</svg>`;
   return s;
 }
 
+function ringBox(ring) {
+  const xs = ring.map(p => p[0]), ys = ring.map(p => p[1]);
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+}
+
+function ringArea(ring) {
+  let s = 0;
+  for (let i = 0; i < ring.length; i++) { const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length]; s += x1 * y2 - x2 * y1; }
+  return Math.abs(s) / 2;
+}
+
+// ---------------------------------------------------------------- the boundary editor: the architect draws the lot line
+
+/* On an odd site the City's parcel polygon may not be the development site (a consolidated lot, a road closure,
+   a strata of a larger parcel), and outside the City there is no polygon at all. In architect mode "Edit
+   boundary" on FIG 01 puts handles on the lot line: drag a corner, click an edge's midpoint to add one, Delete
+   removes the selected corner. "Use this boundary" writes the ring into the site (`boundary_m`, the lot frame, in
+   metres); the massing, the layout and the sheets are rebuilt from it at once, and the next run reproduces it. */
+const bnd = { open: false, ring: null, sel: null, drag: null, busy: false };
+
+function boundaryHandles(ring, X, Y, fs) {
+  const r = Math.max(1.4, fs * 0.9);    // about a finger's width at the label size, so a corner can be taken hold of
+  let s = `<g class="bnd">`;
+  s += polyEl(ring.map(([x, y]) => [X(x), Y(y)]), `class="bnd-line" fill="none" stroke="#2a6fb8" stroke-width="1" stroke-dasharray="2.5 1.5" ${NS}`);
+  ring.forEach(([x, y], i) => {
+    const [nx, ny] = ring[(i + 1) % ring.length];
+    const mx = X((x + nx) / 2), my = Y((y + ny) / 2);
+    s += `<rect class="bnd-mid" data-i="${i}" x="${(mx - r * 0.55).toFixed(2)}" y="${(my - r * 0.55).toFixed(2)}" width="${(r * 1.1).toFixed(2)}" height="${(r * 1.1).toFixed(2)}" fill="#ffffff" stroke="#2a6fb8" stroke-width="0.6" ${NS}><title>Add a corner here</title></rect>`;
+  });
+  ring.forEach(([x, y], i) => {
+    s += `<circle class="bnd-v${bnd.sel === i ? " sel" : ""}" data-i="${i}" cx="${X(x).toFixed(2)}" cy="${Y(y).toFixed(2)}" r="${r.toFixed(2)}" fill="${bnd.sel === i ? "#2a6fb8" : "#ffffff"}" stroke="#2a6fb8" stroke-width="1" ${NS}><title>${h(x)}, ${h(y)} m</title></circle>`;
+  });
+  return s + `</g>`;
+}
+
+function boundaryTools(m) {
+  const site = state.site || {};
+  const drawn = !!(site.boundary_m && site.boundary_m.length >= 3);
+  const ring = bnd.open && bnd.ring ? bnd.ring : m.lot.polygon;
+  const note = bnd.open ? `${ring.length} corners · ${fmtNum(Math.round(ringArea(ring)))} m²${m.lot.polygon_area_m2 || m.lot.area_m2 ? ` (recorded ${fmtNum(Math.round(m.lot.area_m2))} m²)` : ""}` : "";
+  return `<div class="fig-tools bnd-tools">
+      ${bnd.open ? `<span class="help bnd-note">${h(note)}</span>
+      <button type="button" class="btn btn-small btn-primary" id="bnd-apply"${bnd.busy ? " disabled" : ""}>${bnd.busy ? "Rebuilding…" : "Use this boundary"}</button>
+      ${drawn ? `<button type="button" class="btn btn-small btn-quiet" id="bnd-parcel"${bnd.busy ? " disabled" : ""}>Back to the parcel</button>` : ""}` : ""}
+      <button type="button" class="btn btn-small" id="edit-boundary" aria-expanded="${bnd.open}" title="Drag the corners of the lot line, click a midpoint to add one, Delete removes the selected corner">${bnd.open ? "Close" : "Edit boundary"}</button>
+    </div>`;
+}
+
+function wireBoundary(fig, run, redraw) {
+  const m = run.massing;
+  const on = (sel, fn) => { const b = $(sel, fig); if (b) b.addEventListener("click", fn); };
+  on("#edit-boundary", () => {
+    if (bnd.open) { bnd.open = false; bnd.ring = null; bnd.sel = null; }
+    else { if (VIEW3D.mode !== "plan") VIEW3D.mode = "plan"; bnd.open = true; bnd.ring = (m.lot.corners || m.lot.polygon).map(p => [p[0], p[1]]); bnd.sel = null; }
+    redraw();
+    if (bnd.open) setStatus("Drag a corner of the lot line; click a square on an edge to add a corner; Delete removes the selected one. Use this boundary rebuilds the massing and the sheets from it.", "info");
+  });
+  on("#bnd-apply", () => applyBoundary(false, run, redraw));
+  on("#bnd-parcel", () => applyBoundary(true, run, redraw));
+}
+
+/* The handles' pointer and key handling, wired to the plan's SVG each time it is drawn (a refit replaces it). */
+function wireBoundaryCanvas(fig, redraw) {
+  if (!bnd.open) return;
+  const svg = $(".fig-body svg", fig);
+  if (!svg || svg.dataset.bnd) return;
+  svg.dataset.bnd = "1";
+  const toLot = e => {
+    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    return [Math.round((pt.x + parseFloat(svg.dataset.x0)) * 10) / 10, Math.round((parseFloat(svg.dataset.y1) - pt.y) * 10) / 10];
+  };
+  svg.setAttribute("tabindex", "0");
+  svg.addEventListener("pointerdown", e => {
+    const v = e.target.closest(".bnd-v");
+    if (v) { bnd.sel = Number(v.dataset.i); bnd.drag = bnd.sel; svg.setPointerCapture(e.pointerId); svg.focus({ preventScroll: true }); e.preventDefault(); $$(".bnd-v", svg).forEach(c => c.setAttribute("fill", Number(c.dataset.i) === bnd.sel ? "#2a6fb8" : "#ffffff")); return; }
+    const mid = e.target.closest(".bnd-mid");
+    if (mid) { const i = Number(mid.dataset.i); const a = bnd.ring[i], b = bnd.ring[(i + 1) % bnd.ring.length]; bnd.ring.splice(i + 1, 0, [Math.round((a[0] + b[0]) * 5) / 10, Math.round((a[1] + b[1]) * 5) / 10]); bnd.sel = i + 1; e.preventDefault(); redraw(); }
+  });
+  svg.addEventListener("pointermove", e => {
+    if (bnd.drag == null) return;
+    bnd.ring[bnd.drag] = toLot(e);
+    // the lot line and the handles follow the pointer in place; the dimensions redraw on release
+    const x0 = parseFloat(svg.dataset.x0), y1 = parseFloat(svg.dataset.y1);
+    const X = x => x - x0, Y = y => y1 - y;
+    const lot = $("#lot-poly", svg); if (lot) lot.setAttribute("points", bnd.ring.map(([x, y]) => `${X(x).toFixed(2)},${Y(y).toFixed(2)}`).join(" "));
+    const g = $(".bnd", svg); if (g) g.outerHTML = boundaryHandles(bnd.ring, X, Y, VIEW3D.fs || 3);
+  });
+  const done = () => { if (bnd.drag == null) return; bnd.drag = null; redraw(); };
+  for (const ev of ["pointerup", "pointercancel"]) svg.addEventListener(ev, done);
+  svg.addEventListener("keydown", e => {
+    if ((e.key === "Delete" || e.key === "Backspace") && bnd.sel != null && bnd.ring.length > 3) { e.preventDefault(); bnd.ring.splice(bnd.sel, 1); bnd.sel = null; redraw(); }
+    const k = { ArrowLeft: [-0.5, 0], ArrowRight: [0.5, 0], ArrowUp: [0, 0.5], ArrowDown: [0, -0.5] }[e.key];
+    if (k && bnd.sel != null) { e.preventDefault(); const p = bnd.ring[bnd.sel]; bnd.ring[bnd.sel] = [Math.round((p[0] + k[0]) * 10) / 10, Math.round((p[1] + k[1]) * 10) / 10]; redraw(); }
+  });
+}
+
+async function applyBoundary(backToParcel, run, redraw) {
+  const site = state.site;
+  if (!site || !state.option || bnd.busy) return;
+  if (backToParcel) delete site.boundary_m;
+  else site.boundary_m = bnd.ring.map(p => [Math.round(p[0] * 10) / 10, Math.round(p[1] * 10) / 10]);
+  state.siteDirty = true; $("#site-dirty").hidden = false;
+  bnd.busy = true; redraw();
+  try {
+    const res = await postJSON("/api/layout", { site, option: state.option, as_of: $("#as-of").value || todayISO() });
+    run.massing = res.massing; run.layout = res.layout; run.sheets = res.sheets;
+    if (run.ledger && run.ledger.inputs) run.ledger.inputs.site = JSON.parse(JSON.stringify(site));
+    bnd.open = false; bnd.ring = null; bnd.sel = null; bnd.busy = false;
+    refreshSummary("site");
+    rerenderFigures(run);
+    const lot = run.massing.lot;
+    setStatus(backToParcel ? `Back to the parcel polygon: ${fmtNum(Math.round(lot.polygon_area_m2 || lot.area_m2))} m². Run the rules to make the memo from it.`
+      : `The drawn boundary is the lot: ${lot.polygon.length} corners, ${fmtNum(Math.round(lot.polygon_area_m2 || lot.area_m2))} m², shape ${String((lot.shape || {}).class || "polygon").replace(/_/g, " ")}; the masses stand in the ${h(run.massing.envelope.width_m)} × ${h(run.massing.envelope.depth_m)} m plate box. Save site as… keeps it; Run the rules makes the memo from it.`, "ok");
+  } catch (e) {
+    bnd.busy = false; redraw();
+    toast(`Could not rebuild the massing: ${e.message}`, true);
+  }
+}
+
+/* The figures and the sheets, redrawn from a run whose massing changed under them (the boundary editor). */
+function rerenderFigures(run) {
+  const old = $(".figures");
+  if (!old) return;
+  const holder = document.createElement("div");
+  holder.innerHTML = renderFigures(run);
+  old.replaceWith(holder.firstElementChild);
+  wireFigures(run);
+  applyModeToMemo();
+}
+
 function figSection(m, fsIn = null) {
-  const W = m.lot.frontage_m;
+  const W = m.lot.bbox ? m.lot.bbox[2] - m.lot.bbox[0] : m.lot.frontage_m;
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
   let hmax = Math.max(...m.masses.map(x => x.height_m), 1);
   const b = m.policy_benchmark;
@@ -2131,7 +2271,8 @@ function figSection(m, fsIn = null) {
   const vbW = W + 2 * pad + labelRoom, vbH = hmax + pad + fs * 2.2;
   const ground = fs * 1.2 + hmax;
   const Yz = z => ground - z;
-  const envX = pad + (m.envelope.setbacks_m.side || 0), envW = m.envelope.width_m;
+  const bb0 = m.lot.bbox ? m.lot.bbox[0] : 0;
+  const envX = pad + ((m.envelope.box ? m.envelope.box.x : (m.envelope.setbacks_m.side || 0)) - bb0), envW = m.envelope.width_m;
   let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" aria-label="Section across the frontage: outright and proposed heights with the staff benchmark">`;
   s += `<line x1="${(pad - 2).toFixed(2)}" y1="${ground.toFixed(2)}" x2="${(pad + W + 2).toFixed(2)}" y2="${ground.toFixed(2)}" stroke="${FIG.lot}" stroke-width="1.2" ${NS}/>`;
   // as in plan: the proposed mass, then the outright one over it as a heavy dashed outline, so both read
@@ -2298,11 +2439,12 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
 function figOne(m, ctx, fs = null) {
   const three = VIEW3D.mode === "3d";
   return `<div class="fig-head">
-      <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}</div>
+      <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}${m.lot.source === "drawn" ? ' <span class="cont">· boundary drawn by hand</span>' : ""}</div>
       <div class="seg" role="group" aria-label="View of figure 1">
         <button type="button" class="segbtn" data-view="plan" aria-pressed="${!three}">Plan</button>
         <button type="button" class="segbtn" data-view="3d" aria-pressed="${three}">3D</button>
       </div>
+      ${boundaryTools(m)}
     </div>
     <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m, ctx, VIEW3D.az, VIEW3D.el, fs) : figPlan(m, ctx, fs)}</div>
     ${three ? `<p class="fig-hint">Drag sideways to turn it; the arrow keys turn and tilt it. A straight axonometric of the same massing numbers, with storey lines every ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
@@ -2322,11 +2464,14 @@ function wireFigures(run) {
     const sec = $("#fig-02");
     if (sec) fitLabels(sec, fs => figSection(m, fs));
     wireOrbit();
+    wireBoundaryCanvas(fig, redraw);
   };
   const redraw = () => { fig.innerHTML = figOne(m, ctx); wireFigures(run); };
+  wireBoundary(fig, run, redraw);
   $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => {
     if (VIEW3D.mode === b.dataset.view) return;
     VIEW3D.mode = b.dataset.view;
+    if (bnd.open) { bnd.open = false; bnd.ring = null; bnd.sel = null; }   // the editor is a plan tool
     redraw();
     const now = $(`.segbtn[data-view="${VIEW3D.mode}"]`, fig);
     if (now) now.focus();
@@ -2416,7 +2561,9 @@ function renderFigures(run) {
     out.push(`<figure class="card figure">
       <div id="fig-01">${figOne(m, ctx)}</div>
       <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-building"></i>building</span><span><i class="fig-context"></i>road</span></div>
-      <figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back, so the outright mass is drawn dashed over the proposed one, here and in the section. ${contextNote}${treeNote}${ctx.osm && ctx.osm.bearing != null ? " The north arrow follows the OpenStreetMap frame; the plan is drawn with the street at the bottom." : ""}</figcaption>
+      <figcaption>${m.lot.bbox
+        ? `Lot ${m.lot.source === "drawn" ? "as drawn in the tool" : "from the City's parcel polygon"}: ${h(String((m.lot.shape || {}).class || "polygon").replace(/_/g, " "))}, ${h(m.lot.polygon.length)} corners, ${fmtNum(Math.round(m.lot.polygon_area_m2 || m.lot.area_m2))} m² (recorded site area ${fmtNum(m.lot.area_m2)} m²; equivalent rectangle ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m). The setback envelope follows the lot lines (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m) and the masses stand in the plate box, the largest rectangle inside it, ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m, dotted.`
+        : `Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back, so the outright mass is drawn dashed over the proposed one, here and in the section.`} ${contextNote}${treeNote}${ctx.osm && ctx.osm.bearing != null ? " The north arrow follows the OpenStreetMap frame; the plan is drawn with the street at the bottom." : ""}</figcaption>
     </figure>`);
     const bench = m.policy_benchmark;
     const trees = m.trees;

@@ -397,9 +397,19 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         notes.append(f"Zoning district {district}" + (f" (CD-1 by-law {cd1})" if cd1 else "") + " from the City's zoning districts dataset at that point.")
     else:
         notes.append("No zoning district found at that point in the City's dataset; enter it by hand.")
+    shape = None
     if metrics:
         front_how = (f"the side along {street['name']}" + ("" if street["matched_by_name"] else ", the nearest road") + f" from OpenStreetMap, {street['distance_m']} m away") if street else metrics["frontage_from"]
         notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon ({metrics['vertices']} vertices" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"); frontage taken as {front_how}.")
+        try:
+            from .parcel_shapes import classify   # imported here: parcel_shapes builds on this module
+            c = classify([poly])
+            shape = {"class": c["class"], "note": c["note"], "rectangularity": round(c["rectangularity"], 3), "vertices": c["vertices"],
+                     "confidence": round(c["confidence"], 2), "alternative": c["alternative"]}
+            if c["class"] != "rectangle":
+                notes.append(c["note"] + (" The massing uses the polygon itself: the setback envelope follows the lot lines and the plate is the largest rectangle inside it." if c["class"] != "near_rectangle" else ""))
+        except (ValueError, ImportError):
+            shape = None
     else:
         notes.append("No parcel polygon found at that point; enter the area, frontage and depth by hand.")
     notes.append("Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'.")
@@ -418,7 +428,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         "context": {"street": {"name": (street or {}).get("name") or street_name}} if (street or street_name) else None,
         "notes": " ".join(notes),
         "parcel": {"polygon_lonlat": poly, "civic_number": p.get("civic_number"), "streetname": p.get("streetname"),
-                   "site_id": p.get("site_id"), "metrics": metrics, "street": street, "source": SOURCES["parcel"]} if poly else None,
+                   "site_id": p.get("site_id"), "metrics": metrics, "shape": shape, "street": street, "source": SOURCES["parcel"]} if poly else None,
         "lookup": {"center": {"lat": lat, "lon": lon}, "geocoded_as": display, "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
         "sources": [SOURCES["address"] if "property address" in display else SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
     }

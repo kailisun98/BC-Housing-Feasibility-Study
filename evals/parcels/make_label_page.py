@@ -72,7 +72,8 @@ PAGE = """<!doctype html>
   <p class="lead">__N__ parcels the classifier (<code>ffm/parcel_shapes.py</code>) is least sure of, from the City's parcel polygons
   (Open Government Licence – Vancouver). North is up in every thumbnail; beside it the parcel is drawn over the real
   site (OpenStreetMap, or aerial imagery with the switch above; the maps load as you scroll). On the map, click the
-  edge that fronts the street: it turns red, and a second edge marks the cross street on a corner lot (amber). Then tick the shape you would call it; a note helps
+  edge that fronts the street: the whole edge between two white corners turns red (a curved frontage is one edge),
+  and a second edge marks the cross street on a corner lot (amber). Then tick the shape you would call it; a note helps
   when none of the words fit, or when the parcel is not what the City draws (a consolidated site, a road closure).
   The draft stays in this browser until you download it. The classes: <b>rectangle</b> (four corners, square-ish),
   <b>near rectangle</b> (a bevelled corner, a slight skew, a short jog), <b>trapezoid</b> (four sides, not
@@ -132,10 +133,18 @@ function makeMap(el) {
   map.fitBounds(poly.getBounds().pad(0.5));
   L.control.zoom({ position: "bottomright" }).addTo(map);
   const fronts = L.layerGroup().addTo(map);
-  const rec = { map, layer, fronts, latlngs, id: p.site_id };
+  const rec = { map, layer, fronts, latlngs, id: p.site_id, corners: cornersOf(latlngs) };
   maps.set(el, rec);
+  // a draft from the first version of this page marked single published segments; they become the edges they lie on
+  const dr = draft[p.site_id];
+  if (dr && dr.front && dr.front.length && !dr.front_v2) {
+    dr.front = Array.from(new Set(dr.front.map(i => edgeOfSegment(rec.corners, latlngs.length, i))));
+    dr.front_v2 = true; store();
+  }
   drawFronts(rec);
-  // a click near an edge marks it: the first edge is the frontage, a second the cross street; a click on a marked edge unmarks it
+  // a click near the outline marks the whole edge it falls on, an edge being a run of the published line between
+  // two corners (a curve published as many short segments is one edge); the first edge is the frontage, a second
+  // the cross street; a click on a marked edge unmarks it
   const pick = e => {
     const pt = map.latLngToLayerPoint(e.latlng);
     let best = null;
@@ -145,43 +154,96 @@ function makeMap(el) {
       if (best === null || d < best.d) best = { d, i };
     }
     if (!best || best.d > 18) return;
+    const k = edgeOfSegment(rec.corners, latlngs.length, best.i);
     const dr = draft[p.site_id] = draft[p.site_id] || {};
     const list = dr.front || [];
-    const at = list.indexOf(best.i);
-    if (at >= 0) list.splice(at, 1); else list.push(best.i);
-    dr.front = list;
+    const at = list.indexOf(k);
+    if (at >= 0) list.splice(at, 1); else list.push(k);
+    dr.front = list; dr.front_v2 = true;
     store(); drawFronts(rec); frontNote(p.site_id); count();
   };
   poly.on("click", pick);
   map.on("click", pick);
 }
 
-function edgeInfo(latlngs, i) {
-  const a = latlngs[i], b = latlngs[(i + 1) % latlngs.length];
+/* The corners of a ring: the published points that survive a Douglas-Peucker pass at CORNER_TOL metres, as indices
+   into the ring. A gentle curve collapses to its chord; a notch, a jog or an inward corner wider than the tolerance
+   stays. The pass starts from the two points farthest apart so the ring closes properly. */
+const CORNER_TOL = 1.6;
+function cornersOf(latlngs) {
+  const kLat = 110540, kLon = 111320 * Math.cos(latlngs[0][0] * Math.PI / 180);
+  const pts = latlngs.map(([lat, lon]) => [lon * kLon, lat * kLat]);
+  const n = pts.length;
+  let a = 0, b = 0, far = -1;
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) { const d = Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]); if (d > far) { far = d; a = i; b = j; } }
+  const keep = new Set([a, b]);
+  const dist = (p, s, t) => {
+    const dx = t[0] - s[0], dy = t[1] - s[1], L2 = dx * dx + dy * dy;
+    const u = L2 ? Math.max(0, Math.min(1, ((p[0] - s[0]) * dx + (p[1] - s[1]) * dy) / L2)) : 0;
+    return Math.hypot(p[0] - (s[0] + u * dx), p[1] - (s[1] + u * dy));
+  };
+  const dp = idx => {   // idx: a run of ring indices from one kept point to the next
+    if (idx.length < 3) return;
+    const s = pts[idx[0]], t = pts[idx[idx.length - 1]];
+    let worst = -1, at = -1;
+    for (let k = 1; k < idx.length - 1; k++) { const d = dist(pts[idx[k]], s, t); if (d > worst) { worst = d; at = k; } }
+    if (worst > CORNER_TOL) { keep.add(idx[at]); dp(idx.slice(0, at + 1)); dp(idx.slice(at)); }
+  };
+  const run = (from, to) => { const out = []; for (let i = from; ; i = (i + 1) % n) { out.push(i); if (i === to) break; } return out; };
+  dp(run(a, b)); dp(run(b, a));
+  return Array.from(keep).sort((x, y) => x - y);
+}
+
+/* Which edge (between consecutive corners, cyclic) the published segment i -> i+1 belongs to: the edge's number is
+   the position of its first corner in the corners list. */
+function edgeOfSegment(corners, n, i) {
+  for (let k = 0; k < corners.length; k++) {
+    const from = corners[k], to = corners[(k + 1) % corners.length];
+    const len = ((to - from) % n + n) % n || n;
+    if ((((i - from) % n) + n) % n < len) return k;
+  }
+  return 0;
+}
+
+/* The published points of edge k, from its first corner to its last, in order. */
+function edgePoints(rec, k) {
+  const n = rec.latlngs.length, from = rec.corners[k], to = rec.corners[(k + 1) % rec.corners.length];
+  const out = [];
+  for (let i = from; ; i = (i + 1) % n) { out.push(rec.latlngs[i]); if (i === to) break; }
+  return out;
+}
+
+function edgeInfo(rec, k) {
+  const pts = edgePoints(rec, k);
+  const a = pts[0], b = pts[pts.length - 1];
   const kLat = 110540, kLon = 111320 * Math.cos(a[0] * Math.PI / 180);
-  const e = (b[1] - a[1]) * kLon, n = (b[0] - a[0]) * kLat;
-  const length = Math.hypot(e, n);
-  const bearing = (Math.atan2(e, n) * 180 / Math.PI + 360) % 360;
+  let length = 0;
+  for (let i = 1; i < pts.length; i++) length += Math.hypot((pts[i][1] - pts[i - 1][1]) * kLon, (pts[i][0] - pts[i - 1][0]) * kLat);
+  const e = (b[1] - a[1]) * kLon, nn = (b[0] - a[0]) * kLat;
+  const bearing = (Math.atan2(e, nn) * 180 / Math.PI + 360) % 360;
   const dirs = ["N–S", "NE–SW", "E–W", "NW–SE"];
-  return { index: i, from: [a[1], a[0]], to: [b[1], b[0]], length_m: Math.round(length * 10) / 10, bearing_deg: Math.round(bearing * 10) / 10, runs: dirs[Math.round(((bearing % 180) / 45)) % 4] };
+  return { edge: k + 1, from_point: rec.corners[k], to_point: rec.corners[(k + 1) % rec.corners.length], from: [a[1], a[0]], to: [b[1], b[0]],
+           segments: pts.length - 1, length_m: Math.round(length * 10) / 10, chord_bearing_deg: Math.round(bearing * 10) / 10, runs: dirs[Math.round(((bearing % 180) / 45)) % 4] };
 }
 
 function drawFronts(rec) {
   rec.fronts.clearLayers();
   const list = (draft[rec.id] || {}).front || [];
-  list.forEach((i, k) => {
-    const a = rec.latlngs[i], b = rec.latlngs[(i + 1) % rec.latlngs.length];
-    L.polyline([a, b], { color: k === 0 ? "#c81e1e" : "#c77d14", weight: 6, opacity: 0.9 }).addTo(rec.fronts);
+  list.forEach((k, j) => {
+    if (k >= rec.corners.length) return;
+    L.polyline(edgePoints(rec, k), { color: j === 0 ? "#c81e1e" : "#c77d14", weight: 6, opacity: 0.9 }).addTo(rec.fronts);
   });
+  // the corners, so the edges on offer can be seen
+  rec.corners.forEach(i => L.circleMarker(rec.latlngs[i], { radius: 3, color: "#1f3a4d", weight: 1, fillColor: "#fff", fillOpacity: 1, interactive: false }).addTo(rec.fronts));
 }
 
 function frontNote(id) {
   const el = document.querySelector(`.parcel[data-id="${id}"] .front-note`);
   const rec = Array.from(maps.values()).find(r => r.id === id);
   if (!el || !rec) return;
-  const list = (draft[id] || {}).front || [];
-  if (!list.length) { el.innerHTML = `<b>Frontage:</b> click the edge on the street (red); a second edge marks the cross street (amber).`; return; }
-  el.innerHTML = `<b>Frontage:</b> ` + list.map((i, k) => { const f = edgeInfo(rec.latlngs, i); return `${k === 0 ? "edge" : "cross street, edge"} ${i + 1}, ${f.length_m} m, runs ${f.runs}`; }).join(" · ") + ` <span class="muted">(click an edge again to unmark)</span>`;
+  const list = ((draft[id] || {}).front || []).filter(k => k < rec.corners.length);
+  if (!list.length) { el.innerHTML = `<b>Frontage:</b> click the edge on the street (red); a second edge marks the cross street (amber). ${rec.corners.length} edges between the white corners.`; return; }
+  el.innerHTML = `<b>Frontage:</b> ` + list.map((k, j) => { const f = edgeInfo(rec, k); return `${j === 0 ? "edge" : "cross street, edge"} ${f.edge} of ${rec.corners.length}, ${f.length_m} m${f.segments > 1 ? ` (${f.segments} published segments)` : ""}, runs ${f.runs}`; }).join(" · ") + ` <span class="muted">(click an edge again to unmark)</span>`;
 }
 function watchMaps() {
   const els = Array.from(document.querySelectorAll(".map"));
@@ -215,9 +277,11 @@ document.getElementById("save").addEventListener("click", () => {
     labels: parcels.map(p => {
       const d = draft[p.site_id] || {};
       const ll = ((p.ring_lonlat || [[]])[0] || []).map(q => [q[1], q[0]]);
-      const fronts = (d.front || []).map((i, k) => Object.assign({ role: k === 0 ? "frontage" : "cross_street" }, edgeInfo(ll, i)));
+      const rec = Array.from(maps.values()).find(r => r.id === p.site_id) || { latlngs: ll, corners: cornersOf(ll) };
+      const fronts = (d.front || []).filter(k => k < rec.corners.length).map((k, j) => Object.assign({ role: j === 0 ? "frontage" : "cross_street" }, edgeInfo(rec, k)));
       return { site_id: p.site_id, address: p.address, best_guess: p.best_guess, runner_up: p.runner_up, label: d.label || null, note: d.note || null,
-               frontage_edges: fronts, edge_numbering: "edge i runs from ring point i to point i + 1 of ring_lonlat, 1-based here" };
+               frontage_edges: fronts, corners: rec.corners,
+               edge_numbering: `edges run between consecutive corners (Douglas-Peucker at ${CORNER_TOL} m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat` };
     }) };
   const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 2)], { type: "application/json" })); a.download = "labels.json"; a.click();
 });

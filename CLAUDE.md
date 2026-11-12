@@ -324,8 +324,13 @@ Built and verified in the browser:
   nudged re-runs and an `alternative`. `evals/parcels/` holds the survey of all 99,680 City parcels
   (`shape-survey.json`: 89.7% rectangles, 3.4% irregular, 2.0% trapezoids, 0.2% L shapes, 41 flag lots, 2
   multi-part; its README has the thresholds and what surprised the survey), `uncertain.json` (the 40 parcels
-  the classifier is least sure of, thumbnails included, `label` and `labels_by` null for a person), and
-  `label.html` (built by `make_label_page.py`: a page to label them in a browser and download labels.json).
+  the classifier is least sure of, thumbnails included, `label` and `labels_by` null for a person; since 12 Nov
+  2026 every one is a taxable lot with an address, checked against the City's tax report, zoning and parks
+  datasets and the rapid-transit lines and stations, so parks, rights-of-way, strata plans, air-space parcels,
+  station land and untaxed remnants are kept out; the eighteen the first set held are listed in the file and the
+  README), and
+  `label.html` (built by `make_label_page.py`: a page to label them in a browser and download labels.json; the
+  draft in the browser is keyed by site_id, so labels made before the refill carry over).
   The 53.6 MB export and the fetch/survey scripts stay outside the repository; the README says how it was run.
 - `ffm/boundary.py`: `lot_ring(site)` gives the lot's outline in the lot frame from `site.boundary_m` (drawn in
   the tool) or `site.parcel.polygon_lonlat` placed in the site's context frame (`osm.center`, `frame.

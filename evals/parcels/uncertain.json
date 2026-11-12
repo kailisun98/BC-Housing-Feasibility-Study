@@ -12,133 +12,392 @@
   "licence": "Contains information licensed under the Open Government Licence – Vancouver (property parcel polygons; local area boundary).",
   "licence_url": "https://opendata.vancouver.ca/pages/licence/"
  },
- "how_chosen": "Parcels where some of the nudged re-runs (thresholds moved a little; the simplification's 3 degree / 0.5 m tolerances halved and doubled) disagree with the call, lowest agreement first and then nearest a threshold, at most six per pair of classes so the set covers every boundary; multi_part is never uncertain and is left out.",
- "how_to_label": "Set label to one of rectangle, near_rectangle, trapezoid, l_shape, flag_lot, irregular, multi_part (or 'other: ...'), and labels_by to your initials and the date.",
- "parcels": [
+ "how_chosen": "Parcels where some of the nudged re-runs (thresholds moved a little; the simplification's 3 degree / 0.5 m tolerances halved and doubled) disagree with the call, lowest agreement first and then nearest a threshold, at most six per pair of classes so the set covers every boundary; multi_part is never uncertain and is left out. Since 12 Nov 2026 only lots a person could build on: a nine-digit site_id (not a strata plan), a civic address, a property-tax-report record of legal type LAND with a land value, a legal description that is not a park, a right-of-way or a road, and a point outside the parks layer; each parcel's `lot` block carries the zoning district at its point and the tax record's legal type, year built and legal description.",
+ "rejected_while_choosing": [
+  {
+   "site_id": "031313400",
+   "address": "2303 Wall St",
+   "reasons": [
+    "legal description says \"PARK\"",
+    "in the parks layer: Park Site On Trinity Street"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": "LMS4580",
+   "address": "1478 W Hastings St",
+   "reasons": [
+    "strata plan LMS4580, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": "1725 E Broadway",
+   "reasons": [
+    "no site_id",
+    "legal description says \"R/W\""
+   ]
+  },
+  {
+   "site_id": "007123132",
+   "address": "2600 Rupert St",
+   "reasons": [
+    "tax legal type OTHER (a right-of-way, Crown or City land)",
+    "legal description says \"ROW\""
+   ]
+  },
+  {
+   "site_id": "015305015",
+   "address": "3598 E Kent Ave North",
+   "reasons": [
+    "legal description says \"CPR\""
+   ]
+  },
+  {
+   "site_id": "028408322",
+   "address": "2902 Hebb Ave",
+   "reasons": [
+    "rapid transit on it: Millennium Line"
+   ]
+  },
+  {
+   "site_id": "028254261",
+   "address": "2902 Hebb Ave",
+   "reasons": [
+    "rapid transit on it: Millennium Line"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "tax legal type OTHER (a right-of-way, Crown or City land)"
+   ]
+  },
+  {
+   "site_id": "VAS2133",
+   "address": "1350 W 8th Ave",
+   "reasons": [
+    "strata plan VAS2133, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": "006937462",
+   "address": "8288 Ash St",
+   "reasons": [
+    "in the parks layer: Ash Park"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": "018567258",
+   "address": "498 Cardero St",
+   "reasons": [
+    "in the parks layer: Cardero Park"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": "018960821",
+   "address": "183 Drake St",
+   "reasons": [
+    "legal description says \"AIR SPACE\""
+   ]
+  },
+  {
+   "site_id": "LMS2179",
+   "address": "199 Drake St",
+   "reasons": [
+    "strata plan LMS2179, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": "018960804",
+   "address": "199 Drake St",
+   "reasons": [
+    "legal description says \"AIR SPACE\""
+   ]
+  },
+  {
+   "site_id": "010216146",
+   "address": null,
+   "reasons": [
+    "no civic address",
+    "rapid transit on it: Canada Line"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": "VAS2064",
+   "address": "2565 Point Grey Road",
+   "reasons": [
+    "strata plan VAS2064, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": "015304973",
+   "address": "3598 E Kent Ave North",
+   "reasons": [
+    "legal description says \"CPR\""
+   ]
+  },
+  {
+   "site_id": "EPS1529",
+   "address": "3437 Kingsway",
+   "reasons": [
+    "strata plan EPS1529, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": "BCS731",
+   "address": "2515 Ontario St",
+   "reasons": [
+    "strata plan BCS731, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": "1405 Anderson St",
+   "reasons": [
+    "no site_id",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": "1655 Whyte Ave",
+   "reasons": [
+    "no site_id",
+    "tax legal type OTHER (a right-of-way, Crown or City land)"
+   ]
+  }
+ ],
+ "dropped_from_the_11_nov_set": [
   {
    "site_id": "031313400",
    "address": "2303 Wall St",
    "local_area": "Grandview-Woodland",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 1001.3,
-    "perimeter_m": 133.1,
-    "vertices_raw": 20,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.814,
-    "convexity": 0.945,
-    "aspect_ratio": 1.627,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 4.851,
-    "equivalent_rectangle": {
-     "side_a_m": 44.7,
-     "side_b_m": 27.5,
-     "bearing_deg": 47.3
-    },
-    "flag": null,
-    "confidence": 0.636,
-    "alternative": "irregular",
-    "margin": 0.242,
-    "note": "An L: six corners, one inward; 95% of its convex hull, 1,001 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.0593765,
-      49.2894342
-     ],
-     [
-      -123.0592863,
-      49.2895451
-     ],
-     [
-      -123.0590701,
-      49.2896513
-     ],
-     [
-      -123.0592934,
-      49.2898456
-     ],
-     [
-      -123.0593207,
-      49.2898289
-     ],
-     [
-      -123.0593479,
-      49.2898119
-     ],
-     [
-      -123.059375,
-      49.2897948
-     ],
-     [
-      -123.0594019,
-      49.2897774
-     ],
-     [
-      -123.0594286,
-      49.2897597
-     ],
-     [
-      -123.0594552,
-      49.2897419
-     ],
-     [
-      -123.0594817,
-      49.2897238
-     ],
-     [
-      -123.059508,
-      49.2897055
-     ],
-     [
-      -123.0595341,
-      49.289687
-     ],
-     [
-      -123.0595601,
-      49.2896683
-     ],
-     [
-      -123.059586,
-      49.2896493
-     ],
-     [
-      -123.0596116,
-      49.2896302
-     ],
-     [
-      -123.0596371,
-      49.2896108
-     ],
-     [
-      -123.0596625,
-      49.2895912
-     ],
-     [
-      -123.0596877,
-      49.2895714
-     ],
-     [
-      -123.0597127,
-      49.2895514
-     ],
-     [
-      -123.0593765,
-      49.2894342
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M62.5,112.8 L77.7,84.4 L114.0,57.1 L76.5,7.2 L71.9,11.4 L67.3,15.8 L62.8,20.2 L58.2,24.7 L53.7,29.2 L49.3,33.8 L44.8,38.4 L40.4,43.1 L36.0,47.9 L31.6,52.7 L27.3,57.6 L23.0,62.5 L18.7,67.5 L14.4,72.5 L10.2,77.6 L6.0,82.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "irregular",
-   "why": "64% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.814, convexity 0.945, 6 corners after simplifying, 20 as published, narrowest cross-section 4.9 m).",
-   "label": null,
-   "labels_by": null
+   "reasons": [
+    "legal description says \"PARK\"",
+    "in the parks layer: Park Site On Trinity Street"
+   ]
   },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Dunbar-Southlands",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Dunbar-Southlands",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": "LMS4580",
+   "address": "1478 W Hastings St",
+   "local_area": "Downtown",
+   "reasons": [
+    "strata plan LMS4580, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": "1725 E Broadway",
+   "local_area": "Kensington-Cedar Cottage",
+   "reasons": [
+    "no site_id",
+    "legal description says \"R/W\""
+   ]
+  },
+  {
+   "site_id": "007123132",
+   "address": "2600 Rupert St",
+   "local_area": "Renfrew-Collingwood",
+   "reasons": [
+    "tax legal type OTHER (a right-of-way, Crown or City land)",
+    "legal description says \"ROW\""
+   ]
+  },
+  {
+   "site_id": "015305015",
+   "address": "3598 E Kent Ave North",
+   "local_area": "Killarney",
+   "reasons": [
+    "legal description says \"CPR\""
+   ]
+  },
+  {
+   "site_id": "028408322",
+   "address": "2902 Hebb Ave",
+   "local_area": "Renfrew-Collingwood",
+   "reasons": [
+    "rapid transit on it: Millennium Line"
+   ]
+  },
+  {
+   "site_id": "028254261",
+   "address": "2902 Hebb Ave",
+   "local_area": "Renfrew-Collingwood",
+   "reasons": [
+    "rapid transit on it: Millennium Line"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Sunset",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "tax legal type OTHER (a right-of-way, Crown or City land)"
+   ]
+  },
+  {
+   "site_id": "VAS2133",
+   "address": "1350 W 8th Ave",
+   "local_area": "Fairview",
+   "reasons": [
+    "strata plan VAS2133, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": "EPS1529",
+   "address": "3437 Kingsway",
+   "local_area": "Renfrew-Collingwood",
+   "reasons": [
+    "strata plan EPS1529, an existing building",
+    "strata lots: an existing building"
+   ]
+  },
+  {
+   "site_id": "006937462",
+   "address": "8288 Ash St",
+   "local_area": "Marpole",
+   "reasons": [
+    "in the parks layer: Ash Park"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Grandview-Woodland",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Dunbar-Southlands",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Dunbar-Southlands",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  },
+  {
+   "site_id": "018567258",
+   "address": "498 Cardero St",
+   "local_area": "Downtown",
+   "reasons": [
+    "in the parks layer: Cardero Park"
+   ]
+  },
+  {
+   "site_id": null,
+   "address": null,
+   "local_area": "Dunbar-Southlands",
+   "reasons": [
+    "no site_id",
+    "no civic address",
+    "no property-tax record (not a taxable lot)"
+   ]
+  }
+ ],
+ "how_to_label": "Set label to one of rectangle, near_rectangle, trapezoid, l_shape, flag_lot, irregular, multi_part (or 'other: ...'), and labels_by to your initials and the date.",
+ "parcels": [
   {
    "site_id": "018352553",
    "address": "2055 Glen Drive",
@@ -241,6 +500,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M114.0,81.6 L113.6,61.5 L18.6,38.1 L13.9,38.7 L9.2,39.2 L6.0,39.5 L9.8,40.6 L13.5,41.9 L17.2,43.1 L20.9,44.5 L24.6,45.9 L28.3,47.4 L31.9,49.0 L35.5,50.6 L35.8,50.7 L103.5,81.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "I-2"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1970"
+     ],
+     "legal": "LOT A PLAN LMP11213 DISTRICT LOT 2037 NEW WESTMINSTER EXCEPT PLAN B",
+     "report_year": "2026"
+    },
+    "tax_coord": "22263057"
+   },
    "best_guess": "l_shape",
    "runner_up": "irregular",
    "why": "64% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.560, convexity 0.937, 6 corners after simplifying, 16 as published, narrowest cross-section 0.6 m).",
@@ -397,6 +672,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M29.1,106.2 L29.2,106.2 L114.0,66.2 L113.0,64.4 L111.7,62.1 L110.3,59.9 L109.0,57.6 L107.6,55.3 L106.2,53.0 L104.8,50.8 L103.4,48.5 L102.0,46.3 L100.5,44.1 L99.1,41.8 L97.6,39.6 L96.1,37.4 L94.6,35.2 L93.1,33.0 L91.6,30.8 L90.1,28.7 L88.5,26.5 L87.0,24.4 L85.4,22.2 L83.8,20.1 L82.2,18.0 L80.6,15.9 L79.0,13.8 L6.0,57.2 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "2009"
+     ],
+     "legal": "LOT 18 BLOCK 558 PLAN VAP9119 DI STRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "08171605"
+   },
    "best_guess": "irregular",
    "runner_up": "trapezoid",
    "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.900, convexity 1.000, 5 corners after simplifying, 28 as published).",
@@ -585,6 +876,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M90.5,114.0 L92.8,6.0 L92.7,6.0 L90.8,6.8 L88.8,7.5 L86.8,8.2 L84.8,8.9 L82.9,9.6 L80.9,10.3 L78.9,11.0 L76.9,11.7 L74.9,12.3 L72.9,13.0 L70.9,13.6 L68.9,14.2 L66.9,14.8 L64.9,15.4 L62.8,16.0 L60.8,16.6 L58.8,17.2 L56.8,17.7 L54.7,18.3 L52.7,18.8 L50.7,19.3 L48.6,19.9 L46.6,20.4 L44.5,20.9 L42.5,21.3 L40.5,21.8 L38.4,22.2 L36.3,22.7 L34.3,23.1 L32.2,23.6 L30.2,24.0 L29.1,24.2 L27.2,112.5 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1996"
+     ],
+     "legal": "LOT 3 BLOCK 810 PLAN VAP6011 DIS TRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "72512554"
+   },
    "best_guess": "irregular",
    "runner_up": "trapezoid",
    "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.900, convexity 0.990, 5 corners after simplifying, 36 as published, narrowest cross-section 3.1 m).",
@@ -733,6 +1040,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M24.3,82.7 L114.0,72.3 L103.9,37.3 L6.0,48.7 L6.2,48.9 L7.1,50.5 L8.0,52.1 L9.0,53.6 L9.9,55.2 L10.8,56.7 L11.7,58.3 L12.6,59.9 L13.4,61.5 L14.3,63.1 L15.2,64.6 L16.1,66.2 L16.9,67.8 L17.7,69.4 L18.6,71.0 L19.4,72.7 L20.2,74.3 L21.0,75.9 L21.8,77.5 L22.6,79.1 L23.4,80.8 L24.2,82.4 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1988"
+     ],
+     "legal": "LOT 4 BLOCK 813 PLAN VAP6011 DIS TRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "14472578"
+   },
    "best_guess": "irregular",
    "runner_up": "trapezoid",
    "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.899, convexity 0.996, 5 corners after simplifying, 26 as published, narrowest cross-section 2.8 m).",
@@ -885,132 +1208,25 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M13.3,83.3 L114.0,85.6 L114.0,85.6 L100.8,36.6 L6.0,34.4 L6.1,35.8 L6.4,38.0 L6.6,40.2 L6.8,42.5 L7.1,44.7 L7.4,46.9 L7.6,49.1 L7.9,51.4 L8.2,53.6 L8.5,55.8 L8.9,58.0 L9.2,60.2 L9.5,62.5 L9.9,64.7 L10.3,66.9 L10.6,69.1 L11.0,71.3 L11.4,73.5 L11.8,75.7 L12.2,77.9 L12.7,80.1 L13.1,82.3 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "2013"
+     ],
+     "legal": "LOT 2 BLOCK 708 PLAN VAP6011 DIS TRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "12171714"
+   },
    "best_guess": "irregular",
    "runner_up": "trapezoid",
    "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.899, convexity 1.000, 5 corners after simplifying, 27 as published, narrowest cross-section 4.2 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.229008,
-    "lon": -123.195533
-   },
-   "local_area": "Dunbar-Southlands",
-   "metrics": {
-    "class": "irregular",
-    "area_m2": 458.0,
-    "perimeter_m": 85.7,
-    "vertices_raw": 19,
-    "vertices": 5,
-    "reflex_corners": 0,
-    "rectangularity": 0.899,
-    "convexity": 1.0,
-    "aspect_ratio": 1.117,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 6.002,
-    "equivalent_rectangle": {
-     "side_a_m": 23.9,
-     "side_b_m": 21.4,
-     "bearing_deg": 148.9
-    },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "trapezoid",
-    "margin": 0.065,
-    "note": "Irregular: 5 corners, 90% of its 23.9 x 21.4 m bounding rectangle, 458 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.1953278,
-      49.2290432
-     ],
-     [
-      -123.1955445,
-      49.229129
-     ],
-     [
-      -123.1956219,
-      49.2290835
-     ],
-     [
-      -123.1956322,
-      49.2290773
-     ],
-     [
-      -123.1956424,
-      49.2290711
-     ],
-     [
-      -123.1956524,
-      49.2290648
-     ],
-     [
-      -123.1956624,
-      49.2290584
-     ],
-     [
-      -123.1956724,
-      49.229052
-     ],
-     [
-      -123.1956822,
-      49.2290455
-     ],
-     [
-      -123.1956919,
-      49.2290389
-     ],
-     [
-      -123.1957016,
-      49.2290323
-     ],
-     [
-      -123.1957111,
-      49.2290256
-     ],
-     [
-      -123.1957205,
-      49.229019
-     ],
-     [
-      -123.1957298,
-      49.2290121
-     ],
-     [
-      -123.1957391,
-      49.2290053
-     ],
-     [
-      -123.1957482,
-      49.2289984
-     ],
-     [
-      -123.1957572,
-      49.2289914
-     ],
-     [
-      -123.1957594,
-      49.2289897
-     ],
-     [
-      -123.1954791,
-      49.2288788
-     ],
-     [
-      -123.1953278,
-      49.2290432
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M114.0,45.0 L59.8,12.2 L40.4,29.6 L37.8,31.9 L35.3,34.3 L32.8,36.7 L30.3,39.2 L27.8,41.6 L25.3,44.1 L22.9,46.6 L20.5,49.1 L18.1,51.7 L15.7,54.2 L13.4,56.9 L11.1,59.5 L8.8,62.1 L6.5,64.8 L6.0,65.4 L76.1,107.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "irregular",
-   "runner_up": "trapezoid",
-   "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.899, convexity 1.000, 5 corners after simplifying, 19 as published, narrowest cross-section 6.0 m).",
    "label": null,
    "labels_by": null
   },
@@ -1136,9 +1352,129 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M47.9,113.0 L114.0,55.4 L89.7,7.0 L6.0,80.0 L6.8,80.7 L9.3,82.8 L11.7,84.9 L14.2,86.9 L16.6,89.0 L19.1,91.0 L21.6,93.1 L24.3,95.1 L26.8,97.2 L29.3,99.2 L31.9,101.2 L34.5,103.2 L37.1,105.2 L39.8,107.1 L42.4,109.1 L45.0,111.0 L47.7,112.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1940"
+     ],
+     "legal": "LOT 12 BLOCK F PLAN VAP5532 DIST RICT LOT 139 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "05169374"
+   },
    "best_guess": "irregular",
    "runner_up": "trapezoid",
    "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.899, convexity 1.000, 5 corners after simplifying, 21 as published, narrowest cross-section 5.3 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "009423052",
+   "address": "6488 Nanaimo St",
+   "local_area": "Victoria-Fraserview",
+   "metrics": {
+    "class": "irregular",
+    "area_m2": 607.0,
+    "perimeter_m": 107.2,
+    "vertices_raw": 11,
+    "vertices": 5,
+    "reflex_corners": 1,
+    "rectangularity": 0.898,
+    "convexity": 0.979,
+    "aspect_ratio": 1.984,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 10.7,
+    "equivalent_rectangle": {
+     "side_a_m": 18.5,
+     "side_b_m": 36.6,
+     "bearing_deg": 89.1
+    },
+    "flag": null,
+    "confidence": 0.727,
+    "alternative": "trapezoid",
+    "margin": 0.105,
+    "note": "Irregular: 5 corners, 90% of its 36.6 x 18.5 m bounding rectangle, 607 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.0589904,
+      49.225283
+     ],
+     [
+      -123.0589939,
+      49.2251444
+     ],
+     [
+      -123.058918,
+      49.2251423
+     ],
+     [
+      -123.0588422,
+      49.2251393
+     ],
+     [
+      -123.0587665,
+      49.2251355
+     ],
+     [
+      -123.0586909,
+      49.2251308
+     ],
+     [
+      -123.0586154,
+      49.2251252
+     ],
+     [
+      -123.0585401,
+      49.2251188
+     ],
+     [
+      -123.0584919,
+      49.2251142
+     ],
+     [
+      -123.058488,
+      49.2252801
+     ],
+     [
+      -123.05899,
+      49.225283
+     ],
+     [
+      -123.0589904,
+      49.225283
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.8,32.5 L6.0,77.6 L22.2,78.3 L38.4,79.3 L54.5,80.6 L70.7,82.1 L86.8,83.9 L102.9,86.0 L113.2,87.5 L114.0,33.4 L6.8,32.5 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1964"
+     ],
+     "legal": "LOT 1 BLOCK 4 PLAN VAP10279 NEW WESTMINSTER DISTRICT LOT 336 NW QTR",
+     "report_year": "2026"
+    },
+    "tax_coord": "26177294"
+   },
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "why": "73% of the nudged re-runs say irregular, the rest mostly trapezoid: four corners or five depending on the simplification (rectangularity 0.898, convexity 0.979, 5 corners after simplifying, 11 as published).",
    "label": null,
    "labels_by": null
   },
@@ -1212,6 +1548,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M43.8,113.7 L55.5,114.0 L56.1,96.1 L74.3,96.5 L74.8,69.4 L75.3,42.2 L76.2,6.7 L46.4,6.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "RT-8"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1910"
+     ],
+     "legal": "LOT C BLOCK 10 PLAN VAP774 DISTR ICT LOT 192 NWD EXCEPT PLAN PT SHO",
+     "report_year": "2026"
+    },
+    "tax_coord": "63807286"
+   },
    "best_guess": "l_shape",
    "runner_up": "near_rectangle",
    "why": "73% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.894, convexity 0.946, 6 corners after simplifying, 8 as published, narrowest cross-section 4.0 m).",
@@ -1348,88 +1700,25 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M71.3,7.3 L69.7,7.2 L68.1,7.0 L66.5,6.9 L64.9,6.8 L63.2,6.6 L61.6,6.5 L60.0,6.4 L58.4,6.3 L56.7,6.3 L55.1,6.2 L53.5,6.1 L51.8,6.1 L50.2,6.0 L48.6,6.0 L47.0,6.0 L46.7,6.0 L44.1,113.3 L44.1,113.3 L74.7,114.0 L75.7,69.6 L75.9,64.6 L69.9,64.6 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "2002"
+     ],
+     "legal": "LOT 8 BLOCK 21 PLAN VAP2975 DIST RICT LOT 526 NWD OF LOT 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "73509185"
+   },
    "best_guess": "l_shape",
    "runner_up": "irregular",
    "why": "73% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.892, convexity 0.945, 6 corners after simplifying, 23 as published).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.228173,
-    "lon": -123.193222
-   },
-   "local_area": "Dunbar-Southlands",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 772.7,
-    "perimeter_m": 139.0,
-    "vertices_raw": 8,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.744,
-    "convexity": 0.945,
-    "aspect_ratio": 3.333,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 1.768,
-    "equivalent_rectangle": {
-     "side_a_m": 58.8,
-     "side_b_m": 17.7,
-     "bearing_deg": 144.2
-    },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "irregular",
-    "margin": 0.265,
-    "note": "An L: six corners, one inward; 94% of its convex hull, 773 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.1935453,
-      49.2282533
-     ],
-     [
-      -123.1931979,
-      49.2280831
-     ],
-     [
-      -123.1930427,
-      49.2279749
-     ],
-     [
-      -123.1928627,
-      49.2280856
-     ],
-     [
-      -123.1930282,
-      49.2281638
-     ],
-     [
-      -123.1932184,
-      49.2282536
-     ],
-     [
-      -123.1934179,
-      49.2283326
-     ],
-     [
-      -123.1935355,
-      49.228379
-     ],
-     [
-      -123.1935453,
-      49.2282533
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,41.6 L61.0,82.7 L85.5,108.8 L114.0,82.1 L87.8,63.2 L57.7,41.5 L26.2,22.4 L7.6,11.2 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "irregular",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.744, convexity 0.945, 6 corners after simplifying, 8 as published, narrowest cross-section 1.8 m).",
    "label": null,
    "labels_by": null
   },
@@ -1551,1113 +1840,25 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M74.6,114.0 L87.6,11.4 L86.0,11.2 L83.4,10.9 L80.8,10.5 L78.1,10.2 L75.5,9.8 L72.9,9.5 L70.3,9.1 L67.6,8.8 L65.0,8.4 L62.4,8.0 L59.8,7.7 L57.1,7.3 L54.5,6.9 L51.9,6.5 L49.3,6.2 L48.0,6.0 L32.4,112.7 L33.4,113.1 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1940"
+     ],
+     "legal": "LOT 8 BLOCK 190 PLAN VAPVAP6188 DISTRICT LOT 176 NWD GROUP 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "65003452"
+   },
    "best_guess": "rectangle",
    "runner_up": "near_rectangle",
    "why": "73% of the nudged re-runs say rectangle, the rest mostly near_rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.955, convexity 0.999, 4 corners after simplifying, 20 as published).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "LMS4580",
-   "address": "1478 W Hastings St",
-   "local_area": "Downtown",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 1352.0,
-    "perimeter_m": 199.0,
-    "vertices_raw": 9,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.836,
-    "convexity": 0.924,
-    "aspect_ratio": 4.472,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 3.024,
-    "equivalent_rectangle": {
-     "side_a_m": 85.0,
-     "side_b_m": 19.0,
-     "bearing_deg": 157.5
-    },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "irregular",
-    "margin": 1.29,
-    "note": "An L: six corners, one inward; 92% of its convex hull, 1,352 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.1275165,
-      49.2899249
-     ],
-     [
-      -123.1274209,
-      49.2900647
-     ],
-     [
-      -123.1283662,
-      49.2903408
-     ],
-     [
-      -123.1284106,
-      49.2903353
-     ],
-     [
-      -123.1285903,
-      49.2902165
-     ],
-     [
-      -123.1284469,
-      49.2901889
-     ],
-     [
-      -123.1281849,
-      49.2901293
-     ],
-     [
-      -123.1279323,
-      49.2900553
-     ],
-     [
-      -123.1276838,
-      49.2899757
-     ],
-     [
-      -123.1275165,
-      49.2899249
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M105.2,89.4 L114.0,69.6 L26.7,30.6 L22.6,31.4 L6.0,48.2 L19.2,52.1 L43.4,60.5 L66.8,70.9 L89.7,82.2 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "irregular",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.836, convexity 0.924, 6 corners after simplifying, 9 as published, narrowest cross-section 3.0 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": null,
-   "address": "1725 E Broadway",
-   "local_area": "Kensington-Cedar Cottage",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 1502.0,
-    "perimeter_m": 237.6,
-    "vertices_raw": 98,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.823,
-    "convexity": 0.922,
-    "aspect_ratio": 6.625,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 2.283,
-    "equivalent_rectangle": {
-     "side_a_m": 110.0,
-     "side_b_m": 16.6,
-     "bearing_deg": 151.6
-    },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "trapezoid",
-    "margin": 1.397,
-    "note": "An L: six corners, one inward; 92% of its convex hull, 1,502 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.0568491,
-      49.2581186
-     ],
-     [
-      -123.0568493,
-      49.2582612
-     ],
-     [
-      -123.0568675,
-      49.2582665
-     ],
-     [
-      -123.0568857,
-      49.258272
-     ],
-     [
-      -123.0570241,
-      49.2583137
-     ],
-     [
-      -123.0571614,
-      49.2583569
-     ],
-     [
-      -123.0572974,
-      49.2584017
-     ],
-     [
-      -123.0574323,
-      49.2584481
-     ],
-     [
-      -123.0575659,
-      49.258496
-     ],
-     [
-      -123.0576982,
-      49.2585454
-     ],
-     [
-      -123.0578292,
-      49.2585963
-     ],
-     [
-      -123.0578695,
-      49.2586124
-     ],
-     [
-      -123.0580867,
-      49.2586995
-     ],
-     [
-      -123.05809,
-      49.2585462
-     ],
-     [
-      -123.0579745,
-      49.2584999
-     ],
-     [
-      -123.0579626,
-      49.2584951
-     ],
-     [
-      -123.0579508,
-      49.2584904
-     ],
-     [
-      -123.0579388,
-      49.2584857
-     ],
-     [
-      -123.057927,
-      49.2584809
-     ],
-     [
-      -123.0579152,
-      49.2584763
-     ],
-     [
-      -123.0579032,
-      49.2584716
-     ],
-     [
-      -123.0578913,
-      49.2584669
-     ],
-     [
-      -123.0578794,
-      49.2584623
-     ],
-     [
-      -123.0578675,
-      49.2584576
-     ],
-     [
-      -123.0578555,
-      49.2584529
-     ],
-     [
-      -123.0578435,
-      49.2584483
-     ],
-     [
-      -123.0578316,
-      49.2584437
-     ],
-     [
-      -123.0578196,
-      49.2584391
-     ],
-     [
-      -123.0578077,
-      49.2584345
-     ],
-     [
-      -123.0577957,
-      49.2584299
-     ],
-     [
-      -123.0577836,
-      49.2584253
-     ],
-     [
-      -123.0577716,
-      49.2584208
-     ],
-     [
-      -123.0577595,
-      49.2584163
-     ],
-     [
-      -123.0577476,
-      49.2584117
-     ],
-     [
-      -123.0577355,
-      49.2584072
-     ],
-     [
-      -123.0577234,
-      49.2584027
-     ],
-     [
-      -123.0577113,
-      49.2583982
-     ],
-     [
-      -123.0576992,
-      49.2583937
-     ],
-     [
-      -123.0576871,
-      49.2583892
-     ],
-     [
-      -123.057675,
-      49.2583847
-     ],
-     [
-      -123.0576629,
-      49.2583803
-     ],
-     [
-      -123.0576508,
-      49.2583759
-     ],
-     [
-      -123.0576387,
-      49.2583714
-     ],
-     [
-      -123.0576264,
-      49.258367
-     ],
-     [
-      -123.0576143,
-      49.2583627
-     ],
-     [
-      -123.0576021,
-      49.2583583
-     ],
-     [
-      -123.05759,
-      49.2583539
-     ],
-     [
-      -123.0575778,
-      49.2583496
-     ],
-     [
-      -123.0575655,
-      49.2583452
-     ],
-     [
-      -123.0575533,
-      49.2583409
-     ],
-     [
-      -123.0575412,
-      49.2583366
-     ],
-     [
-      -123.057529,
-      49.2583323
-     ],
-     [
-      -123.0575166,
-      49.258328
-     ],
-     [
-      -123.0575043,
-      49.2583237
-     ],
-     [
-      -123.0574921,
-      49.2583194
-     ],
-     [
-      -123.0574799,
-      49.2583152
-     ],
-     [
-      -123.0574675,
-      49.258311
-     ],
-     [
-      -123.0574553,
-      49.2583068
-     ],
-     [
-      -123.0574429,
-      49.2583025
-     ],
-     [
-      -123.0574307,
-      49.2582983
-     ],
-     [
-      -123.0574183,
-      49.2582941
-     ],
-     [
-      -123.0574059,
-      49.25829
-     ],
-     [
-      -123.0573937,
-      49.2582857
-     ],
-     [
-      -123.0573813,
-      49.2582816
-     ],
-     [
-      -123.0573689,
-      49.2582775
-     ],
-     [
-      -123.0573566,
-      49.2582733
-     ],
-     [
-      -123.0573442,
-      49.2582692
-     ],
-     [
-      -123.0573318,
-      49.2582652
-     ],
-     [
-      -123.0573193,
-      49.258261
-     ],
-     [
-      -123.0573069,
-      49.258257
-     ],
-     [
-      -123.0572946,
-      49.2582529
-     ],
-     [
-      -123.057282,
-      49.2582488
-     ],
-     [
-      -123.0572697,
-      49.2582448
-     ],
-     [
-      -123.0572572,
-      49.2582408
-     ],
-     [
-      -123.0572446,
-      49.2582368
-     ],
-     [
-      -123.0572323,
-      49.2582328
-     ],
-     [
-      -123.0572198,
-      49.2582288
-     ],
-     [
-      -123.0572073,
-      49.2582248
-     ],
-     [
-      -123.0571947,
-      49.2582209
-     ],
-     [
-      -123.0571822,
-      49.2582169
-     ],
-     [
-      -123.0571697,
-      49.258213
-     ],
-     [
-      -123.0571572,
-      49.258209
-     ],
-     [
-      -123.0571445,
-      49.2582052
-     ],
-     [
-      -123.057132,
-      49.2582013
-     ],
-     [
-      -123.0571195,
-      49.2581974
-     ],
-     [
-      -123.0571069,
-      49.2581935
-     ],
-     [
-      -123.0570944,
-      49.2581896
-     ],
-     [
-      -123.0570817,
-      49.2581859
-     ],
-     [
-      -123.0570692,
-      49.258182
-     ],
-     [
-      -123.0570566,
-      49.2581781
-     ],
-     [
-      -123.0570439,
-      49.2581744
-     ],
-     [
-      -123.0570313,
-      49.2581706
-     ],
-     [
-      -123.0570186,
-      49.2581668
-     ],
-     [
-      -123.057006,
-      49.2581631
-     ],
-     [
-      -123.0569933,
-      49.2581593
-     ],
-     [
-      -123.0569807,
-      49.2581555
-     ],
-     [
-      -123.056968,
-      49.2581518
-     ],
-     [
-      -123.0569177,
-      49.2581374
-     ],
-     [
-      -123.0568491,
-      49.2581186
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M114.0,98.6 L114.0,79.7 L112.4,79.0 L110.8,78.2 L98.8,72.7 L86.8,66.9 L75.0,61.0 L63.2,54.8 L51.6,48.4 L40.1,41.9 L28.7,35.1 L25.2,33.0 L6.3,21.4 L6.0,41.8 L16.1,47.9 L17.1,48.6 L18.1,49.2 L19.2,49.8 L20.2,50.4 L21.2,51.1 L22.3,51.7 L23.3,52.3 L24.3,52.9 L25.4,53.5 L26.4,54.2 L27.4,54.8 L28.5,55.4 L29.5,56.0 L30.6,56.6 L31.6,57.2 L32.7,57.8 L33.7,58.4 L34.8,59.0 L35.8,59.7 L36.9,60.3 L37.9,60.8 L39.0,61.4 L40.0,62.0 L41.1,62.6 L42.1,63.2 L43.2,63.8 L44.2,64.4 L45.3,65.0 L46.3,65.6 L47.4,66.2 L48.5,66.7 L49.5,67.3 L50.6,67.9 L51.6,68.5 L52.7,69.1 L53.8,69.6 L54.8,70.2 L55.9,70.8 L57.0,71.3 L58.0,71.9 L59.1,72.5 L60.2,73.0 L61.2,73.6 L62.3,74.2 L63.4,74.7 L64.5,75.3 L65.5,75.8 L66.6,76.4 L67.7,76.9 L68.8,77.5 L69.8,78.0 L70.9,78.6 L72.0,79.1 L73.1,79.7 L74.2,80.2 L75.2,80.8 L76.3,81.3 L77.4,81.8 L78.5,82.4 L79.6,82.9 L80.7,83.4 L81.7,84.0 L82.8,84.5 L83.9,85.0 L85.0,85.5 L86.1,86.1 L87.2,86.6 L88.3,87.1 L89.4,87.6 L90.5,88.2 L91.6,88.7 L92.7,89.2 L93.8,89.7 L94.8,90.2 L95.9,90.7 L97.0,91.2 L98.1,91.7 L99.2,92.2 L100.3,92.7 L101.4,93.2 L102.5,93.7 L103.6,94.2 L108.0,96.1 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "trapezoid",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly trapezoid: the deciding figures sit near a threshold (rectangularity 0.823, convexity 0.922, 6 corners after simplifying, 98 as published, narrowest cross-section 2.3 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "007123132",
-   "address": "2600 Rupert St",
-   "local_area": "Renfrew-Collingwood",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 4712.6,
-    "perimeter_m": 459.5,
-    "vertices_raw": 136,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.825,
-    "convexity": 0.918,
-    "aspect_ratio": 8.115,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 2.807,
-    "equivalent_rectangle": {
-     "side_a_m": 215.4,
-     "side_b_m": 26.5,
-     "bearing_deg": 25.6
-    },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "trapezoid",
-    "margin": 1.598,
-    "note": "An L: six corners, one inward; 92% of its convex hull, 4,713 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.031014,
-      49.2610413
-     ],
-     [
-      -123.0310157,
-      49.2612734
-     ],
-     [
-      -123.0319852,
-      49.2609443
-     ],
-     [
-      -123.0322216,
-      49.2608658
-     ],
-     [
-      -123.0323031,
-      49.2608395
-     ],
-     [
-      -123.0327773,
-      49.260691
-     ],
-     [
-      -123.0328729,
-      49.2606618
-     ],
-     [
-      -123.0329914,
-      49.2606267
-     ],
-     [
-      -123.0331108,
-      49.260593
-     ],
-     [
-      -123.0332126,
-      49.2605654
-     ],
-     [
-      -123.0334006,
-      49.2605169
-     ],
-     [
-      -123.0335537,
-      49.2604792
-     ],
-     [
-      -123.0335559,
-      49.2602615
-     ],
-     [
-      -123.0335429,
-      49.2602645
-     ],
-     [
-      -123.0335299,
-      49.2602676
-     ],
-     [
-      -123.033517,
-      49.2602706
-     ],
-     [
-      -123.033504,
-      49.2602737
-     ],
-     [
-      -123.033491,
-      49.2602768
-     ],
-     [
-      -123.033478,
-      49.2602799
-     ],
-     [
-      -123.0334651,
-      49.260283
-     ],
-     [
-      -123.0334522,
-      49.2602861
-     ],
-     [
-      -123.0334392,
-      49.2602892
-     ],
-     [
-      -123.0334262,
-      49.2602923
-     ],
-     [
-      -123.0334133,
-      49.2602955
-     ],
-     [
-      -123.0334004,
-      49.2602986
-     ],
-     [
-      -123.0333874,
-      49.2603018
-     ],
-     [
-      -123.0333745,
-      49.260305
-     ],
-     [
-      -123.0333616,
-      49.2603082
-     ],
-     [
-      -123.0333487,
-      49.2603113
-     ],
-     [
-      -123.0333358,
-      49.2603146
-     ],
-     [
-      -123.0333228,
-      49.2603177
-     ],
-     [
-      -123.0333099,
-      49.260321
-     ],
-     [
-      -123.033297,
-      49.2603242
-     ],
-     [
-      -123.0332842,
-      49.2603275
-     ],
-     [
-      -123.0332713,
-      49.2603307
-     ],
-     [
-      -123.0332584,
-      49.260334
-     ],
-     [
-      -123.0332456,
-      49.2603372
-     ],
-     [
-      -123.0332327,
-      49.2603405
-     ],
-     [
-      -123.0332198,
-      49.2603438
-     ],
-     [
-      -123.033207,
-      49.2603471
-     ],
-     [
-      -123.0331941,
-      49.2603503
-     ],
-     [
-      -123.0331813,
-      49.2603537
-     ],
-     [
-      -123.0331685,
-      49.260357
-     ],
-     [
-      -123.0331556,
-      49.2603603
-     ],
-     [
-      -123.0331428,
-      49.2603637
-     ],
-     [
-      -123.0331301,
-      49.260367
-     ],
-     [
-      -123.0331171,
-      49.2603703
-     ],
-     [
-      -123.0331044,
-      49.2603738
-     ],
-     [
-      -123.0330916,
-      49.2603771
-     ],
-     [
-      -123.0330788,
-      49.2603805
-     ],
-     [
-      -123.033066,
-      49.2603838
-     ],
-     [
-      -123.0330532,
-      49.2603873
-     ],
-     [
-      -123.0330405,
-      49.2603907
-     ],
-     [
-      -123.0330277,
-      49.2603941
-     ],
-     [
-      -123.0330149,
-      49.2603975
-     ],
-     [
-      -123.0330021,
-      49.2604009
-     ],
-     [
-      -123.0329893,
-      49.2604045
-     ],
-     [
-      -123.0329766,
-      49.2604079
-     ],
-     [
-      -123.0329639,
-      49.2604114
-     ],
-     [
-      -123.0329511,
-      49.2604148
-     ],
-     [
-      -123.0329384,
-      49.2604183
-     ],
-     [
-      -123.0329257,
-      49.2604218
-     ],
-     [
-      -123.0329129,
-      49.2604254
-     ],
-     [
-      -123.0329003,
-      49.2604289
-     ],
-     [
-      -123.0328875,
-      49.2604324
-     ],
-     [
-      -123.0328749,
-      49.2604359
-     ],
-     [
-      -123.0328743,
-      49.2604361
-     ],
-     [
-      -123.0328621,
-      49.2604394
-     ],
-     [
-      -123.0328495,
-      49.260443
-     ],
-     [
-      -123.0328368,
-      49.2604465
-     ],
-     [
-      -123.032824,
-      49.2604501
-     ],
-     [
-      -123.0328114,
-      49.2604536
-     ],
-     [
-      -123.0327988,
-      49.2604572
-     ],
-     [
-      -123.0327861,
-      49.2604608
-     ],
-     [
-      -123.0327735,
-      49.2604644
-     ],
-     [
-      -123.0327608,
-      49.260468
-     ],
-     [
-      -123.0327482,
-      49.2604717
-     ],
-     [
-      -123.0327355,
-      49.2604753
-     ],
-     [
-      -123.0327229,
-      49.2604789
-     ],
-     [
-      -123.0327103,
-      49.2604826
-     ],
-     [
-      -123.0326976,
-      49.2604863
-     ],
-     [
-      -123.032685,
-      49.2604899
-     ],
-     [
-      -123.0326725,
-      49.2604936
-     ],
-     [
-      -123.0326598,
-      49.2604973
-     ],
-     [
-      -123.0326472,
-      49.260501
-     ],
-     [
-      -123.0326347,
-      49.2605047
-     ],
-     [
-      -123.032622,
-      49.2605085
-     ],
-     [
-      -123.0326095,
-      49.2605122
-     ],
-     [
-      -123.0325969,
-      49.2605158
-     ],
-     [
-      -123.0325844,
-      49.2605196
-     ],
-     [
-      -123.0325718,
-      49.2605234
-     ],
-     [
-      -123.0325592,
-      49.2605271
-     ],
-     [
-      -123.0325467,
-      49.2605309
-     ],
-     [
-      -123.0325341,
-      49.2605347
-     ],
-     [
-      -123.0325216,
-      49.2605384
-     ],
-     [
-      -123.0325091,
-      49.2605422
-     ],
-     [
-      -123.0324966,
-      49.2605461
-     ],
-     [
-      -123.0324841,
-      49.2605499
-     ],
-     [
-      -123.0324716,
-      49.2605536
-     ],
-     [
-      -123.0324591,
-      49.2605575
-     ],
-     [
-      -123.0324466,
-      49.2605614
-     ],
-     [
-      -123.0324341,
-      49.2605652
-     ],
-     [
-      -123.0324216,
-      49.260569
-     ],
-     [
-      -123.0324092,
-      49.2605729
-     ],
-     [
-      -123.0323967,
-      49.2605768
-     ],
-     [
-      -123.0323842,
-      49.2605807
-     ],
-     [
-      -123.0323718,
-      49.2605846
-     ],
-     [
-      -123.0323593,
-      49.2605885
-     ],
-     [
-      -123.032347,
-      49.2605924
-     ],
-     [
-      -123.0323344,
-      49.2605963
-     ],
-     [
-      -123.0323221,
-      49.2606003
-     ],
-     [
-      -123.0323096,
-      49.2606042
-     ],
-     [
-      -123.0322972,
-      49.2606081
-     ],
-     [
-      -123.0322848,
-      49.2606121
-     ],
-     [
-      -123.0322723,
-      49.260616
-     ],
-     [
-      -123.03226,
-      49.26062
-     ],
-     [
-      -123.0322476,
-      49.2606241
-     ],
-     [
-      -123.0322352,
-      49.260628
-     ],
-     [
-      -123.0322229,
-      49.260632
-     ],
-     [
-      -123.0322105,
-      49.260636
-     ],
-     [
-      -123.0321981,
-      49.2606401
-     ],
-     [
-      -123.0321858,
-      49.260644
-     ],
-     [
-      -123.0321734,
-      49.2606481
-     ],
-     [
-      -123.032161,
-      49.2606522
-     ],
-     [
-      -123.0321488,
-      49.2606562
-     ],
-     [
-      -123.0321364,
-      49.2606603
-     ],
-     [
-      -123.0321241,
-      49.2606644
-     ],
-     [
-      -123.0321118,
-      49.2606684
-     ],
-     [
-      -123.0320995,
-      49.2606725
-     ],
-     [
-      -123.0320873,
-      49.2606766
-     ],
-     [
-      -123.0320749,
-      49.2606807
-     ],
-     [
-      -123.0320627,
-      49.2606848
-     ],
-     [
-      -123.0320504,
-      49.260689
-     ],
-     [
-      -123.0320381,
-      49.2606931
-     ],
-     [
-      -123.0320258,
-      49.2606973
-     ],
-     [
-      -123.0319894,
-      49.2607097
-     ],
-     [
-      -123.031014,
-      49.2610413
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M114.0,42.2 L113.9,27.2 L72.7,48.5 L62.7,53.6 L59.2,55.3 L39.1,65.0 L35.0,66.9 L30.0,69.1 L24.9,71.3 L20.6,73.1 L12.6,76.3 L6.1,78.7 L6.0,92.8 L6.6,92.6 L7.1,92.4 L7.7,92.2 L8.2,92.1 L8.8,91.9 L9.3,91.6 L9.9,91.4 L10.4,91.2 L11.0,91.0 L11.5,90.8 L12.1,90.6 L12.6,90.4 L13.2,90.2 L13.7,90.0 L14.3,89.8 L14.8,89.6 L15.4,89.4 L15.9,89.2 L16.5,89.0 L17.0,88.8 L17.5,88.6 L18.1,88.3 L18.6,88.1 L19.2,87.9 L19.7,87.7 L20.3,87.5 L20.8,87.3 L21.4,87.1 L21.9,86.9 L22.5,86.6 L23.0,86.4 L23.6,86.2 L24.1,86.0 L24.6,85.8 L25.2,85.6 L25.7,85.3 L26.3,85.1 L26.8,84.9 L27.4,84.7 L27.9,84.5 L28.4,84.2 L29.0,84.0 L29.5,83.8 L30.1,83.6 L30.6,83.3 L31.2,83.1 L31.7,82.9 L32.2,82.7 L32.8,82.4 L33.3,82.2 L33.9,82.0 L34.4,81.7 L34.9,81.5 L35.0,81.5 L35.5,81.3 L36.0,81.1 L36.6,80.8 L37.1,80.6 L37.6,80.4 L38.2,80.1 L38.7,79.9 L39.2,79.7 L39.8,79.4 L40.3,79.2 L40.9,79.0 L41.4,78.7 L41.9,78.5 L42.5,78.2 L43.0,78.0 L43.5,77.8 L44.1,77.5 L44.6,77.3 L45.1,77.1 L45.7,76.8 L46.2,76.6 L46.7,76.3 L47.3,76.1 L47.8,75.8 L48.3,75.6 L48.9,75.4 L49.4,75.1 L49.9,74.9 L50.5,74.6 L51.0,74.4 L51.5,74.1 L52.1,73.9 L52.6,73.6 L53.1,73.4 L53.7,73.1 L54.2,72.9 L54.7,72.6 L55.3,72.4 L55.8,72.1 L56.3,71.9 L56.8,71.6 L57.4,71.4 L57.9,71.1 L58.4,70.8 L59.0,70.6 L59.5,70.3 L60.0,70.1 L60.5,69.8 L61.1,69.6 L61.6,69.3 L62.1,69.0 L62.6,68.8 L63.2,68.5 L63.7,68.3 L64.2,68.0 L64.7,67.7 L65.3,67.5 L65.8,67.2 L66.3,67.0 L66.8,66.7 L67.4,66.4 L67.9,66.2 L68.4,65.9 L68.9,65.6 L69.4,65.4 L70.0,65.1 L70.5,64.8 L71.0,64.6 L72.6,63.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "trapezoid",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly trapezoid: the deciding figures sit near a threshold (rectangularity 0.825, convexity 0.918, 6 corners after simplifying, 136 as published, narrowest cross-section 2.8 m).",
    "label": null,
    "labels_by": null
   },
@@ -2787,6 +1988,20 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M48.9,6.0 L49.4,8.7 L50.0,11.4 L50.5,14.1 L51.0,16.9 L51.5,19.6 L51.9,22.4 L52.3,25.2 L52.7,28.0 L53.0,30.8 L53.3,33.6 L53.5,36.4 L53.7,39.2 L53.9,42.1 L54.1,44.9 L54.2,47.7 L54.3,50.6 L54.9,81.2 L55.6,114.0 L71.1,113.7 L69.4,26.8 L54.0,7.3 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "I-2"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [],
+     "legal": "LOT D PLAN BCP802 DISTRICT LOT 20 37 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "22261596"
+   },
    "best_guess": "l_shape",
    "runner_up": "irregular",
    "why": "73% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.756, convexity 0.899, 6 corners after simplifying, 22 as published, narrowest cross-section 3.7 m).",
@@ -2794,462 +2009,224 @@
    "labels_by": null
   },
   {
-   "site_id": "015305015",
-   "address": "3598 E Kent Ave North",
-   "local_area": "Killarney",
+   "site_id": "008040117",
+   "address": "1598 Matthews Ave",
+   "local_area": "Shaughnessy",
    "metrics": {
     "class": "l_shape",
-    "area_m2": 4069.8,
-    "perimeter_m": 445.3,
-    "vertices_raw": 38,
+    "area_m2": 1206.6,
+    "perimeter_m": 157.2,
+    "vertices_raw": 41,
     "vertices": 6,
     "reflex_corners": 1,
-    "rectangularity": 0.807,
-    "convexity": 0.879,
-    "aspect_ratio": 8.339,
+    "rectangularity": 0.693,
+    "convexity": 0.852,
+    "aspect_ratio": 1.387,
     "rings": 1,
     "outer_rings": 1,
     "holes": 0,
-    "narrowest_cross_section_m": 8.503,
+    "narrowest_cross_section_m": 4.411,
     "equivalent_rectangle": {
-     "side_a_m": 205.1,
-     "side_b_m": 24.6,
-     "bearing_deg": 170.6
+     "side_a_m": 49.2,
+     "side_b_m": 35.4,
+     "bearing_deg": 117.6
     },
     "flag": null,
     "confidence": 0.727,
-    "alternative": "trapezoid",
-    "margin": 3.548,
-    "note": "An L: six corners, one inward; 88% of its convex hull, 4,070 m2."
+    "alternative": "irregular",
+    "margin": 4.876,
+    "note": "An L: six corners, one inward; 85% of its convex hull, 1,207 m2."
    },
    "ring_lonlat": [
     [
      [
-      -123.0394429,
-      49.2062707
+      -123.1417061,
+      49.2522073
      ],
      [
-      -123.0394385,
-      49.2064552
+      -123.1413235,
+      49.2522675
      ],
      [
-      -123.0403707,
-      49.2065866
+      -123.1413235,
+      49.2522676
      ],
      [
-      -123.0404829,
-      49.206602
+      -123.1415465,
+      49.2523816
      ],
      [
-      -123.0405952,
-      49.2066167
+      -123.1416366,
+      49.252659
      ],
      [
-      -123.0407076,
-      49.2066307
+      -123.1416391,
+      49.2526582
      ],
      [
-      -123.04082,
-      49.206644
+      -123.1416514,
+      49.252654
      ],
      [
-      -123.0409325,
-      49.2066566
+      -123.1416636,
+      49.2526498
      ],
      [
-      -123.0410452,
-      49.2066685
+      -123.141676,
+      49.2526456
      ],
      [
-      -123.0411578,
-      49.2066797
+      -123.1416882,
+      49.2526414
      ],
      [
-      -123.0412706,
-      49.2066901
+      -123.1417004,
+      49.2526371
      ],
      [
-      -123.0413834,
-      49.2066999
+      -123.1417126,
+      49.2526328
      ],
      [
-      -123.0414963,
-      49.206709
+      -123.1417247,
+      49.2526285
      ],
      [
-      -123.0416092,
-      49.2067174
+      -123.1417369,
+      49.252624
      ],
      [
-      -123.0417222,
-      49.2067251
+      -123.141749,
+      49.2526197
      ],
      [
-      -123.0418352,
-      49.2067321
+      -123.1417611,
+      49.2526153
      ],
      [
-      -123.0419483,
-      49.2067383
+      -123.1417732,
+      49.2526108
      ],
      [
-      -123.0420614,
-      49.2067439
+      -123.1417853,
+      49.2526063
      ],
      [
-      -123.0421745,
-      49.2067488
+      -123.1417972,
+      49.2526018
      ],
      [
-      -123.0421786,
-      49.2065677
+      -123.1418093,
+      49.2525973
      ],
      [
-      -123.0421243,
-      49.2065654
+      -123.1418212,
+      49.2525927
      ],
      [
-      -123.0420179,
-      49.2065604
+      -123.1418332,
+      49.2525881
      ],
      [
-      -123.0419116,
-      49.2065548
+      -123.1418451,
+      49.2525835
      ],
      [
-      -123.0418053,
-      49.2065486
+      -123.141857,
+      49.2525788
      ],
      [
-      -123.0416991,
-      49.2065417
+      -123.1418689,
+      49.2525742
      ],
      [
-      -123.0415929,
-      49.2065342
+      -123.1418807,
+      49.2525695
      ],
      [
-      -123.0414867,
-      49.2065261
+      -123.1418926,
+      49.2525647
      ],
      [
-      -123.0413807,
-      49.2065173
+      -123.1419044,
+      49.25256
      ],
      [
-      -123.0412746,
-      49.2065079
+      -123.1419161,
+      49.2525552
      ],
      [
-      -123.0411686,
-      49.2064978
+      -123.1419279,
+      49.2525504
      ],
      [
-      -123.0410627,
-      49.2064871
+      -123.1419395,
+      49.2525455
      ],
      [
-      -123.0409568,
-      49.2064758
+      -123.1419512,
+      49.2525407
      ],
      [
-      -123.0408511,
-      49.2064639
+      -123.1419629,
+      49.2525358
      ],
      [
-      -123.0407454,
-      49.2064513
+      -123.1419745,
+      49.2525308
      ],
      [
-      -123.0406397,
-      49.2064381
+      -123.1419862,
+      49.2525259
      ],
      [
-      -123.0405342,
-      49.2064242
+      -123.1419977,
+      49.2525209
      ],
      [
-      -123.0404287,
-      49.2064097
+      -123.1420093,
+      49.2525159
      ],
      [
-      -123.0396165,
-      49.2062952
+      -123.1420208,
+      49.2525109
      ],
      [
-      -123.0394429,
-      49.2062707
+      -123.1420323,
+      49.2525058
+     ],
+     [
+      -123.1420438,
+      49.2525008
+     ],
+     [
+      -123.1420552,
+      49.2524956
+     ],
+     [
+      -123.1417061,
+      49.2522073
      ]
     ]
    ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M113.8,74.4 L114.0,63.3 L77.3,55.4 L72.8,54.5 L68.4,53.6 L64.0,52.7 L59.5,51.9 L55.1,51.2 L50.7,50.5 L46.2,49.8 L41.8,49.1 L37.3,48.6 L32.9,48.0 L28.4,47.5 L24.0,47.0 L19.5,46.6 L15.1,46.2 L10.6,45.9 L6.2,45.6 L6.0,56.5 L8.1,56.7 L12.3,57.0 L16.5,57.3 L20.7,57.7 L24.9,58.1 L29.1,58.5 L33.3,59.0 L37.5,59.5 L41.6,60.1 L45.8,60.7 L50.0,61.4 L54.2,62.0 L58.3,62.8 L62.5,63.5 L66.7,64.3 L70.8,65.1 L75.0,66.0 L107.0,72.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "trapezoid",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly trapezoid: the deciding figures sit near a threshold (rectangularity 0.807, convexity 0.879, 6 corners after simplifying, 38 as published).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "028408322",
-   "address": "2902 Hebb Ave",
-   "local_area": "Renfrew-Collingwood",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 1520.1,
-    "perimeter_m": 426.6,
-    "vertices_raw": 22,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.685,
-    "convexity": 0.774,
-    "aspect_ratio": 19.6,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 2.71,
-    "equivalent_rectangle": {
-     "side_a_m": 208.4,
-     "side_b_m": 10.7,
-     "bearing_deg": 25.6
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M57.5,110.9 L114.0,97.3 L114.0,97.3 L81.1,71.6 L67.8,9.1 L67.4,9.3 L65.6,10.2 L63.8,11.1 L62.0,12.1 L60.2,13.1 L58.4,14.0 L56.6,15.0 L54.8,16.0 L53.0,17.0 L51.2,17.9 L49.4,18.9 L47.6,20.0 L45.8,20.9 L44.1,22.0 L42.3,23.0 L40.5,24.0 L38.8,25.1 L37.0,26.1 L35.3,27.2 L33.5,28.2 L31.8,29.3 L30.0,30.3 L28.3,31.4 L26.5,32.5 L24.8,33.6 L23.1,34.7 L21.4,35.8 L19.6,36.9 L17.9,38.0 L16.2,39.1 L14.5,40.2 L12.8,41.3 L11.1,42.5 L9.4,43.6 L7.7,44.8 L6.0,45.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "FSD"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [],
+     "legal": "LOT E BLOCK 33 PLAN VAP21350 DIS TRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
     },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "trapezoid",
-    "margin": 4.349,
-    "note": "An L: six corners, one inward; 77% of its convex hull, 1,520 m2."
+    "tax_coord": "70212504"
    },
-   "ring_lonlat": [
-    [
-     [
-      -123.0335537,
-      49.2604792
-     ],
-     [
-      -123.0334006,
-      49.2605169
-     ],
-     [
-      -123.0332126,
-      49.2605654
-     ],
-     [
-      -123.0331108,
-      49.260593
-     ],
-     [
-      -123.0329914,
-      49.2606267
-     ],
-     [
-      -123.0328729,
-      49.2606618
-     ],
-     [
-      -123.0327773,
-      49.260691
-     ],
-     [
-      -123.0323031,
-      49.2608395
-     ],
-     [
-      -123.0322216,
-      49.2608658
-     ],
-     [
-      -123.0319852,
-      49.2609443
-     ],
-     [
-      -123.0310157,
-      49.2612734
-     ],
-     [
-      -123.0310162,
-      49.2613493
-     ],
-     [
-      -123.0311546,
-      49.2613022
-     ],
-     [
-      -123.0322188,
-      49.26094
-     ],
-     [
-      -123.0324022,
-      49.260879
-     ],
-     [
-      -123.0325872,
-      49.2608202
-     ],
-     [
-      -123.0327738,
-      49.2607635
-     ],
-     [
-      -123.0329619,
-      49.2607089
-     ],
-     [
-      -123.0331513,
-      49.2606565
-     ],
-     [
-      -123.0333422,
-      49.2606062
-     ],
-     [
-      -123.0335344,
-      49.2605582
-     ],
-     [
-      -123.0335534,
-      49.2605535
-     ],
-     [
-      -123.0335537,
-      49.2604792
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,88.3 L12.5,85.8 L20.5,82.7 L24.8,80.9 L29.9,78.7 L35.0,76.4 L39.0,74.5 L59.2,64.9 L62.7,63.2 L72.7,58.0 L114.0,36.6 L114.0,31.7 L108.1,34.8 L62.8,58.3 L55.0,62.3 L47.1,66.1 L39.2,69.8 L31.2,73.3 L23.1,76.8 L15.0,80.0 L6.8,83.1 L6.0,83.4 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
    "best_guess": "l_shape",
-   "runner_up": "trapezoid",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly trapezoid: the deciding figures sit near a threshold (rectangularity 0.685, convexity 0.774, 6 corners after simplifying, 22 as published, narrowest cross-section 2.7 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "028254261",
-   "address": "2902 Hebb Ave",
-   "local_area": "Renfrew-Collingwood",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 1406.7,
-    "perimeter_m": 395.2,
-    "vertices_raw": 22,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.724,
-    "convexity": 0.797,
-    "aspect_ratio": 18.8,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 4.567,
-    "equivalent_rectangle": {
-     "side_a_m": 191.4,
-     "side_b_m": 10.2,
-     "bearing_deg": 13.3
-    },
-    "flag": null,
-    "confidence": 0.727,
-    "alternative": "trapezoid",
-    "margin": 4.933,
-    "note": "An L: six corners, one inward; 80% of its convex hull, 1,407 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.0339687,
-      49.260385
-     ],
-     [
-      -123.0339683,
-      49.2604582
-     ],
-     [
-      -123.0341643,
-      49.2604173
-     ],
-     [
-      -123.0343614,
-      49.2603785
-     ],
-     [
-      -123.0345594,
-      49.2603421
-     ],
-     [
-      -123.0347584,
-      49.2603079
-     ],
-     [
-      -123.0349583,
-      49.260276
-     ],
-     [
-      -123.0351261,
-      49.2602512
-     ],
-     [
-      -123.0351589,
-      49.2602464
-     ],
-     [
-      -123.0352972,
-      49.2602274
-     ],
-     [
-      -123.0365031,
-      49.2600667
-     ],
-     [
-      -123.0365032,
-      49.259997
-     ],
-     [
-      -123.0358631,
-      49.2600824
-     ],
-     [
-      -123.0355221,
-      49.2601291
-     ],
-     [
-      -123.0349526,
-      49.2602125
-     ],
-     [
-      -123.0347598,
-      49.2602422
-     ],
-     [
-      -123.0345671,
-      49.2602723
-     ],
-     [
-      -123.0345274,
-      49.2602787
-     ],
-     [
-      -123.034413,
-      49.2602979
-     ],
-     [
-      -123.0342992,
-      49.2603184
-     ],
-     [
-      -123.0341859,
-      49.2603403
-     ],
-     [
-      -123.0341613,
-      49.2603452
-     ],
-     [
-      -123.0339687,
-      49.260385
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M114.0,49.8 L114.0,45.0 L105.6,47.7 L97.3,50.2 L88.8,52.5 L80.3,54.8 L71.8,56.8 L64.7,58.5 L63.3,58.8 L57.4,60.0 L6.0,70.5 L6.0,75.0 L33.3,69.5 L47.8,66.4 L72.1,61.0 L80.3,59.1 L88.5,57.1 L90.2,56.7 L95.1,55.4 L99.9,54.1 L104.7,52.7 L105.8,52.3 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "trapezoid",
-   "why": "73% of the nudged re-runs say l_shape, the rest mostly trapezoid: the deciding figures sit near a threshold (rectangularity 0.724, convexity 0.797, 6 corners after simplifying, 22 as published, narrowest cross-section 4.6 m).",
+   "runner_up": "irregular",
+   "why": "73% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.693, convexity 0.852, 6 corners after simplifying, 41 as published, narrowest cross-section 4.4 m).",
    "label": null,
    "labels_by": null
   },
@@ -3395,6 +2372,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M63.4,114.0 L107.6,26.2 L56.7,6.0 L56.6,6.1 L12.4,93.7 L14.3,94.4 L16.8,95.3 L19.3,96.2 L21.7,97.1 L24.2,98.1 L26.7,99.0 L29.2,99.9 L31.6,100.9 L34.1,101.9 L36.5,102.9 L39.0,103.8 L41.4,104.8 L43.9,105.8 L46.3,106.8 L48.8,107.8 L51.2,108.8 L53.6,109.8 L56.1,110.9 L58.5,111.9 L60.9,113.0 L63.4,114.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "2015"
+     ],
+     "legal": "LOT 14 BLOCK 712 PLAN VAP6011 DI STRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "71813529"
+   },
    "best_guess": "rectangle",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say rectangle, the rest mostly near_rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.950, convexity 0.997, 4 corners after simplifying, 26 as published).",
@@ -3519,152 +2512,25 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M67.3,114.0 L86.9,23.8 L86.7,23.6 L84.2,22.3 L83.7,22.0 L81.4,20.7 L79.1,19.5 L76.9,18.3 L74.6,17.0 L72.3,15.8 L70.0,14.6 L67.7,13.4 L65.3,12.3 L63.0,11.1 L60.7,10.0 L58.3,8.9 L56.0,7.8 L53.6,6.7 L52.0,6.0 L33.1,98.4 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1972"
+     ],
+     "legal": "LOT 66 PLAN VAP13659 DISTRICT LOT 339 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "79631254"
+   },
    "best_guess": "trapezoid",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say trapezoid, the rest mostly near_rectangle: four corners and a rectangularity near the 0.90 line (rectangularity 0.900, convexity 1.000, 4 corners after simplifying, 20 as published, narrowest cross-section 4.7 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.205252,
-    "lon": -123.093287
-   },
-   "local_area": "Sunset",
-   "metrics": {
-    "class": "near_rectangle",
-    "area_m2": 295.4,
-    "perimeter_m": 93.5,
-    "vertices_raw": 5,
-    "vertices": 5,
-    "reflex_corners": 0,
-    "rectangularity": 0.95,
-    "convexity": 1.0,
-    "aspect_ratio": 5.36,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 3.458,
-    "equivalent_rectangle": {
-     "side_a_m": 40.8,
-     "side_b_m": 7.616,
-     "bearing_deg": 88.8
-    },
-    "flag": null,
-    "confidence": 0.818,
-    "alternative": "rectangle",
-    "margin": 0.02,
-    "note": "Nearly a rectangle (95% of its 40.8 x 7.6 m bounding rectangle), 295 m2, 5 corners."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.0933444,
-      49.2050659
-     ],
-     [
-      -123.0932391,
-      49.2050893
-     ],
-     [
-      -123.0932293,
-      49.2054315
-     ],
-     [
-      -123.0932613,
-      49.20543
-     ],
-     [
-      -123.0933334,
-      49.2054222
-     ],
-     [
-      -123.0933444,
-      49.2050659
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M48.9,114.0 L69.2,107.1 L71.1,6.0 L64.9,6.5 L51.0,8.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "near_rectangle",
-   "runner_up": "rectangle",
-   "why": "82% of the nudged re-runs say near_rectangle, the rest mostly rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.950, convexity 1.000, 5 corners after simplifying, 5 as published, narrowest cross-section 3.5 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "VAS2133",
-   "address": "1350 W 8th Ave",
-   "local_area": "Fairview",
-   "metrics": {
-    "class": "l_shape",
-    "area_m2": 2609.7,
-    "perimeter_m": 228.4,
-    "vertices_raw": 8,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.9,
-    "convexity": 0.947,
-    "aspect_ratio": 2.001,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 30.5,
-    "equivalent_rectangle": {
-     "side_a_m": 76.2,
-     "side_b_m": 38.1,
-     "bearing_deg": 88.7
-    },
-    "flag": null,
-    "confidence": 0.818,
-    "alternative": "near_rectangle",
-    "margin": 0.024,
-    "note": "An L: six corners, one inward; 95% of its convex hull, 2,610 m2."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.1349062,
-      49.2636756
-     ],
-     [
-      -123.1348819,
-      49.26436
-     ],
-     [
-      -123.1348819,
-      49.2643602
-     ],
-     [
-      -123.1354049,
-      49.2643684
-     ],
-     [
-      -123.135417,
-      49.2640262
-     ],
-     [
-      -123.1353126,
-      49.2640244
-     ],
-     [
-      -123.1353247,
-      49.2636826
-     ],
-     [
-      -123.1353247,
-      49.2636824
-     ],
-     [
-      -123.1349062,
-      49.2636756
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M84.8,114.0 L87.3,7.3 L87.3,7.3 L33.9,6.0 L32.7,59.3 L43.4,59.6 L42.1,112.9 L42.1,112.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "l_shape",
-   "runner_up": "near_rectangle",
-   "why": "82% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.900, convexity 0.947, 6 corners after simplifying, 8 as published).",
    "label": null,
    "labels_by": null
   },
@@ -3778,6 +2644,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,52.9 L95.5,95.3 L95.6,95.3 L114.0,63.3 L114.0,63.3 L18.3,24.7 L17.6,26.5 L16.7,28.7 L15.7,31.0 L14.8,33.3 L13.8,35.5 L12.8,37.8 L11.9,40.0 L10.9,42.3 L9.9,44.5 L8.9,46.7 L7.8,49.0 L6.8,51.2 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1963"
+     ],
+     "legal": "LOT 31 BLOCK 26 PLAN VAP8574 DIS TRICT LOT FV NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "26982716"
+   },
    "best_guess": "trapezoid",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say trapezoid, the rest mostly near_rectangle: four corners and a rectangularity near the 0.90 line (rectangularity 0.900, convexity 0.999, 4 corners after simplifying, 18 as published).",
@@ -3898,6 +2780,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M84.8,114.0 L90.7,9.5 L90.7,9.4 L30.4,6.0 L30.5,8.9 L30.7,11.9 L30.8,14.8 L30.9,17.8 L31.0,20.7 L31.1,23.7 L31.1,26.6 L31.1,29.6 L31.1,32.5 L31.1,35.5 L31.1,38.4 L31.0,41.4 L31.0,44.3 L30.9,47.3 L29.3,110.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1924"
+     ],
+     "legal": "LOT 9 BLOCK 813 PLAN VAP6011 DIS TRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "73014405"
+   },
    "best_guess": "rectangle",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say rectangle, the rest mostly near_rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.950, convexity 0.990, 4 corners after simplifying, 19 as published).",
@@ -4054,6 +2952,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M27.9,114.0 L28.0,113.9 L113.5,32.2 L111.9,30.6 L109.8,28.4 L107.7,26.3 L105.6,24.1 L103.4,21.9 L101.3,19.8 L99.1,17.7 L97.0,15.6 L94.8,13.5 L92.6,11.4 L90.4,9.3 L88.2,7.3 L86.8,6.0 L6.6,92.9 L6.5,93.0 L7.7,94.1 L9.9,96.2 L12.1,98.3 L14.3,100.4 L16.5,102.5 L18.7,104.6 L20.9,106.8 L23.0,109.0 L25.2,111.2 L27.3,113.3 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1988"
+     ],
+     "legal": "LOT 37 BLOCK H PLAN VAP5702 DIST RICT LOT 2027 NWD GROUP 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "07171556"
+   },
    "best_guess": "trapezoid",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say trapezoid, the rest mostly near_rectangle: four corners and a rectangularity near the 0.90 line (rectangularity 0.899, convexity 0.999, 4 corners after simplifying, 28 as published).",
@@ -4122,81 +3036,25 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M13.4,37.0 L91.3,114.0 L106.6,98.5 L91.0,83.2 L106.3,67.6 L44.0,6.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "RM-5A"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1975"
+     ],
+     "legal": "LOT B BLOCK 59 PLAN 14822 DISTRI CT LOT 185 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "60611360"
+   },
    "best_guess": "l_shape",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.899, convexity 0.947, 6 corners after simplifying, 6 as published).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "EPS1529",
-   "address": "3437 Kingsway",
-   "local_area": "Renfrew-Collingwood",
-   "metrics": {
-    "class": "rectangle",
-    "area_m2": 427.3,
-    "perimeter_m": 91.7,
-    "vertices_raw": 7,
-    "vertices": 4,
-    "reflex_corners": 0,
-    "rectangularity": 0.951,
-    "convexity": 1.0,
-    "aspect_ratio": 2.622,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 5.536,
-    "equivalent_rectangle": {
-     "side_a_m": 34.3,
-     "side_b_m": 13.1,
-     "bearing_deg": 57.1
-    },
-    "flag": null,
-    "confidence": 0.818,
-    "alternative": "near_rectangle",
-    "margin": 0.045,
-    "note": "A rectangle, 427 m2, 34.3 x 13.1 m bounding rectangle."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.031472,
-      49.2322273
-     ],
-     [
-      -123.0312421,
-      49.23246
-     ],
-     [
-      -123.0313905,
-      49.2325265
-     ],
-     [
-      -123.0316466,
-      49.2322674
-     ],
-     [
-      -123.0316031,
-      49.2322567
-     ],
-     [
-      -123.0315595,
-      49.2322465
-     ],
-     [
-      -123.0315158,
-      49.2322367
-     ],
-     [
-      -123.031472,
-      49.2322273
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M53.4,114.0 L107.8,30.0 L72.7,6.0 L12.2,99.5 L22.5,103.4 L32.8,107.1 L43.1,110.6 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "rectangle",
-   "runner_up": "near_rectangle",
-   "why": "82% of the nudged re-runs say rectangle, the rest mostly near_rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.951, convexity 1.000, 4 corners after simplifying, 7 as published, narrowest cross-section 5.5 m).",
    "label": null,
    "labels_by": null
   },
@@ -4274,6 +3132,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M86.3,114.0 L88.6,6.0 L64.9,9.8 L61.0,10.5 L49.0,13.0 L43.3,14.1 L39.5,14.5 L33.5,15.1 L31.4,113.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "2011"
+     ],
+     "legal": "LOT F BLOCK 24 PLAN BCP44710 DIS TRICT LOT 192 NWD GROUP 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "63005857"
+   },
    "best_guess": "near_rectangle",
    "runner_up": "rectangle",
    "why": "82% of the nudged re-runs say near_rectangle, the rest mostly rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.951, convexity 0.998, 5 corners after simplifying, 9 as published, narrowest cross-section 7.1 m).",
@@ -4386,9 +3260,361 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M65.8,114.0 L88.9,6.5 L47.3,6.0 L31.1,107.4 L32.5,107.7 L35.1,108.1 L37.7,108.5 L40.3,109.0 L42.9,109.5 L45.4,109.9 L48.0,110.4 L50.6,110.9 L53.1,111.4 L55.7,111.9 L58.3,112.4 L60.9,112.9 L63.4,113.5 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1952"
+     ],
+     "legal": "LOT 19 BLOCK 40 PLAN VAP8574 DIS TRICT LOT FV NWD",
+     "report_year": "2026"
+    },
+    "tax_coord": "81925139"
+   },
    "best_guess": "trapezoid",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say trapezoid, the rest mostly near_rectangle: four corners and a rectangularity near the 0.90 line (rectangularity 0.899, convexity 0.999, 4 corners after simplifying, 17 as published, narrowest cross-section 7.0 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "003384543",
+   "address": "4146 Crown Crescent",
+   "local_area": "West Point Grey",
+   "metrics": {
+    "class": "near_rectangle",
+    "area_m2": 514.8,
+    "perimeter_m": 95.5,
+    "vertices_raw": 18,
+    "vertices": 5,
+    "reflex_corners": 1,
+    "rectangularity": 0.951,
+    "convexity": 0.995,
+    "aspect_ratio": 1.927,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 6.21,
+    "equivalent_rectangle": {
+     "side_a_m": 16.8,
+     "side_b_m": 32.3,
+     "bearing_deg": 178.7
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "rectangle",
+    "margin": 0.071,
+    "note": "Nearly a rectangle (95% of its 32.3 x 16.8 m bounding rectangle), 515 m2, 5 corners."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1979694,
+      49.2641382
+     ],
+     [
+      -123.1979596,
+      49.2644284
+     ],
+     [
+      -123.1979596,
+      49.2644285
+     ],
+     [
+      -123.1980386,
+      49.2644193
+     ],
+     [
+      -123.1980522,
+      49.2644177
+     ],
+     [
+      -123.1980659,
+      49.2644163
+     ],
+     [
+      -123.1980795,
+      49.2644149
+     ],
+     [
+      -123.1980933,
+      49.2644136
+     ],
+     [
+      -123.198107,
+      49.2644123
+     ],
+     [
+      -123.1981207,
+      49.2644112
+     ],
+     [
+      -123.1981345,
+      49.2644101
+     ],
+     [
+      -123.1981482,
+      49.2644092
+     ],
+     [
+      -123.198162,
+      49.2644083
+     ],
+     [
+      -123.1981757,
+      49.2644074
+     ],
+     [
+      -123.1981896,
+      49.2644067
+     ],
+     [
+      -123.1981904,
+      49.2644067
+     ],
+     [
+      -123.1981904,
+      49.2644064
+     ],
+     [
+      -123.1981997,
+      49.2641416
+     ],
+     [
+      -123.1979694,
+      49.2641382
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M86.8,114.0 L89.2,6.0 L89.2,6.0 L70.0,9.4 L66.7,10.0 L63.3,10.6 L60.0,11.1 L56.7,11.5 L53.3,12.0 L50.0,12.4 L46.6,12.8 L43.3,13.2 L40.0,13.5 L36.6,13.8 L33.2,14.1 L33.0,14.1 L33.0,14.2 L30.8,112.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "2014"
+     ],
+     "legal": "LOT 33 BLOCK 187 PLAN VAP5867 DI STRICT LOT 176 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "02965069"
+   },
+   "best_guess": "near_rectangle",
+   "runner_up": "rectangle",
+   "why": "82% of the nudged re-runs say near_rectangle, the rest mostly rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.951, convexity 0.995, 5 corners after simplifying, 18 as published, narrowest cross-section 6.2 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "011532769",
+   "address": "1053 Douglas Crescent",
+   "local_area": "Shaughnessy",
+   "metrics": {
+    "class": "near_rectangle",
+    "area_m2": 2381.2,
+    "perimeter_m": 213.3,
+    "vertices_raw": 36,
+    "vertices": 5,
+    "reflex_corners": 0,
+    "rectangularity": 0.951,
+    "convexity": 1.0,
+    "aspect_ratio": 2.444,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 7.843,
+    "equivalent_rectangle": {
+     "side_a_m": 32.0,
+     "side_b_m": 78.2,
+     "bearing_deg": 178.5
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "rectangle",
+    "margin": 0.072,
+    "note": "Nearly a rectangle (95% of its 78.2 x 32.0 m bounding rectangle), 2,381 m2, 5 corners."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1285194,
+      49.2546421
+     ],
+     [
+      -123.1285135,
+      49.2546407
+     ],
+     [
+      -123.1285004,
+      49.2546375
+     ],
+     [
+      -123.1284872,
+      49.2546345
+     ],
+     [
+      -123.128474,
+      49.2546314
+     ],
+     [
+      -123.1284608,
+      49.2546285
+     ],
+     [
+      -123.1284476,
+      49.2546255
+     ],
+     [
+      -123.1284344,
+      49.2546227
+     ],
+     [
+      -123.1284211,
+      49.2546198
+     ],
+     [
+      -123.1284079,
+      49.254617
+     ],
+     [
+      -123.1283945,
+      49.2546143
+     ],
+     [
+      -123.1283812,
+      49.2546115
+     ],
+     [
+      -123.1283679,
+      49.2546088
+     ],
+     [
+      -123.1283545,
+      49.2546062
+     ],
+     [
+      -123.128341,
+      49.2546036
+     ],
+     [
+      -123.1283277,
+      49.254601
+     ],
+     [
+      -123.1283142,
+      49.2545985
+     ],
+     [
+      -123.1283008,
+      49.2545961
+     ],
+     [
+      -123.1282873,
+      49.2545937
+     ],
+     [
+      -123.1282738,
+      49.2545913
+     ],
+     [
+      -123.1282603,
+      49.2545889
+     ],
+     [
+      -123.1282469,
+      49.2545867
+     ],
+     [
+      -123.1282333,
+      49.2545844
+     ],
+     [
+      -123.1282198,
+      49.2545822
+     ],
+     [
+      -123.1282062,
+      49.2545801
+     ],
+     [
+      -123.1281926,
+      49.254578
+     ],
+     [
+      -123.1281789,
+      49.2545759
+     ],
+     [
+      -123.1281653,
+      49.2545739
+     ],
+     [
+      -123.1281517,
+      49.2545719
+     ],
+     [
+      -123.1281381,
+      49.2545699
+     ],
+     [
+      -123.1281245,
+      49.254568
+     ],
+     [
+      -123.1281107,
+      49.2545662
+     ],
+     [
+      -123.1280971,
+      49.2545644
+     ],
+     [
+      -123.1280861,
+      49.254563
+     ],
+     [
+      -123.1280566,
+      49.2552661
+     ],
+     [
+      -123.1284962,
+      49.2552737
+     ],
+     [
+      -123.1285194,
+      49.2546421
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M37.0,102.0 L37.6,102.2 L38.9,102.7 L40.2,103.1 L41.5,103.6 L42.8,104.0 L44.1,104.5 L45.4,104.9 L46.8,105.4 L48.1,105.8 L49.4,106.2 L50.7,106.6 L52.1,107.0 L53.4,107.4 L54.7,107.8 L56.1,108.2 L57.4,108.6 L58.7,109.0 L60.1,109.3 L61.4,109.7 L62.8,110.1 L64.1,110.4 L65.4,110.7 L66.8,111.1 L68.1,111.4 L69.5,111.7 L70.8,112.0 L72.2,112.3 L73.6,112.6 L74.9,112.9 L76.3,113.2 L77.6,113.5 L79.0,113.8 L80.1,114.0 L83.0,7.2 L39.3,6.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "FSD"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1913"
+     ],
+     "legal": "LOT 15 BLOCK 55 PLAN VAP4502 DIS TRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "69414977"
+   },
+   "best_guess": "near_rectangle",
+   "runner_up": "rectangle",
+   "why": "82% of the nudged re-runs say near_rectangle, the rest mostly rectangle: rectangularity sits near the 0.95 line, or a fifth corner comes and goes with the simplification (rectangularity 0.951, convexity 1.000, 5 corners after simplifying, 36 as published, narrowest cross-section 7.8 m).",
    "label": null,
    "labels_by": null
   },
@@ -4510,6 +3736,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M75.3,114.0 L81.2,9.0 L52.1,6.0 L38.8,110.6 L38.8,110.6 L40.0,110.8 L42.5,111.1 L44.9,111.4 L47.3,111.7 L49.8,111.9 L52.2,112.2 L54.7,112.4 L57.1,112.7 L59.6,112.9 L62.1,113.1 L64.5,113.3 L67.0,113.5 L69.4,113.7 L71.9,113.8 L74.3,114.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1993"
+     ],
+     "legal": "LOT 6 BLOCK 31 PLAN VAP8574 NWD DISTRICT LOT FRASERVIEW, GROUP 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "82725819"
+   },
    "best_guess": "trapezoid",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say trapezoid, the rest mostly near_rectangle: four corners and a rectangularity near the 0.90 line (rectangularity 0.899, convexity 1.000, 4 corners after simplifying, 20 as published).",
@@ -4517,281 +3759,650 @@
    "labels_by": null
   },
   {
-   "site_id": "006937462",
-   "address": "8288 Ash St",
-   "local_area": "Marpole",
+   "site_id": "011093153",
+   "address": "4376 Quesnel Drive",
+   "local_area": "Arbutus Ridge",
    "metrics": {
-    "class": "irregular",
-    "area_m2": 5135.6,
-    "perimeter_m": 305.2,
-    "vertices_raw": 8,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.888,
-    "convexity": 0.953,
-    "aspect_ratio": 1.69,
+    "class": "trapezoid",
+    "area_m2": 447.2,
+    "perimeter_m": 101.9,
+    "vertices_raw": 28,
+    "vertices": 4,
+    "reflex_corners": 0,
+    "rectangularity": 0.899,
+    "convexity": 0.999,
+    "aspect_ratio": 3.174,
     "rings": 1,
     "outer_rings": 1,
     "holes": 0,
-    "narrowest_cross_section_m": 39.3,
+    "narrowest_cross_section_m": 10.1,
     "equivalent_rectangle": {
-     "side_a_m": 98.8,
-     "side_b_m": 58.5,
-     "bearing_deg": 178.2
+     "side_a_m": 12.5,
+     "side_b_m": 39.7,
+     "bearing_deg": 129.0
     },
     "flag": null,
     "confidence": 0.818,
     "alternative": "near_rectangle",
-    "margin": 0.144,
-    "note": "Irregular: 6 corners, 89% of its 98.8 x 58.5 m bounding rectangle, 5,136 m2."
+    "margin": 0.087,
+    "note": "Four sides but not square-cornered (90% of its 39.7 x 12.5 m bounding rectangle), 447 m2."
    },
    "ring_lonlat": [
     [
      [
-      -123.1201532,
-      49.2099757
+      -123.1687837,
+      49.2472567
      ],
      [
-      -123.1194657,
-      49.2099616
+      -123.1687832,
+      49.247257
      ],
      [
-      -123.119081,
-      49.210123
+      -123.1683497,
+      49.2474722
      ],
      [
-      -123.1187919,
-      49.2100815
+      -123.1683529,
+      49.2474749
      ],
      [
-      -123.1187916,
-      49.2100815
+      -123.1683613,
+      49.2474821
      ],
      [
-      -123.1187763,
-      49.2104692
+      -123.1683698,
+      49.2474893
      ],
      [
-      -123.1187764,
-      49.2104692
+      -123.1683784,
+      49.2474965
      ],
      [
-      -123.1201288,
-      49.2105015
+      -123.168387,
+      49.2475037
      ],
      [
-      -123.1201532,
-      49.2099757
+      -123.1683957,
+      49.2475109
+     ],
+     [
+      -123.1684045,
+      49.247518
+     ],
+     [
+      -123.1684134,
+      49.247525
+     ],
+     [
+      -123.1684222,
+      49.2475321
+     ],
+     [
+      -123.1684311,
+      49.2475391
+     ],
+     [
+      -123.1684401,
+      49.2475461
+     ],
+     [
+      -123.168449,
+      49.247553
+     ],
+     [
+      -123.1684579,
+      49.2475597
+     ],
+     [
+      -123.16887,
+      49.247327
+     ],
+     [
+      -123.1688704,
+      49.2473268
+     ],
+     [
+      -123.168866,
+      49.2473234
+     ],
+     [
+      -123.1688567,
+      49.2473164
+     ],
+     [
+      -123.1688478,
+      49.2473094
+     ],
+     [
+      -123.1688388,
+      49.2473023
+     ],
+     [
+      -123.1688299,
+      49.2472952
+     ],
+     [
+      -123.168821,
+      49.247288
+     ],
+     [
+      -123.1688122,
+      49.2472808
+     ],
+     [
+      -123.1688035,
+      49.2472735
+     ],
+     [
+      -123.1687949,
+      49.2472663
+     ],
+     [
+      -123.1687863,
+      49.247259
+     ],
+     [
+      -123.1687837,
+      49.2472567
      ]
     ]
    ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,90.6 L59.9,92.3 L90.1,73.0 L112.8,78.0 L112.8,78.0 L114.0,31.5 L114.0,31.5 L7.9,27.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "irregular",
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M24.0,108.0 L24.1,107.9 L114.0,39.7 L113.3,38.9 L111.6,36.6 L109.8,34.3 L108.1,32.0 L106.3,29.8 L104.5,27.5 L102.6,25.2 L100.8,23.0 L99.0,20.8 L97.1,18.5 L95.3,16.3 L93.4,14.1 L91.6,12.0 L6.1,85.7 L6.0,85.8 L6.9,86.9 L8.8,89.1 L10.7,91.3 L12.5,93.6 L14.4,95.8 L16.2,98.1 L18.1,100.4 L19.9,102.7 L21.7,105.0 L23.4,107.3 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1931"
+     ],
+     "legal": "LOT 36 BLOCK H PLAN VAP5702 DIST RICT LOT 2027 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "07171568"
+   },
+   "best_guess": "trapezoid",
    "runner_up": "near_rectangle",
-   "why": "82% of the nudged re-runs say irregular, the rest mostly near_rectangle: rectangularity near the 0.90 line with more than four corners (rectangularity 0.888, convexity 0.953, 6 corners after simplifying, 8 as published).",
+   "why": "82% of the nudged re-runs say trapezoid, the rest mostly near_rectangle: four corners and a rectangularity near the 0.90 line (rectangularity 0.899, convexity 0.999, 4 corners after simplifying, 28 as published).",
    "label": null,
    "labels_by": null
   },
   {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.289573,
-    "lon": -123.060082
-   },
+   "site_id": "014999030",
+   "address": "1928 Venables St",
    "local_area": "Grandview-Woodland",
    "metrics": {
-    "class": "irregular",
-    "area_m2": 259.8,
-    "perimeter_m": 66.2,
-    "vertices_raw": 39,
-    "vertices": 9,
-    "reflex_corners": 3,
-    "rectangularity": 0.894,
-    "convexity": 0.99,
-    "aspect_ratio": 1.459,
+    "class": "l_shape",
+    "area_m2": 336.3,
+    "perimeter_m": 94.4,
+    "vertices_raw": 7,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.898,
+    "convexity": 0.947,
+    "aspect_ratio": 3.692,
     "rings": 1,
     "outer_rings": 1,
     "holes": 0,
-    "narrowest_cross_section_m": 11.4,
+    "narrowest_cross_section_m": 7.005,
     "equivalent_rectangle": {
-     "side_a_m": 20.6,
-     "side_b_m": 14.1,
-     "bearing_deg": 60.6
+     "side_a_m": 37.2,
+     "side_b_m": 10.1,
+     "bearing_deg": 89.3
     },
     "flag": null,
     "confidence": 0.818,
     "alternative": "near_rectangle",
-    "margin": 0.397,
-    "note": "Irregular: 9 corners, 89% of its 20.6 x 14.1 m bounding rectangle, 260 m2."
+    "margin": 0.117,
+    "note": "An L: six corners, one inward; 95% of its convex hull, 336 m2."
    },
    "ring_lonlat": [
     [
      [
-      -123.0602389,
-      49.2895283
+      -123.0647971,
+      49.2761993
      ],
      [
-      -123.0602385,
-      49.2895281
+      -123.0647907,
+      49.2765336
      ],
      [
-      -123.060068,
-      49.2894682
+      -123.0649288,
+      49.2765346
      ],
      [
-      -123.0600672,
-      49.2894694
+      -123.0649322,
+      49.2763677
      ],
      [
-      -123.0600597,
-      49.2894796
+      -123.0649333,
+      49.2763115
      ],
      [
-      -123.0600543,
-      49.2894864
+      -123.0648914,
+      49.2763111
      ],
      [
-      -123.0600446,
-      49.2894985
+      -123.0648933,
+      49.2762001
      ],
      [
-      -123.0600347,
-      49.2895129
-     ],
-     [
-      -123.0600281,
-      49.2895219
-     ],
-     [
-      -123.0600205,
-      49.2895296
-     ],
-     [
-      -123.0600061,
-      49.2895435
-     ],
-     [
-      -123.0599892,
-      49.2895608
-     ],
-     [
-      -123.05998,
-      49.2895705
-     ],
-     [
-      -123.0599733,
-      49.2895783
-     ],
-     [
-      -123.059958,
-      49.2895975
-     ],
-     [
-      -123.0599475,
-      49.2896151
-     ],
-     [
-      -123.0599402,
-      49.2896254
-     ],
-     [
-      -123.0599362,
-      49.2896293
-     ],
-     [
-      -123.0600722,
-      49.2896766
-     ],
-     [
-      -123.0600803,
-      49.2896699
-     ],
-     [
-      -123.0600888,
-      49.2896628
-     ],
-     [
-      -123.0600971,
-      49.2896556
-     ],
-     [
-      -123.0601055,
-      49.2896484
-     ],
-     [
-      -123.0601139,
-      49.2896412
-     ],
-     [
-      -123.0601223,
-      49.289634
-     ],
-     [
-      -123.0601307,
-      49.2896268
-     ],
-     [
-      -123.0601389,
-      49.2896195
-     ],
-     [
-      -123.0601472,
-      49.2896123
-     ],
-     [
-      -123.0601554,
-      49.2896051
-     ],
-     [
-      -123.0601635,
-      49.2895978
-     ],
-     [
-      -123.0601717,
-      49.2895904
-     ],
-     [
-      -123.0601798,
-      49.2895831
-     ],
-     [
-      -123.0601878,
-      49.2895757
-     ],
-     [
-      -123.0601959,
-      49.2895684
-     ],
-     [
-      -123.0602039,
-      49.289561
-     ],
-     [
-      -123.0602119,
-      49.2895537
-     ],
-     [
-      -123.0602198,
-      49.2895462
-     ],
-     [
-      -123.0602278,
-      49.2895388
-     ],
-     [
-      -123.0602356,
-      49.2895313
-     ],
-     [
-      -123.0602389,
-      49.2895283
+      -123.0647971,
+      49.2761993
      ]
     ]
    ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M8.7,82.9 L8.9,83.0 L66.6,114.0 L66.9,113.4 L69.5,108.1 L71.3,104.6 L74.6,98.3 L77.9,90.8 L80.2,86.2 L82.7,82.2 L87.6,75.0 L93.3,66.0 L96.5,61.0 L98.7,57.0 L103.9,47.0 L107.5,37.9 L109.9,32.5 L111.3,30.5 L65.2,6.0 L62.5,9.5 L59.6,13.2 L56.8,16.9 L53.9,20.6 L51.1,24.3 L48.2,28.1 L45.4,31.8 L42.6,35.6 L39.8,39.3 L37.0,43.1 L34.3,46.9 L31.5,50.7 L28.7,54.5 L26.0,58.3 L23.3,62.1 L20.6,65.9 L17.9,69.7 L15.2,73.6 L12.5,77.4 L9.8,81.3 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "irregular",
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M73.7,114.0 L75.0,6.3 L45.9,6.0 L45.2,59.8 L45.0,77.9 L53.8,78.0 L53.4,113.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "RT-5"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1968"
+     ],
+     "legal": "LOT 5 BLOCK 20 PLAN 1067 DISTRIC T LOT 264A NWD AMD (SEE 27669K), &",
+     "report_year": "2026"
+    },
+    "tax_coord": "60025328"
+   },
+   "best_guess": "l_shape",
    "runner_up": "near_rectangle",
-   "why": "82% of the nudged re-runs say irregular, the rest mostly near_rectangle: rectangularity near the 0.90 line with more than four corners (rectangularity 0.894, convexity 0.990, 9 corners after simplifying, 39 as published).",
+   "why": "82% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.898, convexity 0.947, 6 corners after simplifying, 7 as published, narrowest cross-section 7.0 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "015147924",
+   "address": "1423 Grant St",
+   "local_area": "Grandview-Woodland",
+   "metrics": {
+    "class": "l_shape",
+    "area_m2": 3498.3,
+    "perimeter_m": 250.1,
+    "vertices_raw": 8,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.891,
+    "convexity": 0.947,
+    "aspect_ratio": 1.148,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 28.4,
+    "equivalent_rectangle": {
+     "side_a_m": 58.5,
+     "side_b_m": 67.1,
+     "bearing_deg": 89.5
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "near_rectangle",
+    "margin": 0.159,
+    "note": "An L: six corners, one inward; 95% of its convex hull, 3,498 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.0755501,
+      49.2715889
+     ],
+     [
+      -123.0746276,
+      49.2715849
+     ],
+     [
+      -123.0746209,
+      49.272103
+     ],
+     [
+      -123.0753584,
+      49.2721135
+     ],
+     [
+      -123.0753584,
+      49.2721134
+     ],
+     [
+      -123.0753649,
+      49.2718431
+     ],
+     [
+      -123.0755031,
+      49.2718448
+     ],
+     [
+      -123.0755443,
+      49.2718454
+     ],
+     [
+      -123.0755501,
+      49.2715889
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,106.2 L113.2,106.9 L114.0,14.9 L28.3,13.1 L28.3,13.1 L27.5,61.1 L11.5,60.8 L6.7,60.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "I-2"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1955"
+     ],
+     "legal": "LOT A BLOCK J PLAN VAP729 DISTRI CT LOT 182 NWD GROUP 1, (EXPL PL V",
+     "report_year": "2026"
+    },
+    "tax_coord": "61223293"
+   },
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "why": "82% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.891, convexity 0.947, 6 corners after simplifying, 8 as published).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "008521786",
+   "address": "303 Vernon Drive",
+   "local_area": "Strathcona",
+   "metrics": {
+    "class": "l_shape",
+    "area_m2": 5357.7,
+    "perimeter_m": 358.2,
+    "vertices_raw": 6,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.897,
+    "convexity": 0.947,
+    "aspect_ratio": 3.053,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 23.3,
+    "equivalent_rectangle": {
+     "side_a_m": 44.2,
+     "side_b_m": 135.0,
+     "bearing_deg": 89.2
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "near_rectangle",
+    "margin": 0.172,
+    "note": "An L: six corners, one inward; 95% of its convex hull, 5,358 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.0807387,
+      49.2814659
+     ],
+     [
+      -123.0792847,
+      49.2814518
+     ],
+     [
+      -123.0792723,
+      49.2818493
+     ],
+     [
+      -123.0811278,
+      49.2818669
+     ],
+     [
+      -123.0811326,
+      49.2816573
+     ],
+     [
+      -123.0807342,
+      49.2816536
+     ],
+     [
+      -123.0807387,
+      49.2814659
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M28.9,77.2 L113.3,78.4 L114.0,43.1 L6.3,41.6 L6.0,60.2 L29.1,60.5 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "M-2"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1971"
+     ],
+     "legal": "LOT 10 BLOCK L PLAN VAP13634 DIS TRICT LOT 182 NEW WESTMINSTER EX P",
+     "report_year": "2026"
+    },
+    "tax_coord": "22658855"
+   },
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "why": "82% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.897, convexity 0.947, 6 corners after simplifying, 6 as published).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "017973988",
+   "address": "450 Se Marine Drive",
+   "local_area": "Sunset",
+   "metrics": {
+    "class": "l_shape",
+    "area_m2": 10767.9,
+    "perimeter_m": 508.3,
+    "vertices_raw": 6,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.895,
+    "convexity": 0.946,
+    "aspect_ratio": 3.068,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 48.0,
+    "equivalent_rectangle": {
+     "side_a_m": 192.2,
+     "side_b_m": 62.6,
+     "bearing_deg": 88.9
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "near_rectangle",
+    "margin": 0.191,
+    "note": "An L: six corners, one inward; 95% of its convex hull, 10,768 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.0949965,
+      49.2109183
+     ],
+     [
+      -123.0950232,
+      49.2099545
+     ],
+     [
+      -123.0948249,
+      49.2099508
+     ],
+     [
+      -123.0948581,
+      49.2091889
+     ],
+     [
+      -123.0941881,
+      49.20918
+     ],
+     [
+      -123.0941376,
+      49.2108918
+     ],
+     [
+      -123.0949965,
+      49.2109183
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M43.1,6.0 L42.0,65.9 L50.0,66.1 L48.7,113.4 L76.0,114.0 L78.0,7.6 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "I-2"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1990"
+     ],
+     "legal": "LOT E PLAN LMP7130 DISTRICT LOT 3 13 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "83019998"
+   },
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "why": "82% of the nudged re-runs say l_shape, the rest mostly near_rectangle: rectangularity near 0.90 and six corners: a small notch or a real L (rectangularity 0.895, convexity 0.946, 6 corners after simplifying, 6 as published).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "023074183",
+   "address": "1307 Nanton Ave",
+   "local_area": "Shaughnessy",
+   "metrics": {
+    "class": "l_shape",
+    "area_m2": 878.9,
+    "perimeter_m": 145.1,
+    "vertices_raw": 17,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.717,
+    "convexity": 0.942,
+    "aspect_ratio": 3.009,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 1.81,
+    "equivalent_rectangle": {
+     "side_a_m": 60.7,
+     "side_b_m": 20.2,
+     "bearing_deg": 141.5
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "irregular",
+    "margin": 0.4,
+    "note": "An L: six corners, one inward; 94% of its convex hull, 879 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1351266,
+      49.2472089
+     ],
+     [
+      -123.1352375,
+      49.2471049
+     ],
+     [
+      -123.1347361,
+      49.2468452
+     ],
+     [
+      -123.1347245,
+      49.2468386
+     ],
+     [
+      -123.1347128,
+      49.2468322
+     ],
+     [
+      -123.134701,
+      49.246826
+     ],
+     [
+      -123.134689,
+      49.2468198
+     ],
+     [
+      -123.1346769,
+      49.2468137
+     ],
+     [
+      -123.1346645,
+      49.2468077
+     ],
+     [
+      -123.1346521,
+      49.2468019
+     ],
+     [
+      -123.1346396,
+      49.2467963
+     ],
+     [
+      -123.134627,
+      49.2467907
+     ],
+     [
+      -123.1346142,
+      49.2467852
+     ],
+     [
+      -123.1346012,
+      49.2467799
+     ],
+     [
+      -123.1345882,
+      49.2467747
+     ],
+     [
+      -123.13458,
+      49.2469948
+     ],
+     [
+      -123.1349674,
+      49.247123
+     ],
+     [
+      -123.1351266,
+      49.2472089
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M24.5,6.0 L6.5,31.9 L88.1,96.5 L90.0,98.1 L91.9,99.7 L93.8,101.3 L95.8,102.8 L97.8,104.3 L99.8,105.8 L101.8,107.2 L103.8,108.6 L105.9,110.0 L108.0,111.4 L110.1,112.7 L112.2,114.0 L113.5,59.3 L50.4,27.4 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1995"
+     ],
+     "legal": "LOT C BLOCK 692 PLAN LMP23233 DI STRICT LOT 526 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "14471491"
+   },
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "why": "82% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.717, convexity 0.942, 6 corners after simplifying, 17 as published, narrowest cross-section 1.8 m).",
    "label": null,
    "labels_by": null
   },
@@ -4857,6 +4468,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M20.8,103.3 L114.0,55.7 L94.4,16.7 L39.0,42.3 L25.7,64.7 L6.0,73.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1993"
+     ],
+     "legal": "LOT 4 BLOCK B PLAN VAP7130 DISTR ICT LOT 2027 NWD GROUP 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "06071021"
+   },
    "best_guess": "irregular",
    "runner_up": "near_rectangle",
    "why": "82% of the nudged re-runs say irregular, the rest mostly near_rectangle: rectangularity near the 0.90 line with more than four corners (rectangularity 0.890, convexity 0.964, 6 corners after simplifying, 6 as published).",
@@ -4864,244 +4491,454 @@
    "labels_by": null
   },
   {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.228299,
-    "lon": -123.195978
-   },
-   "local_area": "Dunbar-Southlands",
+   "site_id": "006732810",
+   "address": "61 E 27th Ave",
+   "local_area": "Riley Park",
    "metrics": {
-    "class": "flag_lot",
-    "area_m2": 582.4,
-    "perimeter_m": 115.8,
-    "vertices_raw": 8,
-    "vertices": 6,
-    "reflex_corners": 1,
-    "rectangularity": 0.746,
-    "convexity": 0.855,
-    "aspect_ratio": 1.714,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 5.915,
-    "equivalent_rectangle": {
-     "side_a_m": 21.3,
-     "side_b_m": 36.6,
-     "bearing_deg": 75.0
-    },
-    "flag": {
-     "pole_width_m": 5.921,
-     "pole_length_m": 13.0,
-     "body_width_m": 21.3
-    },
-    "confidence": 0.909,
-    "alternative": "l_shape",
-    "margin": 0.079,
-    "note": "A flag lot: a strip about 5.9 m wide and 13 m long leads to a body about 21 m wide; 582 m2. The equivalent rectangle overstates the buildable plate."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.1962087,
-      49.2282312
-     ],
-     [
-      -123.1958941,
-      49.2281758
-     ],
-     [
-      -123.1958391,
-      49.2283095
-     ],
-     [
-      -123.1956687,
-      49.2282796
-     ],
-     [
-      -123.1956476,
-      49.228331
-     ],
-     [
-      -123.1958562,
-      49.2283678
-     ],
-     [
-      -123.1958566,
-      49.2283678
-     ],
-     [
-      -123.1961326,
-      49.2284165
-     ],
-     [
-      -123.1962087,
-      49.2282312
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,79.1 L66.6,95.4 L77.1,56.1 L109.9,64.9 L114.0,49.8 L73.9,39.0 L73.8,38.9 L20.6,24.6 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "flag_lot",
-   "runner_up": "l_shape",
-   "why": "91% of the nudged re-runs say flag_lot, the rest mostly l_shape: a narrow arm: an L with a thin leg, or a flag lot (rectangularity 0.746, convexity 0.855, 6 corners after simplifying, 8 as published, narrowest cross-section 5.9 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.229683,
-    "lon": -123.196685
-   },
-   "local_area": "Dunbar-Southlands",
-   "metrics": {
-    "class": "flag_lot",
-    "area_m2": 581.3,
-    "perimeter_m": 117.7,
-    "vertices_raw": 8,
-    "vertices": 8,
-    "reflex_corners": 2,
-    "rectangularity": 0.731,
-    "convexity": 0.845,
-    "aspect_ratio": 1.8,
-    "rings": 1,
-    "outer_rings": 1,
-    "holes": 0,
-    "narrowest_cross_section_m": 5.839,
-    "equivalent_rectangle": {
-     "side_a_m": 37.8,
-     "side_b_m": 21.0,
-     "bearing_deg": 179.8
-    },
-    "flag": {
-     "pole_width_m": 5.839,
-     "pole_length_m": 8.0,
-     "body_width_m": 21.0
-    },
-    "confidence": 0.909,
-    "alternative": "irregular",
-    "margin": 0.161,
-    "note": "A flag lot: a strip about 5.8 m wide and 8 m long leads to a body about 21 m wide; 581 m2. The equivalent rectangle overstates the buildable plate."
-   },
-   "ring_lonlat": [
-    [
-     [
-      -123.1964402,
-      49.2296037
-     ],
-     [
-      -123.1964388,
-      49.2297311
-     ],
-     [
-      -123.1966341,
-      49.2297316
-     ],
-     [
-      -123.1966337,
-      49.2297932
-     ],
-     [
-      -123.1968527,
-      49.2297937
-     ],
-     [
-      -123.1968535,
-      49.2296572
-     ],
-     [
-      -123.1969584,
-      49.2296574
-     ],
-     [
-      -123.196959,
-      49.2296049
-     ],
-     [
-      -123.1964402,
-      49.2296037
-     ]
-    ]
-   ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M113.7,90.1 L114.0,49.7 L73.5,49.6 L73.5,30.0 L28.1,29.9 L27.9,73.2 L6.1,73.1 L6.0,89.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "flag_lot",
-   "runner_up": "irregular",
-   "why": "91% of the nudged re-runs say flag_lot, the rest mostly irregular: a narrow strip whose width (near 6 m) or body (near 12 m) sits on the flag-lot line (rectangularity 0.731, convexity 0.845, 8 corners after simplifying, 8 as published, narrowest cross-section 5.8 m).",
-   "label": null,
-   "labels_by": null
-  },
-  {
-   "site_id": "018567258",
-   "address": "498 Cardero St",
-   "local_area": "Downtown",
-   "metrics": {
-    "class": "flag_lot",
-    "area_m2": 3262.7,
-    "perimeter_m": 320.4,
+    "class": "l_shape",
+    "area_m2": 428.6,
+    "perimeter_m": 95.1,
     "vertices_raw": 7,
     "vertices": 6,
     "reflex_corners": 1,
-    "rectangularity": 0.821,
-    "convexity": 0.914,
-    "aspect_ratio": 4.508,
+    "rectangularity": 0.879,
+    "convexity": 0.936,
+    "aspect_ratio": 2.178,
     "rings": 1,
     "outer_rings": 1,
     "holes": 0,
-    "narrowest_cross_section_m": 5.672,
+    "narrowest_cross_section_m": 6.589,
     "equivalent_rectangle": {
-     "side_a_m": 29.7,
-     "side_b_m": 133.9,
-     "bearing_deg": 135.4
+     "side_a_m": 32.6,
+     "side_b_m": 15.0,
+     "bearing_deg": 88.6
     },
-    "flag": {
-     "pole_width_m": 5.672,
-     "pole_length_m": 25.5,
-     "body_width_m": 29.7
-    },
-    "confidence": 0.909,
-    "alternative": "l_shape",
-    "margin": 0.328,
-    "note": "A flag lot: a strip about 5.7 m wide and 26 m long leads to a body about 30 m wide; 3,263 m2. The equivalent rectangle overstates the buildable plate."
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "irregular",
+    "margin": 0.696,
+    "note": "An L: six corners, one inward; 94% of its convex hull, 429 m2."
    },
    "ring_lonlat": [
     [
      [
-      -123.1278066,
-      49.2927236
+      -123.1038842,
+      49.247383
      ],
      [
-      -123.1287747,
-      49.2920821
+      -123.1038792,
+      49.2475194
      ],
      [
-      -123.128633,
-      49.2919906
+      -123.1038758,
+      49.2476125
      ],
      [
-      -123.1284842,
-      49.2918946
+      -123.1039905,
+      49.2476147
      ],
      [
-      -123.1271916,
-      49.2927512
+      -123.1039875,
+      49.2476776
      ],
      [
-      -123.1272471,
-      49.2927871
+      -123.1040786,
+      49.2476791
      ],
      [
-      -123.1274944,
-      49.2926232
+      -123.1040897,
+      49.2473862
      ],
      [
-      -123.1278066,
-      49.2927236
+      -123.1038842,
+      49.247383
      ]
     ]
    ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M72.0,20.1 L6.0,87.0 L15.7,96.5 L25.8,106.5 L114.0,17.2 L110.2,13.5 L93.3,30.6 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "flag_lot",
-   "runner_up": "l_shape",
-   "why": "91% of the nudged re-runs say flag_lot, the rest mostly l_shape: a narrow arm: an L with a thin leg, or a flag lot (rectangularity 0.821, convexity 0.914, 6 corners after simplifying, 7 as published, narrowest cross-section 5.7 m).",
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M83.5,114.0 L84.7,64.2 L85.5,30.3 L58.1,29.5 L58.9,6.5 L37.1,6.0 L34.5,112.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1913"
+     ],
+     "legal": "LOT A BLOCK 1 PLAN VAP8650 DISTR ICT LOT 631 NWD OF LOT 2, TO BLKS",
+     "report_year": "2026"
+    },
+    "tax_coord": "71418465"
+   },
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "why": "82% of the nudged re-runs say l_shape, the rest mostly irregular: six corners or not depending on the simplification, or convexity near 0.60 / 0.95 (rectangularity 0.879, convexity 0.936, 6 corners after simplifying, 7 as published, narrowest cross-section 6.6 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "011076488",
+   "address": "6891 Laburnum St",
+   "local_area": "Kerrisdale",
+   "metrics": {
+    "class": "irregular",
+    "area_m2": 1127.5,
+    "perimeter_m": 161.1,
+    "vertices_raw": 8,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.886,
+    "convexity": 0.964,
+    "aspect_ratio": 3.146,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 2.554,
+    "equivalent_rectangle": {
+     "side_a_m": 63.3,
+     "side_b_m": 20.1,
+     "bearing_deg": 179.1
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "near_rectangle",
+    "margin": 0.711,
+    "note": "Irregular: 6 corners, 89% of its 63.3 x 20.1 m bounding rectangle, 1,127 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1519111,
+      49.2230545
+     ],
+     [
+      -123.1511409,
+      49.2230465
+     ],
+     [
+      -123.1511408,
+      49.2230465
+     ],
+     [
+      -123.1511338,
+      49.2232274
+     ],
+     [
+      -123.1511339,
+      49.2232274
+     ],
+     [
+      -123.1516261,
+      49.2232321
+     ],
+     [
+      -123.1516269,
+      49.2232047
+     ],
+     [
+      -123.1520032,
+      49.2232096
+     ],
+     [
+      -123.1519111,
+      49.2230545
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M17.4,76.1 L113.1,77.6 L113.1,77.6 L114.0,43.3 L114.0,43.3 L52.8,42.4 L52.7,47.6 L6.0,46.7 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1931"
+     ],
+     "legal": "LOT 6 BLOCK 11 PLAN VAP5761 DIST RICT LOT 526 NWD OF LOT L.",
+     "report_year": "2026"
+    },
+    "tax_coord": "09379551"
+   },
+   "best_guess": "irregular",
+   "runner_up": "near_rectangle",
+   "why": "82% of the nudged re-runs say irregular, the rest mostly near_rectangle: rectangularity near the 0.90 line with more than four corners (rectangularity 0.886, convexity 0.964, 6 corners after simplifying, 8 as published, narrowest cross-section 2.6 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "018014011",
+   "address": "4465 W 3rd Ave",
+   "local_area": "West Point Grey",
+   "metrics": {
+    "class": "irregular",
+    "area_m2": 774.5,
+    "perimeter_m": 113.9,
+    "vertices_raw": 8,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.888,
+    "convexity": 0.969,
+    "aspect_ratio": 1.02,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 4.993,
+    "equivalent_rectangle": {
+     "side_a_m": 29.3,
+     "side_b_m": 29.8,
+     "bearing_deg": 88.6
+    },
+    "flag": null,
+    "confidence": 0.818,
+    "alternative": "near_rectangle",
+    "margin": 0.82,
+    "note": "Irregular: 6 corners, 89% of its 29.8 x 29.3 m bounding rectangle, 774 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.2078182,
+      49.2704317
+     ],
+     [
+      -123.2078167,
+      49.2704753
+     ],
+     [
+      -123.2076744,
+      49.2704728
+     ],
+     [
+      -123.2076664,
+      49.2706919
+     ],
+     [
+      -123.2076664,
+      49.2706921
+     ],
+     [
+      -123.2080761,
+      49.2706989
+     ],
+     [
+      -123.2080761,
+      49.2706988
+     ],
+     [
+      -123.2080841,
+      49.2704797
+     ],
+     [
+      -123.2078182,
+      49.2704317
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M74.8,112.8 L75.1,95.6 L111.9,96.5 L114.0,10.0 L114.0,9.9 L8.1,7.2 L8.1,7.3 L6.0,93.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1996"
+     ],
+     "legal": "LOT H BLOCK 138 PLAN LMP7635 DIS TRICT LOT 540 NWD OF LOT 1.",
+     "report_year": "2026"
+    },
+    "tax_coord": "63702517"
+   },
+   "best_guess": "irregular",
+   "runner_up": "near_rectangle",
+   "why": "82% of the nudged re-runs say irregular, the rest mostly near_rectangle: rectangularity near the 0.90 line with more than four corners (rectangularity 0.888, convexity 0.969, 6 corners after simplifying, 8 as published, narrowest cross-section 5.0 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "011187727",
+   "address": "8183 Laburnum St",
+   "local_area": "Kerrisdale",
+   "metrics": {
+    "class": "near_rectangle",
+    "area_m2": 1096.4,
+    "perimeter_m": 144.7,
+    "vertices_raw": 30,
+    "vertices": 6,
+    "reflex_corners": 2,
+    "rectangularity": 0.9,
+    "convexity": 0.989,
+    "aspect_ratio": 2.328,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 2.441,
+    "equivalent_rectangle": {
+     "side_a_m": 22.9,
+     "side_b_m": 53.3,
+     "bearing_deg": 123.4
+    },
+    "flag": null,
+    "confidence": 0.909,
+    "alternative": "irregular",
+    "margin": 0.009,
+    "note": "Nearly a rectangle (90% of its 53.3 x 22.9 m bounding rectangle), 1,096 m2, 6 corners."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1497533,
+      49.2116787
+     ],
+     [
+      -123.1497532,
+      49.2116787
+     ],
+     [
+      -123.149143,
+      49.2119422
+     ],
+     [
+      -123.1491445,
+      49.2119428
+     ],
+     [
+      -123.1491564,
+      49.2119474
+     ],
+     [
+      -123.1491685,
+      49.2119518
+     ],
+     [
+      -123.1491808,
+      49.2119561
+     ],
+     [
+      -123.149193,
+      49.2119604
+     ],
+     [
+      -123.1492052,
+      49.2119649
+     ],
+     [
+      -123.1492175,
+      49.2119694
+     ],
+     [
+      -123.1492294,
+      49.211974
+     ],
+     [
+      -123.1492415,
+      49.2119787
+     ],
+     [
+      -123.1492534,
+      49.2119834
+     ],
+     [
+      -123.1492652,
+      49.2119884
+     ],
+     [
+      -123.1492769,
+      49.2119933
+     ],
+     [
+      -123.1492885,
+      49.2119983
+     ],
+     [
+      -123.1493001,
+      49.2120034
+     ],
+     [
+      -123.1493115,
+      49.2120087
+     ],
+     [
+      -123.1493229,
+      49.212014
+     ],
+     [
+      -123.1493342,
+      49.2120194
+     ],
+     [
+      -123.1493455,
+      49.2120249
+     ],
+     [
+      -123.1493565,
+      49.2120304
+     ],
+     [
+      -123.1493675,
+      49.2120361
+     ],
+     [
+      -123.1493783,
+      49.2120417
+     ],
+     [
+      -123.1493892,
+      49.2120476
+     ],
+     [
+      -123.1493999,
+      49.2120534
+     ],
+     [
+      -123.1494105,
+      49.2120594
+     ],
+     [
+      -123.149421,
+      49.2120654
+     ],
+     [
+      -123.1494239,
+      49.2120671
+     ],
+     [
+      -123.1499259,
+      49.21185
+     ],
+     [
+      -123.1497533,
+      49.2116787
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M29.8,100.9 L29.8,100.9 L114.0,45.4 L113.8,45.3 L112.1,44.3 L110.5,43.4 L108.8,42.5 L107.1,41.6 L105.4,40.6 L103.7,39.7 L102.1,38.7 L100.4,37.7 L98.8,36.7 L97.1,35.7 L95.5,34.7 L93.9,33.6 L92.3,32.5 L90.8,31.4 L89.2,30.3 L87.6,29.2 L86.1,28.0 L84.5,26.8 L83.0,25.6 L81.5,24.5 L80.0,23.2 L78.6,22.0 L77.1,20.7 L75.7,19.5 L75.3,19.1 L6.0,64.8 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1948"
+     ],
+     "legal": "LOT 15 BLOCK 10 PLAN VAP5265 DIS TRICT LOT 317 NEW WESTMINSTER",
+     "report_year": "2026"
+    },
+    "tax_coord": "08882365"
+   },
+   "best_guess": "near_rectangle",
+   "runner_up": "irregular",
+   "why": "91% of the nudged re-runs say near_rectangle, the rest mostly irregular: rectangularity near the 0.90 line with more than four corners (rectangularity 0.900, convexity 0.989, 6 corners after simplifying, 30 as published, narrowest cross-section 2.4 m).",
    "label": null,
    "labels_by": null
   },
@@ -5171,6 +5008,22 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,86.6 L70.1,89.1 L71.1,48.7 L113.6,49.7 L114.0,33.3 L7.4,30.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "C-2A"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1986"
+     ],
+     "legal": "LOT E BLOCK 48 PLAN VAP5830 DIST RICT LOT 301 NEW WESTMINSTER SUBSI",
+     "report_year": "2026"
+    },
+    "tax_coord": "19069628"
+   },
    "best_guess": "flag_lot",
    "runner_up": "l_shape",
    "why": "91% of the nudged re-runs say flag_lot, the rest mostly l_shape: a narrow arm: an L with a thin leg, or a flag lot (rectangularity 0.710, convexity 0.833, 6 corners after simplifying, 6 as published, narrowest cross-section 3.9 m).",
@@ -5178,77 +5031,312 @@
    "labels_by": null
   },
   {
-   "site_id": null,
-   "geo_point_2d": {
-    "lat": 49.229026,
-    "lon": -123.196526
-   },
-   "local_area": "Dunbar-Southlands",
+   "site_id": "011221488",
+   "address": "6875 Balsam St",
+   "local_area": "Kerrisdale",
    "metrics": {
-    "class": "irregular",
-    "area_m2": 462.9,
-    "perimeter_m": 94.9,
+    "class": "l_shape",
+    "area_m2": 1598.9,
+    "perimeter_m": 202.8,
     "vertices_raw": 7,
-    "vertices": 7,
+    "vertices": 6,
     "reflex_corners": 1,
-    "rectangularity": 0.681,
-    "convexity": 0.874,
-    "aspect_ratio": 1.183,
+    "rectangularity": 0.85,
+    "convexity": 0.92,
+    "aspect_ratio": 3.155,
     "rings": 1,
     "outer_rings": 1,
     "holes": 0,
-    "narrowest_cross_section_m": 5.45,
+    "narrowest_cross_section_m": 6.057,
     "equivalent_rectangle": {
-     "side_a_m": 28.4,
-     "side_b_m": 24.0,
-     "bearing_deg": 75.0
+     "side_a_m": 77.0,
+     "side_b_m": 24.4,
+     "bearing_deg": 178.9
     },
     "flag": null,
     "confidence": 0.909,
     "alternative": "flag_lot",
-    "margin": 14.6,
-    "note": "Irregular: 7 corners, 68% of its 28.4 x 24.0 m bounding rectangle, 463 m2."
+    "margin": 1.51,
+    "note": "An L: six corners, one inward; 92% of its convex hull, 1,599 m2."
    },
    "ring_lonlat": [
     [
      [
-      -123.1963666,
-      49.2289179
+      -123.1623219,
+      49.2236338
      ],
      [
-      -123.1964519,
-      49.2289536
+      -123.1615397,
+      49.2236237
      ],
      [
-      -123.1963835,
-      49.2291176
+      -123.1615317,
+      49.2238432
      ],
      [
-      -123.196462,
-      49.2291509
+      -123.1625888,
+      49.2238561
      ],
      [
-      -123.1966118,
-      49.2291515
+      -123.1625908,
+      49.2238017
      ],
      [
-      -123.1966907,
-      49.2289584
+      -123.1623815,
+      49.2237988
      ],
      [
-      -123.1963945,
-      49.228875
+      -123.1623878,
+      49.2236346
      ],
      [
-      -123.1963666,
-      49.2289179
+      -123.1623219,
+      49.2236338
      ]
     ]
    ],
-   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M101.5,97.3 L79.6,83.3 L97.1,19.2 L77.0,6.3 L38.7,6.0 L18.5,81.4 L94.3,114.0 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
-   "best_guess": "irregular",
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M33.4,76.5 L113.2,78.1 L114.0,43.9 L6.2,41.9 L6.0,50.4 L27.3,50.8 L26.7,76.4 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1922"
+     ],
+     "legal": "LOT B BLOCK 1 PLAN VAP5149 DISTR ICT LOT 526 NWD GROUP 1, (EXPL PL",
+     "report_year": "2026"
+    },
+    "tax_coord": "07879485"
+   },
+   "best_guess": "l_shape",
    "runner_up": "flag_lot",
-   "why": "91% of the nudged re-runs say irregular, the rest mostly flag_lot: a narrow strip whose width (near 6 m) or body (near 12 m) sits on the flag-lot line (rectangularity 0.681, convexity 0.874, 7 corners after simplifying, 7 as published, narrowest cross-section 5.5 m).",
+   "why": "91% of the nudged re-runs say l_shape, the rest mostly flag_lot: a narrow arm: an L with a thin leg, or a flag lot (rectangularity 0.850, convexity 0.920, 6 corners after simplifying, 7 as published, narrowest cross-section 6.1 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "015036499",
+   "address": "2938 W 39th Ave",
+   "local_area": "Dunbar-Southlands",
+   "metrics": {
+    "class": "l_shape",
+    "area_m2": 451.7,
+    "perimeter_m": 127.6,
+    "vertices_raw": 7,
+    "vertices": 6,
+    "reflex_corners": 1,
+    "rectangularity": 0.831,
+    "convexity": 0.91,
+    "aspect_ratio": 5.337,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 3.992,
+    "equivalent_rectangle": {
+     "side_a_m": 53.9,
+     "side_b_m": 10.1,
+     "bearing_deg": 90.6
+    },
+    "flag": null,
+    "confidence": 0.909,
+    "alternative": "flag_lot",
+    "margin": 2.018,
+    "note": "An L: six corners, one inward; 91% of its convex hull, 452 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1712963,
+      49.23605
+     ],
+     [
+      -123.1712414,
+      49.2360498
+     ],
+     [
+      -123.1712486,
+      49.2365327
+     ],
+     [
+      -123.1713866,
+      49.2365332
+     ],
+     [
+      -123.171382,
+      49.2361826
+     ],
+     [
+      -123.171382,
+      49.2361824
+     ],
+     [
+      -123.1712982,
+      49.2361823
+     ],
+     [
+      -123.1712963,
+      49.23605
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M62.6,113.9 L70.6,114.0 L69.6,6.1 L49.4,6.0 L50.1,84.3 L50.1,84.4 L62.3,84.4 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1991"
+     ],
+     "legal": "LOT G BLOCK 10 PLAN 22512 DISTRI CT LOT 2027 NWD EXCEPT PLAN 19777,",
+     "report_year": "2026"
+    },
+    "tax_coord": "74405676"
+   },
+   "best_guess": "l_shape",
+   "runner_up": "flag_lot",
+   "why": "91% of the nudged re-runs say l_shape, the rest mostly flag_lot: a narrow arm: an L with a thin leg, or a flag lot (rectangularity 0.831, convexity 0.910, 6 corners after simplifying, 7 as published, narrowest cross-section 4.0 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "025028774",
+   "address": "7500 Angus Drive",
+   "local_area": "Marpole",
+   "metrics": {
+    "class": "trapezoid",
+    "area_m2": 6278.8,
+    "perimeter_m": 669.4,
+    "vertices_raw": 19,
+    "vertices": 4,
+    "reflex_corners": 0,
+    "rectangularity": 0.817,
+    "convexity": 0.904,
+    "aspect_ratio": 13.5,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 1.867,
+    "equivalent_rectangle": {
+     "side_a_m": 322.0,
+     "side_b_m": 23.9,
+     "bearing_deg": 109.3
+    },
+    "flag": null,
+    "confidence": 0.909,
+    "alternative": "l_shape",
+    "margin": 5.517,
+    "note": "Four sides but not square-cornered (82% of its 322.0 x 23.9 m bounding rectangle), 6,279 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1473192,
+      49.2145478
+     ],
+     [
+      -123.1479972,
+      49.2159168
+     ],
+     [
+      -123.1479977,
+      49.2159178
+     ],
+     [
+      -123.1481357,
+      49.2161782
+     ],
+     [
+      -123.1482807,
+      49.216437
+     ],
+     [
+      -123.1484325,
+      49.216694
+     ],
+     [
+      -123.1485107,
+      49.2168289
+     ],
+     [
+      -123.1487154,
+      49.2171711
+     ],
+     [
+      -123.1490408,
+      49.2172203
+     ],
+     [
+      -123.1486899,
+      49.2166286
+     ],
+     [
+      -123.1485398,
+      49.2163745
+     ],
+     [
+      -123.1483964,
+      49.2161187
+     ],
+     [
+      -123.1482599,
+      49.2158613
+     ],
+     [
+      -123.148259,
+      49.2158596
+     ],
+     [
+      -123.1482203,
+      49.2157813
+     ],
+     [
+      -123.1479085,
+      49.2151511
+     ],
+     [
+      -123.147818,
+      49.2149682
+     ],
+     [
+      -123.1477272,
+      49.2147848
+     ],
+     [
+      -123.1476116,
+      49.2145511
+     ],
+     [
+      -123.1473192,
+      49.2145478
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M82.8,114.0 L64.8,58.7 L64.8,58.6 L61.2,48.1 L57.3,37.7 L53.3,27.3 L51.2,21.8 L45.8,8.0 L37.2,6.0 L46.5,29.9 L50.5,40.2 L54.3,50.5 L57.9,60.9 L57.9,61.0 L58.9,64.2 L67.2,89.6 L69.6,97.0 L72.0,104.4 L75.0,113.9 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "R1-1"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [],
+     "legal": "LOT 5 BLOCK 285 PLAN VAP590 DIST RICT LOT 526 NWD GROUP 1 PT OF,",
+     "report_year": "2026"
+    },
+    "tax_coord": "64016951"
+   },
+   "best_guess": "trapezoid",
+   "runner_up": "l_shape",
+   "why": "91% of the nudged re-runs say trapezoid, the rest mostly l_shape: the deciding figures sit near a threshold (rectangularity 0.817, convexity 0.904, 4 corners after simplifying, 19 as published, narrowest cross-section 1.9 m).",
    "label": null,
    "labels_by": null
   },
@@ -5318,9 +5406,133 @@
     ]
    ],
    "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M6.0,53.4 L85.5,87.6 L114.0,58.8 L112.4,49.9 L73.3,32.4 L61.2,59.6 L12.7,38.5 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "DD"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1960"
+     ],
+     "legal": "BLOCK 16 PLAN VAP92 DISTRICT LOT 185 NWD THAT PART OF LOT 1 IN EXPL",
+     "report_year": "2026"
+    },
+    "tax_coord": "59211894"
+   },
    "best_guess": "irregular",
    "runner_up": "flag_lot",
    "why": "91% of the nudged re-runs say irregular, the rest mostly flag_lot: a narrow strip whose width (near 6 m) or body (near 12 m) sits on the flag-lot line (rectangularity 0.591, convexity 0.777, 7 corners after simplifying, 7 as published, narrowest cross-section 5.1 m).",
+   "label": null,
+   "labels_by": null
+  },
+  {
+   "site_id": "011537833",
+   "address": "3790 Cypress St",
+   "local_area": "Shaughnessy",
+   "metrics": {
+    "class": "irregular",
+    "area_m2": 2664.8,
+    "perimeter_m": 267.4,
+    "vertices_raw": 12,
+    "vertices": 10,
+    "reflex_corners": 3,
+    "rectangularity": 0.585,
+    "convexity": 0.75,
+    "aspect_ratio": 1.192,
+    "rings": 1,
+    "outer_rings": 1,
+    "holes": 0,
+    "narrowest_cross_section_m": 6.405,
+    "equivalent_rectangle": {
+     "side_a_m": 73.7,
+     "side_b_m": 61.8,
+     "bearing_deg": 86.7
+    },
+    "flag": null,
+    "confidence": 0.909,
+    "alternative": "flag_lot",
+    "margin": 21.0,
+    "note": "Irregular: 10 corners, 59% of its 73.7 x 61.8 m bounding rectangle, 2,665 m2."
+   },
+   "ring_lonlat": [
+    [
+     [
+      -123.1484782,
+      49.2518749
+     ],
+     [
+      -123.1478336,
+      49.2518546
+     ],
+     [
+      -123.1478256,
+      49.251909
+     ],
+     [
+      -123.1477825,
+      49.2522154
+     ],
+     [
+      -123.1476107,
+      49.2522111
+     ],
+     [
+      -123.1475784,
+      49.2524423
+     ],
+     [
+      -123.1476616,
+      49.2524445
+     ],
+     [
+      -123.1476529,
+      49.2525074
+     ],
+     [
+      -123.1477408,
+      49.2525096
+     ],
+     [
+      -123.1477731,
+      49.2522829
+     ],
+     [
+      -123.1484403,
+      49.2523081
+     ],
+     [
+      -123.1484405,
+      49.2523081
+     ],
+     [
+      -123.1484782,
+      49.2518749
+     ]
+    ]
+   ],
+   "thumbnail_svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"120\" height=\"120\" viewBox=\"0 0 120 120\"><path d=\"M11.4,110.7 L81.0,114.0 L81.9,105.0 L86.5,54.5 L105.1,55.2 L108.6,17.1 L99.6,16.7 L100.5,6.4 L91.0,6.0 L87.5,43.4 L15.5,39.2 L15.5,39.2 Z\" fill=\"#d9e4ec\" stroke=\"#1f3a4d\" stroke-width=\"1.2\" fill-rule=\"evenodd\"/><text x=\"116\" y=\"12\" font-size=\"9\" text-anchor=\"end\" font-family=\"sans-serif\">N</text></svg>",
+   "lot": {
+    "zoning": [
+     "FSD"
+    ],
+    "tax": {
+     "legal_type": [
+      "LAND"
+     ],
+     "year_built": [
+      "1912"
+     ],
+     "legal": "LOT 2 BLOCK 42 PLAN VAP4502 DIST RICT LOT 526 NWD AMD (SEE 24023K).",
+     "report_year": "2026"
+    },
+    "tax_coord": "09769866"
+   },
+   "best_guess": "irregular",
+   "runner_up": "flag_lot",
+   "why": "91% of the nudged re-runs say irregular, the rest mostly flag_lot: a narrow strip whose width (near 6 m) or body (near 12 m) sits on the flag-lot line (rectangularity 0.585, convexity 0.750, 10 corners after simplifying, 12 as published, narrowest cross-section 6.4 m).",
    "label": null,
    "labels_by": null
   }

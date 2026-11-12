@@ -72,6 +72,24 @@ a confidence under 1. `uncertain.json` keeps the 40 lowest, at most six per pair
 so every boundary shows up): l_shape/irregular, irregular/trapezoid, rectangle/near_rectangle, near_rectangle/
 trapezoid, l_shape/trapezoid, l_shape/near_rectangle, near_rectangle/irregular, flag_lot/l_shape, flag_lot/irregular.
 
+Only lots a person could build on (12 Nov 2026). The first set of 40 held eighteen parcels that were not lots: three parks
+(2303 Wall St, the park site on Trinity Street; 8288 Ash St, Ash Park; 498 Cardero St, Cardero Park), rights-of-way
+(1725 E Broadway and 2600 Rupert St on the Clark Drive to Nanaimo corridor, 3598 E Kent Ave North on the CPR Marpole
+line), three strata plans of standing buildings (1478 W Hastings St, 1350 W 8th Ave, 3437 Kingsway) and seven
+untaxed remnants with no site_id (five in Southlands under RA-1, a Crown sliver in Sunset under M-2, a scrap of CD-1
+by Wall St), and the two polygons of Rupert SkyTrain station's land at 2902 Hebb Ave. The survey now checks each candidate on the City's portal before it takes it: a nine-digit `site_id`
+(strata plans are LMS, VAS, EPS or BCS numbers), a civic address, a `property-tax-report` record of legal type LAND
+with a land value, a legal description that is not a park, a right-of-way, a road, a lane, a railway or an air-space
+parcel, a point outside `parks-polygon-representation`, and no `rapid-transit-lines` or `rapid-transit-stations`
+geometry intersecting the ring (Rupert Station's land at 2902 Hebb Ave is taxed as ordinary land and passed every
+other test; Kai's note on the label page caught it). `uncertain.json` lists what it rejected while choosing
+(`rejected_while_choosing`, 27 parcels: the eighteen above, three more strata plans, a second CPR piece, two air-space
+parcels on Drake St, a Canada Line piece with no address, and the rest) and what the 11 Nov set lost
+(`dropped_from_the_11_nov_set`); every kept parcel carries a
+`lot` block with the zoning district at its point and the tax roll's legal type, year built and legal description,
+which the label page prints under the address. Industrial lots (I-2, M-2) stay: a lot is a lot, and a reader can see
+the zoning.
+
 To label: open `label.html` in a browser (built from `uncertain.json` by `make_label_page.py`). Each parcel shows
 its published outline, then the outline drawn over the real site (OpenStreetMap tiles, or Esri World Imagery with
 the Aerial switch, each with its attribution; the maps load as you scroll), the classifier's guess and runner-up
@@ -90,7 +108,10 @@ The download and the survey scripts were kept outside the repository (the 53.6 M
 uv run python -I fetch.py <download-dir>
 #    GET https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/property-parcel-polygons/exports/geojson
 #    GET https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/local-area-boundary/exports/geojson
-# 2. classify every feature with ffm.parcel_shapes.classify and write the two JSON files; about 40 s
+# 2. classify every feature with ffm.parcel_shapes.classify and write the two JSON files; about 40 s, plus the
+#    lot checks for the uncertain candidates (five records requests each: property-tax-report by land_coordinate,
+#    zoning-districts-and-labels and parks-polygon-representation at the point, rapid-transit-lines and -stations
+#    intersecting the ring; cached in <download-dir>\developable-cache.json)
 uv run python -I survey.py <repo> <download-dir>\parcels.geojson <download-dir>\local-areas.geojson <download-dir>\fetch-log.json evals\parcels
 ```
 
@@ -101,4 +122,5 @@ The classifier's tests: `python -m unittest tests.test_parcel_shapes`.
 Contains information licensed under the Open Government Licence – Vancouver
 (https://opendata.vancouver.ca/pages/licence/). Datasets: `property-parcel-polygons` and `local-area-boundary`,
 City of Vancouver Open Data Portal (https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/),
-fetched 11 Nov 2026. The classes and thresholds are this project's, not the City's.
+fetched 11 Nov 2026; `property-tax-report`, `zoning-districts-and-labels`, `parks-polygon-representation`,
+`rapid-transit-lines` and `rapid-transit-stations` for the lot checks, 12 Nov 2026. The classes and thresholds are this project's, not the City's.

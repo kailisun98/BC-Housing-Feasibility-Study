@@ -70,7 +70,9 @@ PAGE = """<!doctype html>
 </header>
 <main>
   <p class="lead">__N__ parcels the classifier (<code>ffm/parcel_shapes.py</code>) is least sure of, from the City's parcel polygons
-  (Open Government Licence – Vancouver). North is up in every thumbnail; beside it the parcel is drawn over the real
+  (Open Government Licence – Vancouver), every one a taxable lot with an address (since 12 Nov 2026 parks, rights-of-way,
+  strata plans and untaxed remnants are kept out; the grey line under each address gives the zoning at the parcel's
+  point and what the tax roll says). North is up in every thumbnail; beside it the parcel is drawn over the real
   site (OpenStreetMap, or aerial imagery with the switch above; the maps load as you scroll). On the map, click the
   edge that fronts the street: the whole edge between two white corners turns red (a curved frontage is one edge),
   and a second edge marks the cross street on a corner lot (amber). Then tick the shape you would call it; a note helps
@@ -100,6 +102,7 @@ function render() {
       <div class="text">
         <h2>${i + 1}. ${h(p.address || p.site_id)}</h2>
         <p class="meta">${h(p.local_area || "")} · site_id ${h(p.site_id)} · ${h(Math.round(m.area_m2 || 0).toLocaleString("en-CA"))} m² · <a href="https://www.openstreetmap.org/?mlat=${p.center ? p.center[1] : ""}&mlon=${p.center ? p.center[0] : ""}#map=19/${p.center ? p.center[1] : ""}/${p.center ? p.center[0] : ""}" target="_blank" rel="noopener">map</a></p>
+        ${p.lot ? `<p class="meta lot">zoning ${h((p.lot.zoning || []).join(", ") || "not found")} · tax roll ${h((p.lot.tax.legal_type || []).join("/").toLowerCase())}${(p.lot.tax.year_built || []).length ? " · built " + h(p.lot.tax.year_built.join(", ")) : " · no year built on the roll"} · ${h(p.lot.tax.legal || "")}</p>` : ""}
         <p class="why">${h(p.why || "")}</p>
         <p class="front-note"><b>Frontage:</b> click the edge on the street (red); a second edge marks the cross street (amber).</p>
         <div class="choices">${CLASSES.map(c => `<label class="${c === p.best_guess ? "guess" : (c === p.runner_up ? "runner" : "")}"><input type="radio" name="l-${h(p.site_id)}" value="${c}"${d.label === c ? " checked" : ""}> ${c.replace(/_/g, " ")}</label>`).join("")}
@@ -306,7 +309,7 @@ def main() -> None:
         m = p.get("metrics") or {}
         rows.append({"site_id": p["site_id"], "address": p.get("address"), "local_area": p.get("local_area"), "best_guess": p.get("best_guess"),
                      "runner_up": p.get("runner_up"), "why": p.get("why"), "thumbnail_svg": p.get("thumbnail_svg"), "center": center,
-                     "ring_lonlat": p.get("ring_lonlat"),
+                     "ring_lonlat": p.get("ring_lonlat"), "lot": p.get("lot"),
                      "metrics": {k: m.get(k) for k in ("area_m2", "rectangularity", "convexity", "vertices", "vertices_raw", "narrowest_cross_section_m", "confidence")}})
     data = json.dumps(rows).replace("</", "<\\/")
     html = PAGE.replace("__DATA__", data).replace("__CLASSES__", json.dumps(CLASSES)).replace("__N__", str(len(rows)))

@@ -19,6 +19,8 @@ PAGE = """<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Label the uncertain parcels</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
   :root { --ink: #1f2933; --muted: #5f6672; --line: #e1e5ea; --paper: #fff; --page: #f6f7f8; --blue: #2a6fb8; }
   body { margin: 0; font: 14px/1.5 "IBM Plex Sans", Helvetica, Arial, sans-serif; color: var(--ink); background: var(--page); }
@@ -31,9 +33,15 @@ PAGE = """<!doctype html>
   .count { font-size: 12.5px; color: var(--muted); margin-left: auto; }
   main { max-width: 1100px; margin: 0 auto; padding: 16px 20px 60px; }
   p.lead { color: var(--muted); max-width: 70ch; margin: 6px 0 18px; }
-  .parcel { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px 18px; }
+  .parcel { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; display: grid; grid-template-columns: 130px 300px minmax(0, 1fr); gap: 12px 18px; }
   .parcel.done { border-color: #8fb8e3; }
-  .parcel svg { width: 130px; height: 130px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+  .parcel .thumb svg { width: 130px; height: 130px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+  .parcel .thumb p { font-size: 11px; color: var(--muted); margin: 4px 0 0; text-align: center; }
+  .map { height: 300px; border: 1px solid var(--line); border-radius: 4px; background: #eef0f2; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+  .seg button { border: 0; border-radius: 0; padding: 5px 12px; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .leaflet-container { font: 11px/1.3 "IBM Plex Sans", Helvetica, Arial, sans-serif; }
   .parcel h2 { font-size: 15px; margin: 0 0 2px; }
   .parcel .meta { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; }
   .parcel .why { font-size: 12.5px; margin: 0 0 8px; }
@@ -45,6 +53,7 @@ PAGE = """<!doctype html>
   .note input { font: inherit; font-size: 13px; width: 100%; max-width: 560px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 4px; }
   .nums { font: 11.5px/1.5 ui-monospace, Consolas, monospace; color: var(--muted); margin-top: 6px; }
   a { color: var(--blue); }
+  @media (max-width: 900px) { .parcel { grid-template-columns: 130px minmax(0, 1fr); } .parcel .text { grid-column: 1 / -1; } }
   @media (max-width: 600px) { .parcel { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -52,13 +61,15 @@ PAGE = """<!doctype html>
 <header>
   <h1>Label the uncertain parcels</h1>
   <label>Initials <input id="by" placeholder="KS"></label>
+  <span class="seg" role="group" aria-label="Map underlay"><button type="button" data-base="osm" aria-pressed="true">Map</button><button type="button" data-base="aerial" aria-pressed="false">Aerial</button></span>
   <button id="save" class="primary">Download labels.json</button>
   <button id="clear">Clear the draft</button>
   <span class="count" id="count"></span>
 </header>
 <main>
   <p class="lead">__N__ parcels the classifier (<code>ffm/parcel_shapes.py</code>) is least sure of, from the City's parcel polygons
-  (Open Government Licence – Vancouver). North is up in every thumbnail. Tick the shape you would call it; a note helps
+  (Open Government Licence – Vancouver). North is up in every thumbnail; beside it the parcel is drawn over the real
+  site (OpenStreetMap, or aerial imagery with the switch above; the maps load as you scroll). Tick the shape you would call it; a note helps
   when none of the words fit, or when the parcel is not what the City draws (a consolidated site, a road closure).
   The draft stays in this browser until you download it. The classes: <b>rectangle</b> (four corners, square-ish),
   <b>near rectangle</b> (a bevelled corner, a slight skew, a short jog), <b>trapezoid</b> (four sides, not
@@ -80,8 +91,9 @@ function render() {
     const d = draft[p.site_id] || {};
     const m = p.metrics || {};
     return `<section class="parcel${d.label ? " done" : ""}" data-id="${h(p.site_id)}">
-      <div>${p.thumbnail_svg || ""}</div>
-      <div>
+      <div class="thumb">${p.thumbnail_svg || ""}<p>as published</p></div>
+      <div class="map" data-i="${i}" aria-label="The parcel over the map"></div>
+      <div class="text">
         <h2>${i + 1}. ${h(p.address || p.site_id)}</h2>
         <p class="meta">${h(p.local_area || "")} · site_id ${h(p.site_id)} · ${h(Math.round(m.area_m2 || 0).toLocaleString("en-CA"))} m² · <a href="https://www.openstreetmap.org/?mlat=${p.center ? p.center[1] : ""}&mlon=${p.center ? p.center[0] : ""}#map=19/${p.center ? p.center[1] : ""}/${p.center ? p.center[0] : ""}" target="_blank" rel="noopener">map</a></p>
         <p class="why">${h(p.why || "")}</p>
@@ -93,7 +105,41 @@ function render() {
     </section>`;
   }).join("");
   count();
+  watchMaps();
 }
+
+/* The parcel over the real site: one small map per parcel, made only when it scrolls into view, with the ring drawn
+   on it. Map = OpenStreetMap tiles; Aerial = Esri World Imagery, which is what the eye needs for a driveway, a shed
+   or a fence line. Both carry their attribution. */
+const BASES = {
+  osm: { url: "https://tile.openstreetmap.org/{z}/{x}/{y}.png", opts: { maxZoom: 19, attribution: "&copy; <a href=\\"https://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors" } },
+  aerial: { url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", opts: { maxZoom: 19, attribution: "Imagery &copy; Esri, Maxar, Earthstar Geographics and the GIS User Community" } },
+};
+let base = "osm";
+const maps = new Map();
+function makeMap(el) {
+  const p = parcels[Number(el.dataset.i)];
+  const ring = (p.ring_lonlat || [[]])[0] || [];
+  if (!ring.length || !window.L) { el.textContent = "no ring"; return; }
+  const map = L.map(el, { scrollWheelZoom: false, attributionControl: true, zoomControl: false });
+  const layer = L.tileLayer(BASES[base].url, BASES[base].opts).addTo(map);
+  const poly = L.polygon(ring.map(q => [q[1], q[0]]), { color: "#1f3a4d", weight: 2, fillColor: "#3c8cdc", fillOpacity: 0.18 }).addTo(map);
+  map.fitBounds(poly.getBounds().pad(0.5));
+  L.control.zoom({ position: "bottomright" }).addTo(map);
+  maps.set(el, { map, layer });
+}
+function watchMaps() {
+  const els = Array.from(document.querySelectorAll(".map"));
+  if (!("IntersectionObserver" in window)) { els.forEach(makeMap); return; }
+  const io = new IntersectionObserver(entries => { for (const e of entries) if (e.isIntersecting && !maps.has(e.target)) { makeMap(e.target); io.unobserve(e.target); } }, { rootMargin: "300px 0px" });
+  els.forEach(el => io.observe(el));
+}
+document.querySelectorAll("[data-base]").forEach(b => b.addEventListener("click", () => {
+  base = b.dataset.base;
+  document.querySelectorAll("[data-base]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  for (const { map, layer } of maps.values()) { map.removeLayer(layer); }
+  for (const [el, rec] of maps) { rec.layer = L.tileLayer(BASES[base].url, BASES[base].opts).addTo(rec.map); }
+}));
 function count() {
   const n = parcels.filter(p => (draft[p.site_id] || {}).label).length;
   document.getElementById("count").textContent = `${n} of ${parcels.length} labelled`;
@@ -134,6 +180,7 @@ def main() -> None:
         m = p.get("metrics") or {}
         rows.append({"site_id": p["site_id"], "address": p.get("address"), "local_area": p.get("local_area"), "best_guess": p.get("best_guess"),
                      "runner_up": p.get("runner_up"), "why": p.get("why"), "thumbnail_svg": p.get("thumbnail_svg"), "center": center,
+                     "ring_lonlat": p.get("ring_lonlat"),
                      "metrics": {k: m.get(k) for k in ("area_m2", "rectangularity", "convexity", "vertices", "vertices_raw", "narrowest_cross_section_m", "confidence")}})
     data = json.dumps(rows).replace("</", "<\\/")
     html = PAGE.replace("__DATA__", data).replace("__CLASSES__", json.dumps(CLASSES)).replace("__N__", str(len(rows)))

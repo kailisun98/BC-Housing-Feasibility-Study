@@ -72,9 +72,14 @@ a confidence under 1. `uncertain.json` keeps the 40 lowest, at most six per pair
 so every boundary shows up): l_shape/irregular, irregular/trapezoid, rectangle/near_rectangle, near_rectangle/
 trapezoid, l_shape/trapezoid, l_shape/near_rectangle, near_rectangle/irregular, flag_lot/l_shape, flag_lot/irregular.
 
-To label: open `uncertain.json`, look at `thumbnail_svg` (paste it into any browser or an `.svg` file), and set
-`label` to one of `rectangle`, `near_rectangle`, `trapezoid`, `l_shape`, `flag_lot`, `irregular`, `multi_part` (or
-`"other: ..."`), and `labels_by` to your initials and the date. Leave a parcel null if you cannot tell.
+To label: open `label.html` in a browser (built from `uncertain.json` by `make_label_page.py`). Each parcel shows
+its published outline, then the outline drawn over the real site (OpenStreetMap tiles, or Esri World Imagery with
+the Aerial switch, each with its attribution; the maps load as you scroll), the classifier's guess and runner-up
+and why it hesitated. Tick a class (or "other" with a note), put your initials in the header, and Download
+labels.json; put the file beside `uncertain.json`. The draft stays in that browser until then. Or edit
+`uncertain.json` by hand: set `label` to one of `rectangle`, `near_rectangle`, `trapezoid`, `l_shape`, `flag_lot`,
+`irregular`, `multi_part` (or `"other: ..."`), and `labels_by` to your initials and the date. Leave a parcel null
+if you cannot tell.
 
 ## How it was run
 

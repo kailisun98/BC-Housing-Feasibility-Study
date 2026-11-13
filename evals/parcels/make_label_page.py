@@ -57,6 +57,7 @@ PAGE = """<!doctype html>
   a { color: var(--blue); }
   @media (max-width: 900px) { .parcel { grid-template-columns: 130px minmax(0, 1fr); } .parcel .text { grid-column: 1 / -1; } }
   @media (max-width: 600px) { .parcel { grid-template-columns: 1fr; } }
+main.only-open .parcel.done { display: none; }
 </style>
 </head>
 <body>
@@ -66,6 +67,7 @@ PAGE = """<!doctype html>
   <span class="seg" role="group" aria-label="Map underlay"><button type="button" data-base="osm" aria-pressed="true">Map</button><button type="button" data-base="aerial" aria-pressed="false">Aerial</button></span>
   <button id="save" class="primary">Download labels.json</button>
   <button id="clear">Clear the draft</button>
+  <button id="only-open" aria-pressed="false">Only the unlabelled</button>
   <span class="count" id="count"></span>
 </header>
 <main>
@@ -77,7 +79,9 @@ PAGE = """<!doctype html>
   edge that fronts the street: the whole edge between two white corners turns red (a curved frontage is one edge),
   and a second edge marks the cross street on a corner lot (amber). Then tick the shape you would call it; a note helps
   when none of the words fit, or when the parcel is not what the City draws (a consolidated site, a road closure).
-  The draft stays in this browser until you download it. The classes: <b>rectangle</b> (four corners, square-ish),
+  The draft stays in this browser until you download it, and only in this browser: open the page in your own
+  (double-click <code>label.html</code>), not in a preview pane that forgets its storage when it closes, and download
+  labels.json as you go. The classes: <b>rectangle</b> (four corners, square-ish),
   <b>near rectangle</b> (a bevelled corner, a slight skew, a short jog), <b>trapezoid</b> (four sides, not
   square-cornered), <b>L shape</b> (six corners, one inward), <b>flag lot</b> (a narrow strip leads to a wider body),
   <b>irregular</b> (anything else: triangles, curves, many sides), <b>multi part</b> (more than one piece).</p>
@@ -291,6 +295,11 @@ document.getElementById("save").addEventListener("click", () => {
 document.getElementById("clear").addEventListener("click", () => { if (confirm("Clear every label in this browser?")) { draft = {}; store(); render(); } });
 try { const by = localStorage.getItem(KEY + ".by"); if (by) document.getElementById("by").value = by; } catch (e) {}
 document.getElementById("by").addEventListener("input", e => { try { localStorage.setItem(KEY + ".by", e.target.value); } catch (x) {} });
+// Only the unlabelled: hides every parcel that has a label (a parcel disappears as soon as it is ticked)
+const onlyBtn = document.getElementById("only-open");
+function setOnly(on) { document.querySelector("main").classList.toggle("only-open", on); onlyBtn.setAttribute("aria-pressed", String(on)); try { localStorage.setItem(KEY + ".only", on ? "1" : ""); } catch (e) {} }
+onlyBtn.addEventListener("click", () => setOnly(onlyBtn.getAttribute("aria-pressed") !== "true"));
+try { if (localStorage.getItem(KEY + ".only")) setOnly(true); } catch (e) {}
 render();
 </script>
 </body>

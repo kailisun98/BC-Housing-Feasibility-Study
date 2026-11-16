@@ -50,6 +50,36 @@
           }
         }
       ]
+    },
+    {
+      "id": "bcbc.exits",
+      "title": "Exits from a floor area: number, separation, travel distance, dead-end corridors (BC Building Code 2024, Part 3)",
+      "jurisdiction": "Province of BC; City of Vancouver (Vancouver Building By-law 2025 follows these clauses)",
+      "applies_to_districts": ["*"],
+      "check": "info_only",
+      "versions": [
+        {
+          "effective_from": "2025-03-10",
+          "params": {
+            "two_exits_over_floor_area_m2": 150,
+            "two_exits_over_occupant_load": 60,
+            "separation_min_m": 9,
+            "separation_share_of_diagonal": 0.5,
+            "travel_limit_sprinklered_m": 45,
+            "travel_limit_unsprinklered_m": 30,
+            "dead_end_max_m": 6,
+            "occupant_load_persons_per_sleeping_room": 2,
+            "sleeping_rooms_by_unit": {"studio": 1, "one_bed": 1, "two_bed": 2, "three_bed_plus": 3}
+          },
+          "source": {
+            "title": "BC Building Code 2024, Division B, Part 3 (Safety within floor areas; Exits)",
+            "url": "https://www.bccodes.ca/building-code.html",
+            "section": "Div B 3.4.2.1 (minimum number of exits: two, unless the floor area is not more than 150 m² and the occupant load not more than 60); 3.4.2.3 (least distance between two required exits: one half the maximum overall diagonal dimension of the floor area, but need not be more than 9 m for a sprinklered floor area or one with a public corridor); 3.4.2.4 and 3.4.2.5 (travel distance, measured from a suite door to the nearest exit where suites open on a public corridor; 45 m in a sprinklered floor area, 30 m otherwise, residential occupancy); 3.3.1.9 (dead-end corridors not more than 6 m long); 3.1.17.1 (occupant load of a dwelling unit: two persons per sleeping room)",
+            "verify": "The figures and clause numbers were entered from recollection of the NBC 2020 / BCBC 2024 clauses (3.4.2.1, 3.4.2.3, 3.4.2.4, 3.4.2.5, 3.3.1.9, 3.1.17.1), not read from the code text, and must be confirmed against it; in particular the exact wording of 3.4.2.3 (the 9 m cap is quoted as applying to a sprinklered floor area), the sentence of 3.3.1.9 that sets the 6 m dead end, the in-force date of BCBC 2024 (entered as 10 March 2025), and the Province's single-exit-stair provisions for residential buildings up to six storeys, which this rule does not model.",
+            "verified": false
+          }
+        }
+      ]
     }
   ]
 }

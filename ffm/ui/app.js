@@ -67,8 +67,14 @@ function withoutRepeat(title, finding) {
 function sourceLink(src) {
   if (!src || (!src.title && !src.url)) return "";
   const label = (src.title || src.url) + (src.section ? `, ${src.section}` : "");
-  if (src.url) return `<a href="${h(src.url)}" target="_blank" rel="noopener">${h(label)}</a>`;
-  return h(label);
+  if (src.url) return `<a href="${h(src.url)}" target="_blank" rel="noopener">${h(label)}</a>${unverifiedTag(src)}`;
+  return h(label) + unverifiedTag(src);
+}
+
+/* A rule whose figures were entered from recollection and not read from the document says so wherever it is cited
+   (16 Nov 2026: the district schedules seeded that day, the building code's exit clauses). */
+function unverifiedTag(src) {
+  return src && src.verified === false ? ` <span class="unverified" title="${h(src.verify || "Entered from recollection, not read from the document; confirm before relying on it")}">unverified</span>` : "";
 }
 
 /* Two backends, one call: the local Python server (python -m ffm ui), or, on a static host such as
@@ -198,8 +204,9 @@ def ffm_layout(site_json, option_json, as_of):
 
 from ffm import suggest, lookup
 
-def ffm_suggest(site_json, programs_json, as_of, candidate):
-    return json.dumps(suggest.suggest(json.loads(site_json), json.loads(programs_json), date.fromisoformat(as_of), candidate))
+def ffm_suggest(site_json, programs_json, as_of, candidate, mix_json=None):
+    mix = json.loads(mix_json) if mix_json else None
+    return json.dumps(suggest.suggest(json.loads(site_json), json.loads(programs_json), date.fromisoformat(as_of), candidate, mix_shares=mix))
 
 def ffm_read_site(site_json, as_of):
     return json.dumps(suggest.read_site(json.loads(site_json), date.fromisoformat(as_of)))
@@ -456,7 +463,7 @@ async function staticApi(path, opts) {
     throw new Error(`The web version has no route for ${p}.`);
   }
   if (p === "/api/run") return staticRun(body);
-  if (p === "/api/suggest") { await loadEngine(); return JSON.parse(engine.suggest(JSON.stringify(body.site), JSON.stringify(body.programs || []), body.as_of || todayISO(), body.candidate || "funder-ready")); }
+  if (p === "/api/suggest") { await loadEngine(); return JSON.parse(engine.suggest(JSON.stringify(body.site), JSON.stringify(body.programs || []), body.as_of || todayISO(), body.candidate || "funder-ready", body.mix_shares ? JSON.stringify(body.mix_shares) : "")); }
   if (p === "/api/layout") { await loadEngine(); return JSON.parse(engine.layout(JSON.stringify(body.site), JSON.stringify(body.option), body.as_of || todayISO())); }
   if (p === "/api/read-site") { await loadEngine(); return JSON.parse(engine.readSite(JSON.stringify(body.site), body.as_of || todayISO())); }
   if (/^\/api\/runs\/[^/]+\/[^/]+\/issue$/.test(p)) throw new Error("Issuing a run to another reader needs the local server (python -m ffm ui).");
@@ -612,7 +619,7 @@ const OPTION_FIELDS = [
    only the drawings use it; nothing means it is a note for people. `info` is the explanation behind the (i). */
 const FIELD_META = {
   "id": { need: "run", info: "Names the file (sites/<id>.json or options/<id>.json) and the outputs folder. Letters, digits and hyphens." },
-  "zoning_district": { need: "run", info: "The district schedule that applies without a rezoning, as the by-law writes it. The rule stack has outright limits for RM-1 and RM-1N (FSR 1.2, 10.7 m) and the SSMUH rule for R1-1, RS and RT; any other district, such as CD-1, gets 'not applicable' for those rules, so 'outright: yes' there means no coded limit was tested." },
+  "zoning_district": { need: "run", info: "The district schedule that applies without a rezoning, as the by-law writes it. The rule stack holds outright limits for RM-1/RM-1N and RT-3 (read from the schedules), and for RM-3, RM-3A, RM-4 and most of the RT family entered unverified (the memo says so), plus the SSMUH rule for R1-1, RS and RT. A district with no schedule, such as CD-1 (its own by-law), reads 'not assessed' and the rough envelope stands in." },
   "site_area_m2": { need: "run", info: "Divides the option's floor area into an FSR, sets Schedule C's minimum tree count (2,551 to 2,900 m² needs 20 trees) and sizes the outright mass." },
   "frontage_m": { need: "run", info: "With the depth, the rectangle the massing is drawn in. For an irregular lot use the rectangle with the same area and say so in the notes; the FSR still uses the recorded area." },
   "depth_m": { need: "run", info: "With the frontage, the rectangle the massing is drawn in; the street is along the frontage, the lane behind the depth." },
@@ -1505,7 +1512,7 @@ function stageSite(site) {
     <div class="stage-site">
       <div class="stage-map" id="stage-map" role="img" aria-label="The parcel on a map"><p class="help">Map loading…</p></div>
       <dl class="found-site">
-        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>${site.zoning_district && !scheduleFor(site.zoning_district) ? ` <span class="cont warn-text">· no ${h(site.zoning_district)} schedule in the rules: the envelope is yours to enter at stop 4</span>` : ""}` : "<i>not found: enter it in the Site card</i>"}</dd></div>
+        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>${districtWords(site)}` : "<i>not found: enter it in the Site card</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel: enter the area</i>"}${p.shape ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand in the tool</span>' : ""}</dd></div>
         <div><dt>${cornerStreets(site).length ? "Front" : "Street"}</dt><dd>${h(((site.context || {}).street || {}).name || (site.osm && site.osm.frame && site.osm.frame.front_street) || "not known")}${cornerStreets(site).length ? ` <span class="cont">· a corner lot with ${h(cornerStreets(site).find(s => s !== (((site.context || {}).street || {}).name)) || cornerStreets(site)[1])}; ${site.front_street ? "the front you chose" : "which street is the front is not confirmed: answer at stop 1, or the architect confirms it"}</span>` : ""}</dd></div>
         <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) + (site.owner_type ? ` <span class="cont">(${h(String(site.owner_type).replace(/_/g, " "))})</span>` : "") : "<i>not given</i>"}</dd></div>
@@ -1610,12 +1617,13 @@ async function mountStageMap(site) {
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }).addTo(map);
   if (ring && ring.length >= 3) {
     const latlngs = ring.map(p => [p[1], p[0]]);
-    const poly = L.polygon(latlngs, { color: "#2a6fb8", weight: 2, fillColor: "#3c8cdc", fillOpacity: 0.25 }).addTo(map);
+    // the parcel in the signal blue of the proposed mass, the one colour on a half-tone map (brand.css)
+    const poly = L.polygon(latlngs, { color: tok("--c-envelope-line", "#2a6fb8"), weight: 1.6, fillColor: tok("--c-envelope", "#3c8cdc"), fillOpacity: 0.28 }).addTo(map);
     poly.bindTooltip(`${site.address || site.id} · ${site.site_area_m2 ? fmtNum(site.site_area_m2) + " m²" : "parcel"}`);
     map.fitBounds(poly.getBounds().pad(0.6));
   } else {
     map.setView([c.lat, c.lon], 17);
-    L.circleMarker([c.lat, c.lon], { radius: 6, color: "#2a6fb8" }).addTo(map);
+    L.circleMarker([c.lat, c.lon], { radius: 6, color: tok("--c-envelope-line", "#2a6fb8"), fillColor: tok("--c-envelope", "#3c8cdc"), fillOpacity: 0.5 }).addTo(map);
   }
   setTimeout(() => map.invalidateSize(), 50);
 }
@@ -1651,11 +1659,12 @@ function renderMemo(run) {
       <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
       ${cmpCell}
     </div>
+    ${optionFiguresHtml(site, opt, run)}
     <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
   </div>`);
   // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
   const note = (run.issues || []).filter(i => i.to === state.mode).slice(-1)[0];
-  if (note) parts.push(`<div class="card issue-note"><b>From the ${h(note.by)}, ${h(String(note.issued_at || "").replace("T", " ").slice(0, 16))}:</b> ${note.note ? h(note.note) : "<i>no note</i>"}</div>`);
+  if (note) parts.push(`<div class="card issue-note"><b>From ${note.name ? `${h(note.name)} (the ${h(note.by)})` : `the ${h(note.by)}`}, ${h(String(note.issued_at || "").replace("T", " ").slice(0, 16))}:</b> ${note.note ? h(note.note) : "<i>no note</i>"}</div>`);
 
   // 2. a comparison comes straight after the title block: the two runs side by side, their pickers heading the A
   // and B columns, then What changed; 3. the three answers; 4. the massing figures beside them at >=1600 px, under
@@ -1699,6 +1708,25 @@ function renderMemo(run) {
 
 /* An option's name as the reader knows it. */
 const optionName = L => (L && L.inputs && L.inputs.option && (L.inputs.option.name || L.inputs.option.id)) || "option";
+
+/* The option in figures, under the title block, in every view (16 Nov 2026: after a run the stage's figures left
+   the screen and only the folded Option card still had them): the envelope, the homes, the tiers, the tenure. */
+function optionFiguresHtml(site, opt, run) {
+  const units = opt.units || {};
+  const n = Object.values(units).reduce((t, v) => t + (v || 0), 0);
+  const fsr = opt.gfa_m2 && site.site_area_m2 ? (opt.gfa_m2 / site.site_area_m2).toFixed(2) : null;
+  const tiers = opt.rent_tiers_units;
+  const pm = run && run.massing && run.massing.masses && run.massing.masses.find(x => x.name === "proposed");
+  const cell = (k, v, sub) => `<div><b>${h(k)}</b><span>${v}${sub ? ` <span class="cont">${sub}</span>` : ""}</span></div>`;
+  return `<div class="memo-figures">
+    ${cell("Storeys", opt.storeys != null ? h(opt.storeys) : "<i>not given</i>", opt.height_m != null ? `· ${h(opt.height_m)} m` : "")}
+    ${cell("Floor area", opt.gfa_m2 != null ? `${h(fmtNum(opt.gfa_m2))} m²` : "<i>not given</i>", fsr ? `· FSR ${h(fsr)}` : "")}
+    ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `${v} ${UNIT_WORD[k] || k}`).join(", ")}` : "")}
+    ${cell("Rent tiers", tiers ? `${h(tiers.market || 0)} market · ${h(tiers.rgi || 0)} RGI · ${h(tiers.deep_subsidy || 0)} deep subsidy` : "<i>not split</i>", "")}
+    ${cell("Tenure", h(String(opt.tenure || "not set").replace(/_/g, " ")), opt.housing_agreement_years ? `· ${h(opt.housing_agreement_years)}-year agreement` : "")}
+    ${cell("Plate", pm ? `${h(pm.plate_width_m)} × ${h(pm.plate_depth_m)} m` : "<i>no massing</i>", pm ? `· ${h(fmtNum(pm.plate_area_m2))} m² a floor` : "")}
+  </div>`;
+}
 
 /* The paper memo's references, A1 to F7: the layer's letter and the rule's place in it, in the ledger's order. The
    screen cites the same, so a planner's "re C5" means the same thing in both renderings. Pure. */
@@ -1795,7 +1823,25 @@ function layoutOpenItems(run) {
     out.push({ title: "Blocks placed by hand that break the plate", status: "fail",
       action: `Architect: ${broken.length} problem${broken.length === 1 ? "" : "s"} in the hand placement: ${broken.slice(0, 3).map(g => g.note || g.kind || "").join("; ")}${broken.length > 3 ? "; …" : ""}. Fix them in Edit blocks before issuing.` });
   }
+  // the exits, from the building code (bcbc.exits): a floor over the travel distance, with its stairs too close
+  // together, or a corridor running past the last exit is the architect's to fix in the block editor (16 Nov 2026)
+  const eg = lay.egress;
+  if (eg && ["fail", "conditional", "uncertain"].includes(eg.status)) {
+    const bad = (eg.floors || []).filter(f => f.status !== "pass");
+    const first = bad[0];
+    out.push({ rule_id: eg.rule_id, title: "Exits: travel distance, separation and dead ends (BC Building Code)", status: eg.status,
+      action: `Architect: ${bad.length} of ${(eg.floors || []).length} floors ${bad.length === 1 ? "does" : "do"} not pass the exit clauses${first ? ` (${first.name}: ${egressLine(first)})` : ""}. ${eg.summary || ""} Move or add a core in Edit blocks; the sprinkler assumption${eg.sprinklered_is_placeholder ? " is a placeholder" : ""} and the clause figures are unverified against the code text.` });
+  }
   return out;
+}
+
+/* One floor's egress in a line, as the plans sheet prints it. Pure. */
+function egressLine(f) {
+  const parts = [`exits ${f.exits} of ${f.exits_required}`];
+  if (f.farthest_travel_m != null) parts.push(`travel ${f.farthest_travel_m.toFixed(1)} m of ${f.travel_limit_m}`);
+  if (f.separation_min_m != null && f.separation_m != null) parts.push(`separation ${f.separation_m.toFixed(1)} m of ${f.separation_min_m}`);
+  if (f.dead_end_m != null) parts.push(`dead end ${f.dead_end_m.toFixed(1)} m of ${f.dead_end_limit_m}`);
+  return parts.join(" · ");
 }
 
 function answerUnsure(L, run) {
@@ -1947,7 +1993,7 @@ function renderClauses(res, L, changed = new Set()) {
   const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
     const s = splitValues(r, L);
     return `<tr class="st-${h(r.status)}">
-      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
+      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
       <td class="status">${pill(r.status)}</td>
       <td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>
@@ -2298,11 +2344,14 @@ function siteContext(site, m) {
    strips of their width, building footprints (extruded in 3D by their tagged height or storeys), mapped trees,
    all already in the lot's metres. The lot's own trees from the site file stay as they are. */
 function osmContext(site, m, base) {
-  const o = site.osm, W = m.lot.frontage_m, D = m.lot.depth_m;
+  const o0 = site.osm, W = m.lot.frontage_m, D = m.lot.depth_m;
+  // the lot turned to a chosen front face (massing's lot.orientation: new = R(θ)·old + t) turns the stored context
+  // with it, so the streets and buildings still stand where they do around the lot (16 Nov 2026)
+  const o = m.lot.orientation ? orientedOsm(o0, m.lot.orientation) : o0;
   const r = (o.radius_m || 120) * 0.92;
   const ground = [], labels = [], seen = new Set();
   // the address street is always named, beside the lot and clear of the frontage dimension along its front
-  const front = o.frame && o.frame.front_street;
+  const front = (m.lot.front_face && m.lot.front_face.street) || (o.frame && o.frame.front_street);
   if (front) {
     let best = null;
     for (const road of (o.roads || []).filter(x => x.name === front)) {
@@ -2351,8 +2400,19 @@ function osmContext(site, m, base) {
   return Object.assign({}, base, {
     ground, labels, buildings, osmTrees, streetTrees: [],
     xmin: W / 2 - r, xmax: W / 2 + r, ymin: D / 2 - r, ymax: D / 2 + r, frameRadius: r * 0.75,
-    osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: o.frame && o.frame.front_street,
-           bearing: o.frame && typeof o.frame.x_axis_bearing_deg === "number" ? o.frame.x_axis_bearing_deg : null },
+    osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: front || (o.frame && o.frame.front_street),
+           bearing: o.frame && typeof o.frame.x_axis_bearing_deg === "number" ? (o.frame.x_axis_bearing_deg - (m.lot.orientation ? m.lot.orientation.rotate_deg : 0) + 360) % 360 : null },
+  });
+}
+
+/* The stored context with the lot's orientation applied to every point (roads, buildings, trees). Pure. */
+function orientedOsm(o, or) {
+  const th = (or.rotate_deg || 0) * Math.PI / 180, c = Math.cos(th), s = Math.sin(th);
+  const T = ([x, y]) => [c * x - s * y + (or.tx || 0), s * x + c * y + (or.ty || 0)];
+  return Object.assign({}, o, {
+    roads: (o.roads || []).map(rd => Object.assign({}, rd, { points: (rd.points || []).map(T) })),
+    buildings: (o.buildings || []).map(b => Object.assign({}, b, { polygon: (b.polygon || []).map(T) })),
+    trees: (o.trees || []).map(t => { const [x, y] = T([t.x, t.y]); return Object.assign({}, t, { x, y }); }),
   });
 }
 
@@ -2769,15 +2829,90 @@ function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
 function figOne(m, ctx, fs = null) {
   const three = VIEW3D.mode === "3d";
   return `<div class="fig-head">
-      <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}${m.lot.source === "drawn" ? ' <span class="cont">· boundary drawn by hand</span>' : ""}</div>
+      <div class="eyebrow">FIG 01 · ${three ? "Axonometric" : "Plan"}${m.lot.source === "drawn" ? ' <span class="cont">· boundary drawn by hand</span>' : ""}${m.lot.front_face ? ` <span class="cont">· front on ${h(frontFaceWords(m.lot.front_face))}</span>` : ""}</div>
       <div class="seg" role="group" aria-label="View of figure 1">
         <button type="button" class="segbtn" data-view="plan" aria-pressed="${!three}">Plan</button>
         <button type="button" class="segbtn" data-view="3d" aria-pressed="${three}">3D</button>
       </div>
       ${boundaryTools(m)}
     </div>
+    ${massTools(m)}
     <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m, ctx, VIEW3D.az, VIEW3D.el, fs) : figPlan(m, ctx, fs)}</div>
     ${three ? `<p class="fig-hint">Drag sideways to turn it; the arrow keys turn and tilt it. A straight axonometric of the same massing numbers, with storey lines every ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
+}
+
+const frontFaceWords = ff => ff.street ? ff.street : (ff.side ? `the ${ff.side} side` : (ff.edge != null ? `lot edge ${ff.edge}` : "the chosen face"));
+const ANCHOR_NAMES = [["front-left", "Front, left"], ["front", "Front, centred"], ["front-right", "Front, right"], ["left", "Left, middle"], ["centre", "Centred"], ["right", "Right, middle"], ["rear-left", "Rear, left"], ["rear", "Rear, centred"], ["rear-right", "Rear, right"]];
+const mass = { open: false, busy: false };
+
+/* The architect's placement of the mass and the choice of front face (16 Nov 2026): a fold under FIG 01's head.
+   The mass goes against a side or corner of the plate box (the envelope's largest rectangle), shifted and turned a
+   quarter; the front face is one of the streets that adjoin the lot, or a side of it. The engine rebuilds the
+   massing and the sheets from the choice; the option (massing) and the site (front_face) carry it. */
+function massTools(m) {
+  if (state.mode !== "architect" || !state.option || !state.site) return "";
+  const pm = m.masses.find(x => x.name === "proposed") || {};
+  const pl = pm.placement || {};
+  const cur = Object.assign({ anchor: pl.anchor || (pm.at_street_corner === "right" ? "front-right" : "front-left"), dx_m: pl.dx_m || 0, dy_m: pl.dy_m || 0, rotate: !!pl.rotate }, state.option.massing || {});
+  const roads = [...new Set(((state.site.osm || {}).roads || []).map(r => r.name).filter(Boolean))].sort();
+  const ff = state.site.front_face || null;
+  const ffVal = ff ? (ff.street ? `street:${ff.street}` : ff.side ? `side:${ff.side}` : ff.edge != null ? `edge:${ff.edge}` : "") : "";
+  const corners = m.lot.corners || null;
+  const box = m.envelope.box || {};
+  return `<details class="mass-tools"${mass.open ? " open" : ""}><summary>Place the mass and choose the front <span class="cont">· ${h(ANCHOR_NAMES.find(([k]) => k === cur.anchor)?.[1] || cur.anchor)}${cur.dx_m || cur.dy_m ? `, shifted ${h(cur.dx_m)} / ${h(cur.dy_m)} m` : ""}${cur.rotate ? ", turned a quarter" : ""}${pl.clamped ? " · held inside the envelope" : ""}</span></summary>
+    <div class="mass-row">
+      <div class="mass-anchor" role="group" aria-label="Where the mass stands in the plate box">${ANCHOR_NAMES.map(([k, l]) => `<button type="button" class="segbtn" data-anchor="${k}" aria-pressed="${cur.anchor === k}" title="${h(l)}"><span class="sr-only">${h(l)}</span></button>`).join("")}</div>
+      <label class="field inline"><span class="label">Across (m)</span><input type="number" step="0.5" id="mass-dx" value="${h(cur.dx_m)}" aria-label="Shift along the frontage in metres"></label>
+      <label class="field inline"><span class="label">Back (m)</span><input type="number" step="0.5" id="mass-dy" value="${h(cur.dy_m)}" aria-label="Shift into the lot in metres"></label>
+      <label class="ed-acc"><input type="checkbox" id="mass-rotate"${cur.rotate ? " checked" : ""}> turn a quarter</label>
+      <label class="field inline"><span class="label">Front</span><select id="mass-front" aria-label="Which face of the lot is the street side">
+        <option value=""${ffVal === "" ? " selected" : ""}>as found (${h((state.site.context && state.site.context.street && state.site.context.street.name) || "the lookup's street")})</option>
+        ${roads.map(r => `<option value="street:${h(r)}"${ffVal === `street:${r}` ? " selected" : ""}>${h(r)}</option>`).join("")}
+        ${["front", "rear", "left", "right"].map(s => `<option value="side:${s}"${ffVal === `side:${s}` ? " selected" : ""}>the ${s} side as drawn</option>`).join("")}
+        ${corners ? corners.map((c, i) => `<option value="edge:${i}"${ffVal === `edge:${i}` ? " selected" : ""}>lot edge ${i} (${h(Math.round(Math.hypot(corners[(i + 1) % corners.length][0] - c[0], corners[(i + 1) % corners.length][1] - c[1]) * 10) / 10)} m)</option>`).join("") : ""}
+      </select></label>
+      <button type="button" class="btn btn-small btn-primary" id="mass-apply"${mass.busy ? " disabled" : ""}>${mass.busy ? "Rebuilding…" : "Place it"}</button>
+      <span class="help">Inside the plate box, ${h(box.w ?? m.envelope.width_m)} × ${h(box.d ?? m.envelope.depth_m)} m; a shift past it is held back and said so. The front sets the yards and turns the lot; the sheets follow. Run the rules to make the memo from it.</span>
+    </div>
+  </details>`;
+}
+
+function wireMassTools(fig, run, redraw) {
+  const box = $(".mass-tools", fig);
+  if (!box) return;
+  box.addEventListener("toggle", () => { mass.open = box.open; });
+  $$("[data-anchor]", box).forEach(b => b.addEventListener("click", () => { $$("[data-anchor]", box).forEach(x => x.setAttribute("aria-pressed", String(x === b))); }));
+  $("#mass-apply", box).addEventListener("click", async () => {
+    if (mass.busy || !state.option || !state.site) return;
+    const anchor = ($('[data-anchor][aria-pressed="true"]', box) || {}).dataset?.anchor || "front-left";
+    const spec = { anchor, dx_m: Number($("#mass-dx", box).value) || 0, dy_m: Number($("#mass-dy", box).value) || 0, rotate: $("#mass-rotate", box).checked };
+    const fv = $("#mass-front", box).value;
+    const before = JSON.stringify(state.site.front_face || null);
+    if (!fv) delete state.site.front_face;
+    else if (fv.startsWith("street:")) state.site.front_face = { street: fv.slice(7) };
+    else if (fv.startsWith("side:")) state.site.front_face = { side: fv.slice(5) };
+    else if (fv.startsWith("edge:")) state.site.front_face = { edge: Number(fv.slice(5)) };
+    const frontChanged = JSON.stringify(state.site.front_face || null) !== before;
+    state.option.massing = spec;
+    state.optionDirty = true; $("#option-dirty").hidden = false;
+    if (frontChanged) { state.siteDirty = true; $("#site-dirty").hidden = false; }
+    mass.busy = true; mass.open = true; redraw();
+    try {
+      const res = await postJSON("/api/layout", { site: state.site, option: state.option, as_of: $("#as-of").value || todayISO() });
+      run.massing = res.massing; run.layout = res.layout; run.sheets = res.sheets;
+      if (run.ledger && run.ledger.inputs) { run.ledger.inputs.site = JSON.parse(JSON.stringify(state.site)); run.ledger.inputs.option = JSON.parse(JSON.stringify(state.option)); }
+      mass.busy = false;
+      refreshSummary("option"); if (frontChanged) refreshSummary("site");
+      markStale("the massing placement");
+      rerenderFigures(run);
+      const pm = run.massing.masses.find(x => x.name === "proposed") || {};
+      const warn = (run.massing.warnings || []).filter(w => /moved|turned plate|front/i.test(w));
+      setStatus(`The mass stands ${ANCHOR_NAMES.find(([k]) => k === anchor)?.[1].toLowerCase() || anchor}${spec.rotate ? ", turned a quarter" : ""}: plate ${pm.plate_width_m} × ${pm.plate_depth_m} m${frontChanged ? `; the front is ${state.site.front_face ? frontFaceWords(state.site.front_face) : "as found"} and the lot is turned to it` : ""}.${warn.length ? ` ${warn[0]}` : ""} The sheets follow; Run the rules makes the memo from it.`, warn.length ? "info" : "ok");
+    } catch (e) {
+      mass.busy = false; redraw();
+      toast(`Could not place the mass: ${e.message}`, true);
+    }
+  });
 }
 
 let figWatch = null;   // the ResizeObserver that refits the drawings' labels when their cards change width
@@ -2798,6 +2933,7 @@ function wireFigures(run) {
   };
   const redraw = () => { fig.innerHTML = figOne(m, ctx); wireFigures(run); };
   wireBoundary(fig, run, redraw);
+  wireMassTools(fig, run, redraw);
   $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => {
     if (VIEW3D.mode === b.dataset.view) return;
     VIEW3D.mode = b.dataset.view;
@@ -2938,6 +3074,7 @@ function renderSheets(run, n0) {
     <div class="sheet-editor" id="sheet-editor" hidden></div>
     <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
     <ul class="finding-list sheet-rules">${broken}${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
+    ${egressHtml(L.egress)}
   </figure>`);
   out.push(`<figure class="card figure sheet layout-sheet"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div><div class="sheet-body">${S.stacking || ""}</div>
     <figcaption>One bar per floor, top first; each segment the share of the plate a block takes. Core and corridor are the same on every floor; what is left after the units is spare, dashed.</figcaption></figure>`);
@@ -2946,6 +3083,19 @@ function renderSheets(run, n0) {
   out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 3)} · Code site plan</div><div class="sheet-body">${S["site-plan"] || ""}</div>
     <figcaption>The lot, the yards dimensioned, the setback envelope dashed red, the footprint blue, tree protection barriers where the survey gives positions; the table reads FSR, height, coverage and yards against the schedule where the stack has one.</figcaption></figure>`);
   return out;
+}
+
+/* The exits on every floor, from the building code: under the plans, each floor a line with its status; the
+   limits and the assumptions behind them named once. */
+function egressHtml(eg) {
+  if (!eg) return "";
+  const floors = eg.floors || [];
+  const lim = eg.limits || {};
+  return `<details class="egress"${eg.status === "pass" ? "" : " open"}>
+    <summary>${pill(eg.status)} <b>Exits</b> <span class="cont">· ${refOf(eg.rule_id) ? `<b class="ref">${h(refOf(eg.rule_id))}</b> ` : ""}BC Building Code 2024, Part 3 · ${h(eg.summary || "")}</span></summary>
+    <ul class="finding-list">${floors.map(f => `<li>${pill(f.status)}<span><span class="title">${h(f.name)}:</span> <span class="cont">${h(egressLine(f))}${f.notes && f.notes.length ? `. ${h(f.notes.join(" "))}` : ""}</span></span></li>`).join("")}</ul>
+    <p class="help">Two exits over ${h(lim.two_exits_over_floor_area_m2)} m² or ${h(lim.two_exits_over_occupant_load)} persons; travel at most ${h(lim.travel_limit_m)} m (${eg.sprinklered ? "sprinklered" : "not sprinklered"}${eg.sprinklered_is_placeholder ? ", assumed" : ""}); stairs at least the lesser of ${h(lim.separation_min_m)} m and half the diagonal apart; a dead end at most ${h(lim.dead_end_max_m)} m. A core ${h(lim.core_bay_m)} m wide holds two stairs of ${h(lim.stair_width_m)} m. The clause figures are entered from recollection and unverified against the code text.</p>
+  </details>`;
 }
 
 function wireSheets() {
@@ -2965,15 +3115,33 @@ function wireSheets() {
    the engine measures every move (POST /api/layout, or the engine in the browser) and says what broke and
    which rules still hold; the other sheets redraw from the same check. Apply writes the placement into the
    option (`layout.zones`), so Run the rules reproduces it and the memo says it was placed by hand. */
-const editor = { open: false, level: 0, zones: null, sel: null, dirty: false, result: null, timer: 0, busy: false, applied: false };
+const editor = { open: false, level: 0, zones: null, sel: null, dirty: false, result: null, timer: 0, busy: false, applied: false, grid: 0.1, blank: false };
 const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"]];
-const ZONE_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a" };
+const ZONE_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0" };
 const ZONE_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res" };
+const zoneShort = z => z.block === "other" ? String(z.label || "other").slice(0, 12).toLowerCase() : (ZONE_SHORT[z.block] || z.block);
+/* the grid the blocks snap to in the editor: fine (0.1 m) or a planning module the architect chooses (16 Nov 2026) */
+const GRIDS = [[0.1, "0.1 m (fine)"], [0.5, "0.5 m"], [1, "1 m"], [1.5, "1.5 m"], [3, "3 m"], [6, "6 m"]];
 
 function zonesFromLayout(L) {
   const out = {};
-  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}) }));
+  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}), ...(z.block === "other" ? { label: z.label } : {}) }));
   return out;
+}
+
+/* What the program asks for against what the editor has placed on every floor: one row per block, with what is
+   left to place; the architect's own programs (option.layout.extra_programs) are rows too. Pure. */
+function programTracker(L, zones) {
+  const all = Object.values(zones || {}).flat();
+  const rows = (L.program || []).map(b => {
+    const unit = ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(b.key);
+    const mine = all.filter(z => b.key === "other" ? (z.block === "other" && String(z.label || "").trim().toLowerCase() === String(b.label).trim().toLowerCase()) : z.block === b.key);
+    const placedArea = mine.reduce((t, z) => t + z.w * z.d, 0);
+    return unit ? { key: b.key, label: b.label, unit: true, need: b.count, placed: mine.length, left: b.count - mine.length, each: b.gross_m2_each }
+      : { key: b.key, label: b.label, unit: false, need: b.area_m2, placed: Math.round(placedArea), left: Math.round(b.area_m2 - placedArea) };
+  });
+  const cores = all.filter(z => z.block === "core").length, corridors = all.filter(z => z.block === "corridor").length;
+  return { rows, cores, corridors, done: rows.every(r => r.left <= (r.unit ? 0 : 1)) };
 }
 
 function openEditor() {
@@ -3029,38 +3197,81 @@ function renderEditor() {
   const svgZones = zs.map((z, i) => {
     const r = rect(z);
     const isSel = i === editor.sel;
-    return `<g class="ed-zone${isSel ? " sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(ZONE_SHORT[z.block] || z.block)} at ${z.x}, ${z.y} m">
+    return `<g class="ed-zone${isSel ? " sel" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(zoneShort(z))} at ${z.x}, ${z.y} m">
       <rect x="${r.x.toFixed(1)}" y="${r.y.toFixed(1)}" width="${r.w.toFixed(1)}" height="${r.d.toFixed(1)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="${isSel ? "#245f9c" : "#5f6672"}" stroke-width="${isSel ? 2 : 0.8}"/>
       ${z.accessible ? `<circle cx="${(r.x + 7).toFixed(1)}" cy="${(r.y + 7).toFixed(1)}" r="3.2" fill="#245f9c"/>` : ""}
-      ${r.w > 24 && r.d > 12 ? `<text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(ZONE_SHORT[z.block] || z.block)}</text>` : ""}
+      ${r.w > 24 && r.d > 12 ? `<text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(zoneShort(z))}</text>` : ""}
       ${isSel ? `<rect class="ed-handle ed-handle-w" x="${(r.x + r.w - 4).toFixed(1)}" y="${(r.y + r.d / 2 - 6).toFixed(1)}" width="8" height="12" fill="#245f9c"/><rect class="ed-handle ed-handle-d" x="${(r.x + r.w / 2 - 6).toFixed(1)}" y="${(r.y - 4).toFixed(1)}" width="12" height="8" fill="#245f9c"/>` : ""}
     </g>`;
   }).join("");
+  // the grid, drawn faint when a module is chosen, so the architect sees what the blocks snap to
+  const g = editor.grid || 0.1;
+  const gridLines = g >= 0.5 ? (() => {
+    let s = "";
+    for (let x = 0; x <= p.width_m + 1e-6; x += g) s += `<line x1="${(20 + x * scale).toFixed(1)}" y1="20" x2="${(20 + x * scale).toFixed(1)}" y2="${(20 + p.depth_m * scale).toFixed(1)}"/>`;
+    for (let y = 0; y <= p.depth_m + 1e-6; y += g) s += `<line x1="20" y1="${(20 + y * scale).toFixed(1)}" x2="${(20 + p.width_m * scale).toFixed(1)}" y2="${(20 + y * scale).toFixed(1)}"/>`;
+    return `<g stroke="#c9d1da" stroke-width="0.5" opacity="0.7">${s}</g>`;
+  })() : "";
+  // the program tracker: what is still to place, each row a button that adds that block to this floor
+  const tr = programTracker(L, editor.zones);
+  const extras = ((state.option && state.option.layout && state.option.layout.extra_programs) || []);
+  const addOpts = EDIT_BLOCKS.map(([k, l]) => `<option value="${k}">${h(l)}</option>`).join("") + extras.map(e => `<option value="other:${h(e.label)}">${h(e.label)} (yours)</option>`).join("");
+  const egF = L.egress && (L.egress.floors || []).find(f => f.level === editor.level);
   box.innerHTML = `
     <div class="ed-bar">
       <div class="seg" role="group" aria-label="Floor">${floorsBtns}</div>
-      <label class="field inline"><span class="label">Add</span><select id="ed-add"><option value="">a block…</option>${EDIT_BLOCKS.map(([k, l]) => `<option value="${k}">${h(l)}</option>`).join("")}</select></label>
-      ${sel ? `<span class="ed-sel">${h(EDIT_BLOCKS.find(([k]) => k === sel.block)?.[1] || sel.block)} · ${h(sel.w)} × ${h(sel.d)} m, ${h(fmtNum(Math.round(sel.w * sel.d)))} m²${over}
+      <label class="field inline"><span class="label">Add</span><select id="ed-add"><option value="">a block…</option>${addOpts}</select></label>
+      <label class="field inline"><span class="label">Grid</span><select id="ed-grid" title="What the blocks snap to when moved, resized or added">${GRIDS.map(([v, l]) => `<option value="${v}"${Math.abs(v - g) < 1e-9 ? " selected" : ""}>${h(l)}</option>`).join("")}</select></label>
+      ${sel ? `<span class="ed-sel">${h(sel.block === "other" ? (sel.label || "Other") : (EDIT_BLOCKS.find(([k]) => k === sel.block)?.[1] || sel.block))} · ${h(sel.w)} × ${h(sel.d)} m, ${h(fmtNum(Math.round(sel.w * sel.d)))} m²${over}
         <label class="field inline"><span class="label">to floor</span><select id="ed-move">${L.floors.map(fl => `<option value="${fl.level}"${fl.level === editor.level ? " selected" : ""}>${h(fl.level === 0 ? "Ground" : `L${fl.level + 1}`)}</option>`).join("")}</select></label>
         ${sel.block in ZONE_TONE && ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(sel.block) ? `<label class="ed-acc"><input type="checkbox" id="ed-acc"${sel.accessible ? " checked" : ""}> accessible</label>` : ""}
         <button type="button" class="btn btn-small btn-quiet" id="ed-del">Remove</button></span>` : `<span class="help">Click a block to select it; drag to move, pull the handles to resize.</span>`}
     </div>
     <svg class="ed-canvas" viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="application" aria-label="Block editor, ${h(L.floors[editor.level].name)}">
       <rect x="20" y="20" width="${(p.width_m * scale).toFixed(1)}" height="${(p.depth_m * scale).toFixed(1)}" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-      <text x="${(20 + p.width_m * scale / 2).toFixed(1)}" y="${(H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672">street · ${h(p.width_m)} m · blocks snap to each other's edges and to the corridor</text>
+      ${gridLines}
+      <text x="${(20 + p.width_m * scale / 2).toFixed(1)}" y="${(H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672">street · ${h(p.width_m)} m · blocks snap to the ${g >= 0.5 ? `${g} m grid, ` : ""}other blocks' edges and the corridor</text>
       ${svgZones}
     </svg>
     <div class="ed-status">
       ${editor.busy ? `<span class="help">Checking…</span>` : ""}
       ${floorChecks.length ? `<ul class="finding-list">${floorChecks.map(g => `<li>${pill("fail")}<span>${h(g.note)}</span></li>`).join("")}</ul>` : `<span class="help">${editor.result ? `Nothing broken on this floor. ${(L.geometry || []).length ? `${L.geometry.length} on other floors.` : ""}` : ""}</span>`}
+      ${egF ? `<span class="help">${pill(egF.status)} Exits on this floor: ${h(egressLine(egF))}${egF.notes && egF.notes.length ? ` <span class="cont">· ${h(egF.notes[0])}</span>` : ""}</span>` : ""}
       <span class="help">${h(L.units_placed)} of ${h(L.units_total)} units placed${(L.shortfall || []).length ? `; missing: ${h(L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()}`).join(", "))}` : ""} · ${h((L.adjacencies || []).filter(c => c.status === "pass").length)} rules hold, ${h((L.adjacencies || []).filter(c => c.status === "conditional").length)} conditional</span>
     </div>
+    <details class="ed-tracker"${tr.done ? "" : " open"}>
+      <summary><b>Program left to place</b> <span class="cont">· ${tr.done ? "everything placed" : `${tr.rows.filter(r => r.left > (r.unit ? 0 : 1)).length} of ${tr.rows.length} blocks short`} · ${tr.cores} core${tr.cores === 1 ? "" : "s"}, ${tr.corridors} corridor${tr.corridors === 1 ? "" : "s"} on all floors</span></summary>
+      <table class="plain ed-track"><thead><tr><th>Block</th><th>Program</th><th>Placed</th><th>Left</th><th></th></tr></thead><tbody>
+        ${tr.rows.map(r => `<tr class="${r.left > (r.unit ? 0 : 1) ? "short" : (r.left < (r.unit ? 0 : -1) ? "over" : "ok")}"><td>${h(r.label)}</td><td class="num">${r.unit ? `${r.need} × ${h(fmtNum(Math.round(r.each)))} m²` : `${h(fmtNum(Math.round(r.need)))} m²`}</td><td class="num">${r.unit ? r.placed : `${h(fmtNum(r.placed))} m²`}</td><td class="num">${r.unit ? (r.left > 0 ? r.left : (r.left < 0 ? `${-r.left} over` : "—")) : (r.left > 1 ? `${h(fmtNum(r.left))} m²` : (r.left < -1 ? `${h(fmtNum(-r.left))} m² over` : "—"))}</td><td><button type="button" class="btn btn-small btn-quiet" data-ed-track="${h(r.key)}" data-ed-label="${h(r.label)}" title="Add one to this floor">+ here</button></td></tr>`).join("")}
+      </tbody></table>
+      <div class="ed-newprog"><span class="label">Add a program of your own</span>
+        <input type="text" id="ed-prog-label" placeholder="e.g. Childcare" maxlength="40" aria-label="Program name">
+        <input type="number" id="ed-prog-area" placeholder="m²" min="1" step="1" aria-label="Program area in square metres">
+        <button type="button" class="btn btn-small" id="ed-prog-add">Add to the program</button>
+        <span class="help">It joins the tracker and the option (layout.extra_programs); place it with + here.</span>
+      </div>
+    </details>
     <div class="form-actions">
       <button type="button" class="btn btn-primary btn-small" id="ed-apply"${editor.dirty || !editor.applied ? "" : " disabled"}>${problems ? `Apply with ${problems} problem${problems === 1 ? "" : "s"}` : "Apply to the option"}</button>
       <button type="button" class="btn btn-small btn-quiet" id="ed-reset">Back to the solver's</button>
+      <button type="button" class="btn btn-small btn-quiet" id="ed-blank" title="Clear every floor and place the blocks yourself, from the tracker">Start from a blank plate</button>
       <span class="help">${editor.applied && !editor.dirty ? "Applied: Run the rules reproduces this placement; Save option as… keeps it." : (problems ? "The memo will list the problems as open items for the architect until they are fixed." : "Nothing is in the option until you apply.")}</span>
     </div>`;
   wireEditor(box, scale, p);
+}
+
+/* A block of this kind sized for the program: units at the plate's unit depth and their gross area, a corridor
+   the plate's width, a core a bay wide and the plate deep, anything else about 8 m deep. Pure. */
+function newBlock(kind, label, L, p) {
+  const strip = L.plate.unit_depth_m;
+  const prog = (L.program || []).find(b => kind === "other" ? (b.key === "other" && b.label === label) : b.key === kind);
+  const unit = ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(kind);
+  const d = unit ? strip : (kind === "corridor" ? 1.8 : (kind === "core" ? p.depth_m : Math.min(8, p.depth_m)));
+  const area = prog ? (prog.gross_m2_each || prog.area_m2) : null;
+  const w = area ? Math.round(area / d * 10) / 10 : (kind === "corridor" ? p.width_m : (kind === "core" ? 7 : 8));
+  const z = { block: kind, x: p.x, y: p.y, w: Math.min(w, p.width_m), d: Math.min(d, p.depth_m) };
+  if (kind === "other") z.label = label || "Other";
+  return z;
 }
 
 function wireEditor(box, scale, p) {
@@ -3068,13 +3279,49 @@ function wireEditor(box, scale, p) {
   const zs = editor.zones[String(editor.level)];
   const L = editor.result || state.run.layout;
   const strip = L.plate.unit_depth_m;
-  $("#ed-add", box).addEventListener("change", e => {
-    const k = e.target.value; if (!k) return;
-    const prog = (L.program || []).find(b => b.key === k);
-    const d = ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(k) ? strip : (k === "corridor" ? 1.8 : (k === "core" ? p.depth_m : Math.min(8, p.depth_m)));
-    const w = prog && prog.gross_m2_each ? Math.round(prog.gross_m2_each / d * 10) / 10 : (k === "corridor" ? p.width_m : (k === "core" ? 7 : 8));
-    zs.push({ block: k, x: p.x, y: p.y, w: Math.min(w, p.width_m), d: Math.min(d, p.depth_m) });
+  // a block added lands in the first free spot on this floor, sized for the program and snapped to the grid
+  const addBlock = (kind, label) => {
+    const z = newBlock(kind, label, L, p);
+    const spot = freeSpot(zs, z, p, strip);
+    if (spot) { z.x = spot[0]; z.y = spot[1]; }
+    const g = editor.grid || 0.1;
+    z.w = Math.max(g, Math.round(z.w / g) * g); z.d = Math.max(g, Math.round(z.d / g) * g);
+    z.w = Math.round(Math.min(z.w, p.width_m) * 100) / 100; z.d = Math.round(Math.min(z.d, p.depth_m) * 100) / 100;
+    zs.push(z);
     editor.sel = zs.length - 1; editor.dirty = true; renderEditor(); scheduleCheck();
+    if (!spot) setStatus(`No free room on this floor for a ${z.w} × ${z.d} m block: it sits at the front-left corner and overlaps; move or remove something.`, "busy");
+  };
+  $("#ed-add", box).addEventListener("change", e => {
+    const v = e.target.value; if (!v) return;
+    if (v.startsWith("other:")) addBlock("other", v.slice(6)); else addBlock(v, null);
+  });
+  $$("[data-ed-track]", box).forEach(b => b.addEventListener("click", () => addBlock(b.dataset.edTrack, b.dataset.edLabel)));
+  $("#ed-grid", box).addEventListener("change", e => { editor.grid = Number(e.target.value) || 0.1; renderEditor(); });
+  $("#ed-prog-add", box).addEventListener("click", () => {
+    const label = ($("#ed-prog-label", box).value || "").trim(), area = Number($("#ed-prog-area", box).value);
+    if (!label || !(area > 0)) { toast("A program needs a name and an area in m².", true); return; }
+    if (!state.option) return;
+    state.option.layout = Object.assign({}, state.option.layout || {});
+    const list = (state.option.layout.extra_programs = (state.option.layout.extra_programs || []).filter(x => x.label.toLowerCase() !== label.toLowerCase()));
+    list.push({ label, area_m2: area });
+    state.optionDirty = true; $("#option-dirty").hidden = false;
+    editor.dirty = true;
+    setStatus(`${label}, ${fmtNum(area)} m², is in the program (option.layout.extra_programs). Place it with + here; the engine counts it from the next check.`, "ok");
+    scheduleCheck();
+  });
+  // clearing every floor is asked on the page itself (no browser dialog): the first click arms the button, the second clears
+  $("#ed-blank", box).addEventListener("click", e => {
+    if (!editor.blankArmed) {
+      editor.blankArmed = true;
+      e.target.textContent = "Clear every floor?"; e.target.classList.add("btn-primary");
+      setStatus("Click again to clear every floor; the solver's blocks come back with Back to the solver's.", "busy");
+      return;
+    }
+    editor.blankArmed = false;
+    for (const k of Object.keys(editor.zones)) editor.zones[k] = [];
+    editor.sel = null; editor.dirty = true; editor.blank = true;
+    renderEditor(); scheduleCheck();
+    setStatus("A blank plate on every floor. Pick a grid, then add the blocks from the tracker: a corridor and a core on each floor first, then the units; the engine checks each move.", "info");
   });
   const sel = editor.sel != null ? zs[editor.sel] : null;
   if (sel) {
@@ -3104,9 +3351,11 @@ function wireEditor(box, scale, p) {
   // blocks' edges and to the corridor faces within 0.4 m, so a hand wobble does not become an overlap
   const svg = $(".ed-canvas", box);
   let drag = null;
-  const snap = v => Math.round(v * 10) / 10;
+  // the grid: 0.1 m, or the module the architect chose; a snap to another block's edge wins within SNAP
+  const g = editor.grid || 0.1;
+  const snap = v => Math.round(Math.round(v / g) * g * 100) / 100;
   const toM = (dx, dy) => [dx / scale, -dy / scale];   // the screen's down is the plate's toward-the-street
-  const SNAP = 0.4;
+  const SNAP = Math.max(0.4, g / 2);
   const xStops = i => { const s = [p.x, p.x + p.width_m]; zs.forEach((o, j) => { if (j !== i) { s.push(o.x, o.x + o.w); } }); return s; };
   const yStops = i => { const s = [p.y, p.y + p.depth_m, p.y + strip, p.y + p.depth_m - strip]; zs.forEach((o, j) => { if (j !== i) { s.push(o.y, o.y + o.d); } }); return s; };
   const snapTo = (v, stops) => { let best = v; for (const s of stops) if (Math.abs(s - v) < SNAP && Math.abs(s - v) < Math.abs(best - v) + 1e-9) best = s; return best; };
@@ -3150,7 +3399,7 @@ function wireEditor(box, scale, p) {
   svg.addEventListener("keydown", e => {
     if (editor.sel == null) return;
     const z = zs[editor.sel];
-    const step = e.shiftKey ? 2 : 0.5;
+    const step = e.shiftKey ? Math.max(2, g * 2) : Math.max(0.5, g);
     const k = e.key;
     if (k === "ArrowLeft") z.x = snap(Math.max(p.x, z.x - step)); else if (k === "ArrowRight") z.x = snap(Math.min(p.x + p.width_m - z.w, z.x + step));
     else if (k === "ArrowUp") z.y = snap(Math.min(p.y + p.depth_m - z.d, z.y + step)); else if (k === "ArrowDown") z.y = snap(Math.max(p.y, z.y - step));   // up on screen is away from the street
@@ -3424,9 +3673,21 @@ async function syncInputsTo(run) {
   const optId = run.ledger && run.ledger.run && run.ledger.run.option_id;
   const inputs = (run.ledger && run.ledger.inputs) || {};
   if (optId) state.optionId = optId;
+  // the run's option as the card's, unsaved, where no saved option is the run's (16 Nov 2026)
+  const takeRunOption = () => {
+    state.optionId = null;
+    state.option = Object.assign(blankOption(state.site && state.site.id), JSON.parse(JSON.stringify(inputs.option)));
+    state.optionDirty = false;
+    $("#option-select").value = "__new__";
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    $("#option-dirty").hidden = false;
+    refreshSummary("option");
+    syncCards();
+  };
   if (state.siteId !== siteId && state.sites.some(s => s.id === siteId)) {
     $("#site-select").value = siteId;
     await selectSite(siteId);
+    if (inputs.option && (!optId || !state.options.some(o => o.id === optId))) takeRunOption();
   } else if (!state.sites.some(s => s.id === siteId) && inputs.site && (state.siteId !== null || !state.site || state.site.id !== siteId)) {
     // a run on a site that was never saved (the manager's lookup, issued as it stood): the cards take the run's own
     // inputs, unsaved, so the memo and the cards never show two different sites (15 Nov 2026)
@@ -3452,6 +3713,10 @@ async function syncInputsTo(run) {
   } else if (optId && state.options.some(o => o.id === optId) && $("#option-select").value !== optId) {
     $("#option-select").value = optId;
     await selectOption(optId);
+  } else if (inputs.option && (!optId || !state.options.some(o => o.id === optId)) && (!state.option || state.option.id !== inputs.option.id)) {
+    // a saved site but an option that was never saved (the manager's suggestion, run as it stood): the card takes the
+    // run's own option, so the drawings and the card never describe two different buildings
+    takeRunOption();
   }
 }
 
@@ -3620,7 +3885,7 @@ const TOUR = [
   { target: ".memo-tools:not([hidden]), #side-by-side .pick-row", title: "Past runs",
     text: "Open an earlier run, or compare two. The two runs then sit side by side under the title block, these pickers heading their columns, and What changed follows with a revision mark: the rule, its old and new version, and the new rules revision." },
   { target: "#step-export", title: "Step 4 · Export and issue",
-    text: "Download PDF is the memo for the board, laid out for paper. Issue to the architect hands this revision on with a note; they see an amber chip in their top bar and open it from there. The architect issues to the board the same way." },
+    text: "Download PDF is the memo for the board, laid out for paper. Issue to the architect hands this revision on with your name and a note; they see an amber chip in their top bar and open it from there. When the plans are drawn the architect issues it back to you the same way, and the plans appear in your memo." },
   { target: ".mode", title: "The architect and the reader",
     text: "Switch to Architect and the Site and Option forms open, every ledger layer opens, the figures sit beside the answers, Edit blocks appears on FIG 03 and Export to Revit leads. Switch to Reader and the inputs, the steps and the run controls go; the memo stands alone in a reading column with Download PDF and Print. That is the whole page." },
 ];
@@ -4246,11 +4511,23 @@ function ruleTitle(id) {
   return r ? r.title : id;
 }
 
-/* Whether the rule stack holds an outright schedule for a district (RM-1 yes; RT-3, CD-1 no). */
+/* The rule stack's outright schedule for a district (RM-1, RT-3 read from the PDF; RM-4 and the RT family entered
+   unverified; CD-1 none), or null. */
 function scheduleFor(district) {
   const d = String(district || "").toUpperCase();
-  if (!d) return false;
-  return state.rules.some(r => r.check === "district_outright_fsr" && (r.applies_to_districts || []).some(x => x.toUpperCase() === d || (d.startsWith(x.toUpperCase() + "-") && !x.includes("-"))));
+  if (!d) return null;
+  return state.rules.find(r => r.check === "district_outright_fsr" && (r.applies_to_districts || []).some(x => x.toUpperCase() === d || (d.startsWith(x.toUpperCase() + "-") && !x.includes("-")))) || null;
+}
+
+/* What to say beside the district on the stage and at stop 1: the schedule in the rules (verified or not), or the
+   CD-1 by-law, or that the envelope is the manager's to enter. */
+function districtWords(site) {
+  const d = site.zoning_district; if (!d) return "";
+  const r = scheduleFor(d);
+  const cd1 = site.cd1_bylaw_number;
+  if (r) return r.source && r.source.verified === false ? ` <span class="cont warn-text">· schedule in the rules, entered unverified: confirm against the PDF, or drop it into inbox/</span>` : ` <span class="cont">· schedule in the rules</span>`;
+  if (/^CD-1/i.test(d)) return ` <span class="cont warn-text">· a site-specific district: its limits are in CD-1 by-law${cd1 ? ` No. ${h(cd1)}` : ""}; read it at stop 3 with Claude, or take the rough envelope at stop 4</span>`;
+  return ` <span class="cont warn-text">· no ${h(d)} schedule in the rules: the rough envelope stands in at stop 4, or enter yours</span>`;
 }
 
 /* The focused control survives a re-render of the guide: the thing the reader was on is found again by what it is. */
@@ -4323,7 +4600,8 @@ function renderGuideInto(el) {
   const lookupWarnings = !lk ? "" : `
     ${lkInfo.outside_vancouver ? `<p class="warn">${h(lk.site.municipality)} is outside the City of Vancouver. The rules here are Vancouver's and the Province's, so this tool cannot read the zoning of this site yet.</p>` : ""}
     ${lkInfo.civic_mismatch ? `<p class="warn">You typed ${h(lkInfo.civic_typed)}; the City's address list has no such number on this street, and the nearest parcel is <b>${h(lk.site.address)}</b>. Use it only if that is the site.</p>` : ""}
-    ${lkDistrict && !lkInfo.outside_vancouver && !scheduleFor(lkDistrict) ? `<p class="warn">The rules have no ${h(lkDistrict)} schedule yet: at stop 4 you enter the storeys, height and floor area yourself, or leave them blank and the memo says the envelope was not assessed; at stop 3 the City's schedule can be read in with Claude.</p>` : ""}`;
+    ${lkDistrict && !lkInfo.outside_vancouver && !scheduleFor(lkDistrict) ? `<p class="warn">The rules have no ${h(lkDistrict)} schedule${/^CD-1/.test(lkDistrict) ? ` (a CD-1 site's limits are in its own by-law${lk.site.cd1_bylaw_number ? `, No. ${h(lk.site.cd1_bylaw_number)}` : ""})` : ""}: at stop 4 a rough envelope from the lot and the code stands in, or you enter the storeys, height and floor area yourself; at stop 3 the City's schedule can be read in with Claude.</p>` : ""}
+    ${lkDistrict && scheduleFor(lkDistrict) && scheduleFor(lkDistrict).source && scheduleFor(lkDistrict).source.verified === false ? `<p class="warn">The ${h(lkDistrict)} schedule in the rules was entered from recollection, not read from the PDF: the memo says so, and the architect confirms the figures.</p>` : ""}`;
   const stop1 = siteChosen ? `
     <dl class="found-site"><div><dt>Site</dt><dd><b>${h(site.address || site.id)}</b>${site.zoning_district ? ` · ${h(site.zoning_district)}` : ""}${site.site_area_m2 ? ` · ${h(fmtNum(site.site_area_m2))} m²` : ""} <span class="cont">${state.siteId ? "(saved)" : "(from the lookup, unsaved)"}</span></dd></div></dl>
     ${cornerStreets(site).length ? `<div class="corner-q"><p class="help">A corner lot: ${h(cornerStreets(site)[0])} and ${h(cornerStreets(site)[1])} both run beside it. The front street sets the yards, the envelope and the massing.</p>${answerControl("front_street")}</div>` : ""}
@@ -4355,7 +4633,7 @@ function renderGuideInto(el) {
   const district = (site.zoning_district || "").toUpperCase();
   const scheduleKnown = scheduleFor(district);
   const stop3 = `
-    <p class="help">Layers A to C on the site alone: the outright limits, the rezoning path, transit, trees. Nothing is written.${district && !scheduleKnown ? ` <b>${h(district)} has no outright schedule in the rules</b>: the reading covers the policies, transit and trees; the envelope waits for you, or for the schedule read below.` : ""}</p>
+    <p class="help">Layers A to C on the site alone: the outright limits, the rezoning path, transit, trees. Nothing is written.${district && !scheduleKnown ? ` <b>${h(district)} has no outright schedule in the rules</b>: the reading covers the policies, transit and trees; at stop 4 a rough envelope from the lot and the code stands in, until the schedule is read below or you enter yours.` : (scheduleKnown && scheduleKnown.source && scheduleKnown.source.verified === false ? ` <b>${h(district)}'s schedule was entered unverified</b>: its figures are read as uncertain until confirmed against the PDF.` : "")}</p>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-read"${guide.loading === "read" ? " disabled" : ""}>${guide.loading === "read" ? "Reading…" : (R ? "Read it again" : "Read the site")}</button></div>
     ${R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">The reading is in the memo pane.</p>` : ""}
     <details class="claude-fold"${(district && !scheduleKnown && hasClaude()) || guide.ruleProposal ? " open" : ""}><summary>${district && !scheduleKnown ? `Read the ${h(district)} schedule with Claude` : "Read the district schedule with Claude"} <span class="cont">(${district ? (scheduleKnown ? `${h(district)} is in the rules already` : "needs a key") : "no district yet"})</span></summary>
@@ -4379,8 +4657,10 @@ function renderGuideInto(el) {
     const mine = guide.mine[k];
     const isMine = mine !== undefined;
     const sv = f.value === null || f.value === undefined ? "—" : (typeof f.value === "number" ? fmtNum(f.value) : String(f.value));
+    // what the figure rests on: a rule, the rough envelope (the lot and the code, no schedule), or a placeholder
+    const tag = f.rule_id ? `<code title="${h(ruleTitle(f.rule_id))}">${h(f.rule_id)}</code>` : (f.basis === "envelope" ? `<code class="ph" title="the plate the setbacks leave × the storeys the code allows; not a permitted figure">rough, from the envelope</code>` : `<code class="ph">placeholder</code>`);
     return `<div class="sg-row" data-key="${h(k)}">
-      <div class="sg-label">${h(label)}${f.rule_id ? `<code title="${h(ruleTitle(f.rule_id))}">${h(f.rule_id)}</code>` : `<code class="ph">placeholder</code>`}</div>
+      <div class="sg-label">${h(label)}${tag}</div>
       <div class="sg-pick seg" role="group" aria-label="${h(label)}: suggested or mine">
         <button class="segbtn" type="button" data-pick="suggested" aria-pressed="${!isMine}">Suggested</button>
         <button class="segbtn" type="button" data-pick="mine" aria-pressed="${isMine}">Mine</button>
@@ -4397,14 +4677,36 @@ function renderGuideInto(el) {
     ["Funder terms", "shares and years the programs set", k => ["share_below_hils", "housing_agreement_years", "below_market_unit_share", "below_market_discount"].includes(k), false],
     ["Drawing assumptions", "trees, floor to floor and the setbacks: placeholders that shape the drawings, not the answers", k => ["replacement_trees_proposed", "floor_to_floor_m"].includes(k) || k.startsWith("setbacks_m."), false],
   ];
+  // the rough envelope from the lot and the code (always derived): the manager can take its three figures over the
+  // suggested ones, or keep their own (16 Nov 2026)
+  const E = S && S.envelope;
+  const envDiffers = E && E.storeys != null && ["storeys", "height_m", "gfa_m2"].some(k => guide.mine[k] !== undefined || (S.fields[k] || {}).value !== E[k]);
+  const envLine = E && E.storeys != null ? `<div class="sg-env"><span class="eyebrow">Rough allowed, from the lot and the code</span>
+      <p class="help"><b>${h(E.storeys)} storeys · ${h(E.height_m)} m · ${h(fmtNum(E.gfa_m2))} m²</b> <span class="cont">· plate ${h(E.plate_w_m)} × ${h(E.plate_d_m)} m (${h(fmtNum(E.plate_m2))} m²) × ${h(E.storeys)}${E.basis === "schedule" ? ", capped by the schedule's FSR" : ""}; storeys from ${h(E.basis === "schedule" ? "the schedule's height" : E.basis === "toa" ? "the transit-oriented tier" : E.basis === "benchmark" ? "the staff benchmark" : "the wood-frame standard (a placeholder)")}. Not a permission.</span></p>
+      ${envDiffers ? `<div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-envelope">Use these three figures</button><span class="help">They go into the Storeys, Height and GFA rows as yours; not a permitted figure.</span></div>` : `<p class="help cont">The suggested rows above are these figures.</p>`}
+    </div>` : "";
+  // the bedroom mix the homes are split in: a preset or the manager's own shares, re-derived on the BC Housing areas
+  const M = S && S.mix;
+  const shares = guide.mixShares || (M && M.shares) || { studio: 0.2, one_bed: 0.4, two_bed: 0.32, three_bed_plus: 0.08 };
+  const mixLine = M ? `<div class="sg-mix"><span class="eyebrow">Unit mix</span>
+      <div class="mix-row">
+        <label class="field"><span class="label">Preset</span><select id="guide-mix-preset"><option value="">${M.source === "yours" ? "your shares" : "the starting mix"}</option>${Object.entries(M.presets || {}).map(([k, p]) => `<option value="${h(k)}" title="${h(p.note || "")}">${h(cap(k.replace(/_/g, " ")))} · ${["studio", "one_bed", "two_bed", "three_bed_plus"].map(u => Math.round((p.shares[u] || 0) * 100)).join(" / ")}%</option>`).join("")}</select></label>
+        ${[["studio", "Studio"], ["one_bed", "1-bed"], ["two_bed", "2-bed"], ["three_bed_plus", "3-bed+"]].map(([u, l]) => `<label class="field"><span class="label">${l} %</span><input type="number" class="mix-share" data-unit="${u}" min="0" max="100" step="1" value="${h(Math.round((shares[u] || 0) * 100))}" aria-label="${l}, share of homes"></label>`).join("")}
+      </div>
+      <div class="form-actions"><button class="btn btn-small" type="button" id="guide-mix-apply">Derive with this mix</button><span class="help">Homes sized at the BC Housing minimum net areas (${["studio", "one_bed", "two_bed", "three_bed_plus"].map(u => (M.unit_areas_m2 || {})[u]).join(" / ")} m² + ${Math.round(((M.allowance || 1.1) - 1) * 100)}%); the family-unit minimums still apply.</span></div>
+    </div>` : "";
   const rows = S ? GROUPS.map(([title, what, test, openGroup]) => {
     const fields = GUIDE_FIELDS.filter(([k]) => test(k) && (S.fields[k] || CORE.has(k)));
     if (!fields.length) return "";
     const anyMine = fields.some(([k]) => guide.mine[k] !== undefined);
-    const body = fields.map(rowOf).join("");
+    const body = fields.map(rowOf).join("") + (title === "Envelope" ? envLine : title === "Homes" ? mixLine : "");
     return openGroup ? `<div class="sg-group"><h4 class="sg-head">${h(title)} <span class="cont">· ${h(what)}</span></h4>${body}</div>`
       : `<details class="sg-group"${anyMine ? " open" : ""}><summary class="sg-head">${h(title)} <span class="cont">· ${h(what)} · ${fields.length} figures suggested</span></summary>${body}</details>`;
   }).join("") : "";
+  // why a candidate cannot be built is said on the page, not only in a tooltip (16 Nov 2026: on a CD-1 site outside
+  // the Community Vision areas every button went grey with no word why)
+  const candWhy = cands.filter(c => c.available === false).map(c => `<li><b>${h(c.title)}</b>: ${h(c.why)}.</li>`).join("");
+  const candNote = S && S.candidate_note ? `<p class="help warn-text">${h(S.candidate_note)}</p>` : "";
   // a saved option can be the one, or the rules derive one; a derived option replaces the saved one in the card
   const savedOpts = (state.options || []).filter(o => o.for_site);
   const optLoaded = !!(state.optionId && state.option);
@@ -4413,7 +4715,8 @@ function renderGuideInto(el) {
     ${optLoaded && !S ? `<p class="help">${optionSummary(state.option)}. Its figures are in the Option card below, where each can be edited.</p>` : ""}
     <p class="help stop-or">Or derive one from the rules:</p>` : ""}
     <div class="seg cands" role="group" aria-label="Start from">${cands.map(c => `<button class="segbtn" type="button" data-cand="${h(c.id)}" aria-pressed="${guide.candidate === c.id}"${c.available === false ? ` disabled title="${h(c.why)}"` : ` title="${h(c.what)}"`}>${h(c.title)}</button>`).join("")}</div>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-suggest"${guide.loading === "suggest" ? " disabled" : ""}>${guide.loading === "suggest" ? "Deriving…" : (S ? "Derive again" : "Suggest from the rules")}</button><span class="help">Every figure cites the rule it came from; placeholders say so.</span></div>
+    ${candWhy ? `<ul class="help cand-why">${candWhy}</ul>` : ""}${candNote}
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-suggest"${guide.loading === "suggest" ? " disabled" : ""}>${guide.loading === "suggest" ? "Deriving…" : (S ? "Derive again" : "Suggest from the rules")}</button><span class="help">Every figure cites the rule it came from; placeholders and rough figures say so.</span></div>
     ${S ? `<div class="sg-rows">${rows}</div>
     ${S.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Answer now, or leave as not sure</span><ul>${S.unsure.map(u => `<li><b>${h(keyLabel(u.key))}</b>: ${h(u.why)}. <span class="cont">${h(u.who)}.</span>${answerControl(u.key)}</li>`).join("")}</ul></div>` : ""}
     <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-option">Use this option</button><span class="help">Writes it into the Option card, where every field can still be edited.</span></div>` : ""}`;
@@ -4441,10 +4744,12 @@ function renderGuideInto(el) {
     ${pf && pf.available && pf.verdict.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${pf.verdict.unsure.map(u => `<li>${h(u)}</li>`).join("")}</ul></div>` : ""}
     <div class="form-actions"><button class="btn btn-small" type="button" id="guide-run-again"${done[4] ? "" : " disabled"}>Run again</button><span class="help">After a change in the Site or Option card, or in Money in.</span></div>` : `<div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-run-again"${done[4] ? "" : " disabled"}>Run the rules</button></div>`}`;
 
+  // 7: the form opens here, under the button, with the sender's name and a note; nothing scrolls (16 Nov 2026)
+  const issued = state.run && (state.run.issues || []).filter(i => i.by === "manager").slice(-1)[0];
   const stop7 = `
-    <p class="help">${state.run ? `Hand ${h(rev(state.run.run_id))} to the architect with a note; they see it in their top bar.` : "Run the rules first."}${STATIC ? " Issuing needs the local server." : ""}</p>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-issue"${state.run && !STATIC ? "" : " disabled"}>Issue to the architect</button></div>
-    ${state.run && state.run.issued ? `<p class="help">Issued ${h(state.run.issued.issued_at.replace("T", " ").slice(0, 16))}.</p>` : ""}`;
+    <p class="help">${state.run ? `Hand ${h(rev(state.run.run_id))} to the architect with a note; they see it in their top bar and issue it back to you when the plans are drawn.` : "Run the rules first."}${STATIC ? " Issuing needs the local server." : ""}</p>
+    ${guide.issueOpen && state.run && !STATIC ? issueFormHtml("guide") : `<div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-issue"${state.run && !STATIC ? "" : " disabled"}>Issue to the architect</button></div>`}
+    ${issued ? `<p class="help">Issued to ${h(ISSUE_WORD[issued.to] || issued.to)} ${h(String(issued.issued_at || "").replace("T", " ").slice(0, 16))}${issued.name ? ` by ${h(issued.name)}` : ""}.</p>` : ""}`;
 
   el.innerHTML = `<div class="card-head"><h2><span class="badge">→</span> Set up the run</h2><span class="help">seven stops</span></div>
     ${stop(1, stop1)}${stop(2, stop2)}${stop(3, stop3)}${stop(4, stop4)}${stop(5, stop5)}${stop(6, stop6)}${stop(7, stop7)}`;
@@ -4584,6 +4889,27 @@ function wireGuide() {
   });
   $$(".cands .segbtn", el).forEach(b => b.addEventListener("click", () => { guide.candidate = b.dataset.cand; guide.mine = {}; guideSuggest(); }));
   on("#guide-suggest", guideSuggest);
+  on("#guide-use-envelope", () => {
+    const E = guide.suggestion && guide.suggestion.envelope; if (!E) return;
+    guide.mine.storeys = String(E.storeys); guide.mine.height_m = String(E.height_m); guide.mine.gfa_m2 = String(E.gfa_m2);
+    renderGuide('.sg-row[data-key="storeys"]');
+    setStatus(`Storeys ${E.storeys}, height ${E.height_m} m and GFA ${fmtNum(E.gfa_m2)} m² are now yours, from the rough envelope: ${E.storeys_from}.`, "info");
+  });
+  on("#guide-mix-apply", () => {
+    const shares = {};
+    let total = 0;
+    for (const inp of $$(".mix-share", el)) { const v = Math.max(0, Number(inp.value) || 0); shares[inp.dataset.unit] = v / 100; total += v; }
+    if (Math.abs(total - 100) > 1) { toast(`The shares add up to ${total}%, not 100%.`, true); return; }
+    guide.mixShares = shares; guide.mine = Object.fromEntries(Object.entries(guide.mine).filter(([k]) => !k.startsWith("units.") && !k.startsWith("rent_tiers")));
+    guideSuggest();
+  });
+  const preset = $("#guide-mix-preset", el);
+  if (preset) preset.addEventListener("change", () => {
+    const p = guide.suggestion && guide.suggestion.mix && guide.suggestion.mix.presets && guide.suggestion.mix.presets[preset.value];
+    if (!p) return;
+    for (const inp of $$(".mix-share", el)) inp.value = Math.round((p.shares[inp.dataset.unit] || 0) * 100);
+  });
+  $$(".mix-share", el).forEach(inp => inp.addEventListener("input", () => { const p = $("#guide-mix-preset", el); if (p) p.value = ""; }));
   $$(".sg-row", el).forEach(row => {
     const key = row.dataset.key;
     $$(".sg-pick .segbtn", row).forEach(b => b.addEventListener("click", () => {
@@ -4615,7 +4941,9 @@ function wireGuide() {
   on("#guide-read-schedule", guideReadSchedule);
   on("#confirm-rules", confirmRuleProposal);
   $$(".claude-fold", el).forEach(d => d.addEventListener("toggle", () => { if (d.open) { const i = $(".key-input", d); if (i) i.focus({ preventScroll: true }); } }));
-  on("#guide-issue", () => openIssuePanel());
+  on("#guide-issue", () => { guide.issueOpen = true; renderGuide("#guide-issue"); });
+  const issueForm = $("form[data-issue=guide]", el);
+  if (issueForm) wireIssueForm(issueForm, () => { guide.issueOpen = false; renderGuide(7); });
 }
 
 /* Claude proposes, the person confirms. The model is reached with a key: the local server's own (FFM_CLAUDE_KEY
@@ -4902,12 +5230,17 @@ async function guideSuggest() {
   setStatus(`Deriving the ${guide.candidate} option from the rules…`, "busy");
   try {
     const programs = guide.programs || (state.option && state.option.target_programs) || [];
-    guide.suggestion = await postJSON("/api/suggest", { site: state.site, programs, as_of: $("#as-of").value || todayISO(), candidate: guide.candidate });
+    guide.suggestion = await postJSON("/api/suggest", { site: state.site, programs, as_of: $("#as-of").value || todayISO(), candidate: guide.candidate, mix_shares: guide.mixShares || null });
     guide.suggestionUsed = false;   // a fresh suggestion waits for Use this option; the stage shows it as such
+    // a blank Mine row that stood in for a figure no rule gave gives way once the derivation has one (16 Nov 2026)
+    for (const k of ["storeys", "height_m", "gfa_m2"]) if (guide.mine[k] === "" && (guide.suggestion.fields[k] || {}).value != null) delete guide.mine[k];
+    const asked = guide.candidate;
     guide.candidate = guide.suggestion.candidate;
     const o = guide.suggestion.option;
     const cv = guide.suggestion.unsure.some(u => u.key === "in_former_community_vision_area") && guide.candidate !== "outright";
-    setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} units; ${guide.suggestion.unsure.length} left to a person.${cv ? " The benchmark needs the Community Vision answer in the Site card; until then this is the outright envelope." : ""}`, cv ? "info" : "ok");
+    const rough = ["storeys", "height_m", "gfa_m2"].some(k => (guide.suggestion.fields[k] || {}).basis === "envelope");
+    const swapped = guide.suggestion.candidate_note && asked !== guide.candidate;
+    setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} units; ${guide.suggestion.unsure.length} left to a person.${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ? " The benchmark needs the Community Vision answer in the Site card; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
   } catch (e) {
     toast(`Could not derive the option: ${e.message}`, true);
   } finally {
@@ -5014,43 +5347,85 @@ function renderPreview3D() {
 
 // ---------------------------------------------------------------- issuing a run to the next reader, and hearing of one
 const ISSUES_SEEN_KEY = "ffm.issues.seen";
-const ISSUE_TO = { manager: "architect", architect: "reader", reader: null };
+const ISSUE_NAME_KEY = "ffm.issue.name";
+/* who a run goes to: the manager hands it to the architect, the architect hands it back to the manager to review
+   (16 Nov 2026; before, the architect could only issue to the board); either can send it to the board instead */
+const ISSUE_TO = { manager: "architect", architect: "manager", reader: null };
+const ISSUE_ALT = { manager: "reader", architect: "reader", reader: null };
+const ISSUE_WORD = { architect: "the architect", manager: "the development manager", reader: "the board, planner and funder" };
 let issueTimer = 0;
 
 function seenIssues() { try { return new Set(JSON.parse(localStorage.getItem(ISSUES_SEEN_KEY) || "[]")); } catch (e) { return new Set(); } }
 function markIssueSeen(id) { const s = seenIssues(); s.add(id); try { localStorage.setItem(ISSUES_SEEN_KEY, JSON.stringify([...s].slice(-200))); } catch (e) { /* fine */ } }
+function issueName() { try { return localStorage.getItem(ISSUE_NAME_KEY) || ""; } catch (e) { return guide.issueName || ""; } }
+function setIssueName(n) { try { localStorage.setItem(ISSUE_NAME_KEY, n); } catch (e) { guide.issueName = n; } }
 
+/* The issue form: the sender's name (kept for next time), who it goes to, a note. Rendered where the button was
+   pressed: inside the guide's stop 7 for the manager, under the export bar for anyone. */
+function issueFormHtml(scope) {
+  const to = ISSUE_TO[state.mode], alt = ISSUE_ALT[state.mode];
+  if (!to || !state.run) return "";
+  const opts = [to, alt].filter(Boolean).map(t => `<option value="${t}">${h(cap(ISSUE_WORD[t]))}</option>`).join("");
+  return `<form class="issue-panel" data-issue="${h(scope)}" aria-label="Issue ${h(rev(state.run.run_id))}">
+    <div class="issue-row">
+      <label class="field"><span class="label">Your name</span><input type="text" name="name" value="${h(issueName())}" placeholder="so they know who sent it" autocomplete="name" maxlength="80"></label>
+      <label class="field"><span class="label">To</span><select name="to">${opts}</select></label>
+    </div>
+    <label class="field"><span class="label">A note</span><textarea name="note" rows="2" maxlength="600" placeholder="What changed, and what you want checked"></textarea></label>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">Issue ${h(rev(state.run.run_id))}</button><button class="btn btn-quiet btn-small" type="button" data-issue-cancel>Not now</button><span class="help">They see it in their top bar; the note sits under the memo's title.</span></div>
+  </form>`;
+}
+
+function wireIssueForm(form, onClose) {
+  form.addEventListener("submit", e => { e.preventDefault(); sendIssue(form).then(ok => { if (ok && onClose) onClose(); }); });
+  const c = $("[data-issue-cancel]", form); if (c) c.addEventListener("click", () => onClose && onClose());
+  const first = $("input[name=name]", form);
+  if (first) (first.value ? $("textarea", form) : first).focus({ preventScroll: true });
+}
+
+/* the export bar's copy of the form; the guide renders its own at stop 7 */
 function openIssuePanel() {
   const panel = $("#issue-panel");
   if (!state.run || STATIC) return;
+  panel.innerHTML = issueFormHtml("bar");
   panel.hidden = false;
   $("#issue-btn").setAttribute("aria-expanded", "true");
-  $("#issue-note").focus();
-  panel.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
+  wireIssueForm($("form", panel), closeIssuePanel);
 }
 
 function closeIssuePanel() {
-  $("#issue-panel").hidden = true;
+  const panel = $("#issue-panel");
+  panel.hidden = true; panel.innerHTML = "";
   $("#issue-btn").setAttribute("aria-expanded", "false");
 }
 
-async function sendIssue() {
+/* Records the issue on the run; true when it went. The page does not scroll: the sender stays where they pressed. */
+async function sendIssue(form) {
   const run = state.run;
-  const to = ISSUE_TO[state.mode];
-  if (!run || !to) return;
+  if (!run) return false;
+  const fd = new FormData(form);
+  const to = String(fd.get("to") || ISSUE_TO[state.mode] || "");
+  const name = String(fd.get("name") || "").trim();
+  const note = String(fd.get("note") || "").trim();
+  if (!to) return false;
   const [site, folder] = run.run_id.split("/");
+  const btn = $("button[type=submit]", form); if (btn) btn.disabled = true;
   try {
-    const it = await postJSON(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}/issue`, { by: state.mode, to, note: $("#issue-note").value });
+    const it = await postJSON(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}/issue`, { by: state.mode, to, note, name });
+    if (name) setIssueName(name);
     run.issued = it;
     run.issues = [...(run.issues || []), it];
     const memoEl = $("#memo"); if (memoEl) memoEl.dataset.issuedManager = run.issues.some(i => i.to === "manager") ? "1" : "";
     markIssueSeen(it.id);
+    guide.issueOpen = false;
     closeIssuePanel();
-    $("#issue-note").value = "";
     renderGuide();
-    setStatus(`Issued ${rev(run.run_id)} to the ${to === "reader" ? "board, planner and funder" : to} at ${it.issued_at.replace("T", " ").slice(0, 16)}. They see it in their top bar.`, "ok");
+    setStatus(`Issued ${rev(run.run_id)} to ${ISSUE_WORD[to]} at ${it.issued_at.replace("T", " ").slice(0, 16)}${name ? ` as ${name}` : ""}. They see it in their top bar.`, "ok");
+    return true;
   } catch (e) {
     toast(`Could not issue: ${e.message}`, true);
+    if (btn) btn.disabled = false;
+    return false;
   }
 }
 
@@ -5058,7 +5433,8 @@ function issueButtonLabel() {
   const to = ISSUE_TO[state.mode];
   const btn = $("#issue-btn");
   btn.hidden = !to;
-  btn.textContent = to === "architect" ? "Issue to the architect" : "Issue to the board";
+  btn.textContent = to ? `Issue to ${ISSUE_WORD[to].replace("the development manager", "the manager")}` : "Issue";
+  if (!to) closeIssuePanel();
 }
 
 /* Every 15 s the page asks the local server for the site's issue notes; a new one addressed to this reader becomes a
@@ -5161,8 +5537,9 @@ function setMode(mode, remember = true, announce = true) {
     const stacked = matchMedia("(max-width: 1100px)").matches;
     for (const kind of ["site", "option"]) setCollapsed(kind, (mode === "manager" || stacked) && chosen(kind));
   }
-  applyModeToMemo();
   if (editor.open && mode !== "architect") closeEditor();   // the editor is the architect's; leaving the mode closes it
+  // the memo is laid out for its reader (the note addressed to them, the architect's mass tools), so it is drawn again
+  if (state.run && state.run.ledger) renderMemo(state.run); else applyModeToMemo();
   syncCards();
   renderGuide();
   guideProgress();
@@ -5271,8 +5648,6 @@ async function init() {
   $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the four answers and the figures." : "Detailed: the whole memo.", "info"); }));
   try { setView(localStorage.getItem(VIEW_KEY) || "detailed", false); } catch (e) { setView("detailed", false); }
   $("#issue-btn").addEventListener("click", () => { if ($("#issue-panel").hidden) openIssuePanel(); else closeIssuePanel(); });
-  $("#issue-panel").addEventListener("submit", e => { e.preventDefault(); sendIssue(); });
-  $("#issue-cancel").addEventListener("click", closeIssuePanel);
   $("#open-run").addEventListener("change", e => openRun(e.target.value).catch(err => toast(err.message, true)));
   $("#compare-run").addEventListener("change", e => { state.compareRun = e.target.value || null; applyCompare().catch(err => toast(err.message, true)); });
   document.addEventListener("keydown", e => {

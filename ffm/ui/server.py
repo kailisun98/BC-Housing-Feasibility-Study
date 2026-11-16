@@ -521,7 +521,13 @@ def do_suggest(body: Any) -> dict:
     programs = body.get("programs") or []
     if not isinstance(programs, list):
         raise ApiError(400, "programs must be a list of rule ids.")
-    return suggest.suggest(site, programs, on, body.get("candidate") or "funder-ready")
+    mix = body.get("mix_shares")
+    if mix is not None and not isinstance(mix, dict):
+        raise ApiError(400, "mix_shares must be a set of shares (studio, one_bed, two_bed, three_bed_plus) or left out.")
+    try:
+        return suggest.suggest(site, programs, on, body.get("candidate") or "funder-ready", mix_shares=mix)
+    except ValueError as e:
+        raise ApiError(400, str(e))
 
 
 # ---------------------------------------------------------------- issues: a run handed from one reader to the next
@@ -555,14 +561,15 @@ def add_issue(site_id: str, folder: str, body: Any) -> dict:
     """Record that a reader issued this run to another: who, to whom, a note, when."""
     out = _run_folder(site_id, folder)
     if not isinstance(body, dict):
-        raise ApiError(400, "Send {by, to, note}.")
+        raise ApiError(400, "Send {by, to, note, name?}.")
     by, to = body.get("by"), body.get("to")
     if by not in ROLES or to not in ROLES:
         raise ApiError(400, f"by and to must be one of {', '.join(ROLES)}.")
     f = out / "issues.json"
     items = _read(f) if f.exists() else []
+    # the sender's name travels with the note (16 Nov 2026), so the chip and the memo say who, not only which role
     item = {"id": datetime.now().strftime("%Y%m%dT%H%M%S%f"), "issued_at": datetime.now().isoformat(timespec="seconds"),
-            "by": by, "to": to, "note": str(body.get("note") or "")[:600]}
+            "by": by, "to": to, "name": str(body.get("name") or "").strip()[:80], "note": str(body.get("note") or "")[:600]}
     items.append(item)
     f.write_text(json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8")
     return {**item, "run_id": f"{site_id}/{folder}", "folder": folder}

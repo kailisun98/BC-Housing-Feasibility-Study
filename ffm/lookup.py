@@ -429,9 +429,17 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         metrics = parcel_metrics(poly, street["bearing_deg"])
     district = z.get("zoning_district") or None
     cd1 = z.get("cd_1_number") or None
+    if cd1 is not None:
+        # the dataset may hand the number as 324, 324.0 or "324": an int where it is a whole number, else as written
+        try:
+            f = float(str(cd1).strip())
+            cd1 = int(f) if f.is_integer() else str(cd1).strip()
+        except ValueError:
+            cd1 = str(cd1).strip() or None
     notes = [f"Found by First Read on the address {address!r}: " + (f"the City's property address {display!r}." if "property address" in display else f"geocoded by Nominatim as {display!r}.")]
     if district:
-        notes.append(f"Zoning district {district}" + (f" (CD-1 by-law {cd1})" if cd1 else "") + " from the City's zoning districts dataset at that point.")
+        notes.append(f"Zoning district {district}" + (f" (CD-1 by-law {cd1})" if cd1 else "") + " from the City's zoning districts dataset at that point."
+                     + (f" A CD-1 district has no general schedule: its limits are in CD-1 by-law No. {cd1}." if cd1 else ""))
     else:
         notes.append("No zoning district found at that point in the City's dataset; enter it by hand.")
     shape = None
@@ -493,6 +501,8 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
                    "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
         "sources": [SOURCES["address"] if "property address" in display else SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
     }
+    if cd1:
+        site["cd1_bylaw_number"] = cd1
     if site["context"] is None:
         del site["context"]
     # the surroundings, as python -m ffm context stores them, so the plan draws the real streets and buildings

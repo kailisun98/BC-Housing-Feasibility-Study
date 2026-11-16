@@ -91,6 +91,42 @@ Flow and clarity, in the manager's guide:
 - **The manager's view.** The plans by program and the stacking (the architect's working drawings and the block
   editor) stay out of the manager's memo until the architect issues the run to them; a quiet card holds their place.
 
+## The third pass, 16 Nov 2026 (Kai's list after using the tool)
+
+- **The candidate buttons.** On a CD-1 site outside the Community Vision areas every candidate went grey after one
+  derivation, with the reason only in a tooltip. Funder-ready is now always available (the envelope the site gets,
+  with the funder questions answered); the reasons a candidate cannot be built are printed under the buttons, and
+  a candidate that cannot be built falls back to funder-ready with a note (`candidate_note`).
+- **District schedules.** `rules/a_zoning_district.json` holds RT-3 read from the saved PDF and RM-3, RM-3A, RM-4
+  and most of the RT family entered from recollection, each marked `verified: false`; the memo wears an
+  "unverified" tag on those clauses and answer 3 carries `coverage.schedule_unverified` for the architect. A CD-1
+  site names its by-law number. R1-1 was left out: with a schedule the suggester skips the provincial minimum-units
+  rule, which the small-lot test relies on.
+- **The rough envelope.** Every suggestion carries `envelope` (storeys from the schedule, the transit tier or the
+  wood-frame standard; the plate the setbacks leave × storeys, capped by the FSR where there is one) and, where no
+  schedule exists, the rows take it with a "rough, from the envelope" tag; a line at stop 4 offers the three
+  figures as the manager's own.
+- **The unit mix.** Stop 4 has presets (starting, family, seniors and singles, balanced) and four share fields;
+  the homes are re-derived on the BC Housing minimum areas and the family-unit minimums still apply.
+- **The option in figures** sits under the memo's title block in every view (storeys, floor area and FSR, homes,
+  tiers, tenure, plate).
+- **Issuing.** The form opens where the button was pressed (stop 7, or the export bar) with the sender's name, who
+  it goes to and a note; nothing scrolls. The architect issues back to the manager (or to the board); the chip and
+  the note under the title say who sent it.
+- **The architect's sheets.** The engine's SVGs keep their drawn size instead of stretching to the card (the
+  headline-sized titles); the four answers flow in two columns without a hole under a short one.
+- **Front and placement.** Under FIG 01 the architect chooses the front face (an adjoining street, a side, a lot
+  edge) and places the mass (nine anchors, a shift, a quarter turn) inside the plate box; the lot and the context
+  turn with the front (`site.front_face`, `option.massing`, `lot.orientation`), and the sheets follow.
+- **The block editor.** A grid (0.1 to 6 m) to snap to, a tracker of the program left to place with "+ here" per
+  block, programs of the architect's own (`option.layout.extra_programs`, block kind `other`), and a blank-plate
+  start.
+- **Exits.** `bcbc.exits` (BC Building Code 2024, Part 3, entered from recollection and marked unverified) reads
+  every floor: the number of exits, their separation, the farthest travel distance along the corridor and the
+  dead end; the plans sheet draws the farthest path and answer 3 names the architect. The solver's single 7 m
+  core bay fails the separation clause honestly.
+- **The map** on the stage is in the brand's half tone, the parcel the one colour on it.
+
 ## Still open
 
 - The L-shape class and the 0.95 rectangle line (the parcel labels do not settle them; `evals/parcels/README.md`).

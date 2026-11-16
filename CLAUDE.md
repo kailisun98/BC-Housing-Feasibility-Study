@@ -562,6 +562,17 @@ Phase 6, Claude in the loop (the model proposes, a person confirms, the engine d
   as-approved option; the what-if option is hypothetical and labelled as such.
 - RM-1 outright figures (FSR 1.20, 10.7 m) are cited from the referral report; verify against the
   consolidated district schedule when convenient.
+- District schedules (16 Nov 2026, `rules/a_zoning_district.json`): RT-3 is read from Kai's saved PDF
+  (`inbox/`, `source.verified: true`); the RT family (RT-4 to RT-11 bar RT-9), RM-3, RM-3A and RM-4/4N are typed
+  from recollection (`source.verified: false` plus a `verify` sentence) and raise `coverage.schedule_unverified`
+  in `engine.summarise` until a person confirms them against the PDF. Districts not entered read "not assessed";
+  CD-1 sites carry `cd1_bylaw_number` from the lookup.
+- Also 16 Nov 2026: `bcbc.exits` (`rules/d_design_standards.json`, `verified: false`) is read by `layout.egress`
+  into `L["egress"]`; `option.sprinklered` switches its limits. `option.massing` {anchor, dx_m, dy_m, rotate} and
+  `site.front_face` {street | side | edge} place the mass and turn the lot (`massing.place`,
+  `boundary.oriented_ring`; the page applies `lot.orientation` to the stored context). `option.layout.extra_programs`
+  [{label, area_m2}] are the architect's own blocks (kind `other`). `suggest()` takes `mix_shares` and returns
+  `envelope`, `mix` and `candidate_note`. An issue note carries `name`.
 - `rules/f_assumptions.json`: soft costs 25%, contingency 10%, operating $6,500 and reserve $600 per unit,
   the RGI income at half the fund's limit are declared placeholders (`placeholder: true`); the hard-cost base
   is a 2- to 4-unit catalogue figure; bachelor, one-bedroom and three-bedroom rents are null until typed from

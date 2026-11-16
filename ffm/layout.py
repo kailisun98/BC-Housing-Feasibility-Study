@@ -35,7 +35,12 @@ LAYOUT_ASSUMPTIONS = {
     "amenity_m2_per_unit": (1.5, "indoor amenity, at least 40 m²; a placeholder until the operator's brief"),
     "parking_m2_per_space": (30.0, "a below-grade stall with its aisle share; not on the plates"),
     "window_width_m": (1.5, "one window per unit on the elevation, the unit module as the rhythm"),
+    "stair_width_m": (2.2, "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"),
 }
+
+# Whether the floor areas are sprinklered: a Part 3 residential building over three storeys is sprinklered in
+# practice, so the egress check assumes it; `option.sprinklered: false` switches the unsprinklered limits on.
+SPRINKLERED_DEFAULT = True
 
 UNIT_KEYS = ("three_bed_plus", "two_bed", "one_bed", "studio")   # the order they are placed, bottom up
 UNIT_LABEL = {"studio": "Studio", "one_bed": "One-bedroom", "two_bed": "Two-bedroom", "three_bed_plus": "Three-bedroom+"}
@@ -59,7 +64,7 @@ TONES = {
     "studio": "#dbe9f8", "one_bed": "#b9d4f0", "two_bed": "#8fb8e3", "three_bed_plus": "#6b9fd4",
     "corridor": "#f4f4f2", "core": "#c9c9c5", "services": "#e2e2df", "amenity": "#f6e7c1", "non_residential": "#f0cf9a",
     "spare": "#ffffff", "envelope": "#c81e1e", "outright": "#8e8e8e", "benchmark": "#c77d14", "tree": "#9fb07f", "tree_line": "#7f9664",
-    "accessible": "#245f9c",
+    "accessible": "#245f9c", "other": "#e6dfd0",
 }
 BLOCK_LABEL = {"corridor": "Corridor", "core": "Core (stairs, elevator)", "services": "Services, bicycles", "amenity": "Amenity", "non_residential": "Non-residential", "spare": "Spare", **UNIT_LABEL}
 
@@ -105,6 +110,15 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
     bikes = int(option.get("bicycle_spaces") or 0)
     services = round(serv_base + bikes * bike_each, 1)
     out.append({"key": "services", "label": "Services, bicycles", "count": 1, "area_m2": services, "source": "placeholder", "note": f"{serv_base:.0f} m² services + {bikes} bicycle spaces × {bike_each} m²"})
+    # programs the architect added in the block editor (option.layout.extra_programs: [{label, area_m2}]), each a
+    # block of its own kind "other" told apart by its label (16 Nov 2026)
+    for ex in ((option.get("layout") or {}).get("extra_programs") or []):
+        try:
+            label, area = str(ex.get("label") or "").strip(), float(ex.get("area_m2") or 0)
+        except (TypeError, ValueError, AttributeError):
+            continue
+        if label and area > 0:
+            out.append({"key": "other", "label": label, "count": 1, "area_m2": round(area, 1), "source": "option.layout.extra_programs", "note": "a program the architect added in the block editor"})
     park_each, _ = LAYOUT_ASSUMPTIONS["parking_m2_per_space"]
     stalls = int(option.get("parking_spaces") or 0)
     parking = {"spaces": stalls, "area_m2": round(stalls * park_each, 1), "where": "below grade, not on the plates", "source": "placeholder" if stalls else None}
@@ -206,6 +220,15 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
                 break
         if rest > 0.05:
             shortfall.append({"block": key, "label": b["label"], "area_m2": round(rest, 1)})
+    # the architect's own programs go on the ground floor facing the street, like the non-residential space
+    for b in [b for b in prog["blocks"] if b["key"] == "other"]:
+        rest = b["area_m2"]
+        for fl in floors:
+            rest = place(fl, "other", b["label"], rest, [("front", "left"), ("front", "right")])
+            if rest <= 0.05:
+                break
+        if rest > 0.05:
+            shortfall.append({"block": "other", "label": b["label"], "area_m2": round(rest, 1)})
 
     # units: each one whole, in the first run with room for it, family units lowest and studios highest; the
     # accessible ones are the first placed, so they sit nearest the core on the lowest residential floor
@@ -266,21 +289,234 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
     outright = {"fsr": (fsr_rule or {}).get("values", {}).get("max_fsr_outright"), "height_m": (h_rule or {}).get("values", {}).get("max_height_m_outright"),
                 "rule_ids": [r["rule_id"] for r in (fsr_rule, h_rule) if r]}
     used = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] != "spare"), 1)
+    exits_rule = _find(ledger["results"], rule_id=EGRESS_RULE)
+    sprk = option.get("sprinklered")
+    if sprk is None:
+        sprk = (option.get("layout") or {}).get("sprinklered")
+    eg = None
+    if exits_rule and exits_rule.get("version_effective_from") and exits_rule.get("values"):
+        eg = egress(floors, plate, prog, exits_rule["values"], SPRINKLERED_DEFAULT if sprk is None else bool(sprk))
+        eg["sprinklered_is_placeholder"] = sprk is None
     return {
         "site_id": site.get("id"), "option_id": option.get("id"), "as_of": ledger["run"]["as_of"], "stamp": ledger["run"]["stamp"]["stamp"],
         "units": "m", "origin": massing.get("origin"), "edited": edited,
         "plate": plate,
         "program": prog["blocks"], "parking": prog["parking"], "units_total": prog["units_total"], "units_placed": placed_units,
-        "adjacencies": checks, "geometry": geometry, "floors": floors, "shortfall": shortfall, "outright": outright,
+        "adjacencies": checks, "geometry": geometry, "egress": eg, "floors": floors, "shortfall": shortfall, "outright": outright,
         "totals": {"plates_m2": gross_plates, "used_m2": used, "spare_m2": round(gross_plates - used, 1), "gfa_m2": massing["masses"][0].get("gfa_m2")},
         "assumptions": prog["assumptions"], "warnings": warnings + list(massing.get("warnings") or []),
         "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
     }
 
 
+# ---------------------------------------------------------------- egress, read back from the plates
+
+EGRESS_RULE = "bcbc.exits"
+_STATUS_RANK = {"pass": 0, "conditional": 1, "uncertain": 2, "fail": 3}
+
+
+def _corridor_frame(c: dict) -> dict:
+    """A corridor as its axis ("x" or "y", the longer side), its span along the axis and its centreline."""
+    if c["w"] >= c["d"]:
+        return {"axis": "x", "a0": c["x"], "a1": c["x"] + c["w"], "c0": c["y"] + c["d"] / 2, "zone": c}
+    return {"axis": "y", "a0": c["y"], "a1": c["y"] + c["d"], "c0": c["x"] + c["w"] / 2, "zone": c}
+
+
+def _touches(a: dict, b: dict, tol: float = 0.05) -> bool:
+    return not (a["x"] + a["w"] < b["x"] - tol or b["x"] + b["w"] < a["x"] - tol or a["y"] + a["d"] < b["y"] - tol or b["y"] + b["d"] < a["y"] - tol)
+
+
+def _gap(a: dict, b: dict) -> float:
+    dx = max(0.0, b["x"] - (a["x"] + a["w"]), a["x"] - (b["x"] + b["w"]))
+    dy = max(0.0, b["y"] - (a["y"] + a["d"]), a["y"] - (b["y"] + b["d"]))
+    return dx + dy
+
+
+def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinklered: bool) -> dict[str, Any]:
+    """The exits on every floor against BCBC 2024 Div B Part 3 (rule `bcbc.exits`): how many exits the floor
+    needs and has (3.4.2.1), how far apart they are (3.4.2.3), how far the farthest unit door is from an exit
+    along the corridor (3.4.2.4, 3.4.2.5), and how far a corridor runs past the last exit (3.3.1.9). Exits are the
+    `core` zones: a core at least one core bay wide is read as two stairs at its ends along x, a narrower one as
+    one stair (stair width a declared placeholder). Travel is measured from the midpoint of a unit's edge on its
+    corridor, along the corridor's axis (Manhattan), to the nearest core's edge on that corridor. Pure."""
+    stair_w, _ = LAYOUT_ASSUMPTIONS["stair_width_m"]
+    bay, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
+    area_cap = float(params.get("two_exits_over_floor_area_m2", 150))
+    load_cap = float(params.get("two_exits_over_occupant_load", 60))
+    sep_cap = float(params.get("separation_min_m", 9))
+    sep_share = float(params.get("separation_share_of_diagonal", 0.5))
+    travel_limit = float(params.get("travel_limit_sprinklered_m" if sprinklered else "travel_limit_unsprinklered_m", 45 if sprinklered else 30))
+    dead_limit = float(params.get("dead_end_max_m", 6))
+    per_room = float(params.get("occupant_load_persons_per_sleeping_room", 2))
+    rooms = params.get("sleeping_rooms_by_unit") or {"studio": 1, "one_bed": 1, "two_bed": 2, "three_bed_plus": 3}
+    W, D = float(plate["width_m"]), float(plate["depth_m"])
+    floor_area = W * D
+    diag = (W * W + D * D) ** 0.5
+    sep_min = round(min(sep_cap, sep_share * diag), 2)
+    limits = {"two_exits_over_floor_area_m2": area_cap, "two_exits_over_occupant_load": load_cap, "separation_min_m": sep_cap,
+              "separation_share_of_diagonal": sep_share, "travel_limit_m": travel_limit,
+              "travel_limit_sprinklered_m": params.get("travel_limit_sprinklered_m"), "travel_limit_unsprinklered_m": params.get("travel_limit_unsprinklered_m"),
+              "dead_end_max_m": dead_limit, "occupant_load_persons_per_sleeping_room": per_room, "sleeping_rooms_by_unit": dict(rooms),
+              "stair_width_m": stair_w, "core_bay_m": bay}
+
+    out_floors: list[dict] = []
+    for fl in L_floors:
+        zones = [z for z in fl["zones"] if z["block"] != "spare"]
+        cores = [z for z in zones if z["block"] == "core"]
+        corridors = [_corridor_frame(z) for z in zones if z["block"] == "corridor"]
+        units = [z for z in zones if z.get("unit")]
+        load = sum(per_room * float(rooms.get(z["unit"], 1)) for z in units)
+        required = 2 if (floor_area > area_cap + 1e-9 or load > load_cap + 1e-9) else 1
+        # the stairs: two at the ends of a core a bay wide or wider, one in a narrower core
+        stairs: list[tuple[float, float, int]] = []
+        for i, c in enumerate(cores):
+            cy = c["y"] + c["d"] / 2
+            if c["w"] + 1e-6 >= bay:
+                stairs += [(c["x"] + stair_w / 2, cy, i), (c["x"] + c["w"] - stair_w / 2, cy, i)]
+            else:
+                stairs.append((c["x"] + c["w"] / 2, cy, i))
+        rec = {"level": fl["level"], "name": fl["name"], "exits": len(stairs), "exits_required": required,
+               "separation_m": None, "separation_min_m": sep_min if required >= 2 else None,
+               "farthest_travel_m": None, "travel_limit_m": travel_limit, "farthest_unit": None,
+               "dead_end_m": None, "dead_end_limit_m": dead_limit, "status": "pass", "notes": []}
+        notes = rec["notes"]
+        out_floors.append(rec)
+        if not zones or (not units and not corridors and not cores):
+            notes.append("nothing that needs an exit is placed on this floor: egress not measured")
+            continue
+        if not units and not corridors:
+            notes.append("no units and no corridor on this floor: travel and dead ends not measured")
+        statuses: list[str] = []
+        if not cores:
+            notes.append("no core on this floor, so no exit stair: egress cannot be read (the geometry list names it)")
+            rec["status"] = "uncertain"
+            continue
+        # 3.4.2.1: the number of exits
+        if len(stairs) < required:
+            statuses.append("fail")
+            why = f"the floor area is {floor_area:,.0f} m² (over {area_cap:.0f})" if floor_area > area_cap else f"the occupant load is {load:.0f} (over {load_cap:.0f})"
+            notes.append(f"{len(stairs)} exit{'s' if len(stairs) != 1 else ''} where {required} are required: {why} (3.4.2.1)")
+        # 3.4.2.3: the separation of the two exits farthest apart
+        if len(stairs) >= 2:
+            best = max(((((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5, a, b) for i, a in enumerate(stairs) for b in stairs[i + 1:]), key=lambda t: t[0])
+            rec["separation_m"] = round(best[0], 2)
+            if required >= 2 and best[0] + 1e-6 < sep_min:
+                one = best[1][2] == best[2][2]
+                c = cores[best[1][2]]
+                if one and c["d"] - stair_w + 1e-6 >= sep_min:
+                    statuses.append("conditional")
+                    notes.append(f"the two stairs are {best[0]:.1f} m apart, under the {sep_min:g} m required (3.4.2.3), read as two {stair_w} m stairs at the ends of a {c['w']:g} m core; "
+                                 f"the core runs {c['d']:.1f} m deep, so stairs at its front and rear ends could be {c['d'] - stair_w:.1f} m apart: an arrangement for the architect to draw")
+                else:
+                    statuses.append("fail")
+                    notes.append(f"the exits are {best[0]:.1f} m apart, under the {sep_min:g} m required (3.4.2.3: half the {diag:.1f} m diagonal, not more than {sep_cap:g} m)")
+        # travel distance and dead ends need a corridor
+        if units and not corridors:
+            notes.append("units but no corridor on this floor: travel distance and dead ends cannot be read (the geometry list names it)")
+            rec["status"] = "uncertain"
+            continue
+        if corridors:
+            dead = 0.0
+            for cf in corridors:
+                on = [c for c in cores if _touches(c, cf["zone"])]
+                if not on:
+                    dead = max(dead, cf["a1"] - cf["a0"])
+                    notes.append(f"a corridor of {cf['a1'] - cf['a0']:.1f} m reaches no core: all of it is a dead end")
+                    continue
+                spans = [(c["x"], c["x"] + c["w"]) if cf["axis"] == "x" else (c["y"], c["y"] + c["d"]) for c in on]
+                dead = max(dead, min(s[0] for s in spans) - cf["a0"], cf["a1"] - max(s[1] for s in spans))
+            rec["dead_end_m"] = round(max(0.0, dead), 2)
+            if rec["dead_end_m"] > dead_limit + 1e-6:
+                statuses.append("fail")
+                notes.append(f"the corridor runs {rec['dead_end_m']:.1f} m past the last exit, over the {dead_limit:g} m a dead end may be (3.3.1.9)")
+        # 3.4.2.5: the farthest unit door from its nearest exit
+        far = None
+        for u in units:
+            cf = min(corridors, key=lambda f: _gap(u, f["zone"]))
+            if cf["axis"] == "x":
+                da = u["x"] + u["w"] / 2
+                dc = u["y"] + u["d"] if (u["y"] + u["d"] / 2) < cf["c0"] else u["y"]
+                door = (da, dc)
+            else:
+                da = u["y"] + u["d"] / 2
+                dc = u["x"] + u["w"] if (u["x"] + u["w"] / 2) < cf["c0"] else u["x"]
+                door = (dc, da)
+            best = None
+            on = [c for c in cores if _touches(c, cf["zone"])]
+            for c in on:
+                lo, hi = (c["x"], c["x"] + c["w"]) if cf["axis"] == "x" else (c["y"], c["y"] + c["d"])
+                ea = da if lo <= da <= hi else (lo if da < lo else hi)
+                dist = abs(da - ea) + abs(dc - cf["c0"])
+                pt = (ea, cf["c0"]) if cf["axis"] == "x" else (cf["c0"], ea)
+                if best is None or dist < best[0]:
+                    best = (dist, pt)
+            if best is None:   # the unit's corridor reaches no core: the nearest core edge, Manhattan, as a fallback
+                for c in cores:
+                    ex = min(max(door[0], c["x"]), c["x"] + c["w"])
+                    ey = min(max(door[1], c["y"]), c["y"] + c["d"])
+                    dist = abs(door[0] - ex) + abs(door[1] - ey)
+                    if best is None or dist < best[0]:
+                        best = (dist, (ex, ey))
+            if far is None or best[0] > far[0]:
+                far = (best[0], u, door, best[1])
+        if far:
+            d_, u, door, ex = far
+            rec["farthest_travel_m"] = round(d_, 2)
+            rec["farthest_unit"] = {"block": u["block"], "x": u["x"], "y": u["y"], "door": [round(door[0], 2), round(door[1], 2)], "exit": [round(ex[0], 2), round(ex[1], 2)]}
+            if d_ > travel_limit + 1e-6:
+                statuses.append("fail")
+                notes.append(f"the farthest unit door is {d_:.1f} m from an exit along the corridor, over the {travel_limit:g} m for a{' sprinklered' if sprinklered else 'n unsprinklered'} floor area (3.4.2.5)")
+        elif not units and corridors:
+            notes.append("no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured")
+        rec["status"] = max(statuses, key=lambda s: _STATUS_RANK[s]) if statuses else "pass"
+
+    if any(f["status"] == "fail" for f in out_floors):
+        overall = "fail"
+    elif any(f["status"] == "uncertain" for f in out_floors):
+        overall = "uncertain"
+    elif any(f["status"] == "conditional" for f in out_floors):
+        overall = "conditional"
+    else:
+        overall = "pass"
+    return {"rule_id": EGRESS_RULE, "sprinklered": bool(sprinklered), "sprinklered_is_placeholder": True, "limits": limits,
+            "floors": out_floors, "status": overall, "summary": _egress_summary(out_floors, overall, sprinklered, travel_limit, dead_limit)}
+
+
+def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_limit: float, dead_limit: float) -> str:
+    n = {s: sum(1 for f in floors if f["status"] == s) for s in ("pass", "conditional", "fail", "uncertain")}
+    counts = ", ".join(f"{v} {k}" for k, v in n.items() if v)
+    bits = []
+    short = [f for f in floors if any("(3.4.2.1)" in n for n in f["notes"])]
+    if short:
+        bits.append(f"too few exits on {len(short)} floor{'s' if len(short) != 1 else ''}")
+    sep = [f for f in floors if f["separation_m"] is not None and f["separation_min_m"] is not None and f["separation_m"] + 1e-6 < f["separation_min_m"]]
+    if sep:
+        bits.append(f"exits {min(f['separation_m'] for f in sep):.1f} m apart against {sep[0]['separation_min_m']:g} m on {len(sep)} floor{'s' if len(sep) != 1 else ''}")
+    tr = [f["farthest_travel_m"] for f in floors if f["farthest_travel_m"] is not None]
+    if tr:
+        bits.append(f"farthest travel {max(tr):.1f} m of {travel_limit:g}")
+    de = [f["dead_end_m"] for f in floors if f["dead_end_m"] is not None]
+    if de and max(de) > dead_limit + 1e-6:
+        bits.append(f"dead-end corridors up to {max(de):.1f} m against {dead_limit:g}")
+    return (f"Egress ({'sprinklered' if sprinklered else 'unsprinklered'}, BCBC 2024 Part 3): {overall}; {len(floors)} floor{'s' if len(floors) != 1 else ''}: {counts}"
+            + (f"; {'; '.join(bits)}" if bits else "") + ".")
+
+
+def egress_line(f: dict) -> str:
+    """One floor's egress in a line: exits, travel, separation, dead end against their limits."""
+    parts = [f"exits {f['exits']} of {f['exits_required']}"]
+    if f["farthest_travel_m"] is not None:
+        parts.append(f"travel {f['farthest_travel_m']:.1f} m of {f['travel_limit_m']:g}")
+    if f["separation_min_m"] is not None and f["separation_m"] is not None:
+        parts.append(f"separation {f['separation_m']:.1f} m of {f['separation_min_m']:g}")
+    if f["dead_end_m"] is not None:
+        parts.append(f"dead end {f['dead_end_m']:.1f} m of {f['dead_end_limit_m']:g}")
+    return " · ".join(parts) + f" · {f['status']}"
+
+
 # ---------------------------------------------------------------- a placement drawn by hand, re-checked
 
-EDITABLE_BLOCKS = ("studio", "one_bed", "two_bed", "three_bed_plus", "non_residential", "amenity", "services", "core", "corridor")
+EDITABLE_BLOCKS = ("studio", "one_bed", "two_bed", "three_bed_plus", "non_residential", "amenity", "services", "core", "corridor", "other")
 
 
 def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_level: dict | list) -> dict[str, Any]:
@@ -312,7 +548,8 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                 geometry.append({"kind": "bad_zone", "level": lv, "note": f"zone {i + 1} ({block}) on {'the ground floor' if lv == 0 else f'level {lv + 1}'} is not a block the editor knows, or has no size, and was ignored"})
                 continue
             side = "front" if (y + d / 2) < (y0 + D / 2) else "rear"
-            zone = {"block": block, "label": BLOCK_LABEL.get(block, block), "x": x, "y": y, "w": w, "d": d, "area_m2": round(w * d, 1), "side": side}
+            zone = {"block": block, "label": (str(z.get("label") or "").strip() or "Other") if block == "other" else BLOCK_LABEL.get(block, block),
+                    "x": x, "y": y, "w": w, "d": d, "area_m2": round(w * d, 1), "side": side}
             if block in UNIT_KEYS:
                 zone["unit"] = block
                 zone["accessible"] = bool(z.get("accessible"))
@@ -348,7 +585,9 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             elif n > b["count"]:
                 warnings.append(f"{n - b['count']} more {b['label'].lower()} unit{'s' if n - b['count'] != 1 else ''} drawn than the option counts ({b['count']}): the option's unit mix is what the rules read")
         else:
-            placed = sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] == b["key"])
+            # an added program ("other") is told apart by its label
+            same = (lambda z: z["block"] == "other" and z["label"].strip().lower() == b["label"].strip().lower()) if b["key"] == "other" else (lambda z: z["block"] == b["key"])
+            placed = sum(z["area_m2"] for fl in floors for z in fl["zones"] if same(z))
             if placed + 1.0 < b["area_m2"]:
                 shortfall.append({"block": b["key"], "label": b["label"], "area_m2": round(b["area_m2"] - placed, 1)})
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
@@ -359,7 +598,7 @@ def zones_of(L: dict) -> dict[str, list[dict]]:
     """A layout's placement in the form the option keeps (`layout.zones`): the editor starts from the solver's."""
     out: dict[str, list[dict]] = {}
     for fl in L["floors"]:
-        out[str(fl["level"])] = [{k: z[k] for k in ("block", "x", "y", "w", "d")} | ({"accessible": True} if z.get("accessible") else {})
+        out[str(fl["level"])] = [{k: z[k] for k in ("block", "x", "y", "w", "d")} | ({"accessible": True} if z.get("accessible") else {}) | ({"label": z["label"]} if z["block"] == "other" else {})
                                  for z in fl["zones"] if z["block"] != "spare"]
     return out
 
@@ -484,9 +723,12 @@ def svg_stacking(L: dict) -> str:
     return "\n".join(out)
 
 
-def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float, title: str) -> None:
+def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float, title: str, eg: dict | None = None) -> None:
     p = L["plate"]
-    out.append(f'<text x="{ox:.1f}" y="{oy - 8:.1f}" font-size="13" font-weight="600">{_esc(title)}</text>')
+    out.append(f'<text x="{ox:.1f}" y="{oy - (22 if eg else 8):.1f}" font-size="13" font-weight="600">{_esc(title)}</text>')
+    if eg:
+        colour = {"pass": "#2f7d4a", "conditional": "#9a6b00", "fail": "#c81e1e", "uncertain": "#a3640c"}.get(eg["status"], TONES["muted"])
+        out.append(f'<text x="{ox:.1f}" y="{oy - 7:.1f}" font-size="10.5" fill="{colour}">Egress: {_esc(egress_line(eg))}</text>')
     out.append(f'<rect x="{ox:.1f}" y="{oy:.1f}" width="{p["width_m"] * scale:.1f}" height="{p["depth_m"] * scale:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
     # the street is at the bottom of every plan in the set, as on FIG 01 (15 Nov 2026): the plate's y runs from the
     # street side, so a zone is drawn from the far edge down
@@ -499,8 +741,22 @@ def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float,
         if z.get("accessible"):
             out.append(f'<circle cx="{x + 7:.1f}" cy="{y + 7:.1f}" r="3.2" fill="{TONES["accessible"]}"/>')
         if w > 26 and d > 14:
-            lab = {"three_bed_plus": "3b", "two_bed": "2b", "one_bed": "1b", "studio": "st", "corridor": "corridor", "core": "core", "services": "services", "amenity": "amenity", "non_residential": "non-res", "spare": "spare"}[z["block"]]
+            lab = {"three_bed_plus": "3b", "two_bed": "2b", "one_bed": "1b", "studio": "st", "corridor": "corridor", "core": "core", "services": "services", "amenity": "amenity", "non_residential": "non-res", "spare": "spare"}.get(z["block"], str(z.get("label") or "")[:12].lower())
             out.append(f'<text x="{x + w / 2:.1f}" y="{y + d / 2 + 3.5:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["ink"]}">{lab}</text>')
+    # the farthest travel path: the unit's door, across to the corridor's axis, along it to the exit
+    fu = (eg or {}).get("farthest_unit")
+    if fu:
+        px = lambda x: ox + (x - p["x"]) * scale
+        py = lambda y: oy + (p["depth_m"] - (y - p["y"])) * scale
+        (dx, dy), (ex, ey) = fu["door"], fu["exit"]
+        corner = (dx, ey) if abs(dy - ey) <= abs(dx - ex) else (ex, dy)
+        over = eg["farthest_travel_m"] > eg["travel_limit_m"] + 1e-6
+        tone = TONES["envelope"] if over else TONES["ink"]
+        out.append(f'<polyline points="{px(dx):.1f},{py(dy):.1f} {px(corner[0]):.1f},{py(corner[1]):.1f} {px(ex):.1f},{py(ey):.1f}" fill="none" stroke="{tone}" stroke-width="1.4" stroke-dasharray="4 2"/>')
+        out.append(f'<circle cx="{px(dx):.1f}" cy="{py(dy):.1f}" r="2.4" fill="{tone}"/>')
+        out.append(f'<path d="M {px(ex) - 3:.1f} {py(ey) - 3:.1f} L {px(ex) + 3:.1f} {py(ey) + 3:.1f} M {px(ex) - 3:.1f} {py(ey) + 3:.1f} L {px(ex) + 3:.1f} {py(ey) - 3:.1f}" stroke="{tone}" stroke-width="1.4"/>')
+        mx, my = (px(corner[0]) + px(ex)) / 2, (py(corner[1]) + py(ey)) / 2
+        out.append(f'<text x="{mx:.1f}" y="{my - 4:.1f}" font-size="10" text-anchor="middle" fill="{tone}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{eg["farthest_travel_m"]:.1f} m</text>')
     # dimension strings
     out.append(f'<line x1="{ox:.1f}" y1="{oy + p["depth_m"] * scale + 14:.1f}" x2="{ox + p["width_m"] * scale:.1f}" y2="{oy + p["depth_m"] * scale + 14:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
     out.append(f'<text x="{ox + p["width_m"] * scale / 2:.1f}" y="{oy + p["depth_m"] * scale + 26:.1f}" font-size="10" text-anchor="middle" fill="{TONES["muted"]}">{p["width_m"]} m · street side</text>')
@@ -530,10 +786,15 @@ def svg_plans(L: dict) -> str:
     # one plan per row, each as wide as the sheet allows, so the drawing stays legible in a 400 px column
     scale = max(3.0, min(560 / p["width_m"], 200 / p["depth_m"]))
     pw, pd = p["width_m"] * scale, p["depth_m"] * scale
-    row = pd + 64
+    eg = L.get("egress")
+    head = 14 if eg else 0
+    row = pd + 64 + head
     width = pad + 30 + pw + pad
     lines = [f'Unit depth {p["unit_depth_m"]} m either side of a {LAYOUT_ASSUMPTIONS["corridor_width_m"][0]} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;',
              f'partitions +{int((LAYOUT_ASSUMPTIONS["partition_allowance"][0] - 1) * 100)}% over net areas (declared placeholders). The rules read back from the plates are listed with the figure.',
+             *([f'Egress ({eg["rule_id"]}, BCBC 2024 Part 3, figures to be verified): dashed, the farthest unit door to its exit along the corridor;',
+                f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.']
+               if eg else []),
              _stamp_line(L)]
     height = pad + 24 + len(levels) * row + 20 + 30 + 16 * len(lines) + 16
     out = _svg_open(max(width, 640), height, "Floor plans by program")
@@ -545,7 +806,8 @@ def svg_plans(L: dict) -> str:
             if z.get("unit"):
                 counts[z["unit"]] = counts.get(z["unit"], 0) + 1
         title = fl["name"] + (": " + ", ".join(f'{n} {UNIT_LABEL[k].lower()}' for k, n in counts.items()) if counts else "") + (f' · {fl["spare_m2"]:,.0f} m² spare' if fl["spare_m2"] > 5 else "")
-        _plan(out, L, fl, pad + 30, pad + 24 + i * row + 14, scale, title if len(title) < 80 else fl["name"])
+        _plan(out, L, fl, pad + 30, pad + 24 + i * row + 14 + head, scale, title if len(title) < 80 else fl["name"],
+              eg["floors"][lv] if eg and lv < len(eg["floors"]) else None)
     ly = pad + 24 + len(levels) * row + 14
     out += _legend(pad, ly, ["non_residential", "amenity", "services", "core", "corridor", "three_bed_plus", "two_bed", "one_bed", "studio", "spare"])
     out.append(f'<circle cx="{pad + 6}" cy="{ly + 18:.1f}" r="3.2" fill="{TONES["accessible"]}"/><text x="{pad + 16}" y="{ly + 22:.1f}" font-size="11" fill="{TONES["muted"]}">accessible unit</text>')
@@ -805,6 +1067,17 @@ def markdown(L: dict) -> list[str]:
     for w in L.get("warnings") or []:
         M.append(f"- Note: {w}")
     M.append("")
+    eg = L.get("egress")
+    if eg:
+        M.append("### Egress")
+        M.append("")
+        M.append(f"{eg['summary']} Read against `{eg['rule_id']}` (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). "
+                 + ("Sprinklered is assumed (a declared placeholder; `sprinklered: false` on the option switches the limits). " if eg["sprinklered_is_placeholder"] else ("Sprinklered, as the option states. " if eg["sprinklered"] else "Unsprinklered, as the option states. "))
+                 + f"Exits are the core zones, a core {LAYOUT_ASSUMPTIONS['core_bay_m'][0]:g} m wide or wider read as two {LAYOUT_ASSUMPTIONS['stair_width_m'][0]} m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.")
+        M.append("")
+        for f in eg["floors"]:
+            M.append(f"- *{f['status']}* — {f['name']}: {egress_line(f).rsplit(' · ', 1)[0]}." + (" " + "; ".join(f["notes"])[0].upper() + "; ".join(f["notes"])[1:] + "." if f["notes"] else ""))
+        M.append("")
     for name, cap in (("stacking", "Stacking diagram"), ("plans", "Plans by program"), ("elevations", "Preliminary elevations"), ("axon", "The floors stacked"), ("site-plan", "Code site plan")):
         M.append(f"![{cap}]({name}.svg)")
         M.append("")

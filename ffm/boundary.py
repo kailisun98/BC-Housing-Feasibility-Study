@@ -12,6 +12,8 @@ Three pure pieces, standard library only:
                           swallow the shape
     largest_rect(poly)    the largest rectangle, aligned with the lot frame, inside a polygon: the plate box the
                           rectangular masses and the layout's plates are placed in
+    oriented_ring(site)   the lot turned so the face `site.front_face` names is the street side, with the affine
+                          transform (`rotate_deg`, `tx`, `ty`) that takes the old lot frame to the new one
 
 Coordinates follow massing.json: metres, origin at the front-left corner of the equivalent rectangle.
 """
@@ -97,6 +99,208 @@ def lot_ring(site: dict) -> dict[str, Any] | None:
     pts = [(x - x0, y - y0) for x, y in rot]
     return {"ring": [[round(x, 2), round(y, 2)] for x, y in _ccw(pts)], "source": "parcel", "frame": "bearing",
             "note": "the City's parcel polygon turned so the frontage runs along x; the street side is assumed to be the lower edge (no context frame on file)"}
+
+
+# ---------------------------------------------------------------- which face is the front
+
+ADJOIN_M = 15.0    # a road adjoins the lot where its centreline comes within half its width plus this of the lot line
+SIDE_NORMALS = {"front": (0.0, -1.0), "rear": (0.0, 1.0), "left": (-1.0, 0.0), "right": (1.0, 0.0)}
+
+
+def lot_corners(ring: list) -> list[Point]:
+    """The corners a hand would draw (no curve segments): what massing records as `lot.corners`, and what
+    `front_face: {"edge": i}` counts edges on (edge i runs from corner i to corner i + 1)."""
+    return simplify([(float(p[0]), float(p[1])) for p in ring], 3.0, 0.5)
+
+
+def _dist_seg(p: Point, a: Point, b: Point) -> tuple[float, Point]:
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    L2 = dx * dx + dy * dy
+    t = 0.0 if L2 == 0 else max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2))
+    q = (a[0] + t * dx, a[1] + t * dy)
+    return math.hypot(p[0] - q[0], p[1] - q[1]), q
+
+
+def _dist_polyline(p: Point, pts: list[Point]) -> tuple[float, Point]:
+    if len(pts) == 1:
+        return math.dist(p, pts[0]), pts[0]
+    return min((_dist_seg(p, pts[i], pts[i + 1]) for i in range(len(pts) - 1)), key=lambda r: r[0])
+
+
+def _outward(a: Point, b: Point) -> Point:
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    L = math.hypot(dx, dy) or 1.0
+    return (dy / L, -dx / L)     # counter-clockwise ring: the outside is to the right of a -> b
+
+
+def _road_frontage(corners: list[Point], pts: list[Point], reach: float) -> list[tuple[float, float]]:
+    """Per edge of the lot: (metres of the edge that face the road within `reach`, mean distance of those)."""
+    out = []
+    n = len(corners)
+    for i in range(n):
+        a, b = corners[i], corners[(i + 1) % n]
+        L = math.dist(a, b)
+        nrm = _outward(a, b)
+        k = max(2, int(L))     # a sample about every metre
+        near, dsum = 0, 0.0
+        for j in range(k):
+            t = (j + 0.5) / k
+            p = (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
+            d, q = _dist_polyline(p, pts)
+            if d <= reach and (d < 1e-6 or (q[0] - p[0]) * nrm[0] + (q[1] - p[1]) * nrm[1] > 0):
+                near += 1
+                dsum += d
+        out.append((L * near / k, dsum / near if near else math.inf))
+    return out
+
+
+def adjoining_roads(site: dict, corners: list[Point]) -> dict[str, list[list[Point]]]:
+    """The named roads in `site.osm.roads` (stored in the lot frame) whose centreline comes within half the road's
+    width plus ADJOIN_M of the lot outline, name -> its ways' points."""
+    out: dict[str, list[list[Point]]] = {}
+    n = len(corners)
+    for rd in (site.get("osm") or {}).get("roads") or []:
+        name, pts = rd.get("name"), [(float(p[0]), float(p[1])) for p in rd.get("points") or []]
+        if not name or not pts:
+            continue
+        reach = float(rd.get("width_m") or 10.0) / 2 + ADJOIN_M
+        d = min(_dist_seg(q, corners[i], corners[(i + 1) % n])[0] for q in pts for i in range(n))
+        # a way that crosses an edge between its vertices: check the lot corners against the way as well
+        d = min(d, min(_dist_polyline(c, pts)[0] for c in corners))
+        if d <= reach:
+            out.setdefault(name, []).append(pts)
+    return out
+
+
+def _face_edge(site: dict, corners: list[Point], ff: dict) -> tuple[int, Point, Point, list[Point]]:
+    """The corner edge the front_face names: its index, the two ends of the face (for a street, the chord of the
+    run of neighbouring edges that face it) and the corners along the face."""
+    n = len(corners)
+    if "edge" in ff:
+        i = ff["edge"]
+        if not isinstance(i, int) or isinstance(i, bool) or not 0 <= i < n:
+            raise ValueError(f"front_face edge {i!r} is not an edge of the lot: it has {n} edges, numbered 0 to {n - 1} from lot.corners.")
+        return i, corners[i], corners[(i + 1) % n], [corners[i], corners[(i + 1) % n]]
+    if "side" in ff:
+        want = SIDE_NORMALS.get(ff["side"])
+        if want is None:
+            raise ValueError(f"front_face side {ff['side']!r} is not one of front, rear, left, right.")
+        best, best_score = 0, -math.inf
+        for i in range(n):
+            a, b = corners[i], corners[(i + 1) % n]
+            nrm = _outward(a, b)
+            dot = nrm[0] * want[0] + nrm[1] * want[1]
+            score = dot * math.dist(a, b) if dot > 0.7 else dot - 10.0    # the longest edge that faces that way
+            if score > best_score:
+                best, best_score = i, score
+        return best, corners[best], corners[(best + 1) % n], [corners[best], corners[(best + 1) % n]]
+    if "street" in ff:
+        roads = adjoining_roads(site, corners)
+        name = str(ff["street"])
+        match = next((k for k in roads if k.lower() == name.strip().lower()), None)
+        if match is None:
+            listed = ", ".join(sorted(roads)) or "none (fetch the context with python -m ffm context)"
+            raise ValueError(f"No road named {name!r} adjoins the lot. The roads that adjoin it are: {listed}.")
+        near = [0.0] * n
+        for pts in roads[match]:
+            for i, (m, _) in enumerate(_road_frontage(corners, pts, ADJOIN_M + 10.0)):
+                near[i] = max(near[i], m)
+        if max(near) <= 0:
+            raise ValueError(f"{match} adjoins the lot but no lot line faces it; name the face with front_face side or edge instead.")
+        best = max(range(n), key=lambda i: (round(near[i], 3), -i))
+        # a street front drawn as several short edges (a kinked or gently curving property line): the run of
+        # neighbouring edges that face the same road the same way is one face, and its chord the new x axis
+        nb = _outward(corners[best], corners[(best + 1) % n])
+
+        def joins(k: int) -> bool:
+            nk = _outward(corners[k], corners[(k + 1) % n])
+            L = math.dist(corners[k], corners[(k + 1) % n]) or 1.0
+            return near[k] >= 0.5 * L and nk[0] * nb[0] + nk[1] * nb[1] > math.cos(math.radians(30))
+        lo = hi = best
+        while (lo - 1) % n != hi and joins((lo - 1) % n):
+            lo = (lo - 1) % n
+        while (hi + 1) % n != lo and joins((hi + 1) % n):
+            hi = (hi + 1) % n
+        run = [corners[k % n] for k in range(lo, lo + ((hi - lo) % n) + 2)]
+        return best, corners[lo], corners[(hi + 1) % n], run
+    raise ValueError("front_face must be {\"street\": name}, {\"side\": front|rear|left|right} or {\"edge\": index}.")
+
+
+def _rot(theta_deg: float) -> tuple[float, float]:
+    q = theta_deg / 90.0
+    if abs(q - round(q)) < 1e-9:      # quarter turns exactly, so a rectangle stays a clean rectangle
+        return [(1.0, 0.0), (0.0, 1.0), (-1.0, 0.0), (0.0, -1.0)][int(round(q)) % 4]
+    t = math.radians(theta_deg)
+    return math.cos(t), math.sin(t)
+
+
+def apply_orientation(o: dict, pt) -> Point:
+    """new = R(θ)·old + t, R(θ) = [[cos θ, −sin θ], [sin θ, cos θ]] (θ counter-clockwise, degrees)."""
+    c, s = _rot(float(o["rotate_deg"]))
+    x, y = float(pt[0]), float(pt[1])
+    return (c * x - s * y + float(o["tx"]), s * x + c * y + float(o["ty"]))
+
+
+def oriented_ring(site: dict) -> dict[str, Any] | None:
+    """The lot turned so the face `site.front_face` names is the street side, or None where the site names none
+    (then everything stays in the frame `lot_ring` gives).
+
+    front_face is one of:
+        {"street": "<road name>"}   a road in site.osm.roads that adjoins the lot; the lot edge that faces it
+                                    over the most length becomes the front (ValueError, listing the adjoining
+                                    roads, for a name that does not adjoin)
+        {"side": "front"|"rear"|"left"|"right"}   the longest edge facing that way in the current frame
+        {"edge": i}                 edge i of lot.corners (corner i to corner i + 1), as massing records them
+
+    The base is the lot ring (`lot_ring`) or, on a plain lot, the frontage x depth rectangle. The chosen face
+    a -> b of the counter-clockwise ring (one edge; for a street, the chord of the run of neighbouring edges that
+    face it) is turned to run along +x, so the lot lies above it (y > 0); then the ring is shifted so the face's
+    outermost corner sits on y = 0 and the lot's leftmost point on x = 0 (the new front-left corner).
+
+    The transform, stored by massing in `lot.orientation` and to be applied by the page to everything stored in
+    the old lot frame (site.osm roads, buildings, trees):
+
+        new = R(θ)·old + t,   R(θ) = [[cos θ, −sin θ], [sin θ, cos θ]],   θ = rotate_deg, counter-clockwise,
+        t = (tx, ty)
+
+    Worked example: the plain 75.6 x 37.2 m lot with front_face {"side": "right"}. The right side runs from
+    (75.6, 0) to (75.6, 37.2), direction +y, so θ = −90 and R = [[0, 1], [−1, 0]]: (x, y) -> (y, −x). That
+    takes (75.6, 0) to (0, −75.6) and (0, 0) to (0, 0), so t = (0, 75.6). A point on the old front street at
+    (30, −10) goes to (−10 + 0, −30 + 75.6) = (−10, 45.6): it now lies off the new left side, 45.6 m in from the
+    new front. The new lot is 37.2 m along the front (frontage) and 75.6 m deep.
+    """
+    ff = site.get("front_face")
+    if not ff:
+        return None
+    if not isinstance(ff, dict):
+        raise ValueError("front_face must be a dict: {\"street\": name}, {\"side\": ...} or {\"edge\": index}.")
+    base = lot_ring(site)
+    W, D = float(site.get("frontage_m") or 0), float(site.get("depth_m") or 0)
+    if base:
+        ring = [(float(p[0]), float(p[1])) for p in base["ring"]]
+        corners = lot_corners(ring)
+    else:
+        if not W or not D:
+            raise ValueError("Site needs frontage_m and depth_m to choose a front face.")
+        ring = corners = [(0.0, 0.0), (W, 0.0), (W, D), (0.0, D)]
+    i, a, b, face = _face_edge(site, corners, ff)
+    theta = round(-math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])), 6)
+    if theta <= -180:
+        theta += 360
+    theta = theta + 0.0                       # no -0.0
+    c, s = _rot(theta)
+    rx = [c * x - s * y for x, y in ring]
+    tx = round(-min(rx), 3) + 0.0
+    ty = round(-min(s * x + c * y for x, y in face), 3) + 0.0     # the face's outermost corner on y = 0
+    o = {"rotate_deg": theta, "tx": tx, "ty": ty}
+    new_ring = [apply_orientation(o, p) for p in ring]
+    new_corners = [apply_orientation(o, p) for p in corners]
+    bb = bbox(new_ring)
+    r2 = lambda pts: [[round(x, 2) + 0.0, round(y, 2) + 0.0] for x, y in pts]
+    return {"ring": r2(new_ring), "corners": r2(new_corners), "orientation": o, "front_face": ff, "edge": i,
+            "rectangle": base is None, "frontage_m": round(bb[2] - bb[0], 2), "depth_m": round(bb[3] - bb[1], 2),
+            "source": base["source"] if base else "rectangle", "frame": base["frame"] if base else "lot",
+            "note": (base["note"] + "; " if base else "") + f"turned so lot edge {i} is the front (front_face {ff})"}
 
 
 # ---------------------------------------------------------------- geometry

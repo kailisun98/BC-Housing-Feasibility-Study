@@ -319,6 +319,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .memo-meta .cont { color: var(--muted); }
 .memo-meta code { font: 600 11.5px/1.3 var(--mono); }
 .memo-head .quiet { color: var(--muted); margin: 0; max-width: 58ch; font-size: 12.5px; }
+/* the option in figures, a second row under the title block's keys (16 Nov 2026) */
+.memo-figures { display: flex; flex-wrap: wrap; gap: 4px 0; margin: -4px 0 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.memo-figures > div { display: flex; flex-direction: column; gap: 1px; padding: 0 12px 0 0; margin-right: 12px; border-right: 1px solid var(--line); min-width: 0; flex: 1 1 120px; font-size: 13px; }
+.memo-figures > div:last-child { border-right: 0; margin-right: 0; }
+.memo-figures b { font-size: 10.5px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+.memo-figures .cont { color: var(--muted); font-size: 12px; }
 
 /* a revision, the drafting way: a delta with its letter beside what changed, and a revision row in the title block */
 .rev { display: inline-block; width: 16px; height: 14px; vertical-align: -2px; color: var(--ink); flex: 0 0 auto; }
@@ -479,13 +485,33 @@ table.plain td.status { white-space: nowrap; }
 .fig-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; margin-bottom: 6px; }
 .fig-head .eyebrow { margin: 0; }
 /* the architect's sheets: the engine's SVGs at the card's width, a Plan | Axon tab on the plans, the rules under them */
-.figure.sheet .sheet-body svg { display: block; width: 100%; height: auto; }
+/* a sheet is drawn at a fixed size (640 px wide, 12 px type) and keeps it: stretched to a wide card its titles became
+   headlines (16 Nov 2026); it only ever shrinks to fit a narrow column */
+.figure.sheet .sheet-body svg { display: block; width: auto; max-width: 100%; height: auto; }
 .figure.sheet .sheet-body[hidden] { display: none; }
 .sheet-rules { margin-top: 8px; font-size: 12px; }
+.egress { margin-top: 8px; font-size: 12px; }
+.egress summary { cursor: pointer; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+.egress .finding-list { margin-top: 6px; }
+.egress .help { margin: 6px 0 0; }
+.unverified { display: inline-block; font: 600 10px/1 var(--mono); color: var(--s-uncertain-text); background: var(--s-uncertain-wash); border-radius: 3px; padding: 2px 5px; margin-left: 5px; vertical-align: middle; letter-spacing: .04em; text-transform: uppercase; cursor: help; }
 .sheet-rules .cont { color: var(--c-drawmuted); }
 .fig-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-left: auto; }
 /* the block editor is the architect's tool: the manager and the reader see the sheets without it */
 [data-mode="manager"] #edit-blocks, [data-mode="manager"] #sheet-editor, [data-mode="manager"] .bnd-tools { display: none !important; }
+/* the architect's placement of the mass and choice of the front, a fold under FIG 01's head */
+.mass-tools { font-size: 12px; margin: 0 0 8px; border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; background: var(--field); }
+.mass-tools summary { cursor: pointer; }
+.mass-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 8px; }
+.mass-row .field.inline { display: inline-flex; align-items: center; gap: 6px; }
+.mass-row .field.inline .label { font-size: 11px; }
+.mass-row input[type=number] { width: 64px; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.mass-row select { max-width: 220px; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.mass-row .help { flex-basis: 100%; }
+.mass-anchor { display: grid; grid-template-columns: repeat(3, 18px); grid-auto-rows: 14px; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
+.mass-anchor .segbtn { padding: 0; min-height: 0; border-radius: 2px; background: var(--c-half-building); border: 1px solid var(--c-half-line); }
+.mass-anchor .segbtn[aria-pressed="true"] { background: var(--c-envelope); border-color: var(--c-envelope-line); }
+[data-mode="manager"] .mass-tools, [data-mode="reader"] .mass-tools { display: none !important; }
 /* the boundary editor on FIG 01: handles on the lot line, the tools beside the Plan | 3D control */
 .bnd-tools .bnd-note { font-size: 11.5px; }
 .bnd .bnd-v, .bnd .bnd-mid { cursor: grab; }
@@ -507,6 +533,19 @@ table.plain td.status { white-space: nowrap; }
 .ed-canvas .ed-handle-w { cursor: ew-resize; }
 .ed-canvas .ed-handle-d { cursor: ns-resize; }
 .ed-status { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
+/* the program tracker under the editor: what is left to place, a row per block, and the architect's own programs */
+.ed-tracker { font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; background: var(--field); }
+.ed-tracker summary { cursor: pointer; }
+.ed-track { margin-top: 6px; }
+.ed-track td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ed-track tr.short td:nth-child(4) { color: var(--s-uncertain-text); font-weight: 600; }
+.ed-track tr.over td:nth-child(4) { color: var(--s-fail-text); }
+.ed-track tr.ok td:nth-child(4) { color: var(--muted); }
+.ed-newprog { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 8px; }
+.ed-newprog .label { font-size: 11px; color: var(--muted); font-weight: 500; }
+.ed-newprog input { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.ed-newprog input[type=text] { width: 150px; }
+.ed-newprog input[type=number] { width: 72px; }
 .ed-status .finding-list { gap: 3px; }
 .seg { display: inline-flex; border: 1px solid var(--c-rule); border-radius: 4px; overflow: hidden; background: var(--c-paper); }
 .segbtn { border: 0; border-radius: 0; background: var(--c-paper); color: var(--c-drawmuted); font-size: 11.5px; font-weight: 500; padding: 3px 10px; min-height: 24px; cursor: pointer; transition: background-color .12s ease-out, color .12s ease-out; }
@@ -735,6 +774,17 @@ table.plain td.status { white-space: nowrap; }
 @media (min-width: 900px) { .stage-site { grid-template-columns: minmax(280px, 1.1fr) minmax(0, 1fr); align-items: start; } }
 .stage-map { height: 260px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--field); }
 .stage-map .help { padding: 12px; }
+/* the map in the brand's half tone (16 Nov 2026): the OpenStreetMap tiles are drained to the paper greys the drawings
+   use for roads and buildings, so the parcel's signal blue is the one colour on it; the controls take the tool's type */
+.stage-map .leaflet-tile-pane { filter: grayscale(1) brightness(1.07) contrast(0.74); }
+.stage-map .leaflet-container { font-family: var(--sans); background: var(--c-half-road); }
+.stage-map .leaflet-bar { border: 1px solid var(--line); box-shadow: none; border-radius: 4px; }
+.stage-map .leaflet-control-zoom a { color: var(--ink); background: var(--paper); border-bottom-color: var(--line); font: 500 16px/26px var(--sans); }
+.stage-map .leaflet-control-zoom a:hover { background: var(--field); }
+.stage-map .leaflet-control-attribution { font: 10px var(--sans); color: var(--muted); background: rgba(255, 255, 255, .78); }
+.stage-map .leaflet-control-attribution a { color: var(--muted); }
+.stage-map .leaflet-tooltip { font: 12px var(--sans); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); padding: 4px 8px; }
+.stage-map .leaflet-tooltip::before { display: none; }
 .stage-src { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
 .stage-src a { color: var(--blue, #2a6fb8); }
 .stage-program { padding: 8px 0; border-top: 1px solid var(--line); }
@@ -768,6 +818,15 @@ table.plain td.status { white-space: nowrap; }
 .proposal .field.inline { display: inline-flex; align-items: center; gap: 6px; }
 .proposal .field.inline input { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12px; min-width: 140px; }
 .sg-rows { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+/* the rough envelope line and the unit-mix controls under their groups at stop 4 (16 Nov 2026) */
+.sg-env, .sg-mix { margin: 8px 0 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--field); }
+.sg-env .help, .sg-mix .help { margin: 4px 0 0; }
+.mix-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 8px; margin-top: 6px; }
+.mix-row .field { margin: 0; }
+.mix-row .field:first-child { flex: 1 1 100%; }
+.mix-row .mix-share { width: 64px; }
+.cand-why { margin: 6px 0 0; padding-left: 16px; }
+.cand-why li { margin: 2px 0; }
 .sg-row { display: grid; grid-template-columns: minmax(0, 1.2fr) auto minmax(72px, .9fr); grid-template-areas: "label pick value" "note note note"; gap: 2px 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .sg-label { grid-area: label; font-size: 12.5px; font-weight: 500; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .sg-label code { font: 10.5px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
@@ -809,10 +868,14 @@ table.plain td.status { white-space: nowrap; }
 @media (max-width: 1100px) { .preview3d { grid-template-columns: 1fr; } }
 
 /* ------------------------------------------------------------------ issuing, and the chip that says a run was issued to you */
-.issue-panel { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-panel); background: var(--field); display: flex; flex-direction: column; gap: 6px; max-width: 560px; }
-.issue-panel label { font-size: 12px; color: var(--muted); font-weight: 500; }
-.issue-panel textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; resize: vertical; }
-.issue-panel .form-actions { margin-top: 2px; }
+/* the issue form opens where the button was pressed (the guide's stop 7 or the export bar), never somewhere else
+   on the page (16 Nov 2026: it used to scroll the reader to the foot of the page) */
+.issue-panel { margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-panel); background: var(--field); display: flex; flex-direction: column; gap: 8px; max-width: 560px; }
+.issue-panel .label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.issue-panel .issue-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 8px; }
+.issue-panel input, .issue-panel select, .issue-panel textarea { width: 100%; border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; }
+.issue-panel textarea { resize: vertical; }
+.issue-panel .form-actions { margin-top: 0; }
 .issue-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 9px; border-radius: 999px; border: 1px solid var(--b-amber-night); background: color-mix(in srgb, var(--b-amber-night) 18%, transparent); color: #ffe3a6; font: 500 12px/1 var(--sans); cursor: pointer; white-space: nowrap; transition: background-color var(--t-fast); }
 .issue-chip:hover { background: color-mix(in srgb, var(--b-amber-night) 32%, transparent); color: #fff; }
 .issue-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--b-amber-night); box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-amber-night) 30%, transparent); }
@@ -836,7 +899,11 @@ table.plain td.status { white-space: nowrap; }
 }
 @media (min-width: 1600px) {
   [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; }
-  [data-mode="architect"] .memo-body > .answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
+  /* two columns that fill: a grid left a card-sized hole under a short answer (16 Nov 2026), so the answers flow
+     down one column and into the next instead */
+  [data-mode="architect"] .memo-body > .answers { display: block; columns: 2; column-gap: 12px; }
+  [data-mode="architect"] .memo-body > .answers > .answer { break-inside: avoid; margin-bottom: 12px; }
+  [data-mode="architect"] .memo-body > .answers > .answer:last-child { margin-bottom: 0; }
 }
 [data-mode="reader"] { --bars-h: 92px; }
 [data-mode="reader"] .steps, [data-mode="reader"] #tour-offer, [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,

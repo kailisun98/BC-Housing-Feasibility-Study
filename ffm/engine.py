@@ -118,10 +118,21 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         by_rezoning = _verdict(policy_rules)
         extra_open.append({"rule_id": "coverage.district_schedule", "title": f"No outright schedule for {district} in the rules", "status": "uncertain",
                            "finding": f"The rule stack has no {district} district schedule, so the envelope (storeys, height, floor area, yards) is the option's own figure, not a permitted one."
-                           + (" A CD-1 site's limits are whatever its by-law and the rezoning set." if district.upper().startswith("CD-1") else ""),
+                           + ((f" Its limits are in CD-1 by-law No. {site['cd1_bylaw_number']}, and whatever the rezoning set." if site.get("cd1_bylaw_number") not in (None, "")
+                               else " A CD-1 site's limits are whatever its by-law and the rezoning set.") if district.upper().startswith("CD-1") else ""),
                            "action": f"Architect: read the {district} schedule (or read it with Claude at stop 3 and confirm its clauses) and enter the outright FSR, height and yards."})
     else:
         by_rezoning = _verdict(policy_rules)
+    # schedule figures typed from recollection, not read from the schedule PDF (16 Nov 2026): a rule version whose
+    # source says verified false and that was tested on this site is one open item for the run, not one per rule
+    unverified = [r["rule_id"] for r in results
+                  if r["status"] != NA and r["layer"] == "A" and r.get("check", "").startswith("district_")
+                  and (r.get("source") or {}).get("verified") is False]
+    if unverified and not outside:
+        extra_open.append({"rule_id": "coverage.schedule_unverified", "title": f"District schedule figures entered unverified ({district})", "status": "uncertain",
+                           "finding": f"The figures in {', '.join(unverified)} were entered from recollection of the {district} schedule and not read from the schedule PDF; "
+                                      "until they are confirmed, a pass against them is not a permission.",
+                           "action": f"Architect: open the {district} schedule PDF and confirm the FSR, height and yards; or drop the PDF into inbox/ and have the rule confirmed."})
     # the yards: where no district yard rule tested them, the option's setbacks are its own figures, and a reader of the
     # site plan should know that nothing checked them (15 Nov 2026, from an architect's test)
     sb = option.get("setbacks_m") or {}

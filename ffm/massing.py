@@ -12,6 +12,10 @@ the site carries its parcel polygon or a drawn boundary (`ffm.boundary`): then t
 setback envelope is the shape inset by the setbacks, and the masses stand in the largest rectangle inside
 the envelope (the plate box).
 
+The architect can move and turn the proposed mass inside the plate box (`option.massing`, see `place`) and choose
+which face of the lot is the street side (`site.front_face`, see `boundary.oriented_ring`; the transform is stored
+in `lot.orientation`). Without either, the masses stand where they always have.
+
 Coordinates: metres, origin at the front-left lot corner, x along the frontage, y into the lot
 (away from the street), z up. massing.json is what the pyRevit script reads.
 """
@@ -56,6 +60,54 @@ def _outright_params(results: list[dict]) -> tuple[float | None, float | None, l
     return fsr, height, used
 
 
+ANCHORS = {   # anchor -> (x: 0 left, 0.5 centre, 1 right; y: 0 front, 0.5 middle, 1 rear) within the plate box
+    "front-left": (0, 0), "front": (0.5, 0), "front-right": (1, 0),
+    "left": (0, 0.5), "centre": (0.5, 0.5), "right": (1, 0.5),
+    "rear-left": (0, 1), "rear": (0.5, 1), "rear-right": (1, 1),
+}
+
+
+def place(spec: dict, plate_m2: float, w: float, d: float, box: dict, default_anchor: str,
+          warnings: list[str]) -> tuple[list[list[float]], float, float, dict[str, Any]]:
+    """Where the architect put the proposed plate (`option.massing`): against a side or corner of the plate box
+    (`anchor`), shifted by `dx_m` (along the frontage) and `dy_m` (into the lot), turned a quarter (`rotate`: the
+    w x d plate becomes d x w). The footprint never leaves the box: a rotated plate that does not fit is refit to the
+    box keeping its area, and a shift past the box is clamped; each says so in `warnings`."""
+    if not isinstance(spec, dict):
+        raise ValueError("option.massing must be a dict: {anchor, dx_m, dy_m, rotate}.")
+    anchor = spec.get("anchor") or default_anchor
+    if anchor not in ANCHORS:
+        raise ValueError(f"option.massing anchor {anchor!r} is not one of {', '.join(ANCHORS)}.")
+    dx, dy = float(spec.get("dx_m") or 0), float(spec.get("dy_m") or 0)
+    rotate = bool(spec.get("rotate"))
+    bx, by, bw, bd = float(box["x"]), float(box["y"]), float(box["w"]), float(box["d"])
+    if rotate:
+        w, d = d, w
+        if w > bw + 1e-6 or d > bd + 1e-6:
+            was = (w, d)
+            w = min(w, bw)
+            d = plate_m2 / w if w else d
+            if d > bd:
+                d = bd
+                w = min(bw, plate_m2 / d) if d else w
+            warnings.append(f"The turned plate, {was[0]:.1f} × {was[1]:.1f} m, does not fit the {bw:.1f} × {bd:.1f} m plate box; "
+                            f"it is refit to {w:.1f} × {d:.1f} m, keeping its {w * d:,.0f} m².")
+    fx, fy = ANCHORS[anchor]
+    x0 = bx + (bw - w if fx == 1 else (bw - w) / 2 if fx == 0.5 else 0.0) + dx
+    y0 = by + (bd - d if fy == 1 else (bd - d) / 2 if fy == 0.5 else 0.0) + dy
+    cx = min(max(x0, bx), bx + bw - w)
+    cy = min(max(y0, by), by + bd - d)
+    moved = math.hypot(cx - x0, cy - y0)
+    clamped = moved > 1e-6
+    if clamped:
+        warnings.append(f"The mass was moved {moved:.1f} m back inside the setback envelope (the {bw:.1f} × {bd:.1f} m plate box): "
+                        f"the shift of {dx:+.1f} m across and {dy:+.1f} m back from the {anchor} anchor took it past the box.")
+        x0, y0 = cx, cy
+    placement = {"anchor": anchor, "dx_m": round(dx, 2), "dy_m": round(dy, 2), "rotate": rotate, "clamped": clamped,
+                 "box": {"x": round(bx, 2), "y": round(by, 2), "w": round(bw, 2), "d": round(bd, 2)}}
+    return _rect(x0, y0, w, d), w, d, placement
+
+
 def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     results = ledger["results"]
     W = float(site.get("frontage_m") or 0)
@@ -69,13 +121,25 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     if abs(W * D - area) / area > 0.05:
         warnings.append(f"Lot is not a clean rectangle: frontage x depth = {W * D:,.0f} m² against a recorded {area:,.0f} m²; the plan uses the rectangle, the FSR uses the recorded area.")
 
+    # the front face the architect chose (site.front_face): the lot turned so that face is the street side
+    oriented = boundary.oriented_ring(site)
+    if oriented and oriented["rectangle"]:
+        W, D = oriented["frontage_m"], oriented["depth_m"]      # a plain lot: the rectangle turned, W and D swapped on a quarter turn
+
     # the lot: the equivalent rectangle, or the parcel polygon / drawn boundary where the site carries one
     lot = {"polygon": _rect(0, 0, W, D), "frontage_m": W, "depth_m": D, "area_m2": area, "street_side": "y = 0"}
+    if oriented:
+        lot.update({"front_face": oriented["front_face"], "orientation": oriented["orientation"], "front_edge": oriented["edge"]})
     ring = boundary.lot_ring(site)
+    if ring and oriented:
+        ring = {k: oriented[k] for k in ("ring", "source", "frame", "note")}
+        W, D = oriented["frontage_m"], oriented["depth_m"]      # the oriented ring's bounding extent
+        lot.update({"frontage_m": W, "depth_m": D})
     box = None   # the plate box: x, y, w, d of the rectangle the masses stand in
     if ring:
         poly_area = boundary.area(ring["ring"])
-        corners = boundary.simplify([tuple(p) for p in ring["ring"]], 3.0, 0.5)    # the corners a hand would draw: no curve segments
+        # the corners a hand would draw: no curve segments (turned with the ring, so edge numbers stay the same)
+        corners = [tuple(p) for p in oriented["corners"]] if oriented else boundary.simplify([tuple(p) for p in ring["ring"]], 3.0, 0.5)
         lot.update({"polygon": ring["ring"], "corners": [[round(x, 2), round(y, 2)] for x, y in corners],
                     "bbox": boundary.bbox(ring["ring"]), "source": ring["source"], "frame": ring["frame"],
                     "polygon_area_m2": round(poly_area, 1), "shape": boundary.shape_summary(ring["ring"]), "note": ring["note"]})
@@ -107,6 +171,10 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     # from the site's context frame where one has been fetched.
     cross = (((site.get("osm") or {}).get("frame") or {}).get("snapped_m") or {}).get("cross_street") or {}
     at_right = cross.get("side") == "right"
+    if oriented and oriented["orientation"]["rotate_deg"] != 0:
+        # the lot was turned: the corner that matters is where the old front street now meets the new front.
+        # The old street side's outward normal (0, -1) turns to (sin θ, -cos θ); it is on the right where sin θ > 0.7.
+        at_right = math.sin(math.radians(oriented["orientation"]["rotate_deg"])) > 0.7
 
     def footprint(plate_m2: float) -> tuple[list[list[float]], float, float]:
         d = min(env_d, max(plate_m2 / env_w, min(env_d, PLATE_MIN_DEPTH_M))) if env_w else env_d
@@ -127,6 +195,9 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}; the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.")
         plate = plate_cap
     p_ring, p_w, depth = footprint(plate)
+    placement = None
+    if option.get("massing") is not None:
+        p_ring, p_w, depth, placement = place(option["massing"], plate, p_w, depth, box, "front-right" if at_right else "front-left", warnings)
     h = storeys * f2f
     parapet = option.get("height_m")
     if parapet and parapet > h:
@@ -137,8 +208,11 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         "footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "at_street_corner": "right" if at_right else "left",
         "base_z": 0.0, "height_m": round(h, 2), "storeys": storeys, "floor_to_floor_m": f2f,
         "plate_area_m2": round(plate, 1), "gfa_m2": round(plate * storeys, 1), "fsr": round(plate * storeys / area, 3),
-        "derived_from": ["option.gfa_m2", "option.storeys", "option.setbacks_m", "option.floor_to_floor_m"],
+        "derived_from": ["option.gfa_m2", "option.storeys", "option.setbacks_m", "option.floor_to_floor_m"]
+                        + (["option.massing"] if placement else []) + (["site.front_face"] if oriented else []),
     })
+    if placement:
+        masses[-1]["placement"] = placement
 
     # Outright mass: what the schedule allows with no rezoning.
     max_fsr, max_h, used = _outright_params(results)
@@ -152,7 +226,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
             "footprint": o_ring, "plate_width_m": round(o_w, 2), "plate_depth_m": round(o_d, 2), "at_street_corner": "right" if at_right else "left",
             "base_z": 0.0, "height_m": round(min(o_storeys * f2f, max_h), 2), "storeys": o_storeys, "floor_to_floor_m": f2f,
             "plate_area_m2": round(o_plate, 1), "gfa_m2": round(o_plate * o_storeys, 1), "fsr": round(o_plate * o_storeys / area, 3),
-            "derived_from": used + ["option.setbacks_m", "option.floor_to_floor_m"],
+            "derived_from": used + ["option.setbacks_m", "option.floor_to_floor_m"] + (["site.front_face"] if oriented else []),
         })
 
     # Policy benchmark, if a rezoning policy fired.

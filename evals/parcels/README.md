@@ -138,15 +138,18 @@ rectangle and 458 into trapezoid; the table above has the new counts. `uncertain
 (its `best_guess` fields are the 11 Nov calls); `survey.py` run today would choose a different 40 near the new lines.
 
 **Frontage** (`python evals/parcels/score_frontage.py [--cache <file>]`; one `public-streets` request per parcel): the
-tool's rule, the parcel side along the street the parcel is named for, applied to the page's edges (the edge whose
-midpoint is nearest the centreline of that street, lanes left out), guesses 34 of the 39 marked frontage edges. The
-five misses: where the named street touches two edges because the corner is a curve (4411 Brakenridge St, 1598
-Matthews Ave) Kai marks the straight edge and the rule takes the curve; on a corner lot whose long side is the address
-street (4890 Hudson St) Kai marks the short side; 6891 Laburnum St's two Laburnum-side edges are swapped between
-frontage and cross street; 4465 W 3rd Ave's polygon runs to within 3 m of the W 3rd centreline, so its nearest edge is
-not its front (the parcel is one of the odd ones). The cross street, guessed as the edge nearest the nearest
-other-named street within 12 m, is right 7 times of 13: Kai marks every other street-facing edge, lanes included, as
-a cross street, so the second mark is not one edge.
+tool's rule, the parcel side along the street the parcel is named for, applied to the page's edges (of the edges
+along that street, the one most parallel to it, lanes left out), guesses 35 of the 39 marked frontage edges. The
+four misses are all corner lots where Kai put the front on the other street: 4411 Brakenridge St (on McMullen Ave,
+the longer side), 1598 Matthews Ave (on Alexandra St, longer), 4890 Hudson St (on W 33rd Ave, shorter), 6891
+Laburnum St (on East Blvd, shorter). A first reading blamed curved sides, but measured properly every many-point side
+in the set bends under 20 degrees except two cul-de-sac bulbs (2388 Harrison Drive, 2027 W 35th Ave), and the
+Harrison bulb is the side Kai marked as the front; so neither length, point count nor curvature predicts the choice,
+which presumably follows the house on the aerial. The tool therefore keeps the named street and, since 15 Nov 2026,
+names the cross street of a corner lot in the site's notes (`lookup.street_bearing` returns `cross_street`) and asks
+which side is the front. The cross street, guessed as the edge nearest the nearest other-named street within 12 m,
+is right 7 times of 13: Kai marks every other street-facing edge, lanes included, as a cross street, so the second
+mark is not one edge.
 
 **The parcels Kai flagged**: 2055 Glen Drive and 1599 Glen Drive are I-2 lots beside the Millennium Line guideway
 (the line is off the ring; the transit check passed); 4465 W 3rd Ave (LOT H, plan LMP7635, 1996) is a six-cornered lot

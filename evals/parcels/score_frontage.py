@@ -2,13 +2,18 @@
 
     python evals/parcels/score_frontage.py [--cache streets-cache.json]
 
-The guess is the rule the tool uses for a site (`lookup.street_bearing`: the parcel side along the street the parcel
-is named for), applied to the label page's edges: for each parcel, the City's `public-streets` centrelines within
-reach of the parcel are fetched (one request per parcel, plain User-Agent, cached when --cache is given), the ones
-named as the address is (`lookup.parse_address`) are kept, lanes left out, and the edge between two of the page's
-corners whose midpoint lies nearest to that street is the guess; with no street of that name in reach, the edge nearest
-any street. The cross street is guessed as the edge nearest the nearest street of another name, if one comes within
-12 m. Prints one line per parcel and the totals.
+The guess is the rule the tool uses for a site (`lookup.street_bearing` and `parcel_metrics`: the parcel side parallel
+to the street the parcel is named for), applied to the label page's edges: for each parcel, the City's
+`public-streets` centrelines within reach of the parcel are fetched (one request per parcel, plain User-Agent, cached
+when --cache is given), the ones named as the address is (`lookup.parse_address`) are kept, lanes left out, and of the
+edges between the page's corners that lie along that street (within 12 m of the nearest one) the guess is the edge
+most parallel to the street beside it (added 15 Nov 2026 after the labels; the nearest edge alone took a side edge
+on 4465 W 3rd Ave, whose outline reaches the street). With no street of that name in reach, the same on any street.
+The cross street is guessed the same way on the nearest street of another name, if one comes within 12 m. Prints
+one line per parcel and the totals. What the labels showed and this does not model: on four corner lots the person
+put the front on the other street, and neither the sides' lengths nor their point counts nor their curvature
+(every many-point side in the set bends under 20 degrees except two cul-de-sac bulbs) says which; the tool flags a
+corner lot and asks.
 """
 
 from __future__ import annotations
@@ -118,8 +123,31 @@ def guess_for(label: dict, parcel: dict, cache: dict, cache_path: Path | None) -
                 best = (round(d, 1), e)
         return best
 
-    guess = nearest_edge(named) if named else None
-    fallback = nearest_edge(roads) if roads else None
+    def street_edge(lines):
+        """The tool's rule on edges: of the edges within reach of the street (12 m beyond the nearest), the one most
+        parallel to the street beside it; a straight edge beats a curve published as many segments when both lie
+        along the same street (a rounded corner), since the curve's chord runs diagonally to the street."""
+        near = nearest_edge(lines)
+        if near is None:
+            return None
+        cands = []
+        for e, m in mids.items():
+            d = min(line_dist(m, ln[2]) for ln in lines)
+            if d > near[0] + 12:
+                continue
+            # the street's bearing beside this edge: its segment nearest the edge's midpoint
+            seg = min(((seg_dist(m, ln[2][i], ln[2][i + 1]), ln[2][i], ln[2][i + 1]) for ln in lines for i in range(len(ln[2]) - 1)), key=lambda s: s[0])
+            sb = math.degrees(math.atan2(seg[2][1] - seg[1][1], seg[2][0] - seg[1][0])) % 180
+            a, b = pts[corners[e - 1]], pts[corners[e % n]]
+            eb = math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 180
+            skew = min(abs(eb - sb), 180 - abs(eb - sb))
+            cands.append((skew, d, e))
+        skew, d, e = min(cands)
+        return (round(d, 1), e, round(skew, 1))
+
+    guess = street_edge(named) if named else None
+    fallback = street_edge(roads) if roads else None
+    how = "named street" if guess else ("nearest street" if fallback else None)
     others = [s for s in roads if s[0] != want]
     cross = None
     if others:
@@ -129,11 +157,11 @@ def guess_for(label: dict, parcel: dict, cache: dict, cache_path: Path | None) -
             if best is None or d < best[0]:
                 best = (d, ln)
         if best and best[0] < 12:
-            cross = nearest_edge([best[1]])
+            cross = street_edge([best[1]])
     truth = [f["edge"] for f in label.get("frontage_edges", []) if f["role"] == "frontage"]
     cross_truth = [f["edge"] for f in label.get("frontage_edges", []) if f["role"] == "cross_street"]
     return {"address": label["address"], "street": want, "named_streets": len(named), "edges": n,
-            "guess": (guess or fallback), "by": "named street" if guess else ("nearest street" if fallback else None),
+            "guess": (guess or fallback), "by": how,
             "truth": truth, "cross_guess": cross, "cross_truth": cross_truth}
 
 

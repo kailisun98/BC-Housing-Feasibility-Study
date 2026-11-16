@@ -69,12 +69,31 @@ class ParcelMetrics(unittest.TestCase):
         s = lookup.street_bearing([heatley, georgia], (c["lat"], c["lon"]), "Heatley Ave")
         self.assertTrue(s["matched_by_name"])
         self.assertAlmostEqual(s["bearing_deg"], 90, delta=3)
+        self.assertEqual(s["cross_street"]["name"], "East Georgia Street")          # a corner lot: the other street is named
+        self.assertNotIn("cross_street", lookup.street_bearing([heatley], (c["lat"], c["lon"]), "Heatley Ave"))
         along = lookup.parcel_metrics(parcel, s["bearing_deg"])
         self.assertGreater(along["frontage_m"], along["depth_m"])          # 37.2 m on Heatley
         g = lookup.street_bearing([heatley, georgia], (c["lat"], c["lon"]), "E Georgia St")
         self.assertAlmostEqual(g["bearing_deg"], 0, delta=3)
         self.assertLess(lookup.parcel_metrics(parcel, g["bearing_deg"])["frontage_m"], 16)   # 15.2 m on Georgia
         self.assertIsNone(lookup.street_bearing([], (c["lat"], c["lon"]), "Heatley Ave"))
+
+    def test_a_corner_lot_is_flagged_not_decided(self):
+        # 609 Heatley Ave again, assembled with both streets in the context: the front stays on Heatley and the note
+        # names East Georgia Street as the other side to confirm
+        parcel_ring = [[-123.08996199873619, 49.2792120018887], [-123.089976239477, 49.27887771187751],
+                       [-123.08976691960697, 49.27887376388247], [-123.08975269125037, 49.27920808084372], [-123.08996199873619, 49.2792120018887]]
+        c = lookup.parcel_metrics(parcel_ring)["center"]
+        heatley = {"type": "way", "id": 1, "tags": {"highway": "residential", "name": "Heatley Avenue"},
+                   "geometry": [{"lat": c["lat"] - 0.001, "lon": c["lon"] - 0.00028}, {"lat": c["lat"] + 0.001, "lon": c["lon"] - 0.00028}]}
+        georgia = {"type": "way", "id": 2, "tags": {"highway": "residential", "name": "East Georgia Street"},
+                   "geometry": [{"lat": c["lat"] - 0.00025, "lon": c["lon"] - 0.001}, {"lat": c["lat"] - 0.00025, "lon": c["lon"] + 0.001}]}
+        parcel = {"geom": {"geometry": {"coordinates": [parcel_ring]}}, "civic_number": "609", "streetname": "HEATLEY AV", "site_id": "x"}
+        site = lookup.assemble("609 Heatley Ave", c["lat"], c["lon"], "609 HEATLEY AV (test)", [], [parcel], [heatley, georgia])["site"]
+        self.assertIn("A corner lot: East Georgia Street also runs beside it", site["notes"])
+        self.assertIn("Confirm which side is the front", site["notes"])
+        self.assertGreater(site["frontage_m"], site["depth_m"])             # still 37.2 m on Heatley
+        self.assertEqual(site["parcel"]["street"]["cross_street"]["name"], "East Georgia Street")
 
     def test_assemble_with_context_places_the_osm_block(self):
         parcels = [{"civic_number": "998", "streetname": "E 19TH AV", "geom": {"geometry": {"type": "Polygon", "coordinates": [PARCEL_998]}}}]

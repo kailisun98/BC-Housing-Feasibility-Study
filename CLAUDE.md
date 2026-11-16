@@ -359,8 +359,10 @@ Built and verified in the browser:
 - Labelled (15 Nov 2026): `evals/parcels/labels.json` is Kai's pass over the 40 (33 classed, 4 "other", 3 blank,
   39 frontage edges). `score_labels.py` and `score_frontage.py` beside it score the classifier and the frontage
   rule; the labels moved the near-rectangle line to 0.88 and added the five-cornered convex trapezoid (8 → 21 of
-  33 right; the frontage rule 34 of 39). `uncertain.json` is frozen as the labelled set. The L rule is not
-  settled by the labels (one of ten L guesses confirmed). Which of 2,712 and 3,908 m² is the Expo development
+  33 right; the frontage rule 35 of 39, the four misses corner lots where Kai put the front on the other street
+  with nothing in the geometry to say so, so `lookup.street_bearing` now names the `cross_street` of a corner
+  lot and the site's notes ask which side is the front). `uncertain.json` is frozen as the labelled set. The L
+  rule is not settled by the labels (one of ten L guesses confirmed). Which of 2,712 and 3,908 m² is the Expo development
   site is a question for a person.
 
 ## Phase 4 (3 Nov 2026): the block editor over the solver

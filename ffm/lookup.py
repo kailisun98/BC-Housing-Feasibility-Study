@@ -295,11 +295,18 @@ def street_bearing(elements: list[dict], center_latlon: tuple[float, float], str
     """The street in front of a parcel, from OpenStreetMap ways around its centre: the named road matching the
     parcel's street where there is one, else the nearest road that is not a path. Returns its bearing in the
     parcel_metrics frame (degrees from east, counter-clockwise, mod 180), its name and its distance; None when
-    no road comes within 60 m. Pure."""
+    no road comes within 60 m. Since 15 Nov 2026 it also names the cross street of a corner lot (`cross_street`:
+    the nearest other named road within 60 m that runs more than 45 degrees off the front street), so the site can
+    say the front might be the other side. Checked against a person's frontage marks on 39 parcels
+    (`evals/parcels/labels.json`): the named street's side was the front on 35; on the other four, all corner lots,
+    the person put the front on the other street (the shorter side on 4890 Hudson St and 6891 Laburnum St, the
+    longer on 4411 Brakenridge St and 1598 Matthews Ave; the sides' point counts and curvature say nothing either),
+    so the tool keeps the named street and flags the corner rather than choosing. Pure."""
     lat0, lon0 = center_latlon
     P = project(lat0, lon0)
     want = norm_name(street_name or "")
     best = None
+    ways: list[tuple[int, float, float, str]] = []     # (rank, distance, bearing, name) per way, at its nearest segment
     for e in elements or []:
         tags = e.get("tags") or {}
         if e.get("type") != "way" or "highway" not in tags or not e.get("geometry"):
@@ -307,6 +314,7 @@ def street_bearing(elements: list[dict], center_latlon: tuple[float, float], str
         pts = [P(g["lon"], g["lat"]) for g in e["geometry"]]
         name = tags.get("name", "")
         rank = 0 if want and norm_name(name) == want else (1 if name and tags.get("highway") not in MINOR else 2)
+        nearest = None
         for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
             dx, dy = x2 - x1, y2 - y1
             l2 = dx * dx + dy * dy
@@ -317,9 +325,24 @@ def street_bearing(elements: list[dict], center_latlon: tuple[float, float], str
             key = (rank, d)
             if best is None or key < best[0]:
                 best = (key, math.degrees(math.atan2(dy, dx)) % 180, name)
+            if nearest is None or d < nearest[0]:
+                nearest = (d, math.degrees(math.atan2(dy, dx)) % 180)
+        if nearest:
+            ways.append((rank, nearest[0], nearest[1], name))
     if best is None or best[0][1] > 60:
         return None
-    return {"bearing_deg": round(best[1], 1), "name": best[2] or None, "matched_by_name": best[0][0] == 0, "distance_m": round(best[0][1], 1)}
+    out = {"bearing_deg": round(best[1], 1), "name": best[2] or None, "matched_by_name": best[0][0] == 0, "distance_m": round(best[0][1], 1)}
+    cross = None
+    for rank, d, b, name in sorted(ways, key=lambda w: w[1]):
+        if rank != 1 or d > 60 or norm_name(name) == norm_name(best[2] or ""):
+            continue
+        skew = abs(b - best[1]) % 180
+        if min(skew, 180 - skew) > 45:
+            cross = {"name": name, "distance_m": round(d, 1), "bearing_deg": round(b, 1)}
+            break
+    if cross:
+        out["cross_street"] = cross
+    return out
 
 
 def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_M) -> dict[str, Any]:
@@ -401,6 +424,11 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     if metrics:
         front_how = (f"the side along {street['name']}" + ("" if street["matched_by_name"] else ", the nearest road") + f" from OpenStreetMap, {street['distance_m']} m away") if street else metrics["frontage_from"]
         notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon ({metrics['vertices']} vertices" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"); frontage taken as {front_how}.")
+        if street and street.get("cross_street"):
+            x = street["cross_street"]
+            notes.append(f"A corner lot: {x['name']} also runs beside it, {x['distance_m']} m from the centre. The frontage is taken on {street['name']} "
+                         f"({metrics['frontage_m']} m); the front could instead be the {metrics['depth_m']} m side on {x['name']} "
+                         f"(a person put it there on four of the 39 corner and odd lots checked on 15 Nov 2026). Confirm which side is the front.")
         try:
             from .parcel_shapes import classify   # imported here: parcel_shapes builds on this module
             c = classify([poly])

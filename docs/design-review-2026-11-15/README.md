@@ -53,18 +53,47 @@ Flow and clarity, in the manager's guide:
   "four answers" everywhere; a comparison never crosses sites; a run on a site that was never saved still gets its
   revision number.
 
-## What the review raised and is still open
+## The second pass, the same day (Kai: "all of the above")
+
+- **States.** An edit to the site, the option or the money after a run puts a band over the memo ("The option changed
+  after R1 … Run the rules again") and disables Issue until a new run; Save as… is an inline id field (and a name for
+  an option) under the card, with the server's 409 for an id that exists; the browser asks before the page is left
+  with unsaved work; the guide and the unsaved site and option live in the tab's session storage, and the blank stage
+  offers "Resume where you were" after a refresh.
+- **Setbacks are zoning.** The three setback fields are "read by a rule"; where no district yard rule tested them, an
+  open item says so with the figures drawn and the architect named. Under the Building group the Option form derives
+  the floor area the envelope allows at the storeys given and the height from storeys × floor to floor, each with a
+  "Use it" button; what was typed stays until then.
+- **One height, one orientation.** FIG 05 stands as tall as FIG 02 (the stated height), with the top floor level as
+  a thin line; FIG 03, FIG 06 and the block editor draw the street at the bottom, as FIG 01 does.
+- **The comparison for the meeting.** The Side by side card has a "Building and money" table (storeys, height, floor
+  area, FSR, yards, homes asked and homes that fit the plate, family homes, capital, funding, gap, gap per home, gap
+  as a share of capital, A less B), the two sections side by side, and the money in its one-line trade-off; the
+  address bar names the run and the comparison (`?run=…&compare=…`) so a memo can be sent as a link; the past-run
+  picker leads with the day the run was made; a comparison never crosses sites.
+- **One citation system.** Every rule on screen carries its paper reference (A1, C5, F2) before its title: the
+  clauses, the ledger, the open-items table (a Ref column) and the money table, where the source is a short link.
+  Reader mode is in the paper's order: answers, comparison, clauses, massing, ledger.
+- **Heritage and what stays on the lot.** Stop 1 asks whether the buildings on the lot stay (the Site card has the
+  field); "not sure" is an open item for the manager and "yes" one for the architect, since the massing is drawn on a
+  clear lot. A church owner adds "Heritage register and designation" with the architect named (the rules hold no
+  heritage rule). The demo sites record that their lots are cleared.
+- **The editors.** The block editor snaps a block's edges to the other blocks' edges and to the corridor faces, flags
+  a unit drawn over or under the area the program carries, puts a block moved to another floor in the first free run
+  (or says there is no room), and names its problems on the Apply button; the boundary editor reopens a drawn
+  boundary exactly as saved, zooms the plan to the lot, has an edge table where a length can be typed from a survey,
+  and offers to set the recorded site area to the drawn lot after "Use this boundary".
+- **Revit.** The pyRevit script reads `layout.json` beside `massing.json` and builds a level per storey and a block
+  per zone (named by floor, block and area); the lot's extent comes from its polygon, and the plan is dimensioned
+  only when the lot has four sides. Not run against Revit in this pass.
+- **The escalation index.** The money line names the quarter in force on the run date and the rule's newer
+  observation, so the two figures in one memo are explained.
+- **The manager's view.** The plans by program and the stacking (the architect's working drawings and the block
+  editor) stay out of the manager's memo until the architect issues the run to them; a quiet card holds their place.
+
+## Still open
 
 - The L-shape class and the 0.95 rectangle line (the parcel labels do not settle them; `evals/parcels/README.md`).
-- The block editor has no snap, no oversize flag, and "to floor" drops a block on top of others; the boundary editor
-  re-simplifies on every open and has no numeric entry; the Revit handoff carries the envelope but not the layout.
-- The comparison has no money or drawings side by side; runs have no URL of their own; the past-run picker shows the
-  rules date, not the run date.
-- FIG 02 and FIG 05 state two heights for one building; FIG 01 draws the street at the bottom and FIG 03 and 06 at
-  the top; FIG 01's lot is small inside 120 m of context.
-- Setbacks are "drawings only" and no yard rule is checked; height, floor area and residential floor area do not
-  follow storeys in the Option form.
-- Save as… uses a browser prompt and does not warn before overwriting; a refresh loses the guide's state; a memo is
-  never marked stale after its inputs change.
-- No heritage rule; nothing asks what stays on the lot; the escalation index prints two values in one memo.
-- Rule ids on screen against A1 refs on paper; Reader mode is not the paper's order.
+- The corner lot's flanking street is still an interior side yard; the kept building's footprint is not drawn.
+- FIG 01's lot is small inside 120 m of context.
+- The Revit script's new levels and blocks have not been run against Revit.

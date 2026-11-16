@@ -857,6 +857,13 @@
           "action": "Architect: read the CD-1 schedule (or read it with Claude at stop 3 and confirm its clauses) and enter the outright FSR, height and yards."
         },
         {
+          "rule_id": "coverage.yards",
+          "title": "Yards not checked: no CD-1 yard rule in the rules",
+          "status": "uncertain",
+          "finding": "The setbacks on the site plan (front 3.0, rear 3.0, side 3.0 m) are the option's own figures; no rule in the stack tested them against CD-1's minimum yards.",
+          "action": "Architect: read the CD-1 schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for."
+        },
+        {
           "rule_id": "bc.toa.minimum_density",
           "title": "Transit-oriented area minimum allowable height and density",
           "status": "uncertain",
@@ -916,6 +923,7 @@
       "frequent_bus_stop_within_400m": null,
       "has_water_and_sewer": true,
       "owner_type": "municipality",
+      "keep_existing_buildings": false,
       "owner": "City of Vancouver (site transferred by Concord Pacific under the False Creek North social housing agreement, 2023)",
       "land_tenure_plan": "City-owned; BC Housing develops and the BC Indigenous Housing Society operates under a lease (terms to confirm)",
       "existing_trees_on_site": [],

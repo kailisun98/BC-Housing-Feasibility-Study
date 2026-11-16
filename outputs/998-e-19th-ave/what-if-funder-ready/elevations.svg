@@ -3,7 +3,8 @@
 <text x="48" y="44" font-size="14" font-weight="600">Elevations · metres</text>
 <text x="48.0" y="62.0" font-size="12" font-weight="600">Front elevation · from the street</text>
 <line x1="38.0" y1="188.3" x2="438.0" y2="188.3" stroke="#1f2933" stroke-width="1.5"/>
-<rect x="48.0" y="98.2" width="380.0" height="90.1" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="48.0" y="88.4" width="380.0" height="99.9" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="48.0" y1="98.2" x2="428.0" y2="98.2" stroke="#5f6672" stroke-width="0.6" stroke-dasharray="3 2"/>
 <rect x="50.0" y="173.0" width="166.9" height="13.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="259.1" y="173.0" width="166.9" height="13.1" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="48.0" y1="170.3" x2="428.0" y2="170.3" stroke="#5f6672" stroke-width="0.6"/>
@@ -45,10 +46,11 @@
 <line x1="38.0" y1="79.6" x2="438.0" y2="79.6" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
 <line x1="38.0" y1="72.0" x2="438.0" y2="72.0" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
 <text x="440.0" y="76.0" font-size="10" fill="#c77d14">benchmark 19.9–21.3 m</text>
-<text x="440.0" y="102.2" font-size="10" fill="#1f2933">16.5 m</text>
+<text x="440.0" y="92.4" font-size="10" fill="#1f2933">18.3 m</text>
 <text x="538.0" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
 <line x1="528.0" y1="188.3" x2="657.8" y2="188.3" stroke="#1f2933" stroke-width="1.5"/>
-<rect x="538.0" y="98.2" width="109.8" height="90.1" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="538.0" y="88.4" width="109.8" height="99.9" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<line x1="538.0" y1="98.2" x2="647.8" y2="98.2" stroke="#5f6672" stroke-width="0.6" stroke-dasharray="3 2"/>
 <line x1="538.0" y1="170.3" x2="647.8" y2="170.3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="558.9" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="618.7" y="157.2" width="8.2" height="8.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -66,8 +68,8 @@
 <line x1="528.0" y1="79.6" x2="657.8" y2="79.6" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
 <line x1="528.0" y1="72.0" x2="657.8" y2="72.0" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
 <text x="659.8" y="76.0" font-size="10" fill="#c77d14">benchmark 19.9–21.3 m</text>
-<text x="659.8" y="102.2" font-size="10" fill="#1f2933">16.5 m</text>
-<text x="48.0" y="218.3" fill="#1f2933">5 storeys × 3.3 m = 16.5 m to the top floor level; the option states 18.3 m</text>
+<text x="659.8" y="92.4" font-size="10" fill="#1f2933">18.3 m</text>
+<text x="48.0" y="218.3" fill="#1f2933">18.3 m high, as the section: 5 storeys × 3.3 m = 16.5 m to the top floor level (thin line), the 1.8 m above it parapet, roof or a taller ground floor</text>
 <text x="48.0" y="234.3" fill="#1f2933">Outright maximum height 10.7 m, dashed grey</text>
 <text x="48.0" y="250.3" fill="#1f2933">Staff benchmark 19.9 to 21.3 m, amber</text>
 <text x="48.0" y="266.3" fill="#1f2933">Windows: one per unit on its side, 1.5 m wide, the unit module as the rhythm; a placeholder for the elevation study</text>

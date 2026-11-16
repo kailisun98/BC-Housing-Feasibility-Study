@@ -70,11 +70,11 @@
     },
     {
       "key": "escalation",
-      "label": "Escalation to the latest index",
+      "label": "Escalation to the index in force on the run date",
       "value": 1.0292,
       "unit": "×",
       "rule_id": "f.escalation_bcpi",
-      "note": "BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01)",
+      "note": "BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-23) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date",
       "placeholder": false
     },
     {

@@ -81,8 +81,14 @@
       <div class="form-fold"><div class="form-fold-in">
       <form id="site-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
-        <button id="save-site" class="btn btn-quiet" type="button">Save site as…</button>
+        <button id="save-site" class="btn btn-quiet" type="button" aria-expanded="false" aria-controls="save-site-inline">Save site as…</button>
         <span id="site-dirty" class="dirty" hidden>edited, not saved</span>
+        <div id="save-site-inline" class="save-inline" hidden>
+          <label class="field"><span class="label">Site id</span><input type="text" id="save-site-id" placeholder="609-heatley-ave" autocomplete="off"></label>
+          <button class="btn btn-primary btn-small" type="button" data-save="site">Save</button>
+          <button class="btn btn-quiet btn-small" type="button" data-save-cancel="site">Cancel</button>
+          <span class="help">Letters, digits and hyphens; names sites/&lt;id&gt;.json. An id that exists is not overwritten.</span>
+        </div>
       </div>
       </div></div>
     </section>
@@ -100,8 +106,15 @@
       <div class="form-fold"><div class="form-fold-in">
       <form id="option-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
-        <button id="save-option" class="btn btn-quiet" type="button">Save option as…</button>
+        <button id="save-option" class="btn btn-quiet" type="button" aria-expanded="false" aria-controls="save-option-inline">Save option as…</button>
         <span id="option-dirty" class="dirty" hidden>edited, not saved</span>
+        <div id="save-option-inline" class="save-inline" hidden>
+          <label class="field"><span class="label">Option id</span><input type="text" id="save-option-id" placeholder="609-heatley-ave-funder-ready" autocomplete="off"></label>
+          <label class="field"><span class="label">Name</span><input type="text" id="save-option-name" placeholder="Funder-ready, 4 homes" autocomplete="off"></label>
+          <button class="btn btn-primary btn-small" type="button" data-save="option">Save</button>
+          <button class="btn btn-quiet btn-small" type="button" data-save-cancel="option">Cancel</button>
+          <span class="help">Names options/&lt;id&gt;.json. An id that exists is not overwritten.</span>
+        </div>
       </div>
       </div></div>
     </section>

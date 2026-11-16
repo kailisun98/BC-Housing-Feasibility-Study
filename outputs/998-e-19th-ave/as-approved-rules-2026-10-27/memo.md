@@ -21,6 +21,8 @@
 ## 3. What is still unsure, and who resolves it?
 | Item | Status | Who / what |
 |---|---|---|
+| Yards not checked: no RM-1 yard rule in the rules | Uncertain | Architect: read the RM-1 schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. |
+| Heritage register and designation | Uncertain | Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. |
 | Interim Rezoning Policy for Social Housing in Former Community Vision Areas | Conditional | Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Conditional | Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu. |
 | BC Builds: eligibility and below-market requirement | Uncertain | Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices. |
@@ -38,7 +40,7 @@
 | Line | Figure | From | Note |
 |---|---|---|---|
 | Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf) |
-| Escalation to the latest index | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01) |
+| Escalation to the index in force on the run date | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-27) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date |
 | Hard cost | $40,084,465 | `f.hard_cost_base` | 8,299 m² × $4,693 × 1.0292 |
 | Soft costs | $10,021,116 | `f.soft_costs` (placeholder) | 25% of hard cost |
 | Contingency | $4,008,446 | `f.soft_costs` (placeholder) | 10% of hard cost |

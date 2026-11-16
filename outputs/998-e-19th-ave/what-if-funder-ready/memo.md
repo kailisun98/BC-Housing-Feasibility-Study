@@ -17,7 +17,10 @@
 - *Pass* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: Fits the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award; program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).
 
 ## 3. What is still unsure, and who resolves it?
-Nothing outstanding.
+| Item | Status | Who / what |
+|---|---|---|
+| Yards not checked: no RM-1 yard rule in the rules | Uncertain | Architect: read the RM-1 schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. |
+| Heritage register and designation | Uncertain | Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. |
 
 ## 4. Does the money work? (feasibility grade)
 **Unlikely.** The gap is $20,228,128, 44% of the capital cost, more than the 15% a feasibility screen can call close. Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.
@@ -30,7 +33,7 @@ Nothing outstanding.
 | Line | Figure | From | Note |
 |---|---|---|---|
 | Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf) |
-| Escalation to the latest index | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01) |
+| Escalation to the index in force on the run date | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-23) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date |
 | Hard cost | $33,810,249 | `f.hard_cost_base` | 7,000 m² × $4,693 × 1.0292 |
 | Soft costs | $8,452,562 | `f.soft_costs` (placeholder) | 25% of hard cost |
 | Contingency | $3,381,025 | `f.soft_costs` (placeholder) | 10% of hard cost |

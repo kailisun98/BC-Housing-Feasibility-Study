@@ -22,6 +22,7 @@
 | Item | Status | Who / what |
 |---|---|---|
 | No outright schedule for CD-1 in the rules | Uncertain | Architect: read the CD-1 schedule (or read it with Claude at stop 3 and confirm its clauses) and enter the outright FSR, height and yards. |
+| Yards not checked: no CD-1 yard rule in the rules | Uncertain | Architect: read the CD-1 schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. |
 | Transit-oriented area minimum allowable height and density | Uncertain | Architect: check the City's transit-oriented areas map and record the tier. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $20,545,320 for 120 units. |
@@ -37,7 +38,7 @@
 | Line | Figure | From | Note |
 |---|---|---|---|
 | Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf) |
-| Escalation to the latest index | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01) over 106.1 (2024-07-01) |
+| Escalation to the index in force on the run date | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-23) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date |
 | Hard cost | $46,368,342 | `f.hard_cost_base` | 9,600 m² × $4,693 × 1.0292 |
 | Soft costs | $11,592,086 | `f.soft_costs` (placeholder) | 25% of hard cost |
 | Contingency | $4,636,834 | `f.soft_costs` (placeholder) | 10% of hard cost |

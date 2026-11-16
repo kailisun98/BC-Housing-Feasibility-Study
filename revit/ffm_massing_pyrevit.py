@@ -358,17 +358,74 @@ def stage_masses(doc, data, stamp, result):
                 built["plates"] += 1
     result["built"].append({"kind": "floor plates", "count": built["plates"]})
     result["built"].append({"kind": "model lines", "lot": len(built["lines"]["lot"]), "envelope": len(built["lines"]["envelope"])})
+    # The layout, when it sits beside massing.json (layout.json, written by the same run): a level per storey and a
+    # block per zone, named by floor, block and area, so the program arrives in Revit and not only the envelope
+    # (15 Nov 2026). Each piece is its own try, so a zone that fails leaves the rest standing.
+    layout = read_layout_beside(data)
+    if layout:
+        made_levels = 0
+        made_zones = 0
+        for fl in layout.get("floors", []):
+            z = float(fl.get("z", 0.0))
+            lname = "FFM " + ("Ground" if fl.get("level") == 0 else "L{0}".format(int(fl.get("level", 0)) + 1))
+            try:
+                lv = Level.Create(doc, m(z))
+                safe_name(lv, lname)
+                made_levels += 1
+            except Exception:
+                result["errors"].append({"stage": "masses/levels " + lname, "traceback": traceback.format_exc()})
+            f2f = float(layout.get("plate", {}).get("floor_to_floor_m", 3.0))
+            for zone in fl.get("zones", []):
+                if zone.get("block") in ("spare", "corridor"):
+                    continue
+                try:
+                    x, y, w, d = float(zone["x"]), float(zone["y"]), float(zone["w"]), float(zone["d"])
+                    ring = [[x, y], [x + w, y], [x + w, y + d], [x, y + d]]
+                    label = "{0} | {1} | {2:,.0f} m2 | {3}".format(lname, zone.get("label") or zone.get("block"), w * d, stamp)
+                    make_extrusion(doc, ring, z + 0.05, max(0.5, f2f - 0.35), "FFM {0} {1}".format(lname.replace("FFM ", ""), zone.get("block")), label)
+                    made_zones += 1
+                except Exception:
+                    result["errors"].append({"stage": "masses/zone", "traceback": traceback.format_exc()})
+        result["built"].append({"kind": "layout", "levels": made_levels, "blocks": made_zones})
     return built
+
+
+def read_layout_beside(data):
+    """layout.json from the folder massing.json came from, or None."""
+    try:
+        path = os.environ.get("FFM_MASSING_JSON") or data.get("_path") or ""
+        folder = os.path.dirname(path) if path else ""
+        lp = os.path.join(folder, "layout.json") if folder else ""
+        if lp and os.path.exists(lp):
+            with open(lp, "r") as f:
+                return json.load(f)
+    except Exception:
+        return None
+    return None
 
 
 # ---------------------------------------------------------------- stage 2: views
 
+def lot_extent(data):
+    """The lot's extent in the lot frame: the polygon's own, so a polygon lot (bbox in massing.json, or just its
+    points) is boxed as it is, not as its equivalent rectangle."""
+    bb = data["lot"].get("bbox")
+    if bb and len(bb) == 4:
+        return float(bb[0]), float(bb[1]), float(bb[2]), float(bb[3])
+    pts = data["lot"].get("polygon") or []
+    if pts:
+        xs = [float(p[0]) for p in pts]
+        ys = [float(p[1]) for p in pts]
+        return min(xs), min(ys), max(xs), max(ys)
+    return 0.0, 0.0, float(data["lot"]["frontage_m"]), float(data["lot"]["depth_m"])
+
+
 def lot_bbox(data, margin_m=6.0):
-    W, D = data["lot"]["frontage_m"], data["lot"]["depth_m"]
+    x0, y0, x1, y1 = lot_extent(data)
     H = max([x["height_m"] for x in data["masses"]] + [10.0])
     bb = BoundingBoxXYZ()
-    bb.Min = XYZ(m(-margin_m), m(-margin_m), m(-1.0))
-    bb.Max = XYZ(m(W + margin_m), m(D + margin_m), m(H + margin_m))
+    bb.Min = XYZ(m(x0 - margin_m), m(y0 - margin_m), m(-1.0))
+    bb.Max = XYZ(m(x1 + margin_m), m(y1 + margin_m), m(H + margin_m))
     return bb
 
 
@@ -540,13 +597,22 @@ def stage_annotations(doc, data, ledger, views, built, stamp, result):
     # Lot and envelope dimensions in the plan. Lot polygon order: front-left, front-right,
     # rear-right, rear-left -> edges 0 front, 1 right side, 2 rear, 3 left side.
     lot, env = built["lines"]["lot"], built["lines"]["envelope"]
+    # The dimension strings assume a four-sided lot and envelope; on a polygon lot (the City's parcel, 16 or 85
+    # corners) the edge indices mean nothing, so the strings are left off and the result says so (15 Nov 2026).
+    four_sided = len(lot) == 4 and len(env) == 4
+    if not four_sided:
+        result["built"].append({"kind": "dimensions", "count": 0, "note": "polygon lot: the plan is not dimensioned; the lot lines carry their own lengths"})
     try:
+        if not four_sided:
+            raise StopIteration()
         dimension_between_lines(doc, plan, lot[3], lot[1], XYZ(0, m(-4.0), 0), XYZ.BasisX); made["dimensions"] += 1
         dimension_between_lines(doc, plan, lot[0], lot[2], XYZ(m(W + 4.0), 0, 0), XYZ.BasisY); made["dimensions"] += 1
         dimension_between_lines(doc, plan, lot[3], env[3], XYZ(0, m(D / 2.0), 0), XYZ.BasisX); made["dimensions"] += 1
         dimension_between_lines(doc, plan, env[1], lot[1], XYZ(0, m(D / 2.0), 0), XYZ.BasisX); made["dimensions"] += 1
         dimension_between_lines(doc, plan, lot[0], env[0], XYZ(m(W / 2.0), 0, 0), XYZ.BasisY); made["dimensions"] += 1
         dimension_between_lines(doc, plan, env[2], lot[2], XYZ(m(W / 2.0), 0, 0), XYZ.BasisY); made["dimensions"] += 1
+    except StopIteration:
+        pass
     except Exception:
         result["errors"].append({"stage": "annotations/dimensions", "traceback": traceback.format_exc()})
 

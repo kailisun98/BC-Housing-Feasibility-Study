@@ -517,6 +517,7 @@ const SITE_FIELDS = [
   { group: "Owner", fields: [
     { key: "owner", label: "Owner", type: "text" },
     { key: "owner_type", label: "Owner type", type: "text", help: "church, society, municipality, private …" },
+    { key: "keep_existing_buildings", label: "The buildings on the lot stay", type: TRI },
     { key: "land_tenure_plan", label: "Land tenure plan", type: "text", help: "Write “to confirm” if it is not settled; the funders' checks read that honestly." },
     { key: "notes", label: "Notes", type: "textarea" },
   ]},
@@ -549,6 +550,7 @@ const OPTION_FIELDS = [
       { key: "setbacks_m.rear", label: "Rear", type: "number" },
       { key: "setbacks_m.side", label: "Side", type: "number" },
     ]},
+    { type: "envelope-live" },
   ]},
   { group: "Units", fields: [
     { row: true, fields: [
@@ -619,6 +621,7 @@ const FIELD_META = {
   "toa_tier": { need: "rule", info: "Distance bands around a SkyTrain station: Tier 1 within 200 m, minimum allowable 20 storeys; Tier 2 200 to 400 m, 12 storeys; Tier 3 400 to 800 m, 8 storeys. Bus-exchange areas use lower tiers the stack does not code yet. The tier comes from the City's TOA map, which the tool does not read." },
   "frequent_bus_stop_within_400m": { need: "", info: "Recorded for the record: no rule in the stack reads it yet. It will matter when frequent-transit policies are coded." },
   "has_water_and_sewer": { need: "rule", info: "The Small-Scale Multi-Unit Housing minimums (Bill 44) apply only where the lot has water and sewer service; 'No' switches that rule off." },
+  "keep_existing_buildings": { need: "rule", info: "The massing is drawn on a clear lot. Yes means a building stays and the architect must draw the kept footprint; No means the lot is cleared; Not sure becomes an open item with the manager's name." },
   "existing_trees_on_site": { need: "rule", info: "Protection of Trees By-law 9958. The survey must cover every tree of 20 cm DBH or more on the site, within 2 m of the boundary and on the adjoining street. Schedule A sets the protection barrier by trunk diameter (40 cm: 2.4 m, which the massing must leave clear); Schedule C sets how many trees the site must have after development, by area; each missing tree is $1,000 cash in lieu. No survey on file: the rule says so and returns uncertain." },
   "street_trees.count": { need: "figure", info: "Drawn along the frontage in the figures; no rule reads it." },
   "land_tenure_plan": { need: "rule", info: "Who will hold the land. The Community Housing Fund needs a lease of at least 60 years at nominal value, or ownership. Write 'to confirm' while it is unsettled: the check then returns uncertain instead of guessing. The option's own tenure plan overrides this one." },
@@ -632,9 +635,9 @@ const FIELD_META = {
   "gfa_m2": { need: "run", info: "Gross floor area over all storeys. Divided by the site area it is the FSR, tested against the outright maximum (RM-1: 1.2) and the benchmark (about 3.0). The massing spreads it evenly over the storeys." },
   "residential_gfa_m2": { need: "rule", info: "With the non-residential area, BC Builds' cap of 30% non-residential floor area." },
   "non_residential_gfa_m2": { need: "rule", info: "Childcare, a hall, a church, shops. BC Builds caps non-residential space at 30% of the floor area." },
-  "setbacks_m.front": { need: "figure", info: "Setbacks size the envelope the masses are drawn in; they are not read from the by-law here, so say in the notes when they are placeholders." },
-  "setbacks_m.rear": { need: "figure", info: "The rear yard, usually the lane side; it also leaves room for the retained trees' barriers." },
-  "setbacks_m.side": { need: "figure", info: "Applied on both sides; the envelope's width is the frontage less twice this." },
+  "setbacks_m.front": { need: "rule", info: "The yards are zoning: where the rules hold the district's schedule (a confirmed one), the front, rear and side setbacks are tested against its minimum yards; where they do not, the memo's open items say the yards were not checked. They also size the envelope the masses are drawn in." },
+  "setbacks_m.rear": { need: "rule", info: "The rear yard, usually the lane side; tested against the schedule's minimum where the rules hold one, and it leaves room for the retained trees' barriers." },
+  "setbacks_m.side": { need: "rule", info: "Applied on both sides (a corner lot's flanking street is not told apart yet); the envelope's width is the frontage less twice this." },
   "units.studio": { need: "rule", info: "The bedroom mix. In a rezoning at least 35% of units must have two or more bedrooms, and from 27 Oct 2026 at least 5% three or more. Leave the mix blank and the family-unit rule returns uncertain." },
   "units.one_bed": { need: "rule", info: "Counted toward the total; the family share is two-bedroom-plus over all units." },
   "units.two_bed": { need: "rule", info: "Counts as a family unit: at least 35% of units must have two or more bedrooms in a rezoning." },
@@ -776,6 +779,12 @@ function renderField(f, obj, onChange) {
     el.innerHTML = unitsLive(obj);
     return el;
   }
+  if (f.type === "envelope-live") {
+    el.className = "live";
+    el.dataset.live = "envelope";
+    el.innerHTML = envelopeLive(obj);
+    return el;
+  }
   if (f.type === TRI) {
     el.innerHTML = labelHtml(f, id, { tag: "span" });
     $("span[id]", el).classList.add("label");
@@ -915,6 +924,30 @@ function unitsLive(option) {
   return `total <b>${total}</b> units · two-bed or more <b>${fam}</b> (<b>${(100 * fam / total).toFixed(1)}%</b>) · three-bed or more <b>${n("three_bed_plus")}</b> (<b>${(100 * n("three_bed_plus") / total).toFixed(1)}%</b>)`;
 }
 
+/* What the storeys and the setbacks imply, so the architect need not multiply by hand: the plate the setbacks leave
+   on this site (or the last massing's plate box on a polygon lot), × storeys = a floor area; storeys × floor to floor
+   = a height. Each can be taken into the option with one click; what was typed stays until then (15 Nov 2026). */
+function envelopeLive(option) {
+  const site = state.site || {};
+  const o = option || {};
+  const st = Number(o.storeys) || 0, f2f = Number(o.floor_to_floor_m) || 3.0;
+  const sb = o.setbacks_m || {};
+  const m = state.run && state.run.massing && state.run.run_id.split("/")[0] === (state.siteId || site.id) ? state.run.massing : null;
+  let plate = null, how = "";
+  if (m && m.envelope && m.envelope.box) { plate = m.envelope.box.w * m.envelope.box.d; how = `the plate box ${m.envelope.box.w} × ${m.envelope.box.d} m inside the setback envelope`; }
+  else if (site.frontage_m && site.depth_m) {
+    const w = site.frontage_m - 2 * (Number(sb.side) || 0), d = site.depth_m - (Number(sb.front) || 0) - (Number(sb.rear) || 0);
+    if (w > 0 && d > 0) { plate = w * d; how = `the envelope the setbacks leave, ${w.toFixed(1)} × ${d.toFixed(1)} m`; }
+  }
+  if (!st) return `<span class="cont">Give the storeys and the floor area and height can be derived from the plate here.</span>`;
+  const gfa = plate ? Math.round(plate * st) : null, hgt = Math.round(st * f2f * 10) / 10;
+  const diffG = gfa != null && o.gfa_m2 != null && Math.abs(gfa - o.gfa_m2) > 1;
+  const diffH = o.height_m != null && Math.abs(hgt - o.height_m) > 0.05;
+  const own = `<span class="cont">· the figure in the option</span>`;
+  return `<span class="cont">From ${st} storeys:</span> ${gfa != null ? `floor area up to <b>${fmtNum(gfa)} m²</b> <span class="cont">(${how}, ${fmtNum(Math.round(plate))} m² × ${st}; a plate smaller than the envelope gives less)</span> ${o.gfa_m2 == null || diffG ? `<button type="button" class="btn btn-quiet btn-small" data-use="gfa_m2" data-value="${gfa}">${o.gfa_m2 == null ? "Use it" : "Use it instead of " + fmtNum(o.gfa_m2)}</button>` : own}` : `<span class="cont">no plate known yet: give the site its frontage and depth</span>`}
+    · height <b>${hgt} m</b> <span class="cont">(${st} × ${f2f} m)</span> ${o.height_m == null || diffH ? `<button type="button" class="btn btn-quiet btn-small" data-use="height_m" data-value="${hgt}">${o.height_m == null ? "Use it" : "Use it instead of " + o.height_m}</button>` : own}`;
+}
+
 /* How many three-state answers in a form are "not sure" (null), for the card's one-line summary. */
 function countUnsure(obj, schema) {
   let n = 0;
@@ -1021,7 +1054,7 @@ function fillSelect(sel, items, current, extraLabel) {
 function blankSite() {
   return { id: null, address: null, municipality: "City of Vancouver", zoning_district: null, site_area_m2: null, frontage_m: null, depth_m: null,
     in_former_community_vision_area: null, in_transit_oriented_area: null, toa_tier: null, frequent_bus_stop_within_400m: null,
-    has_water_and_sewer: null, owner_type: null, owner: null, land_tenure_plan: null, existing_trees_on_site: [], street_trees: { count: null }, notes: null, sources: [] };
+    has_water_and_sewer: null, owner_type: null, owner: null, land_tenure_plan: null, keep_existing_buildings: null, existing_trees_on_site: [], street_trees: { count: null }, notes: null, sources: [] };
 }
 
 function blankOption(siteId) {
@@ -1068,6 +1101,8 @@ function onSiteChange() {
   $("#site-dirty").hidden = false;
   refreshSummary("site");
   refreshNeeds($("#site-form"), SITE_FIELDS, state.site);
+  markStale("the site");
+  saveDraft();
 }
 
 async function loadOptions() {
@@ -1105,20 +1140,42 @@ function onOptionChange(key) {
   $("#option-dirty").hidden = false;
   refreshSummary("option");
   refreshNeeds($("#option-form"), OPTION_FIELDS, state.option);
+  markStale("the option");
+  saveDraft();
   if (key && key.startsWith("units.")) {
     const live = $('[data-live="units"]');
     if (live) live.innerHTML = unitsLive(state.option);
   }
+  if (!key || ["storeys", "height_m", "floor_to_floor_m", "gfa_m2"].includes(key) || key.startsWith("setbacks_m.")) {
+    const live = $('[data-live="envelope"]');
+    if (live) live.innerHTML = envelopeLive(state.option);
+  }
 }
 
-async function saveAs(kind) {
+/* Save as… opens an inline id field under the card (no browser prompt, which some browsers do not have); Save
+   writes it, and an id that already exists comes back as a 409 the strip reports (15 Nov 2026). */
+function saveAs(kind) {
+  const obj = kind === "site" ? state.site : state.option;
+  if (!obj) return;
+  const box = $(`#save-${kind}-inline`);
+  const open = box.hidden;
+  box.hidden = !open;
+  $(`#save-${kind}`).setAttribute("aria-expanded", String(open));
+  if (open) {
+    const idEl = $(`#save-${kind}-id`);
+    idEl.value = obj.id && obj.id !== "__new__" ? obj.id : (kind === "option" && state.site ? `${state.site.id || "site"}-${String(obj.name || guide.candidate || "option").toLowerCase().split(/[;,]/)[0].trim().replace(/[^a-z0-9._-]+/g, "-")}` : "");
+    if (kind === "option") $("#save-option-name").value = obj.name || "";
+    idEl.focus();
+  }
+}
+
+async function saveNow(kind) {
   const obj = kind === "site" ? state.site : tidyOption(state.option);
-  const current = obj.id || "";
-  const id = prompt(`Save this ${kind} as ${kind}s/<id>.json. Id:`, current);
-  if (!id) return;
+  const id = $(`#save-${kind}-id`).value;
+  if (!id || !id.trim()) { toast("Give the file an id first.", true); $(`#save-${kind}-id`).focus(); return; }
   const clean = id.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "-");
   const body = Object.assign({}, obj, { id: clean });
-  if (kind === "option" && !body.name) body.name = prompt("A name for the option:", clean) || clean;
+  if (kind === "option") body.name = ($("#save-option-name").value || "").trim() || obj.name || clean;
   try {
     const r = await postJSON(kind === "site" ? "/api/sites" : "/api/options", body);
     if (r.downloaded) {
@@ -1141,9 +1198,90 @@ async function saveAs(kind) {
       fillSelect($("#option-select"), forSite.map(o => ({ value: o.id, label: o.name })).concat(others.map(o => ({ value: o.id, label: `(other site) ${o.name}` }))), clean, "New option…");
       renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
     }
+    $(`#save-${kind}-inline`).hidden = true;
+    $(`#save-${kind}`).setAttribute("aria-expanded", "false");
+    saveDraft();
   } catch (e) {
     toast(e.message, true);
   }
+}
+
+// ---------------------------------------------------------------- the memo's standing: stale after an edit, and a draft that survives a refresh
+
+/* An edit to the site, the option or the money after a run leaves the answers on screen out of date: a band over the
+   memo says so, and Issue waits for a new run. runRules and openRun clear it. */
+function markStale(what) {
+  if (!state.run || state.runStale) { if (state.run) syncStaleBand(); return; }
+  state.runStale = what || "the inputs";
+  syncStaleBand();
+}
+
+function syncStaleBand() {
+  const memo = $("#memo");
+  if (!memo) return;
+  let band = $("#stale-band", memo);
+  const stale = !!(state.run && state.runStale);
+  if (!stale) { if (band) band.remove(); $("#issue-btn").disabled = !state.run || !!STATIC; $("#issue-btn").title = ""; return; }
+  if (!band) { band = document.createElement("div"); band.id = "stale-band"; band.className = "card stale-band"; band.setAttribute("role", "status"); memo.prepend(band); }
+  band.innerHTML = `<b>${h(state.runStale[0].toUpperCase() + state.runStale.slice(1))} changed after ${h(rev(state.run.run_id))}.</b> The answers and the drawings below are ${h(rev(state.run.run_id))}'s. <button type="button" class="btn btn-primary btn-small" id="stale-run">Run the rules again</button>`;
+  $("#stale-run", band).addEventListener("click", runRules);
+  $("#issue-btn").disabled = true;
+  $("#issue-btn").title = "The inputs changed after this run: run the rules again before issuing it.";
+}
+
+/* The guide's state and the unsaved site and option are kept in this tab's session storage, so a refresh offers to
+   resume rather than starting from nothing. */
+const DRAFT_KEY = "ffm.draft";
+let draftTimer = null;
+function saveDraft() {
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(() => {
+    try {
+      if (state.mode !== "manager" || (!state.site && !guide.lookup)) { sessionStorage.removeItem(DRAFT_KEY); return; }
+      const d = { saved_at: new Date().toISOString(), as_of: $("#as-of").value, siteId: state.siteId, site: state.siteId ? null : state.site, siteDirty: state.siteDirty,
+        optionId: state.optionId, option: state.optionId ? null : state.option, optionDirty: state.optionDirty,
+        guide: { step: guide.step, address: guide.address, way: guide.way, programs: guide.programs, candidate: guide.candidate, mine: guide.mine, answers: guide.answers,
+                 lookup: guide.lookup, suggestion: guide.suggestion, suggestionUsed: guide.suggestionUsed, reading: guide.reading } };
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    } catch (e) { /* storage off or full: the draft is not kept */ }
+  }, 400);
+}
+
+function readDraft() {
+  try { const d = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null"); return d && (d.site || d.siteId || (d.guide && d.guide.lookup)) ? d : null; } catch (e) { return null; }
+}
+
+async function resumeDraft(d) {
+  if (d.as_of) $("#as-of").value = d.as_of;
+  if (d.siteId && state.sites.some(s => s.id === d.siteId)) { $("#site-select").value = d.siteId; await selectSite(d.siteId); }
+  else if (d.site) {
+    state.siteId = null; state.site = d.site; state.siteDirty = !!d.siteDirty;
+    $("#site-select").value = "__new__";
+    renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+    $("#site-dirty").hidden = !state.siteDirty;
+    refreshSummary("site");
+    await loadOptions(); await loadRuns(); fillRunSelects();
+  }
+  if (d.optionId && state.options.some(o => o.id === d.optionId)) { $("#option-select").value = d.optionId; await selectOption(d.optionId); }
+  else if (d.option) {
+    state.optionId = null; state.option = d.option; state.optionDirty = !!d.optionDirty;
+    $("#option-select").value = "__new__";
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    $("#option-dirty").hidden = !state.optionDirty;
+    refreshSummary("option");
+  }
+  Object.assign(guide, d.guide || {});
+  guide.loading = "";
+  if (!guide.mine) guide.mine = {};
+  syncCards();
+  renderGuide(guide.step || 1);
+  stageSig = "";
+  renderStage();
+  setStatus(`Resumed where you were: ${state.site ? (state.site.address || state.site.id) : "a lookup"}, stop ${guide.step || 1}.`, "ok");
+}
+
+function discardDraft() {
+  try { sessionStorage.removeItem(DRAFT_KEY); } catch (e) { /* fine */ }
 }
 
 // ---------------------------------------------------------------- runs
@@ -1190,6 +1328,7 @@ async function runRules() {
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
     state.run = run;
+    state.runStale = null;
     await loadRuns();   // the new run joins the list first, so it takes the next revision number
     await attachCause(run);
     renderMemo(run);
@@ -1199,6 +1338,7 @@ async function runRules() {
     closeExportPanel();
     fillRunSelects();
     setCompareNote(run.diff);
+    syncUrl();
     if (guide.step === 5 || guide.step === 6) { guide.step = 6; renderGuide(); }
     const ms = Math.round(performance.now() - t0);
     toast(`Ran the rules as of ${run.as_of}: ${rev(run.run_id)}, in ${ms} ms ·${run.in_browser ? "kept in this browser tab" : `wrote outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}`);
@@ -1318,15 +1458,19 @@ function renderStage() {
       ${open ? body : `<p class="quiet">${h(s.empty)}</p>`}
     </section>`;
   });
+  const draft = !site && !preview ? readDraft() : null;   // a refresh mid-flow: the last tab's work, to resume or drop
   memo.innerHTML = `<div class="card memo-head stage-head">
       <h1>${site ? h(site.address || site.id) : "A site, a funder, an option, a memo"}</h1>
       <p class="quiet">${site ? "What each stop found so far. Run the rules at stop 6 and the memo takes this pane." : "Seven stops on the left, one input at a time. Each stop puts what it found here, so the memo is read before it is written."}</p>
+      ${draft ? `<div class="form-actions resume"><button type="button" class="btn btn-primary btn-small" id="stage-resume">Resume where you were</button><button type="button" class="btn btn-quiet btn-small" id="stage-discard">Start fresh</button><span class="help">${h((draft.site && (draft.site.address || draft.site.id)) || draft.siteId || (draft.guide && draft.guide.lookup && draft.guide.lookup.site && draft.guide.lookup.site.address) || "a site")}, stop ${h(draft.guide && draft.guide.step || 1)}, left in this tab ${h(String(draft.saved_at || "").replace("T", " ").slice(0, 16))}.</span></div>` : ""}
       ${site ? "" : `<div class="form-actions"><button type="button" class="btn btn-small" id="stage-demo">Load the demo case</button><span class="help">998 E 19th Ave as approved by Council, 25 Jul 2024, from the City's public referral report.</span></div>`}
     </div>
     <div class="stage-list">${cards.join("")}</div>`;
   memo.className = "memo landed";
   memo.dataset.stage = "1";
   const demo = $("#stage-demo"); if (demo) demo.addEventListener("click", () => loadDemo().catch(e => toast(e.message, true)));
+  const res = $("#stage-resume"); if (res) res.addEventListener("click", () => resumeDraft(draft).catch(e => toast(e.message, true)));
+  const drop = $("#stage-discard"); if (drop) drop.addEventListener("click", () => { discardDraft(); stageSig = ""; renderStage(); });
   const use = $("#stage-use-site"); if (use) use.addEventListener("click", () => guideUseSite().catch(e => toast(e.message, true)));
   if (site || preview) mountStageMap(site || preview);
 }
@@ -1520,15 +1664,17 @@ function renderMemo(run) {
   if (B) parts.push(renderSideBySide(run));
   if (d) parts.push(renderChanges(d, L, run));
   const changed = new Set(kind === "rules" ? (d.changes || []).map(c => c.rule_id) : []);
+  state.refOf = memoRefs(res);   // the paper's A1, C4 references, the same on screen (15 Nov 2026)
   const rest = [];
-  rest.push(renderClauses(res, L, changed));
   rest.push(renderLedger(res, changed));
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));
+  // the clauses stand on their own so the reader's order can be the paper's: answers, comparison, clauses, massing, ledger
   parts.push(`<div class="memo-body">
     <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L, run)}${answerMoney(run)}</div>
     ${renderFigures(run)}
+    <div class="memo-clauses">${renderClauses(res, L, changed)}</div>
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
 
@@ -1538,6 +1684,7 @@ function renderMemo(run) {
   placeRunTools(false);
   memoEl.innerHTML = parts.join("\n");
   memoEl.className = "memo";
+  memoEl.dataset.issuedManager = (run.issues || []).some(i => i.to === "manager") ? "1" : "";
   $(".memo-pane").classList.remove("no-run");
   void memoEl.offsetWidth;  // restart the fade
   memoEl.classList.add("landed");
@@ -1547,10 +1694,21 @@ function renderMemo(run) {
   wireLedger();
   applyModeToMemo();
   setPrintFooter(run);
+  syncStaleBand();
 }
 
 /* An option's name as the reader knows it. */
 const optionName = L => (L && L.inputs && L.inputs.option && (L.inputs.option.name || L.inputs.option.id)) || "option";
+
+/* The paper memo's references, A1 to F7: the layer's letter and the rule's place in it, in the ledger's order. The
+   screen cites the same, so a planner's "re C5" means the same thing in both renderings. Pure. */
+function memoRefs(res) {
+  const refOf = {}, n = {};
+  for (const r of res || []) { n[r.layer] = (n[r.layer] || 0) + 1; refOf[r.rule_id] = `${r.layer}${n[r.layer]}`; }
+  return refOf;
+}
+const refOf = id => (state.refOf && state.refOf[id]) || "";
+const refTagOf = id => (refOf(id) ? `<b class="ref">${h(refOf(id))}</b> ` : "");
 
 /* A rule id with a break allowed after each dot and underscore, so a narrow column wraps it between its words. */
 const idBreak = id => h(id).replace(/([._])/g, "$1<wbr>");
@@ -1645,8 +1803,8 @@ function answerUnsure(L, run) {
   const n = items.length;
   const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}. Each names who resolves it.` : "Nothing outstanding.";
   const who = u => { const m = /^(Manager|Architect|Owner|Planner|Both|Manager and owner|Manager and architect)\b/i.exec(u.action || ""); return m ? m[1] : "—"; };
-  const table = n ? `<table class="plain"><thead><tr><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
-    ${items.map(u => `<tr><td>${h(u.title)}</td><td class="status">${pill(u.status)}</td><td class="who">${h(who(u))}</td><td class="who">${h((u.action || "—").replace(/^(Manager and owner|Manager and architect|Manager|Architect|Owner|Planner|Both):\s*/i, ""))}</td></tr>`).join("")}
+  const table = n ? `<table class="plain"><thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
+    ${items.map(u => `<tr><td>${refOf(u.rule_id) ? `<b class="ref">${h(refOf(u.rule_id))}</b>` : "—"}</td><td>${h(u.title)}</td><td class="status">${pill(u.status)}</td><td class="who">${h(who(u))}</td><td class="who">${h((u.action || "—").replace(/^(Manager and owner|Manager and architect|Manager|Architect|Owner|Planner|Both):\s*/i, ""))}</td></tr>`).join("")}
   </tbody></table>` : "";
   // a count of open items is not a verdict: the card carries no status wash; each row wears its own
   return `<section class="card answer" data-verdict="${n ? "plain" : "pass"}">
@@ -1659,6 +1817,8 @@ function answerUnsure(L, run) {
 /* The fourth answer: the feasibility-grade pro-forma from layer F and layer E, four lines and the verdict; the
    line-by-line table with every source opens under it. */
 const money = x => (x === null || x === undefined ? "not given" : `$${fmtNum(Math.round(x))}`);
+/* A source's short name for a table cell: the publisher and the document up to the first comma or semicolon. */
+const shortSource = s => { const t = String((s && s.title) || (s && s.url) || ""); const cut = t.split(/[;(]/)[0]; return (cut.length > 72 ? cut.slice(0, 70).replace(/\s+\S*$/, "") + "…" : cut).trim(); };
 const MONEY_STATUS = { likely: "pass", unlikely: "fail", unsure: "uncertain" };
 
 function answerMoney(run) {
@@ -1677,7 +1837,8 @@ function answerMoney(run) {
   const srcOf = id => { const r = (run.ledger && run.ledger.results || []).find(x => x.rule_id === id); return r && r.source ? r.source : null; };
   const rows = (pf.lines || []).map(ln => {
     const s = ln.rule_id ? srcOf(ln.rule_id) : null;
-    const from = ln.rule_id ? `<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>${s ? `<div class="cont">${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener">${h(s.title || s.url)}</a>` : h(s.title || "")}${s.section ? `, ${h(s.section)}` : ""}</div>` : ""}` : `<span class="cont">the option's own figures</span>`;
+    // the rule by its reference, the source as a short link (its full title in the link's title): the ledger carries the rest
+    const from = ln.rule_id ? `${refTagOf(ln.rule_id)}<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>${s ? `<div class="cont">${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener" title="${h(s.title || s.url)}">${h(shortSource(s))}</a>` : h(shortSource(s))}</div>` : ""}` : `<span class="cont">the option's own figures</span>`;
     return `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${from}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont">${h(ln.note || "")}</td></tr>`;
   }).join("");
   return `<section class="card answer money" data-verdict="${MONEY_STATUS[v.word] || "uncertain"}">
@@ -1786,7 +1947,7 @@ function renderClauses(res, L, changed = new Set()) {
   const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
     const s = splitValues(r, L);
     return `<tr class="st-${h(r.status)}">
-      <td><span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
+      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
       <td class="status">${pill(r.status)}</td>
       <td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>
@@ -1853,9 +2014,42 @@ function renderSideBySide(run) {
   // each run named by its revision on the site: A is this run, B the run compared
   const ra = rev(run.run_id), rb = rev(state.compareRun);
   const trade = tradeOff(A, B);
+  // the building and the money, side by side: what a board decides between (15 Nov 2026, from an architect's test)
+  const pa = run.proforma && run.proforma.available ? run.proforma : null, pb = run.compareProforma && run.compareProforma.available ? run.compareProforma : null;
+  const la = run.layout || null, lb = run.compareLayout || null;
+  const oa = A.inputs.option || {}, ob = B.inputs.option || {};
+  const unitsOf = o => Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
+  const famOf = o => (Number((o.units || {}).two_bed) || 0) + (Number((o.units || {}).three_bed_plus) || 0);
+  const numCell = (v, unit = "", digits = 0) => (v == null || Number.isNaN(v) ? "—" : `${v < 0 ? "−" : ""}${unit === "$" ? "$" : ""}${fmtNum(Math.abs(digits ? Math.round(v * 10 ** digits) / 10 ** digits : Math.round(v)))}${unit && unit !== "$" ? unit : ""}`);
+  const delta = (a, b, unit = "", digits = 0) => (a == null || b == null ? "" : `<span class="cont">${a - b > 0 ? "+" : ""}${numCell(a - b, unit, digits)}</span>`);
+  const moneyRows = [
+    ["Storeys", oa.storeys, ob.storeys, "", 0],
+    ["Height", oa.height_m, ob.height_m, " m", 1],
+    ["Floor area", oa.gfa_m2, ob.gfa_m2, " m²", 0],
+    ["FSR", oa.gfa_m2 && A.inputs.site.site_area_m2 ? oa.gfa_m2 / A.inputs.site.site_area_m2 : null, ob.gfa_m2 && B.inputs.site.site_area_m2 ? ob.gfa_m2 / B.inputs.site.site_area_m2 : null, "", 2],
+    ["Yards front / rear / side", null, null, "", 0, `${(oa.setbacks_m || {}).front ?? "—"} / ${(oa.setbacks_m || {}).rear ?? "—"} / ${(oa.setbacks_m || {}).side ?? "—"} m`, `${(ob.setbacks_m || {}).front ?? "—"} / ${(ob.setbacks_m || {}).rear ?? "—"} / ${(ob.setbacks_m || {}).side ?? "—"} m`],
+    ["Homes asked", unitsOf(oa) || null, unitsOf(ob) || null, "", 0],
+    ["Homes that fit the plate", la ? la.units_placed : null, lb ? lb.units_placed : null, "", 0],
+    ["Family homes (2-bed+)", famOf(oa) || null, famOf(ob) || null, "", 0],
+    ["Capital cost", pa ? pa.capital.total : null, pb ? pb.capital.total : null, "$", 0],
+    ["Funding", pa ? pa.funding.total : null, pb ? pb.funding.total : null, "$", 0],
+    ["Gap", pa ? pa.gap.value : null, pb ? pb.gap.value : null, "$", 0],
+    ["Gap per home", pa && pa.gap.value != null && unitsOf(oa) ? pa.gap.value / unitsOf(oa) : null, pb && pb.gap.value != null && unitsOf(ob) ? pb.gap.value / unitsOf(ob) : null, "$", 0],
+    ["Gap, share of capital", pa && pa.gap.share_of_capital != null ? pa.gap.share_of_capital * 100 : null, pb && pb.gap.share_of_capital != null ? pb.gap.share_of_capital * 100 : null, "%", 0],
+  ];
+  const moneyTable = kind === "rules" ? "" : `<table class="plain side-money"><colgroup><col class="c-rule"><col class="c-ab"><col class="c-ab"><col class="c-ab"></colgroup>
+      <thead><tr><th>Building and money</th><th>A · ${h(ra)}</th><th>B · ${h(rb)}</th><th>A less B</th></tr></thead>
+      <tbody>${moneyRows.map(([k, a, b, unit, digits, ta, tb]) => `<tr><th scope="row">${h(k)}</th><td class="num">${ta != null ? h(ta) : numCell(a, unit, digits)}</td><td class="num">${tb != null ? h(tb) : numCell(b, unit, digits)}</td><td class="num">${ta != null ? "" : delta(a, b, unit, digits)}</td></tr>`).join("")}</tbody></table>
+      <p class="cont side-note">The money rows are each run's pro-forma (answer 4, with every line's rule and source); the plate fit is each run's plans by program.</p>`;
+  const moneyPhrase = pa && pb && pa.gap.value != null && pb.gap.value != null ? ` Gap ${money(pa.gap.value)} against ${money(pb.gap.value)}${unitsOf(oa) && unitsOf(ob) ? ` (${money(pa.gap.value / unitsOf(oa))} against ${money(pb.gap.value / unitsOf(ob))} a home)` : ""}.` : "";
+  // the two sections, drawn from each run's massing, one beside the other
+  const sections = kind !== "rules" && run.massing && run.compareMassing ? `<div class="side-figs">
+      <figure><figcaption>A · ${h(ra)} · section</figcaption><div class="fig-section">${figSection(run.massing)}</div></figure>
+      <figure><figcaption>B · ${h(rb)} · section</figcaption><div class="fig-section">${figSection(run.compareMassing)}</div></figure>
+    </div>` : "";
   const lead = kind === "rules"
     ? `The same site and option: ${h(ra)} reads the rules as of ${h(A.run.as_of)}, ${h(rb)} as of ${h(B.run.as_of)}.`
-    : `${trade ? `A, ${h(ra)}, against B, ${h(rb)}: ${h(trade)}.` : `A, ${h(ra)}, and B, ${h(rb)}, propose the same building.`} Both read the rules as of ${h(A.run.as_of)}.`;
+    : `${trade ? `A, ${h(ra)}, against B, ${h(rb)}: ${h(trade)}.` : `A, ${h(ra)}, and B, ${h(rb)}, propose the same building.`}${h(moneyPhrase)} Both read the rules as of ${h(A.run.as_of)}.`;
   const byId = Object.fromEntries(B.results.map(r => [r.rule_id, r]));
   const rows = A.results.filter(r => r.status !== "not_applicable" || (byId[r.rule_id] && byId[r.rule_id].status !== "not_applicable")).map(r => {
     const b = byId[r.rule_id];
@@ -1887,6 +2081,8 @@ function renderSideBySide(run) {
     <p class="side-lead">${lead}</p>
     <table class="plain side-head"><thead><tr><th><span class="sr-only">Answer</span></th><th><span class="sr-only">A, ${h(ra)}, ${h(optionName(A))}</span></th><th><span class="sr-only">B, ${h(rb)}, ${h(optionName(B))}</span></th></tr></thead>
       <tbody>${head.map(([k, a, b]) => `<tr><th scope="row">${h(k)}</th><td>${a}</td><td>${b}</td></tr>`).join("")}</tbody></table>
+    ${moneyTable}
+    ${sections}
     ${openList}
     <h3 class="side-sub">${differ.length ? `${differ.length} of ${rows.length} rules read differently` : `All ${rows.length} rules read the same in both`}</h3>
     ${differ.length ? table(differ) : ""}
@@ -1907,7 +2103,7 @@ function renderLedger(res, changed = new Set()) {
     for (const r of L.rows) counts[r.status] = (counts[r.status] || 0) + 1;
     const countPills = Object.entries(counts).map(([s, n]) => `<span class="pill pill-${h(s)}">${n} ${h(STATUS_WORD[s] || s)}</span>`).join("");
     const rows = L.rows.map(r => `<tr>
-      <td><span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code></td>
+      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code></td>
       <td class="status">${pill(r.status)}</td>
       <td>${h(r.finding)}</td>
       <td class="nums">${h(fmtValues(r.values))}</td>
@@ -2169,7 +2365,10 @@ function figPlan(m, ctx, fsIn = null) {
   const pad = Math.max(3, W * 0.05);
   const fs = fsIn || Math.max(2.2, W / 34);
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
-  const x0 = Math.min(ctx.xmin, bb[0]) - pad, x1 = Math.max(ctx.xmax + pad, bb[2] + fs * 2.6 + pad), y0 = Math.min(ctx.ymin, bb[1]) - pad, y1 = Math.max(ctx.ymax, bb[3]) + pad;
+  // with the boundary editor open the plan zooms to the lot (5 m around it), so the handles are a hand's width apart
+  const zoom = bnd.open ? 5 : null;
+  const x0 = zoom != null ? bb[0] - zoom : Math.min(ctx.xmin, bb[0]) - pad, x1 = zoom != null ? bb[2] + zoom + fs * 2.6 : Math.max(ctx.xmax + pad, bb[2] + fs * 2.6 + pad);
+  const y0 = zoom != null ? bb[1] - zoom : Math.min(ctx.ymin, bb[1]) - pad, y1 = zoom != null ? bb[3] + zoom : Math.max(ctx.ymax, bb[3]) + pad;
   const Y = y => y1 - y;                                // the street (y < 0) drawn at the bottom
   const X = x => x - x0;
   const P = pts => pts.map(([x, y]) => [X(x), Y(y)]);
@@ -2260,12 +2459,17 @@ function boundaryTools(m) {
   const drawn = !!(site.boundary_m && site.boundary_m.length >= 3);
   const ring = bnd.open && bnd.ring ? bnd.ring : m.lot.polygon;
   const note = bnd.open ? `${ring.length} corners · ${fmtNum(Math.round(ringArea(ring)))} m²${m.lot.polygon_area_m2 || m.lot.area_m2 ? ` (recorded ${fmtNum(Math.round(m.lot.area_m2))} m²)` : ""}` : "";
+  // after a drawn boundary is in use, the recorded site area can be set to it with one click (never silently)
+  const drawnArea = drawn && m.lot.source === "drawn" ? Math.round((m.lot.polygon_area_m2 || m.lot.area_m2) * 10) / 10 : null;
+  const areaOff = drawnArea != null && site.site_area_m2 != null && Math.abs(drawnArea - site.site_area_m2) > 0.5;
+  const edges = bnd.open && bnd.ring ? `<details class="bnd-edges"><summary>Edges: lengths and bearings (type a length to set it)</summary><table class="plain"><thead><tr><th>Edge</th><th>Length (m)</th><th>Bearing</th></tr></thead><tbody>${ringEdges(bnd.ring).map(e => `<tr><td>${e.i + 1}</td><td><input type="number" step="0.01" min="0.1" class="bnd-edge" data-i="${e.i}" value="${e.length}" aria-label="Length of edge ${e.i + 1} in metres"></td><td class="cont">${e.bearing}°</td></tr>`).join("")}</tbody></table></details>` : "";
   return `<div class="fig-tools bnd-tools">
       ${bnd.open ? `<span class="help bnd-note">${h(note)}</span>
       <button type="button" class="btn btn-small btn-primary" id="bnd-apply"${bnd.busy ? " disabled" : ""}>${bnd.busy ? "Rebuilding…" : "Use this boundary"}</button>
       ${drawn ? `<button type="button" class="btn btn-small btn-quiet" id="bnd-parcel"${bnd.busy ? " disabled" : ""}>Back to the parcel</button>` : ""}` : ""}
+      ${!bnd.open && areaOff ? `<button type="button" class="btn btn-small btn-quiet" id="bnd-area" title="The recorded site area, ${h(fmtNum(site.site_area_m2))} m², is what the FSR and the plate cap read">Set the site area to the drawn lot, ${h(fmtNum(drawnArea))} m²</button>` : ""}
       <button type="button" class="btn btn-small" id="edit-boundary" aria-expanded="${bnd.open}" title="Drag the corners of the lot line, click a midpoint to add one, Delete removes the selected corner">${bnd.open ? "Close" : "Edit boundary"}</button>
-    </div>`;
+    </div>${edges}`;
 }
 
 function wireBoundary(fig, run, redraw) {
@@ -2273,12 +2477,47 @@ function wireBoundary(fig, run, redraw) {
   const on = (sel, fn) => { const b = $(sel, fig); if (b) b.addEventListener("click", fn); };
   on("#edit-boundary", () => {
     if (bnd.open) { bnd.open = false; bnd.ring = null; bnd.sel = null; }
-    else { if (VIEW3D.mode !== "plan") VIEW3D.mode = "plan"; bnd.open = true; bnd.ring = (m.lot.corners || m.lot.polygon).map(p => [p[0], p[1]]); bnd.sel = null; }
+    else {
+      if (VIEW3D.mode !== "plan") VIEW3D.mode = "plan";
+      bnd.open = true; bnd.sel = null;
+      // a boundary drawn before reopens exactly as it was saved; the City's parcel opens as its simplified corners
+      const drawn = state.site && state.site.boundary_m && state.site.boundary_m.length >= 3 ? state.site.boundary_m : null;
+      bnd.ring = (drawn || m.lot.corners || m.lot.polygon).map(p => [p[0], p[1]]);
+    }
     redraw();
-    if (bnd.open) setStatus("Drag a corner of the lot line; click a square on an edge to add a corner; Delete removes the selected one. Use this boundary rebuilds the massing and the sheets from it.", "info");
+    if (bnd.open) setStatus("Drag a corner of the lot line; click a square on an edge to add a corner; Delete removes the selected one; or type an edge length in the table. Use this boundary rebuilds the massing and the sheets from it.", "info");
   });
   on("#bnd-apply", () => applyBoundary(false, run, redraw));
   on("#bnd-parcel", () => applyBoundary(true, run, redraw));
+  on("#bnd-area", () => {
+    const lot = run.massing && run.massing.lot;
+    if (!state.site || !lot) return;
+    state.site.site_area_m2 = Math.round((lot.polygon_area_m2 || lot.area_m2) * 10) / 10;
+    onSiteChange("site_area_m2");
+    renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+    redraw();
+    setStatus(`Site area set to ${fmtNum(state.site.site_area_m2)} m², the drawn lot; the FSR and the plate cap now read it. Run the rules to make the memo from it.`, "ok");
+  });
+  // the edge table: a typed length moves the edge's far corner along the edge, so a survey can be entered
+  $$(".bnd-edge", fig).forEach(inp => inp.addEventListener("change", () => {
+    if (!bnd.open || !bnd.ring) return;
+    const i = Number(inp.dataset.i), len = Number(inp.value);
+    const a = bnd.ring[i], b = bnd.ring[(i + 1) % bnd.ring.length];
+    const cur = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    if (!(len > 0) || !(cur > 0)) return;
+    const k = len / cur;
+    bnd.ring[(i + 1) % bnd.ring.length] = [Math.round((a[0] + (b[0] - a[0]) * k) * 100) / 100, Math.round((a[1] + (b[1] - a[1]) * k) * 100) / 100];
+    bnd.sel = (i + 1) % bnd.ring.length;
+    redraw();
+  }));
+}
+
+/* Each edge of the ring: its length and its bearing (degrees from east, anticlockwise, in the lot frame). Pure. */
+function ringEdges(ring) {
+  return ring.map(([x, y], i) => {
+    const [nx, ny] = ring[(i + 1) % ring.length];
+    return { i, length: Math.round(Math.hypot(nx - x, ny - y) * 100) / 100, bearing: Math.round(((Math.atan2(ny - y, nx - x) * 180 / Math.PI) + 360) % 360 * 10) / 10 };
+  });
 }
 
 /* The handles' pointer and key handling, wired to the plan's SVG each time it is drawn (a refit replaces it). */
@@ -2686,7 +2925,11 @@ function renderSheets(run, n0) {
   const short = (L.shortfall || []).length ? ` Did not fit: ${L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()} (${fmtNum(Math.round(s.area_m2))} m²)`).join("; ")}; more storeys, a larger plate or a smaller program.` : "";
   const out = [];
   const broken = (L.geometry || []).map(g => `<li>${pill("fail")}<span><span class="title">broken:</span> <span class="cont">${h(g.note)}.</span></span></li>`).join("");
-  out.push(`<figure class="card figure sheet" data-sheet="plans">
+  // the plans and the stacking are the architect's working drawings: the manager sees them once the architect has
+  // issued the run to them (Kai, 15 Nov 2026); until then a quiet card holds their place
+  out.push(`<div class="card figure layout-wait"><div class="eyebrow">${fig(n0)} and ${fig(n0 + 1)} · Plans by program and stacking</div>
+    <p class="note">The schematic plans are the architect's to draw and check. They appear here once the architect issues this run back to you; the massing above and the elevations and site plan below are the rule-derived envelope.</p></div>`);
+  out.push(`<figure class="card figure sheet layout-sheet" data-sheet="plans">
     <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>
       <div class="fig-tools"><div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div>
       <button type="button" class="btn btn-small" id="edit-blocks" aria-expanded="false" title="Drag, resize, add or remove the blocks; the engine checks every move">Edit blocks</button></div></div>
@@ -2696,7 +2939,7 @@ function renderSheets(run, n0) {
     <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
     <ul class="finding-list sheet-rules">${broken}${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
   </figure>`);
-  out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div><div class="sheet-body">${S.stacking || ""}</div>
+  out.push(`<figure class="card figure sheet layout-sheet"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div><div class="sheet-body">${S.stacking || ""}</div>
     <figcaption>One bar per floor, top first; each segment the share of the plate a block takes. Core and corridor are the same on every floor; what is left after the units is spare, dashed.</figcaption></figure>`);
   out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 2)} · Preliminary elevations</div><div class="sheet-body">${S.elevations || ""}</div>
     <figcaption>Storeys × floor to floor; one window per unit on its side as the rhythm, the ground floor glazed where the non-residential space is; the outright height dashed grey${run.massing && run.massing.policy_benchmark && run.massing.policy_benchmark.height_m ? ", the staff benchmark amber" : ""}. A placeholder for the elevation study, not a design.</figcaption></figure>`);
@@ -2767,10 +3010,22 @@ function renderEditor() {
   const width = Math.max(320, box.clientWidth || 600) - 4;
   const scale = (width - 40) / p.width_m;
   const H = p.depth_m * scale + 40;
-  const rect = z => { const x = 20 + (z.x - p.x) * scale, y = 20 + (z.y - p.y) * scale, w = Math.max(1, z.w * scale), d = Math.max(1, z.d * scale); return { x, y, w, d }; };
+  // the street at the bottom, as on every plan in the set: a zone's y runs from the street side, so it is drawn
+  // from its far edge down (15 Nov 2026)
+  const rect = z => { const x = 20 + (z.x - p.x) * scale, y = 20 + (p.depth_m - (z.y - p.y) - z.d) * scale, w = Math.max(1, z.w * scale), d = Math.max(1, z.d * scale); return { x, y, w, d }; };
   const floorsBtns = L.floors.map(fl => `<button type="button" class="segbtn" data-ed-level="${fl.level}" aria-pressed="${fl.level === editor.level}">${h(fl.level === 0 ? "Ground" : `L${fl.level + 1}`)}</button>`).join("");
   const sel = editor.sel != null ? zs[editor.sel] : null;
   const floorChecks = (L.geometry || []).filter(g => g.level === editor.level);
+  const problems = (L.geometry || []).length;
+  // a unit drawn well over the area the program carries for it is flagged on the selection line
+  const over = (() => {
+    if (!sel) return "";
+    const prog = (L.program || []).find(b => b.key === sel.block);
+    const gross = prog && prog.gross_m2_each;
+    if (!gross) return "";
+    const a = sel.w * sel.d;
+    return a > gross * 1.15 ? ` <span class="warn-text">· ${fmtNum(Math.round(a - gross))} m² over the ${fmtNum(Math.round(gross))} m² the program carries</span>` : (a < gross * 0.95 ? ` <span class="warn-text">· ${fmtNum(Math.round(gross - a))} m² under the ${fmtNum(Math.round(gross))} m² the program carries</span>` : "");
+  })();
   const svgZones = zs.map((z, i) => {
     const r = rect(z);
     const isSel = i === editor.sel;
@@ -2778,21 +3033,21 @@ function renderEditor() {
       <rect x="${r.x.toFixed(1)}" y="${r.y.toFixed(1)}" width="${r.w.toFixed(1)}" height="${r.d.toFixed(1)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="${isSel ? "#245f9c" : "#5f6672"}" stroke-width="${isSel ? 2 : 0.8}"/>
       ${z.accessible ? `<circle cx="${(r.x + 7).toFixed(1)}" cy="${(r.y + 7).toFixed(1)}" r="3.2" fill="#245f9c"/>` : ""}
       ${r.w > 24 && r.d > 12 ? `<text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(ZONE_SHORT[z.block] || z.block)}</text>` : ""}
-      ${isSel ? `<rect class="ed-handle ed-handle-w" x="${(r.x + r.w - 4).toFixed(1)}" y="${(r.y + r.d / 2 - 6).toFixed(1)}" width="8" height="12" fill="#245f9c"/><rect class="ed-handle ed-handle-d" x="${(r.x + r.w / 2 - 6).toFixed(1)}" y="${(r.y + r.d - 4).toFixed(1)}" width="12" height="8" fill="#245f9c"/>` : ""}
+      ${isSel ? `<rect class="ed-handle ed-handle-w" x="${(r.x + r.w - 4).toFixed(1)}" y="${(r.y + r.d / 2 - 6).toFixed(1)}" width="8" height="12" fill="#245f9c"/><rect class="ed-handle ed-handle-d" x="${(r.x + r.w / 2 - 6).toFixed(1)}" y="${(r.y - 4).toFixed(1)}" width="12" height="8" fill="#245f9c"/>` : ""}
     </g>`;
   }).join("");
   box.innerHTML = `
     <div class="ed-bar">
       <div class="seg" role="group" aria-label="Floor">${floorsBtns}</div>
       <label class="field inline"><span class="label">Add</span><select id="ed-add"><option value="">a block…</option>${EDIT_BLOCKS.map(([k, l]) => `<option value="${k}">${h(l)}</option>`).join("")}</select></label>
-      ${sel ? `<span class="ed-sel">${h(EDIT_BLOCKS.find(([k]) => k === sel.block)?.[1] || sel.block)} · ${h(sel.w)} × ${h(sel.d)} m, ${h(fmtNum(Math.round(sel.w * sel.d)))} m²
+      ${sel ? `<span class="ed-sel">${h(EDIT_BLOCKS.find(([k]) => k === sel.block)?.[1] || sel.block)} · ${h(sel.w)} × ${h(sel.d)} m, ${h(fmtNum(Math.round(sel.w * sel.d)))} m²${over}
         <label class="field inline"><span class="label">to floor</span><select id="ed-move">${L.floors.map(fl => `<option value="${fl.level}"${fl.level === editor.level ? " selected" : ""}>${h(fl.level === 0 ? "Ground" : `L${fl.level + 1}`)}</option>`).join("")}</select></label>
         ${sel.block in ZONE_TONE && ["studio", "one_bed", "two_bed", "three_bed_plus"].includes(sel.block) ? `<label class="ed-acc"><input type="checkbox" id="ed-acc"${sel.accessible ? " checked" : ""}> accessible</label>` : ""}
         <button type="button" class="btn btn-small btn-quiet" id="ed-del">Remove</button></span>` : `<span class="help">Click a block to select it; drag to move, pull the handles to resize.</span>`}
     </div>
     <svg class="ed-canvas" viewBox="0 0 ${width} ${H}" width="${width}" height="${H}" role="application" aria-label="Block editor, ${h(L.floors[editor.level].name)}">
       <rect x="20" y="20" width="${(p.width_m * scale).toFixed(1)}" height="${(p.depth_m * scale).toFixed(1)}" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-      <text x="${(20 + p.width_m * scale / 2).toFixed(1)}" y="14" font-size="10" text-anchor="middle" fill="#5f6672">street · ${h(p.width_m)} m</text>
+      <text x="${(20 + p.width_m * scale / 2).toFixed(1)}" y="${(H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672">street · ${h(p.width_m)} m · blocks snap to each other's edges and to the corridor</text>
       ${svgZones}
     </svg>
     <div class="ed-status">
@@ -2801,9 +3056,9 @@ function renderEditor() {
       <span class="help">${h(L.units_placed)} of ${h(L.units_total)} units placed${(L.shortfall || []).length ? `; missing: ${h(L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()}`).join(", "))}` : ""} · ${h((L.adjacencies || []).filter(c => c.status === "pass").length)} rules hold, ${h((L.adjacencies || []).filter(c => c.status === "conditional").length)} conditional</span>
     </div>
     <div class="form-actions">
-      <button type="button" class="btn btn-primary btn-small" id="ed-apply"${editor.dirty || !editor.applied ? "" : " disabled"}>Apply to the option</button>
+      <button type="button" class="btn btn-primary btn-small" id="ed-apply"${editor.dirty || !editor.applied ? "" : " disabled"}>${problems ? `Apply with ${problems} problem${problems === 1 ? "" : "s"}` : "Apply to the option"}</button>
       <button type="button" class="btn btn-small btn-quiet" id="ed-reset">Back to the solver's</button>
-      <span class="help">${editor.applied && !editor.dirty ? "Applied: Run the rules reproduces this placement; Save option as… keeps it." : "Nothing is in the option until you apply."}</span>
+      <span class="help">${editor.applied && !editor.dirty ? "Applied: Run the rules reproduces this placement; Save option as… keeps it." : (problems ? "The memo will list the problems as open items for the architect until they are fixed." : "Nothing is in the option until you apply.")}</span>
     </div>`;
   wireEditor(box, scale, p);
 }
@@ -2826,8 +3081,14 @@ function wireEditor(box, scale, p) {
     $("#ed-del", box).addEventListener("click", () => { zs.splice(editor.sel, 1); editor.sel = null; editor.dirty = true; renderEditor(); scheduleCheck(); });
     $("#ed-move", box).addEventListener("change", e => {
       const to = String(e.target.value); if (to === String(editor.level)) return;
-      zs.splice(editor.sel, 1); (editor.zones[to] = editor.zones[to] || []).push(sel);
-      editor.level = Number(to); editor.sel = editor.zones[to].length - 1; editor.dirty = true; renderEditor(); scheduleCheck();
+      zs.splice(editor.sel, 1);
+      const target = (editor.zones[to] = editor.zones[to] || []);
+      // the block lands in the first free run on the target floor, not on top of what is there (15 Nov 2026)
+      const spot = freeSpot(target, sel, p, strip);
+      if (spot) { sel.x = spot[0]; sel.y = spot[1]; }
+      target.push(sel);
+      editor.level = Number(to); editor.sel = target.length - 1; editor.dirty = true; renderEditor(); scheduleCheck();
+      setStatus(spot ? `Moved to ${to === "0" ? "the ground floor" : `L${Number(to) + 1}`} at ${sel.x}, ${sel.y} m, the first free run.` : `No room on ${to === "0" ? "the ground floor" : `L${Number(to) + 1}`} for a ${sel.w} × ${sel.d} m block: it sits where it was and overlaps; move or remove something.`, spot ? "info" : "busy");
     });
     const acc = $("#ed-acc", box);
     if (acc) acc.addEventListener("change", () => { if (acc.checked) sel.accessible = true; else delete sel.accessible; editor.dirty = true; renderEditor(); scheduleCheck(); });
@@ -2839,11 +3100,16 @@ function wireEditor(box, scale, p) {
     state.optionDirty = true; $("#option-dirty").hidden = false;
     checkPlacement(true);
   });
-  // dragging and resizing, by pointer; the plate's edges are the limit; 0.1 m steps
+  // dragging and resizing, by pointer; the plate's edges are the limit; 0.1 m steps, and edges snap to the other
+  // blocks' edges and to the corridor faces within 0.4 m, so a hand wobble does not become an overlap
   const svg = $(".ed-canvas", box);
   let drag = null;
   const snap = v => Math.round(v * 10) / 10;
-  const toM = (dx, dy) => [dx / scale, dy / scale];
+  const toM = (dx, dy) => [dx / scale, -dy / scale];   // the screen's down is the plate's toward-the-street
+  const SNAP = 0.4;
+  const xStops = i => { const s = [p.x, p.x + p.width_m]; zs.forEach((o, j) => { if (j !== i) { s.push(o.x, o.x + o.w); } }); return s; };
+  const yStops = i => { const s = [p.y, p.y + p.depth_m, p.y + strip, p.y + p.depth_m - strip]; zs.forEach((o, j) => { if (j !== i) { s.push(o.y, o.y + o.d); } }); return s; };
+  const snapTo = (v, stops) => { let best = v; for (const s of stops) if (Math.abs(s - v) < SNAP && Math.abs(s - v) < Math.abs(best - v) + 1e-9) best = s; return best; };
   svg.addEventListener("pointerdown", e => {
     const g = e.target.closest(".ed-zone"); if (!g) { editor.sel = null; renderEditor(); return; }
     const i = Number(g.dataset.i);
@@ -2858,16 +3124,24 @@ function wireEditor(box, scale, p) {
     const [dx, dy] = toM(e.clientX - drag.x0, e.clientY - drag.y0);
     const z = zs[drag.i], z0 = drag.z0;
     if (drag.mode === "move") {
-      z.x = snap(Math.max(p.x, Math.min(p.x + p.width_m - z.w, z0.x + dx)));
-      z.y = snap(Math.max(p.y, Math.min(p.y + p.depth_m - z.d, z0.y + dy)));
+      let nx = z0.x + dx, ny = z0.y + dy;
+      // snap the left or right edge, the near or far edge, whichever is closest to a stop
+      const xs = xStops(drag.i), ys = yStops(drag.i);
+      const lx = snapTo(nx, xs), rx = snapTo(nx + z.w, xs) - z.w;
+      nx = Math.abs(lx - nx) <= Math.abs(rx - nx) ? lx : rx;
+      const ly = snapTo(ny, ys), fy = snapTo(ny + z.d, ys) - z.d;
+      ny = Math.abs(ly - ny) <= Math.abs(fy - ny) ? ly : fy;
+      z.x = snap(Math.max(p.x, Math.min(p.x + p.width_m - z.w, nx)));
+      z.y = snap(Math.max(p.y, Math.min(p.y + p.depth_m - z.d, ny)));
     } else if (drag.mode === "w") {
-      z.w = snap(Math.max(1, Math.min(p.x + p.width_m - z.x, z0.w + dx)));
+      z.w = snap(Math.max(1, Math.min(p.x + p.width_m - z.x, snapTo(z.x + z0.w + dx, xStops(drag.i)) - z.x)));
     } else {
-      z.d = snap(Math.max(1, Math.min(p.y + p.depth_m - z.y, z0.d + dy)));
+      // the depth handle is on the far edge: pulling it away from the street deepens the block
+      z.d = snap(Math.max(1, Math.min(p.y + p.depth_m - z.y, snapTo(z.y + z0.d + dy, yStops(drag.i)) - z.y)));
     }
     const g = $(`.ed-zone[data-i="${drag.i}"]`, svg);
     const r = g.querySelector("rect");
-    r.setAttribute("x", (20 + (z.x - p.x) * scale).toFixed(1)); r.setAttribute("y", (20 + (z.y - p.y) * scale).toFixed(1));
+    r.setAttribute("x", (20 + (z.x - p.x) * scale).toFixed(1)); r.setAttribute("y", (20 + (p.depth_m - (z.y - p.y) - z.d) * scale).toFixed(1));
     r.setAttribute("width", Math.max(1, z.w * scale).toFixed(1)); r.setAttribute("height", Math.max(1, z.d * scale).toFixed(1));
   });
   const end = () => { if (!drag) return; drag = null; editor.dirty = true; renderEditor(); scheduleCheck(); };
@@ -2879,7 +3153,7 @@ function wireEditor(box, scale, p) {
     const step = e.shiftKey ? 2 : 0.5;
     const k = e.key;
     if (k === "ArrowLeft") z.x = snap(Math.max(p.x, z.x - step)); else if (k === "ArrowRight") z.x = snap(Math.min(p.x + p.width_m - z.w, z.x + step));
-    else if (k === "ArrowUp") z.y = snap(Math.max(p.y, z.y - step)); else if (k === "ArrowDown") z.y = snap(Math.min(p.y + p.depth_m - z.d, z.y + step));
+    else if (k === "ArrowUp") z.y = snap(Math.min(p.y + p.depth_m - z.d, z.y + step)); else if (k === "ArrowDown") z.y = snap(Math.max(p.y, z.y - step));   // up on screen is away from the street
     else if (k === "Delete" || k === "Backspace") { zs.splice(editor.sel, 1); editor.sel = null; }
     else return;
     e.preventDefault(); editor.dirty = true; renderEditor(); scheduleCheck();
@@ -2890,6 +3164,22 @@ function wireEditor(box, scale, p) {
 function scheduleCheck() {
   clearTimeout(editor.timer);
   editor.timer = setTimeout(() => checkPlacement(false), 350);
+}
+
+/* The first place on a floor where a block of this size overlaps nothing but a corridor: the street strip first,
+   then the rear strip, then anywhere, scanned in 0.5 m steps; null when there is none. Pure. */
+function freeSpot(zones, z, p, strip) {
+  const others = zones.filter(o => o !== z && o.block !== "corridor");
+  const clear = (x, y) => others.every(o => x + z.w <= o.x + 1e-6 || o.x + o.w <= x + 1e-6 || y + z.d <= o.y + 1e-6 || o.y + o.d <= y + 1e-6);
+  const rows = [p.y, p.y + p.depth_m - z.d];
+  for (let y = p.y; y <= p.y + p.depth_m - z.d + 1e-6; y += 0.5) if (!rows.some(r => Math.abs(r - y) < 1e-6)) rows.push(y);
+  for (const y of rows) {
+    if (y < p.y || y + z.d > p.y + p.depth_m + 1e-6) continue;
+    for (let x = p.x; x <= p.x + p.width_m - z.w + 1e-6; x += 0.5) {
+      if (clear(x, y)) return [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
+    }
+  }
+  return null;
 }
 
 /* The engine measures the placement: the option with these zones is read under the rules exactly as a run would
@@ -2999,6 +3289,9 @@ async function attachCause(run) {
     const [site, folder] = state.compareRun.split("/");
     const prev = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
     run.compareLedger = prev.ledger || null;   // for the side-by-side card
+    run.compareProforma = prev.proforma || null;   // its money, its drawings and its fit, for the same card (15 Nov 2026)
+    run.compareLayout = prev.layout || null;
+    run.compareMassing = prev.massing || null;
     const a = (prev.ledger && prev.ledger.inputs) || {}, b = (run.ledger && run.ledger.inputs) || {};
     const changed = [stable(a.site) !== stable(b.site) && "the site's inputs", stable(a.option) !== stable(b.option) && "the option's inputs"].filter(Boolean);
     const date = d.previous_as_of !== d.current_as_of ? `the as-of date (${d.previous_as_of} → ${d.current_as_of})` : null;
@@ -3051,7 +3344,21 @@ function runLabel(r) {
   const option = r.option_name || r.option_id || "option";
   const named = r.folder && r.folder !== r.as_of && !/^\d{4}-\d\d-\d\d/.test(r.folder);
   const stamped = r.folder && r.folder !== r.as_of && !named;
-  return `${rev(r.run_id)} · ${r.as_of} · ${named ? `${r.folder} · ` : ""}${option}${stamped ? ` · ${r.folder}` : ""}${r.revit ? " · Revit" : ""}`;
+  // the day it was run leads (a timestamped folder says it; a committed run has none), then the rules date
+  const ranOn = r.written ? String(r.written).slice(0, 10) : (stamped ? r.folder.slice(0, 10) : null);
+  const ranAt = stamped && /T\d\d-\d\d/.test(r.folder) ? ` ${r.folder.slice(11, 16).replace("-", ":")}` : "";
+  return `${rev(r.run_id)} · ${ranOn ? `run ${ranOn}${ranAt} · rules as of ${r.as_of}` : `rules as of ${r.as_of}`} · ${named ? `${r.folder} · ` : ""}${option}${r.revit ? " · Revit" : ""}`;
+}
+
+/* The address bar names the run on screen (and the run compared), so a memo can be sent as a link. */
+function syncUrl() {
+  if (STATIC && !state.run) return;
+  const q = new URLSearchParams(location.search);
+  if (state.run && !state.run.in_browser) q.set("run", state.run.run_id); else q.delete("run");
+  if (state.run && state.compareRun) q.set("compare", state.compareRun); else q.delete("compare");
+  q.set("mode", state.mode);
+  const url = `${location.pathname}?${q.toString().replace(/%2F/g, "/")}`;   // run ids read as site/folder, as the site's own links write them
+  if (url !== location.pathname + location.search) history.replaceState(null, "", url);
 }
 
 function fillRunSelects() {
@@ -3071,6 +3378,7 @@ async function openRun(runId) {
   setStatus(`Opening the run ${runId}…`, "busy");
   const run = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
   state.run = run;
+  state.runStale = null;
   // the date in the top bar is the date of the memo on screen, and so of the next run
   $("#as-of").value = run.as_of;
   enableExports(run);
@@ -3089,6 +3397,7 @@ async function openRun(runId) {
   renderMemo(run);
   fillRunSelects();
   setCompareNote(run.diff);
+  syncUrl();
   setStep(3);
   closeExportPanel();
   setStatus(`Opened ${rev(run.run_id)}, the run as of ${run.as_of} ·${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
@@ -3166,6 +3475,7 @@ async function applyCompare(render = true) {
     await attachCause(run);
   }
   setCompareNote(run.diff);
+  syncUrl();
   if (render) {
     renderMemo(run);
     if (run.diff) {
@@ -4017,6 +4327,7 @@ function renderGuideInto(el) {
   const stop1 = siteChosen ? `
     <dl class="found-site"><div><dt>Site</dt><dd><b>${h(site.address || site.id)}</b>${site.zoning_district ? ` · ${h(site.zoning_district)}` : ""}${site.site_area_m2 ? ` · ${h(fmtNum(site.site_area_m2))} m²` : ""} <span class="cont">${state.siteId ? "(saved)" : "(from the lookup, unsaved)"}</span></dd></div></dl>
     ${cornerStreets(site).length ? `<div class="corner-q"><p class="help">A corner lot: ${h(cornerStreets(site)[0])} and ${h(cornerStreets(site)[1])} both run beside it. The front street sets the yards, the envelope and the massing.</p>${answerControl("front_street")}</div>` : ""}
+    <div class="corner-q"><p class="help">The massing is drawn on a clear lot${site.osm && site.osm.omitted && site.osm.omitted.length ? `; ${site.osm.omitted.length === 1 ? "one building stands" : `${site.osm.omitted.length} buildings stand`} on it now` : ""}.</p>${answerControl("keep_existing_buildings")}</div>
     <div class="form-actions"><button class="btn btn-small btn-quiet" type="button" id="guide-change-site">Change the site</button><span class="help">The Site card below holds its facts; answer what the data could not.</span></div>` : `
     <div class="seg way" role="group" aria-label="How to find the site"><button type="button" class="segbtn" data-way="address" aria-pressed="${way === "address"}">An address</button><button type="button" class="segbtn" data-way="saved" aria-pressed="${way === "saved"}">A saved site</button></div>
     ${way === "address" ? `
@@ -4140,6 +4451,7 @@ function renderGuideInto(el) {
   wireGuide();
   guideProgress();
   if (!state.run) renderStage();
+  saveDraft();
 }
 
 /* What the rules leave to a person can be answered here, in the flow. Site facts go to the Site card at once (the
@@ -4153,6 +4465,8 @@ const ANSWERS = {
   site_control: { on: "option", kind: "select", label: "Site control", options: [["", "Not sure"], ["letter_of_intent", "Letter of intent"], ["purchase_agreement", "Purchase agreement"], ["council_resolution", "Council resolution"], ["finalized", "Finalized"], ["none", "None yet"]] },
   // a corner lot: which street is the front sets the yards, the envelope and the massing; the options are the two streets
   front_street: { on: "site", kind: "select", label: "Which street is the front?", options: [] },
+  // the massing stands on a clear lot: say whether that is so
+  keep_existing_buildings: { on: "site", kind: "tri", label: "Do the buildings on the lot stay?" },
 };
 
 /* The two streets of a corner lot, from the lookup's parcel record; empty for a lot on one street. */
@@ -4289,7 +4603,10 @@ function wireGuide() {
     const raw = inp.value.trim();
     setPath(state.option, inp.dataset.key, raw === "" ? null : Number(raw));
     state.optionDirty = true;
+    $("#option-dirty").hidden = false;
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    markStale("the money in");
+    saveDraft();
   }));
   on("#guide-run-again", () => runRules());
   on("#guide-ask-claude", guideAskClaude);
@@ -4725,6 +5042,8 @@ async function sendIssue() {
   try {
     const it = await postJSON(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}/issue`, { by: state.mode, to, note: $("#issue-note").value });
     run.issued = it;
+    run.issues = [...(run.issues || []), it];
+    const memoEl = $("#memo"); if (memoEl) memoEl.dataset.issuedManager = run.issues.some(i => i.to === "manager") ? "1" : "";
     markIssueSeen(it.id);
     closeIssuePanel();
     $("#issue-note").value = "";
@@ -4878,6 +5197,23 @@ async function init() {
   $("#pdf-btn").addEventListener("click", () => exportPdf().catch(err => toast(err.message, true)));
   $("#save-site").addEventListener("click", () => saveAs("site"));
   $("#save-option").addEventListener("click", () => saveAs("option"));
+  $$("[data-save]").forEach(b => b.addEventListener("click", () => saveNow(b.dataset.save)));
+  // "Use it" under the Building group: the derived floor area or height goes into the option
+  $("#option-form").addEventListener("click", e => {
+    const b = e.target.closest("[data-use]");
+    if (!b || !state.option) return;
+    setPath(state.option, b.dataset.use, Number(b.dataset.value));
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    onOptionChange(b.dataset.use);
+    setStatus(`${b.dataset.use === "gfa_m2" ? "Floor area" : "Height"} set to ${b.dataset.use === "gfa_m2" ? fmtNum(Number(b.dataset.value)) + " m²" : b.dataset.value + " m"} from the storeys and the plate.`, "info");
+  });
+  $$("[data-save-cancel]").forEach(b => b.addEventListener("click", () => { $(`#save-${b.dataset.saveCancel}-inline`).hidden = true; $(`#save-${b.dataset.saveCancel}`).setAttribute("aria-expanded", "false"); $(`#save-${b.dataset.saveCancel}`).focus(); }));
+  $$(".save-inline input").forEach(i => i.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); saveNow(i.closest(".save-inline").id.includes("site") ? "site" : "option"); } if (e.key === "Escape") { i.closest(".save-inline").hidden = true; } }));
+  // leaving the page with unsaved work: the browser asks first
+  window.addEventListener("beforeunload", e => {
+    const unsaved = (state.siteDirty && state.site) || (state.optionDirty && state.option) || (state.run && state.run.in_browser);
+    if (unsaved) { e.preventDefault(); e.returnValue = ""; }
+  });
   // switching files discards unsaved edits, so ask first
   $("#site-select").addEventListener("change", e => {
     if ((state.siteDirty || state.optionDirty) && !confirm("Switch the site file? The unsaved edits to the site and option will be lost.")) { e.target.value = state.siteId || "__new__"; return; }

@@ -108,8 +108,12 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     factor = round(latest / base_index, 4) if latest and base_index else 1.0
     hard = round(gfa * rate_m2 * factor) if gfa else None
     line("hard_rate", "Hard cost base", rate_m2, "$/m²", "f.hard_cost_base", f"{hc.get('basis', '')}".split(";")[0], False)
-    line("escalation", "Escalation to the latest index", factor, "×", "f.escalation_bcpi",
-         f"BCPI {latest} ({latest_period}) over {base_index} ({base_period})" if base_index and latest else "index not on file for this date: no escalation applied")
+    newest_period = max(obs) if obs else None
+    newest = float(obs[newest_period]) if newest_period else None
+    line("escalation", "Escalation to the index in force on the run date", factor, "×", "f.escalation_bcpi",
+         (f"BCPI {latest} ({latest_period}, the last quarter published {BCPI_PUBLISHING_LAG_DAYS} days before the run date {as_of}) over {base_index} ({base_period})"
+          + (f"; the rule's newest observation is {newest} ({newest_period}), published after that date" if newest_period and newest_period != latest_period else ""))
+         if base_index and latest else "index not on file for this date: no escalation applied")
     line("hard", "Hard cost", hard, "$", "f.hard_cost_base",
          (f"{gfa:,.0f} m² × ${rate_m2:,.0f} × {factor}" + (" (floor area from the massing: the plate × the storeys, since the option gives none)" if gfa_from == "the massing" else "")) if gfa else "no floor area")
     s_share, c_share = float(soft.get("soft_cost_share_of_hard") or 0), float(soft.get("contingency_share_of_hard") or 0)

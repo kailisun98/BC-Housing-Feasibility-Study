@@ -872,7 +872,22 @@
         "conditional": [],
         "uncertain": []
       },
-      "unsure": []
+      "unsure": [
+        {
+          "rule_id": "coverage.yards",
+          "title": "Yards not checked: no RM-1 yard rule in the rules",
+          "status": "uncertain",
+          "finding": "The setbacks on the site plan (front 3.7, rear 6.0, side 3.0 m) are the option's own figures; no rule in the stack tested them against RM-1's minimum yards.",
+          "action": "Architect: read the RM-1 schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for."
+        },
+        {
+          "rule_id": "coverage.heritage",
+          "title": "Heritage register and designation",
+          "status": "uncertain",
+          "finding": "The rules hold no heritage rule, and a church site is where the City's Heritage Register and heritage designations are most likely to apply; a listed building changes what can be demolished and how the rezoning is read.",
+          "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address."
+        }
+      ]
     }
   },
   "inputs": {
@@ -890,6 +905,7 @@
       "frequent_bus_stop_within_400m": null,
       "has_water_and_sewer": true,
       "owner_type": "church",
+      "keep_existing_buildings": false,
       "owner": "Vancouver First Church of the Nazarene",
       "land_tenure_plan": "long-term lease or transfer to a non-profit society (to confirm)",
       "existing_trees_on_site": [

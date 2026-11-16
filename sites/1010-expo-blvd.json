@@ -12,6 +12,7 @@
   "frequent_bus_stop_within_400m": null,
   "has_water_and_sewer": true,
   "owner_type": "municipality",
+  "keep_existing_buildings": false,
   "owner": "City of Vancouver (site transferred by Concord Pacific under the False Creek North social housing agreement, 2023)",
   "land_tenure_plan": "City-owned; BC Housing develops and the BC Indigenous Housing Society operates under a lease (terms to confirm)",
   "existing_trees_on_site": [],

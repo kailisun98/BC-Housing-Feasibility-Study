@@ -12,6 +12,7 @@
   "frequent_bus_stop_within_400m": null,
   "has_water_and_sewer": true,
   "owner_type": "church",
+  "keep_existing_buildings": false,
   "owner": "Vancouver First Church of the Nazarene",
   "land_tenure_plan": "long-term lease or transfer to a non-profit society (to confirm)",
   "existing_trees_on_site": [

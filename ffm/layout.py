@@ -488,9 +488,11 @@ def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float,
     p = L["plate"]
     out.append(f'<text x="{ox:.1f}" y="{oy - 8:.1f}" font-size="13" font-weight="600">{_esc(title)}</text>')
     out.append(f'<rect x="{ox:.1f}" y="{oy:.1f}" width="{p["width_m"] * scale:.1f}" height="{p["depth_m"] * scale:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
+    # the street is at the bottom of every plan in the set, as on FIG 01 (15 Nov 2026): the plate's y runs from the
+    # street side, so a zone is drawn from the far edge down
     for z in fl["zones"]:
         x = ox + (z["x"] - p["x"]) * scale
-        y = oy + (z["y"] - p["y"]) * scale
+        y = oy + (p["depth_m"] - (z["y"] - p["y"]) - z["d"]) * scale
         w, d = z["w"] * scale, z["d"] * scale
         dash = ' stroke-dasharray="3 2"' if z["block"] == "spare" else ""
         out.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{d:.1f}" fill="{TONES[z["block"]]}" stroke="{TONES["muted"]}" stroke-width="0.8"{dash}/>')
@@ -535,7 +537,7 @@ def svg_plans(L: dict) -> str:
              _stamp_line(L)]
     height = pad + 24 + len(levels) * row + 20 + 30 + 16 * len(lines) + 16
     out = _svg_open(max(width, 640), height, "Floor plans by program")
-    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Plans by program · metres, street at the top</text>')
+    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Plans by program · metres, street at the bottom</text>')
     for i, lv in enumerate(levels):
         fl = L["floors"][lv]
         counts = {}
@@ -561,13 +563,16 @@ def svg_elevations(L: dict, massing: dict) -> str:
     masses = {m["name"]: m for m in massing["masses"]}
     bench = massing.get("policy_benchmark") or {}
     out_h = (L.get("outright") or {}).get("height_m") or (masses.get("outright") or {}).get("height_m")
-    hmax = max([H, out_h or 0] + ([bench["height_m"][1]] if bench.get("height_m") else []))
+    # one height for one building: the elevation stands as tall as the section (the option's stated height where it
+    # is taller than the storeys), with the top floor level marked inside it (15 Nov 2026)
+    Hp = max(H, float((masses.get("proposed") or {}).get("height_m") or 0))
+    hmax = max([Hp, out_h or 0] + ([bench["height_m"][1]] if bench.get("height_m") else []))
     pad = 48
     scale = max(3.0, min(380 / p["width_m"], 220 / hmax, 260 / p["depth_m"]))
     fw, sw, eh = p["width_m"] * scale, p["depth_m"] * scale, hmax * scale
     gap = 70
     width = pad + fw + gap + sw + pad
-    lines = [f'{n} storeys × {f2f} m = {H:.1f} m to the top floor level' + (f'; the option states {masses["proposed"]["height_m"]} m' if masses.get("proposed", {}).get("height_m", H) > H + 0.05 else ""),
+    lines = [f'{Hp:.1f} m high, as the section' + (f': {n} storeys × {f2f} m = {H:.1f} m to the top floor level (thin line), the {Hp - H:.1f} m above it parapet, roof or a taller ground floor' if Hp > H + 0.05 else f': {n} storeys × {f2f} m'),
              (f'Outright maximum height {out_h} m, dashed grey' if out_h else "No outright height in the stack for this district"),
              *( [f'Staff benchmark {bench["height_m"][0]} to {bench["height_m"][1]} m, amber'] if bench.get("height_m") else []),
              f'Windows: one per unit on its side, {LAYOUT_ASSUMPTIONS["window_width_m"][0]} m wide, the unit module as the rhythm; a placeholder for the elevation study',
@@ -581,7 +586,9 @@ def svg_elevations(L: dict, massing: dict) -> str:
     def elevation(ox: float, length: float, label: str, axis: str) -> None:
         out.append(f'<text x="{ox:.1f}" y="{pad + 14:.1f}" font-size="12" font-weight="600">{_esc(label)}</text>')
         out.append(f'<line x1="{ox - 10:.1f}" y1="{base:.1f}" x2="{ox + length + 10:.1f}" y2="{base:.1f}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
-        out.append(f'<rect x="{ox:.1f}" y="{base - H * scale:.1f}" width="{length:.1f}" height="{H * scale:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
+        out.append(f'<rect x="{ox:.1f}" y="{base - Hp * scale:.1f}" width="{length:.1f}" height="{Hp * scale:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
+        if Hp > H + 0.05:
+            out.append(f'<line x1="{ox:.1f}" y1="{base - H * scale:.1f}" x2="{ox + length:.1f}" y2="{base - H * scale:.1f}" stroke="{TONES["muted"]}" stroke-width="0.6" stroke-dasharray="3 2"/>')
         for fl in L["floors"]:
             y_top = base - (fl["z"] + f2f) * scale
             y_floor = base - fl["z"] * scale
@@ -611,7 +618,7 @@ def svg_elevations(L: dict, massing: dict) -> str:
                 yb = base - hv * scale
                 out.append(f'<line x1="{ox - 10:.1f}" y1="{yb:.1f}" x2="{ox + length + 10:.1f}" y2="{yb:.1f}" stroke="{TONES["benchmark"]}" stroke-width="1" stroke-dasharray="4 3"/>')
             out.append(f'<text x="{ox + length + 12:.1f}" y="{base - bench["height_m"][1] * scale + 4:.1f}" font-size="10" fill="{TONES["benchmark"]}">benchmark {bench["height_m"][0]}–{bench["height_m"][1]} m</text>')
-        out.append(f'<text x="{ox + length + 12:.1f}" y="{base - H * scale + 4:.1f}" font-size="10" fill="{TONES["ink"]}">{H:.1f} m</text>')
+        out.append(f'<text x="{ox + length + 12:.1f}" y="{base - Hp * scale + 4:.1f}" font-size="10" fill="{TONES["ink"]}">{Hp:.1f} m</text>')
 
     elevation(pad, fw, "Front elevation · from the street", "x")
     elevation(pad + fw + gap + 40, sw, "Side elevation · street at the left", "y")
@@ -690,22 +697,24 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     height = pad + 24 + pd + 50 + table_h + 40
     width = max(pad + pw + 60 + 400, 760)
     out = _svg_open(width, height, "Code site plan")
-    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the top</text>')
+    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>')
     ox, oy = pad + 30, pad + 24
-    T = lambda x, y: (ox + (x - bb[0]) * scale, oy + (y - bb[1]) * scale)
+    # the street at the bottom, as on FIG 01 and the plans (15 Nov 2026): y runs up the sheet
+    T = lambda x, y: (ox + (x - bb[0]) * scale, oy + (bb[3] - y) * scale)
     pts = lambda ring: " ".join(f"{T(x, y)[0]:.1f},{T(x, y)[1]:.1f}" for x, y in ring)
     out.append(f'<polygon points="{pts(lot["polygon"])}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
     out.append(f'<polygon points="{pts(env["polygon"])}" fill="none" stroke="{TONES["envelope"]}" stroke-width="1.2" stroke-dasharray="6 4"/>')
     if polygon_lot and env.get("box"):
         bx = env["box"]
-        out.append(f'<rect x="{T(bx["x"], bx["y"])[0]:.1f}" y="{T(bx["x"], bx["y"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
-    fx, fy = T(pm["footprint"][0][0], pm["footprint"][0][1])
+        out.append(f'<rect x="{T(bx["x"], bx["y"] + bx["d"])[0]:.1f}" y="{T(bx["x"], bx["y"] + bx["d"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
+    fp_x = min(x for x, _ in pm["footprint"]); fp_y = max(y for _, y in pm["footprint"])
+    fx, fy = T(fp_x, fp_y)
     out.append(f'<rect x="{fx:.1f}" y="{fy:.1f}" width="{pm["plate_width_m"] * scale:.1f}" height="{pm["plate_depth_m"] * scale:.1f}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
     out.append(f'<text x="{fx + 6:.1f}" y="{fy + 14:.1f}" font-size="10" fill="{TONES["ink"]}">{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys</text>')
-    # the yards, dimensioned on a rectangular lot; on a polygon the envelope's own line shows the setbacks
+    # the yards, dimensioned on a rectangular lot (front at the bottom); on a polygon the envelope's own line shows the setbacks
     dims = [] if polygon_lot else [
-            (ox + pw / 2, oy, oy + sb.get("front", 0) * scale, f'front {sb.get("front")} m', True),
-            (ox + pw / 2, oy + pd - sb.get("rear", 0) * scale, oy + pd, f'rear {sb.get("rear")} m', True),
+            (ox + pw / 2, oy + pd - sb.get("front", 0) * scale, oy + pd, f'front {sb.get("front")} m', True),
+            (ox + pw / 2, oy, oy + sb.get("rear", 0) * scale, f'rear {sb.get("rear")} m', True),
             (oy + pd / 2, ox, ox + sb.get("side", 0) * scale, f'side {sb.get("side")} m', False),
             (oy + pd / 2, ox + pw - sb.get("side", 0) * scale, ox + pw, f'side {sb.get("side")} m', False)]
     for a, b1, b2, lab, vert in dims:

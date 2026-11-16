@@ -334,6 +334,18 @@ used (`guide.suggestionUsed`); `layoutOpenItems(run)` joins answer 3 and the pap
 `syncInputsTo` loads an unsaved site's inputs from the run; `focusKeyOf` keeps focus across guide re-renders;
 `front_street` is a site answer that swaps frontage and depth on a corner lot; `scheduleFor(district)` says whether
 the stack has a schedule; the rail's Run button carries `aria-disabled` until a site and an option exist.
+The second pass the same day (the README in that folder lists it): `markStale`/`syncStaleBand` (a memo whose inputs
+changed wears a band and Issue waits), `saveAs`/`saveNow` (an inline id field, no browser prompt), `saveDraft`/
+`resumeDraft` (the guide and unsaved files in sessionStorage, "Resume where you were" on the blank stage),
+`envelopeLive` (floor area and height derived under the Building group, "Use it"), `coverage.yards`,
+`coverage.existing_buildings` and `coverage.heritage` open items in `engine.summarise` (the site field
+`keep_existing_buildings`), the sheets and the block editor with the street at the bottom (`layout._plan`,
+`svg_site_plan`, `renderEditor`), FIG 05 as tall as the section, `memoRefs`/`refOf` (A1 refs on screen) and the
+reader's order by CSS `order`, the Side by side card's building-and-money table and two sections
+(`run.compareProforma`, `compareLayout`, `compareMassing` from `attachCause`), `syncUrl`, `runLabel` with the run
+date, the block editor's snapping/`freeSpot`/oversize flag, the boundary editor's edge table and "Set the site
+area", the pyRevit script's levels and blocks from `layout.json`, and `.layout-sheet`/`.layout-wait` (the manager
+sees the plans only once the architect has issued the run; `memo[data-issued-manager]`).
 
 ## The lot as a polygon (11 Nov 2026): odd sites, the parcel survey, the boundary editor
 

@@ -122,6 +122,30 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
                            "action": f"Architect: read the {district} schedule (or read it with Claude at stop 3 and confirm its clauses) and enter the outright FSR, height and yards."})
     else:
         by_rezoning = _verdict(policy_rules)
+    # the yards: where no district yard rule tested them, the option's setbacks are its own figures, and a reader of the
+    # site plan should know that nothing checked them (15 Nov 2026, from an architect's test)
+    sb = option.get("setbacks_m") or {}
+    yards_tested = [r for r in results if r.get("check") == "district_setbacks" and r["status"] != "not_applicable"]
+    if not outside and not yards_tested and any(v is not None for v in sb.values()):
+        extra_open.append({"rule_id": "coverage.yards", "title": f"Yards not checked: no {district} yard rule in the rules", "status": "uncertain",
+                           "finding": f"The setbacks on the site plan (front {sb.get('front')}, rear {sb.get('rear')}, side {sb.get('side')} m) are the option's own figures; no rule in the stack tested them against {district}'s minimum yards.",
+                           "action": f"Architect: read the {district} schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for."})
+    # what stands on the lot, and heritage: the massing draws a clear lot; a church site or a kept building is a question
+    # with a person (15 Nov 2026, from an architect's test of a West End church site)
+    owner = f"{site.get('owner_type') or ''} {site.get('owner') or ''}".lower()
+    keep = site.get("keep_existing_buildings")
+    if keep is None:
+        extra_open.append({"rule_id": "coverage.existing_buildings", "title": "What stays on the lot", "status": "uncertain",
+                           "finding": "The massing stands on a clear lot; whether the existing buildings (or part of them) stay is not stated.",
+                           "action": "Manager: say whether the buildings on the lot stay (stop 1); if they do, the architect draws the footprint that is kept and the massing moves off it."})
+    elif keep:
+        extra_open.append({"rule_id": "coverage.existing_buildings", "title": "A building kept on the lot", "status": "conditional",
+                           "finding": "The existing buildings stay, but the massing is drawn on the whole lot: the floor area and the plate here assume the ground they stand on.",
+                           "action": "Architect: draw the kept footprint and reduce the plate (the boundary editor, or a smaller site area); the answers hold for the lot as drawn."})
+    if "church" in owner or "parish" in owner or "congregation" in owner:
+        extra_open.append({"rule_id": "coverage.heritage", "title": "Heritage register and designation", "status": "uncertain",
+                           "finding": "The rules hold no heritage rule, and a church site is where the City's Heritage Register and heritage designations are most likely to apply; a listed building changes what can be demolished and how the rezoning is read.",
+                           "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address."})
     allowed = {"outright": outright, "by_rezoning": by_rezoning, "rezoning_path": option.get("rezoning_path")}
 
     # Question 2: does it fit the funders? Layer E rules the option targets.

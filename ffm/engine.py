@@ -77,16 +77,20 @@ def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None
             "stamp": stamp(rules, on, rules_dir),
         },
         "results": results,
-        "summary": summarise(results, option),
+        "summary": summarise(results, option, site),
         "inputs": {"site": site, "option": option},
     }
     return ledger
 
 
-def summarise(results: list[dict], option: dict) -> dict[str, Any]:
+def summarise(results: list[dict], option: dict, site: dict | None = None) -> dict[str, Any]:
     counts = {s: 0 for s in STATUS_ORDER}
     for r in results:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
+    site = site or {}
+    district = site.get("zoning_district") or "this district"
+    municipality = (site.get("municipality") or "").strip()
+    outside = bool(municipality) and "vancouver" not in municipality.lower()
 
     # Question 1: is it allowed? Layers A to C decide; D is flags only.
     # Outright = the district schedule alone. By rezoning = everything else in A to C, which is
@@ -97,7 +101,28 @@ def summarise(results: list[dict], option: dict) -> dict[str, Any]:
     if outright["uncertain"] and option.get("rezoning_path"):
         # 'uncertain' from an outright check means 'exceeds, needs rezoning': say no outright.
         outright["verdict"] = "no"
-    allowed = {"outright": outright, "by_rezoning": _verdict(policy_rules), "rezoning_path": option.get("rezoning_path")}
+    # No schedule in the stack for the district is not a pass: nothing was tested (15 Nov 2026, after two architects
+    # read "Allowed outright" on a DD, an R1-1 and a Burnaby site). The verdict says so, and answer 3 carries it.
+    tested = [r for r in outright_rules if r["status"] != "not_applicable"]
+    extra_open: list[dict] = []
+    if outside:
+        why = f"the rules are written for the City of Vancouver and the Province; this site is in {municipality}"
+        outright = {"verdict": "not assessed", "fail": [], "conditional": [], "uncertain": [], "why": why}
+        by_rezoning = {"verdict": "not assessed", "fail": [], "conditional": [], "uncertain": [], "why": why}
+        extra_open.append({"rule_id": "coverage.municipality", "title": f"A site outside the City of Vancouver ({municipality})", "status": "uncertain",
+                           "finding": f"The rule stack reads the City of Vancouver's by-laws and policies and the Province's; {municipality}'s zoning is not in it, so nothing below tests this site's zoning.",
+                           "action": f"Architect: read {municipality}'s zoning by-law for the district and enter its outright FSR, height and yards; the provincial and funder rules still apply."})
+    elif not tested:
+        why = f"the rules have no outright schedule for {district}"
+        outright = {"verdict": "not assessed", "fail": [], "conditional": [], "uncertain": [], "why": why}
+        by_rezoning = _verdict(policy_rules)
+        extra_open.append({"rule_id": "coverage.district_schedule", "title": f"No outright schedule for {district} in the rules", "status": "uncertain",
+                           "finding": f"The rule stack has no {district} district schedule, so the envelope (storeys, height, floor area, yards) is the option's own figure, not a permitted one."
+                           + (" A CD-1 site's limits are whatever its by-law and the rezoning set." if district.upper().startswith("CD-1") else ""),
+                           "action": f"Architect: read the {district} schedule (or read it with Claude at stop 3 and confirm its clauses) and enter the outright FSR, height and yards."})
+    else:
+        by_rezoning = _verdict(policy_rules)
+    allowed = {"outright": outright, "by_rezoning": by_rezoning, "rezoning_path": option.get("rezoning_path")}
 
     # Question 2: does it fit the funders? Layer E rules the option targets.
     targets = set(option.get("target_programs") or [])
@@ -107,7 +132,7 @@ def summarise(results: list[dict], option: dict) -> dict[str, Any]:
     # Question 3: what is still unsure, and who resolves it?
     # Outright-schedule exceedances are already answered by the rezoning path, so they do not
     # reappear as open items when a path is stated.
-    unsure = [
+    unsure = extra_open + [
         {"rule_id": r["rule_id"], "title": r["title"], "status": r["status"], "finding": r["finding"], "action": r["action"]}
         for r in results if r["status"] in (UNSURE, COND, FAIL)
         and not (option.get("rezoning_path") and r.get("check", "").startswith("district_outright"))

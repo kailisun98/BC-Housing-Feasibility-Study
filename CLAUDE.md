@@ -134,8 +134,8 @@ Added 23 Oct 2026: FIG 01 carries a Plan | 3D segmented switch; the 3D view (`fi
 is a dependency-free orbitable axonometric drawn from `massing.json`. A second case study,
 `sites/1010-expo-blvd.json` with `options/1010-expo-blvd-as-permitted.json` and the run in
 `outputs/1010-expo-blvd/2026-10-23/`, comes from public City pages (see README); it is a CD-1 site,
-so the outright rules are not applicable and the memo's "outright: yes" is an engine limitation
-noted in the site file, not a finding.
+so the outright rules are not applicable and the memo's outright answer reads "not assessed" (since 15 Nov 2026;
+before that it read "yes", an engine limitation noted in the site file).
 
 Comparison demo (23 Oct 2026): `options/998-e-19th-ave-what-if-funder-ready.json` is the five-storey
 what-if with every funder question answered (rent tiers 30/50/20, 5 accessible units, 60-year
@@ -316,6 +316,24 @@ Built and verified in the browser:
   .memo-body` / `.figures`), the plans sheet and the block editor spanning both columns, the ledger after.
 - The committed Expo runs were regenerated on 11 Nov 2026 with the polygon massing (below); the 998 runs are
   unchanged (a rectangle). Browser-test runs (timestamp folders) are deleted before a commit, as before.
+
+## The design review (15 Nov 2026): three UX critiques, two architects' tests, and what changed
+
+`docs/design-review-2026-11-15/` holds the five reports and the evidence pack, and its README lists what changed
+that day and what is still open. The engine changes a later session must know: a blank `site_control` or
+`developer_partner` is uncertain, never a fail, and no finding prints a Python None (`tests/test_blank_answers.py`);
+`checks.smallest_split` and the suggester say when a unit count cannot meet the fund's mix; `engine.summarise(results,
+option, site)` returns `"not assessed"` for the outright verdict (and for by-rezoning outside the City of Vancouver)
+with a `why`, and adds a `coverage.*` open item, when the stack has no schedule for the district or the site's
+`municipality` is not Vancouver; `proforma.build(site, option, ledger, massing)` takes the floor area from the
+massing when the option has none and says so; `massing.build` labels a mass drawn without a storey count as a
+placeholder; `lookup.assemble` reads the municipality from the point and records `lookup.civic_mismatch` and
+`lookup.outside_vancouver`; `server.list_issues(None)` lists every site's issues and `run_payload` carries `issues`.
+In the page: the stage previews a found parcel before "Use this site"; `stageOption` shows the suggestion until it is
+used (`guide.suggestionUsed`); `layoutOpenItems(run)` joins answer 3 and the paper; the paper has a money section;
+`syncInputsTo` loads an unsaved site's inputs from the run; `focusKeyOf` keeps focus across guide re-renders;
+`front_street` is a site answer that swaps frontage and depth on a corner lot; `scheduleFor(district)` says whether
+the stack has a schedule; the rail's Run button carries `aria-disabled` until a site and an option exist.
 
 ## The lot as a polygon (11 Nov 2026): odd sites, the parcel survey, the boundary editor
 

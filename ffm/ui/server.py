@@ -275,9 +275,15 @@ def run_payload(out: Path, site_id: str, ledger: dict, m: dict | None, svg: str 
             pf = None
     lay = _read(out / "layout.json") if (out / "layout.json").exists() else None
     sheets = {name: (out / f"{name}.svg").read_text(encoding="utf-8") for name in layout.SHEETS if (out / f"{name}.svg").exists()} if lay else None
+    issues = []
+    if (out / "issues.json").exists():
+        try:
+            issues = _read(out / "issues.json")
+        except Exception:
+            issues = []
     return {"run_id": f"{site_id}/{out.name}", "folder": out.name, "folder_abs": str(out),
             "as_of": ledger["run"]["as_of"], "stamp": stamp, "ledger": ledger, "massing": m, "svg": svg, "diff": d, "proforma": pf,
-            "layout": lay, "sheets": sheets,
+            "layout": lay, "sheets": sheets, "issues": issues,
             "massing_note": massing_note, "revit": revit_summary(out, stamp),
             "files": {"massing_json": str(out / "massing.json") if m else None, "ledger_json": str(out / "ledger.json"),
                       "script": str(ROOT / "revit" / "ffm_massing_pyrevit.py")}}
@@ -334,7 +340,7 @@ def do_run(body: Any) -> dict:
         d = engine.diff(_read(_run_folder(ps_id, pf) / "ledger.json"), ledger)
         (out / "diff.json").write_text(json.dumps(d, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    pfm = proforma.build(site, option, ledger)
+    pfm = proforma.build(site, option, ledger, m)
     (out / "proforma.json").write_text(json.dumps(pfm, indent=2, ensure_ascii=False), encoding="utf-8")
     memo.write(ledger, out, m, d, svg, proforma=pfm)
     return run_payload(out, site_id, ledger, m, svg, d, massing_note, pfm)
@@ -524,20 +530,21 @@ ROLES = ("manager", "architect", "reader")
 
 
 def list_issues(site_id: str | None) -> list[dict]:
-    """Every issue note on the site's runs, newest first."""
-    if not site_id:
-        return []
-    if not _slug_ok(site_id):
+    """Every issue note on the site's runs, newest first; with no site, on every site's runs (since 15 Nov 2026: the
+    architect's chip must find a run issued on a site that is not on their screen, or not saved at all)."""
+    if site_id and not _slug_ok(site_id):
         raise ApiError(400, "Bad site id.")
-    base = OUTPUTS_DIR / site_id
+    bases = [OUTPUTS_DIR / site_id] if site_id else ([p for p in OUTPUTS_DIR.iterdir() if p.is_dir()] if OUTPUTS_DIR.exists() else [])
     out = []
-    if base.exists():
+    for base in bases:
+        if not base.exists():
+            continue
         for p in base.iterdir():
             f = p / "issues.json"
             if p.is_dir() and f.exists():
                 try:
                     for it in _read(f):
-                        out.append({**it, "run_id": f"{site_id}/{p.name}", "folder": p.name})
+                        out.append({**it, "run_id": f"{base.name}/{p.name}", "folder": p.name, "site": base.name})
                 except Exception:
                     continue
     out.sort(key=lambda i: i.get("issued_at", ""), reverse=True)

@@ -114,8 +114,12 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         x0 = box["x"] + (env_w - w if at_right else 0.0)
         return _rect(x0, box["y"], w, d), w, d
 
-    # Proposed mass: the option's GFA at its storey count.
+    # Proposed mass: the option's GFA at its storey count. With no storey count the plate is drawn one storey high as
+    # a placeholder, and the label and a warning say so (15 Nov 2026: a reviewer read it as a building someone chose).
+    storeys_given = option.get("storeys") is not None
     storeys = int(option.get("storeys") or 1)
+    if not storeys_given:
+        warnings.append("The option gives no storey count: the proposed mass is drawn one storey high on the plate the setbacks leave, as a placeholder, not a building anyone chose.")
     gfa = float(option.get("gfa_m2") or 0)
     plate = gfa / storeys if gfa else plate_cap
     if plate > plate_cap:
@@ -129,7 +133,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         warnings.append(f"Option height {parapet} m exceeds {storeys} x {f2f} m = {h:.1f} m; the extra {parapet - h:.1f} m is parapet, roof structure or taller ground floor, and the mass uses the stated height.")
         h = float(parapet)
     masses.append({
-        "name": "proposed", "label": f"Proposed: {storeys} storeys, FSR {gfa / area:.2f}" if gfa else f"Proposed: {storeys} storeys",
+        "name": "proposed", "label": (f"Proposed: {storeys} storeys, FSR {gfa / area:.2f}" if gfa else f"Proposed: {storeys} storeys") if storeys_given else "Proposed: storeys not given, drawn at one storey as a placeholder",
         "footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "at_street_corner": "right" if at_right else "left",
         "base_z": 0.0, "height_m": round(h, 2), "storeys": storeys, "floor_to_floor_m": f2f,
         "plate_area_m2": round(plate, 1), "gfa_m2": round(plate * storeys, 1), "fsr": round(plate * storeys / area, 3),

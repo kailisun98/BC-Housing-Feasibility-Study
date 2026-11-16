@@ -13,7 +13,7 @@ function h(s) {
 }
 
 const STATUS_WORD = { pass: "Pass", conditional: "Conditional", fail: "Fail", uncertain: "Uncertain", not_applicable: "Not applicable", info: "Info" };
-const VERDICT_OUTRIGHT = { no: "Not outright.", yes: "Allowed outright.", "yes, with conditions": "Outright, with conditions.", "not yet confirmed": "Outright: not yet confirmed." };
+const VERDICT_OUTRIGHT = { no: "Not outright.", yes: "Allowed outright.", "yes, with conditions": "Outright, with conditions.", "not yet confirmed": "Outright: not yet confirmed.", "not assessed": "Outright: not assessed." };
 
 function pill(status) {
   return `<span class="pill pill-${h(status)}">${h(STATUS_WORD[status] || status)}</span>`;
@@ -28,7 +28,7 @@ function scrollBehavior() { return reducedMotion() ? "auto" : "smooth"; }
 function cap(s) { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /* The status a verdict word stands for, so a card can wear its colour. */
-const VERDICT_STATUS = { no: "fail", yes: "pass", "yes, with conditions": "conditional", "not yet confirmed": "uncertain" };
+const VERDICT_STATUS = { no: "fail", yes: "pass", "yes, with conditions": "conditional", "not yet confirmed": "uncertain", "not assessed": "uncertain" };
 function verdictStatus(word) { return VERDICT_STATUS[word] || ""; }
 
 function fmtNum(x) {
@@ -181,7 +181,7 @@ def ffm_run(site_json, option_json, as_of, previous_json):
         except ValueError as e:
             note = (note + " " if note else "") + "Layout skipped: " + str(e)
     d = engine.diff(json.loads(previous_json), L) if previous_json else None
-    pf = proforma.build(site, option, L)
+    pf = proforma.build(site, option, L, m)
     md = memo.markdown(L, m, d, proforma=pf, layout=lay)
     return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note, "proforma": pf, "layout": lay, "sheets": sheets,
                        "memo_md": md, "memo_html": memo.html_page(md, svg, {k + ".svg": v for k, v in (sheets or {}).items()})})
@@ -966,7 +966,17 @@ function syncCards() {
   const siteCard = $("#step-site"), optCard = $("#step-option");
   if (!siteCard || !optCard) return;
   siteCard.hidden = manager && !state.site;
-  optCard.hidden = manager && !(state.option && (state.optionId || state.option.storeys != null || state.option.gfa_m2 != null));
+  optCard.hidden = manager && !(state.option && (state.optionId || guide.suggestionUsed || state.option.storeys != null || state.option.gfa_m2 != null));
+  syncRunButton();
+}
+
+/* The top bar's Run the rules says when it has nothing to run, instead of doing nothing. */
+function syncRunButton() {
+  const b = $("#run-btn");
+  if (!b) return;
+  const ok = !!(state.site && state.option);
+  b.setAttribute("aria-disabled", String(!ok));
+  b.title = ok ? "Run the rules (Ctrl+Enter)" : (!state.site ? "Find a site first (stop 1)" : "Shape or pick an option first (stop 4)");
 }
 
 /* Load the demo case from the guide: the committed site and its as-approved option. */
@@ -1039,6 +1049,7 @@ async function selectSite(id) {
     state.site = await api(`/api/sites/${encodeURIComponent(id)}`);
     state.siteDirty = false;
   }
+  if (state.compareRun && !state.compareRun.startsWith((state.siteId || "") + "/")) { state.compareRun = null; setCompareNote(null); }   // a comparison never crosses sites
   renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
   $("#site-dirty").hidden = !state.siteDirty;
   refreshSummary("site");
@@ -1137,8 +1148,8 @@ async function saveAs(kind) {
 
 // ---------------------------------------------------------------- runs
 
-async function loadRuns() {
-  const sid = state.siteId || (state.site && state.site.id);
+async function loadRuns(siteId = null) {
+  const sid = siteId || state.siteId || (state.site && state.site.id);
   state.runs = sid ? await api(`/api/runs?site=${encodeURIComponent(sid)}`) : [];
   noteRevisions(state.runs);
 }
@@ -1163,7 +1174,13 @@ const rev = runId => (runId && state.revisions.get(runId)) || "a new revision";
 
 async function runRules() {
   const btn = $("#run-btn");
-  if (!state.site || !state.option) return;
+  if (state.running) return;   // a second click while a run is in flight made a second revision of the same inputs
+  if (!state.site || !state.option) {
+    toast(!state.site ? "Nothing to run yet: find a site at stop 1." : "Nothing to run yet: shape or pick an option at stop 4.", true);
+    return;
+  }
+  state.running = true;
+  btn.disabled = true;
   btn.classList.add("busy");
   btn.textContent = "Running…";
   setStatus("Running the rules…", "busy");
@@ -1191,6 +1208,8 @@ async function runRules() {
   } catch (e) {
     toast(e.message, true);
   } finally {
+    state.running = false;
+    btn.disabled = false;
     btn.classList.remove("busy");
     btn.textContent = "Run the rules";
   }
@@ -1244,7 +1263,7 @@ function renderQuiet() {
         <div><b>Proponent</b><span>${h(opt.proponent || "—")}</span></div>
         <div><b>Rules as of</b><span>${h($("#as-of").value || todayISO())}</span></div>
       </div>
-      <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the memo in this tab" : "writes the memo to <code>outputs/</code>"}, and reads it here: three answers first, then the massing and the full ledger.</p>
+      <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the memo in this tab" : "writes the memo to <code>outputs/</code>"}, and reads it here: four answers first, then the massing and the full ledger.</p>
     </div>
     <div class="answers">
       ${quietCard("01 · Is it allowed", "Is it allowed?", "Outright under the district, then by rezoning under the City policy that applies.")}
@@ -1276,15 +1295,19 @@ function renderStage() {
   const site = state.site;
   const cur = guide.step || 1;
   const o = state.option || {};
-  const sig = JSON.stringify([site && [site.id, site.address, site.site_area_m2, site.zoning_district, site.owner, site.parcel && site.parcel.polygon_lonlat && site.parcel.polygon_lonlat.length],
-    guide.programs || o.target_programs, guide.reading && [guide.reading.as_of, guide.reading.results.length], guide.suggestion && [guide.suggestion.candidate, Object.keys(guide.mine || {})],
+  const preview = !site && guide.lookup && guide.lookup.site ? guide.lookup.site : null;   // a parcel found, not yet used: shown to be checked
+  const sig = JSON.stringify([site && [site.id, site.address, site.site_area_m2, site.zoning_district, site.owner, site.front_street, site.parcel && site.parcel.polygon_lonlat && site.parcel.polygon_lonlat.length],
+    preview && [preview.address, preview.site_area_m2], guide.programs || o.target_programs, guide.reading && [guide.reading.as_of, guide.reading.results.length],
+    guide.suggestion && [guide.suggestion.candidate, guide.mine, guide.suggestionUsed],
     cur, o.storeys, o.gfa_m2, o.units, o.rent_tiers_units, o.tenure, o.finance, memo.dataset.stage]);
   if (sig === stageSig && memo.dataset.stage === "1") return;
   stageSig = sig;
   placeRunTools(false);
+  $(".memo-pane").classList.toggle("no-run", !state.run && !(state.runs || []).length);   // nothing to open or compare yet: the pickers wait
   const cards = STAGE.map(s => {
     let body = "";
     if (s.key === "site" && site) body = stageSite(site);
+    else if (s.key === "site" && preview) body = stagePreview(preview);
     else if (s.key === "programs" && (guide.programs || (state.option && state.option.target_programs))) body = stagePrograms(guide.programs || state.option.target_programs);
     else if (s.key === "reading" && guide.reading) body = stageReading(guide.reading);
     else if (s.key === "option" && (guide.suggestion || (state.option && state.option.storeys != null))) body = stageOption();
@@ -1304,8 +1327,30 @@ function renderStage() {
   memo.className = "memo landed";
   memo.dataset.stage = "1";
   const demo = $("#stage-demo"); if (demo) demo.addEventListener("click", () => loadDemo().catch(e => toast(e.message, true)));
-  if (site) mountStageMap(site);
+  const use = $("#stage-use-site"); if (use) use.addEventListener("click", () => guideUseSite().catch(e => toast(e.message, true)));
+  if (site || preview) mountStageMap(site || preview);
 }
+
+/* The parcel the lookup found, over the map, before it is used: the check that catches a wrong lot. */
+function stagePreview(found) {
+  const info = found.lookup || {};
+  const p = found.parcel || {};
+  return `<div class="stage-site">
+      <div class="stage-map" id="stage-map" role="img" aria-label="The parcel the lookup found, on a map"><p class="help">Map loading…</p></div>
+      <dl class="found-site">
+        <div><dt>Is this the parcel?</dt><dd><b>${h(found.address)}</b><span class="cont"> · found from the ${info.geocoded_as && String(info.geocoded_as).includes("property address") ? "City's address list" : "address as geocoded"}</span></dd></div>
+        <div><dt>District</dt><dd>${found.zoning_district ? `<b>${h(found.zoning_district)}</b>` : "<i>not found</i>"}</dd></div>
+        <div><dt>Lot</dt><dd>${found.site_area_m2 ? `<b>${h(fmtNum(found.site_area_m2))} m²</b> · ${h(found.frontage_m)} × ${h(found.depth_m)} m` : "<i>no parcel polygon at the point</i>"}${p.shape && p.shape.class !== "rectangle" ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : ""}</dd></div>
+        ${info.civic_mismatch ? `<div><dt>Check</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street. This is the nearest parcel: use it only if it is the site.</dd></div>` : ""}
+        ${info.outside_vancouver ? `<div><dt>Check</dt><dd class="warn-text">${h(found.municipality)} is outside the City of Vancouver: the rules here cannot read its zoning.</dd></div>` : ""}
+      </dl>
+    </div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="stage-use-site"${info.outside_vancouver ? " disabled" : ""}>${info.civic_mismatch ? `Yes, ${h(String(found.address).split(",")[0])} is the site` : "Use this site"}</button><span class="help">If the outline is wrong, look up again or pick a saved site.</span></div>`;
+}
+
+/* A parcel's shape in a manager's words, without the classifier's figures. */
+const shapeWords = shape => shape.class === "rectangle" ? "a rectangle"
+  : String(shape.note || cap(String(shape.class || "").replace(/_/g, " "))).replace(/\s*\([^)]*\)/g, "").replace(/,\s*[\d,.]+ m2\b.*$/, "").replace(/\.$/, "") + (shape.class !== "near_rectangle" ? "; the massing follows the polygon" : "");
 
 function stageSite(site) {
   const notSure = SITE_FIELDS.flatMap(g => g.fields).filter(f => f.type === TRI && getPath(site, f.key) == null).map(f => f.label);
@@ -1314,11 +1359,11 @@ function stageSite(site) {
   const srcs = (site.sources || []).slice(0, 3);
   return `
     <div class="stage-site">
-      <div class="stage-map" id="stage-map" aria-label="The parcel on a map"><p class="help">Map loading…</p></div>
+      <div class="stage-map" id="stage-map" role="img" aria-label="The parcel on a map"><p class="help">Map loading…</p></div>
       <dl class="found-site">
-        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>` : "<i>not found: enter it in the Site card</i>"}</dd></div>
-        <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel: enter the area</i>"}${p.shape ? ` <span class="cont">· ${h(p.shape.note)}${p.shape.class !== "rectangle" ? " The massing follows the polygon." : ""}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand in the tool</span>' : ""}</dd></div>
-        <div><dt>Street</dt><dd>${h(((site.context || {}).street || {}).name || (site.osm && site.osm.frame && site.osm.frame.front_street) || "not known")}</dd></div>
+        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>${site.zoning_district && !scheduleFor(site.zoning_district) ? ` <span class="cont warn-text">· no ${h(site.zoning_district)} schedule in the rules: the envelope is yours to enter at stop 4</span>` : ""}` : "<i>not found: enter it in the Site card</i>"}</dd></div>
+        <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel: enter the area</i>"}${p.shape ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand in the tool</span>' : ""}</dd></div>
+        <div><dt>${cornerStreets(site).length ? "Front" : "Street"}</dt><dd>${h(((site.context || {}).street || {}).name || (site.osm && site.osm.frame && site.osm.frame.front_street) || "not known")}${cornerStreets(site).length ? ` <span class="cont">· a corner lot with ${h(cornerStreets(site).find(s => s !== (((site.context || {}).street || {}).name)) || cornerStreets(site)[1])}; ${site.front_street ? "the front you chose" : "which street is the front is not confirmed: answer at stop 1, or the architect confirms it"}</span>` : ""}</dd></div>
         <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) + (site.owner_type ? ` <span class="cont">(${h(String(site.owner_type).replace(/_/g, " "))})</span>` : "") : "<i>not given</i>"}</dd></div>
         ${notSure.length ? `<div><dt>Not sure</dt><dd class="cont">${h(notSure.join("; "))}. The rules read these as uncertain until answered in the Site card.</dd></div>` : ""}
       </dl>
@@ -1350,21 +1395,39 @@ function stageReading(R) {
 }
 
 function stageOption() {
-  const S = guide.suggestion, o = state.option || (S && S.option) || {};
+  // the suggestion with the manager's own figures laid over it, until Use this option writes it into the card;
+  // after that the card's option (15 Nov 2026: before, a blank option in the card hid a full suggestion, "not set")
+  const S = guide.suggestion;
+  const pending = !!(S && !guide.suggestionUsed);
+  let o = pending ? JSON.parse(JSON.stringify(S.option)) : (state.option || (S && S.option) || {});
+  if (pending) {
+    for (const [k, , kind] of GUIDE_FIELDS) {
+      if (guide.mine[k] === undefined) continue;
+      const raw = String(guide.mine[k]).trim();
+      if (raw === "") { setPath(o, k, null); continue; }
+      const v = kind === "text" ? raw : Number(raw);
+      if (kind === "text" || Number.isFinite(v)) setPath(o, k, v);
+    }
+  }
   const units = o.units || {};
   const n = Object.values(units).reduce((t, v) => t + (v || 0), 0);
   const tiers = o.rent_tiers_units;
   const f = k => (S && S.fields && S.fields[k]) || null;
   const cite = k => { const x = f(k); return x && x.rule_id ? ` <code title="${h(ruleTitle(x.rule_id))}">${h(x.rule_id)}</code>` : (x ? ` <code class="ph">placeholder</code>` : ""); };
+  const yours = Object.keys(guide.mine || {}).filter(k => String(guide.mine[k]).trim() !== "").length;
+  const blank = ["storeys", "height_m", "gfa_m2"].filter(k => getPath(o, k) == null);
+  const envelope = o.storeys != null || o.height_m != null || o.gfa_m2 != null
+    ? `<b>${o.storeys != null ? `${h(o.storeys)} storeys` : "<i>storeys yours to enter</i>"} · ${o.height_m != null ? `${h(o.height_m)} m` : "<i>height yours to enter</i>"} · ${o.gfa_m2 != null ? `${h(fmtNum(o.gfa_m2))} m²` : "<i>floor area yours to enter</i>"}</b>${cite("storeys")}`
+    : (blank.length === 3 && S ? `<i>yours to enter at stop 4: no rule in the stack derives the envelope for ${h((state.site || {}).zoning_district || "this district")}</i>` : "<i>not set</i>");
   return `<dl class="found-site">
-      <div><dt>Candidate</dt><dd>${S ? `<b>${h(cap(S.candidate))}</b>${Object.keys(guide.mine || {}).length ? ` <span class="cont">· ${Object.keys(guide.mine).length} figure${Object.keys(guide.mine).length === 1 ? "" : "s"} yours</span>` : ""}` : `<b>${h(o.name || o.id || "saved option")}</b>`}</dd></div>
-      <div><dt>Envelope</dt><dd>${o.storeys != null ? `<b>${h(o.storeys)} storeys · ${h(o.height_m)} m · ${h(fmtNum(o.gfa_m2))} m²</b>${cite("storeys")}` : "<i>not set</i>"}${o.rezoning_path ? `<div class="cont">${h(o.rezoning_path)}</div>` : ""}</dd></div>
+      <div><dt>Candidate</dt><dd>${S ? `<b>${h(cap(S.candidate))}</b>${pending ? ` <span class="cont">· suggested, not yet in the Option card: Use this option at stop 4</span>` : ""}${yours ? ` <span class="cont">· ${yours} figure${yours === 1 ? "" : "s"} yours</span>` : ""}` : `<b>${h(o.name || o.id || "saved option")}</b>`}</dd></div>
+      <div><dt>Envelope</dt><dd>${envelope}${o.rezoning_path ? `<div class="cont">${h(o.rezoning_path)}</div>` : ""}</dd></div>
       <div><dt>Units</dt><dd>${n ? `<b>${h(n)}</b> · ${Object.entries(units).map(([k, v]) => `${v || 0} ${UNIT_WORD[k] || k}`).join(", ")}${cite("units.two_bed")}` : "<i>not set</i>"}</dd></div>
       <div><dt>Tiers</dt><dd>${tiers ? `${h(tiers.market || 0)} market · ${h(tiers.rgi || 0)} RGI · ${h(tiers.deep_subsidy || 0)} deep subsidy${cite("rent_tiers_units.market")}` : "<i>not split</i>"}</dd></div>
       <div><dt>Tenure</dt><dd>${h(String(o.tenure || "not set").replace(/_/g, " "))}${o.housing_agreement_years ? ` · ${h(o.housing_agreement_years)}-year agreement` : ""}${cite("tenure")}</dd></div>
       <div><dt>Trees</dt><dd>${o.replacement_trees_proposed != null ? `${h(o.replacement_trees_proposed)} replacements${cite("replacement_trees_proposed")}` : "<i>not set</i>"}</dd></div>
     </dl>
-    ${S && S.unsure && S.unsure.length ? `<p class="help">Left to a person: ${h(S.unsure.map(u => u.key.replace(/_/g, " ")).join("; "))}. Answer them in stop 4.</p>` : ""}`;
+    ${S && S.unsure && S.unsure.length ? `<p class="help">To answer, or leave as not sure: ${h(S.unsure.map(u => keyLabel(u.key)).join("; "))}. At stop 4.</p>` : ""}`;
 }
 
 /* The assumptions the pro-forma reads, from layer F as it stands on the as-of date, each with its source. */
@@ -1446,6 +1509,9 @@ function renderMemo(run) {
     </div>
     <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
   </div>`);
+  // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
+  const note = (run.issues || []).filter(i => i.to === state.mode).slice(-1)[0];
+  if (note) parts.push(`<div class="card issue-note"><b>From the ${h(note.by)}, ${h(String(note.issued_at || "").replace("T", " ").slice(0, 16))}:</b> ${note.note ? h(note.note) : "<i>no note</i>"}</div>`);
 
   // 2. a comparison comes straight after the title block: the two runs side by side, their pickers heading the A
   // and B columns, then What changed; 3. the three answers; 4. the massing figures beside them at >=1600 px, under
@@ -1461,7 +1527,7 @@ function renderMemo(run) {
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));
   parts.push(`<div class="memo-body">
-    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L)}${answerMoney(run)}</div>
+    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L, run)}${answerMoney(run)}</div>
     ${renderFigures(run)}
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
@@ -1472,6 +1538,7 @@ function renderMemo(run) {
   placeRunTools(false);
   memoEl.innerHTML = parts.join("\n");
   memoEl.className = "memo";
+  $(".memo-pane").classList.remove("no-run");
   void memoEl.offsetWidth;  // restart the fade
   memoEl.classList.add("landed");
   placeRunTools(true);
@@ -1524,6 +1591,8 @@ function answerAllowed(L) {
   let verdict = `${h(VERDICT_OUTRIGHT[o.verdict] || cap(o.verdict) + ".")}`;
   if (path) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
   let body = `<p class="path">Outright under ${h(site.zoning_district || "the district")}${path ? ` · rezoning path: ${h(path)}` : " · no rezoning path stated"}</p>`;
+  // nothing was tested: say why, in the words answer 3 repeats with the person who settles it
+  if (o.why) body += `<p class="finding"><b>Not assessed:</b> ${h(o.why)}. The storeys, height and floor area in this memo are the option's own figures, not permitted ones; answer 3 names who reads the schedule.</p>`;
   body += outLines.map(r => `<p class="finding">${leadCont(r.finding)}</p>`).join("");
   if (path && policy.length) {
     body += `<ul class="finding-list">${policy.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
@@ -1550,15 +1619,37 @@ function answerFunders(L) {
   </section>`;
 }
 
-function answerUnsure(L) {
-  const items = L.summary.answers.unsure || [];
+/* What the drawings found that the rules did not: homes that did not fit the plate, and hand-placed blocks that
+   overlap or sit outside it. They join answer 3 with the architect named (15 Nov 2026: before, they stayed on FIG 03
+   while the answers priced every home). Pure. */
+function layoutOpenItems(run) {
+  const lay = run && run.layout;
+  if (!lay) return [];
+  const out = [];
+  const short = (lay.shortfall || []).filter(s => s.units || s.area_m2);
+  if (short.length && lay.units_total) {
+    const words = short.map(s => `${s.units ? s.units + " " : ""}${String(s.label || "").toLowerCase()}`).join(", ");
+    out.push({ title: "Homes that do not fit the plate", status: "conditional",
+      action: `Architect: ${lay.units_placed} of ${lay.units_total} homes fit the plate on ${(lay.floors || []).length} floors; did not fit: ${words}. More storeys, a larger plate or a smaller program. The money and the funders' checks count all ${lay.units_total}.` });
+  }
+  const broken = lay.geometry || [];
+  if (broken.length) {
+    out.push({ title: "Blocks placed by hand that break the plate", status: "fail",
+      action: `Architect: ${broken.length} problem${broken.length === 1 ? "" : "s"} in the hand placement: ${broken.slice(0, 3).map(g => g.note || g.kind || "").join("; ")}${broken.length > 3 ? "; …" : ""}. Fix them in Edit blocks before issuing.` });
+  }
+  return out;
+}
+
+function answerUnsure(L, run) {
+  const items = [...(L.summary.answers.unsure || []), ...layoutOpenItems(run)];
   const n = items.length;
-  const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}, each with <em>a named person</em>.` : "<em>Nothing outstanding.</em>";
-  const table = n ? `<table class="plain"><thead><tr><th>Item</th><th>Status</th><th>Who / what</th></tr></thead><tbody>
-    ${items.map(u => `<tr><td>${h(u.title)}</td><td class="status">${pill(u.status)}</td><td class="who">${h(u.action || "—")}</td></tr>`).join("")}
+  const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}. Each names who resolves it.` : "Nothing outstanding.";
+  const who = u => { const m = /^(Manager|Architect|Owner|Planner|Both|Manager and owner|Manager and architect)\b/i.exec(u.action || ""); return m ? m[1] : "—"; };
+  const table = n ? `<table class="plain"><thead><tr><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
+    ${items.map(u => `<tr><td>${h(u.title)}</td><td class="status">${pill(u.status)}</td><td class="who">${h(who(u))}</td><td class="who">${h((u.action || "—").replace(/^(Manager and owner|Manager and architect|Manager|Architect|Owner|Planner|Both):\s*/i, ""))}</td></tr>`).join("")}
   </tbody></table>` : "";
-  const worst = items.some(u => u.status === "fail") ? "fail" : (n ? "uncertain" : "pass");   // the card wears the heaviest open status
-  return `<section class="card answer" data-verdict="${worst}">
+  // a count of open items is not a verdict: the card carries no status wash; each row wears its own
+  return `<section class="card answer" data-verdict="${n ? "plain" : "pass"}">
     <h2><span class="badge">3</span> What is still unsure, and who resolves it?</h2>
     <p class="verdict">${verdict}</p>
     ${table}
@@ -1595,12 +1686,12 @@ function answerMoney(run) {
     <dl class="pf-four">
       <div><dt>Capital cost</dt><dd><b>${h(money(c.total))}</b><span class="cont">hard ${h(money(c.hard))} ×${h(c.escalation)}, soft ${h(money(c.soft))}, contingency ${h(money(c.contingency))}, land ${h(money(c.land))}</span></dd></div>
       <div><dt>Net operating income</dt><dd><b>${h(money(o.noi))} a year</b><span class="cont">rent ${h(money(o.gross))} less vacancy, operating cost and reserve</span></dd></div>
-      <div><dt>Funding</dt><dd><b>${h(money(f.total))}</b><span class="cont">grants ${h(money(grants))}, equity ${h(money(f.equity))}, debt ${h(money(f.debt.supportable))} at ${h(f.debt.rate_pct)}% over ${h(f.debt.amortization_years)} years, ${h(Number(f.debt.dcr).toFixed(2))} coverage</span></dd></div>
+      <div><dt>Funding</dt><dd><b>${h(money(f.total))}</b><span class="cont">grants ${h(money(grants))}, equity ${h(money(f.equity))}, debt ${h(money(f.debt.supportable))} at ${h(f.debt.rate_pct)}% over ${h(f.debt.amortization_years)} years, ${h(Number(f.debt.dcr).toFixed(2))} coverage${pf.inputs && pf.inputs.units_total ? `; ${h(pf.inputs.units_total)} homes as entered${run.layout && run.layout.units_placed != null && run.layout.units_placed < pf.inputs.units_total ? ` (${h(run.layout.units_placed)} fit the plate: answer 3)` : ""}` : ""}</span></dd></div>
       <div><dt>Gap</dt><dd><b>${h(money(g.value))}</b><span class="cont">${g.share_of_capital != null ? `${h(Math.round(g.share_of_capital * 100))}% of the capital cost; a negative gap is headroom` : ""}</span></dd></div>
     </dl>
     ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
     ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
-    <details class="pf-lines" open><summary>Every line, where it came from, and its source</summary>
+    <details class="pf-lines"${state.mode === "architect" ? " open" : ""}><summary>Every line, where it came from, and its source <span class="cont">(${(pf.lines || []).length} lines)</span></summary>
       <table class="plain"><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="cont">A feasibility screen, not a lender's model. Hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked.</p>
     </details>
@@ -2984,6 +3075,10 @@ async function openRun(runId) {
   $("#as-of").value = run.as_of;
   enableExports(run);
   await syncInputsTo(run);
+  // the run's own site names its revisions, whether or not the inputs followed it (unsaved edits keep them where they are)
+  const runSite = run.run_id.split("/")[0];
+  if (!state.revisions.has(run.run_id)) await loadRuns(runSite);
+  if (state.compareRun && !state.compareRun.startsWith(runSite + "/")) state.compareRun = null;   // a comparison never crosses sites
   showStamp(run);   // after the inputs follow the run, so its site's runs, and their revisions, are loaded
   // a run cannot be compared with itself; a run recorded against an earlier one opens compared with it, when the
   // list can tell which run that was
@@ -3018,10 +3113,33 @@ async function syncInputsTo(run) {
   if (state.siteDirty || state.optionDirty) return;
   const siteId = run.run_id.split("/")[0];
   const optId = run.ledger && run.ledger.run && run.ledger.run.option_id;
+  const inputs = (run.ledger && run.ledger.inputs) || {};
   if (optId) state.optionId = optId;
   if (state.siteId !== siteId && state.sites.some(s => s.id === siteId)) {
     $("#site-select").value = siteId;
     await selectSite(siteId);
+  } else if (!state.sites.some(s => s.id === siteId) && inputs.site && (state.siteId !== null || !state.site || state.site.id !== siteId)) {
+    // a run on a site that was never saved (the manager's lookup, issued as it stood): the cards take the run's own
+    // inputs, unsaved, so the memo and the cards never show two different sites (15 Nov 2026)
+    state.siteId = null;
+    state.site = Object.assign(blankSite(), JSON.parse(JSON.stringify(inputs.site)));
+    state.siteDirty = false;
+    $("#site-select").value = "__new__";
+    renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+    $("#site-dirty").hidden = false;
+    refreshSummary("site");
+    if (inputs.option) {
+      state.optionId = null;
+      state.option = Object.assign(blankOption(state.site.id), JSON.parse(JSON.stringify(inputs.option)));
+      state.optionDirty = false;
+      $("#option-select").value = "__new__";
+      renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+      $("#option-dirty").hidden = false;
+      refreshSummary("option");
+    }
+    await loadOptions();
+    syncCards();
+    setStatus(`${state.site.address || siteId} was never saved: its facts and the option are in the cards from the run itself; Save site as… keeps them.`, "info");
   } else if (optId && state.options.some(o => o.id === optId) && $("#option-select").value !== optId) {
     $("#option-select").value = optId;
     await selectOption(optId);
@@ -3181,7 +3299,7 @@ const TOUR = [
     text: "The building: storeys, floor area, the unit mix, tenure, the funders, the rezoning path. Suggested figures land here too, and every one can still be edited. Save it as a file to rerun the same thing from the command line." },
   { target: "#run-btn", title: "Run the rules", action: "run",
     text: "One click, or Ctrl+Enter. In under a second the engine writes the memo to the outputs folder and reads it here. The walkthrough runs the real case for you now." },
-  { target: ".answers", fallback: "#memo", title: "Step 3 · The three answers, and the money",
+  { target: ".answers", fallback: "#memo", title: "Step 3 · The four answers",
     text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item. A fourth card asks whether the money works: capital cost, net operating income, the funding stack and the gap, feasibility grade, every line citing its dated assumption." },
   { target: "#view-switch", title: "Summary, Detailed, 3D preview", before: () => setView("3d", false),
     text: "How much of the memo to show. Summary is the title block, the answers and the figures; Detailed the whole memo; 3D preview the drawings, large. The page is switched to the preview for the next stop." },
@@ -3459,7 +3577,7 @@ function paperDocument(run) {
     const items = ["fail", "conditional", "uncertain"].flatMap(k => (o[k] || []).map(id => `<li>${refTag(id)} ${h(titleOf[id] || id)} <span class="muted">(${h((STATUS_WORD[k] || k).toLowerCase())})</span></li>`));
     return items.length ? `<ul class="refs">${items.join("")}</ul>` : `<span class="muted">No rule stands in the way.</span>`;
   };
-  const unsure = ans.unsure || [];
+  const unsure = [...(ans.unsure || []), ...layoutOpenItems(run).map(u => ({ ...u, rule_id: "layout", finding: "" }))];   // the drawings' open items join the rules'
   const fmtVal = x => (x === null || x === undefined ? "—" : typeof x === "boolean" ? (x ? "yes" : "no")
     : typeof x === "object" ? JSON.stringify(x).replace(/[{}"]/g, "").replace(/,/g, ", ").replace(/:/g, ": ")
     : typeof x === "string" && /^[a-z0-9]+(_[a-z0-9]+)+$/.test(x) ? x.replace(/_/g, " ") : fmtNum(x));
@@ -3474,7 +3592,7 @@ function paperDocument(run) {
         <tr><th scope="row">Is it allowed by rezoning?</th><td>${vmark(ans.allowed.by_rezoning.verdict)}</td><td>${decidedBy(ans.allowed.by_rezoning)}${ans.allowed.rezoning_path ? `<p class="note">Path: ${h(ans.allowed.rezoning_path)}.</p>` : ""}</td></tr>
         <tr><th scope="row">Does it fit the funders?</th><td>${vmark(ans.funded.verdict)}</td><td>${decidedBy(ans.funded)}${(opt.target_programs || []).length ? `<p class="note">Programs the option targets: ${h(opt.target_programs.map(id => titleOf[id] ? `${ref(id)} ${titleOf[id]}` : id).join("; "))}.</p>` : ""}</td></tr>
         <tr><th scope="row">What is still unsure?</th><td>${unsure.length ? `<span class="st st-${unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${unsure.length} open item${unsure.length === 1 ? "" : "s"}</span>` : `<span class="st st-pass">Nothing open</span>`}</td><td>${unsure.length ? `Each with the person who resolves it, in section 2: ${unsure.map(u => refTag(u.rule_id)).join(", ")}.` : `<span class="muted">Every rule that applies is settled.</span>`}</td></tr>
-        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(cap(run.proforma.verdict.word))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Every line and its source are in the memo on screen.</td></tr>` : ""}
+        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(cap(run.proforma.verdict.word))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Every line, its rule and its source are in section ${s.money}.</td></tr>` : ""}
       </tbody></table>`;
 
   // 2. open items
@@ -3512,7 +3630,15 @@ function paperDocument(run) {
   }
   // the sections after the comparison are numbered on from it; massing only when there is one
   const sn = (k => () => ++k)(d ? 3 : 2);
-  const s = { clauses: sn(), massing: run.massing || run.massing_note ? sn() : null, ledger: sn(), inputs: sn(), sources: sn(), verify: sn() };
+  const pfOk = !!(run.proforma && run.proforma.available);
+  const s = { money: pfOk ? sn() : null, clauses: sn(), massing: run.massing || run.massing_note ? sn() : null, ledger: sn(), inputs: sn(), sources: sn(), verify: sn() };
+  // the money, line by line, on paper: the board and the funder's officer read the gap here and nowhere else (15 Nov 2026)
+  const moneyLines = pfOk ? `<table class="money"><colgroup><col style="width:6%"><col style="width:22%"><col style="width:16%"><col></colgroup>
+      <thead><tr><th>Ref</th><th>Line</th><th>Figure</th><th>How, and from what</th></tr></thead><tbody>
+      ${run.proforma.lines.map(ln => { const shown = ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + (ln.unit === "$/yr" ? " a year" : ln.unit === "$/m²" ? " per m²" : "") : (ln.value == null ? "not given" : fmtNum(ln.value));
+        return `<tr><td>${ln.rule_id ? refTag(ln.rule_id) : '<span class="muted">option</span>'}</td><td><b>${h(ln.label)}</b>${ln.placeholder ? ' <span class="st st-uncertain">placeholder</span>' : ""}</td><td class="num">${h(shown)}</td><td>${h(ln.note || "")}${ln.rule_id ? ` <span class="muted">(${h(ref(ln.rule_id))}: ${h(titleOf[ln.rule_id] || ln.rule_id)})</span>` : ""}</td></tr>`; }).join("")}
+      </tbody></table>
+      <p class="note">Capital cost ${h(money(run.proforma.capital.total))}, less funding ${h(money(run.proforma.funding.total))}, gives the gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the capital cost)` : ""}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; each rule's source is in section ${s.ledger}.</p>` : "";
 
   // 4. every clause that applies, in reference order
   const applied = res.filter(r => r.status !== "not_applicable");
@@ -3696,9 +3822,10 @@ function paperDocument(run) {
     <h1>${h(address)}</h1>
     <p class="sub">First Read memo · ${h(revA)} · issued ${h(issued)}</p>
     ${titleBlock}
-    <p class="howto">Section 1 gives the three answers and the rules that decide them; rules are named by layer and place (A1, C4…) throughout. Section ${s.ledger} gives each rule's finding, numbers and source, and section ${s.verify} says how to reproduce this memo.</p>
-    <section class="sec"><h2><span class="no">1</span> The three answers</h2>${answers}</section>
+    <p class="howto">Section 1 gives the four answers and the rules that decide them; rules are named by layer and place (A1, C4…) throughout. Section ${s.ledger} gives each rule's finding, numbers and source, and section ${s.verify} says how to reproduce this memo.</p>
+    <section class="sec"><h2><span class="no">1</span> The four answers</h2>${answers}</section>
     <section class="sec"><h2><span class="no">2</span> Open items and who resolves them</h2>${open}</section>
+    ${pfOk ? `<section class="sec"><h2><span class="no">${s.money}</span> The money, line by line</h2>${moneyLines}</section>` : ""}
     ${compare}
     <section class="sec"><h2><span class="no">${s.clauses}</span> Clauses applied</h2><p class="note">${applied.length} of ${res.length} rules apply. Proposed is what the option puts forward; permitted or required is the clause's own limit; the ask is what stands between them.</p>${clauses}</section>
     ${s.massing ? `<section class="sec"><h2><span class="no">${s.massing}</span> Massing</h2>${figures}</section>` : ""}
@@ -3787,7 +3914,7 @@ function guideDone() {
     1: !!(state.site && (state.siteId || state.site.zoning_district)),
     2: !!guide.programs,
     3: !!guide.reading,
-    4: !!(state.option && state.option.storeys != null && (guide.suggestion || state.optionId)),
+    4: !!(state.option && (guide.suggestionUsed || state.optionId || state.option.storeys != null || state.option.gfa_m2 != null)),
     5: !!(state.run || (state.option && state.option.finance && Object.values(state.option.finance).some(v => v != null))),
     6: !!state.run,
     7: !!(state.run && state.run.issued),
@@ -3809,6 +3936,28 @@ function ruleTitle(id) {
   return r ? r.title : id;
 }
 
+/* Whether the rule stack holds an outright schedule for a district (RM-1 yes; RT-3, CD-1 no). */
+function scheduleFor(district) {
+  const d = String(district || "").toUpperCase();
+  if (!d) return false;
+  return state.rules.some(r => r.check === "district_outright_fsr" && (r.applies_to_districts || []).some(x => x.toUpperCase() === d || (d.startsWith(x.toUpperCase() + "-") && !x.includes("-"))));
+}
+
+/* The focused control survives a re-render of the guide: the thing the reader was on is found again by what it is. */
+function focusKeyOf(el, root) {
+  if (!el || !root.contains(el)) return null;
+  if (el.id) return `#${el.id}`;
+  const row = el.closest(".sg-row");
+  if (el.dataset.stop) return `.stop-head[data-stop="${el.dataset.stop}"]`;
+  if (el.dataset.answer) return el.dataset.value !== undefined ? `[data-answer="${el.dataset.answer}"][data-value="${el.dataset.value}"]` : `[data-answer="${el.dataset.answer}"]`;
+  if (row && el.dataset.pick) return `.sg-row[data-key="${row.dataset.key}"] [data-pick="${el.dataset.pick}"]`;
+  if (row && el.classList.contains("sg-input")) return `.sg-row[data-key="${row.dataset.key}"] .sg-input`;
+  if (el.dataset.cand) return `.cands [data-cand="${el.dataset.cand}"]`;
+  if (el.dataset.way) return `.way [data-way="${el.dataset.way}"]`;
+  if (el.classList.contains("guide-program")) return `.guide-program[value="${el.value}"]`;
+  return null;
+}
+
 /* Re-rendering the card changes its height (a stop opens, another closes, a form folds below), and the browser would
    leave the reader's scroll position pointing at whatever moved into it. So the head of one stop, the one the reader
    acted on, is kept at the same place on screen across the render: measured before, matched after. */
@@ -3820,8 +3969,10 @@ function renderGuide(anchor = guide.step, placeAtY = null) {
   const anchorOf = () => (typeof anchor === "string" ? $(anchor, el) : (anchor && $(`.stop-head[data-stop="${anchor}"]`, el))) || el;
   const wasHidden = el.hidden;
   const before = wasHidden ? null : anchorOf().getBoundingClientRect().top;
+  const focusKey = focusKeyOf(document.activeElement, el);
   el.hidden = false;
   renderGuideInto(el);
+  if (focusKey) { const again = $(focusKey, el); if (again) again.focus({ preventScroll: true }); }
   let target = null;
   if (placeAtY != null) {
     // where the reader just acted: the stop that opens next appears under the button they pressed, kept on screen
@@ -3845,8 +3996,8 @@ function renderGuideInto(el) {
   const stop = (n, body) => {
     const open = guide.step === n;
     return `<section class="stop${open ? " open" : ""}${done[n] ? " done" : ""}">
-      <button class="stop-head" type="button" data-stop="${n}" aria-expanded="${open}">
-        <span class="badge">${done[n] && !open ? "✓" : n}</span><span class="stop-title">${h(GUIDE_STOPS[n - 1].title)}</span><span class="stop-what">${h(GUIDE_STOPS[n - 1].what)}</span>
+      <button class="stop-head" type="button" data-stop="${n}" aria-expanded="${open}" aria-label="Stop ${n} of 7, ${h(GUIDE_STOPS[n - 1].title)}${done[n] ? ", done" : ""}"${open ? ' aria-current="step"' : ""}>
+        <span class="badge" aria-hidden="true">${done[n] && !open ? "✓" : n}</span><span class="stop-title">${h(GUIDE_STOPS[n - 1].title)}</span><span class="stop-what">${h(GUIDE_STOPS[n - 1].what)}</span>
       </button>
       ${open ? `<div class="stop-body">${body}</div>` : ""}
     </section>`;
@@ -3857,19 +4008,27 @@ function renderGuideInto(el) {
   const way = guide.way || "address";
   const siteChosen = done[1] && !guide.changing;
   const savedList = state.sites.map(s => `<option value="${h(s.id)}"${state.siteId === s.id ? " selected" : ""}>${h(s.address || s.id)} · ${h(s.zoning_district || "?")}</option>`).join("");
+  const lkInfo = lk && lk.site && lk.site.lookup ? lk.site.lookup : {};
+  const lkDistrict = lk && lk.site ? String(lk.site.zoning_district || "").toUpperCase() : "";
+  const lookupWarnings = !lk ? "" : `
+    ${lkInfo.outside_vancouver ? `<p class="warn">${h(lk.site.municipality)} is outside the City of Vancouver. The rules here are Vancouver's and the Province's, so this tool cannot read the zoning of this site yet.</p>` : ""}
+    ${lkInfo.civic_mismatch ? `<p class="warn">You typed ${h(lkInfo.civic_typed)}; the City's address list has no such number on this street, and the nearest parcel is <b>${h(lk.site.address)}</b>. Use it only if that is the site.</p>` : ""}
+    ${lkDistrict && !lkInfo.outside_vancouver && !scheduleFor(lkDistrict) ? `<p class="warn">The rules have no ${h(lkDistrict)} schedule yet: at stop 4 you enter the storeys, height and floor area yourself, or leave them blank and the memo says the envelope was not assessed; at stop 3 the City's schedule can be read in with Claude.</p>` : ""}`;
   const stop1 = siteChosen ? `
     <dl class="found-site"><div><dt>Site</dt><dd><b>${h(site.address || site.id)}</b>${site.zoning_district ? ` · ${h(site.zoning_district)}` : ""}${site.site_area_m2 ? ` · ${h(fmtNum(site.site_area_m2))} m²` : ""} <span class="cont">${state.siteId ? "(saved)" : "(from the lookup, unsaved)"}</span></dd></div></dl>
+    ${cornerStreets(site).length ? `<div class="corner-q"><p class="help">A corner lot: ${h(cornerStreets(site)[0])} and ${h(cornerStreets(site)[1])} both run beside it. The front street sets the yards, the envelope and the massing.</p>${answerControl("front_street")}</div>` : ""}
     <div class="form-actions"><button class="btn btn-small btn-quiet" type="button" id="guide-change-site">Change the site</button><span class="help">The Site card below holds its facts; answer what the data could not.</span></div>` : `
     <div class="seg way" role="group" aria-label="How to find the site"><button type="button" class="segbtn" data-way="address" aria-pressed="${way === "address"}">An address</button><button type="button" class="segbtn" data-way="saved" aria-pressed="${way === "saved"}">A saved site</button></div>
     ${way === "address" ? `
-    <label class="field"><span class="label">Address</span><input type="text" id="guide-address" value="${h(guide.address)}" placeholder="998 E 19th Ave, Vancouver, BC" autocomplete="street-address"></label>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-lookup"${guide.loading === "lookup" ? " disabled" : ""}>${guide.loading === "lookup" ? "Looking up…" : "Look up the site"}</button><span class="help">The City's address list for the point, its open data for the district and the parcel.</span></div>
+    <label class="field"><span class="label">Address</span><input type="text" id="guide-address" value="${h(guide.address)}" placeholder="a civic number and a street, e.g. 609 Heatley Ave" aria-label="Address" autocomplete="street-address"></label>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-lookup"${guide.loading === "lookup" ? " disabled" : ""}>${guide.loading === "lookup" ? "Looking up…" : "Look up the site"}</button><span class="help">The City's address list for the point, its open data for the district and the parcel${guide.loading === "lookup" ? "; the streets, buildings and trees around it take a few seconds more" : ""}.</span></div>
     ${lk ? `<dl class="found-site">
       <div><dt>District</dt><dd>${lk.site.zoning_district ? `<b>${h(lk.site.zoning_district)}</b>` : "<i>not found: enter it</i>"}</dd></div>
       <div><dt>Lot</dt><dd>${lk.site.site_area_m2 ? `<b>${h(fmtNum(lk.site.site_area_m2))} m²</b> · ${h(lk.site.frontage_m)} × ${h(lk.site.depth_m)} m <span class="cont">(${h(lk.fields.frontage_m.note)})</span>` : "<i>no parcel found</i>"}</dd></div>
       <div><dt>Found as</dt><dd class="cont">${h(lk.site.address)}</dd></div>
     </dl>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-use-site">Use this site</button><span class="help">Then answer what the data cannot: the policy areas, water and sewer, trees, the owner.</span></div>` : ""}` : `
+    ${lookupWarnings}
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-use-site"${lkInfo.outside_vancouver ? " disabled" : ""}>${lkInfo.civic_mismatch ? `Yes, ${h(lk.site.address.split(",")[0])} is the site` : "Use this site"}</button><span class="help">${lkInfo.outside_vancouver ? "Not available outside the City of Vancouver." : "The parcel is on the map in the memo pane. Then answer what the data cannot: the policy areas, water and sewer, trees, the owner."}</span></div>` : ""}` : `
     <label class="field"><span class="label">Saved site</span><select id="guide-saved-site">${savedList || `<option value="">none saved yet</option>`}</select></label>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-use-saved"${state.sites.length ? "" : " disabled"}>Use this site</button><span class="help">A site file in sites/, with its facts and context already answered.</span></div>`}
     <details class="claude-fold"${hasClaude() || guide.proposal ? " open" : ""}><summary>Ask Claude about this site <span class="cont">(with a key; optional)</span></summary>
@@ -3878,17 +4037,17 @@ function renderGuideInto(el) {
     </details>`;
 
   const stop2 = `
-    <div class="checks">${progs.map(r => `<label><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
+    <div class="checks">${progs.map(r => `<label><input type="checkbox" class="guide-program" value="${h(r.id)}" aria-label="${h(r.title)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-programs">Use these programs</button></div>`;
 
   const R = guide.reading;
   const district = (site.zoning_district || "").toUpperCase();
-  const scheduleKnown = state.rules.some(r => r.check === "district_outright_fsr" && (r.applies_to_districts || []).some(d => d.toUpperCase() === district || (district.startsWith(d.toUpperCase() + "-") && !d.includes("-"))));
+  const scheduleKnown = scheduleFor(district);
   const stop3 = `
-    <p class="help">Layers A to C on the site alone: the outright limits, the rezoning path, transit, trees. Nothing is written.</p>
+    <p class="help">Layers A to C on the site alone: the outright limits, the rezoning path, transit, trees. Nothing is written.${district && !scheduleKnown ? ` <b>${h(district)} has no outright schedule in the rules</b>: the reading covers the policies, transit and trees; the envelope waits for you, or for the schedule read below.` : ""}</p>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-read"${guide.loading === "read" ? " disabled" : ""}>${guide.loading === "read" ? "Reading…" : (R ? "Read it again" : "Read the site")}</button></div>
     ${R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">The reading is in the memo pane.</p>` : ""}
-    <details class="claude-fold"${(district && !scheduleKnown && hasClaude()) || guide.ruleProposal ? " open" : ""}><summary>Read the district schedule with Claude <span class="cont">(${district ? (scheduleKnown ? `${h(district)} is in the stack` : `no outright schedule for ${h(district)} in the stack`) : "no district yet"}; with a key)</span></summary>
+    <details class="claude-fold"${(district && !scheduleKnown && hasClaude()) || guide.ruleProposal ? " open" : ""}><summary>${district && !scheduleKnown ? `Read the ${h(district)} schedule with Claude` : "Read the district schedule with Claude"} <span class="cont">(${district ? (scheduleKnown ? `${h(district)} is in the rules already` : "needs a key") : "no district yet"})</span></summary>
       <p class="help">Save the schedule's PDF from the City's by-law site (it refuses scripts), choose it here, and the model proposes its clauses with the quote behind each. You check the quotes against the PDF and confirm under your name; the rules file then cites the schedule, the model and you.</p>
       ${renderKeyBox("keybox-rule")}
       ${hasClaude() ? `<div class="sched-form">
@@ -3903,8 +4062,8 @@ function renderGuideInto(el) {
   // the envelope rows always show: where no rule in the stack derives them for this district (RT-3, CD-1…), the
   // row says so and waits for the manager's own figure
   const CORE = new Set(["storeys", "height_m", "gfa_m2"]);
-  const rows = S ? GUIDE_FIELDS.filter(([k]) => S.fields[k] || CORE.has(k)).map(([k, label, kind]) => {
-    const f = S.fields[k] || { value: null, rule_id: null, note: `no rule in the stack derives this for ${state.site && state.site.zoning_district ? state.site.zoning_district : "this district"}: enter it` };
+  const rowOf = ([k, label, kind]) => {
+    const f = S.fields[k] || { value: null, rule_id: null, note: `no rule in the stack derives this for ${state.site && state.site.zoning_district ? state.site.zoning_district : "this district"}: enter it, or leave it blank and the memo says the envelope was not assessed` };
     if (guide.mine[k] === undefined && (f.value === null || f.value === undefined) && CORE.has(k)) guide.mine[k] = "";
     const mine = guide.mine[k];
     const isMine = mine !== undefined;
@@ -3915,9 +4074,25 @@ function renderGuideInto(el) {
         <button class="segbtn" type="button" data-pick="suggested" aria-pressed="${!isMine}">Suggested</button>
         <button class="segbtn" type="button" data-pick="mine" aria-pressed="${isMine}">Mine</button>
       </div>
-      <div class="sg-value">${isMine ? `<input type="${kind === "text" ? "text" : "number"}" class="sg-input" value="${h(mine)}"${kind === "int" ? ' step="1"' : (kind === "number" ? ' step="any"' : "")} aria-label="${h(label)}, my figure">` : `<b>${h(sv)}</b>`}</div>
+      <div class="sg-value">${isMine ? `<input type="${kind === "text" ? "text" : "number"}" class="sg-input" value="${h(mine)}"${kind === "int" ? ' step="1"' : (kind === "number" ? ' step="any"' : "")} aria-label="${h(label)}, my figure"${CORE.has(k) && mine === "" ? ' placeholder="yours to enter"' : ""}>` : `<b>${h(sv)}</b>`}</div>
       <div class="sg-note">${h(f.note || "")}</div>
     </div>`;
+  };
+  // the figures in four groups, so the three that need a decision are not lost among the eighteen that do not:
+  // the envelope and the homes open; the funder terms and the drawing assumptions folded unless a figure there is Mine
+  const GROUPS = [
+    ["Envelope", "what the building is: a decision", k => ["rezoning_path", "storeys", "height_m", "gfa_m2"].includes(k), true],
+    ["Homes", "the unit mix, the rent tiers, the accessible units", k => k.startsWith("units.") || k.startsWith("rent_tiers_units.") || k === "accessible_units", true],
+    ["Funder terms", "shares and years the programs set", k => ["share_below_hils", "housing_agreement_years", "below_market_unit_share", "below_market_discount"].includes(k), false],
+    ["Drawing assumptions", "trees, floor to floor and the setbacks: placeholders that shape the drawings, not the answers", k => ["replacement_trees_proposed", "floor_to_floor_m"].includes(k) || k.startsWith("setbacks_m."), false],
+  ];
+  const rows = S ? GROUPS.map(([title, what, test, openGroup]) => {
+    const fields = GUIDE_FIELDS.filter(([k]) => test(k) && (S.fields[k] || CORE.has(k)));
+    if (!fields.length) return "";
+    const anyMine = fields.some(([k]) => guide.mine[k] !== undefined);
+    const body = fields.map(rowOf).join("");
+    return openGroup ? `<div class="sg-group"><h4 class="sg-head">${h(title)} <span class="cont">· ${h(what)}</span></h4>${body}</div>`
+      : `<details class="sg-group"${anyMine ? " open" : ""}><summary class="sg-head">${h(title)} <span class="cont">· ${h(what)} · ${fields.length} figures suggested</span></summary>${body}</details>`;
   }).join("") : "";
   // a saved option can be the one, or the rules derive one; a derived option replaces the saved one in the card
   const savedOpts = (state.options || []).filter(o => o.for_site);
@@ -3929,7 +4104,7 @@ function renderGuideInto(el) {
     <div class="seg cands" role="group" aria-label="Start from">${cands.map(c => `<button class="segbtn" type="button" data-cand="${h(c.id)}" aria-pressed="${guide.candidate === c.id}"${c.available === false ? ` disabled title="${h(c.why)}"` : ` title="${h(c.what)}"`}>${h(c.title)}</button>`).join("")}</div>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="button" id="guide-suggest"${guide.loading === "suggest" ? " disabled" : ""}>${guide.loading === "suggest" ? "Deriving…" : (S ? "Derive again" : "Suggest from the rules")}</button><span class="help">Every figure cites the rule it came from; placeholders say so.</span></div>
     ${S ? `<div class="sg-rows">${rows}</div>
-    ${S.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${S.unsure.map(u => `<li><b>${h(u.key.replace(/_/g, " "))}</b>: ${h(u.why)}. <span class="cont">${h(u.who)}.</span>${answerControl(u.key)}</li>`).join("")}</ul></div>` : ""}
+    ${S.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Answer now, or leave as not sure</span><ul>${S.unsure.map(u => `<li><b>${h(keyLabel(u.key))}</b>: ${h(u.why)}. <span class="cont">${h(u.who)}.</span>${answerControl(u.key)}</li>`).join("")}</ul></div>` : ""}
     <div class="form-actions"><button class="btn btn-small" type="button" id="guide-use-option">Use this option</button><span class="help">Writes it into the Option card, where every field can still be edited.</span></div>` : ""}`;
 
   // 5: the money the rules cannot know comes before the run, so one run answers everything
@@ -3949,7 +4124,7 @@ function renderGuideInto(el) {
     ${state.run ? `<ul class="reading-list">
       <li>${pill(verdictStatus(state.run.ledger.summary.answers.allowed.rezoning_path ? state.run.ledger.summary.answers.allowed.by_rezoning.verdict : state.run.ledger.summary.answers.allowed.outright.verdict))} <span>Allowed: ${h(state.run.ledger.summary.answers.allowed.rezoning_path ? state.run.ledger.summary.answers.allowed.by_rezoning.verdict + " by rezoning" : state.run.ledger.summary.answers.allowed.outright.verdict + " outright")}</span></li>
       <li>${pill(verdictStatus(state.run.ledger.summary.answers.funded.verdict))} <span>Funders: ${h(state.run.ledger.summary.answers.funded.verdict)}</span></li>
-      <li>${pill((state.run.ledger.summary.answers.unsure || []).length ? "uncertain" : "pass")} <span>${(state.run.ledger.summary.answers.unsure || []).length || "No"} open item${(state.run.ledger.summary.answers.unsure || []).length === 1 ? "" : "s"}, each with a person</span></li>
+      <li>${pill(((state.run.ledger.summary.answers.unsure || []).length + layoutOpenItems(state.run).length) ? "uncertain" : "pass")} <span>${((state.run.ledger.summary.answers.unsure || []).length + layoutOpenItems(state.run).length) || "No"} open item${((state.run.ledger.summary.answers.unsure || []).length + layoutOpenItems(state.run).length) === 1 ? "" : "s"}, each with a person: answer 3 in the memo</span></li>
       ${pf && pf.available ? `<li>${pill(MONEY_STATUS[pf.verdict.word] || "uncertain")} <span>Money: ${h(pf.verdict.word)} · capital ${h(money(pf.capital.total))}, funding ${h(money(pf.funding.total))}, gap ${h(money(pf.gap.value))}</span></li>` : (pf ? `<li>${pill("uncertain")} <span>Money: not computed (${h(pf.why || "")})</span></li>` : "")}
     </ul>
     ${pf && pf.available && pf.verdict.unsure.length ? `<div class="sg-unsure"><span class="eyebrow">Left to a person</span><ul>${pf.verdict.unsure.map(u => `<li>${h(u)}</li>`).join("")}</ul></div>` : ""}
@@ -3976,12 +4151,32 @@ const ANSWERS = {
   land_tenure_plan: { on: "site", kind: "text", label: "Land tenure plan", placeholder: "e.g. 60-year lease at nominal rent from the church" },
   developer_partner: { on: "option", kind: "tri", label: "Teamed with a developer or builder?" },
   site_control: { on: "option", kind: "select", label: "Site control", options: [["", "Not sure"], ["letter_of_intent", "Letter of intent"], ["purchase_agreement", "Purchase agreement"], ["council_resolution", "Council resolution"], ["finalized", "Finalized"], ["none", "None yet"]] },
+  // a corner lot: which street is the front sets the yards, the envelope and the massing; the options are the two streets
+  front_street: { on: "site", kind: "select", label: "Which street is the front?", options: [] },
 };
+
+/* The two streets of a corner lot, from the lookup's parcel record; empty for a lot on one street. */
+function cornerStreets(site) {
+  const st = site && site.parcel && site.parcel.street;
+  if (!st || !st.cross_street || !st.name) return [];
+  return [st.name, st.cross_street.name];
+}
+
+/* What the words in the "left to a person" list mean to the manager. */
+const KEY_LABEL = { gfa_m2: "Storeys, height and floor area", rent_tiers_units: "Rent tiers", unit_count_for_the_mix: "Homes for the fund's mix",
+  existing_trees_on_site: "Trees on the site", in_former_community_vision_area: "Former Community Vision area", in_transit_oriented_area: "Transit-oriented area",
+  frequent_bus_stop_within_400m: "Frequent bus stop within 400 m", land_tenure_plan: "Land tenure", developer_partner: "Developer partner", site_control: "Site control" };
+const keyLabel = k => KEY_LABEL[k] || (ANSWERS[k] && ANSWERS[k].label.replace(/\?$/, "")) || cap(k.replace(/_/g, " "));
 
 function answerControl(key) {
   const a = ANSWERS[key];
   if (!a) return "";
   const cur = a.on === "site" ? getPath(state.site || {}, key) : (guide.answers || {})[key];
+  if (key === "front_street") {
+    const streets = cornerStreets(state.site);
+    if (!streets.length) return "";
+    return `<div class="answer-ctl"><label class="label">${h(a.label)}<select data-answer="front_street">${[["", "Not sure"], ...streets.map(s => [s, s])].map(([val, lab]) => `<option value="${h(val)}"${(cur || "") === val ? " selected" : ""}>${h(lab)}</option>`).join("")}</select></label></div>`;
+  }
   if (a.kind === "tri") {
     const v = cur === true ? "yes" : cur === false ? "no" : "";
     return `<div class="answer-ctl"><span class="label">${h(a.label)}</span><span class="tri" role="radiogroup" aria-label="${h(a.label)}">${[["yes", "Yes"], ["no", "No"], ["", "Not sure"]].map(([val, lab]) => `<button type="button" role="radio" class="${val === "" ? "unsure" : ""}" data-answer="${h(key)}" data-value="${val}" aria-checked="${v === val}">${lab}</button>`).join("")}</span></div>`;
@@ -3998,6 +4193,23 @@ function takeAnswer(key, raw) {
   const v = a.kind === "tri" ? (raw === "yes" ? true : raw === "no" ? false : null) : (raw === "" ? null : raw);
   if (a.on === "site") {
     if (!state.site) return;
+    if (key === "front_street") {
+      // the front decides which side the frontage is: the lookup took the named street; choosing the other swaps the sides
+      const site = state.site, streets = cornerStreets(site);
+      const current = (site.context && site.context.street && site.context.street.name) || streets[0];
+      site.front_street = v;
+      if (v && current && v !== current && streets.includes(v)) {
+        [site.frontage_m, site.depth_m] = [site.depth_m, site.frontage_m];
+        site.context = Object.assign(site.context || {}, { street: Object.assign((site.context || {}).street || {}, { name: v }) });
+        if (site.parcel && site.parcel.metrics) site.parcel.metrics.frontage_from = `the side along ${v}, chosen as the front by the manager`;
+        if (site.osm && site.osm.frame) site.osm.frame.front_street = v;
+      }
+      onSiteChange(key);
+      renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+      stageSig = "";
+      setStatus(v ? `The front is ${v}: frontage ${site.frontage_m} m, depth ${site.depth_m} m. The yards and the massing follow it; derive the option again.` : "Which street is the front stays not sure: the memo keeps the named street and asks the architect to confirm.", "info");
+      return;
+    }
     setPath(state.site, key, v);
     onSiteChange(key);
     renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
@@ -4374,6 +4586,7 @@ async function guideSuggest() {
   try {
     const programs = guide.programs || (state.option && state.option.target_programs) || [];
     guide.suggestion = await postJSON("/api/suggest", { site: state.site, programs, as_of: $("#as-of").value || todayISO(), candidate: guide.candidate });
+    guide.suggestionUsed = false;   // a fresh suggestion waits for Use this option; the stage shows it as such
     guide.candidate = guide.suggestion.candidate;
     const o = guide.suggestion.option;
     const cv = guide.suggestion.unsure.some(u => u.key === "in_former_community_vision_area") && guide.candidate !== "outright";
@@ -4416,11 +4629,17 @@ function guideUseOptionNow() {
   }
   for (const [k, v] of Object.entries(guide.answers || {})) if (ANSWERS[k] && ANSWERS[k].on === "option") setPath(opt, k, v);
   if (!opt.rent_tiers_units || Object.values(opt.rent_tiers_units).every(v => v == null)) opt.rent_tiers_units = null;
-  const chosen = Object.keys(guide.mine).length;
-  opt.notes = (opt.notes || "") + (chosen ? ` ${chosen} figure${chosen === 1 ? "" : "s"} replaced by the manager's own.` : "");
+  // only a figure actually typed counts as the manager's own; a blank Mine row is a blank, and the strip says what it costs
+  const typed = GUIDE_FIELDS.filter(([k]) => guide.mine[k] !== undefined && String(guide.mine[k]).trim() !== "");
+  const blank = GUIDE_FIELDS.filter(([k]) => ["storeys", "height_m", "gfa_m2"].includes(k) && getPath(opt, k) == null).map(([, label]) => label);
+  const chosen = typed.length;
+  opt.notes = (opt.notes || "") + (chosen ? ` ${chosen} figure${chosen === 1 ? "" : "s"} entered by the manager: ${typed.map(([, label]) => label).join(", ")}.` : "");
+  if (blank.length) opt.name = `${opt.name || cap(guide.candidate) + " option"}; ${blank.join(", ").toLowerCase()} not given`;
+  else if (chosen) opt.name = `${opt.name || cap(guide.candidate) + " option"}; ${typed.map(([, label]) => label).join(", ").toLowerCase()} entered by the manager`;
   state.optionId = null;
   state.option = opt;
   state.optionDirty = true;
+  guide.suggestionUsed = true;
   $("#option-select").value = "__new__";
   renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
   $("#option-dirty").hidden = false;
@@ -4431,7 +4650,8 @@ function guideUseOptionNow() {
   guide.step = 5;
   renderGuide(5, y);   // Run the rules opens where the button was, not far above or below
   setStep(2);
-  setStatus(`The ${guide.candidate} option is in the Option card${chosen ? `, with ${chosen} of your own figures` : ""}. Run the rules when it reads right.`, "ok");
+  if (blank.length) setStatus(`The ${guide.candidate} option is in the Option card${chosen ? ` with ${chosen} of your own figures` : ""}, but ${blank.join(", ").toLowerCase()} ${blank.length === 1 ? "is" : "are"} blank: the run will answer allowed and funders, say the money is unsure and draw the plate the setbacks leave. Enter ${blank.length === 1 ? "it" : "them"} at stop 4 (Mine) for all four answers, or run as it stands.`, "busy");
+  else setStatus(`The ${guide.candidate} option is in the Option card${chosen ? `, with ${chosen} of your own figures` : ""}. Run the rules when it reads right.`, "ok");
 }
 
 // ---------------------------------------------------------------- the view: summary, detailed, 3D preview
@@ -4526,10 +4746,9 @@ function issueButtonLabel() {
    chip in the top bar, and a click opens that run. Nothing polls on the web build. */
 async function pollIssues() {
   if (STATIC) return;
-  const sid = state.siteId || (state.site && state.site.id);
-  if (!sid) return;
   try {
-    const issues = await api(`/api/issues?site=${encodeURIComponent(sid)}`);
+    // every site's issues: a run handed over on a site that is not on this screen, or never saved, still arrives
+    const issues = await api("/api/issues");
     state.issues = issues;
     const seen = seenIssues();
     const mine = issues.filter(i => i.to === state.mode && i.by !== state.mode && !seen.has(i.id));
@@ -4542,7 +4761,8 @@ function showIssueChip(issue, count) {
   if (!issue) { chip.hidden = true; return; }
   const ago = (() => { const s = Math.max(0, (Date.now() - new Date(issue.issued_at).getTime()) / 1000); return s < 90 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`; })();
   chip.hidden = false;
-  chip.innerHTML = `<span class="dot"></span>${h(rev(issue.run_id))} issued to you by the ${h(issue.by)} · ${h(ago)}${count > 1 ? ` · +${count - 1}` : ""}`;
+  const siteName = (state.sites.find(s => s.id === issue.site) || {}).address || issue.site || "";
+  chip.innerHTML = `<span class="dot"></span>${siteName ? h(String(siteName).split(",")[0]) + " · " : ""}${h(state.revisions.get(issue.run_id) || "a run")} issued to you by the ${h(issue.by)} · ${h(ago)}${count > 1 ? ` · +${count - 1}` : ""}`;
   chip.title = issue.note ? `"${issue.note}" · click to open` : "Click to open the run";
   chip.onclick = async () => {
     markIssueSeen(issue.id);
@@ -4614,6 +4834,7 @@ function setMode(mode, remember = true, announce = true) {
   if (mode === "reader") {
     showInputs(false, false);
     closeExportPanel();
+    if (state.view !== "detailed") setView("detailed", false);   // the reader has no view switch: never land them in the 3D view with the answers hidden
   } else {
     showInputs(true, false);
     // the architect's forms open on a desk; stacked over the memo on a narrow window they would bury it, so
@@ -4711,7 +4932,7 @@ async function init() {
   $("#tour-link").addEventListener("click", e => { e.preventDefault(); startTour(0); });
   $("#tour-start").addEventListener("click", () => startTour(0));
   $("#tour-dismiss").addEventListener("click", () => { $("#tour-offer").hidden = true; try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* fine */ } });
-  $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the three answers and the figures." : "Detailed: the whole memo.", "info"); }));
+  $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the four answers and the figures." : "Detailed: the whole memo.", "info"); }));
   try { setView(localStorage.getItem(VIEW_KEY) || "detailed", false); } catch (e) { setView("detailed", false); }
   $("#issue-btn").addEventListener("click", () => { if ($("#issue-panel").hidden) openIssuePanel(); else closeIssuePanel(); });
   $("#issue-panel").addEventListener("submit", e => { e.preventDefault(); sendIssue(); });

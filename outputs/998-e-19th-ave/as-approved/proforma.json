@@ -10,6 +10,7 @@
     },
     "units_total": 105,
     "gfa_m2": 8299.0,
+    "gfa_from": "the option",
     "rent_tiers_units": null,
     "finance": {}
   },

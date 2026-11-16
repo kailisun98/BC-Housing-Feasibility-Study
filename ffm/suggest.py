@@ -162,7 +162,7 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
         unsure.append({"key": "gfa_m2", "why": f"the rule stack holds no floor-area or height schedule for {district}; the SSMUH rule sets a minimum number of homes, not an envelope", "who": "Architect: read the district schedule and enter FSR and height"})
         fields["rezoning_path"] = {"value": None, "rule_id": "bc.ssmuh.minimum_units", "note": "outright under the provincial minimum"}
         return out
-    unsure.append({"key": "gfa_m2", "why": f"the rule stack has no outright schedule for {district or 'this district'}" + (": a CD-1 site's limits are whatever the rezoning sets" if district.upper().startswith("CD-1") else ""), "who": "Manager: enter the storeys, height and floor area the rezoning or the schedule sets"})
+    unsure.append({"key": "gfa_m2", "why": f"the rule stack has no outright schedule for {district or 'this district'}" + (": a CD-1 site's limits are whatever the rezoning sets" if district.upper().startswith("CD-1") else ""), "who": "Architect: read the district schedule and enter the storeys, height and floor area it permits (or read it with Claude at stop 3). Left blank, the memo says the envelope was not assessed and draws no building"})
     fields["rezoning_path"] = {"value": None, "rule_id": None, "note": "not derived: enter the path the site takes"}
     return out
 
@@ -277,8 +277,21 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         if p_chf:
             tiers = _largest_remainder(n, p_chf["mix"])
             option["rent_tiers_units"] = tiers
+            # whole homes cannot always split the way the fund asks: say so here, before the run says Fail (15 Nov 2026)
+            off = max(abs(tiers[k] / n - p_chf["mix"][k]) for k in p_chf["mix"])
+            short = off > p_chf["mix_tolerance"] + 1e-9
+            from .checks import smallest_split
+            least = smallest_split(p_chf["mix"], p_chf["mix_tolerance"]) if short else None
             for k, v in tiers.items():
-                fields[f"rent_tiers_units.{k}"] = {"value": v, "rule_id": "bch.chf.eligibility", "note": f"{p_chf['mix'][k] * 100:.0f}% of {n} units under the fund's 30 / 50 / 20 mix"}
+                note = f"{p_chf['mix'][k] * 100:.0f}% of {n} units under the fund's 30 / 50 / 20 mix"
+                if short:
+                    note += (f"; no split of {n} homes lands within {p_chf['mix_tolerance'] * 100:.0f} points of the mix, so the fund "
+                             f"will read this as short; {least} homes is the smallest count that can meet it")
+                fields[f"rent_tiers_units.{k}"] = {"value": v, "rule_id": "bch.chf.eligibility", "note": note}
+            if short:
+                unsure.append({"key": "unit_count_for_the_mix", "why": f"{n} homes cannot split {' / '.join(f'{int(s * 100)}' for s in p_chf['mix'].values())} within the fund's tolerance; the nearest split is "
+                               + " / ".join(str(tiers[k]) for k in p_chf["mix"]) + f", which the fund's check will call short",
+                               "who": f"Manager: plan at least {least} homes, or ask BC Housing whether a smaller count can be read as meeting the mix"})
             acc = int(math.ceil(p_chf["min_accessible_unit_share"] * n))
             option["accessible_units"] = acc
             fields["accessible_units"] = {"value": acc, "rule_id": "bch.chf.eligibility", "note": f"the fund's {p_chf['min_accessible_unit_share'] * 100:.0f}% minimum of {n} units, rounded up"}

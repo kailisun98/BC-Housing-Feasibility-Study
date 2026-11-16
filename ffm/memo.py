@@ -80,7 +80,8 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     L.append("## 1. Is it allowed?")
     o, bz = ans["allowed"]["outright"], ans["allowed"]["by_rezoning"]
     out_lines = [r for r in res if r.get("check", "").startswith("district_outright") and r["status"] != "not_applicable"]
-    L.append(f"**Outright, under {site.get('zoning_district', 'the district')}: {o['verdict']}.** " + " ".join(r["finding"] for r in out_lines))
+    L.append(f"**Outright, under {site.get('zoning_district', 'the district')}: {o['verdict']}.** " + " ".join(r["finding"] for r in out_lines)
+             + (f" Not assessed: {o['why']}; the envelope is the option's own figure, not a permitted one." if o.get("why") else ""))
     L.append("")
     if ans["allowed"].get("rezoning_path"):
         L.append(f"**By rezoning ({ans['allowed']['rezoning_path']}): {bz['verdict']}.**")

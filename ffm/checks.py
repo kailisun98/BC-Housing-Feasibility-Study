@@ -33,6 +33,18 @@ def _units_total(option: Option) -> int:
     return int(sum(v for v in u.values() if v))
 
 
+def smallest_split(mix: dict[str, float], tolerance: float, limit: int = 400) -> int:
+    """The smallest unit count that some whole-number split lands within the tolerance of the mix (every tier at
+    once): 10 for 30/50/20 at 2%. Pure; used by the fit check and by the suggestion so both say the same thing."""
+    for n in range(1, limit + 1):
+        if all(abs(round(n * s) / n - s) <= tolerance + 1e-9 for s in mix.values()) and sum(round(n * s) for s in mix.values()) == n:
+            return n
+    return limit
+
+
+_smallest_split = smallest_split
+
+
 def fsr(site: Site, option: Option) -> float | None:
     if site.get("site_area_m2") and option.get("gfa_m2"):
         return option["gfa_m2"] / site["site_area_m2"]
@@ -269,7 +281,9 @@ def tree_replacement(site, option, p) -> Result:
 
 def dcl_cac(site, option, p) -> Result:
     if option.get("tenure") == "social_housing":
-        return _r(INFO, "Social housing is exempt from development cost levies and from community amenity contributions in a rezoning; the church use is also DCL-exempt. The exemption's value is worth stating in the memo.",
+        church = "church" in str(site.get("owner_type") or "").lower() or "church" in str(site.get("owner") or "").lower()
+        return _r(INFO, "Social housing is exempt from development cost levies and from community amenity contributions in a rezoning"
+                  + ("; the existing church use is also DCL-exempt" if church else "") + ". The exemption's value is worth stating in the memo.",
                   {"dcl_exempt": True, "cac_exempt": True})
     return _r(INFO, "Development cost levies apply at the City's current rates; confirm the rate schedule before the pro forma.", {"dcl_exempt": False})
 
@@ -302,8 +316,10 @@ def code_basis_flags(site, option, p) -> Result:
 
 def chf_fit(site, option, p) -> Result:
     fails, unknown, notes = [], [], []
-    if option.get("proponent_type") not in p["eligible_proponent_types"]:
-        fails.append(f"proponent type '{option.get('proponent_type')}' is not eligible")
+    if not option.get("proponent_type"):
+        unknown.append("the proponent type (" + ", ".join(t.replace("_", " ") for t in p["eligible_proponent_types"]) + ")")
+    elif option.get("proponent_type") not in p["eligible_proponent_types"]:
+        fails.append(f"proponent type ({str(option.get('proponent_type')).replace('_', ' ')}) is not eligible")
     tiers = option.get("rent_tiers_units")
     total = _units_total(option)
     vals: dict[str, Any] = {"required_mix": p["mix"], "status": p["status"]}
@@ -312,7 +328,11 @@ def chf_fit(site, option, p) -> Result:
         vals["mix_shares"] = {k: round(v, 3) for k, v in shares.items()}
         off = {k: abs(shares[k] - p["mix"][k]) for k in p["mix"]}
         if any(v > p["mix_tolerance"] for v in off.values()):
-            fails.append("unit mix " + ", ".join(f"{k} {_pct(shares[k])}" for k in p["mix"]) + " is not 30/50/20")
+            msg = "unit mix " + ", ".join(f"{k.replace('_', ' ')} {_pct(shares[k])}" for k in p["mix"]) + " is not 30/50/20"
+            if total < _smallest_split(p["mix"], p["mix_tolerance"]):
+                msg += (f" (no split of {total} homes lands within {_pct(p['mix_tolerance'])} of it; "
+                        f"{_smallest_split(p['mix'], p['mix_tolerance'])} homes is the smallest count that can)")
+            fails.append(msg)
         else:
             notes.append("unit mix matches 30/50/20 within tolerance")
     else:
@@ -326,8 +346,12 @@ def chf_fit(site, option, p) -> Result:
     if "confirm" in tenure_plan.lower() or not tenure_plan:
         unknown.append(f"land tenure (lease of at least {p['min_lease_years_nominal']} years at nominal value, or ownership)")
     sc = option.get("site_control")
-    if sc not in p["readiness_site_control"]:
-        fails.append(f"site control '{sc}' does not meet the RFP's readiness bar")
+    bar = ", ".join(s.replace("_", " ") for s in p["readiness_site_control"])
+    if sc is None or sc == "":
+        # not answered is not the same as none: a blank is uncertain (15 Nov 2026; before, a blank was a fail printed as 'None')
+        unknown.append(f"site control in hand ({bar})")
+    elif sc not in p["readiness_site_control"]:
+        fails.append(f"site control ({str(sc).replace('_', ' ')}) does not meet the RFP's readiness bar ({bar})")
     else:
         notes.append(f"site control ({sc.replace('_', ' ')}) meets the readiness bar")
     notes.append(f"construction must be able to start within {p['readiness_construction_start_months_after_award']} months of award")
@@ -347,8 +371,12 @@ def chf_fit(site, option, p) -> Result:
 
 def bc_builds_fit(site, option, p) -> Result:
     fails, unknown, notes = [], [], []
-    if p["non_profit_must_team_with_developer"] and option.get("proponent_type") == "non_profit_society" and not option.get("developer_partner"):
-        fails.append("a non-profit must team with a developer or builder to propose")
+    if p["non_profit_must_team_with_developer"] and option.get("proponent_type") == "non_profit_society":
+        partner = option.get("developer_partner")
+        if partner is None or partner == "":
+            unknown.append("non-profit's developer or builder partner (the program requires one; say whether there is one)")
+        elif not partner:
+            fails.append("a non-profit must team with a developer or builder to propose")
     share, disc = option.get("below_market_unit_share"), option.get("below_market_discount")
     if share is None or disc is None:
         unknown.append("share of units at least 20% below market")

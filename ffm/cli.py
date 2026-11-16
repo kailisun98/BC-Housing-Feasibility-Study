@@ -62,7 +62,7 @@ def cmd_run(a: argparse.Namespace) -> int:
         d = engine.diff(engine.load_json(a.previous), ledger)
         (out / "diff.json").write_text(json.dumps(d, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    pf = proforma.build(site, option, ledger)
+    pf = proforma.build(site, option, ledger, m)
     (out / "proforma.json").write_text(json.dumps(pf, indent=2, ensure_ascii=False), encoding="utf-8")
 
     pm, ph = memo.write(ledger, out, m, d, svg_text, proforma=pf, layout=lay)

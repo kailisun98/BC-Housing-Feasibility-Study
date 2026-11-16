@@ -59,7 +59,10 @@ def mortgage_constant(rate_pct: float, years: int) -> float:
     return 12 * i / (1 - (1 + i) ** -n)
 
 
-def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
+def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -> dict[str, Any]:
+    """The pro-forma. With the run's `massing`, a floor area the option leaves blank is taken from the proposed mass
+    (plate × storeys) and every line that uses it says so (15 Nov 2026: before, FIG 02 stated a floor area while
+    answer 4 said there was none)."""
     F = _layer(ledger, "F")
     E = _layer(ledger, "E")
     lines: list[dict] = []
@@ -82,6 +85,12 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     units = _units(option)
     n = sum(units.values())
     gfa = float(option.get("gfa_m2") or 0)
+    gfa_from = "the option"
+    if not gfa and massing and option.get("storeys"):
+        proposed = next((x for x in (massing.get("masses") or []) if x.get("name") == "proposed"), None)
+        if proposed and proposed.get("gfa_m2"):
+            gfa = float(proposed["gfa_m2"])
+            gfa_from = "the massing"
     fin = option.get("finance") or {}
 
     # ---------------- capital cost
@@ -101,7 +110,8 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     line("hard_rate", "Hard cost base", rate_m2, "$/m²", "f.hard_cost_base", f"{hc.get('basis', '')}".split(";")[0], False)
     line("escalation", "Escalation to the latest index", factor, "×", "f.escalation_bcpi",
          f"BCPI {latest} ({latest_period}) over {base_index} ({base_period})" if base_index and latest else "index not on file for this date: no escalation applied")
-    line("hard", "Hard cost", hard, "$", "f.hard_cost_base", f"{gfa:,.0f} m² × ${rate_m2:,.0f} × {factor}" if gfa else "no floor area")
+    line("hard", "Hard cost", hard, "$", "f.hard_cost_base",
+         (f"{gfa:,.0f} m² × ${rate_m2:,.0f} × {factor}" + (" (floor area from the massing: the plate × the storeys, since the option gives none)" if gfa_from == "the massing" else "")) if gfa else "no floor area")
     s_share, c_share = float(soft.get("soft_cost_share_of_hard") or 0), float(soft.get("contingency_share_of_hard") or 0)
     soft_cost = round(hard * s_share) if hard else None
     contingency = round(hard * c_share) if hard else None
@@ -224,13 +234,15 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     else:
         word = "unsure"
         why.append(f"the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the capital cost: close enough to turn on the placeholders")
+    if gfa and gfa_from == "the massing":
+        why.append(f"the floor area, {gfa:,.0f} m², is the massing's (plate × storeys), not a figure in the option")
     placeholders = [l["label"] for l in lines if l["placeholder"]]
     if placeholders:
         why.append("placeholders in use: " + ", ".join(placeholders))
 
     return {
         "grade": "feasibility", "available": True,
-        "inputs": {"units": units, "units_total": n, "gfa_m2": gfa or None, "rent_tiers_units": tiers, "finance": fin},
+        "inputs": {"units": units, "units_total": n, "gfa_m2": gfa or None, "gfa_from": gfa_from if gfa else None, "rent_tiers_units": tiers, "finance": fin},
         "capital": {"hard": hard, "escalation": factor, "soft": soft_cost, "contingency": contingency, "land": land_cost, "total": capital},
         "operating": {"revenue": rev, "gross": gross, "vacancy": vacancy, "operating_cost": opx, "reserve": reserve, "noi": noi},
         "funding": {"grants": grants, "equity": equity, "debt": {"supportable": debt, "rate_pct": rate, "amortization_years": years, "dcr": dcr, "annual_service": service}, "total": funding},

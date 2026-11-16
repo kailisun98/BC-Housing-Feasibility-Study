@@ -116,6 +116,20 @@ def geocode_vancouver(address: str) -> tuple[float, float, str]:
     raise ValueError(f"Nothing in Metro Vancouver matched {address!r}; try the civic number, the street and its suffix (998 E 19th Ave).")
 
 
+def _municipality_of(display: str) -> str | None:
+    """The town in a Nominatim display name: the part just before 'Metro Vancouver Regional District', else the part
+    before 'British Columbia'. Pure. 'Burnaby City Hall, 4949, Canada Way, Deer Lake, Burnaby, Metro Vancouver
+    Regional District, British Columbia, V5G 1M2, Canada' -> 'Burnaby'."""
+    parts = [x.strip() for x in str(display or "").split(",")]
+    for marker in ("Metro Vancouver Regional District", "British Columbia"):
+        if marker in parts:
+            i = parts.index(marker)
+            for cand in reversed(parts[:i]):
+                if cand and not re.fullmatch(r"[A-Z]\d[A-Z] ?\d[A-Z]\d|\d+", cand):
+                    return cand
+    return None
+
+
 def pick_parcel(parcels: list[dict], address: str) -> dict:
     """Among parcels near a point, the one whose civic number matches the address, else the first."""
     if not parcels:
@@ -428,7 +442,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
             x = street["cross_street"]
             notes.append(f"A corner lot: {x['name']} also runs beside it, {x['distance_m']} m from the centre. The frontage is taken on {street['name']} "
                          f"({metrics['frontage_m']} m); the front could instead be the {metrics['depth_m']} m side on {x['name']} "
-                         f"(a person put it there on four of the 39 corner and odd lots checked on 15 Nov 2026). Confirm which side is the front.")
+                         f"Confirm which side is the front: it sets the yards, the envelope and the massing.")
         try:
             from .parcel_shapes import classify   # imported here: parcel_shapes builds on this module
             c = classify([poly])
@@ -441,10 +455,27 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     else:
         notes.append("No parcel polygon found at that point; enter the area, frontage and depth by hand.")
     notes.append("Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'.")
+    # the municipality is read from the point, never assumed (15 Nov 2026: a Burnaby address came back as the City of
+    # Vancouver and the flow carried on with Vancouver's rules). The City's address list means Vancouver; a Nominatim
+    # point is placed by the town in its display name.
+    from_city_list = "property address" in display
+    town = _municipality_of(display) if display and not from_city_list else None
+    municipality = "City of Vancouver" if (from_city_list or not town or "vancouver" == town.lower()) else town
+    typed_civic = parse_address(address).get("civic_number")
+    found_civic = None
+    try:
+        found_civic = int(str(p.get("civic_number") or "").strip()) if p.get("civic_number") else None
+    except ValueError:
+        found_civic = None
+    mismatch = bool(typed_civic and found_civic and typed_civic != found_civic)
+    if mismatch:
+        notes.insert(0, f"You typed {typed_civic}; the City's address list has no such number on this street, and the nearest parcel is {civic}. Use it only if that is the site.")
+    if municipality != "City of Vancouver":
+        notes.insert(0, f"{municipality} is outside the City of Vancouver: the rule stack reads Vancouver's by-laws and policies, so the zoning answers will say not assessed.")
     site = {
         "id": _slug(civic or address),
         "address": f"{civic}, Vancouver, BC" if civic else (display.split(", Metro Vancouver")[0] if display else address),
-        "municipality": "City of Vancouver",
+        "municipality": municipality,
         "zoning_district": district,
         "site_area_m2": metrics["area_m2"] if metrics else None,
         "frontage_m": metrics["frontage_m"] if metrics else None,
@@ -457,7 +488,9 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         "notes": " ".join(notes),
         "parcel": {"polygon_lonlat": poly, "civic_number": p.get("civic_number"), "streetname": p.get("streetname"),
                    "site_id": p.get("site_id"), "metrics": metrics, "shape": shape, "street": street, "source": SOURCES["parcel"]} if poly else None,
-        "lookup": {"center": {"lat": lat, "lon": lon}, "geocoded_as": display, "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
+        "lookup": {"center": {"lat": lat, "lon": lon}, "geocoded_as": display, "typed": address, "civic_typed": typed_civic, "civic_found": found_civic,
+                   "civic_mismatch": mismatch, "outside_vancouver": municipality != "City of Vancouver",
+                   "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
         "sources": [SOURCES["address"] if "property address" in display else SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
     }
     if site["context"] is None:

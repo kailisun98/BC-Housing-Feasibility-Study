@@ -10,6 +10,7 @@
     },
     "units_total": 120,
     "gfa_m2": 9600.0,
+    "gfa_from": "the option",
     "rent_tiers_units": {
       "market": 36,
       "rgi": 60,

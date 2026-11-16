@@ -366,7 +366,7 @@
       "version_effective_from": "2023-01-01",
       "version_effective_to": null,
       "status": "info",
-      "finding": "Social housing is exempt from development cost levies and from community amenity contributions in a rezoning; the church use is also DCL-exempt. The exemption's value is worth stating in the memo.",
+      "finding": "Social housing is exempt from development cost levies and from community amenity contributions in a rezoning; the existing church use is also DCL-exempt. The exemption's value is worth stating in the memo.",
       "values": {
         "dcl_exempt": true,
         "cac_exempt": true

@@ -14,14 +14,23 @@ found by sweeping lines across the parcel along both axes of that rectangle.
 Classes (checked in this order; the thresholds are this module's own choices for a first read, not a City rule):
   multi_part      more than one outer ring
   rectangle       4 vertices and rectangularity >= 0.95
-  near_rectangle  rectangularity >= 0.90
+  trapezoid       5 vertices, convex (convexity >= 0.97) and rectangularity < 0.90: a four-sided lot whose fifth
+                  corner is a rounded or bevelled street corner (the curved lots of Shaughnessy and Arbutus Ridge)
+  near_rectangle  rectangularity >= 0.88
   flag_lot        a strip under 6 m wide and at least 6 m long, of near-constant width, at one end of the parcel,
                   stepping within 3 m to a body wider than 12 m
-  trapezoid       4 vertices, rectangularity < 0.90
+  trapezoid       4 vertices, rectangularity < 0.88
   l_shape         6 vertices, one reflex corner, convexity between 0.6 and 0.95
   irregular       anything else
 `classify` also re-runs the decision with the thresholds and the simplification nudged a little and reports how many
 of those runs agree (`confidence`) and the most common other answer (`alternative`), so a reader knows when to look.
+
+Checked against a person's labels on 15 Nov 2026 (`evals/parcels/labels.json`, scored by `evals/parcels/score_labels.py`):
+the near-rectangle line moved from 0.90 to 0.88 (every four-cornered lot at 0.899 to 0.900 and five of nine
+six-cornered lots at 0.886 to 0.900 were called near rectangle) and the five-cornered convex trapezoid was added (six
+of six curved corner lots were called trapezoid, not irregular). The rectangle line stays at 0.95 (one of three lots at
+0.950 to 0.955 was called a rectangle) and the L rule stays as it is, though a person called only one of ten L
+guesses an L: a notch of 5% of the hull reads as "nearly a rectangle" or "irregular" as often as "an L".
 """
 
 from __future__ import annotations
@@ -34,7 +43,9 @@ from .lookup import bounding_rectangle, project, ring_area
 ANGLE_TOL_DEG = 3.0
 SHORT_EDGE_M = 0.5
 RECT_MIN = 0.95
-NEAR_RECT_MIN = 0.90
+NEAR_RECT_MIN = 0.88          # 0.90 until 15 Nov 2026; see the docstring
+BEVEL_RECT_MAX = 0.90         # a five-cornered convex lot under this is a trapezoid with a cut corner
+BEVEL_CONVEXITY_MIN = 0.97
 L_CONVEXITY = (0.60, 0.95)
 FLAG_POLE_MAX_M = 6.0
 FLAG_BODY_MIN_M = 12.0
@@ -330,6 +341,8 @@ def _decide(m: dict[str, Any], vertices: int, reflex: int, rect_min: float = REC
     r = m["rectangularity"]
     if vertices == 4 and r >= rect_min:
         return "rectangle", None
+    if vertices == 5 and m["convexity"] >= BEVEL_CONVEXITY_MIN and r < BEVEL_RECT_MAX:
+        return "trapezoid", None
     if r >= near_min:
         return "near_rectangle", None
     flag = None
@@ -359,6 +372,8 @@ def _note(cls: str, m: dict[str, Any], flag: Any) -> str:
     if cls == "flag_lot":
         return (f"A flag lot: a strip about {flag['pole_width_m']:.1f} m wide and {flag['pole_length_m']:.0f} m long leads to a body "
                 f"about {flag['body_width_m']:.0f} m wide; {base}. The equivalent rectangle overstates the buildable plate.")
+    if cls == "trapezoid" and m["vertices"] == 5:
+        return f"Four sides with a rounded or cut corner, not square-cornered ({m['rectangularity']:.0%} of its {box}), {base}."
     if cls == "trapezoid":
         return f"Four sides but not square-cornered ({m['rectangularity']:.0%} of its {box}), {base}."
     if cls == "l_shape":
@@ -394,8 +409,10 @@ def classify(geom: Any, units: str = "auto") -> dict[str, Any]:
             others[r] = others.get(r, 0) + 1
     alternative = max(others, key=others.get) if others else None
     # how far the deciding figures sit from the nearest threshold, in the units of the nudges (0 = on the line)
-    margins = {"rectangularity_0.95": abs(m["rectangularity"] - RECT_MIN) / 0.015,
-               "rectangularity_0.90": abs(m["rectangularity"] - NEAR_RECT_MIN) / 0.015}
+    margins = {f"rectangularity_{RECT_MIN:.2f}": abs(m["rectangularity"] - RECT_MIN) / 0.015,
+               f"rectangularity_{NEAR_RECT_MIN:.2f}": abs(m["rectangularity"] - NEAR_RECT_MIN) / 0.015}
+    if m["vertices"] == 5:
+        margins[f"rectangularity_{BEVEL_RECT_MAX:.2f}"] = abs(m["rectangularity"] - BEVEL_RECT_MAX) / 0.015
     if m["vertices"] == 6:
         margins["convexity"] = min(abs(m["convexity"] - L_CONVEXITY[0]) / 0.04, abs(m["convexity"] - L_CONVEXITY[1]) / 0.02)
     if flag:

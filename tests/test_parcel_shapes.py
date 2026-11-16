@@ -76,6 +76,22 @@ class Classes(unittest.TestCase):
         self.assertEqual(r["holes"], 1)
         self.assertAlmostEqual(r["area_m2"], 896)
 
+    def test_a_four_sided_lot_with_a_cut_corner_is_a_trapezoid(self):
+        # the curved corner lots of Shaughnessy: five corners after simplifying, convex, under the near-rectangle line
+        ring = [[0, 0], [30, 0], [22, 20], [4, 20], [0, 16]]
+        r = ps.classify(ring, units="m")
+        self.assertEqual(r["vertices"], 5)
+        self.assertGreaterEqual(r["convexity"], 0.97)
+        self.assertLess(r["rectangularity"], ps.BEVEL_RECT_MAX)
+        self.assertEqual(r["class"], "trapezoid")
+        self.assertIn("cut corner", r["note"])
+
+    def test_near_rectangle_line_is_0_88(self):
+        # a 30 x 20 m lot with a 2 x 20 m triangular sliver taken off one side: rectangularity about 0.89
+        ring = [[0, 0], [30, 0], [30, 20], [0, 20], [-2, 10]]
+        r = ps.classify(ring, units="m")
+        self.assertEqual(r["class"], "near_rectangle" if r["rectangularity"] >= ps.NEAR_RECT_MIN else "irregular")
+
     def test_a_triangle_is_irregular(self):
         tri = [[-123.0, 49.0], [-123.0 + 0.0008, 49.0], [-123.0, 49.0 + 0.0004], [-123.0, 49.0]]
         self.assertEqual(ps.classify(tri)["class"], "irregular")

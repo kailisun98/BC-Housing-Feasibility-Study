@@ -15,49 +15,49 @@
   "classified": 99680,
   "failed": [],
   "failed_count": 0,
-  "scan_seconds": 39.5,
-  "load_seconds": 1.0,
+  "scan_seconds": 39.0,
+  "load_seconds": 0.9,
   "classifier": "ffm/parcel_shapes.py classify(); thresholds in its module docstring"
  },
  "counts_by_class": {
   "rectangle": 89441,
-  "near_rectangle": 4589,
-  "irregular": 3370,
-  "trapezoid": 2018,
-  "l_shape": 219,
+  "near_rectangle": 5135,
+  "trapezoid": 2476,
+  "irregular": 2387,
+  "l_shape": 198,
   "flag_lot": 41,
   "multi_part": 2
  },
  "counts_by_local_area": {
   "(outside the 22 local areas)": {
    "rectangle": 45,
-   "irregular": 12,
-   "near_rectangle": 9,
-   "trapezoid": 3,
+   "near_rectangle": 11,
+   "irregular": 7,
+   "trapezoid": 6,
    "total": 69
   },
   "Arbutus Ridge": {
    "rectangle": 2740,
-   "irregular": 221,
-   "near_rectangle": 178,
-   "trapezoid": 96,
+   "near_rectangle": 197,
+   "irregular": 157,
+   "trapezoid": 141,
    "l_shape": 5,
    "total": 3240
   },
   "Downtown": {
    "rectangle": 1343,
-   "irregular": 260,
-   "near_rectangle": 136,
-   "trapezoid": 49,
+   "irregular": 225,
+   "near_rectangle": 160,
+   "trapezoid": 60,
    "l_shape": 12,
    "flag_lot": 4,
    "total": 1804
   },
   "Dunbar-Southlands": {
    "rectangle": 6284,
-   "irregular": 274,
-   "near_rectangle": 215,
-   "trapezoid": 113,
+   "near_rectangle": 244,
+   "irregular": 216,
+   "trapezoid": 142,
    "flag_lot": 15,
    "l_shape": 11,
    "multi_part": 1,
@@ -65,164 +65,164 @@
   },
   "Fairview": {
    "rectangle": 1685,
-   "irregular": 149,
-   "near_rectangle": 106,
-   "l_shape": 16,
-   "trapezoid": 15,
+   "irregular": 131,
+   "near_rectangle": 116,
+   "trapezoid": 25,
+   "l_shape": 14,
    "total": 1971
   },
   "Grandview-Woodland": {
    "rectangle": 4548,
-   "near_rectangle": 150,
-   "irregular": 78,
-   "trapezoid": 56,
-   "l_shape": 18,
+   "near_rectangle": 167,
+   "trapezoid": 62,
+   "irregular": 58,
+   "l_shape": 15,
    "flag_lot": 4,
    "total": 4854
   },
   "Hastings-Sunrise": {
    "rectangle": 8055,
-   "near_rectangle": 165,
-   "irregular": 108,
-   "trapezoid": 70,
-   "l_shape": 7,
+   "near_rectangle": 182,
+   "irregular": 89,
+   "trapezoid": 73,
+   "l_shape": 6,
    "total": 8405
   },
   "Kensington-Cedar Cottage": {
    "rectangle": 9048,
-   "near_rectangle": 360,
-   "trapezoid": 209,
-   "irregular": 170,
+   "near_rectangle": 400,
+   "trapezoid": 234,
+   "irregular": 105,
    "l_shape": 13,
    "flag_lot": 3,
    "total": 9803
   },
   "Kerrisdale": {
    "rectangle": 3271,
-   "near_rectangle": 181,
-   "irregular": 140,
-   "trapezoid": 111,
+   "near_rectangle": 213,
+   "trapezoid": 117,
+   "irregular": 102,
    "l_shape": 15,
    "flag_lot": 1,
    "total": 3719
   },
   "Killarney": {
    "rectangle": 3064,
-   "near_rectangle": 318,
-   "irregular": 266,
-   "trapezoid": 90,
+   "near_rectangle": 357,
+   "irregular": 195,
+   "trapezoid": 122,
    "l_shape": 6,
    "total": 3744
   },
   "Kitsilano": {
    "rectangle": 5968,
-   "near_rectangle": 213,
-   "irregular": 68,
-   "trapezoid": 43,
-   "l_shape": 12,
+   "near_rectangle": 233,
+   "trapezoid": 48,
+   "irregular": 47,
+   "l_shape": 8,
    "flag_lot": 2,
    "total": 6306
   },
   "Marpole": {
    "rectangle": 3811,
-   "near_rectangle": 237,
-   "irregular": 154,
-   "trapezoid": 145,
-   "l_shape": 5,
+   "near_rectangle": 285,
+   "trapezoid": 152,
+   "irregular": 100,
+   "l_shape": 4,
    "flag_lot": 2,
    "total": 4354
   },
   "Mount Pleasant": {
    "rectangle": 3132,
-   "near_rectangle": 128,
-   "irregular": 72,
-   "trapezoid": 37,
-   "l_shape": 14,
+   "near_rectangle": 137,
+   "trapezoid": 52,
+   "irregular": 51,
+   "l_shape": 11,
    "total": 3383
   },
   "Oakridge": {
    "rectangle": 2171,
-   "near_rectangle": 191,
-   "irregular": 85,
-   "trapezoid": 6,
+   "near_rectangle": 196,
+   "irregular": 63,
+   "trapezoid": 23,
    "l_shape": 5,
    "total": 2458
   },
   "Renfrew-Collingwood": {
    "rectangle": 8180,
-   "near_rectangle": 464,
-   "irregular": 259,
-   "trapezoid": 239,
+   "near_rectangle": 500,
+   "trapezoid": 307,
+   "irregular": 155,
    "l_shape": 23,
    "flag_lot": 1,
    "total": 9166
   },
   "Riley Park": {
    "rectangle": 5051,
-   "near_rectangle": 185,
-   "irregular": 53,
-   "trapezoid": 31,
-   "l_shape": 8,
+   "near_rectangle": 200,
+   "irregular": 37,
+   "trapezoid": 33,
+   "l_shape": 7,
    "flag_lot": 2,
    "total": 5330
   },
   "Shaughnessy": {
    "rectangle": 1615,
-   "irregular": 308,
-   "near_rectangle": 270,
-   "trapezoid": 198,
-   "l_shape": 7,
+   "near_rectangle": 307,
+   "trapezoid": 287,
+   "irregular": 184,
+   "l_shape": 5,
    "flag_lot": 2,
    "total": 2400
   },
   "South Cambie": {
    "rectangle": 1375,
-   "near_rectangle": 60,
-   "trapezoid": 25,
-   "irregular": 24,
+   "near_rectangle": 64,
+   "trapezoid": 29,
+   "irregular": 16,
    "l_shape": 3,
    "flag_lot": 1,
    "total": 1488
   },
   "Strathcona": {
    "rectangle": 1698,
-   "irregular": 136,
-   "near_rectangle": 128,
-   "trapezoid": 69,
-   "l_shape": 8,
+   "near_rectangle": 142,
+   "irregular": 114,
+   "trapezoid": 78,
+   "l_shape": 7,
    "multi_part": 1,
    "total": 2040
   },
   "Sunset": {
    "rectangle": 6838,
-   "near_rectangle": 235,
-   "irregular": 55,
-   "trapezoid": 40,
-   "l_shape": 7,
+   "near_rectangle": 253,
+   "trapezoid": 39,
+   "irregular": 39,
+   "l_shape": 6,
    "total": 7175
   },
   "Victoria-Fraserview": {
    "rectangle": 4983,
-   "near_rectangle": 521,
-   "irregular": 300,
-   "trapezoid": 294,
-   "l_shape": 5,
+   "near_rectangle": 607,
+   "trapezoid": 350,
+   "irregular": 159,
+   "l_shape": 4,
    "total": 6103
   },
   "West End": {
    "rectangle": 1195,
-   "near_rectangle": 33,
-   "irregular": 18,
-   "trapezoid": 17,
-   "l_shape": 16,
+   "near_rectangle": 37,
+   "trapezoid": 18,
+   "l_shape": 15,
+   "irregular": 14,
    "flag_lot": 4,
    "total": 1283
   },
   "West Point Grey": {
    "rectangle": 3341,
-   "irregular": 160,
-   "near_rectangle": 106,
-   "trapezoid": 62,
+   "near_rectangle": 127,
+   "irregular": 123,
+   "trapezoid": 78,
    "l_shape": 3,
    "total": 3672
   }
@@ -313,10 +313,10 @@
   },
   "confidence_histogram": {
    "0.64": 2,
-   "0.73": 68,
-   "0.82": 907,
-   "0.91": 2880,
-   "1.0": 95823
+   "0.73": 113,
+   "0.82": 841,
+   "0.91": 2685,
+   "1.0": 96039
   }
  },
  "project_sites": {
@@ -461,7 +461,7 @@
      "flag": null,
      "confidence": 1.0,
      "alternative": null,
-     "margin": 23.9,
+     "margin": 22.6,
      "note": "Irregular: 16 corners, 54% of its 100.1 x 50.1 m bounding rectangle, 2,712 m2."
     },
     "ring_lonlat": [
@@ -842,7 +842,7 @@
      "flag": null,
      "confidence": 1.0,
      "alternative": null,
-     "margin": 4.359,
+     "margin": 3.026,
      "note": "Irregular: 49 corners, 83% of its 319.0 x 214.8 m bounding rectangle, 57,181 m2."
     },
     "ring_lonlat": [
@@ -1231,7 +1231,7 @@
      "flag": null,
      "confidence": 1.0,
      "alternative": null,
-     "margin": 23.9,
+     "margin": 22.6,
      "note": "Irregular: 16 corners, 54% of its 100.1 x 50.1 m bounding rectangle, 2,712 m2."
     },
     "ring_lonlat": [
@@ -1588,7 +1588,7 @@
  },
  "examples": {
   "near_rectangle": {
-   "count": 4589,
+   "count": 5135,
    "shown": 25,
    "how_chosen": "firm calls (every nudged re-run agrees) first, in a fixed pseudo-random order by a hash of site_id",
    "examples": [
@@ -1618,7 +1618,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 1.641,
+      "margin": 1.692,
       "note": "Nearly a rectangle (92% of its 130.9 x 70.6 m bounding rectangle), 8,538 m2, 7 corners."
      },
      "ring_lonlat": [
@@ -1688,7 +1688,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 1.469,
+      "margin": 1.865,
       "note": "Nearly a rectangle (92% of its 33.8 x 25.4 m bounding rectangle), 793 m2, 4 corners."
      },
      "ring_lonlat": [
@@ -1900,6 +1900,68 @@
        [
         -123.0252196,
         49.2520858
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "BCS3700",
+     "address": "1001 W Cordova St",
+     "local_area": "Downtown",
+     "metrics": {
+      "class": "near_rectangle",
+      "area_m2": 4661.4,
+      "perimeter_m": 285.1,
+      "vertices_raw": 6,
+      "vertices": 6,
+      "reflex_corners": 0,
+      "rectangularity": 0.896,
+      "convexity": 1.0,
+      "aspect_ratio": 2.046,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 4.188,
+      "equivalent_rectangle": {
+       "side_a_m": 50.4,
+       "side_b_m": 103.2,
+       "bearing_deg": 68.3
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 1.038,
+      "note": "Nearly a rectangle (90% of its 103.2 x 50.4 m bounding rectangle), 4,661 m2, 6 corners."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1161509,
+        49.2878279
+       ],
+       [
+        -123.1157853,
+        49.2880694
+       ],
+       [
+        -123.1158288,
+        49.2881353
+       ],
+       [
+        -123.1170677,
+        49.2884707
+       ],
+       [
+        -123.1173241,
+        49.2880493
+       ],
+       [
+        -123.1163144,
+        49.2877926
+       ],
+       [
+        -123.1161509,
+        49.2878279
        ]
       ]
      ]
@@ -2553,6 +2615,80 @@
      ]
     },
     {
+     "site_id": "004499441",
+     "address": "1249 Devonshire Crescent",
+     "local_area": "Shaughnessy",
+     "metrics": {
+      "class": "near_rectangle",
+      "area_m2": 832.2,
+      "perimeter_m": 124.0,
+      "vertices_raw": 9,
+      "vertices": 4,
+      "reflex_corners": 0,
+      "rectangularity": 0.898,
+      "convexity": 0.999,
+      "aspect_ratio": 2.283,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 4.691,
+      "equivalent_rectangle": {
+       "side_a_m": 46.0,
+       "side_b_m": 20.1,
+       "bearing_deg": 88.6
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 1.211,
+      "note": "Nearly a rectangle (90% of its 46.0 x 20.1 m bounding rectangle), 832 m2, 4 corners."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1331058,
+        49.2455046
+       ],
+       [
+        -123.1331056,
+        49.2455077
+       ],
+       [
+        -123.1330915,
+        49.2458841
+       ],
+       [
+        -123.1330915,
+        49.2458842
+       ],
+       [
+        -123.1333664,
+        49.2459225
+       ],
+       [
+        -123.1333799,
+        49.2455604
+       ],
+       [
+        -123.1333804,
+        49.2455593
+       ],
+       [
+        -123.1333672,
+        49.2455565
+       ],
+       [
+        -123.1332363,
+        49.2455297
+       ],
+       [
+        -123.1331058,
+        49.2455046
+       ]
+      ]
+     ]
+    },
+    {
      "site_id": "010093079",
      "address": "1822 Nassau Drive",
      "local_area": "Victoria-Fraserview",
@@ -2724,6 +2860,156 @@
        [
         -123.1195422,
         49.2416984
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "011021772",
+     "address": "4338 Pine Crescent",
+     "local_area": "Shaughnessy",
+     "metrics": {
+      "class": "near_rectangle",
+      "area_m2": 946.6,
+      "perimeter_m": 130.7,
+      "vertices_raw": 28,
+      "vertices": 5,
+      "reflex_corners": 0,
+      "rectangularity": 0.902,
+      "convexity": 1.0,
+      "aspect_ratio": 2.164,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 4.586,
+      "equivalent_rectangle": {
+       "side_a_m": 47.7,
+       "side_b_m": 22.0,
+       "bearing_deg": 178.6
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 0.131,
+      "note": "Nearly a rectangle (90% of its 47.7 x 22.0 m bounding rectangle), 947 m2, 5 corners."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1473993,
+        49.2470432
+       ],
+       [
+        -123.1467962,
+        49.2470336
+       ],
+       [
+        -123.1467959,
+        49.2470337
+       ],
+       [
+        -123.1468711,
+        49.2472327
+       ],
+       [
+        -123.1474426,
+        49.2472419
+       ],
+       [
+        -123.147443,
+        49.2472419
+       ],
+       [
+        -123.147442,
+        49.2472351
+       ],
+       [
+        -123.1474406,
+        49.247226
+       ],
+       [
+        -123.1474392,
+        49.247217
+       ],
+       [
+        -123.1474378,
+        49.2472079
+       ],
+       [
+        -123.1474363,
+        49.2471989
+       ],
+       [
+        -123.1474347,
+        49.2471898
+       ],
+       [
+        -123.1474331,
+        49.2471808
+       ],
+       [
+        -123.1474314,
+        49.2471718
+       ],
+       [
+        -123.1474296,
+        49.2471629
+       ],
+       [
+        -123.1474278,
+        49.2471539
+       ],
+       [
+        -123.1474258,
+        49.2471448
+       ],
+       [
+        -123.1474237,
+        49.2471359
+       ],
+       [
+        -123.1474218,
+        49.2471269
+       ],
+       [
+        -123.1474195,
+        49.2471179
+       ],
+       [
+        -123.1474175,
+        49.2471089
+       ],
+       [
+        -123.1474152,
+        49.2470999
+       ],
+       [
+        -123.1474129,
+        49.247091
+       ],
+       [
+        -123.1474105,
+        49.247082
+       ],
+       [
+        -123.147408,
+        49.2470731
+       ],
+       [
+        -123.1474055,
+        49.2470641
+       ],
+       [
+        -123.1474029,
+        49.2470552
+       ],
+       [
+        -123.1474002,
+        49.2470463
+       ],
+       [
+        -123.1473993,
+        49.2470432
        ]
       ]
      ]
@@ -2994,7 +3280,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 1.094,
+      "margin": 2.239,
       "note": "Nearly a rectangle (92% of its 43.0 x 16.0 m bounding rectangle), 631 m2, 4 corners."
      },
      "ring_lonlat": [
@@ -3263,193 +3549,11 @@
        ]
       ]
      ]
-    },
-    {
-     "site_id": "003021386",
-     "address": "3270 E Broadway",
-     "local_area": "Renfrew-Collingwood",
-     "metrics": {
-      "class": "near_rectangle",
-      "area_m2": 1470.3,
-      "perimeter_m": 154.2,
-      "vertices_raw": 5,
-      "vertices": 5,
-      "reflex_corners": 0,
-      "rectangularity": 0.996,
-      "convexity": 1.0,
-      "aspect_ratio": 1.421,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 30.3,
-      "equivalent_rectangle": {
-       "side_a_m": 32.2,
-       "side_b_m": 45.8,
-       "bearing_deg": 179.8
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 3.074,
-      "note": "Nearly a rectangle (100% of its 45.8 x 32.2 m bounding rectangle), 1,470 m2, 5 corners."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0346773,
-        49.2613469
-       ],
-       [
-        -123.0346748,
-        49.2617582
-       ],
-       [
-        -123.0351174,
-        49.2617599
-       ],
-       [
-        -123.0351199,
-        49.2613754
-       ],
-       [
-        -123.0350786,
-        49.261348
-       ],
-       [
-        -123.0346773,
-        49.2613469
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "007890923",
-     "address": "3218 E 62nd Ave",
-     "local_area": "Killarney",
-     "metrics": {
-      "class": "near_rectangle",
-      "area_m2": 649.5,
-      "perimeter_m": 115.9,
-      "vertices_raw": 7,
-      "vertices": 6,
-      "reflex_corners": 1,
-      "rectangularity": 0.966,
-      "convexity": 0.997,
-      "aspect_ratio": 2.888,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 11.3,
-      "equivalent_rectangle": {
-       "side_a_m": 44.1,
-       "side_b_m": 15.3,
-       "bearing_deg": 88.2
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 1.054,
-      "note": "Nearly a rectangle (97% of its 44.1 x 15.3 m bounding rectangle), 649 m2, 6 corners."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0364777,
-        49.2130616
-       ],
-       [
-        -123.0363095,
-        49.2130453
-       ],
-       [
-        -123.0362697,
-        49.2130445
-       ],
-       [
-        -123.0362514,
-        49.2134276
-       ],
-       [
-        -123.0362514,
-        49.2134277
-       ],
-       [
-        -123.0362919,
-        49.2134285
-       ],
-       [
-        -123.0364602,
-        49.2134448
-       ],
-       [
-        -123.0364777,
-        49.2130616
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "004567382",
-     "address": "1328 Park Drive",
-     "local_area": "Marpole",
-     "metrics": {
-      "class": "near_rectangle",
-      "area_m2": 419.9,
-      "perimeter_m": 93.7,
-      "vertices_raw": 5,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.928,
-      "convexity": 1.0,
-      "aspect_ratio": 2.962,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.261,
-      "equivalent_rectangle": {
-       "side_a_m": 36.6,
-       "side_b_m": 12.4,
-       "bearing_deg": 89.1
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 1.462,
-      "note": "Nearly a rectangle (93% of its 36.6 x 12.4 m bounding rectangle), 420 m2, 4 corners."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1352065,
-        49.2158346
-       ],
-       [
-        -123.1352066,
-        49.2158345
-       ],
-       [
-        -123.1352146,
-        49.2155061
-       ],
-       [
-        -123.135045,
-        49.2155037
-       ],
-       [
-        -123.1350382,
-        49.2157864
-       ],
-       [
-        -123.1352065,
-        49.2158346
-       ]
-      ]
-     ]
     }
    ]
   },
   "trapezoid": {
-   "count": 2018,
+   "count": 2476,
    "shown": 25,
    "how_chosen": "firm calls (every nudged re-run agrees) first, in a fixed pseudo-random order by a hash of site_id",
    "examples": [
@@ -3479,7 +3583,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 24.4,
+      "margin": 23.0,
       "note": "Four sides but not square-cornered (53% of its 9.6 x 5.5 m bounding rectangle), 28 m2."
      },
      "ring_lonlat": [
@@ -3537,7 +3641,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 5.479,
+      "margin": 4.146,
       "note": "Four sides but not square-cornered (82% of its 40.8 x 31.6 m bounding rectangle), 1,056 m2."
      },
      "ring_lonlat": [
@@ -3570,60 +3674,6 @@
      ]
     },
     {
-     "site_id": "014113791",
-     "address": "2547 E 34th Ave",
-     "local_area": "Renfrew-Collingwood",
-     "metrics": {
-      "class": "trapezoid",
-      "area_m2": 232.9,
-      "perimeter_m": 68.8,
-      "vertices_raw": 4,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.866,
-      "convexity": 1.0,
-      "aspect_ratio": 2.671,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 1.478,
-      "equivalent_rectangle": {
-       "side_a_m": 26.8,
-       "side_b_m": 10.0,
-       "bearing_deg": 89.8
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 2.245,
-      "note": "Four sides but not square-cornered (87% of its 26.8 x 10.0 m bounding rectangle), 233 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0535718,
-        49.2392154
-       ],
-       [
-        -123.0535732,
-        49.2389749
-       ],
-       [
-        -123.0534354,
-        49.2389741
-       ],
-       [
-        -123.0534345,
-        49.2391512
-       ],
-       [
-        -123.0535718,
-        49.2392154
-       ]
-      ]
-     ]
-    },
-    {
      "site_id": "012324582",
      "address": "3088 School Ave",
      "local_area": "Renfrew-Collingwood",
@@ -3649,7 +3699,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 2.827,
+      "margin": 1.494,
       "note": "Four sides but not square-cornered (86% of its 26.9 x 12.6 m bounding rectangle), 291 m2."
      },
      "ring_lonlat": [
@@ -3707,7 +3757,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 17.4,
+      "margin": 16.1,
       "note": "Four sides but not square-cornered (64% of its 32.9 x 29.2 m bounding rectangle), 613 m2."
      },
      "ring_lonlat": [
@@ -3761,7 +3811,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 5.32,
+      "margin": 3.987,
       "note": "Four sides but not square-cornered (82% of its 38.1 x 20.2 m bounding rectangle), 632 m2."
      },
      "ring_lonlat": [
@@ -3827,7 +3877,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 14.8,
+      "margin": 13.4,
       "note": "Four sides but not square-cornered (68% of its 128.7 x 92.3 m bounding rectangle), 8,061 m2."
      },
      "ring_lonlat": [
@@ -3881,7 +3931,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 3.251,
+      "margin": 1.918,
       "note": "Four sides but not square-cornered (85% of its 42.9 x 10.0 m bounding rectangle), 365 m2."
      },
      "ring_lonlat": [
@@ -3905,6 +3955,68 @@
        [
         -123.0274262,
         49.244063
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "010013628",
+     "address": "1607 Sw Marine Drive",
+     "local_area": "Marpole",
+     "metrics": {
+      "class": "trapezoid",
+      "area_m2": 429.0,
+      "perimeter_m": 98.4,
+      "vertices_raw": 6,
+      "vertices": 5,
+      "reflex_corners": 0,
+      "rectangularity": 0.658,
+      "convexity": 1.0,
+      "aspect_ratio": 2.05,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 4.606,
+      "equivalent_rectangle": {
+       "side_a_m": 17.8,
+       "side_b_m": 36.6,
+       "bearing_deg": 178.7
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 14.8,
+      "note": "Four sides with a rounded or cut corner, not square-cornered (66% of its 36.6 x 17.8 m bounding rectangle), 429 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1446896,
+        49.2087442
+       ],
+       [
+        -123.1448512,
+        49.2090657
+       ],
+       [
+        -123.1449233,
+        49.2090668
+       ],
+       [
+        -123.1449346,
+        49.2087381
+       ],
+       [
+        -123.1449346,
+        49.208738
+       ],
+       [
+        -123.1446899,
+        49.2087344
+       ],
+       [
+        -123.1446896,
+        49.2087442
        ]
       ]
      ]
@@ -3935,7 +4047,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 3.744,
+      "margin": 2.411,
       "note": "Four sides but not square-cornered (84% of its 48.1 x 23.8 m bounding rectangle), 964 m2."
      },
      "ring_lonlat": [
@@ -3997,7 +4109,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 18.9,
+      "margin": 17.5,
       "note": "Four sides but not square-cornered (62% of its 11.8 x 7.6 m bounding rectangle), 55 m2."
      },
      "ring_lonlat": [
@@ -4026,171 +4138,59 @@
      ]
     },
     {
-     "site_id": "015724751",
-     "address": "157 Alexander St",
-     "local_area": "Downtown",
+     "site_id": "009639675",
+     "address": "3415 Mons Drive",
+     "local_area": "Renfrew-Collingwood",
      "metrics": {
       "class": "trapezoid",
-      "area_m2": 83.4,
-      "perimeter_m": 37.8,
-      "vertices_raw": 4,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.867,
-      "convexity": 1.0,
-      "aspect_ratio": 1.663,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.445,
-      "equivalent_rectangle": {
-       "side_a_m": 12.6,
-       "side_b_m": 7.605,
-       "bearing_deg": 86.8
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 2.195,
-      "note": "Four sides but not square-cornered (87% of its 12.6 x 7.6 m bounding rectangle), 83 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1002111,
-        49.2843099
-       ],
-       [
-        -123.100317,
-        49.2842863
-       ],
-       [
-        -123.1003251,
-        49.2842002
-       ],
-       [
-        -123.1002206,
-        49.2841983
-       ],
-       [
-        -123.1002111,
-        49.2843099
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "014686309",
-     "address": "2246 Vanness Ave",
-     "local_area": "Kensington-Cedar Cottage",
-     "metrics": {
-      "class": "trapezoid",
-      "area_m2": 460.9,
-      "perimeter_m": 93.5,
+      "area_m2": 736.8,
+      "perimeter_m": 117.1,
       "vertices_raw": 5,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.866,
-      "convexity": 1.0,
-      "aspect_ratio": 2.28,
+      "vertices": 5,
+      "reflex_corners": 1,
+      "rectangularity": 0.667,
+      "convexity": 0.994,
+      "aspect_ratio": 1.31,
       "rings": 1,
       "outer_rings": 1,
       "holes": 0,
-      "narrowest_cross_section_m": 1.808,
+      "narrowest_cross_section_m": 2.653,
       "equivalent_rectangle": {
-       "side_a_m": 34.8,
-       "side_b_m": 15.3,
-       "bearing_deg": 88.7
+       "side_a_m": 29.0,
+       "side_b_m": 38.0,
+       "bearing_deg": 44.9
       },
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 2.296,
-      "note": "Four sides but not square-cornered (87% of its 34.8 x 15.3 m bounding rectangle), 461 m2."
+      "margin": 14.2,
+      "note": "Four sides with a rounded or cut corner, not square-cornered (67% of its 38.0 x 29.0 m bounding rectangle), 737 m2."
      },
      "ring_lonlat": [
       [
        [
-        -123.0592669,
-        49.2494485
+        -123.0317165,
+        49.2529993
        ],
        [
-        -123.0594738,
-        49.2495348
+        -123.0311733,
+        49.2528708
        ],
        [
-        -123.059483,
-        49.2492764
+        -123.0311605,
+        49.2529045
        ],
        [
-        -123.059485,
-        49.2492216
+        -123.0311035,
+        49.2529661
        ],
        [
-        -123.0592756,
-        49.249219
+        -123.031434,
+        49.2531836
        ],
        [
-        -123.0592669,
-        49.2494485
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "009916415",
-     "address": "1445 W Georgia St",
-     "local_area": "Downtown",
-     "metrics": {
-      "class": "trapezoid",
-      "area_m2": 135.2,
-      "perimeter_m": 47.7,
-      "vertices_raw": 5,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.875,
-      "convexity": 1.0,
-      "aspect_ratio": 1.525,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 2.922,
-      "equivalent_rectangle": {
-       "side_a_m": 15.3,
-       "side_b_m": 10.1,
-       "bearing_deg": 45.3
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 1.649,
-      "note": "Four sides but not square-cornered (88% of its 15.3 x 10.1 m bounding rectangle), 135 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1285036,
-        49.2896288
-       ],
-       [
-        -123.1284857,
-        49.2896405
-       ],
-       [
-        -123.1283554,
-        49.2897267
-       ],
-       [
-        -123.1284903,
-        49.2897661
-       ],
-       [
-        -123.1286022,
-        49.2896922
-       ],
-       [
-        -123.1285036,
-        49.2896288
+        -123.0317165,
+        49.2529993
        ]
       ]
      ]
@@ -4221,7 +4221,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 3.322,
+      "margin": 1.988,
       "note": "Four sides but not square-cornered (85% of its 57.0 x 20.1 m bounding rectangle), 975 m2."
      },
      "ring_lonlat": [
@@ -4279,7 +4279,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 7.663,
+      "margin": 6.33,
       "note": "Four sides but not square-cornered (79% of its 43.6 x 20.6 m bounding rectangle), 705 m2."
      },
      "ring_lonlat": [
@@ -4425,7 +4425,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 2.78,
+      "margin": 1.447,
       "note": "Four sides but not square-cornered (86% of its 39.7 x 28.1 m bounding rectangle), 956 m2."
      },
      "ring_lonlat": [
@@ -4487,7 +4487,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 7.769,
+      "margin": 6.436,
       "note": "Four sides but not square-cornered (78% of its 49.1 x 15.0 m bounding rectangle), 576 m2."
      },
      "ring_lonlat": [
@@ -4520,6 +4520,342 @@
      ]
     },
     {
+     "site_id": "003821129",
+     "address": "55 Dieppe Place",
+     "local_area": "Renfrew-Collingwood",
+     "metrics": {
+      "class": "trapezoid",
+      "area_m2": 455.2,
+      "perimeter_m": 90.8,
+      "vertices_raw": 5,
+      "vertices": 5,
+      "reflex_corners": 0,
+      "rectangularity": 0.753,
+      "convexity": 1.0,
+      "aspect_ratio": 1.54,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.424,
+      "equivalent_rectangle": {
+       "side_a_m": 30.5,
+       "side_b_m": 19.8,
+       "bearing_deg": 89.9
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 8.47,
+      "note": "Four sides with a rounded or cut corner, not square-cornered (75% of its 30.5 x 19.8 m bounding rectangle), 455 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.0263384,
+        49.2571339
+       ],
+       [
+        -123.026209,
+        49.2568597
+       ],
+       [
+        -123.0260668,
+        49.2568593
+       ],
+       [
+        -123.0260663,
+        49.2571062
+       ],
+       [
+        -123.0261082,
+        49.2571336
+       ],
+       [
+        -123.0263384,
+        49.2571339
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "013242008",
+     "address": "8899 Granville St",
+     "local_area": "Marpole",
+     "metrics": {
+      "class": "trapezoid",
+      "area_m2": 506.0,
+      "perimeter_m": 98.3,
+      "vertices_raw": 6,
+      "vertices": 5,
+      "reflex_corners": 0,
+      "rectangularity": 0.67,
+      "convexity": 1.0,
+      "aspect_ratio": 1.48,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.825,
+      "equivalent_rectangle": {
+       "side_a_m": 33.4,
+       "side_b_m": 22.6,
+       "bearing_deg": 178.7
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 14.0,
+      "note": "Four sides with a rounded or cut corner, not square-cornered (67% of its 33.4 x 22.6 m bounding rectangle), 506 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1412544,
+        49.2054568
+       ],
+       [
+        -123.1412564,
+        49.2053965
+       ],
+       [
+        -123.1408394,
+        49.2052473
+       ],
+       [
+        -123.1408024,
+        49.2052721
+       ],
+       [
+        -123.1407965,
+        49.2054497
+       ],
+       [
+        -123.1407967,
+        49.2054497
+       ],
+       [
+        -123.1412544,
+        49.2054568
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "005911184",
+     "address": "1511 Marpole Ave",
+     "local_area": "Shaughnessy",
+     "metrics": {
+      "class": "trapezoid",
+      "area_m2": 1001.4,
+      "perimeter_m": 142.6,
+      "vertices_raw": 29,
+      "vertices": 4,
+      "reflex_corners": 0,
+      "rectangularity": 0.601,
+      "convexity": 1.0,
+      "aspect_ratio": 1.246,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 1.413,
+      "equivalent_rectangle": {
+       "side_a_m": 45.6,
+       "side_b_m": 36.6,
+       "bearing_deg": 88.6
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 18.6,
+      "note": "Four sides but not square-cornered (60% of its 45.6 x 36.6 m bounding rectangle), 1,001 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1394907,
+        49.2565584
+       ],
+       [
+        -123.1394984,
+        49.2563547
+       ],
+       [
+        -123.1394981,
+        49.2563544
+       ],
+       [
+        -123.1394883,
+        49.2563599
+       ],
+       [
+        -123.1394778,
+        49.2563658
+       ],
+       [
+        -123.1394674,
+        49.2563717
+       ],
+       [
+        -123.139457,
+        49.2563777
+       ],
+       [
+        -123.1394465,
+        49.2563836
+       ],
+       [
+        -123.1394363,
+        49.2563896
+       ],
+       [
+        -123.1394258,
+        49.2563956
+       ],
+       [
+        -123.1394157,
+        49.2564016
+       ],
+       [
+        -123.1394054,
+        49.2564077
+       ],
+       [
+        -123.1393952,
+        49.2564138
+       ],
+       [
+        -123.1393849,
+        49.2564198
+       ],
+       [
+        -123.1393749,
+        49.2564261
+       ],
+       [
+        -123.1393648,
+        49.2564322
+       ],
+       [
+        -123.1393548,
+        49.2564384
+       ],
+       [
+        -123.1393447,
+        49.2564446
+       ],
+       [
+        -123.1393347,
+        49.2564508
+       ],
+       [
+        -123.1393247,
+        49.2564572
+       ],
+       [
+        -123.1393148,
+        49.2564634
+       ],
+       [
+        -123.139305,
+        49.2564698
+       ],
+       [
+        -123.1392951,
+        49.2564761
+       ],
+       [
+        -123.1392853,
+        49.2564825
+       ],
+       [
+        -123.1392756,
+        49.2564889
+       ],
+       [
+        -123.1392659,
+        49.2564953
+       ],
+       [
+        -123.1389835,
+        49.2566832
+       ],
+       [
+        -123.1389809,
+        49.256756
+       ],
+       [
+        -123.1394832,
+        49.256764
+       ],
+       [
+        -123.1394907,
+        49.2565584
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "010063927",
+     "address": "2810 E 51st Ave",
+     "local_area": "Killarney",
+     "metrics": {
+      "class": "trapezoid",
+      "area_m2": 767.4,
+      "perimeter_m": 125.2,
+      "vertices_raw": 6,
+      "vertices": 4,
+      "reflex_corners": 0,
+      "rectangularity": 0.678,
+      "convexity": 0.994,
+      "aspect_ratio": 1.693,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.34,
+      "equivalent_rectangle": {
+       "side_a_m": 43.8,
+       "side_b_m": 25.9,
+       "bearing_deg": 179.8
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 13.5,
+      "note": "Four sides but not square-cornered (68% of its 43.8 x 25.9 m bounding rectangle), 767 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.0487554,
+        49.2225886
+       ],
+       [
+        -123.0481655,
+        49.2225875
+       ],
+       [
+        -123.048165,
+        49.2225875
+       ],
+       [
+        -123.0481534,
+        49.2228201
+       ],
+       [
+        -123.0486278,
+        49.2227061
+       ],
+       [
+        -123.0487507,
+        49.222679
+       ],
+       [
+        -123.0487554,
+        49.2225886
+       ]
+      ]
+     ]
+    },
+    {
      "site_id": "005605857",
      "address": "7688 Muirfield Drive",
      "local_area": "Victoria-Fraserview",
@@ -4545,7 +4881,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 19.3,
+      "margin": 18.0,
       "note": "Four sides but not square-cornered (61% of its 46.3 x 27.4 m bounding rectangle), 774 m2."
      },
      "ring_lonlat": [
@@ -4603,7 +4939,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 4.555,
+      "margin": 3.222,
       "note": "Four sides but not square-cornered (83% of its 34.4 x 13.8 m bounding rectangle), 395 m2."
      },
      "ring_lonlat": [
@@ -4657,7 +4993,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 23.9,
+      "margin": 22.6,
       "note": "Four sides but not square-cornered (54% of its 34.6 x 26.8 m bounding rectangle), 502 m2."
      },
      "ring_lonlat": [
@@ -4711,7 +5047,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 24.4,
+      "margin": 23.1,
       "note": "Four sides but not square-cornered (53% of its 37.3 x 25.1 m bounding rectangle), 500 m2."
      },
      "ring_lonlat": [
@@ -4769,7 +5105,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 21.3,
+      "margin": 20.0,
       "note": "Four sides but not square-cornered (58% of its 39.5 x 29.2 m bounding rectangle), 670 m2."
      },
      "ring_lonlat": [
@@ -4806,167 +5142,59 @@
      ]
     },
     {
-     "site_id": "010174834",
-     "address": "3423 Anzio Drive",
-     "local_area": "Renfrew-Collingwood",
+     "site_id": "BCS1581",
+     "address": "2635 Prince Edward St",
+     "local_area": "Mount Pleasant",
      "metrics": {
       "class": "trapezoid",
-      "area_m2": 627.9,
-      "perimeter_m": 108.5,
-      "vertices_raw": 4,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.688,
-      "convexity": 1.0,
-      "aspect_ratio": 1.43,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.008,
-      "equivalent_rectangle": {
-       "side_a_m": 36.1,
-       "side_b_m": 25.3,
-       "bearing_deg": 89.9
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 14.1,
-      "note": "Four sides but not square-cornered (69% of its 36.1 x 25.3 m bounding rectangle), 628 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0302471,
-        49.2523853
-       ],
-       [
-        -123.0300398,
-        49.2527096
-       ],
-       [
-        -123.0303868,
-        49.2527099
-       ],
-       [
-        -123.0303879,
-        49.2524082
-       ],
-       [
-        -123.0302471,
-        49.2523853
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "018602924",
-     "address": "280 E Cordova St",
-     "local_area": "Strathcona",
-     "metrics": {
-      "class": "trapezoid",
-      "area_m2": 474.7,
-      "perimeter_m": 100.2,
+      "area_m2": 2166.2,
+      "perimeter_m": 195.6,
       "vertices_raw": 5,
-      "vertices": 4,
+      "vertices": 5,
       "reflex_corners": 0,
-      "rectangularity": 0.85,
+      "rectangularity": 0.833,
       "convexity": 1.0,
-      "aspect_ratio": 2.478,
+      "aspect_ratio": 1.88,
       "rings": 1,
       "outer_rings": 1,
       "holes": 0,
-      "narrowest_cross_section_m": 10.5,
+      "narrowest_cross_section_m": 4.001,
       "equivalent_rectangle": {
-       "side_a_m": 15.0,
+       "side_a_m": 69.9,
        "side_b_m": 37.2,
-       "bearing_deg": 178.4
+       "bearing_deg": 178.7
       },
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 3.334,
-      "note": "Four sides but not square-cornered (85% of its 37.2 x 15.0 m bounding rectangle), 475 m2."
+      "margin": 3.152,
+      "note": "Four sides with a rounded or cut corner, not square-cornered (83% of its 69.9 x 37.2 m bounding rectangle), 2,166 m2."
      },
      "ring_lonlat": [
       [
        [
-        -123.0978934,
-        49.2818281
+        -123.0962692,
+        49.2611487
        ],
        [
-        -123.0976872,
-        49.2818243
+        -123.0962376,
+        49.2614825
        ],
        [
-        -123.0977339,
-        49.2821598
+        -123.0971798,
+        49.2614965
        ],
        [
-        -123.0978783,
-        49.2821624
+        -123.097199,
+        49.261474
        ],
        [
-        -123.0978783,
-        49.2821623
+        -123.0968884,
+        49.2611577
        ],
        [
-        -123.0978934,
-        49.2818281
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "018886515",
-     "address": "2222 W 23rd Ave",
-     "local_area": "Arbutus Ridge",
-     "metrics": {
-      "class": "trapezoid",
-      "area_m2": 463.9,
-      "perimeter_m": 90.3,
-      "vertices_raw": 4,
-      "vertices": 4,
-      "reflex_corners": 0,
-      "rectangularity": 0.803,
-      "convexity": 1.0,
-      "aspect_ratio": 1.597,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 1.802,
-      "equivalent_rectangle": {
-       "side_a_m": 19.0,
-       "side_b_m": 30.4,
-       "bearing_deg": 178.6
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 6.486,
-      "note": "Four sides but not square-cornered (80% of its 30.4 x 19.0 m bounding rectangle), 464 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1568646,
-        49.2516515
-       ],
-       [
-        -123.1568741,
-        49.2513784
-       ],
-       [
-        -123.1566097,
-        49.2514814
-       ],
-       [
-        -123.1566034,
-        49.2516473
-       ],
-       [
-        -123.1568646,
-        49.2516515
+        -123.0962692,
+        49.2611487
        ]
       ]
      ]
@@ -4974,7 +5202,7 @@
    ]
   },
   "l_shape": {
-   "count": 219,
+   "count": 198,
    "shown": 25,
    "how_chosen": "firm calls (every nudged re-run agrees) first, in a fixed pseudo-random order by a hash of site_id",
    "examples": [
@@ -6955,264 +7183,6 @@
      ]
     },
     {
-     "site_id": "BCS638",
-     "address": "3838 Cypress St",
-     "local_area": "Shaughnessy",
-     "metrics": {
-      "class": "flag_lot",
-      "area_m2": 3574.7,
-      "perimeter_m": 253.5,
-      "vertices_raw": 54,
-      "vertices": 8,
-      "reflex_corners": 1,
-      "rectangularity": 0.872,
-      "convexity": 0.962,
-      "aspect_ratio": 1.575,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.807,
-      "equivalent_rectangle": {
-       "side_a_m": 80.4,
-       "side_b_m": 51.0,
-       "bearing_deg": 86.7
-      },
-      "flag": {
-       "pole_width_m": 3.815,
-       "pole_length_m": 6.5,
-       "body_width_m": 50.8
-      },
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 1.877,
-      "note": "A flag lot: a strip about 3.8 m wide and 6 m long leads to a body about 51 m wide; 3,575 m2. The equivalent rectangle overstates the buildable plate."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1484782,
-        49.2518749
-       ],
-       [
-        -123.1485359,
-        49.2512123
-       ],
-       [
-        -123.1485219,
-        49.251212
-       ],
-       [
-        -123.148508,
-        49.2512117
-       ],
-       [
-        -123.148494,
-        49.2512114
-       ],
-       [
-        -123.14848,
-        49.2512112
-       ],
-       [
-        -123.1484661,
-        49.2512111
-       ],
-       [
-        -123.1484521,
-        49.2512109
-       ],
-       [
-        -123.1484381,
-        49.2512109
-       ],
-       [
-        -123.1484242,
-        49.2512109
-       ],
-       [
-        -123.1484102,
-        49.2512108
-       ],
-       [
-        -123.1483962,
-        49.2512109
-       ],
-       [
-        -123.1483823,
-        49.251211
-       ],
-       [
-        -123.1483683,
-        49.2512111
-       ],
-       [
-        -123.1483543,
-        49.2512113
-       ],
-       [
-        -123.1483404,
-        49.2512116
-       ],
-       [
-        -123.1483264,
-        49.2512118
-       ],
-       [
-        -123.1483124,
-        49.2512122
-       ],
-       [
-        -123.1482985,
-        49.2512126
-       ],
-       [
-        -123.1482845,
-        49.2512129
-       ],
-       [
-        -123.1482706,
-        49.2512134
-       ],
-       [
-        -123.1482566,
-        49.251214
-       ],
-       [
-        -123.1482426,
-        49.2512144
-       ],
-       [
-        -123.1482287,
-        49.2512151
-       ],
-       [
-        -123.1482147,
-        49.2512157
-       ],
-       [
-        -123.1482008,
-        49.2512164
-       ],
-       [
-        -123.1481869,
-        49.2512171
-       ],
-       [
-        -123.1481729,
-        49.2512178
-       ],
-       [
-        -123.148159,
-        49.2512187
-       ],
-       [
-        -123.1481452,
-        49.2512196
-       ],
-       [
-        -123.1481313,
-        49.2512205
-       ],
-       [
-        -123.1481173,
-        49.2512214
-       ],
-       [
-        -123.1481034,
-        49.2512224
-       ],
-       [
-        -123.1480895,
-        49.2512234
-       ],
-       [
-        -123.1480756,
-        49.2512245
-       ],
-       [
-        -123.1480618,
-        49.2512256
-       ],
-       [
-        -123.1480479,
-        49.2512268
-       ],
-       [
-        -123.1480342,
-        49.251228
-       ],
-       [
-        -123.1480203,
-        49.2512293
-       ],
-       [
-        -123.1480064,
-        49.2512307
-       ],
-       [
-        -123.1479927,
-        49.2512319
-       ],
-       [
-        -123.1479788,
-        49.2512334
-       ],
-       [
-        -123.1479651,
-        49.2512348
-       ],
-       [
-        -123.1479512,
-        49.2512363
-       ],
-       [
-        -123.1479374,
-        49.2512379
-       ],
-       [
-        -123.1479237,
-        49.2512394
-       ],
-       [
-        -123.14791,
-        49.251241
-       ],
-       [
-        -123.1478961,
-        49.2512427
-       ],
-       [
-        -123.1478825,
-        49.2512444
-       ],
-       [
-        -123.1478688,
-        49.2512461
-       ],
-       [
-        -123.1478675,
-        49.2512463
-       ],
-       [
-        -123.1477733,
-        49.2519076
-       ],
-       [
-        -123.1478256,
-        49.251909
-       ],
-       [
-        -123.1478336,
-        49.2518546
-       ],
-       [
-        -123.1484782,
-        49.2518749
-       ]
-      ]
-     ]
-    },
-    {
      "site_id": "EPS3401",
      "address": "735 E 22nd Ave",
      "local_area": "Kensington-Cedar Cottage",
@@ -8935,11 +8905,84 @@
        ]
       ]
      ]
+    },
+    {
+     "site_id": null,
+     "geo_point_2d": {
+      "lat": 49.227095,
+      "lon": -123.195645
+     },
+     "local_area": "Dunbar-Southlands",
+     "metrics": {
+      "class": "flag_lot",
+      "area_m2": 381.2,
+      "perimeter_m": 114.6,
+      "vertices_raw": 7,
+      "vertices": 7,
+      "reflex_corners": 2,
+      "rectangularity": 0.489,
+      "convexity": 0.658,
+      "aspect_ratio": 1.713,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 4.878,
+      "equivalent_rectangle": {
+       "side_a_m": 36.5,
+       "side_b_m": 21.3,
+       "bearing_deg": 71.5
+      },
+      "flag": {
+       "pole_width_m": 4.892,
+       "pole_length_m": 23.5,
+       "body_width_m": 21.3
+      },
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 1.108,
+      "note": "A flag lot: a strip about 4.9 m wide and 24 m long leads to a body about 21 m wide; 381 m2. The equivalent rectangle overstates the buildable plate."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1958693,
+        49.2270316
+       ],
+       [
+        -123.1955915,
+        49.2269708
+       ],
+       [
+        -123.1954322,
+        49.2272823
+       ],
+       [
+        -123.1954957,
+        49.2272962
+       ],
+       [
+        -123.1955932,
+        49.2271057
+       ],
+       [
+        -123.195628,
+        49.2270944
+       ],
+       [
+        -123.195816,
+        49.2271357
+       ],
+       [
+        -123.1958693,
+        49.2270316
+       ]
+      ]
+     ]
     }
    ]
   },
   "irregular": {
-   "count": 3370,
+   "count": 2387,
    "shown": 25,
    "how_chosen": "firm calls (every nudged re-run agrees) first, in a fixed pseudo-random order by a hash of site_id",
    "examples": [
@@ -9035,7 +9078,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 5.28,
+      "margin": 3.946,
       "note": "Irregular: 64 corners, 82% of its 13.2 x 13.1 m bounding rectangle, 141 m2."
      },
      "ring_lonlat": [
@@ -9329,7 +9372,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 26.7,
+      "margin": 25.3,
       "note": "Irregular: 3 corners, 50% of its 39.1 x 25.9 m bounding rectangle, 507 m2."
      },
      "ring_lonlat": [
@@ -9383,7 +9426,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 20.8,
+      "margin": 19.4,
       "note": "Irregular: 11 corners, 59% of its 39.0 x 26.8 m bounding rectangle, 614 m2."
      },
      "ring_lonlat": [
@@ -9505,7 +9548,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 26.7,
+      "margin": 25.3,
       "note": "Irregular: 3 corners, 50% of its 57.1 x 22.3 m bounding rectangle, 637 m2."
      },
      "ring_lonlat": [
@@ -9625,7 +9668,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 9.607,
+      "margin": 8.274,
       "note": "Irregular: 15 corners, 76% of its 37.2 x 25.1 m bounding rectangle, 707 m2."
      },
      "ring_lonlat": [
@@ -9730,7 +9773,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 26.7,
+      "margin": 25.3,
       "note": "Irregular: 3 corners, 50% of its 18.5 x 3.2 m bounding rectangle, 30 m2."
      },
      "ring_lonlat": [
@@ -9750,308 +9793,6 @@
        [
         -123.0587642,
         49.2496702
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "010865420",
-     "address": "1716 Drummond Drive",
-     "local_area": "West Point Grey",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 3828.4,
-      "perimeter_m": 276.2,
-      "vertices_raw": 66,
-      "vertices": 6,
-      "reflex_corners": 0,
-      "rectangularity": 0.658,
-      "convexity": 0.999,
-      "aspect_ratio": 1.584,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.345,
-      "equivalent_rectangle": {
-       "side_a_m": 96.0,
-       "side_b_m": 60.6,
-       "bearing_deg": 46.7
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 2.435,
-      "note": "Irregular: 6 corners, 66% of its 96.0 x 60.6 m bounding rectangle, 3,828 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.2217753,
-        49.2720184
-       ],
-       [
-        -123.221775,
-        49.2720186
-       ],
-       [
-        -123.2208703,
-        49.2726461
-       ],
-       [
-        -123.2210595,
-        49.2727594
-       ],
-       [
-        -123.2223412,
-        49.2724201
-       ],
-       [
-        -123.2223413,
-        49.27242
-       ],
-       [
-        -123.2223343,
-        49.2724124
-       ],
-       [
-        -123.2223271,
-        49.2724045
-       ],
-       [
-        -123.2223198,
-        49.2723969
-       ],
-       [
-        -123.2223123,
-        49.2723893
-       ],
-       [
-        -123.2223047,
-        49.2723816
-       ],
-       [
-        -123.222297,
-        49.2723741
-       ],
-       [
-        -123.2222892,
-        49.2723667
-       ],
-       [
-        -123.2222812,
-        49.2723592
-       ],
-       [
-        -123.2222732,
-        49.2723518
-       ],
-       [
-        -123.2222651,
-        49.2723446
-       ],
-       [
-        -123.2222568,
-        49.2723373
-       ],
-       [
-        -123.2222484,
-        49.27233
-       ],
-       [
-        -123.22224,
-        49.2723229
-       ],
-       [
-        -123.2222313,
-        49.2723159
-       ],
-       [
-        -123.2222226,
-        49.2723088
-       ],
-       [
-        -123.2222138,
-        49.2723019
-       ],
-       [
-        -123.2222048,
-        49.2722949
-       ],
-       [
-        -123.2221958,
-        49.272288
-       ],
-       [
-        -123.2221866,
-        49.2722812
-       ],
-       [
-        -123.2221773,
-        49.2722745
-       ],
-       [
-        -123.222168,
-        49.2722678
-       ],
-       [
-        -123.2221585,
-        49.2722612
-       ],
-       [
-        -123.2221489,
-        49.2722547
-       ],
-       [
-        -123.2221393,
-        49.2722482
-       ],
-       [
-        -123.2221295,
-        49.2722418
-       ],
-       [
-        -123.2221196,
-        49.2722355
-       ],
-       [
-        -123.2221096,
-        49.2722292
-       ],
-       [
-        -123.2220996,
-        49.272223
-       ],
-       [
-        -123.2220894,
-        49.2722168
-       ],
-       [
-        -123.222079,
-        49.2722106
-       ],
-       [
-        -123.2220688,
-        49.2722044
-       ],
-       [
-        -123.2220586,
-        49.2721983
-       ],
-       [
-        -123.2220483,
-        49.2721921
-       ],
-       [
-        -123.2220381,
-        49.2721859
-       ],
-       [
-        -123.2220279,
-        49.2721796
-       ],
-       [
-        -123.2220178,
-        49.2721734
-       ],
-       [
-        -123.2220076,
-        49.2721671
-       ],
-       [
-        -123.2219974,
-        49.2721609
-       ],
-       [
-        -123.2219874,
-        49.2721546
-       ],
-       [
-        -123.2219772,
-        49.2721483
-       ],
-       [
-        -123.2219671,
-        49.272142
-       ],
-       [
-        -123.221957,
-        49.2721357
-       ],
-       [
-        -123.221947,
-        49.2721294
-       ],
-       [
-        -123.2219369,
-        49.2721231
-       ],
-       [
-        -123.2219268,
-        49.2721167
-       ],
-       [
-        -123.2219168,
-        49.2721105
-       ],
-       [
-        -123.2219069,
-        49.2721041
-       ],
-       [
-        -123.2218968,
-        49.2720977
-       ],
-       [
-        -123.2218869,
-        49.2720913
-       ],
-       [
-        -123.2218769,
-        49.2720849
-       ],
-       [
-        -123.221867,
-        49.2720785
-       ],
-       [
-        -123.2218571,
-        49.2720721
-       ],
-       [
-        -123.2218472,
-        49.2720657
-       ],
-       [
-        -123.2218372,
-        49.2720592
-       ],
-       [
-        -123.2218273,
-        49.2720528
-       ],
-       [
-        -123.2218175,
-        49.2720463
-       ],
-       [
-        -123.2218077,
-        49.2720399
-       ],
-       [
-        -123.2217978,
-        49.2720334
-       ],
-       [
-        -123.221788,
-        49.2720269
-       ],
-       [
-        -123.2217782,
-        49.2720204
-       ],
-       [
-        -123.2217753,
-        49.2720184
        ]
       ]
      ]
@@ -10085,7 +9826,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 11.6,
+      "margin": 10.3,
       "note": "Irregular: 13 corners, 73% of its 101.3 x 25.1 m bounding rectangle, 1,849 m2."
      },
      "ring_lonlat": [
@@ -10186,68 +9927,6 @@
      ]
     },
     {
-     "site_id": "010013628",
-     "address": "1607 Sw Marine Drive",
-     "local_area": "Marpole",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 429.0,
-      "perimeter_m": 98.4,
-      "vertices_raw": 6,
-      "vertices": 5,
-      "reflex_corners": 0,
-      "rectangularity": 0.658,
-      "convexity": 1.0,
-      "aspect_ratio": 2.05,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 4.606,
-      "equivalent_rectangle": {
-       "side_a_m": 17.8,
-       "side_b_m": 36.6,
-       "bearing_deg": 178.7
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 16.2,
-      "note": "Irregular: 5 corners, 66% of its 36.6 x 17.8 m bounding rectangle, 429 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1446896,
-        49.2087442
-       ],
-       [
-        -123.1448512,
-        49.2090657
-       ],
-       [
-        -123.1449233,
-        49.2090668
-       ],
-       [
-        -123.1449346,
-        49.2087381
-       ],
-       [
-        -123.1449346,
-        49.208738
-       ],
-       [
-        -123.1446899,
-        49.2087344
-       ],
-       [
-        -123.1446896,
-        49.2087442
-       ]
-      ]
-     ]
-    },
-    {
      "site_id": "LMS2731",
      "address": "1529 W 6th Ave",
      "local_area": "Fairview",
@@ -10273,7 +9952,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 4.67,
+      "margin": 3.337,
       "note": "Irregular: 8 corners, 83% of its 55.6 x 45.7 m bounding rectangle, 2,111 m2."
      },
      "ring_lonlat": [
@@ -10515,7 +10194,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 13.2,
+      "margin": 11.9,
       "note": "Irregular: 19 corners, 70% of its 169.5 x 133.6 m bounding rectangle, 15,902 m2."
      },
      "ring_lonlat": [
@@ -10925,7 +10604,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 2.511,
+      "margin": 1.177,
       "note": "Irregular: 8 corners, 86% of its 82.7 x 58.0 m bounding rectangle, 4,136 m2."
      },
      "ring_lonlat": [
@@ -10995,7 +10674,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 13.7,
+      "margin": 12.4,
       "note": "Irregular: 19 corners, 69% of its 30.3 x 28.8 m bounding rectangle, 605 m2."
      },
      "ring_lonlat": [
@@ -11084,64 +10763,6 @@
      ]
     },
     {
-     "site_id": "009639675",
-     "address": "3415 Mons Drive",
-     "local_area": "Renfrew-Collingwood",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 736.8,
-      "perimeter_m": 117.1,
-      "vertices_raw": 5,
-      "vertices": 5,
-      "reflex_corners": 1,
-      "rectangularity": 0.667,
-      "convexity": 0.994,
-      "aspect_ratio": 1.31,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 2.653,
-      "equivalent_rectangle": {
-       "side_a_m": 29.0,
-       "side_b_m": 38.0,
-       "bearing_deg": 44.9
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 15.5,
-      "note": "Irregular: 5 corners, 67% of its 38.0 x 29.0 m bounding rectangle, 737 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0317165,
-        49.2529993
-       ],
-       [
-        -123.0311733,
-        49.2528708
-       ],
-       [
-        -123.0311605,
-        49.2529045
-       ],
-       [
-        -123.0311035,
-        49.2529661
-       ],
-       [
-        -123.031434,
-        49.2531836
-       ],
-       [
-        -123.0317165,
-        49.2529993
-       ]
-      ]
-     ]
-    },
-    {
      "site_id": "007281269",
      "address": "1100 The Castings",
      "local_area": "Fairview",
@@ -11167,7 +10788,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 18.3,
+      "margin": 16.9,
       "note": "Irregular: 10 corners, 63% of its 109.5 x 42.5 m bounding rectangle, 2,913 m2."
      },
      "ring_lonlat": [
@@ -11692,112 +11313,6 @@
      ]
     },
     {
-     "site_id": "010023062",
-     "address": "2038 Qualicum Drive",
-     "local_area": "Victoria-Fraserview",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 705.4,
-      "perimeter_m": 116.0,
-      "vertices_raw": 17,
-      "vertices": 6,
-      "reflex_corners": 2,
-      "rectangularity": 0.659,
-      "convexity": 0.996,
-      "aspect_ratio": 1.413,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 2.869,
-      "equivalent_rectangle": {
-       "side_a_m": 38.9,
-       "side_b_m": 27.5,
-       "bearing_deg": 4.832
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 2.3,
-      "note": "Irregular: 6 corners, 66% of its 38.9 x 27.5 m bounding rectangle, 705 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0653287,
-        49.2127414
-       ],
-       [
-        -123.0653285,
-        49.2127414
-       ],
-       [
-        -123.0648157,
-        49.2129173
-       ],
-       [
-        -123.0648163,
-        49.2129182
-       ],
-       [
-        -123.0648208,
-        49.2129271
-       ],
-       [
-        -123.064825,
-        49.2129359
-       ],
-       [
-        -123.064829,
-        49.2129449
-       ],
-       [
-        -123.0648324,
-        49.2129539
-       ],
-       [
-        -123.0648357,
-        49.2129628
-       ],
-       [
-        -123.0648386,
-        49.212972
-       ],
-       [
-        -123.0648411,
-        49.2129811
-       ],
-       [
-        -123.0648434,
-        49.2129903
-       ],
-       [
-        -123.0648452,
-        49.2129995
-       ],
-       [
-        -123.0648469,
-        49.2130087
-       ],
-       [
-        -123.0648479,
-        49.2130165
-       ],
-       [
-        -123.0653233,
-        49.2129901
-       ],
-       [
-        -123.0653239,
-        49.2129901
-       ],
-       [
-        -123.0653287,
-        49.2127414
-       ]
-      ]
-     ]
-    },
-    {
      "site_id": "008023875",
      "address": "2270 E 25th Ave",
      "local_area": "Kensington-Cedar Cottage",
@@ -11823,7 +11338,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 19.3,
+      "margin": 18.0,
       "note": "Irregular: 11 corners, 61% of its 137.2 x 101.7 m bounding rectangle, 8,517 m2."
      },
      "ring_lonlat": [
@@ -11888,216 +11403,6 @@
      ]
     },
     {
-     "site_id": "008035521",
-     "address": "4356 Jericho Circle",
-     "local_area": "West Point Grey",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 661.7,
-      "perimeter_m": 108.5,
-      "vertices_raw": 13,
-      "vertices": 7,
-      "reflex_corners": 3,
-      "rectangularity": 0.717,
-      "convexity": 0.993,
-      "aspect_ratio": 1.088,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 2.767,
-      "equivalent_rectangle": {
-       "side_a_m": 31.7,
-       "side_b_m": 29.1,
-       "bearing_deg": 70.2
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 12.2,
-      "note": "Irregular: 7 corners, 72% of its 31.7 x 29.1 m bounding rectangle, 662 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.2039225,
-        49.2694057
-       ],
-       [
-        -123.2037807,
-        49.2696634
-       ],
-       [
-        -123.2038475,
-        49.2696791
-       ],
-       [
-        -123.2038607,
-        49.2696824
-       ],
-       [
-        -123.2038736,
-        49.2696859
-       ],
-       [
-        -123.2038864,
-        49.2696898
-       ],
-       [
-        -123.2038991,
-        49.2696939
-       ],
-       [
-        -123.2039113,
-        49.2696984
-       ],
-       [
-        -123.2039235,
-        49.2697031
-       ],
-       [
-        -123.2039353,
-        49.2697082
-       ],
-       [
-        -123.2039469,
-        49.2697134
-       ],
-       [
-        -123.2039495,
-        49.2697148
-       ],
-       [
-        -123.204299,
-        49.2694943
-       ],
-       [
-        -123.2039225,
-        49.2694057
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "003821129",
-     "address": "55 Dieppe Place",
-     "local_area": "Renfrew-Collingwood",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 455.2,
-      "perimeter_m": 90.8,
-      "vertices_raw": 5,
-      "vertices": 5,
-      "reflex_corners": 0,
-      "rectangularity": 0.753,
-      "convexity": 1.0,
-      "aspect_ratio": 1.54,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.424,
-      "equivalent_rectangle": {
-       "side_a_m": 30.5,
-       "side_b_m": 19.8,
-       "bearing_deg": 89.9
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 9.803,
-      "note": "Irregular: 5 corners, 75% of its 30.5 x 19.8 m bounding rectangle, 455 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.0263384,
-        49.2571339
-       ],
-       [
-        -123.026209,
-        49.2568597
-       ],
-       [
-        -123.0260668,
-        49.2568593
-       ],
-       [
-        -123.0260663,
-        49.2571062
-       ],
-       [
-        -123.0261082,
-        49.2571336
-       ],
-       [
-        -123.0263384,
-        49.2571339
-       ]
-      ]
-     ]
-    },
-    {
-     "site_id": "013242008",
-     "address": "8899 Granville St",
-     "local_area": "Marpole",
-     "metrics": {
-      "class": "irregular",
-      "area_m2": 506.0,
-      "perimeter_m": 98.3,
-      "vertices_raw": 6,
-      "vertices": 5,
-      "reflex_corners": 0,
-      "rectangularity": 0.67,
-      "convexity": 1.0,
-      "aspect_ratio": 1.48,
-      "rings": 1,
-      "outer_rings": 1,
-      "holes": 0,
-      "narrowest_cross_section_m": 3.825,
-      "equivalent_rectangle": {
-       "side_a_m": 33.4,
-       "side_b_m": 22.6,
-       "bearing_deg": 178.7
-      },
-      "flag": null,
-      "confidence": 1.0,
-      "alternative": null,
-      "margin": 15.3,
-      "note": "Irregular: 5 corners, 67% of its 33.4 x 22.6 m bounding rectangle, 506 m2."
-     },
-     "ring_lonlat": [
-      [
-       [
-        -123.1412544,
-        49.2054568
-       ],
-       [
-        -123.1412564,
-        49.2053965
-       ],
-       [
-        -123.1408394,
-        49.2052473
-       ],
-       [
-        -123.1408024,
-        49.2052721
-       ],
-       [
-        -123.1407965,
-        49.2054497
-       ],
-       [
-        -123.1407967,
-        49.2054497
-       ],
-       [
-        -123.1412544,
-        49.2054568
-       ]
-      ]
-     ]
-    },
-    {
      "site_id": "007396783",
      "address": "7787 Beamish Court",
      "local_area": "Killarney",
@@ -12123,7 +11428,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 11.4,
+      "margin": 10.0,
       "note": "Irregular: 14 corners, 73% of its 303.2 x 160.0 m bounding rectangle, 35,399 m2."
      },
      "ring_lonlat": [
@@ -12557,7 +11862,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 18.5,
+      "margin": 17.2,
       "note": "Irregular: 12 corners, 62% of its 33.6 x 31.4 m bounding rectangle, 656 m2."
      },
      "ring_lonlat": [
@@ -12622,127 +11927,1945 @@
      ]
     },
     {
-     "site_id": "010099522",
-     "address": "1730 Upland Drive",
-     "local_area": "Victoria-Fraserview",
+     "site_id": "011013664",
+     "address": "1850 W 30th Ave",
+     "local_area": "Shaughnessy",
      "metrics": {
       "class": "irregular",
-      "area_m2": 524.2,
-      "perimeter_m": 102.8,
-      "vertices_raw": 22,
-      "vertices": 5,
+      "area_m2": 732.6,
+      "perimeter_m": 140.6,
+      "vertices_raw": 3,
+      "vertices": 3,
       "reflex_corners": 0,
-      "rectangularity": 0.777,
+      "rectangularity": 0.5,
       "convexity": 1.0,
-      "aspect_ratio": 2.188,
+      "aspect_ratio": 2.448,
       "rings": 1,
       "outer_rings": 1,
       "holes": 0,
-      "narrowest_cross_section_m": 6.841,
+      "narrowest_cross_section_m": 0.648,
       "equivalent_rectangle": {
-       "side_a_m": 38.4,
-       "side_b_m": 17.6,
-       "bearing_deg": 130.3
+       "side_a_m": 59.9,
+       "side_b_m": 24.5,
+       "bearing_deg": 116.0
       },
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 8.167,
-      "note": "Irregular: 5 corners, 78% of its 38.4 x 17.6 m bounding rectangle, 524 m2."
+      "margin": 25.3,
+      "note": "Irregular: 3 corners, 50% of its 59.9 x 24.5 m bounding rectangle, 733 m2."
      },
      "ring_lonlat": [
       [
        [
-        -123.0694942,
-        49.2175305
+        -123.1471885,
+        49.2440728
        ],
        [
-        -123.0694986,
-        49.217528
+        -123.1471707,
+        49.2445504
        ],
        [
-        -123.0695092,
-        49.2175221
+        -123.1475493,
+        49.2445567
        ],
        [
-        -123.0695196,
-        49.2175161
+        -123.1471885,
+        49.2440728
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "007707223",
+     "address": "7184 Elmhurst Drive",
+     "local_area": "Killarney",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 532.7,
+      "perimeter_m": 101.8,
+      "vertices_raw": 24,
+      "vertices": 8,
+      "reflex_corners": 0,
+      "rectangularity": 0.685,
+      "convexity": 1.0,
+      "aspect_ratio": 1.812,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.642,
+      "equivalent_rectangle": {
+       "side_a_m": 37.5,
+       "side_b_m": 20.7,
+       "bearing_deg": 19.5
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 13.0,
+      "note": "Irregular: 8 corners, 69% of its 37.5 x 20.7 m bounding rectangle, 533 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.0478424,
+        49.2188522
        ],
        [
-        -123.06953,
-        49.2175102
+        -123.047361,
+        49.2189639
        ],
        [
-        -123.0695404,
-        49.2175042
+        -123.0474471,
+        49.2190341
        ],
        [
-        -123.0695509,
-        49.2174982
+        -123.0479071,
+        49.2190348
        ],
        [
-        -123.0695612,
-        49.2174922
+        -123.047907,
+        49.2190257
        ],
        [
-        -123.0695714,
-        49.2174861
+        -123.0479066,
+        49.2190166
        ],
        [
-        -123.0695816,
-        49.2174799
+        -123.0479059,
+        49.2190075
        ],
        [
-        -123.0695919,
-        49.2174738
+        -123.0479048,
+        49.2189985
        ],
        [
-        -123.069602,
-        49.2174677
+        -123.0479034,
+        49.2189894
        ],
        [
-        -123.0696121,
-        49.2174615
+        -123.0479017,
+        49.2189803
        ],
        [
-        -123.0696221,
-        49.2174552
+        -123.0478998,
+        49.2189713
        ],
        [
-        -123.0696321,
-        49.217449
+        -123.0478975,
+        49.2189623
        ],
        [
-        -123.0696421,
-        49.2174427
+        -123.047895,
+        49.2189534
        ],
        [
-        -123.069652,
-        49.2174364
+        -123.0478921,
+        49.2189445
        ],
        [
-        -123.0696619,
-        49.21743
+        -123.0478889,
+        49.2189356
        ],
        [
-        -123.0696717,
-        49.2174236
+        -123.0478853,
+        49.2189268
        ],
        [
-        -123.0693021,
-        49.217229
+        -123.0478816,
+        49.2189181
        ],
        [
-        -123.0692362,
-        49.2172277
+        -123.0478775,
+        49.2189093
        ],
        [
-        -123.0691533,
-        49.217267
+        -123.0478732,
+        49.2189007
        ],
        [
-        -123.0694942,
-        49.2175305
+        -123.0478686,
+        49.2188921
+       ],
+       [
+        -123.0478636,
+        49.2188836
+       ],
+       [
+        -123.0478584,
+        49.2188752
+       ],
+       [
+        -123.0478529,
+        49.2188668
+       ],
+       [
+        -123.0478471,
+        49.2188585
+       ],
+       [
+        -123.0478424,
+        49.2188522
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "007573014",
+     "address": "1828 Harrison Drive",
+     "local_area": "Victoria-Fraserview",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 1175.4,
+      "perimeter_m": 168.7,
+      "vertices_raw": 29,
+      "vertices": 10,
+      "reflex_corners": 5,
+      "rectangularity": 0.828,
+      "convexity": 0.978,
+      "aspect_ratio": 3.714,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.418,
+      "equivalent_rectangle": {
+       "side_a_m": 72.6,
+       "side_b_m": 19.6,
+       "bearing_deg": 89.3
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 3.476,
+      "note": "Irregular: 10 corners, 83% of its 72.6 x 19.6 m bounding rectangle, 1,175 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.0690644,
+        49.2107931
+       ],
+       [
+        -123.0690555,
+        49.211277
+       ],
+       [
+        -123.0690556,
+        49.2112771
+       ],
+       [
+        -123.0690671,
+        49.2112826
+       ],
+       [
+        -123.0690782,
+        49.2112882
+       ],
+       [
+        -123.069089,
+        49.2112941
+       ],
+       [
+        -123.0690998,
+        49.2113
+       ],
+       [
+        -123.0691103,
+        49.2113062
+       ],
+       [
+        -123.0691206,
+        49.2113124
+       ],
+       [
+        -123.0691308,
+        49.2113189
+       ],
+       [
+        -123.0691407,
+        49.2113254
+       ],
+       [
+        -123.0691503,
+        49.2113322
+       ],
+       [
+        -123.0691598,
+        49.211339
+       ],
+       [
+        -123.069169,
+        49.211346
+       ],
+       [
+        -123.069178,
+        49.2113531
+       ],
+       [
+        -123.0691868,
+        49.2113603
+       ],
+       [
+        -123.0691951,
+        49.2113677
+       ],
+       [
+        -123.0692034,
+        49.2113752
+       ],
+       [
+        -123.0692115,
+        49.2113828
+       ],
+       [
+        -123.0692192,
+        49.2113905
+       ],
+       [
+        -123.0692266,
+        49.2113983
+       ],
+       [
+        -123.0692339,
+        49.2114063
+       ],
+       [
+        -123.0692408,
+        49.2114143
+       ],
+       [
+        -123.0692475,
+        49.2114224
+       ],
+       [
+        -123.0692538,
+        49.2114306
+       ],
+       [
+        -123.06926,
+        49.211439
+       ],
+       [
+        -123.0692658,
+        49.2114473
+       ],
+       [
+        -123.06932,
+        49.2114481
+       ],
+       [
+        -123.0693316,
+        49.2108596
+       ],
+       [
+        -123.0690644,
+        49.2107931
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "010922482",
+     "address": "1995 Sasamat Place",
+     "local_area": "West Point Grey",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 739.1,
+      "perimeter_m": 120.8,
+      "vertices_raw": 30,
+      "vertices": 26,
+      "reflex_corners": 14,
+      "rectangularity": 0.583,
+      "convexity": 0.895,
+      "aspect_ratio": 1.165,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 1.186,
+      "equivalent_rectangle": {
+       "side_a_m": 38.4,
+       "side_b_m": 33.0,
+       "bearing_deg": 178.6
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 19.8,
+      "note": "Irregular: 26 corners, 58% of its 38.4 x 33.0 m bounding rectangle, 739 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.2079998,
+        49.2694031
+       ],
+       [
+        -123.2082838,
+        49.269256
+       ],
+       [
+        -123.2082839,
+        49.269256
+       ],
+       [
+        -123.2082852,
+        49.2692206
+       ],
+       [
+        -123.2082894,
+        49.2691112
+       ],
+       [
+        -123.2077615,
+        49.2691027
+       ],
+       [
+        -123.2077618,
+        49.2691123
+       ],
+       [
+        -123.2077635,
+        49.2691218
+       ],
+       [
+        -123.2077664,
+        49.2691312
+       ],
+       [
+        -123.2077707,
+        49.2691404
+       ],
+       [
+        -123.2077762,
+        49.2691492
+       ],
+       [
+        -123.207783,
+        49.2691578
+       ],
+       [
+        -123.2077909,
+        49.2691659
+       ],
+       [
+        -123.2077998,
+        49.2691734
+       ],
+       [
+        -123.2078099,
+        49.2691804
+       ],
+       [
+        -123.2079505,
+        49.2692705
+       ],
+       [
+        -123.2079607,
+        49.2692775
+       ],
+       [
+        -123.2079699,
+        49.2692849
+       ],
+       [
+        -123.2079783,
+        49.2692927
+       ],
+       [
+        -123.2079859,
+        49.269301
+       ],
+       [
+        -123.2079924,
+        49.2693095
+       ],
+       [
+        -123.207998,
+        49.2693184
+       ],
+       [
+        -123.2080026,
+        49.2693276
+       ],
+       [
+        -123.208006,
+        49.2693368
+       ],
+       [
+        -123.2080084,
+        49.2693464
+       ],
+       [
+        -123.2080097,
+        49.2693559
+       ],
+       [
+        -123.2080099,
+        49.2693654
+       ],
+       [
+        -123.2080091,
+        49.2693751
+       ],
+       [
+        -123.2080071,
+        49.2693846
+       ],
+       [
+        -123.2080039,
+        49.269394
+       ],
+       [
+        -123.2079998,
+        49.2694031
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "VAS1343",
+     "address": "1508 Mariner Walk",
+     "local_area": "Fairview",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 9756.8,
+      "perimeter_m": 530.9,
+      "vertices_raw": 197,
+      "vertices": 84,
+      "reflex_corners": 28,
+      "rectangularity": 0.585,
+      "convexity": 0.735,
+      "aspect_ratio": 2.251,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.332,
+      "equivalent_rectangle": {
+       "side_a_m": 193.7,
+       "side_b_m": 86.0,
+       "bearing_deg": 133.7
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 19.6,
+      "note": "Irregular: 84 corners, 59% of its 193.7 x 86.0 m bounding rectangle, 9,757 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.1405557,
+        49.2711418
+       ],
+       [
+        -123.1402517,
+        49.2707942
+       ],
+       [
+        -123.1407836,
+        49.2705953
+       ],
+       [
+        -123.140697,
+        49.2704962
+       ],
+       [
+        -123.1406816,
+        49.2704803
+       ],
+       [
+        -123.1406661,
+        49.2704645
+       ],
+       [
+        -123.1406504,
+        49.2704489
+       ],
+       [
+        -123.1406346,
+        49.2704334
+       ],
+       [
+        -123.1406187,
+        49.2704181
+       ],
+       [
+        -123.1406026,
+        49.270403
+       ],
+       [
+        -123.1405863,
+        49.270388
+       ],
+       [
+        -123.1405699,
+        49.2703731
+       ],
+       [
+        -123.1405534,
+        49.2703584
+       ],
+       [
+        -123.1405367,
+        49.2703439
+       ],
+       [
+        -123.1405199,
+        49.2703295
+       ],
+       [
+        -123.140503,
+        49.2703153
+       ],
+       [
+        -123.1404859,
+        49.2703013
+       ],
+       [
+        -123.1404687,
+        49.2702874
+       ],
+       [
+        -123.1404513,
+        49.2702737
+       ],
+       [
+        -123.1404339,
+        49.2702601
+       ],
+       [
+        -123.1404163,
+        49.2702468
+       ],
+       [
+        -123.1403985,
+        49.2702335
+       ],
+       [
+        -123.1403807,
+        49.2702205
+       ],
+       [
+        -123.1403627,
+        49.2702076
+       ],
+       [
+        -123.1403446,
+        49.2701949
+       ],
+       [
+        -123.1403264,
+        49.2701824
+       ],
+       [
+        -123.140308,
+        49.27017
+       ],
+       [
+        -123.1402896,
+        49.2701579
+       ],
+       [
+        -123.140271,
+        49.2701459
+       ],
+       [
+        -123.1402523,
+        49.270134
+       ],
+       [
+        -123.1402335,
+        49.2701224
+       ],
+       [
+        -123.1402146,
+        49.2701109
+       ],
+       [
+        -123.1401956,
+        49.2700996
+       ],
+       [
+        -123.1401765,
+        49.2700885
+       ],
+       [
+        -123.1401573,
+        49.2700776
+       ],
+       [
+        -123.1401379,
+        49.2700669
+       ],
+       [
+        -123.1401185,
+        49.2700563
+       ],
+       [
+        -123.140099,
+        49.270046
+       ],
+       [
+        -123.1400793,
+        49.2700358
+       ],
+       [
+        -123.1400596,
+        49.2700258
+       ],
+       [
+        -123.1400398,
+        49.270016
+       ],
+       [
+        -123.1400199,
+        49.2700064
+       ],
+       [
+        -123.1399999,
+        49.2699969
+       ],
+       [
+        -123.1399798,
+        49.2699877
+       ],
+       [
+        -123.1399596,
+        49.2699787
+       ],
+       [
+        -123.1399393,
+        49.2699698
+       ],
+       [
+        -123.139919,
+        49.2699612
+       ],
+       [
+        -123.1398985,
+        49.2699527
+       ],
+       [
+        -123.139878,
+        49.2699445
+       ],
+       [
+        -123.1398575,
+        49.2699364
+       ],
+       [
+        -123.1398368,
+        49.2699285
+       ],
+       [
+        -123.139816,
+        49.2699208
+       ],
+       [
+        -123.1397952,
+        49.2699134
+       ],
+       [
+        -123.1397744,
+        49.2699061
+       ],
+       [
+        -123.1397534,
+        49.269899
+       ],
+       [
+        -123.1397324,
+        49.2698921
+       ],
+       [
+        -123.1397113,
+        49.2698855
+       ],
+       [
+        -123.1396902,
+        49.269879
+       ],
+       [
+        -123.139669,
+        49.2698727
+       ],
+       [
+        -123.1396477,
+        49.2698667
+       ],
+       [
+        -123.1396264,
+        49.2698608
+       ],
+       [
+        -123.139605,
+        49.2698551
+       ],
+       [
+        -123.1395836,
+        49.2698497
+       ],
+       [
+        -123.1395621,
+        49.2698444
+       ],
+       [
+        -123.1395406,
+        49.2698394
+       ],
+       [
+        -123.139519,
+        49.2698345
+       ],
+       [
+        -123.1394974,
+        49.2698299
+       ],
+       [
+        -123.1394757,
+        49.2698254
+       ],
+       [
+        -123.1392343,
+        49.2697686
+       ],
+       [
+        -123.1389085,
+        49.2697632
+       ],
+       [
+        -123.1387876,
+        49.2700503
+       ],
+       [
+        -123.1388008,
+        49.2700786
+       ],
+       [
+        -123.1388962,
+        49.2703002
+       ],
+       [
+        -123.1389005,
+        49.270309
+       ],
+       [
+        -123.1389058,
+        49.2703177
+       ],
+       [
+        -123.1389119,
+        49.270326
+       ],
+       [
+        -123.1389189,
+        49.270334
+       ],
+       [
+        -123.1389266,
+        49.2703417
+       ],
+       [
+        -123.1389351,
+        49.2703491
+       ],
+       [
+        -123.1389445,
+        49.2703561
+       ],
+       [
+        -123.1389546,
+        49.2703626
+       ],
+       [
+        -123.1389653,
+        49.2703687
+       ],
+       [
+        -123.1389766,
+        49.2703742
+       ],
+       [
+        -123.1389884,
+        49.2703793
+       ],
+       [
+        -123.1390008,
+        49.2703837
+       ],
+       [
+        -123.1390136,
+        49.2703876
+       ],
+       [
+        -123.1390268,
+        49.270391
+       ],
+       [
+        -123.1390404,
+        49.2703937
+       ],
+       [
+        -123.1390542,
+        49.2703958
+       ],
+       [
+        -123.1390681,
+        49.2703973
+       ],
+       [
+        -123.1390822,
+        49.2703981
+       ],
+       [
+        -123.1390964,
+        49.2703984
+       ],
+       [
+        -123.1391104,
+        49.270398
+       ],
+       [
+        -123.1391246,
+        49.2703969
+       ],
+       [
+        -123.1391385,
+        49.2703953
+       ],
+       [
+        -123.1392422,
+        49.2703803
+       ],
+       [
+        -123.1392562,
+        49.2703785
+       ],
+       [
+        -123.1392704,
+        49.2703769
+       ],
+       [
+        -123.1392845,
+        49.2703756
+       ],
+       [
+        -123.1392987,
+        49.2703746
+       ],
+       [
+        -123.139313,
+        49.2703738
+       ],
+       [
+        -123.1393273,
+        49.2703734
+       ],
+       [
+        -123.1393416,
+        49.2703732
+       ],
+       [
+        -123.1393559,
+        49.2703732
+       ],
+       [
+        -123.1393703,
+        49.2703737
+       ],
+       [
+        -123.1393845,
+        49.2703743
+       ],
+       [
+        -123.1393988,
+        49.2703752
+       ],
+       [
+        -123.1394129,
+        49.2703764
+       ],
+       [
+        -123.1394271,
+        49.2703779
+       ],
+       [
+        -123.1394411,
+        49.2703796
+       ],
+       [
+        -123.1394551,
+        49.2703817
+       ],
+       [
+        -123.139469,
+        49.270384
+       ],
+       [
+        -123.1394828,
+        49.2703866
+       ],
+       [
+        -123.1394964,
+        49.2703893
+       ],
+       [
+        -123.1395099,
+        49.2703925
+       ],
+       [
+        -123.1395232,
+        49.2703958
+       ],
+       [
+        -123.1395364,
+        49.2703995
+       ],
+       [
+        -123.1395495,
+        49.2704033
+       ],
+       [
+        -123.1395627,
+        49.2704075
+       ],
+       [
+        -123.1395756,
+        49.2704118
+       ],
+       [
+        -123.1395886,
+        49.2704163
+       ],
+       [
+        -123.1396015,
+        49.2704209
+       ],
+       [
+        -123.1396142,
+        49.2704256
+       ],
+       [
+        -123.1396268,
+        49.2704305
+       ],
+       [
+        -123.1396393,
+        49.2704355
+       ],
+       [
+        -123.1396517,
+        49.2704406
+       ],
+       [
+        -123.139664,
+        49.2704458
+       ],
+       [
+        -123.1396761,
+        49.2704511
+       ],
+       [
+        -123.1396881,
+        49.2704566
+       ],
+       [
+        -123.1396999,
+        49.2704622
+       ],
+       [
+        -123.1397117,
+        49.2704679
+       ],
+       [
+        -123.1397233,
+        49.2704737
+       ],
+       [
+        -123.1397349,
+        49.2704796
+       ],
+       [
+        -123.1397462,
+        49.2704857
+       ],
+       [
+        -123.1397573,
+        49.2704918
+       ],
+       [
+        -123.1397683,
+        49.2704981
+       ],
+       [
+        -123.1397794,
+        49.2705046
+       ],
+       [
+        -123.1397901,
+        49.2705111
+       ],
+       [
+        -123.1398007,
+        49.2705176
+       ],
+       [
+        -123.139811,
+        49.2705243
+       ],
+       [
+        -123.1398214,
+        49.2705312
+       ],
+       [
+        -123.1399171,
+        49.2705972
+       ],
+       [
+        -123.139927,
+        49.2706041
+       ],
+       [
+        -123.1399366,
+        49.2706111
+       ],
+       [
+        -123.1399462,
+        49.2706182
+       ],
+       [
+        -123.1399554,
+        49.2706254
+       ],
+       [
+        -123.1399646,
+        49.2706327
+       ],
+       [
+        -123.1399734,
+        49.2706402
+       ],
+       [
+        -123.1399823,
+        49.2706477
+       ],
+       [
+        -123.1399908,
+        49.2706554
+       ],
+       [
+        -123.1399991,
+        49.270663
+       ],
+       [
+        -123.1400072,
+        49.2706708
+       ],
+       [
+        -123.1400152,
+        49.2706787
+       ],
+       [
+        -123.1400229,
+        49.2706867
+       ],
+       [
+        -123.1400304,
+        49.2706948
+       ],
+       [
+        -123.1400377,
+        49.270703
+       ],
+       [
+        -123.1400448,
+        49.2707111
+       ],
+       [
+        -123.1400517,
+        49.2707195
+       ],
+       [
+        -123.1400584,
+        49.2707279
+       ],
+       [
+        -123.1400804,
+        49.2707571
+       ],
+       [
+        -123.1400864,
+        49.2707661
+       ],
+       [
+        -123.1400905,
+        49.2707755
+       ],
+       [
+        -123.140093,
+        49.2707851
+       ],
+       [
+        -123.1400936,
+        49.2707949
+       ],
+       [
+        -123.1400924,
+        49.2708047
+       ],
+       [
+        -123.1400895,
+        49.2708143
+       ],
+       [
+        -123.1400847,
+        49.2708236
+       ],
+       [
+        -123.1400783,
+        49.2708325
+       ],
+       [
+        -123.1400704,
+        49.2708407
+       ],
+       [
+        -123.1400609,
+        49.2708483
+       ],
+       [
+        -123.1400501,
+        49.2708552
+       ],
+       [
+        -123.1400381,
+        49.270861
+       ],
+       [
+        -123.1400264,
+        49.2708664
+       ],
+       [
+        -123.1400155,
+        49.2708723
+       ],
+       [
+        -123.140005,
+        49.2708787
+       ],
+       [
+        -123.1399954,
+        49.2708855
+       ],
+       [
+        -123.1399865,
+        49.2708928
+       ],
+       [
+        -123.1399783,
+        49.2709004
+       ],
+       [
+        -123.139971,
+        49.2709084
+       ],
+       [
+        -123.1399646,
+        49.2709167
+       ],
+       [
+        -123.139959,
+        49.2709253
+       ],
+       [
+        -123.1399543,
+        49.2709341
+       ],
+       [
+        -123.1399506,
+        49.2709431
+       ],
+       [
+        -123.1399479,
+        49.2709523
+       ],
+       [
+        -123.1399462,
+        49.2709615
+       ],
+       [
+        -123.1399454,
+        49.2709708
+       ],
+       [
+        -123.1399455,
+        49.2709801
+       ],
+       [
+        -123.1399468,
+        49.2709894
+       ],
+       [
+        -123.1399489,
+        49.2709986
+       ],
+       [
+        -123.1399521,
+        49.2710077
+       ],
+       [
+        -123.1399562,
+        49.2710167
+       ],
+       [
+        -123.1399612,
+        49.2710254
+       ],
+       [
+        -123.1399671,
+        49.2710338
+       ],
+       [
+        -123.1399802,
+        49.27105
+       ],
+       [
+        -123.1399804,
+        49.2710502
+       ],
+       [
+        -123.140062,
+        49.2710315
+       ],
+       [
+        -123.1402557,
+        49.2712538
+       ],
+       [
+        -123.1405557,
+        49.2711418
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "008943117",
+     "address": "1 Sennok Crescent",
+     "local_area": "Dunbar-Southlands",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 953.8,
+      "perimeter_m": 128.7,
+      "vertices_raw": 38,
+      "vertices": 7,
+      "reflex_corners": 3,
+      "rectangularity": 0.776,
+      "convexity": 0.957,
+      "aspect_ratio": 1.195,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 3.446,
+      "equivalent_rectangle": {
+       "side_a_m": 38.3,
+       "side_b_m": 32.1,
+       "bearing_deg": 164.6
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 6.938,
+      "note": "Irregular: 7 corners, 78% of its 38.3 x 32.1 m bounding rectangle, 954 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.204836,
+        49.2366673
+       ],
+       [
+        -123.2050044,
+        49.2363985
+       ],
+       [
+        -123.2049905,
+        49.2363993
+       ],
+       [
+        -123.2049763,
+        49.2364001
+       ],
+       [
+        -123.2049623,
+        49.2364009
+       ],
+       [
+        -123.2049482,
+        49.2364015
+       ],
+       [
+        -123.2049341,
+        49.236402
+       ],
+       [
+        -123.20492,
+        49.2364025
+       ],
+       [
+        -123.2049059,
+        49.2364028
+       ],
+       [
+        -123.2048917,
+        49.236403
+       ],
+       [
+        -123.2048776,
+        49.2364031
+       ],
+       [
+        -123.2048635,
+        49.236403
+       ],
+       [
+        -123.2048494,
+        49.236403
+       ],
+       [
+        -123.2048353,
+        49.2364027
+       ],
+       [
+        -123.2048211,
+        49.2364024
+       ],
+       [
+        -123.204807,
+        49.236402
+       ],
+       [
+        -123.204793,
+        49.2364015
+       ],
+       [
+        -123.2047788,
+        49.2364009
+       ],
+       [
+        -123.2047648,
+        49.2364002
+       ],
+       [
+        -123.2047507,
+        49.2363993
+       ],
+       [
+        -123.2047366,
+        49.2363983
+       ],
+       [
+        -123.2047226,
+        49.2363973
+       ],
+       [
+        -123.2047086,
+        49.2363961
+       ],
+       [
+        -123.2046946,
+        49.2363949
+       ],
+       [
+        -123.2046806,
+        49.2363935
+       ],
+       [
+        -123.2046667,
+        49.2363921
+       ],
+       [
+        -123.2046527,
+        49.2363905
+       ],
+       [
+        -123.2046388,
+        49.2363888
+       ],
+       [
+        -123.2046249,
+        49.236387
+       ],
+       [
+        -123.2046112,
+        49.2363851
+       ],
+       [
+        -123.2045973,
+        49.2363832
+       ],
+       [
+        -123.2045835,
+        49.236381
+       ],
+       [
+        -123.2045698,
+        49.2363789
+       ],
+       [
+        -123.2045562,
+        49.2363766
+       ],
+       [
+        -123.2045426,
+        49.2363742
+       ],
+       [
+        -123.2045289,
+        49.2363717
+       ],
+       [
+        -123.2045153,
+        49.2363691
+       ],
+       [
+        -123.2043802,
+        49.2365852
+       ],
+       [
+        -123.204836,
+        49.2366673
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "CVGDFEVY",
+     "address": "2799 Renfrew St",
+     "local_area": "Renfrew-Collingwood",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 141.2,
+      "perimeter_m": 42.4,
+      "vertices_raw": 64,
+      "vertices": 64,
+      "reflex_corners": 0,
+      "rectangularity": 0.821,
+      "convexity": 1.0,
+      "aspect_ratio": 1.008,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 8.608,
+      "equivalent_rectangle": {
+       "side_a_m": 13.2,
+       "side_b_m": 13.1,
+       "bearing_deg": 47.3
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 3.947,
+      "note": "Irregular: 64 corners, 82% of its 13.2 x 13.1 m bounding rectangle, 141 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.0454047,
+        49.2588929
+       ],
+       [
+        -123.0454014,
+        49.258886
+       ],
+       [
+        -123.0453976,
+        49.2588794
+       ],
+       [
+        -123.0453933,
+        49.2588731
+       ],
+       [
+        -123.0453887,
+        49.2588671
+       ],
+       [
+        -123.0453835,
+        49.2588615
+       ],
+       [
+        -123.045378,
+        49.2588563
+       ],
+       [
+        -123.0453722,
+        49.2588514
+       ],
+       [
+        -123.0453659,
+        49.2588471
+       ],
+       [
+        -123.0453594,
+        49.2588431
+       ],
+       [
+        -123.0453527,
+        49.2588397
+       ],
+       [
+        -123.0453457,
+        49.2588367
+       ],
+       [
+        -123.0453384,
+        49.2588343
+       ],
+       [
+        -123.0453311,
+        49.2588324
+       ],
+       [
+        -123.0453236,
+        49.258831
+       ],
+       [
+        -123.045316,
+        49.2588302
+       ],
+       [
+        -123.0453085,
+        49.2588299
+       ],
+       [
+        -123.0453009,
+        49.2588302
+       ],
+       [
+        -123.0452933,
+        49.258831
+       ],
+       [
+        -123.0452858,
+        49.2588324
+       ],
+       [
+        -123.0452785,
+        49.2588343
+       ],
+       [
+        -123.0452713,
+        49.2588368
+       ],
+       [
+        -123.0452642,
+        49.2588397
+       ],
+       [
+        -123.0452575,
+        49.2588432
+       ],
+       [
+        -123.045251,
+        49.2588471
+       ],
+       [
+        -123.0452448,
+        49.2588515
+       ],
+       [
+        -123.0452389,
+        49.2588563
+       ],
+       [
+        -123.0452334,
+        49.2588616
+       ],
+       [
+        -123.0452283,
+        49.2588672
+       ],
+       [
+        -123.0452236,
+        49.2588732
+       ],
+       [
+        -123.0452193,
+        49.2588795
+       ],
+       [
+        -123.0452156,
+        49.2588861
+       ],
+       [
+        -123.0452123,
+        49.2588929
+       ],
+       [
+        -123.0452156,
+        49.2588998
+       ],
+       [
+        -123.0452194,
+        49.2589064
+       ],
+       [
+        -123.0452236,
+        49.2589127
+       ],
+       [
+        -123.0452283,
+        49.2589187
+       ],
+       [
+        -123.0452334,
+        49.2589243
+       ],
+       [
+        -123.0452389,
+        49.2589295
+       ],
+       [
+        -123.0452448,
+        49.2589344
+       ],
+       [
+        -123.045251,
+        49.2589388
+       ],
+       [
+        -123.0452575,
+        49.2589427
+       ],
+       [
+        -123.0452643,
+        49.2589461
+       ],
+       [
+        -123.0452713,
+        49.2589491
+       ],
+       [
+        -123.0452785,
+        49.2589515
+       ],
+       [
+        -123.0452859,
+        49.2589534
+       ],
+       [
+        -123.0452933,
+        49.2589548
+       ],
+       [
+        -123.0453009,
+        49.2589556
+       ],
+       [
+        -123.0453085,
+        49.2589559
+       ],
+       [
+        -123.0453161,
+        49.2589556
+       ],
+       [
+        -123.0453237,
+        49.2589548
+       ],
+       [
+        -123.0453311,
+        49.2589534
+       ],
+       [
+        -123.0453385,
+        49.2589515
+       ],
+       [
+        -123.0453457,
+        49.258949
+       ],
+       [
+        -123.0453527,
+        49.2589461
+       ],
+       [
+        -123.0453595,
+        49.2589426
+       ],
+       [
+        -123.045366,
+        49.2589387
+       ],
+       [
+        -123.0453722,
+        49.2589343
+       ],
+       [
+        -123.0453781,
+        49.2589295
+       ],
+       [
+        -123.0453836,
+        49.2589242
+       ],
+       [
+        -123.0453887,
+        49.2589186
+       ],
+       [
+        -123.0453934,
+        49.2589126
+       ],
+       [
+        -123.0453976,
+        49.2589063
+       ],
+       [
+        -123.0454014,
+        49.2588997
+       ],
+       [
+        -123.0454047,
+        49.2588929
+       ]
+      ]
+     ]
+    },
+    {
+     "site_id": "010922504",
+     "address": "1990 Sasamat Place",
+     "local_area": "West Point Grey",
+     "metrics": {
+      "class": "irregular",
+      "area_m2": 661.9,
+      "perimeter_m": 113.6,
+      "vertices_raw": 25,
+      "vertices": 18,
+      "reflex_corners": 9,
+      "rectangularity": 0.671,
+      "convexity": 0.906,
+      "aspect_ratio": 1.068,
+      "rings": 1,
+      "outer_rings": 1,
+      "holes": 0,
+      "narrowest_cross_section_m": 4.834,
+      "equivalent_rectangle": {
+       "side_a_m": 30.4,
+       "side_b_m": 32.5,
+       "bearing_deg": 88.6
+      },
+      "flag": null,
+      "confidence": 1.0,
+      "alternative": null,
+      "margin": 13.9,
+      "note": "Irregular: 18 corners, 67% of its 32.5 x 30.4 m bounding rectangle, 662 m2."
+     },
+     "ring_lonlat": [
+      [
+       [
+        -123.2078801,
+        49.2693777
+       ],
+       [
+        -123.2078837,
+        49.2693675
+       ],
+       [
+        -123.2078836,
+        49.2693568
+       ],
+       [
+        -123.2078797,
+        49.2693466
+       ],
+       [
+        -123.2078724,
+        49.2693373
+       ],
+       [
+        -123.2078621,
+        49.2693292
+       ],
+       [
+        -123.2077215,
+        49.269239
+       ],
+       [
+        -123.2077113,
+        49.2692321
+       ],
+       [
+        -123.2077016,
+        49.2692249
+       ],
+       [
+        -123.2076925,
+        49.2692174
+       ],
+       [
+        -123.2076841,
+        49.2692095
+       ],
+       [
+        -123.2076762,
+        49.2692014
+       ],
+       [
+        -123.2076691,
+        49.2691931
+       ],
+       [
+        -123.2076624,
+        49.2691844
+       ],
+       [
+        -123.2076566,
+        49.2691756
+       ],
+       [
+        -123.2076513,
+        49.2691667
+       ],
+       [
+        -123.2076469,
+        49.2691576
+       ],
+       [
+        -123.2076432,
+        49.2691482
+       ],
+       [
+        -123.2076402,
+        49.2691389
+       ],
+       [
+        -123.207638,
+        49.2691293
+       ],
+       [
+        -123.2076364,
+        49.2691198
+       ],
+       [
+        -123.2076357,
+        49.2691103
+       ],
+       [
+        -123.2076357,
+        49.2691007
+       ],
+       [
+        -123.2074473,
+        49.2690978
+       ],
+       [
+        -123.2074375,
+        49.2693709
+       ],
+       [
+        -123.2078801,
+        49.2693777
        ]
       ]
      ]
@@ -12783,7 +13906,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 37.0,
+      "margin": 35.7,
       "note": "4 separate pieces, 282 m2 in all; the tool reads the largest (282 m2) only."
      },
      "ring_lonlat": [
@@ -13455,7 +14578,7 @@
       "flag": null,
       "confidence": 1.0,
       "alternative": null,
-      "margin": 27.5,
+      "margin": 26.2,
       "note": "2 separate pieces, 1,271 m2 in all; the tool reads the largest (1,271 m2) only."
      },
      "ring_lonlat": [

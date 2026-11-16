@@ -1,0 +1,1758 @@
+{
+ "labelled_by": "KS",
+ "labelled_on": "2026-11-15",
+ "source": "evals/parcels/uncertain.json",
+ "labels": [
+  {
+   "site_id": "018352553",
+   "address": "2055 Glen Drive",
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "label": "other: check that this is actually a correct parcel... it looks like its right next to skytrain.",
+   "note": "check that this is actually a correct parcel... it looks like its right next to skytrain.",
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 0,
+     "to_point": 1,
+     "from": [
+      -123.0814544,
+      49.2663777
+     ],
+     "to": [
+      -123.0814598,
+      49.2665582
+     ],
+     "segments": 1,
+     "length_m": 20,
+     "chord_bearing_deg": 358.9,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    5,
+    12,
+    15
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "005094801",
+   "address": "4411 Brakenridge St",
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "label": "trapezoid",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 26,
+     "to_point": 27,
+     "from": [
+      -123.1604989,
+      49.2469828
+     ],
+     "to": [
+      -123.1608839,
+      49.246833
+     ],
+     "segments": 1,
+     "length_m": 32.5,
+     "chord_bearing_deg": 239.4,
+     "runs": "NE–SW"
+    },
+    {
+     "role": "cross_street",
+     "edge": 1,
+     "from_point": 2,
+     "to_point": 26,
+     "from": [
+      -123.1603142,
+      49.2468018
+     ],
+     "to": [
+      -123.1604989,
+      49.2469828
+     ],
+     "segments": 24,
+     "length_m": 24.1,
+     "chord_bearing_deg": 326.1,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    2,
+    26,
+    27,
+    28
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011004673",
+   "address": "1568 W 32nd Ave",
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "label": "trapezoid",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 1,
+     "to_point": 34,
+     "from": [
+      -123.1406983,
+      49.2429213
+     ],
+     "to": [
+      -123.1411191,
+      49.2428427
+     ],
+     "segments": 33,
+     "length_m": 31.8,
+     "chord_bearing_deg": 254.1,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    34,
+    35,
+    36
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "010088075",
+   "address": "4788 Hudson St",
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "label": "trapezoid",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 3,
+     "to_point": 26,
+     "from": [
+      -123.134828,
+      49.2429987
+     ],
+     "to": [
+      -123.1346872,
+      49.2428275
+     ],
+     "segments": 23,
+     "length_m": 21.5,
+     "chord_bearing_deg": 151.6,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    3,
+    26
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "009486275",
+   "address": "4326 Angus Drive",
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "label": "trapezoid",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 4,
+     "to_point": 27,
+     "from": [
+      -123.1459696,
+      49.2472092
+     ],
+     "to": [
+      -123.1459243,
+      49.2470113
+     ],
+     "segments": 23,
+     "length_m": 22.1,
+     "chord_bearing_deg": 171.4,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    2,
+    3,
+    4,
+    27
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011132451",
+   "address": "3578 Quesnel Drive",
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "label": "trapezoid",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 3,
+     "to_point": 0,
+     "from": [
+      -123.1769605,
+      49.2549645
+     ],
+     "to": [
+      -123.1767757,
+      49.2548693
+     ],
+     "segments": 19,
+     "length_m": 17.1,
+     "chord_bearing_deg": 128.1,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "009423052",
+   "address": "6488 Nanaimo St",
+   "best_guess": "irregular",
+   "runner_up": "trapezoid",
+   "label": "trapezoid",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 0,
+     "to_point": 1,
+     "from": [
+      -123.0589904,
+      49.225283
+     ],
+     "to": [
+      -123.0589939,
+      49.2251444
+     ],
+     "segments": 1,
+     "length_m": 15.3,
+     "chord_bearing_deg": 181,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    8,
+    9
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "010585541",
+   "address": "2624 W 3rd Ave",
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 5,
+     "from_point": 6,
+     "to_point": 7,
+     "from": [
+      -123.1649451,
+      49.2691197
+     ],
+     "to": [
+      -123.1650833,
+      49.2691218
+     ],
+     "segments": 1,
+     "length_m": 10,
+     "chord_bearing_deg": 271.3,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3,
+    6,
+    7
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "013281640",
+   "address": "2027 W 35th Ave",
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "label": "irregular",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 18,
+     "to_point": 19,
+     "from": [
+      -123.152718,
+      49.2401327
+     ],
+     "to": [
+      -123.1524583,
+      49.2401288
+     ],
+     "segments": 1,
+     "length_m": 18.9,
+     "chord_bearing_deg": 91.3,
+     "runs": "E–W"
+    },
+    {
+     "role": "cross_street",
+     "edge": 6,
+     "from_point": 23,
+     "to_point": 16,
+     "from": [
+      -123.1524876,
+      49.2407213
+     ],
+     "to": [
+      -123.1526965,
+      49.2407287
+     ],
+     "segments": 17,
+     "length_m": 15.2,
+     "chord_bearing_deg": 273.1,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    16,
+    18,
+    19,
+    21,
+    22,
+    23
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "010945784",
+   "address": "3864 W Broadway",
+   "best_guess": "rectangle",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 1,
+     "to_point": 17,
+     "from": [
+      -123.1897157,
+      49.2643598
+     ],
+     "to": [
+      -123.1899226,
+      49.2643783
+     ],
+     "segments": 16,
+     "length_m": 15.2,
+     "chord_bearing_deg": 277.7,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    17,
+    18,
+    20
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "025467697",
+   "address": "1599 Glen Drive",
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "label": "irregular",
+   "note": "double check that this is actually a parcel",
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 19,
+     "to_point": 20,
+     "from": [
+      -123.0815674,
+      49.2700272
+     ],
+     "to": [
+      -123.0815863,
+      49.2706376
+     ],
+     "segments": 1,
+     "length_m": 67.5,
+     "chord_bearing_deg": 358.8,
+     "runs": "N–S"
+    },
+    {
+     "role": "cross_street",
+     "edge": 3,
+     "from_point": 18,
+     "to_point": 19,
+     "from": [
+      -123.0817349,
+      49.2700249
+     ],
+     "to": [
+      -123.0815674,
+      49.2700272
+     ],
+     "segments": 1,
+     "length_m": 12.2,
+     "chord_bearing_deg": 88.8,
+     "runs": "E–W"
+    },
+    {
+     "role": "cross_street",
+     "edge": 5,
+     "from_point": 20,
+     "to_point": 21,
+     "from": [
+      -123.0815863,
+      49.2706376
+     ],
+     "to": [
+      -123.0817521,
+      49.2707747
+     ],
+     "segments": 1,
+     "length_m": 19.4,
+     "chord_bearing_deg": 321.5,
+     "runs": "NW–SE"
+    },
+    {
+     "role": "cross_street",
+     "edge": 6,
+     "from_point": 21,
+     "to_point": 0,
+     "from": [
+      -123.0817521,
+      49.2707747
+     ],
+     "to": [
+      -123.0818068,
+      49.2707839
+     ],
+     "segments": 2,
+     "length_m": 4.1,
+     "chord_bearing_deg": 284.4,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    0,
+    13,
+    18,
+    19,
+    20,
+    21
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "008040117",
+   "address": "1598 Matthews Ave",
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "label": null,
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 40,
+     "to_point": 41,
+     "from": [
+      -123.1420552,
+      49.2524956
+     ],
+     "to": [
+      -123.1417061,
+      49.2522073
+     ],
+     "segments": 1,
+     "length_m": 40.7,
+     "chord_bearing_deg": 141.5,
+     "runs": "NW–SE"
+    },
+    {
+     "role": "cross_street",
+     "edge": 3,
+     "from_point": 4,
+     "to_point": 40,
+     "from": [
+      -123.1416366,
+      49.252659
+     ],
+     "to": [
+      -123.1420552,
+      49.2524956
+     ],
+     "segments": 36,
+     "length_m": 35.4,
+     "chord_bearing_deg": 239.3,
+     "runs": "NE–SW"
+    }
+   ],
+   "corners": [
+    1,
+    3,
+    4,
+    40,
+    41
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011027495",
+   "address": "1367 Devonshire Crescent",
+   "best_guess": "rectangle",
+   "runner_up": "near_rectangle",
+   "label": "rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 4,
+     "to_point": 26,
+     "from": [
+      -123.1362113,
+      49.2464355
+     ],
+     "to": [
+      -123.135943,
+      49.2463654
+     ],
+     "segments": 22,
+     "length_m": 21,
+     "chord_bearing_deg": 111.7,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    4,
+    26
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "008562881",
+   "address": "3444 E 51st Ave",
+   "best_guess": "trapezoid",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 18,
+     "from": [
+      -123.0309244,
+      49.2225774
+     ],
+     "to": [
+      -123.0311109,
+      49.2226397
+     ],
+     "segments": 17,
+     "length_m": 15.2,
+     "chord_bearing_deg": 296.9,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    18,
+    19
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "010039392",
+   "address": "2388 Harrison Drive",
+   "best_guess": "trapezoid",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 5,
+     "to_point": 0,
+     "from": [
+      -123.056951,
+      49.2095664
+     ],
+     "to": [
+      -123.0570205,
+      49.2094621
+     ],
+     "segments": 14,
+     "length_m": 12.6,
+     "chord_bearing_deg": 203.7,
+     "runs": "NE–SW"
+    }
+   ],
+   "corners": [
+    0,
+    2,
+    3,
+    5
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "007569084",
+   "address": "4890 Hudson St",
+   "best_guess": "rectangle",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 18,
+     "to_point": 0,
+     "from": [
+      -123.1344281,
+      49.2417924
+     ],
+     "to": [
+      -123.1341513,
+      49.2417822
+     ],
+     "segments": 2,
+     "length_m": 20.1,
+     "chord_bearing_deg": 93.2,
+     "runs": "E–W"
+    },
+    {
+     "role": "cross_street",
+     "edge": 3,
+     "from_point": 3,
+     "to_point": 18,
+     "from": [
+      -123.1344229,
+      49.2421352
+     ],
+     "to": [
+      -123.1344281,
+      49.2417924
+     ],
+     "segments": 15,
+     "length_m": 37.9,
+     "chord_bearing_deg": 180.6,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    2,
+    3,
+    18
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "005271762",
+   "address": "4366 Quesnel Drive",
+   "best_guess": "trapezoid",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 17,
+     "to_point": 28,
+     "from": [
+      -123.1690465,
+      49.2474462
+     ],
+     "to": [
+      -123.1689482,
+      49.2473829
+     ],
+     "segments": 11,
+     "length_m": 10,
+     "chord_bearing_deg": 134.4,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    2,
+    15,
+    17,
+    28
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "016913086",
+   "address": "1644 Nelson St",
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "label": "irregular",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 4,
+     "to_point": 5,
+     "from": [
+      -123.1358698,
+      49.2874573
+     ],
+     "to": [
+      -123.1366557,
+      49.287966
+     ],
+     "segments": 1,
+     "length_m": 80.1,
+     "chord_bearing_deg": 314.6,
+     "runs": "NW–SE"
+    },
+    {
+     "role": "cross_street",
+     "edge": 1,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.1360588,
+      49.2870746
+     ],
+     "to": [
+      -123.1358661,
+      49.2872021
+     ],
+     "segments": 1,
+     "length_m": 19.9,
+     "chord_bearing_deg": 44.8,
+     "runs": "NE–SW"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "028218990",
+   "address": "2999 Point Grey Road",
+   "best_guess": "near_rectangle",
+   "runner_up": "rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 8,
+     "to_point": 9,
+     "from": [
+      -123.1716255,
+      49.2711784
+     ],
+     "to": [
+      -123.1712382,
+      49.2711736
+     ],
+     "segments": 1,
+     "length_m": 28.1,
+     "chord_bearing_deg": 91.1,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    7,
+    8,
+    9
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "010018484",
+   "address": "2141 Scarboro Ave",
+   "best_guess": "trapezoid",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 3,
+     "to_point": 17,
+     "from": [
+      -123.0630044,
+      49.2136554
+     ],
+     "to": [
+      -123.062819,
+      49.2136324
+     ],
+     "segments": 14,
+     "length_m": 13.7,
+     "chord_bearing_deg": 100.7,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    3,
+    17
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "003384543",
+   "address": "4146 Crown Crescent",
+   "best_guess": "near_rectangle",
+   "runner_up": "rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 2,
+     "to_point": 15,
+     "from": [
+      -123.1979596,
+      49.2644285
+     ],
+     "to": [
+      -123.1981904,
+      49.2644067
+     ],
+     "segments": 13,
+     "length_m": 16.9,
+     "chord_bearing_deg": 261.8,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    2,
+    15,
+    17,
+    18
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011532769",
+   "address": "1053 Douglas Crescent",
+   "best_guess": "near_rectangle",
+   "runner_up": "rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 36,
+     "to_point": 33,
+     "from": [
+      -123.1285194,
+      49.2546421
+     ],
+     "to": [
+      -123.1280861,
+      49.254563
+     ],
+     "segments": 34,
+     "length_m": 32.7,
+     "chord_bearing_deg": 105.5,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    33,
+    34,
+    35,
+    36
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "010033726",
+   "address": "2311 Burquitlam Drive",
+   "best_guess": "trapezoid",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 4,
+     "to_point": 0,
+     "from": [
+      -123.0597709,
+      49.2096608
+     ],
+     "to": [
+      -123.0595663,
+      49.2096485
+     ],
+     "segments": 17,
+     "length_m": 14.9,
+     "chord_bearing_deg": 95.2,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    4
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011093153",
+   "address": "4376 Quesnel Drive",
+   "best_guess": "trapezoid",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 3,
+     "from_point": 17,
+     "to_point": 28,
+     "from": [
+      -123.1688704,
+      49.2473268
+     ],
+     "to": [
+      -123.1687837,
+      49.2472567
+     ],
+     "segments": 11,
+     "length_m": 10,
+     "chord_bearing_deg": 140.9,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    2,
+    15,
+    17,
+    28
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "014999030",
+   "address": "1928 Venables St",
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "label": "l_shape",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.0647907,
+      49.2765336
+     ],
+     "to": [
+      -123.0649288,
+      49.2765346
+     ],
+     "segments": 1,
+     "length_m": 10,
+     "chord_bearing_deg": 270.6,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    4,
+    5,
+    6
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "015147924",
+   "address": "1423 Grant St",
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 0,
+     "to_point": 1,
+     "from": [
+      -123.0755501,
+      49.2715889
+     ],
+     "to": [
+      -123.0746276,
+      49.2715849
+     ],
+     "segments": 1,
+     "length_m": 67,
+     "chord_bearing_deg": 90.4,
+     "runs": "E–W"
+    },
+    {
+     "role": "cross_street",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.0746276,
+      49.2715849
+     ],
+     "to": [
+      -123.0746209,
+      49.272103
+     ],
+     "segments": 1,
+     "length_m": 57.3,
+     "chord_bearing_deg": 0.5,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    7
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "008521786",
+   "address": "303 Vernon Drive",
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "label": "irregular",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.0792847,
+      49.2814518
+     ],
+     "to": [
+      -123.0792723,
+      49.2818493
+     ],
+     "segments": 1,
+     "length_m": 43.9,
+     "chord_bearing_deg": 1.2,
+     "runs": "N–S"
+    },
+    {
+     "role": "cross_street",
+     "edge": 3,
+     "from_point": 3,
+     "to_point": 4,
+     "from": [
+      -123.0811278,
+      49.2818669
+     ],
+     "to": [
+      -123.0811326,
+      49.2816573
+     ],
+     "segments": 1,
+     "length_m": 23.2,
+     "chord_bearing_deg": 180.9,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "017973988",
+   "address": "450 Se Marine Drive",
+   "best_guess": "l_shape",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 6,
+     "from_point": 5,
+     "to_point": 0,
+     "from": [
+      -123.0941376,
+      49.2108918
+     ],
+     "to": [
+      -123.0949965,
+      49.2109183
+     ],
+     "segments": 2,
+     "length_m": 62.5,
+     "chord_bearing_deg": 272.7,
+     "runs": "E–W"
+    },
+    {
+     "role": "cross_street",
+     "edge": 5,
+     "from_point": 4,
+     "to_point": 5,
+     "from": [
+      -123.0941881,
+      49.20918
+     ],
+     "to": [
+      -123.0941376,
+      49.2108918
+     ],
+     "segments": 1,
+     "length_m": 189.3,
+     "chord_bearing_deg": 1.1,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "023074183",
+   "address": "1307 Nanton Ave",
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "label": "irregular",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 14,
+     "from": [
+      -123.1352375,
+      49.2471049
+     ],
+     "to": [
+      -123.1345882,
+      49.2467747
+     ],
+     "segments": 13,
+     "length_m": 59.7,
+     "chord_bearing_deg": 127.7,
+     "runs": "NW–SE"
+    },
+    {
+     "role": "cross_street",
+     "edge": 3,
+     "from_point": 14,
+     "to_point": 15,
+     "from": [
+      -123.1345882,
+      49.2467747
+     ],
+     "to": [
+      -123.13458,
+      49.2469948
+     ],
+     "segments": 1,
+     "length_m": 24.3,
+     "chord_bearing_deg": 1.4,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    14,
+    15,
+    16
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011491973",
+   "address": "4129 Quesnel Drive",
+   "best_guess": "irregular",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.1718723,
+      49.2494675
+     ],
+     "to": [
+      -123.1719664,
+      49.2495901
+     ],
+     "segments": 1,
+     "length_m": 15.2,
+     "chord_bearing_deg": 333.2,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "006732810",
+   "address": "61 E 27th Ave",
+   "best_guess": "l_shape",
+   "runner_up": "irregular",
+   "label": null,
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 6,
+     "from_point": 6,
+     "to_point": 0,
+     "from": [
+      -123.1040897,
+      49.2473862
+     ],
+     "to": [
+      -123.1038842,
+      49.247383
+     ],
+     "segments": 2,
+     "length_m": 14.9,
+     "chord_bearing_deg": 91.4,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    0,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011076488",
+   "address": "6891 Laburnum St",
+   "best_guess": "irregular",
+   "runner_up": "near_rectangle",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 5,
+     "from_point": 7,
+     "to_point": 8,
+     "from": [
+      -123.1520032,
+      49.2232096
+     ],
+     "to": [
+      -123.1519111,
+      49.2230545
+     ],
+     "segments": 1,
+     "length_m": 18.4,
+     "chord_bearing_deg": 158.7,
+     "runs": "N–S"
+    },
+    {
+     "role": "cross_street",
+     "edge": 1,
+     "from_point": 2,
+     "to_point": 3,
+     "from": [
+      -123.1511408,
+      49.2230465
+     ],
+     "to": [
+      -123.1511338,
+      49.2232274
+     ],
+     "segments": 1,
+     "length_m": 20,
+     "chord_bearing_deg": 1.5,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    2,
+    3,
+    5,
+    6,
+    7,
+    8
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "018014011",
+   "address": "4465 W 3rd Ave",
+   "best_guess": "irregular",
+   "runner_up": "near_rectangle",
+   "label": "irregular",
+   "note": "this parcel does not look right. double check.",
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.2078167,
+      49.2704753
+     ],
+     "to": [
+      -123.2076744,
+      49.2704728
+     ],
+     "segments": 1,
+     "length_m": 10.3,
+     "chord_bearing_deg": 91.5,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    4,
+    5,
+    7,
+    8
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011187727",
+   "address": "8183 Laburnum St",
+   "best_guess": "near_rectangle",
+   "runner_up": "irregular",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 2,
+     "to_point": 28,
+     "from": [
+      -123.149143,
+      49.2119422
+     ],
+     "to": [
+      -123.1494239,
+      49.2120671
+     ],
+     "segments": 26,
+     "length_m": 24.7,
+     "chord_bearing_deg": 304.1,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    28,
+    29
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011069350",
+   "address": "3626 Main St",
+   "best_guess": "flag_lot",
+   "runner_up": "l_shape",
+   "label": "other",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 6,
+     "from_point": 5,
+     "to_point": 0,
+     "from": [
+      -123.1007554,
+      49.2524083
+     ],
+     "to": [
+      -123.1007601,
+      49.2522891
+     ],
+     "segments": 2,
+     "length_m": 13.2,
+     "chord_bearing_deg": 181.5,
+     "runs": "N–S"
+    },
+    {
+     "role": "cross_street",
+     "edge": 4,
+     "from_point": 3,
+     "to_point": 4,
+     "from": [
+      -123.1004083,
+      49.2523682
+     ],
+     "to": [
+      -123.100407,
+      49.2524032
+     ],
+     "segments": 1,
+     "length_m": 3.9,
+     "chord_bearing_deg": 1.4,
+     "runs": "N–S"
+    },
+    {
+     "role": "cross_street",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.1005506,
+      49.2522839
+     ],
+     "to": [
+      -123.1005474,
+      49.2523703
+     ],
+     "segments": 1,
+     "length_m": 9.6,
+     "chord_bearing_deg": 1.4,
+     "runs": "N–S"
+    },
+    {
+     "role": "cross_street",
+     "edge": 3,
+     "from_point": 2,
+     "to_point": 3,
+     "from": [
+      -123.1005474,
+      49.2523703
+     ],
+     "to": [
+      -123.1004083,
+      49.2523682
+     ],
+     "segments": 1,
+     "length_m": 10.1,
+     "chord_bearing_deg": 91.3,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011221488",
+   "address": "6875 Balsam St",
+   "best_guess": "l_shape",
+   "runner_up": "flag_lot",
+   "label": "near_rectangle",
+   "note": null,
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 1,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.1615397,
+      49.2236237
+     ],
+     "to": [
+      -123.1615317,
+      49.2238432
+     ],
+     "segments": 1,
+     "length_m": 24.3,
+     "chord_bearing_deg": 1.4,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "015036499",
+   "address": "2938 W 39th Ave",
+   "best_guess": "l_shape",
+   "runner_up": "flag_lot",
+   "label": "other: dohble check the parcel",
+   "note": "dohble check the parcel",
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 2,
+     "from_point": 2,
+     "to_point": 3,
+     "from": [
+      -123.1712486,
+      49.2365327
+     ],
+     "to": [
+      -123.1713866,
+      49.2365332
+     ],
+     "segments": 1,
+     "length_m": 10,
+     "chord_bearing_deg": 270.3,
+     "runs": "E–W"
+    }
+   ],
+   "corners": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "025028774",
+   "address": "7500 Angus Drive",
+   "best_guess": "trapezoid",
+   "runner_up": "l_shape",
+   "label": "other: this does not look like a correct site. double check.",
+   "note": "this does not look like a correct site. double check.",
+   "frontage_edges": [],
+   "corners": [
+    0,
+    3,
+    7,
+    8,
+    11,
+    18
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "015411524",
+   "address": "1112 W Pender St",
+   "best_guess": "irregular",
+   "runner_up": "flag_lot",
+   "label": null,
+   "note": "double check this parcel. it looks incorrect.",
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 4,
+     "from_point": 3,
+     "to_point": 4,
+     "from": [
+      -123.1207065,
+      49.2874886
+     ],
+     "to": [
+      -123.120911,
+      49.2875484
+     ],
+     "segments": 1,
+     "length_m": 16.3,
+     "chord_bearing_deg": 294,
+     "runs": "NW–SE"
+    },
+    {
+     "role": "cross_street",
+     "edge": 2,
+     "from_point": 1,
+     "to_point": 2,
+     "from": [
+      -123.1208472,
+      49.2873597
+     ],
+     "to": [
+      -123.1206982,
+      49.2874582
+     ],
+     "segments": 1,
+     "length_m": 15.3,
+     "chord_bearing_deg": 44.8,
+     "runs": "NE–SW"
+    },
+    {
+     "role": "cross_street",
+     "edge": 6,
+     "from_point": 5,
+     "to_point": 6,
+     "from": [
+      -123.1209746,
+      49.2874554
+     ],
+     "to": [
+      -123.1212284,
+      49.2875276
+     ],
+     "segments": 1,
+     "length_m": 20.1,
+     "chord_bearing_deg": 293.4,
+     "runs": "NW–SE"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  },
+  {
+   "site_id": "011537833",
+   "address": "3790 Cypress St",
+   "best_guess": "irregular",
+   "runner_up": "flag_lot",
+   "label": "irregular",
+   "note": "check this site. it looks incorrect/",
+   "frontage_edges": [
+    {
+     "role": "frontage",
+     "edge": 10,
+     "from_point": 11,
+     "to_point": 0,
+     "from": [
+      -123.1484405,
+      49.2523081
+     ],
+     "to": [
+      -123.1484782,
+      49.2518749
+     ],
+     "segments": 2,
+     "length_m": 48,
+     "chord_bearing_deg": 183.3,
+     "runs": "N–S"
+    }
+   ],
+   "corners": [
+    0,
+    1,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    11
+   ],
+   "edge_numbering": "edges run between consecutive corners (Douglas-Peucker at 1.6 m on the published ring, cyclic); from_point and to_point are 0-based indices into ring_lonlat"
+  }
+ ],
+ "how_saved": "Read out of the label page in the Claude app browser pane on 15 Nov 2026 (the same object the Download button writes), checked against the page by length and hash."
+}

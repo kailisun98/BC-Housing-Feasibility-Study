@@ -356,9 +356,12 @@ Built and verified in the browser:
   parcel" clears it. The next run reproduces the drawn lot and the memo says "boundary drawn by hand". The
   handles are wired to the SVG each time it is refitted (`wireBoundaryCanvas` from `fit`), because a refit
   replaces the element.
-- Still open: the five most ambiguous parcels (2303 Wall St, 2055 Glen Dr, 4411 Brakenridge St, 1568 W 32nd
-  Ave, 4788 Hudson St) and the rest of `uncertain.json` wait for Kai's labels; the thresholds are then checked
-  against them. Which of 2,712 and 3,908 m² is the Expo development site is a question for a person.
+- Labelled (15 Nov 2026): `evals/parcels/labels.json` is Kai's pass over the 40 (33 classed, 4 "other", 3 blank,
+  39 frontage edges). `score_labels.py` and `score_frontage.py` beside it score the classifier and the frontage
+  rule; the labels moved the near-rectangle line to 0.88 and added the five-cornered convex trapezoid (8 → 21 of
+  33 right; the frontage rule 34 of 39). `uncertain.json` is frozen as the labelled set. The L rule is not
+  settled by the labels (one of ten L guesses confirmed). Which of 2,712 and 3,908 m² is the Expo development
+  site is a question for a person.
 
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 

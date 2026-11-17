@@ -15,13 +15,13 @@
 <line x1="506.4170003079766" y1="129" x2="886.4170003079767" y2="129" stroke="#e1e5ea" stroke-width="0.8"/>
 <text x="506.4170003079766" y="124" font-size="11" fill="#5f6672">Floor space ratio</text>
 <text x="616.4170003079767" y="124" font-size="11">2.46 (9,600 m²)</text>
-<text x="756.4170003079767" y="124" font-size="11" fill="#5f6672">no schedule in the stack</text>
-<text x="836.4170003079767" y="124" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<text x="756.4170003079767" y="124" font-size="11" fill="#5f6672">6.04 outright</text>
+<text x="836.4170003079767" y="124" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
 <line x1="506.4170003079766" y1="147" x2="886.4170003079767" y2="147" stroke="#e1e5ea" stroke-width="0.8"/>
 <text x="506.4170003079766" y="142" font-size="11" fill="#5f6672">Height</text>
 <text x="616.4170003079767" y="142" font-size="11">36.6 m, 12 storeys</text>
-<text x="756.4170003079767" y="142" font-size="11" fill="#5f6672">no schedule in the stack</text>
-<text x="836.4170003079767" y="142" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<text x="756.4170003079767" y="142" font-size="11" fill="#5f6672">91.0 m outright</text>
+<text x="836.4170003079767" y="142" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
 <line x1="506.4170003079766" y1="165" x2="886.4170003079767" y2="165" stroke="#e1e5ea" stroke-width="0.8"/>
 <text x="506.4170003079766" y="160" font-size="11" fill="#5f6672">Site coverage</text>
 <text x="616.4170003079767" y="160" font-size="11">20% (800 m²)</text>
@@ -49,7 +49,7 @@
 <text x="836.4170003079767" y="232" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
 <line x1="506.4170003079766" y1="255" x2="886.4170003079767" y2="255" stroke="#e1e5ea" stroke-width="0.8"/>
 <text x="506.4170003079766" y="250" font-size="11" fill="#5f6672">Allowed</text>
-<text x="616.4170003079767" y="250" font-size="11">outright: not assessed; by rezoning: not yet confirmed</text>
+<text x="616.4170003079767" y="250" font-size="11">outright: yes; by rezoning: not yet confirmed</text>
 <text x="756.4170003079767" y="250" font-size="11" fill="#5f6672">False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program</text>
-<text x="48.0" y="604.0" fill="#1f2933">Rules as of 2026-10-23 · stamp f04c09783591820f · derived by ffm from the option and the massing, not a design</text>
+<text x="48.0" y="604.0" fill="#1f2933">Rules as of 2026-10-23 · stamp 8edfb9e62179aa68 · derived by ffm from the option and the massing, not a design</text>
 </svg>

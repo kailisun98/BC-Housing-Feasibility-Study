@@ -1,6 +1,6 @@
 {
-  "previous_stamp": "f04c09783591820f",
-  "current_stamp": "f04c09783591820f",
+  "previous_stamp": "8edfb9e62179aa68",
+  "current_stamp": "8edfb9e62179aa68",
   "previous_as_of": "2026-10-23",
   "current_as_of": "2026-10-23",
   "rules_changed": false,
@@ -34,6 +34,20 @@
       "from": "info",
       "to": "info",
       "finding": "BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 80 m² gross per unit, so net areas should be checked at the plan stage."
+    },
+    {
+      "rule_id": "cov.cd1_324.floor_area",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "Residential floor area 9,600 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 2.46 on 3,908.0 m²)."
+    },
+    {
+      "rule_id": "cov.cd1_324.outright_height",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "Height 36.6 m is within the outright maximum of 91.0 m."
     },
     {
       "rule_id": "cov.family_units",

@@ -2,7 +2,7 @@
   "site_id": "1010-expo-blvd",
   "option_id": "1010-expo-blvd-as-permitted",
   "as_of": "2026-10-23",
-  "stamp": "f04c09783591820f",
+  "stamp": "8edfb9e62179aa68",
   "units": "m",
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
@@ -2612,9 +2612,12 @@
   ],
   "shortfall": [],
   "outright": {
-    "fsr": null,
-    "height_m": null,
-    "rule_ids": []
+    "fsr": 6.04,
+    "height_m": 91.0,
+    "rule_ids": [
+      "cov.cd1_324.floor_area",
+      "cov.cd1_324.outright_height"
+    ]
   },
   "capacity": {
     "site_area_m2": 3908.0,
@@ -2622,11 +2625,11 @@
     "plate_m2": 800.5,
     "gfa_m2": 23215.0,
     "fsr": 5.94,
-    "fsr_limit": null,
-    "limit_from": null,
-    "rule_id": null,
-    "room_m2": null,
-    "levels_room": null,
+    "fsr_limit": 6.04,
+    "limit_from": "the district schedule's outright maximum",
+    "rule_id": "cov.cd1_324.floor_area",
+    "room_m2": 389.3,
+    "levels_room": 0,
     "fsr_with_one_more": 6.145
   },
   "totals": {

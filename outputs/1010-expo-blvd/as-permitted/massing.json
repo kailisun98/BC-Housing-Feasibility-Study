@@ -4,7 +4,7 @@
   "site_id": "1010-expo-blvd",
   "option_id": "1010-expo-blvd-as-permitted",
   "as_of": "2026-10-23",
-  "stamp": "f04c09783591820f",
+  "stamp": "8edfb9e62179aa68",
   "lot": {
     "polygon": [
       [
@@ -576,6 +576,44 @@
       "derived_from": [
         "option.gfa_m2",
         "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    },
+    {
+      "name": "outright",
+      "label": "Outright: FSR 6.04, 91.0 m",
+      "footprint": [
+        [
+          8.29,
+          2.45
+        ],
+        [
+          39.79,
+          2.45
+        ],
+        [
+          39.79,
+          28.289
+        ],
+        [
+          8.29,
+          28.289
+        ]
+      ],
+      "plate_width_m": 31.5,
+      "plate_depth_m": 25.84,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 88.45,
+      "storeys": 29,
+      "floor_to_floor_m": 3.05,
+      "plate_area_m2": 813.9,
+      "gfa_m2": 23604.3,
+      "fsr": 6.04,
+      "derived_from": [
+        "cov.cd1_324.floor_area",
+        "cov.cd1_324.outright_height",
         "option.setbacks_m",
         "option.floor_to_floor_m"
       ]

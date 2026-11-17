@@ -81,7 +81,11 @@ const FIELDS = [
   // the front of a corner lot: asked at stop 1 only where the lookup found two streets; not a schedule row
   { on: "site", key: "front_street", label: "Which street is the front", type: "select", need: "rule", ref: "drawings",
     ask: { stop: 1, q: "Which street is the front?", who: "you, or the architect confirms it", when: site => cornerStreets(site).length > 0 },
-    info: "The front street sets the yards, the envelope and the massing; choosing the other street swaps the frontage and the depth." },
+    info: "The front street sets the yards, the envelope and the massing; choosing the other street turns the lot to it (the site's front_face)." },
+  // a lane behind the lot as fronted: RT-3 takes the distance to the lane's centre line off the rear yard (s.3.1.2.17)
+  { on: "site", key: "context.lane_behind", group: "Lot", label: "A lane behind the lot", type: TRI, need: "rule", reads: ["district_setbacks"],
+    ask: { stop: 1, q: "A lane behind the lot, opposite the front?", who: "you, or the architect from the survey" },
+    info: "Where the rear of the lot (the side opposite the front) runs along a lane. RT-3 reduces the 20.0 m rear yard by the distance from the rear property line to the lane's ultimate centre line (s.3.1.2.17), taken as 3.05 m, half a standard 6.1 m lane, unless the site gives its own figure (context.lane_to_centre_line_m). The open data the lookup reads carry no lanes, so a person says. Not sure leaves the full rear yard." },
 
   // ---- the option
   { on: "option", key: "id", group: "Option", label: "Option id", type: "slug", need: "run", ref: "file",

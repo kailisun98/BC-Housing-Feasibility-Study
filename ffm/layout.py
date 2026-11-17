@@ -20,6 +20,7 @@ Coordinates as in massing.json: metres, origin at the front-left lot corner, x a
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -96,7 +97,7 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
         n_total += n
         net = round(float(mins[k]) * allowance, 1)
         gross = round(net * partition, 1)
-        out.append({"key": k, "label": UNIT_LABEL[k], "count": n, "net_m2_each": net, "gross_m2_each": gross, "area_m2": round(gross * n, 1),
+        out.append({"key": k, "label": UNIT_LABEL[k], "count": n, "net_m2_each": net, "gross_m2_each": gross, "min_gross_m2_each": round(float(mins[k]) * partition, 1), "area_m2": round(gross * n, 1),
                     "source": (areas_rule or {}).get("rule_id") or "placeholder", "note": f"{n} × {net} m² net ({mins[k]} m² minimum + {int((allowance - 1) * 100)}%), {gross} m² gross with partitions"})
     nonres = float(option.get("non_residential_gfa_m2") or 0)
     if nonres:
@@ -142,12 +143,46 @@ def adjacencies_for(option: dict) -> list[dict]:
     return rules
 
 
+def grid_of(option: dict) -> dict | None:
+    """The structural grid the architect chose in the block editor (`option.layout.grid`: {bay_m, divide}): the
+    bay is the wall-to-wall width (6 m, 8 m), `divide` how many modules a bay holds (1 a whole bay, 2 half bays,
+    4 quarters); the blocks' walls sit on the module, counted from the plate's left edge. None without one."""
+    g = (option.get("layout") or {}).get("grid")
+    if not isinstance(g, dict):
+        return None
+    try:
+        bay = float(g.get("bay_m") or 0)
+        divide = int(g.get("divide") or 2)
+    except (TypeError, ValueError):
+        return None
+    if not 2.0 <= bay <= 12.0 or divide not in (1, 2, 4):
+        return None
+    return {"bay_m": round(bay, 2), "divide": divide, "module_m": round(bay / divide, 3)}
+
+
+def _cores_of(option: dict, x0: float, y0: float, W: float, D: float) -> list[dict]:
+    """The cores the architect placed (`option.layout.cores`: [{x, y, w, d}]), kept inside the plate: the stairs
+    do not shift from level to level, so the solver stands them on every floor and lays the program round them."""
+    out: list[dict] = []
+    for c in ((option.get("layout") or {}).get("cores") or []):
+        try:
+            x, y, w, d = (float(c.get(k)) for k in ("x", "y", "w", "d"))
+        except (TypeError, ValueError, AttributeError):
+            continue
+        x, y = max(x0, min(x, x0 + W)), max(y0, min(y, y0 + D))
+        w, d = min(w, x0 + W - x), min(d, y0 + D - y)
+        if w > 0.5 and d > 0.5:
+            out.append({"x": x, "y": y, "w": w, "d": d})
+    return sorted(out, key=lambda c: (c["x"], c["y"]))
+
+
 def _plate(massing: dict) -> tuple[dict, float, float, float, float, int, float]:
     pm = next((x for x in massing["masses"] if x["name"] == "proposed"), None)
     if pm is None:
         raise ValueError("The massing has no proposed mass to lay out.")
     ring = pm["footprint"]
-    return pm, float(ring[0][0]), float(ring[0][1]), float(pm["plate_width_m"]), float(pm["plate_depth_m"]), int(pm["storeys"]), float(pm["floor_to_floor_m"])
+    # a plate is never negative (a massing.json from before 16 Nov 2026 can carry one where the yards exceeded the lot)
+    return pm, float(ring[0][0]), float(ring[0][1]), max(0.0, float(pm["plate_width_m"])), max(0.0, float(pm["plate_depth_m"])), int(pm["storeys"]), float(pm["floor_to_floor_m"])
 
 
 def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, Any]:
@@ -166,22 +201,59 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         warnings.append(f"The plate is {D:.1f} m deep: too shallow for a double-loaded corridor (about 12 m); the units are drawn single-loaded on the street side and the depth is the limit.")
     strip = max(0.0, (D - corr) / 2) if D >= corr + 8.0 else max(0.0, D - corr)
     double = D >= corr + 8.0
-    cx = x0 + (W - core_w) / 2            # the core bay
-    seg_len = max(0.0, (W - core_w) / 2)  # a run of units on one side of the core
     corr_y = y0 + strip if double else y0 + strip   # the corridor behind the front strip
+
+    # the structural grid (option.layout.grid) and the cores the architect placed (option.layout.cores): with
+    # neither, the layout is the one of 3 Nov 2026, a 7 m core bay at the centre and blocks as wide as their area
+    grid = grid_of(option)
+    mod = grid["module_m"] if grid else None
+    given = _cores_of(option, x0, y0, W, D)
+
+    def q(width: float) -> float:
+        """A width on the grid's module, rounded up; as it is without a grid."""
+        return math.ceil(width / mod - 1e-6) * mod if mod else width
+
+    if given:
+        cores = given
+    elif grid:
+        cw = min(W, q(core_w))
+        cores = [{"x": x0 + round(max(0.0, (W - cw) / 2) / mod) * mod, "y": y0, "w": cw, "d": D}]
+    else:
+        cores = [{"x": x0 + (W - core_w) / 2, "y": y0, "w": core_w, "d": D}]
+    legacy = not grid and not given
+    seg_len = max(0.0, (W - core_w) / 2)  # a run of units on one side of the centred core
+
+    def band_runs(side: str, y: float) -> list[dict]:
+        """The runs one strip offers: the lengths of it the cores leave free, each filled outward from a core."""
+        if legacy:
+            cx = cores[0]["x"]
+            return [{"side": side, "end": "left", "x_edge": cx, "dir": -1, "y": y, "len": seg_len, "left": seg_len},
+                    {"side": side, "end": "right", "x_edge": cx + core_w, "dir": 1, "y": y, "len": seg_len, "left": seg_len}]
+        spans: list[list[float]] = []
+        for c in sorted(cores, key=lambda c: c["x"]):
+            if c["y"] < y + strip - 0.05 and c["y"] + c["d"] > y + 0.05:
+                if spans and c["x"] <= spans[-1][1] + 1e-6:
+                    spans[-1][1] = max(spans[-1][1], c["x"] + c["w"])
+                else:
+                    spans.append([c["x"], c["x"] + c["w"]])
+        if not spans:
+            return [{"side": side, "end": "left", "x_edge": x0, "dir": 1, "y": y, "len": W, "left": W}]
+        out = [{"side": side, "end": "left", "x_edge": spans[0][0], "dir": -1, "y": y, "len": max(0.0, spans[0][0] - x0)}]
+        for a, b in zip(spans, spans[1:]):
+            out.append({"side": side, "end": "mid", "x_edge": a[1], "dir": 1, "y": y, "len": max(0.0, b[0] - a[1])})
+        out.append({"side": side, "end": "right", "x_edge": spans[-1][1], "dir": 1, "y": y, "len": max(0.0, x0 + W - spans[-1][1])})
+        for r in out:
+            r["left"] = r["len"]
+        return out
 
     floors: list[dict] = []
     for lv in range(storeys):
-        zones = [
-            {"block": "core", "label": BLOCK_LABEL["core"], "x": round(cx, 2), "y": round(y0, 2), "w": core_w, "d": round(D, 2), "area_m2": round(core_w * D, 1)},
-            {"block": "corridor", "label": "Corridor", "x": round(x0, 2), "y": round(corr_y, 2), "w": round(W, 2), "d": corr, "area_m2": round(W * corr, 1), "through": "core"},
-        ]
-        # the four runs a floor offers: front-left, front-right (facing the street), rear-left, rear-right (the lane)
-        runs = [{"side": "front", "end": "left", "x_edge": cx, "dir": -1, "y": y0, "left": seg_len},
-                {"side": "front", "end": "right", "x_edge": cx + core_w, "dir": 1, "y": y0, "left": seg_len}]
+        zones = [{"block": "core", "label": BLOCK_LABEL["core"], "x": round(c["x"], 2), "y": round(c["y"], 2), "w": round(c["w"], 2), "d": round(c["d"], 2), "area_m2": round(c["w"] * c["d"], 1)} for c in cores]
+        zones.append({"block": "corridor", "label": "Corridor", "x": round(x0, 2), "y": round(corr_y, 2), "w": round(W, 2), "d": corr, "area_m2": round(W * corr, 1), "through": "core"})
+        # the runs a floor offers: on the street side, then (a double-loaded plate) on the lane side
+        runs = band_runs("front", y0)
         if double:
-            runs += [{"side": "rear", "end": "left", "x_edge": cx, "dir": -1, "y": corr_y + corr, "left": seg_len},
-                     {"side": "rear", "end": "right", "x_edge": cx + core_w, "dir": 1, "y": corr_y + corr, "left": seg_len}]
+            runs += band_runs("rear", corr_y + corr)
         floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "runs": runs, "spare_m2": 0.0})
 
     def place(floor: dict, block: str, label: str, area: float, prefer: list[tuple[str, str]], extra: dict | None = None) -> float:
@@ -193,10 +265,10 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
                 break
             if r["left"] <= 0.05:
                 continue
-            width = min(r["left"], left / strip) if strip else 0
+            width = min(r["left"], q(left / strip)) if strip else 0
             if width <= 0.05:
                 continue
-            x = r["x_edge"] + (r["dir"] * (seg_len - r["left"])) + (0 if r["dir"] > 0 else -width)
+            x = r["x_edge"] + (r["dir"] * (r["len"] - r["left"])) + (0 if r["dir"] > 0 else -width)
             z = {"block": block, "label": label, "x": round(x, 2), "y": round(r["y"], 2), "w": round(width, 2), "d": round(strip, 2), "area_m2": round(width * strip, 1), "side": r["side"]}
             if extra:
                 z.update(extra)
@@ -238,7 +310,7 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
             for r in runs:
                 if r["left"] + 1e-9 < width:
                     continue
-                x = r["x_edge"] + (r["dir"] * (seg_len - r["left"])) + (0 if r["dir"] > 0 else -width)
+                x = r["x_edge"] + (r["dir"] * (r["len"] - r["left"])) + (0 if r["dir"] > 0 else -width)
                 fl["zones"].append({"block": key, "label": UNIT_LABEL[key], "x": round(x, 2), "y": round(r["y"], 2), "w": round(width, 2), "d": round(strip, 2),
                                     "area_m2": round(width * strip, 1), "side": r["side"], "unit": key, "accessible": flagged})
                 r["left"] -= width
@@ -251,6 +323,11 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         if not b or not strip:
             continue
         width = b["gross_m2_each"] / strip
+        if mod:
+            # on a grid a unit takes the nearest whole number of modules, as long as that keeps it at or over
+            # the BC Housing minimum with its partitions; otherwise the next module up
+            near = max(1, round(width / mod)) * mod
+            width = near if near * strip + 0.5 >= b["min_gross_m2_each"] else q(width)
         for _ in range(b["count"]):
             flagged = accessible_left > 0
             if place_unit(key, width, flagged):
@@ -269,13 +346,15 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         spare = 0.0
         for r in fl["runs"]:
             if r["left"] > 0.3:
-                x = r["x_edge"] + (r["dir"] * (seg_len - r["left"])) + (0 if r["dir"] > 0 else -r["left"])
+                x = r["x_edge"] + (r["dir"] * (r["len"] - r["left"])) + (0 if r["dir"] > 0 else -r["left"])
                 fl["zones"].append({"block": "spare", "label": "Spare", "x": round(x, 2), "y": round(r["y"], 2), "w": round(r["left"], 2), "d": round(strip, 2), "area_m2": round(r["left"] * strip, 1), "side": r["side"]})
                 spare += r["left"] * strip
         fl["spare_m2"] = round(spare, 1)
         del fl["runs"]
 
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
+    if grid:
+        plate["grid"] = grid
     return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
 
 
@@ -303,10 +382,39 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
         "plate": plate,
         "program": prog["blocks"], "parking": prog["parking"], "units_total": prog["units_total"], "units_placed": placed_units,
         "adjacencies": checks, "geometry": geometry, "egress": eg, "floors": floors, "shortfall": shortfall, "outright": outright,
+        "capacity": capacity(site, massing, outright),
         "totals": {"plates_m2": gross_plates, "used_m2": used, "spare_m2": round(gross_plates - used, 1), "gfa_m2": massing["masses"][0].get("gfa_m2")},
         "assumptions": prog["assumptions"], "warnings": warnings + list(massing.get("warnings") or []),
-        "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
+        "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + (["option.layout.grid"] if plate.get("grid") else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
     }
+
+
+# ---------------------------------------------------------------- the floor space ratio left for another level
+
+def capacity(site: dict, massing: dict, outright: dict) -> dict | None:
+    """How much floor area the FSR still leaves, and how many more levels of the proposed plate that is: against
+    the rezoning policy's benchmark FSR where one fired (the massing's `policy_benchmark`), else the district
+    schedule's outright maximum; `fsr_limit` is None where the rules carry neither. The block editor reads it
+    before it lets the architect add a level to place the rest of the program. Pure."""
+    pm = next((x for x in massing["masses"] if x["name"] == "proposed"), None)
+    try:
+        area = float(site.get("site_area_m2") or 0)
+    except (TypeError, ValueError):
+        area = 0.0
+    if not pm or area <= 0 or not pm.get("plate_area_m2"):
+        return None
+    bench = massing.get("policy_benchmark") or {}
+    limit = frm = rule_id = None
+    if isinstance(bench.get("fsr"), (int, float)) and bench["fsr"] > 0:
+        limit, frm, rule_id = float(bench["fsr"]), "the rezoning policy's benchmark", bench.get("rule_id")
+    elif isinstance(outright.get("fsr"), (int, float)) and outright["fsr"] > 0:
+        limit, frm, rule_id = float(outright["fsr"]), "the district schedule's outright maximum", (outright.get("rule_ids") or [None])[0]
+    gfa, plate = float(pm["gfa_m2"]), float(pm["plate_area_m2"])
+    room = None if limit is None else round(limit * area - gfa, 1)
+    return {"site_area_m2": area, "storeys": pm["storeys"], "plate_m2": plate, "gfa_m2": gfa, "fsr": round(gfa / area, 3),
+            "fsr_limit": limit, "limit_from": frm, "rule_id": rule_id, "room_m2": room,
+            "levels_room": None if limit is None else max(0, int((room + 0.5) // plate)),
+            "fsr_with_one_more": round((gfa + plate) / area, 3)}
 
 
 # ---------------------------------------------------------------- egress, read back from the plates
@@ -530,6 +638,7 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
     double = D >= corr + 8.0
     strip = max(0.0, (D - corr) / 2) if double else max(0.0, D - corr)
     by_key = {b["key"]: b for b in prog["blocks"]}
+    on_grid = grid_of(option) is not None
     geometry: list[dict] = []
     warnings: list[str] = []
     levels = {int(k): v for k, v in (zones_by_level.items() if isinstance(zones_by_level, dict) else enumerate(zones_by_level))}
@@ -559,8 +668,11 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             # inside the plate?
             if x < x0 - 0.05 or y < y0 - 0.05 or x + w > x0 + W + 0.05 or y + d > y0 + D + 0.05:
                 geometry.append({"kind": "outside", "level": lv, "block": block, "note": f"{zone['label']} at {x:.1f}, {y:.1f} m runs past the plate ({W:.1f} × {D:.1f} m) on {'the ground floor' if lv == 0 else f'level {lv + 1}'}"})
-            if block in UNIT_KEYS and block in by_key and w * d + 0.5 < by_key[block]["gross_m2_each"]:
-                geometry.append({"kind": "undersized", "level": lv, "block": block, "note": f"a {zone['label'].lower()} on {'the ground floor' if lv == 0 else f'level {lv + 1}'} is {w * d:.0f} m², under its {by_key[block]['gross_m2_each']:.0f} m² gross"})
+            # a unit too small: under its gross area, or (on a structural grid, where a unit takes whole modules)
+            # under the BC Housing minimum with its partitions
+            floor_m2 = by_key[block]["min_gross_m2_each" if on_grid else "gross_m2_each"] if block in UNIT_KEYS and block in by_key else None
+            if floor_m2 is not None and w * d + 0.5 < floor_m2:
+                geometry.append({"kind": "undersized", "level": lv, "block": block, "note": f"a {zone['label'].lower()} on {'the ground floor' if lv == 0 else f'level {lv + 1}'} is {w * d:.0f} m², under its {floor_m2:.0f} m² {'minimum with partitions' if on_grid else 'gross'}"})
         # overlaps: units and uses may not share floor area; the corridor and the core are the circulation and may cross each other only
         for i, a in enumerate(zones):
             for b in zones[i + 1:]:
@@ -591,6 +703,8 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             if placed + 1.0 < b["area_m2"]:
                 shortfall.append({"block": b["key"], "label": b["label"], "area_m2": round(b["area_m2"] - placed, 1)})
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
+    if grid_of(option):
+        plate["grid"] = grid_of(option)
     return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
 
 
@@ -784,7 +898,8 @@ def svg_plans(L: dict) -> str:
     levels = _typical_levels(L)
     pad = 48
     # one plan per row, each as wide as the sheet allows, so the drawing stays legible in a 400 px column
-    scale = max(3.0, min(560 / p["width_m"], 200 / p["depth_m"]))
+    # (a plate the yards left no width or depth, 16 Nov 2026, is scaled as if it were a metre: nothing divides by zero)
+    scale = max(3.0, min(560 / max(p["width_m"], 1.0), 200 / max(p["depth_m"], 1.0)))
     pw, pd = p["width_m"] * scale, p["depth_m"] * scale
     eg = L.get("egress")
     head = 14 if eg else 0
@@ -830,7 +945,7 @@ def svg_elevations(L: dict, massing: dict) -> str:
     Hp = max(H, float((masses.get("proposed") or {}).get("height_m") or 0))
     hmax = max([Hp, out_h or 0] + ([bench["height_m"][1]] if bench.get("height_m") else []))
     pad = 48
-    scale = max(3.0, min(380 / p["width_m"], 220 / hmax, 260 / p["depth_m"]))
+    scale = max(3.0, min(380 / max(p["width_m"], 1.0), 220 / max(hmax, 1.0), 260 / max(p["depth_m"], 1.0)))
     fw, sw, eh = p["width_m"] * scale, p["depth_m"] * scale, hmax * scale
     gap = 70
     width = pad + fw + gap + sw + pad
@@ -844,6 +959,7 @@ def svg_elevations(L: dict, massing: dict) -> str:
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Elevations · metres</text>')
     base = pad + 24 + eh
     win_w, _ = LAYOUT_ASSUMPTIONS["window_width_m"]
+    shop_h, win_h = max(0.0, f2f - 0.9) * scale, max(0.0, f2f - 1.8) * scale   # glazing below the floor above, never negative on a low storey
 
     def elevation(ox: float, length: float, label: str, axis: str) -> None:
         out.append(f'<text x="{ox:.1f}" y="{pad + 14:.1f}" font-size="12" font-weight="600">{_esc(label)}</text>')
@@ -862,15 +978,15 @@ def svg_elevations(L: dict, massing: dict) -> str:
                 for z in face:
                     cx = ox + (z["x"] - p["x"] + z["w"] / 2) * scale
                     if z["block"] in ("non_residential", "amenity"):
-                        out.append(f'<rect x="{ox + (z["x"] - p["x"]) * scale + 2:.1f}" y="{y_top + 0.5 * scale:.1f}" width="{max(2, z["w"] * scale - 4):.1f}" height="{(f2f - 0.9) * scale:.1f}" fill="{TONES["studio"]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
+                        out.append(f'<rect x="{ox + (z["x"] - p["x"]) * scale + 2:.1f}" y="{y_top + 0.5 * scale:.1f}" width="{max(2, z["w"] * scale - 4):.1f}" height="{shop_h:.1f}" fill="{TONES["studio"]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
                     elif z.get("unit"):
-                        out.append(f'<rect x="{cx - win_w * scale / 2:.1f}" y="{y_top + 0.9 * scale:.1f}" width="{win_w * scale:.1f}" height="{(f2f - 1.8) * scale:.1f}" fill="{TONES["two_bed"]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
+                        out.append(f'<rect x="{cx - win_w * scale / 2:.1f}" y="{y_top + 0.9 * scale:.1f}" width="{win_w * scale:.1f}" height="{win_h:.1f}" fill="{TONES["two_bed"]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
             else:
                 # the side elevation sees the end unit of each strip: one window per strip, placed at its depth
                 for side, yy in (("front", p["y"]), ("rear", p["y"] + p["depth_m"] - p["unit_depth_m"])):
                     if any(z.get("unit") and z.get("side") == side for z in fl["zones"]):
                         cx = ox + (yy - p["y"] + p["unit_depth_m"] / 2) * scale
-                        out.append(f'<rect x="{cx - win_w * scale / 2:.1f}" y="{y_top + 0.9 * scale:.1f}" width="{win_w * scale:.1f}" height="{(f2f - 1.8) * scale:.1f}" fill="{TONES["two_bed"]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
+                        out.append(f'<rect x="{cx - win_w * scale / 2:.1f}" y="{y_top + 0.9 * scale:.1f}" width="{win_w * scale:.1f}" height="{win_h:.1f}" fill="{TONES["two_bed"]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
         if out_h:
             yo = base - out_h * scale
             out.append(f'<line x1="{ox - 10:.1f}" y1="{yo:.1f}" x2="{ox + length + 10:.1f}" y2="{yo:.1f}" stroke="{TONES["outright"]}" stroke-width="1" stroke-dasharray="5 3"/>')
@@ -897,7 +1013,7 @@ def svg_axon(L: dict) -> str:
     ang = 0.5235987756  # 30 degrees
     import math
     cos, sin = math.cos(ang) * k, math.sin(ang) * k
-    scale = max(3.0, min(360 / (p["width_m"] + p["depth_m"] * cos), 260 / (p["storeys"] * p["floor_to_floor_m"] + p["depth_m"] * sin)))
+    scale = max(3.0, min(360 / max(p["width_m"] + p["depth_m"] * cos, 1.0), 260 / max(p["storeys"] * p["floor_to_floor_m"] + p["depth_m"] * sin, 1.0)))
     pad = 48
     width = pad + (p["width_m"] + p["depth_m"] * cos) * scale + pad
     height = pad + 24 + (p["storeys"] * p["floor_to_floor_m"] + p["depth_m"] * sin) * scale + 40 + 16 * 2 + 16
@@ -1044,6 +1160,8 @@ def markdown(L: dict) -> list[str]:
     M.append("## Layouts derived from the option")
     p = L["plate"]
     M.append(f"{p['storeys']} floors of {p['width_m']} × {p['depth_m']} m ({p['width_m'] * p['depth_m']:,.0f} m² each); {'a double-loaded corridor' if p['double_loaded'] else 'a single-loaded plate, the depth is the limit'}, units {p['unit_depth_m']} m deep; {L['units_placed']} of {L['units_total']} units placed.")
+    if p.get("grid"):
+        M.append(f"Laid out on a {p['grid']['bay_m']:g} m structural bay, the blocks' walls on a {p['grid']['module_m']:g} m module (`layout.grid` on the option, the architect's choice).")
     M.append("")
     M.append("| Block | Count | Area | From |")
     M.append("|---|---|---|---|")

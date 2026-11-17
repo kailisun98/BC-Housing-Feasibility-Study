@@ -22,7 +22,7 @@ from typing import Any
 
 from . import __version__
 from .checks import CHECKS, COND, FAIL, INFO, NA, PASS, UNSURE
-from .rules_loader import RULES_DIR, Rule, load_rules, stamp
+from .rules_loader import RULES_DIR, Rule, cd1_number, district_of, load_rules, stamp
 
 LAYER_ORDER = ["A", "B", "C", "D", "E", "F"]
 STATUS_ORDER = [FAIL, COND, UNSURE, PASS, INFO, NA]
@@ -35,7 +35,7 @@ def load_json(path: str | Path) -> dict[str, Any]:
 def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None,
              rules_dir: Path = RULES_DIR) -> dict[str, Any]:
     rules = rules if rules is not None else load_rules(rules_dir)
-    district = site.get("zoning_district", "")
+    district = district_of(site)     # "CD-1 (324)" for a CD-1 site whose number is known
     results: list[dict[str, Any]] = []
 
     for rule in rules:
@@ -54,9 +54,9 @@ def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None
         if version is None:
             results.append({**base, "status": NA, "finding": f"No version of this rule is in force on {on.isoformat()}.", "values": {}, "action": ""})
             continue
-        if not rule.applies_to(district):
+        if not rule.applies_to_site(site):
             results.append({**base, "status": NA,
-                            "finding": f"Written for {', '.join(rule.applies_to_districts)} districts; this site is zoned {district or 'unknown'}.",
+                            "finding": f"Written for {rule.written_for()}; this site is zoned {district or 'unknown'}.",
                             "values": {"district": district}, "action": ""})
             continue
         fn = CHECKS.get(rule.check)
@@ -83,19 +83,32 @@ def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None
     return ledger
 
 
+def counts_outright(r: dict) -> bool:
+    """A result the outright answer reads: the district's FSR and height, and its yards where they leave no envelope."""
+    check = r.get("check") or ""
+    return check.startswith("district_outright") or (check == "district_setbacks" and bool((r.get("values") or {}).get("no_envelope")))
+
+
 def summarise(results: list[dict], option: dict, site: dict | None = None) -> dict[str, Any]:
     counts = {s: 0 for s in STATUS_ORDER}
     for r in results:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
     site = site or {}
-    district = site.get("zoning_district") or "this district"
+    district = district_of(site) or "this district"
+    cd1 = cd1_number(site.get("zoning_district"), site.get("cd1_bylaw_number"))
+    is_cd1 = cd1 is not None or district.upper().startswith("CD-1")
+    # what the district's limits are written in: a district schedule, or a CD-1's own by-law (17 Nov 2026)
+    written_in = f"CD-1 ({cd1})'s by-law" if cd1 else ("the site's CD-1 by-law" if is_cd1 else f"the {district} schedule")
     municipality = (site.get("municipality") or "").strip()
     outside = bool(municipality) and "vancouver" not in municipality.lower()
 
     # Question 1: is it allowed? Layers A to C decide; D is flags only.
     # Outright = the district schedule alone. By rezoning = everything else in A to C, which is
     # what a rezoning under a City policy is tested against.
-    outright_rules = [r for r in results if r["layer"] == "A" and r.get("check", "").startswith("district_outright")]
+    # The district's yards count here only when they leave no envelope on the lot as fronted (17 Nov 2026, Kai: 609
+    # Heatley Ave read "yes" at FSR 0.60 with no plate): then the answer is "not yet confirmed", and the open item names
+    # the other front, the lane and the variance.
+    outright_rules = [r for r in results if r["layer"] == "A" and counts_outright(r)]
     policy_rules = [r for r in results if r["layer"] in ("A", "B", "C") and r not in outright_rules]
     outright = _verdict(outright_rules)
     if outright["uncertain"] and option.get("rezoning_path"):
@@ -113,14 +126,30 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
                            "finding": f"The rule stack reads the City of Vancouver's by-laws and policies and the Province's; {municipality}'s zoning is not in it, so nothing below tests this site's zoning.",
                            "action": f"Architect: read {municipality}'s zoning by-law for the district and enter its outright FSR, height and yards; the provincial and funder rules still apply."})
     elif not tested:
-        why = f"the rules have no outright schedule for {district}"
+        # said plainly which is missing (17 Nov 2026): the district's schedule, this CD-1's by-law, or the CD-1 number itself
+        envelope_words = "so the envelope (storeys, height, floor area, yards) is the option's own figure, not a permitted one."
+        if cd1:
+            why = f"CD-1 ({cd1})'s by-law is not in the rules"
+            title = f"CD-1 ({cd1}) is not in the rules"
+            finding = (f"The site is zoned CD-1 ({cd1}), a district of its own whose limits are in its by-law and whatever its rezoning set; "
+                       f"the rule stack holds no rules from that by-law, {envelope_words}")
+            action = (f"Architect: save CD-1 ({cd1})'s by-law (cd1-bylaws.vancouver.ca) into inbox/ and have its height, floor area and yards "
+                      "entered as rules (or read it with Claude at stop 3 and confirm its clauses).")
+        elif is_cd1:
+            why = "the site's CD-1 number is not recorded, so no CD-1 by-law in the rules can be matched to it"
+            title = "A CD-1 site with no CD-1 number"
+            finding = (f"The site is zoned CD-1 but its CD-1 number is not recorded, so no CD-1 by-law in the rules can be matched to it, {envelope_words}")
+            action = ("Manager or architect: find the address again (the lookup records the CD-1 number from the City's zoning data) or enter "
+                      "the site's cd1_bylaw_number; the rules from that by-law then apply where the stack holds them.")
+        else:
+            why = f"the rules have no {district} schedule"
+            title = f"No {district} schedule in the rules"
+            finding = f"The rule stack has no {district} district schedule, {envelope_words}"
+            action = (f"Architect: save the {district} schedule into inbox/ and have its FSR, height and yards entered as rules "
+                      "(or read it with Claude at stop 3 and confirm its clauses).")
         outright = {"verdict": "not assessed", "fail": [], "conditional": [], "uncertain": [], "why": why}
         by_rezoning = _verdict(policy_rules)
-        extra_open.append({"rule_id": "coverage.district_schedule", "title": f"No outright schedule for {district} in the rules", "status": "uncertain",
-                           "finding": f"The rule stack has no {district} district schedule, so the envelope (storeys, height, floor area, yards) is the option's own figure, not a permitted one."
-                           + ((f" Its limits are in CD-1 by-law No. {site['cd1_bylaw_number']}, and whatever the rezoning set." if site.get("cd1_bylaw_number") not in (None, "")
-                               else " A CD-1 site's limits are whatever its by-law and the rezoning set.") if district.upper().startswith("CD-1") else ""),
-                           "action": f"Architect: read the {district} schedule (or read it with Claude at stop 3 and confirm its clauses) and enter the outright FSR, height and yards."})
+        extra_open.append({"rule_id": "coverage.district_schedule", "title": title, "status": "uncertain", "finding": finding, "action": action})
     else:
         by_rezoning = _verdict(policy_rules)
     # schedule figures typed from recollection, not read from the schedule PDF (16 Nov 2026): a rule version whose
@@ -129,10 +158,12 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
                   if r["status"] != NA and r["layer"] == "A" and r.get("check", "").startswith("district_")
                   and (r.get("source") or {}).get("verified") is False]
     if unverified and not outside:
+        why_unverified = sorted({(r.get("source") or {}).get("unverified_because") or f"entered from recollection of {written_in}" for r in results
+                                 if r["rule_id"] in unverified})
         extra_open.append({"rule_id": "coverage.schedule_unverified", "title": f"District schedule figures entered unverified ({district})", "status": "uncertain",
-                           "finding": f"The figures in {', '.join(unverified)} were entered from recollection of the {district} schedule and not read from the schedule PDF; "
+                           "finding": f"The figures in {', '.join(unverified)} were {'; '.join(why_unverified)}, and not read from {written_in} itself; "
                                       "until they are confirmed, a pass against them is not a permission.",
-                           "action": f"Architect: open the {district} schedule PDF and confirm the FSR, height and yards; or drop the PDF into inbox/ and have the rule confirmed."})
+                           "action": f"Architect: open {written_in} and confirm the FSR, height and yards; or drop its PDF into inbox/ and have the rule confirmed."})
     # the yards: where no district yard rule tested them, the option's setbacks are its own figures, and a reader of the
     # site plan should know that nothing checked them (15 Nov 2026, from an architect's test)
     sb = option.get("setbacks_m") or {}

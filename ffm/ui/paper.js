@@ -319,8 +319,8 @@ export function paperDocument(run) {
     <p class="howto">Section 1 gives the four answers and the rules that decide them; rules are named by layer and place (A1, C4…) throughout. Section ${s.ledger} gives each rule's finding, numbers and source, and section ${s.verify} says how to reproduce this memo.</p>
     <section class="sec"><h2><span class="no">1</span> The four answers</h2>${answers}</section>
     <section class="sec"><h2><span class="no">2</span> Open items and who resolves them</h2>${open}</section>
-    ${pfOk ? `<section class="sec"><h2><span class="no">${s.money}</span> The money, line by line</h2>${moneyLines}</section>` : ""}
     ${compare}
+    ${pfOk ? `<section class="sec"><h2><span class="no">${s.money}</span> The money, line by line</h2>${moneyLines}</section>` : ""}
     <section class="sec"><h2><span class="no">${s.clauses}</span> Clauses applied</h2><p class="note">${applied.length} of ${res.length} rules apply. Proposed is what the option puts forward; permitted or required is the clause's own limit; the ask is what stands between them.</p>${clauses}</section>
     ${s.massing ? `<section class="sec"><h2><span class="no">${s.massing}</span> Massing</h2>${figures}</section>` : ""}
     <section class="sec"><h2><span class="no">${s.ledger}</span> The full ledger, by layer</h2><p class="note">Every rule the engine ran, including those that do not apply here, with its finding, every number it used and the section of its source (S numbers, section ${s.sources}).</p>${ledger}</section>

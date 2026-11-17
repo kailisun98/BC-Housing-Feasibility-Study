@@ -494,32 +494,70 @@ table.plain td.status { white-space: nowrap; }
 /* the block editor: a toolbar, the plate as a canvas, what the engine says under it */
 .sheet-editor { display: flex; flex-direction: column; gap: 8px; }
 .sheet-editor[hidden] { display: none; }
-.ed-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 12px; }
-.ed-bar .field.inline { display: inline-flex; align-items: center; gap: 6px; }
-.ed-bar .field.inline .label { font-size: 11px; }
-.ed-bar select { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
-.ed-sel { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--field); }
+.ed-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; font-size: 12px; }
+.ed-bar .field.inline, .ed-selbar .field.inline { display: inline-flex; align-items: center; gap: 6px; }
+.ed-bar .label, .ed-selbar .label { font-size: 11px; color: var(--muted); }
+.ed-bar select, .ed-selbar select, .ed-bar input[type=number] { border: 1px solid var(--line); background: var(--field); color: var(--ink); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.ed-bar input[type=number] { width: 62px; }
+.ed-grid { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ed-tools { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; }
+.ed-floors .segbtn small { margin-left: 5px; font-size: 10px; font-weight: 400; opacity: .75; font-variant-numeric: tabular-nums; }
+/* the program beside the plate (above it on a narrow column): what is placed and what is left, every row a block to drag */
+.ed-main { display: flex; flex-direction: column; gap: 10px; }
+.ed-wide .ed-main { flex-direction: row; align-items: flex-start; }
+.ed-program { flex: none; border: 1px solid var(--line); border-radius: 6px; background: var(--field); padding: 8px; font-size: 12px; }
+.ed-wide .ed-program { width: 260px; position: sticky; top: calc(var(--bars-h, 88px) + 8px); }
+.ed-stage { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.ed-prog-head { display: flex; flex-direction: column; gap: 2px; padding: 0 2px 6px; }
+.ed-left { font-size: 13px; color: var(--ink); }
+.ed-left.short b { color: var(--s-uncertain-text); font-size: 15px; }
+.ed-left.done b { color: var(--s-pass-text); }
+.ed-prog-sub { font-size: 11px; color: var(--muted); padding: 8px 2px 4px; }
+.ed-prog-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.ed-wide .ed-prog-list { flex-direction: column; }
+.ed-prog { display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 2px 8px; padding: 5px 6px; border: 1px solid var(--line); border-radius: 4px; background: var(--panel); cursor: grab; touch-action: none; user-select: none; transition: border-color .12s ease-out, background-color .12s ease-out; }
+.ed-prog:hover { border-color: var(--blue); }
+.ed-prog:focus-visible { outline: 2px solid var(--blue); outline-offset: 1px; }
+.ed-prog.dragging { cursor: grabbing; border-color: var(--blue); background: color-mix(in srgb, var(--blue) 8%, var(--panel)); }
+.ed-prog .sw { width: 14px; height: 14px; border-radius: 2px; border: 1px solid #5f6672; }
+.ed-prog .nm { display: flex; flex-direction: column; min-width: 0; font-weight: 500; color: var(--ink); }
+.ed-prog .nm small { font-weight: 400; font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ed-prog .ct { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 11.5px; }
+.ed-prog.short .ct b { color: var(--s-uncertain-text); font-size: 13px; }
+.ed-prog.over .ct b { color: var(--s-fail-text); }
+.ed-prog.done .ct { color: var(--s-pass-text); }
+.ed-prog .bar { grid-column: 2 / 4; height: 3px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.ed-prog .bar i { display: block; height: 100%; background: var(--blue); }
+.ed-prog.done .bar i { background: var(--ok); }
+.ed-prog.over .bar i { background: var(--red); }
+.ed-dragging, .ed-dragging * { cursor: grabbing !important; }
+.ed-newprog { margin-top: 8px; font-size: 12px; }
+.ed-newprog summary { cursor: pointer; color: var(--muted); padding: 2px; }
+.ed-newprog[open] { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.ed-newprog[open] summary { flex-basis: 100%; }
+.ed-newprog input { border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.ed-newprog input[type=text] { flex: 1; min-width: 90px; }
+.ed-newprog input[type=number] { width: 64px; }
+/* the line over the plate: what is selected; a fixed height, so selecting does not move the plate */
+.ed-selbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 30px; font-size: 12px; }
+.ed-selbar .ed-kind { font-weight: 600; }
+.ed-bar select, .ed-selbar select { width: auto; flex: none; }
+.ed-selbar .field.inline { flex-direction: row; }
+.ed-levels { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .ed-acc { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
 .ed-canvas { display: block; width: 100%; height: auto; touch-action: none; border: 1px solid var(--line); background: var(--c-paper); user-select: none; }
 .ed-canvas .ed-zone { cursor: grab; }
+.ed-canvas.dragging .ed-zone { cursor: grabbing; }
 .ed-canvas .ed-zone:focus { outline: none; }
-.ed-canvas .ed-zone:focus-visible rect:first-child { stroke: var(--amber); stroke-width: 2; }
-.ed-canvas .ed-handle-w { cursor: ew-resize; }
+.ed-canvas .ed-zone.clash > rect:first-child { stroke: #c81e1e; stroke-width: 1.6; stroke-dasharray: 5 3; }
+.ed-canvas .ed-zone.sel > rect:first-child { stroke: #245f9c; stroke-width: 2; stroke-dasharray: none; }
+.ed-canvas .ed-zone.sel.clash > rect:first-child { stroke: #c81e1e; }
+.ed-canvas .ed-zone:focus-visible > rect:first-child { stroke-width: 2.6; }
+.ed-canvas .ed-handle { display: none; }
+.ed-canvas .ed-zone.sel .ed-handle { display: block; }
+.ed-canvas .ed-handle-w, .ed-canvas .ed-handle-l { cursor: ew-resize; }
 .ed-canvas .ed-handle-d { cursor: ns-resize; }
 .ed-status { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
-/* the program tracker under the editor: what is left to place, a row per block, and the architect's own programs */
-.ed-tracker { font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 6px 10px; background: var(--field); }
-.ed-tracker summary { cursor: pointer; }
-.ed-track { margin-top: 6px; }
-.ed-track td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.ed-track tr.short td:nth-child(4) { color: var(--s-uncertain-text); font-weight: 600; }
-.ed-track tr.over td:nth-child(4) { color: var(--s-fail-text); }
-.ed-track tr.ok td:nth-child(4) { color: var(--muted); }
-.ed-newprog { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 8px; }
-.ed-newprog .label { font-size: 11px; color: var(--muted); font-weight: 500; }
-.ed-newprog input { border: 1px solid var(--line); background: var(--panel); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
-.ed-newprog input[type=text] { width: 150px; }
-.ed-newprog input[type=number] { width: 72px; }
 .ed-status .finding-list { gap: 3px; }
 .seg { display: inline-flex; border: 1px solid var(--c-rule); border-radius: 4px; overflow: hidden; background: var(--c-paper); }
 .segbtn { border: 0; border-radius: 0; background: var(--c-paper); color: var(--c-drawmuted); font-size: 11.5px; font-weight: 500; padding: 3px 10px; min-height: 24px; cursor: pointer; transition: background-color .12s ease-out, color .12s ease-out; }

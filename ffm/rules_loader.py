@@ -10,12 +10,42 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 from typing import Any, Optional
 
 RULES_DIR = Path(__file__).resolve().parent.parent / "rules"
+
+_CD1 = re.compile(r"^\s*CD-1(?![0-9A-Za-z])\s*(?:\(\s*([0-9A-Za-z]+)\s*\))?", re.I)
+
+
+def cd1_number(district: Optional[str], given: Any = None) -> Optional[str]:
+    """The CD-1 number of a site zoned CD-1: `given` (the site's `cd1_bylaw_number`, which the lookup records from the
+    City's zoning dataset) when there is one, else the number in "CD-1 (324)". None when the district is not a CD-1
+    or no number is known. Each CD-1 is its own by-law, so a CD-1 rule is matched on this number and nothing else."""
+    m = _CD1.match(district or "")
+    if not m:
+        return None
+    v = given if given not in (None, "") else m.group(1)
+    if v in (None, ""):
+        return None
+    s = str(v).strip()
+    try:
+        f = float(s)
+        s = str(int(f)) if f.is_integer() else s
+    except ValueError:
+        pass
+    return s.upper()
+
+
+def district_of(site: dict) -> str:
+    """The site's district as the rules read it: "CD-1 (324)" for a CD-1 site whose number is known (from
+    `cd1_bylaw_number` or the district itself), else `zoning_district` as written."""
+    d = (site or {}).get("zoning_district") or ""
+    n = cd1_number(d, (site or {}).get("cd1_bylaw_number"))
+    return f"CD-1 ({n})" if n else d
 
 
 @dataclass
@@ -44,6 +74,7 @@ class Rule:
     check: str
     versions: list[RuleVersion] = field(default_factory=list)
     file: str = ""
+    applies_to_cd1: list[str] = field(default_factory=list)
 
     def version_on(self, on: date) -> Optional[RuleVersion]:
         hits = [v for v in self.versions if v.in_force(on)]
@@ -52,9 +83,14 @@ class Rule:
         # If two versions overlap, the later effective_from wins.
         return sorted(hits, key=lambda v: v.effective_from)[-1]
 
-    def applies_to(self, district: str) -> bool:
+    def applies_to(self, district: str, cd1: Any = None) -> bool:
         """'*' matches every district; 'RM-1' matches exactly; a family code such as 'RS' or 'RT'
-        matches any district in that family ('RS-1', 'RT-3')."""
+        matches any district in that family ('RS-1', 'RT-3'). A rule keyed to CD-1 numbers (`applies_to_cd1`,
+        17 Nov 2026) matches a CD-1 site with one of those numbers (`cd1`, the site's `cd1_bylaw_number`, or the
+        number in "CD-1 (324)") and no other site: a CD-1 with no number known matches none."""
+        if self.applies_to_cd1:
+            n = cd1_number(district, cd1)
+            return n is not None and n in {str(x).strip().upper() for x in self.applies_to_cd1}
         if "*" in self.applies_to_districts:
             return True
         d = (district or "").upper()
@@ -65,6 +101,15 @@ class Rule:
             if "-" not in x and d.startswith(x + "-"):
                 return True
         return False
+
+    def applies_to_site(self, site: dict) -> bool:
+        return self.applies_to((site or {}).get("zoning_district") or "", (site or {}).get("cd1_bylaw_number"))
+
+    def written_for(self) -> str:
+        """The districts the rule is written for, in words: "CD-1 (324)" or "RM-4, RM-4N districts"."""
+        if self.applies_to_cd1:
+            return ", ".join(f"CD-1 ({x})" for x in self.applies_to_cd1)
+        return f"{', '.join(self.applies_to_districts)} districts"
 
 
 def _parse_date(s: Optional[str]) -> Optional[date]:
@@ -96,6 +141,7 @@ def load_rules(rules_dir: Path = RULES_DIR) -> list[Rule]:
                     check=r["check"],
                     versions=versions,
                     file=path.name,
+                    applies_to_cd1=[str(x) for x in r.get("applies_to_cd1", [])],
                 )
             )
     return rules

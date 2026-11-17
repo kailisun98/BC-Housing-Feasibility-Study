@@ -35,4 +35,4 @@ export const guide = { step: 1, address: "", lookup: null, programs: null, readi
 export const bnd = { open: false, ring: null, sel: null, drag: null, busy: false };
 
 /* The block editor on FIG 03 (editors/blocks.js; a re-rendered memo closes it, and leaving architect mode). */
-export const editor = { open: false, level: 0, zones: null, sel: null, dirty: false, result: null, timer: 0, busy: false, applied: false, grid: 0.1, blank: false };
+export const editor = { open: false, level: 0, zones: null, sel: null, dirty: false, result: null, timer: 0, busy: false, applied: false, bay: 6, divide: 2, history: [], dragging: false, pendingRender: false, seq: 0 };

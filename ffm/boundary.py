@@ -133,8 +133,15 @@ def _outward(a: Point, b: Point) -> Point:
     return (dy / L, -dx / L)     # counter-clockwise ring: the outside is to the right of a -> b
 
 
+FACING_COS = math.cos(math.radians(45))   # a road faces an edge where it lies within 45 degrees of the edge's outward normal
+
+
 def _road_frontage(corners: list[Point], pts: list[Point], reach: float) -> list[tuple[float, float]]:
-    """Per edge of the lot: (metres of the edge that face the road within `reach`, mean distance of those)."""
+    """Per edge of the lot: (metres of the edge that face the road within `reach`, mean distance of those). A sample
+    counts where the road's nearest point lies within 45 degrees of the edge's outward normal: before 17 Nov 2026 any
+    point on the outward side counted, so on 609 Heatley Ave the stretch of Keefer St past the corner, diagonally off
+    the Heatley frontage, gave that edge 16.4 m against the 15.2 m that actually face Keefer, and front_face
+    {"street": "Keefer St"} kept Heatley as the front."""
     out = []
     n = len(corners)
     for i in range(n):
@@ -147,7 +154,7 @@ def _road_frontage(corners: list[Point], pts: list[Point], reach: float) -> list
             t = (j + 0.5) / k
             p = (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
             d, q = _dist_polyline(p, pts)
-            if d <= reach and (d < 1e-6 or (q[0] - p[0]) * nrm[0] + (q[1] - p[1]) * nrm[1] > 0):
+            if d <= reach and (d < 1e-6 or (q[0] - p[0]) * nrm[0] + (q[1] - p[1]) * nrm[1] > FACING_COS * d):
                 near += 1
                 dsum += d
         out.append((L * near / k, dsum / near if near else math.inf))

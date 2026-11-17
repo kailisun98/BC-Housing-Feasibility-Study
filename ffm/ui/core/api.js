@@ -26,11 +26,20 @@ async function ledgerOf(runId) {
   return fetchJSON(`data/runs/${runId}/ledger.json`);
 }
 
+/* The committed runs' listing (data/runs.json, written by pages.py from server.list_runs), fetched once for
+   loadStaticRun: a static host's data does not change under an open page. */
+let listing = null;
+const runListing = () => listing || (listing = fetchJSON("data/runs.json").catch(e => { listing = null; throw e; }));
+
 async function loadStaticRun(runId) {
   if (browserRuns.has(runId)) return browserRuns.get(runId).payload;
+  // a base run has no diff.json: ask for it only when the listing says the run has one, so the console shows no 404
+  // (16 Nov 2026); a run the listing does not name is asked for as before
+  const listed = (await runListing().catch(() => [])).find(r => r.run_id === runId);
+  const wantDiff = !listed || !!listed.has_diff;
   const [ledger, massing, svg, diff, proforma, layout] = await Promise.all([
     fetchJSON(`data/runs/${runId}/ledger.json`), fetchJSON(`data/runs/${runId}/massing.json`, true),
-    fetchText(`data/runs/${runId}/massing.svg`, true), fetchJSON(`data/runs/${runId}/diff.json`, true),
+    fetchText(`data/runs/${runId}/massing.svg`, true), wantDiff ? fetchJSON(`data/runs/${runId}/diff.json`, true) : null,
     fetchJSON(`data/runs/${runId}/proforma.json`, true), fetchJSON(`data/runs/${runId}/layout.json`, true),
   ]);
   let sheets = null;

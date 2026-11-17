@@ -405,19 +405,175 @@ def info_only(site, option, p) -> Result:
     return _r(INFO, "; ".join(bits) + ".", dict(p))
 
 
+# Where a schedule reduces the rear yard by the distance to a lane's ultimate centre line (RT-3 s.3.1.2.17) and the site
+# says a lane runs behind but not how far its centre line is: half a standard 6.1 m (20 ft) City lane. A placeholder,
+# not a rule: the ultimate centre line moves where the City plans a widening, and `site.context.lane_to_centre_line_m`
+# replaces it. The suggester declares it among its assumptions.
+LANE_TO_CENTRE_LINE_M = 3.05
+
+
+def lot_as_fronted(site: Site) -> tuple[float, float]:
+    """The lot's frontage and depth as the site is fronted: the lot turned to `site.front_face` where one is named
+    (`boundary.oriented_ring`), else `frontage_m` and `depth_m`. Zeros where neither is known."""
+    W, D = float(site.get("frontage_m") or 0), float(site.get("depth_m") or 0)
+    if site.get("front_face"):
+        try:
+            from .boundary import oriented_ring
+            o = oriented_ring(site)
+            if o:
+                return float(o["frontage_m"]), float(o["depth_m"])
+        except (ValueError, KeyError, TypeError):
+            pass
+    return W, D
+
+
+def corner_streets(site: Site) -> list[str]:
+    """The two streets of a corner lot as the lookup named them (the parcel's street and its cross street, else the
+    context frame's), or [] where the lookup found one street."""
+    st = (site.get("parcel") or {}).get("street") or {}
+    names = [st.get("name"), (st.get("cross_street") or {}).get("name")]
+    if not all(names):
+        fr = (site.get("osm") or {}).get("frame") or {}
+        names = [fr.get("front_street"), ((fr.get("snapped_m") or {}).get("cross_street") or {}).get("name")]
+    if not all(names) or names[0].strip().lower() == names[1].strip().lower():
+        return []
+    return [str(n) for n in names]
+
+
+def other_front(site: Site) -> str | None:
+    """On a corner lot, the street the site does not take as its front, or None: a lot on one street, or a front the
+    architect named by side or edge (`site.front_face`), which a person has already chosen."""
+    streets = corner_streets(site)
+    if not streets:
+        return None
+    ff = site.get("front_face")
+    if ff and not (isinstance(ff, dict) and ff.get("street")):
+        return None
+    cur = ((ff or {}).get("street") or site.get("front_street") or ((site.get("context") or {}).get("street") or {}).get("name") or streets[0])
+    others = [s for s in streets if s.strip().lower() != str(cur).strip().lower()]
+    return others[0] if len(others) == 1 else None
+
+
+def yard_minimums(site: Site, p: Params) -> tuple[dict[str, float | None], dict | None]:
+    """A schedule's minimum yards for this site: the rear reduced by the distance to the lane's ultimate centre line
+    where the schedule says so (`rear_yard_lane_reduction`, the clause) and the site has a lane behind
+    (`site.context.lane_behind`, with `lane_to_centre_line_m` or LANE_TO_CENTRE_LINE_M). Returns the minimums and the
+    reduction applied (None where there is none)."""
+    mins = {k: p.get(f"min_{k}_yard_m") for k in ("front", "rear", "side")}
+    ctx = site.get("context") or {}
+    if not (p.get("rear_yard_lane_reduction") and mins["rear"] is not None and ctx.get("lane_behind") is True):
+        return mins, None
+    dist = ctx.get("lane_to_centre_line_m")
+    given = isinstance(dist, (int, float)) and not isinstance(dist, bool) and dist >= 0
+    to_cl = float(dist) if given else LANE_TO_CENTRE_LINE_M
+    lane = {"clause": p["rear_yard_lane_reduction"], "to_centre_line_m": to_cl, "given": given, "rear_yard_m": mins["rear"]}
+    mins["rear"] = round(max(0.0, float(mins["rear"]) - to_cl), 2)
+    return mins, lane
+
+
+def _m(x: float) -> str:
+    return f"{x:.1f}"
+
+
+def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
+    """The yards the option keeps (at least the schedule's) leave no plate on the lot as fronted. Uncertain, never a
+    fail: the other street as the front of a corner lot, a lane behind, or the Director's variance may leave one, and the
+    finding gives each one's numbers (decided with Kai, 17 Nov 2026, on 609 Heatley Ave)."""
+    district = site.get("zoning_district") or "the district"
+    w_left, d_left = W - 2 * eff["side"], D - eff["front"] - eff["rear"]
+    which = []
+    if d_left <= 0:
+        which.append(f"a front yard of {eff['front']:g} m and a rear yard of {eff['rear']:g} m on a lot {D:g} m deep"
+                     + (f" (the {lane['rear_yard_m']:g} m rear yard less {lane['to_centre_line_m']:g} m to the lane's centre line, {lane['clause']})" if lane else ""))
+    if w_left <= 0:
+        which.append(f"two side yards of {eff['side']:g} m on a lot {W:g} m wide")
+    finding = f"The {district} yards leave no envelope on this lot as fronted: {' and '.join(which)}."
+    if short:
+        finding += f" The option's own setbacks sit inside them ({'; '.join(short)})."
+    ways: list[str] = []
+    asks: list[str] = []
+    vals.update({"no_envelope": True, "lot_as_fronted_m": {"frontage": round(W, 2), "depth": round(D, 2)},
+                 "envelope_m": {"width": round(max(0.0, w_left), 2), "depth": round(max(0.0, d_left), 2)}})
+    # the other street as the front: the lot turned a quarter, the same yards (a front yard the schedule fixes, else the
+    # most it can ask)
+    other = other_front(site)
+    if other:
+        f_alt = mins["front"] if mins["front"] is not None else (p.get("max_front_yard_m") if p.get("max_front_yard_m") is not None else eff["front"])
+        rear_base = lane["rear_yard_m"] if lane else mins["rear"] or 0
+        w2, d2 = D - 2 * eff["side"], W - float(f_alt) - float(rear_base)
+        alt = {"street": other, "frontage_m": round(D, 2), "depth_m": round(W, 2), "front_yard_m": f_alt,
+               "envelope_m": {"width": round(max(0.0, w2), 2), "depth": round(max(0.0, d2), 2)}}
+        if w2 > 0 and d2 > 0:
+            words = (f"With {other} as the front the lot is about {D:.1f} m wide and {W:.1f} m deep, and the same yards"
+                     + (f" (a front yard of up to {f_alt:g} m)" if mins["front"] is None and p.get("max_front_yard_m") is not None else "")
+                     + f" leave about {_m(w2)} × {_m(d2)} m ({w2 * d2:,.0f} m²)")
+            if p.get("rear_yard_lane_reduction"):
+                d3 = d2 + LANE_TO_CENTRE_LINE_M
+                alt["envelope_with_lane_m"] = {"width": round(w2, 2), "depth": round(d3, 2)}
+                words += f"; {_m(w2)} × {_m(d3)} m ({w2 * d3:,.0f} m²) if a lane runs behind it ({p['rear_yard_lane_reduction']}, {LANE_TO_CENTRE_LINE_M:g} m to a standard lane's centre line)"
+            ways.append(words + ".")
+            asks.append(f"choose the front of the corner lot at 01 (the schedule does not say which street a corner site fronts; confirm it with the City), and if {other} is the front, say whether a lane runs behind it")
+        else:
+            ways.append(f"With {other} as the front the same yards leave no envelope either ({_m(max(0.0, w2))} × {_m(max(0.0, d2))} m).")
+        vals["other_front"] = alt
+    # a lane behind the lot as fronted, where the site has not said and it would leave a plate
+    ctx = site.get("context") or {}
+    if p.get("rear_yard_lane_reduction") and not lane and ctx.get("lane_behind") is None and mins["rear"] is not None:
+        d_lane = D - eff["front"] - (float(mins["rear"]) - LANE_TO_CENTRE_LINE_M)   # the schedule's rear yard, reduced
+        if d_lane > 0 and w_left > 0:
+            ways.append(f"If a lane runs behind the lot, {p['rear_yard_lane_reduction']} takes {LANE_TO_CENTRE_LINE_M:g} m off the rear yard and leaves about {_m(w_left)} × {_m(d_lane)} m.")
+            asks.append("say whether a lane runs behind the lot")
+    # the Director of Planning's variance for affordable housing, stated as a question for the City, never assumed
+    var = p.get("affordable_variance")
+    if var:
+        clause = var.get("clause") if isinstance(var, dict) else str(var)
+        needs = var.get("needs") if isinstance(var, dict) else ""
+        words = f"Or ask the Director of Planning to vary the yards under {clause}" + (f" ({needs})" if needs else "")
+        if option.get("tenure") == "social_housing":
+            words += "; this option is social housing, which can meet that"
+        from .massing import PLATE_MIN_DEPTH_M
+        room = D - eff["front"]
+        if d_left <= 0 < room and w_left > 0:
+            depth = min(PLATE_MIN_DEPTH_M, room)
+            rear_max = room - depth
+            words += f". On this front a rear yard of at most {rear_max:.1f} m (against {mins['rear']:g} m) leaves a plate {depth:.1f} m deep"
+            vals["variance"] = {"clause": clause, "rear_yard_for_plate_m": round(rear_max, 2), "plate_depth_m": round(depth, 2)}
+        else:
+            vals["variance"] = {"clause": clause}
+        ways.append(words + "; the variance is the City's to grant, not assumed here.")
+        asks.append(f"or ask the Director of Planning about a variance under {clause}")
+    finding += (" " + " ".join(ways)) if ways else " The yards must change before a building fits."
+    action = ("Manager or architect: " + "; ".join(asks) + ".") if asks else "Architect: the yards must change before a building fits; state the relaxation to ask for."
+    return _r(UNSURE, finding, vals, action=action)
+
+
 def district_setbacks(site, option, p) -> Result:
     """A district schedule's minimum yards against the option's setbacks: pass where the option keeps them,
-    conditional where it sits inside one (a relaxation to ask for), info where the option states none."""
-    mins = {k: p.get(f"min_{k}_yard_m") for k in ("front", "rear", "side")}
+    conditional where it sits inside one (a relaxation to ask for), info where the option states none, uncertain where
+    the yards leave no envelope on the lot as fronted (values `no_envelope`; the outright answer reads "not yet
+    confirmed" then, and the finding gives the other front, the lane and the variance with their numbers). The rear
+    minimum is reduced for a lane behind where the schedule says so (`yard_minimums`)."""
+    mins, lane = yard_minimums(site, p)
     sb = option.get("setbacks_m") or {}
     vals = {f"min_{k}_yard_m": v for k, v in mins.items()} | {f"setback_{k}_m": sb.get(k) for k in mins}
-    said = "; ".join(f"{k} {v} m" for k, v in mins.items() if v is not None) or "no minimum yards given"
+    if lane:
+        vals["lane_reduction"] = lane
+    lane_words = (f", the {lane['rear_yard_m']:g} m rear yard less {lane['to_centre_line_m']:g} m to the lane's centre line under {lane['clause']}"
+                  + ("" if lane["given"] else ", a standard lane assumed")) if lane else ""
+    said = "; ".join(f"{k} {v} m" + (lane_words if k == "rear" else "") for k, v in mins.items() if v is not None) or "no minimum yards given"
     if not any(v is not None for v in sb.values()):
         return _r(INFO, f"The schedule's minimum yards are {said}; the option states no setbacks yet.", vals)
     short = [f"{k} {sb[k]} m against a {mins[k]} m minimum" for k in mins if mins[k] is not None and sb.get(k) is not None and sb[k] + 1e-9 < mins[k]]
+    W, D = lot_as_fronted(site)
+    eff = {k: max(float(sb.get(k) or 0), float(mins[k] or 0)) for k in mins}
+    if W > 0 and D > 0 and (D - eff["front"] - eff["rear"] <= 0 or W - 2 * eff["side"] <= 0):
+        return _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals)
     if short:
+        var = p.get("affordable_variance")
+        clause = (var.get("clause") if isinstance(var, dict) else str(var)) if var else None
         return _r(COND, f"The option sits inside the schedule's minimum yards: {'; '.join(short)}. A relaxation is needed or the envelope moves in.",
-                  vals, action="Architect: move the mass to the minimum yards or state the relaxation to ask for.")
+                  vals, action="Architect: move the mass to the minimum yards or state the relaxation to ask for"
+                  + (f" (the Director of Planning may vary the yards for affordable housing under {clause})." if clause else "."))
     return _r(PASS, f"The option's setbacks keep the schedule's minimum yards ({said}).", vals)
 
 

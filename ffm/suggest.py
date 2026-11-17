@@ -28,7 +28,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from .checks import _schedule_c_required
+from .checks import LANE_TO_CENTRE_LINE_M, _schedule_c_required, district_setbacks, lot_as_fronted, yard_minimums
 from .engine import evaluate
 from .rules_loader import RULES_DIR, Rule, load_rules, stamp
 
@@ -87,10 +87,11 @@ def _pct(shares: dict[str, float]) -> str:
 
 def _plate(site: dict, sb: dict[str, float]) -> dict[str, Any] | None:
     """The setback envelope's plate box, as ffm.massing finds it: the largest rectangle inside the lot polygon inset
-    by the setbacks, else the equivalent rectangle less the yards. None when the site has neither."""
+    by the setbacks, else the equivalent rectangle less the yards. None when the site has neither, or when the yards
+    leave nothing. The lot is turned to `site.front_face` where one is named, as the massing turns it."""
     try:
         from . import boundary
-        ring = boundary.lot_ring(site)
+        ring = boundary.oriented_ring(site) or boundary.lot_ring(site)
         if ring:
             env_poly = boundary.inset(ring["ring"], sb)
             box = boundary.largest_rect(env_poly, PLATE_GRID_M) if env_poly else None
@@ -98,7 +99,7 @@ def _plate(site: dict, sb: dict[str, float]) -> dict[str, Any] | None:
                 return {"w": round(box["w"], 1), "d": round(box["d"], 1), "area": round(box["area_m2"], 1), "how": "the largest rectangle inside the lot polygon less the setbacks"}
     except Exception:
         pass
-    W, D = float(site.get("frontage_m") or 0), float(site.get("depth_m") or 0)
+    W, D = lot_as_fronted(site)
     if not W or not D:
         return None
     w = W - 2 * float(sb.get("side", 0))
@@ -167,6 +168,10 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
     if plate:
         gfa = round(plate["area"] * storeys, 0)
         gfa_from = f"the plate the setbacks leave ({plate['how']}, {sb_words}), {plate['w']} × {plate['d']} m = {plate['area']:,.0f} m², × {storeys} storeys = {gfa:,.0f} m²"
+    elif all(lot_as_fronted(site)):
+        W, D = lot_as_fronted(site)
+        gfa_from = (f"no plate to multiply: {sb_words} (front {sb.get('front', 0):g} m, rear {sb.get('rear', 0):g} m, sides {sb.get('side', 0):g} m) "
+                    f"leave no envelope on a lot {W:g} m wide and {D:g} m deep as fronted")
     else:
         gfa_from = "no frontage, depth or lot polygon, so no plate to multiply"
     if fsr_cap and area:
@@ -199,7 +204,7 @@ def setbacks_for(site: dict) -> dict[str, float]:
     998 E 19th Ave, and no more than 12% of the depth in front, 20% behind and 8% of the frontage each side on a
     smaller one, so a shallow corner lot keeps a buildable envelope. Still a placeholder, declared as such."""
     base, _ = ASSUMPTIONS["setbacks_m"]
-    W, D = float(site.get("frontage_m") or 0), float(site.get("depth_m") or 0)
+    W, D = lot_as_fronted(site)     # the lot as fronted: turned where site.front_face names another face
     if not W or not D:
         return dict(base)
     return {"front": round(min(base["front"], D * 0.12), 1), "rear": round(min(base["rear"], D * 0.20), 1), "side": round(min(base["side"], W * 0.08), 1)}
@@ -340,9 +345,18 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     # a confirmed district schedule's yards replace the placeholders, and the rows cite it
     r_sb = _district_rule(rules, on, "district_setbacks", district)
     sb_rule: str | None = None
+    p_sb: dict = {}
+    lane = None
     if r_sb:
         sb_rule, p_sb = r_sb
-        sb = {k: float(p_sb.get(f"min_{k}_yard_m", sb[k])) for k in ("front", "rear", "side")}
+        # the schedule's minimums, the rear less the distance to a lane's centre line where the schedule says so and the
+        # site has a lane behind (RT-3 s.3.1.2.17)
+        mins, lane = yard_minimums(site, p_sb)
+        sb = {k: float(mins[k]) if mins[k] is not None else sb[k] for k in ("front", "rear", "side")}
+        if lane and not lane["given"]:
+            assumptions.append({"key": "lane_to_centre_line_m", "value": LANE_TO_CENTRE_LINE_M,
+                                "note": f"the distance from the rear property line to the lane's ultimate centre line, taken as half a standard 6.1 m City lane for {lane['clause']}; "
+                                        "a planned widening moves it, so enter the site's own figure (context.lane_to_centre_line_m) where the City gives one"})
     eff, _ = ASSUMPTIONS["net_efficiency"]
     allowance, _ = ASSUMPTIONS["design_allowance"]
     shares = mine if mine is not None else dict(ASSUMPTIONS["mix_shares"][0])
@@ -404,8 +418,15 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     fields["tenure"] = {"value": "social_housing", "rule_id": "cov.social_housing_definition", "note": "100% social housing: exempt from levies and the path the rezoning policy takes"}
     fields["floor_to_floor_m"] = {"value": f2f, "rule_id": None, "note": "placeholder"}
     for k in ("front", "rear", "side"):
-        fields[f"setbacks_m.{k}"] = ({"value": sb[k], "rule_id": sb_rule, "note": "the schedule's minimum yard"} if sb_rule else
-                                     {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")})
+        if sb_rule and p_sb.get(f"min_{k}_yard_m") is None:
+            # the schedule fixes no minimum for this yard (RT-3's front: the neighbours' average): the placeholder stands
+            fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": None, "note": f"placeholder: {sb_rule} fixes no minimum {k} yard" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")}
+        elif sb_rule:
+            fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": sb_rule, "note": "the schedule's minimum yard" + (
+                f": {lane['rear_yard_m']:g} m less {lane['to_centre_line_m']:g} m to the lane's centre line ({lane['clause']}"
+                + ("" if lane["given"] else ", a standard lane assumed") + ")" if k == "rear" and lane else "")}
+        else:
+            fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")}
     fields["non_residential_gfa_m2"] = {"value": option["non_residential_gfa_m2"], "rule_id": "bc.bcbuilds.eligibility", "note": "none suggested; BC Builds caps it at 30% of the floor area"}
     fields["residential_gfa_m2"] = {"value": gfa, "rule_id": None, "note": "all of the floor area, with no non-residential space"}
 
@@ -503,6 +524,14 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         fields["replacement_trees_proposed"] = {"value": rep, "rule_id": "cov.trees.replacement", "note": f"Schedule C asks {required} trees on {area:,.0f} m²; {retained} retained" + ("" if trees else " (no survey on file: all are replacements until one exists)")}
         if not trees:
             unsure.append({"key": "existing_trees_on_site", "why": "no tree survey is on file; the by-law needs every tree of 20 cm or more surveyed", "who": "Architect: obtain the arborist report and survey"})
+
+    # the schedule's yards leave no envelope on the lot as fronted (17 Nov 2026, Kai, on 609 Heatley Ave): said plainly,
+    # with the other street as the front, a lane behind and the Director's variance as the ways out, in the words the
+    # memo's open item uses. The front is offered, never switched: a person chooses it at 01.
+    if sb_rule:
+        yards = district_setbacks(site, option, p_sb)
+        if (yards.get("values") or {}).get("no_envelope"):
+            unsure.append({"key": "yards", "why": yards["finding"].rstrip("."), "who": yards["action"].rstrip(".")})
 
     # what no rule settles
     if site.get("in_transit_oriented_area") is None:

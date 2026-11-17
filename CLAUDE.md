@@ -430,6 +430,12 @@ cached old module never runs beside a new one. One fix came with the split: `pap
 numbers before it declared them, so PDF and Print threw "Cannot access 's' before initialization" on every run with
 money (the committed app.js had it too); the numbering now comes first.
 
+Three defects found while testing the split, fixed the same day (none caused by it):
+- Yards larger than the lot: `massing.build` clamps the equivalent-rectangle envelope at zero and warns which yards left no plate (609 Heatley Ave: RT-3's 20 m rear yard on a lot 15.2 m deep gave a -6.6 m envelope, a negative FSR in the memo and nine negative `<rect>`s per memo); `layout._plate` never takes a negative plate and the sheets' scales never divide by zero (`tests/test_layout.py`, `ShallowLot`).
+- What the tool does when the yards leave no envelope (Kai's choice, 17 Nov 2026): `checks.district_setbacks` returns uncertain with `values.no_envelope` when the yards (at least the schedule's) leave no plate on the lot as fronted (`lot_as_fronted`). Its finding offers the corner lot's other street as the front with its numbers (`other_front`; offered, never switched), a lane behind, and the Director's variance (`affordable_variance`, s.3.1.2.21, an open item, never assumed). `engine.counts_outright` lets that result make the outright answer "not yet confirmed" (609 Heatley Ave read "yes" at FSR 0.60 with no plate). The suggester lists the same words as its `yards` item. RT-3's lane clause (`rear_yard_lane_reduction`, s.3.1.2.17) takes the distance to the lane's centre line off the rear yard where `site.context.lane_behind` is true: `context.lane_to_centre_line_m`, else `checks.LANE_TO_CENTRE_LINE_M` = 3.05 m (half a standard 6.1 m lane, a declared placeholder). The page asks "A lane behind the lot?" at 01. The page's "Which street is the front?" now sets `site.front_face {street}` instead of swapping frontage and depth. The swap had left the parcel polygon 11 m off the envelope. `boundary._road_frontage` counts a road only within 45° of an edge's normal, so `front_face {"street": "Keefer St"}` turns the lot (`tests/test_suggest.py`, `YardsLeaveNoEnvelope`).
+- `paperDocument` (`paper.js`) prints "3 Compared with…" before "4 The money", as numbered; the template had them the other way round. Refs (A1…) unchanged.
+- Static build: `loadStaticRun` (`core/api.js`) asks for `diff.json` only when `data/runs.json` lists the run with `has_diff`, so a base run logs no 404.
+
 ## The lot as a polygon (11 Nov 2026): odd sites, the parcel survey, the boundary editor
 
 - `ffm/parcel_shapes.py` (written by a survey agent, reviewed): shape metrics and a class for one parcel
@@ -477,6 +483,34 @@ money (the committed app.js had it too); the numbering now comes first.
   lot and the site's notes ask which side is the front). `uncertain.json` is frozen as the labelled set. The L
   rule is not settled by the labels (one of ten L guesses confirmed). Which of 2,712 and 3,908 m² is the Expo development
   site is a question for a person.
+
+## The block editor rebuilt (17 Nov 2026): a grid, the program beside the plate, a suggested plan, linked cores
+
+Kai found the editor clunky; `editors/blocks.js` was rewritten (the section below describes the first version).
+- **Grid.** `option.layout.grid` {bay_m, divide}: the bay is wall to wall (6, 7.5, 8 m or 3 to 12), `divide` 1, 2 or 4
+  (walls on whole, half or quarter bays), counted from the plate's left edge (`layout.grid_of`; the plate record
+  carries `grid`). With a grid `layout.solve` gives a unit the nearest whole number of modules that keeps it at or
+  over the BC Housing minimum with partitions (`min_gross_m2_each` on a program block), else the next module up;
+  `place_zones` then reads `undersized` against that minimum, not the gross. `option.layout.cores` [{x, y, w, d}]
+  stands the given cores on every floor and the runs go round them. Neither key: the layout of 3 Nov, unchanged.
+- **Editor.** The program (`programHtml`, `programTracker`) sits beside the plate with placed and left to place; a row
+  is dragged onto the plate (`placeAt`: the strip under the pointer, the nearest free place on the module) or clicked
+  (`freeSpot`). A press on a block selects and drags in one gesture; walls go to a neighbour's wall within 0.4 m, else
+  the module; a block dropped on the program is removed. Any change to a core is copied to every floor (`syncCores`,
+  through `commit(core)`). `suggestPlan` asks the engine for a plan on the grid, round the cores once one was moved
+  (`editor.coreMoved`); the editor opens on one when the option has no zones. Undo (`snapshot`, Ctrl+Z), Repeat this
+  floor above, Clear the plates (cores and corridors stay). Apply writes `layout.zones` and `layout.grid`. A check's
+  redraw waits for a drag to end (`editor.dragging`, `pendingRender`), and stale replies are dropped (`editor.seq`).
+
+- **Changing a block's program, adding a level (same day).** The selection line's name is a select (`#ed-kind`): the
+  block becomes another program where it stands, a unit taking that unit's width on the grid. `layout.capacity(site,
+  massing, outright)` (in every layout record as `capacity`) gives the FSR room: against the rezoning policy's benchmark
+  FSR where one fired, else the outright maximum, `fsr_limit` None with neither; `levels_room` is how many more plates
+  fit (998 E 19th Ave what-if: FSR 2.49 of 3.0, one level). "+ Level" (`addLevel`, live only with room, or with no limit
+  in the rules) adds a storey with the cores and corridor of the level under it; `withLevels` sends storeys, a plate more
+  of `gfa_m2` and `residential_gfa_m2` and a floor more of `height_m` with every check, so the plate stays; Apply writes
+  them into the option, redraws the Option schedule and marks the memo stale. Committed `layout.json` files predate
+  `capacity`; the editor reads it from its first check.
 
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 

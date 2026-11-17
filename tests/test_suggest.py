@@ -7,7 +7,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from ffm import suggest
+from ffm import massing, suggest
 from ffm.engine import evaluate, load_json
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -185,6 +185,116 @@ class Mix(unittest.TestCase):
         for bad in ({"studio": 0.5, "one_bed": 0.2}, {"studio": 1.2, "one_bed": -0.2}, {"loft": 1.0}, "half", {"studio": "x", "one_bed": 1}):
             with self.assertRaises(ValueError):
                 suggest.suggest(SITE, PROGRAMS, AS_OF, "funder-ready", mix_shares=bad)
+
+
+class YardsLeaveNoEnvelope(unittest.TestCase):
+    """609 Heatley Ave (RT-3, 37.2 x 15.2 m, a corner lot on Heatley Ave and Keefer St), as Kai decided on 17 Nov 2026:
+    RT-3's 20.0 m rear yard (s.3.1.2.7) on a lot 15.2 m deep leaves no envelope with Heatley as the front. The suggestion
+    says so and offers Keefer St as the front without switching it; the lane behind takes the distance to its centre
+    line off the rear yard (s.3.1.2.17); the Director's variance (s.3.1.2.21) is an open item, never assumed; and the
+    outright answer reads "not yet confirmed" instead of "yes"."""
+
+    ON = date(2026, 11, 17)
+    # the real parcel in its context frame and the City's street ways beside it, as the lookup stored them
+    RING = [[38.42, 14.94], [1.45, 15.13], [1.36, -0.07], [38.33, -0.27]]
+    ROADS = [{"name": "Heatley Ave", "width_m": 11.0, "points": [[47.0, -10.0], [-2.6, -10.0]]},
+             {"name": "Heatley Ave", "width_m": 11.0, "points": [[97.2, -10.2], [47.0, -10.0]]},
+             {"name": "Heatley Ave", "width_m": 11.0, "points": [[-2.6, -10.0], [-52.9, -9.6]]},
+             {"name": "Keefer St", "width_m": 11.0, "points": [[47.0, -10.0], [46.4, -182.7]]},
+             {"name": "Keefer St", "width_m": 11.0, "points": [[48.7, 131.7], [47.0, -10.0]]}]
+    SITE = {"id": "609-heatley-ave", "address": "609 Heatley Ave, Vancouver, BC", "municipality": "City of Vancouver", "zoning_district": "RT-3",
+            "site_area_m2": 566.7, "frontage_m": 37.2, "depth_m": 15.2, "has_water_and_sewer": True, "existing_trees_on_site": [],
+            "keep_existing_buildings": False, "context": {"street": {"name": "Heatley Ave"}},
+            "parcel": {"street": {"name": "Heatley Ave", "cross_street": {"name": "Keefer St"}}},
+            "osm": {"frame": {"front_street": "Heatley Ave", "snapped_m": {"x": 0, "y": 0, "cross_street": {"name": "Keefer St", "side": "right"}}}}}
+
+    def site(self, **extra):
+        s = copy.deepcopy(self.SITE)
+        for k, v in extra.items():
+            if k == "lane_behind":
+                s["context"]["lane_behind"] = v
+            else:
+                s[k] = v
+        return s
+
+    def test_the_suggestion_says_so_and_offers_the_other_front_without_switching(self):
+        site = self.site()
+        S = suggest.suggest(site, ["bch.chf.eligibility"], self.ON)
+        o = S["option"]
+        self.assertEqual(o["setbacks_m"]["rear"], 20.0)
+        self.assertEqual(S["fields"]["setbacks_m.rear"]["rule_id"], "cov.rt3.setbacks")
+        self.assertIsNone(S["fields"]["setbacks_m.front"]["rule_id"])            # RT-3 fixes no minimum front yard
+        self.assertNotIn("front_face", site)                                    # offered, never switched
+        self.assertIsNone(S["envelope"]["plate_m2"])
+        self.assertIn("leave no envelope on a lot 37.2 m wide and 15.2 m deep", S["envelope"]["gfa_from"])
+        y = next(u for u in S["unsure"] if u["key"] == "yards")
+        self.assertIn("The RT-3 yards leave no envelope", y["why"])
+        self.assertIn("With Keefer St as the front", y["why"])
+        self.assertIn("12.2 × 13.5 m (165 m²)", y["why"])                     # 37.2 - 3.7 - 20.0 deep, 15.2 - 2 x 1.5 wide
+        self.assertIn("12.2 × 16.6 m (202 m²) if a lane runs behind it (s.3.1.2.17", y["why"])
+        self.assertIn("s.3.1.2.21", y["why"])
+        self.assertIn("not assumed", y["why"])
+        self.assertIn("choose the front of the corner lot at 01", y["who"])
+
+    def test_the_outright_answer_is_not_yet_confirmed_and_the_open_item_names_the_ways_out(self):
+        site = self.site()
+        o = suggest.suggest(site, ["bch.chf.eligibility"], self.ON)["option"]
+        L = evaluate(site, o, self.ON)
+        r = next(x for x in L["results"] if x["rule_id"] == "cov.rt3.setbacks")
+        self.assertEqual(r["status"], "uncertain")
+        self.assertTrue(r["values"]["no_envelope"])
+        self.assertEqual(r["values"]["other_front"]["street"], "Keefer St")
+        self.assertEqual(r["values"]["other_front"]["envelope_m"], {"width": 12.2, "depth": 13.5})
+        self.assertEqual(r["values"]["variance"]["clause"], "s.3.1.2.21")
+        self.assertAlmostEqual(r["values"]["variance"]["rear_yard_for_plate_m"], 1.4, places=2)   # 15.2 - 1.8 - a 12 m plate
+        out = L["summary"]["answers"]["allowed"]["outright"]
+        self.assertEqual(out["verdict"], "not yet confirmed")                   # was "yes" at FSR 0.60 with no plate
+        self.assertEqual(out["uncertain"], ["cov.rt3.setbacks"])
+        self.assertNotIn("why", out)                                            # assessed, not "not assessed"
+        item = next(u for u in L["summary"]["answers"]["unsure"] if u["rule_id"] == "cov.rt3.setbacks")
+        self.assertIn("Keefer St", item["action"])
+        from ffm import memo
+        self.assertIn("**Outright, under RT-3: not yet confirmed.**", memo.markdown(L))
+
+    def test_a_lane_behind_takes_the_centre_line_off_the_rear_yard(self):
+        site = self.site(front_face={"street": "Keefer St"}, boundary_m=self.RING, osm={"roads": self.ROADS}, lane_behind=True)
+        S = suggest.suggest(site, ["bch.chf.eligibility"], self.ON)
+        o = S["option"]
+        self.assertEqual(o["setbacks_m"], {"front": 3.7, "rear": 16.95, "side": 1.5})   # 20.0 less half a 6.1 m lane
+        self.assertIn("s.3.1.2.17", S["fields"]["setbacks_m.rear"]["note"])
+        self.assertIn("lane_to_centre_line_m", {a["key"] for a in S["assumptions"]})
+        self.assertNotIn("yards", {u["key"] for u in S["unsure"]})
+        L = evaluate(site, o, self.ON)
+        r = next(x for x in L["results"] if x["rule_id"] == "cov.rt3.setbacks")
+        self.assertEqual(r["status"], "pass")
+        self.assertEqual(r["values"]["min_rear_yard_m"], 16.95)
+        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "yes")
+        m = massing.build(site, o, L)
+        self.assertAlmostEqual(m["lot"]["frontage_m"], 15.2, delta=0.1)       # the lot turned to Keefer St
+        self.assertGreater(m["envelope"]["depth_m"], 15.5)                      # about 37 - 3.7 - 16.95
+        self.assertGreater(m["masses"][0]["plate_area_m2"], 100)
+        # the site's own distance to the centre line replaces the standard lane's
+        site["context"]["lane_to_centre_line_m"] = 4.0
+        self.assertEqual(suggest.suggest(site, ["bch.chf.eligibility"], self.ON)["option"]["setbacks_m"]["rear"], 16.0)
+        # without a lane the full 20.0 m stands and the envelope is shallower, but still there
+        site["context"]["lane_behind"] = False
+        L2 = evaluate(site, suggest.suggest(site, ["bch.chf.eligibility"], self.ON)["option"], self.ON)
+        self.assertEqual(L2["summary"]["answers"]["allowed"]["outright"]["verdict"], "yes")
+
+    def test_a_lane_beside_the_heatley_front_does_not_rescue_it(self):
+        # the lane reduction is for the rear; with Heatley as the front the yards still leave nothing, so it stays open
+        L = evaluate(self.site(lane_behind=True), suggest.suggest(self.site(lane_behind=True), ["bch.chf.eligibility"], self.ON)["option"], self.ON)
+        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "not yet confirmed")
+
+    def test_front_face_names_the_cross_street_and_the_lot_turns(self):
+        # Keefer St's way past the corner lies diagonally off the Heatley frontage; it used to win that edge (16.4 m
+        # "facing" against 15.2 m) and the lot stayed fronted on Heatley
+        from ffm import boundary
+        o = boundary.oriented_ring({"frontage_m": 37.2, "depth_m": 15.2, "boundary_m": self.RING, "osm": {"roads": self.ROADS},
+                                    "front_face": {"street": "Keefer St"}})
+        self.assertAlmostEqual(abs(o["orientation"]["rotate_deg"]), 90, delta=1)
+        self.assertAlmostEqual(o["frontage_m"], 15.2, delta=0.1)
+        self.assertAlmostEqual(o["depth_m"], 37.0, delta=0.3)
 
 
 class ReadSite(unittest.TestCase):

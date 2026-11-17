@@ -158,6 +158,15 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     else:
         env_w = W - 2 * float(sb.get("side", 0))
         env_d = D - float(sb.get("front", 0)) - float(sb.get("rear", 0))
+        # yards wider or deeper than the lot leave nothing, never a negative plate (16 Nov 2026: RT-3's 20 m rear
+        # yard on 609 Heatley Ave, 15.2 m deep, gave a -6.6 m envelope, a negative FSR and negative rects in the sheets)
+        if env_d <= 0:
+            warnings.append(f"The setbacks leave no envelope: a front yard of {float(sb.get('front', 0)):g} m and a rear yard of {float(sb.get('rear', 0)):g} m "
+                            f"on a lot {D:g} m deep. The masses are drawn with no plate; the yards, or which street is the front, must change before one fits.")
+        if env_w <= 0:
+            warnings.append(f"The setbacks leave no envelope: two side yards of {float(sb.get('side', 0)):g} m on a lot {W:g} m wide. "
+                            "The masses are drawn with no plate; the yards must change before one fits.")
+        env_w, env_d = max(0.0, env_w), max(0.0, env_d)
         env_area = env_w * env_d
         env = {"polygon": _rect(sb.get("side", 0), sb.get("front", 0), env_w, env_d), "width_m": round(env_w, 2), "depth_m": round(env_d, 2), "area_m2": round(env_area, 1), "setbacks_m": sb}
         box = {"x": float(sb.get("side", 0)), "y": float(sb.get("front", 0)), "w": env_w, "d": env_d, "area_m2": round(env_area, 1)}

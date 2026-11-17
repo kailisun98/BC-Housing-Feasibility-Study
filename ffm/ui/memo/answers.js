@@ -9,7 +9,8 @@ import { ruleTitle } from "../route-stage.js";
 export function answerAllowed(L) {
   const res = L.results, ans = L.summary.answers, site = L.inputs.site;
   const o = ans.allowed.outright, bz = ans.allowed.by_rezoning, path = ans.allowed.rezoning_path;
-  const outLines = res.filter(r => (r.check || "").startsWith("district_outright") && r.status !== "not_applicable");
+  // the district's FSR and height, and its yards where they leave no envelope (as engine.counts_outright)
+  const outLines = res.filter(r => ((r.check || "").startsWith("district_outright") || (r.check === "district_setbacks" && (r.values || {}).no_envelope)) && r.status !== "not_applicable");
   const policy = res.filter(r => ["A", "B", "C"].includes(r.layer) && ["fail", "conditional", "uncertain"].includes(r.status) && !(r.check || "").startsWith("district_outright"));
   let verdict = `${h(VERDICT_OUTRIGHT[o.verdict] || cap(o.verdict) + ".")}`;
   if (path) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;

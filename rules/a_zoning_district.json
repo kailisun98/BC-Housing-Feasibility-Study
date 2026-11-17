@@ -120,7 +120,12 @@
             "max_site_coverage": 0.45,
             "front_yard_note": "The minimum front yard is the average of the front yards of the 2 adjacent sites on each side (a vacant adjacent site counts as 3.7 m); the maximum front yard is 3.7 m. No fixed minimum is entered, so the front is not tested.",
             "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less.",
-            "rear_yard_note": "20.0 m, less the distance from the rear property line to the ultimate centre line of a lane behind."
+            "rear_yard_note": "20.0 m, less the distance from the rear property line to the ultimate centre line of a lane behind.",
+            "rear_yard_lane_reduction": "s.3.1.2.17",
+            "affordable_variance": {
+              "clause": "s.3.1.2.21",
+              "needs": "open to a multiple dwelling with at least 25% of its units owned or leased by a government or non-profit and secured for low income or disability, s.3.1.1.2"
+            }
           },
           "source": {
             "title": "City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026)",

@@ -452,17 +452,23 @@ function takeAnswer(key, raw) {
   if (a.on === "site") {
     if (!state.site) return;
     if (key === "front_street") {
-      // the front decides which side the frontage is: the lookup took the named street; choosing the other swaps the sides
+      // the front decides which side the frontage is. The lookup took the named street (streets[0]); the other one becomes
+      // site.front_face {street}, which the engine turns the lot to (boundary.oriented_ring) and the figures follow
+      // through lot.orientation. Before 17 Nov 2026 this swapped frontage_m and depth_m, which left a parcel polygon
+      // placed in the old frame, 11 m off the envelope drawn for the new front (609 Heatley Ave); a site saved that
+      // way is swapped back first.
       const site = state.site, streets = cornerStreets(site);
-      const current = (site.context && site.context.street && site.context.street.name) || streets[0];
-      site.front_street = v;
-      if (v && current && v !== current && streets.includes(v)) {
+      const named = (site.context && site.context.street && site.context.street.name) || streets[0];
+      if (streets[0] && named && named !== streets[0] && streets.includes(named)) {
         [site.frontage_m, site.depth_m] = [site.depth_m, site.frontage_m];
-        site.context = Object.assign(site.context || {}, { street: Object.assign((site.context || {}).street || {}, { name: v }) });
-        if (site.parcel && site.parcel.metrics) site.parcel.metrics.frontage_from = `the side along ${v}, chosen as the front by the manager`;
-        if (site.osm && site.osm.frame) site.osm.frame.front_street = v;
+        site.context.street.name = streets[0];
+        if (site.osm && site.osm.frame) site.osm.frame.front_street = streets[0];
+        if (site.parcel && site.parcel.metrics) site.parcel.metrics.frontage_from = "the side parallel to the street";
       }
-      setStatus(v ? `The front is ${v}: frontage ${site.frontage_m} m, depth ${site.depth_m} m. The yards and the massing follow it.` : "Which street is the front stays not sure: the memo keeps the named street and asks the architect to confirm.", "info");
+      site.front_street = v;
+      if (v && streets.includes(v) && v !== streets[0]) site.front_face = { street: v };
+      else if (site.front_face && site.front_face.street) delete site.front_face;
+      setStatus(v ? `The front is ${v}${site.front_face ? ": the lot is turned to it" : ""}. The yards, the envelope and the massing follow it.` : "Which street is the front stays not sure: the memo keeps the named street and asks the architect to confirm.", "info");
     } else {
       setPath(state.site, key, key === "toa_tier" && v != null ? Number(v) : v);
       setStatus(`${said}.`, "info");

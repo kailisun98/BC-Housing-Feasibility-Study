@@ -103,9 +103,11 @@ class Stacking(unittest.TestCase):
 
 
 class ShallowLot(unittest.TestCase):
+    SITE = {"id": "609-heatley-ave", "address": "609 Heatley Ave", "zoning_district": "RT-3", "site_area_m2": 566.7, "frontage_m": 37.2, "depth_m": 15.2,
+            "has_water_and_sewer": True, "existing_trees_on_site": [], "osm": {"frame": {"snapped_m": {"cross_street": {"name": "Keefer St", "side": "right"}}}}}
+
     def test_a_shallow_corner_lot_is_single_loaded_and_says_so(self):
-        site = {"id": "609-heatley-ave", "address": "609 Heatley Ave", "zoning_district": "RT-3", "site_area_m2": 566.7, "frontage_m": 37.2, "depth_m": 15.2,
-                "has_water_and_sewer": True, "existing_trees_on_site": [], "osm": {"frame": {"snapped_m": {"cross_street": {"name": "Keefer St", "side": "right"}}}}}
+        site = self.SITE
         option = {"id": "o", "name": "three storeys", "tenure": "social_housing", "storeys": 3, "height_m": 10.7, "gfa_m2": 700,
                   "units": {"studio": 2, "one_bed": 3, "two_bed": 3, "three_bed_plus": 1}, "target_programs": [], "floor_to_floor_m": 3.3,
                   "setbacks_m": {"front": 1.8, "rear": 3.0, "side": 3.0}}
@@ -118,6 +120,34 @@ class ShallowLot(unittest.TestCase):
         S = layout.sheets(lay, site, m, L)
         for text in S.values():
             ET.fromstring(text)
+
+    def test_no_sheet_draws_a_negative_size_when_the_yards_leave_little_or_no_plate(self):
+        # 609 Heatley Ave as the tool suggests it (16 Nov 2026): RT-3's 20 m rear yard on a lot 15.2 m deep gave a -6.6 m
+        # envelope, and the plans, stacking, elevations and site plan drew rects of negative width or height (nine
+        # console errors per memo). The plate is now zero, and every sheet draws without a negative size.
+        option = {"id": "o", "name": "three storeys, four homes", "tenure": "social_housing", "storeys": 3, "height_m": 9.9, "gfa_m2": 340,
+                  "units": {"studio": 1, "one_bed": 1, "two_bed": 1, "three_bed_plus": 1}, "target_programs": [], "floor_to_floor_m": 3.3}
+        drawn = {"boundary_m": [[0, 0], [37.2, 0], [37.2, 15.2], [0, 15.2]]}   # the polygon path, which falls back to the rectangle
+        for rear in (20.0, 12.0, 3.0):
+            for extra in ({}, drawn):
+                with self.subTest(rear=rear, polygon=bool(extra)):
+                    site, opt = dict(self.SITE, **extra), dict(option, setbacks_m={"front": 1.8, "rear": rear, "side": 1.5})
+                    L = evaluate(site, opt, AS_OF)
+                    m = massing.build(site, opt, L)
+                    self.assertGreaterEqual(m["envelope"]["depth_m"], 0)
+                    for mass in m["masses"]:
+                        self.assertGreaterEqual(mass["plate_depth_m"], 0, mass["name"])
+                        self.assertGreaterEqual(mass["gfa_m2"], 0, mass["name"])
+                    if rear == 20.0:
+                        self.assertTrue(any("leave no envelope: a front yard of 1.8 m and a rear yard of 20 m" in w for w in m["warnings"]), m["warnings"])
+                    S = layout.sheets(layout.solve(site, opt, L, m), site, m, L)
+                    S["massing"] = massing.svg(m)
+                    for name, text in S.items():
+                        for el in ET.fromstring(text).iter():
+                            for a in ("width", "height"):
+                                v = el.get(a)
+                                if v is not None and not v.endswith("%"):
+                                    self.assertGreaterEqual(float(v), 0, f"{name}: <{el.tag.split('}')[-1]} {a}=\"{v}\">")
 
 
 if __name__ == "__main__":

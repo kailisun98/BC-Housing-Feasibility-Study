@@ -652,7 +652,11 @@ ledgers), "Same verdict, new version" when only the version moved, and a table o
 force (old struck through, then new), Status and Now reads; changed rows in the clauses and the
 ledger carry the delta and their layer opens. Between two options: "What changed between the two
 options", "R1 → R2 · same rules, as of …", no version column, the status read B → A, and "numbers changed"
-where the engine says a finding was reworded. Rows are named by the rule's title over its id. On a
+where the engine says a finding was reworded. Rows are named by the rule's title over its id. A rule that applies
+to neither run (not applicable on both sides, or added or dropped while not applicable) folds into one muted row at
+the foot, "N rules not applicable to either run, for other districts, policies or programs", as the ledger folds its
+own (17 Nov 2026); a status moving to or from not applicable stays in view. The status strip counts the same way and
+the paper memo lists only those rules, with a line for the rest. On a
 phone the table stacks, each value under its column's name.
 
 ### Answer cards

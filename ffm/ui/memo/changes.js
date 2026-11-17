@@ -15,14 +15,21 @@ export function changeWord(c, kind = "rules") {
   return { added: "rule added", removed: "rule dropped" }[c.change] || String(c.change).replace(/_/g, " ");
 }
 
+/* A change to a rule that applies to neither run: not applicable on both sides, or added or dropped while not
+   applicable (17 Nov 2026, Kai: 52 of 61 rows between the two Glen Drive runs were districts added since). A status
+   that moves to or from not applicable is a real change and stays in view. */
+export const naChange = c => [c.from, c.to].filter(Boolean).every(s => s === "not_applicable");
+
 /* A comparison in a few words for the status strip: how many statuses and versions moved, without the rule ids. */
 function changesPhrase(d) {
-  const ch = d.changes || [];
-  if (!ch.length) return "no rule changed version or status";
+  // counted over the rules that apply to either run, as the card lists them; the rest are a count at the end
+  const all = d.changes || [], ch = all.filter(c => !naChange(c)), na = all.length - ch.length;
+  const tail = na ? `; ${na} more for other districts, policies or programs` : "";
+  if (!ch.length) return (all.length ? "no rule that applies to either run changed" : "no rule changed version or status") + tail;
   const st = ch.filter(c => c.from !== c.to).length;
   const ver = ch.filter(c => c.from_version && c.to_version && c.from_version !== c.to_version).length;
   const bits = [st && (st === 1 ? "1 status differs" : `${st} statuses differ`), ver && `${ver} new version${ver === 1 ? "" : "s"}`].filter(Boolean);
-  return bits.length ? bits.join(", ") : `the same statuses, ${ch.length} finding${ch.length === 1 ? "" : "s"} with other numbers`;
+  return (bits.length ? bits.join(", ") : `the same statuses, ${ch.length} finding${ch.length === 1 ? "" : "s"} with other numbers`) + tail;
 }
 
 /* An option's name up to its colon: "As approved by Council, 25 Jul 2024", not the description after it. */
@@ -83,7 +90,7 @@ export function renderChanges(d, L, run) {
   const kind = compareKind(d), rules = kind === "rules";
   const titles = Object.fromEntries(((L && L.results) || []).map(r => [r.rule_id, r.title]));
   const changes = d.changes || [];
-  const rows = changes.map(c => {
+  const row = c => {
     const ver = c.from_version && c.to_version && c.from_version !== c.to_version;
     const status = c.from && c.to ? (c.from === c.to ? `${pill(c.to)} <span class="cont">unchanged</span>` : `${pill(c.from)} → ${pill(c.to)}`) : (c.to ? pill(c.to) : c.from ? pill(c.from) : "—");
     return `<tr>
@@ -92,8 +99,14 @@ export function renderChanges(d, L, run) {
       <td class="trans" data-label="${rules ? "Status" : "Status, B → A"}">${status}</td>
       <td data-label="Now reads">${h(c.finding)}</td>
     </tr>`;
-  }).join("");
-  const sameVerdict = changes.length && changes.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
+  };
+  // the rules that apply to neither run fold into one row at the foot, as the ledger folds its own
+  const shown = changes.filter(c => !naChange(c)), na = changes.filter(naChange);
+  const cols = rules ? 4 : 3;
+  const naRow = na.length ? `<tr class="na-row"><td colspan="${cols}"><details class="fold na-fold"><summary>${na.length} rule${na.length === 1 ? "" : "s"} not applicable to either run, for other districts, policies or programs</summary>
+      <table class="plain"><tbody>${na.map(row).join("")}</tbody></table></details></td></tr>` : "";
+  const rows = shown.map(row).join("") + naRow;
+  const sameVerdict = shown.length && shown.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
   const cause = d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs");
   const lead = rules
     ? `<b>${h(state.compareRun ? rev(state.compareRun) : "The earlier memo")}</b> → <b>${h(rev(run && run.run_id))}</b> · ${h(cause)}.`
@@ -101,7 +114,7 @@ export function renderChanges(d, L, run) {
   return `<section class="card section changes" id="changes">
     <h2>${rules ? `${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}` : "What changed between the two options"}</h2>
     <p class="stamps">${lead}</p>
-    ${changes.length ? `${sameVerdict ? `<p class="same">Same verdict${changes.length === 1 ? "" : "s"}, new version${changes.length === 1 ? "" : "s"}: the memo names the version it used.</p>` : ""}
+    ${changes.length ? `${sameVerdict ? `<p class="same">Same verdict${shown.length === 1 ? "" : "s"}, new version${shown.length === 1 ? "" : "s"}: the memo names the version it used.</p>` : ""}${!shown.length ? `<p>No rule that applies to either run changed version or status.</p>` : ""}
     <table class="plain"><thead><tr><th>Rule</th>${rules ? "<th>Version in force</th><th>Status</th>" : "<th>Status, B → A</th>"}<th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
     : `<p>No rule changed version or status between the two runs.</p>`}
   </section>`;

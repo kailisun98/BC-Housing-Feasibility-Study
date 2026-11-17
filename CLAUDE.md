@@ -750,6 +750,10 @@ Phase 2, the cost layer and the pro-forma:
   verdict and puts the next step, the four figures, the reasons and the line table behind "Show the pro-forma ·
   capital, funding, gap" (`details.money-more`); the choice is kept (`ffm.architect.money`) and ledger layer F
   opens and folds with it (`wireMoneyFold`, `applyModeToMemo`). The line table is folded in every mode now.
+- What changed folds the rules that apply to neither run (17 Nov 2026, Kai; `naChange` in `memo/changes.js`: every
+  status present is not applicable): between the two Glen Drive runs 52 of 61 rows were districts added since. They
+  sit in one `na-fold` row at the foot of the table; a status moving to or from not applicable (family units, fail →
+  not applicable) stays in view. `changesPhrase` and the paper memo's comparison count and list the same way.
 - Day or night by hand (17 Nov 2026): `#theme-btn` at the end of the top bar, `initTheme` / `setTheme` in
   `modes.js`, `ffm.theme` in localStorage applied by a one-line script in index.html's head; app.css repeats the
   night tokens under `:root[data-theme="dark"]` (brand.css already did for the statuses). The site pages stay dark.

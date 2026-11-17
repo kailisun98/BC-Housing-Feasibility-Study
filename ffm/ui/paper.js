@@ -9,7 +9,7 @@ import { compareKind, idBreak, optionName, refOf } from "./memo/memo.js";
 import { layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyWord } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
 import { tradeOff } from "./memo/side-by-side.js";
-import { changeWord, shortName } from "./memo/changes.js";
+import { changeWord, naChange, shortName } from "./memo/changes.js";
 import { siteContext } from "./figures/common.js";
 import { figPlan } from "./figures/plan.js";
 import { figSection } from "./figures/section.js";
@@ -104,7 +104,10 @@ export function paperDocument(run) {
   // 3. the comparison, when there is one
   let compare = "";
   if (d) {
-    const changes = (d.changes || []).slice().sort((a, b) => String(ref(a.rule_id)).localeCompare(String(ref(b.rule_id)), "en", { numeric: true }));
+    // the rules that apply to neither memo are counted, not listed (17 Nov 2026), as the screen folds them
+    const naCount = (d.changes || []).filter(naChange).length;
+    const changes = (d.changes || []).filter(c => !naChange(c)).sort((a, b) => String(ref(a.rule_id)).localeCompare(String(ref(b.rule_id)), "en", { numeric: true }));
+    const naNote = naCount ? `<p class="note">${naCount} more rule${naCount === 1 ? "" : "s"} changed that ${naCount === 1 ? "applies" : "apply"} to neither memo, for other districts, policies or programs; the ledger in section ${s.ledger} lists every rule.</p>` : "";
     const head = B ? `<table class="ab">
         <colgroup><col style="width:30%"><col style="width:35%"><col></colgroup>
         <thead><tr><th>Answer</th><th>A · ${h(revA)} · this memo</th><th>B · ${h(revB)} · ${h(shortName(optionName(B)))}</th></tr></thead>
@@ -123,8 +126,8 @@ export function paperDocument(run) {
       ${changes.length ? `<h3>What changed, rule by rule</h3><table class="changes">
         <colgroup><col style="width:5%"><col style="width:27%"><col style="width:13%"><col style="width:24%"><col></colgroup>
         <thead><tr><th>Ref</th><th>Rule</th><th>What changed</th><th>Status, ${h(revB)} → ${h(revA)}</th><th>Now reads</th></tr></thead>
-        <tbody>${changes.map(c => `<tr><td>${refTag(c.rule_id)}</td><td>${h(titleOf[c.rule_id] || c.rule_id)}${c.from_version && c.to_version && c.from_version !== c.to_version ? `<div class="mono muted">v ${h(c.from_version)} → ${h(c.to_version)}</div>` : ""}</td><td>${h(changeWord(c, kind))}</td><td class="trans">${c.from === c.to ? `${mark(c.to)} <span class="muted">same</span>` : `${c.from ? mark(c.from) : "—"} → ${c.to ? mark(c.to) : "—"}`}</td><td>${h(c.finding || "")}</td></tr>`).join("")}</tbody></table>`
-        : `<p>No rule changed its version or status between the two memos.</p>`}
+        <tbody>${changes.map(c => `<tr><td>${refTag(c.rule_id)}</td><td>${h(titleOf[c.rule_id] || c.rule_id)}${c.from_version && c.to_version && c.from_version !== c.to_version ? `<div class="mono muted">v ${h(c.from_version)} → ${h(c.to_version)}</div>` : ""}</td><td>${h(changeWord(c, kind))}</td><td class="trans">${c.from === c.to ? `${mark(c.to)} <span class="muted">same</span>` : `${c.from ? mark(c.from) : "—"} → ${c.to ? mark(c.to) : "—"}`}</td><td>${h(c.finding || "")}</td></tr>`).join("")}</tbody></table>${naNote}`
+        : naCount ? `<p>No rule that applies to either memo changed its version or status.</p>${naNote}` : `<p>No rule changed its version or status between the two memos.</p>`}
     </section>`;
   }
   // the money, line by line, on paper: the board and the funder's officer read the gap here and nowhere else (15 Nov 2026)

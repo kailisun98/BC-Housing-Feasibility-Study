@@ -1277,9 +1277,9 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .stage-foot:has(.stage-block) { flex-wrap: wrap; }
 @media (max-width: 760px) { .foot-main .stage-block { text-align: left; } }
 /* inside a layer: the rules that did not apply, folded into one row; a long source section under its first words */
-.ledger tr.na-row > td { padding: 4px 0; }
-.ledger .na-fold > summary { font-size: 12px; color: var(--muted); }
-.ledger .na-fold table.plain { margin: 6px 0 4px; }
+.ledger tr.na-row > td, .changes tr.na-row > td { padding: 4px 0; }
+.ledger .na-fold > summary, .changes .na-fold > summary { font-size: 12px; color: var(--muted); }
+.ledger .na-fold table.plain, .changes .na-fold table.plain { margin: 6px 0 4px; }
 .ledger td.src .rule-sec { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
 .ledger .rule-sec-fold { margin-top: 2px; font-size: 11px; color: var(--muted); }
 .ledger .rule-sec-fold > summary { cursor: pointer; list-style: none; }

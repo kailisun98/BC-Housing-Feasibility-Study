@@ -1,0 +1,151 @@
+/* How the page is laid out for who is reading (manager, architect, reader), the left column folding, the Summary |
+   Detailed | 3D view of the memo, and the step a reader is working in. */
+
+import { $, $$, setStatus } from "./core/util.js";
+import { editor, guide, state } from "./core/state.js";
+import { syncCards } from "./schedule.js";
+import { renderMemo, renderQuiet } from "./memo/memo.js";
+import { renderPreview3D } from "./figures/cards.js";
+import { closeExportPanel } from "./revit.js";
+import { renderGuide } from "./route-stage.js";
+import { closeIssuePanel, issueButtonLabel, pollIssues } from "./issue.js";
+import { loaded } from "./core/lazy.js";
+
+/* The step bar: the current step is the one the reader is working in (aria-current); a step is done when its work is
+   done (a site and an option chosen, a memo on screen), not when the page has scrolled past it. */
+function stepsDone() {
+  return {
+    1: !!(state.site && (state.siteId || state.site.address)),
+    2: !!(state.option && (state.optionId || state.option.storeys != null)),
+    3: !!state.run,
+    4: false,
+  };
+}
+
+/* The first step whose work is not done yet: with the case preloaded, that is Run and read. */
+export function firstOpenStep() {
+  const done = stepsDone();
+  return [1, 2, 3, 4].find(k => !done[k]) || 4;
+}
+
+export function setStep(n) {
+  state.step = n;
+  const done = stepsDone();
+  $$(".steps a[data-step]").forEach(a => {
+    const k = Number(a.dataset.step);
+    a.classList.toggle("active", k === n);
+    a.classList.toggle("done", k !== n && done[k]);
+    if (k === n) a.setAttribute("aria-current", "step"); else a.removeAttribute("aria-current");
+  });
+}
+
+const STEP_OF = { "step-site": 1, "step-option": 2, "step-run": 3, "step-export": 4 };
+
+export function watchSteps() {
+  // where the reader is working: focus or a click inside a step's panel
+  const follow = e => {
+    const sec = e.target && e.target.closest && e.target.closest("#step-site, #step-option, #step-export, #step-run");
+    if (sec) setStep(STEP_OF[sec.id]);
+  };
+  document.addEventListener("focusin", follow);
+  document.addEventListener("pointerdown", follow);
+  // and scrolling: side by side, the inputs and the memo are both on screen, so only the memo pane's scroll counts
+  if (!("IntersectionObserver" in window)) return;
+  const stacked = window.matchMedia("(max-width: 1100px)");
+  const io = new IntersectionObserver(entries => {
+    const vis = entries.filter(e => e.isIntersecting && (stacked.matches || e.target.id === "step-run" || e.target.id === "step-export"))
+                       .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (vis) setStep(STEP_OF[vis.target.id]);
+  }, { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.2, 0.5] });
+  for (const id of Object.keys(STEP_OF)) { const el = document.getElementById(id); if (el) io.observe(el); }
+}
+
+export const VIEW_KEY = "ffm.view";
+
+export function setView(v, remember = true) {
+  if (!["summary", "detailed", "3d"].includes(v)) v = "detailed";
+  state.view = v;
+  $(".memo-pane").dataset.view = v;
+  $$("#view-switch .segbtn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
+  if (v === "3d") renderPreview3D(); else { const p = $("#preview3d"); if (p) p.remove(); }
+  if (remember) { try { localStorage.setItem(VIEW_KEY, v); } catch (e) { /* fine */ } }
+}
+
+/* The left column folds to a strip with its own arrow and opens again on another click. The reader's own choice is
+   kept for their next visit, where the browser allows it; the manager's folds by itself once a memo is on screen. */
+export const RAIL_KEY = "ffm.inputs.collapsed";
+
+export function showInputs(show, remember = true) {
+  $(".panes").classList.toggle("no-inputs", !show);
+  const btn = $("#rail-toggle");
+  btn.setAttribute("aria-expanded", String(show));
+  const word = state.mode === "manager" ? "the stops" : "the inputs";
+  btn.title = show ? `Fold ${word}` : `Show ${word}`;
+  if (remember) { try { localStorage.setItem(RAIL_KEY, show ? "0" : "1"); } catch (e) { /* storage off: the choice lasts this visit */ } }
+}
+
+/* Who is reading. The three flows in docs/user-flows.md each lay the same page out differently; the switch in the
+   top bar picks one, ?mode= in a link from the site picks it for a visitor, and the choice is kept for the next visit.
+     manager   the route of three stops on the left, one card at a time on the stage, then the memo with Download PDF
+     architect the Site and Option schedules on the left; every ledger layer open; Export to Revit leads
+     reader    no inputs, no run controls: the memo alone in a reading column, Download PDF and Print
+   The engine and the memo are the same in every mode; only what is shown first changes (app.css does the rest). */
+const MODE_KEY = "ffm.mode";
+
+export const MODES = {
+  manager: { who: "the development manager", line: "three stops, the site, the option and the run, then the memo with Download PDF for the board." },
+  architect: { who: "the architect", line: "the Site and Option schedules beside the memo, every ledger layer open, two runs compared, the block editor on FIG 03, and the massing to Revit." },
+  reader: { who: "a reader", line: "the memo alone, as on paper, with Download PDF and Print. Switch to Manager or Architect to change anything." },
+};
+
+/* The switch's paper thumb slides under the pressed reader; it is measured, so it follows the fonts and the window. */
+export function placeModeThumb() {
+  const sw = $("#mode-switch"), thumb = $(".seg-thumb", sw), on = $('button[aria-pressed="true"]', sw);
+  if (!thumb || !on) return;
+  thumb.style.width = `${on.offsetWidth}px`;
+  thumb.style.transform = `translateX(${on.offsetLeft}px)`;
+  sw.classList.add("placed");
+}
+
+export function setMode(mode, remember = true, announce = true) {
+  if (!MODES[mode]) mode = "manager";
+  state.mode = mode;
+  document.documentElement.dataset.mode = mode;
+  $$("#mode-switch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.mode === mode)));
+  placeModeThumb();
+  document.title = `First Read · for ${MODES[mode].who}`;
+  guide.over = false;
+  const railWord = mode === "manager" ? "Stops" : "Inputs";
+  $(".rail-label").textContent = railWord;
+  if (mode === "reader") {
+    showInputs(false, false);
+    closeExportPanel();
+    if (state.view !== "detailed") setView("detailed", false);   // the reader has no view switch: never land them in the 3D view with the answers hidden
+  } else {
+    // the manager's route folds once a memo is on screen; the architect works from the schedules beside it
+    showInputs(!(mode === "manager" && state.run), false);
+  }
+  if (editor.open && mode !== "architect") loaded.blocks.closeEditor();   // the editor is the architect's; leaving the mode closes it
+  // the memo is laid out for its reader (the note addressed to them, the architect's mass tools), so it is drawn again
+  if (state.run && state.run.ledger) renderMemo(state.run); else applyModeToMemo();
+  syncCards();
+  renderGuide();
+  if (!state.run) renderQuiet();   // the manager's stage, the reader's empty page, or the quiet cards for the architect
+  issueButtonLabel();
+  closeIssuePanel();
+  if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }
+  if (announce) { setStatus(`Laid out for ${MODES[mode].who}: ${MODES[mode].line}`, "info"); pollIssues(); }
+}
+
+/* What a mode does to the memo on screen: the architect reads every ledger layer open, the others start closed. */
+export function applyModeToMemo() {
+  const open = state.mode === "architect";
+  $$(".ledger details").forEach(d => { if (d.open !== open) d.open = open; });
+}
+
+export function initialMode() {
+  const q = new URLSearchParams(location.search).get("mode");
+  if (q && MODES[q]) return q;
+  try { const m = localStorage.getItem(MODE_KEY); if (m && MODES[m]) return m; } catch (e) { /* fine */ }
+  return "manager";
+}

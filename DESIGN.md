@@ -157,6 +157,7 @@ typography:
     lineHeight: 1.25
 rounded:
   mark: "2px"
+  revision: "3px"
   control: "4px"
   button: "5px"
   panel: "6px"
@@ -412,22 +413,38 @@ hashes, paths, shell lines, the as-of date. Human sentences are never set in mon
 
 ## Layout
 
-Two panes under the bars: a top bar of at least 46px, the step bar and the status strip stick
-together as one block, and the top bar grows a row rather than let its controls overflow. The
-input rail sits on the left at min(420px, 36vw) on the page grey with a 1px line on its right, the
-memo on the right taking the rest. The rail holds the Site and Option cards 12px apart with 16px
-side padding; once a file is chosen each card collapses to its file and a one-line summary, and
-Edit opens the form. The rail folds with its own control: a row at its top, keyed Inputs, with a
-chevron (an SVG, not a glyph). One click folds the rail to a 44px strip (56px on a wide touch screen)
-that reads Inputs upward under a right-pointing chevron and sticks under the bars; another click, or
-the Site or Option step, opens it again, and the reader's choice is kept for the next visit. Stacked
-over the memo below 1100px, the rail folds to its single row, the chevron pointing up to fold and down
-to open. Folding moves nothing else: the run pickers and the walkthrough stay where they are.
-The memo pane has 20px side padding, and anything a link or a step lands on keeps a scroll margin
-the height of the bars. Below 1100px the panes stack and the two input cards sit side by side;
-below 760px everything is one column and the bars stop sticking. At 1600px and above the answers
-and the figures sit side by side, the figures in a 460px column, and the ledger and the rest run
-the full width beneath.
+Two panes under the bars: a top bar of at least 46px and the status line stick together as one block
+(88px; the step bar and the walkthrough banner went on 16 Nov 2026), and the top bar grows a row rather
+than let its controls overflow. **The left column is what you work from; the right is what it says**
+(`docs/ui-route-and-stage.md`). For the manager it is the **route**, 236px: three read-only rows, 01 The
+site, 02 The option, 03 Run, each a mono key, a 13px title and, once decided, its decision in a 12px
+line ("609 Heatley Ave · RT-3 · 37.2 × 15.2 m"), joined by a hairline; the current row sits on a Group
+tab, a done row's key becomes a drawn check, a row not yet reachable is muted; under them "Then the
+memo…", or after a run a row for the memo (R1 · The memo). The memo pane is then the **stage**: one card
+at a time (below). For the architect the left column is min(420px, 36vw) and holds the **Site and
+Option schedules** under two tabs. The reader has none. The column folds with its own control, keyed
+Stops or Inputs, to a 44px strip (56px on a wide touch screen) that reads its key upward and sticks
+under the bars; the manager's folds by itself once a memo is on screen, and the reader's own choice is
+kept for the next visit. The memo pane has 20px side padding, and anything a link lands on keeps a
+scroll margin the height of the bars. Below 1100px the panes stack: the route becomes one line of
+three pills over the stage, the schedules one column; below 760px everything is one column, the bars
+stop sticking and the stage card's footer, with its one filled button, sticks to the foot of the
+screen. At 1600px and above the answers and the figures sit side by side, the figures in a 460px
+column, and the ledger and the rest run the full width beneath.
+
+**The stage (manager).** A light 30px head (the address, or "A site, a funder, an option, a memo" on a
+blank page) over one card, at most 900px wide: an 18px question (the Title size) with its mono key before it (01 Where is
+the site? → Is this the parcel? → What the open data could not tell; 02 What goes on it?; 03 Money in,
+then run), its body, and a footer with quiet buttons on the left and the card's one filled button on
+the right (Continue to the option →, Continue to the run →, Run the rules). 01 leads with a 15px address
+field and Look up, the saved sites and the demo case following on one quiet line; the parcel check
+puts the half-tone map beside its facts; the questions the open data could not answer are one schedule
+(question, a three-state or a select, who answers). 02 and 03 set keys beside their content as the
+title block does (For, The site allows, Start from, The building, Left to you); the building is **four
+figures under a 2px ink rule** (storeys, height, FSR over floor area, homes), each changed in place with
+its rule's ref, "rough", "placeholder" or "yours" beneath; every other figure waits behind "All 21
+figures". A blank page adds the memo's title block in dashed outline, labels only. A route row brought
+back after a run lays its card over the memo, with Back to R1 in the head.
 
 The home page is one 1280px column with a 20px gutter (16px on a phone); its top bar's contents
 line up with that column at any width, and its four anchors mark the section the reader is in. On a
@@ -497,7 +514,8 @@ and a revision cloud is a 1px dashed ink outline at a 7px radius around the word
 Dark and plain; they say what they do.
 - **Shape:** 5px radius, 30px minimum height, 13px weight 500, 6px by 12px padding; small variant
   26px high at 12px.
-- **Primary:** Ink fill, Panel text. One per screen: Run the rules; the walkthrough's Next and
+- **Primary:** Ink fill, Panel text. One per screen: the stage card's Continue or Run the rules (the
+  architect's Run the rules in the top bar is signal blue); Download PDF in the memo's title block; the walkthrough's Next and
   Take the walkthrough; on the home page, the two "Run the real case with a walkthrough" buttons,
   each with its alternatives as plain links beside it.
 - **Secondary:** Group fill, Ink text; Download PDF, Print, Check Revit result, and the home
@@ -538,21 +556,35 @@ here, including opening a past run, a comparison and reading the Revit result; t
   placeholder. A share written as a percentage (30 for 30%) gets a field warning in Uncertain Text.
 - **Checkbox groups and tree rows:** ink-accented native checkboxes; compact 12.5px rows; each
   tree row's remove button is named for its tree.
-- **Input cards:** collapsed, a card shows its file select and a summary line (address, district,
-  area and dimensions, and how many answers are "not sure"; or the option's storeys, height, floor
-  area, units and tenure), with Edit to open the form and Done to close it.
+- **Schedules (architect, 16 Nov 2026):** the Site and the Option each a schedule under a file select:
+  groups under 11px keys, one row per input, **Item | Value | Ref**. The Item is the 12.5px label (a 6px
+  ink dot when the engine needs it to run; who answers, where the manager is asked it); the Value is the
+  control; the Ref names the rules that read the input as the memo cites them (A1, C2, "E1 E2", "+2" past
+  two; the same count the engine makes, so a ref before a run is the ref in the memo) or a word where no
+  rule does (file, title, note, drawings, money, open item). A click on the Ref opens the reason under the
+  row on the group grey. This replaced the (i) on every label and the three need marks. A line over each
+  schedule counts the inputs needed to run and those a rule reads. The Claude folds sit here only: "Odd
+  lot? Ask Claude" at the Site schedule's head, "Read the RT-3 schedule with Claude" under the district's
+  row when the rules hold none. Every input is one entry in `FIELDS` (`ffm/ui/fields.js`); the schedules, the
+  manager's questions, the four figures and the money fields are views of it.
+- **Questions (manager):** a table of question, answer, who answers, under 11px column keys; the
+  three-state control, a select or a text field per row; one row each, never asked twice.
 
 ### Navigation
-- **Step bar:** four 12.5px labels with a 20px round badge; the current step (`aria-current`)
-  sits on a Group tab with its badge filled Ink, a step whose work is done (a site, an option, a
-  memo on screen) keeps the filled badge, the rest are Muted. The current step follows where the
-  reader works: focus or a click in a panel, and scrolling in the memo pane. A step link moves focus
-  to its panel. Hover tints the tab and draws a 3px inset underline. A "Walkthrough" link in Blue
-  ends the bar.
+- **Route (manager):** see Layout. The rows are buttons in a `nav` named Stops, `aria-current="step"`
+  on the current one; a click brings that stop's card to the stage and focus to its question.
+- **Status line:** one line under the top bar, sticky with it: the dot, the sentence (a polite live
+  region) and, at its end, a Blue "Walkthrough" link, with a 6px Blue dot before it until the
+  walkthrough has been seen. Never an `outputs/` path for the manager or the reader.
 - **Top bar:** the wordmark (a link back to the home page) and subtitle, then the as-of date in a
-  mono field (the date of the memo on screen, and of the next run), the primary button (Ctrl+Enter),
-  the engine chip, and the memo's revision: a "Revision" key and R1, R2… in a small 1px Ink box.
-  A skip link to the memo comes first in the tab order.
+  mono field (the date of the memo on screen, and of the next run), Run the rules (Ctrl+Enter), the
+  engine chip, and the memo's revision: a "Revision" key and R1, R2… in a small 1px Ink box. For the
+  architect Run the rules is the signal-blue button; for the manager, who runs from the card at 03, it
+  is absent until a memo exists and then reads Run again, quiet on the ink, live only once an edit has
+  left the memo out of date. A skip link to the memo comes first in the tab order.
+- **The memo's actions:** in its title block, under the option's figures: Download PDF (Ink), Issue to
+  the architect, Print, More formats; the architect's row leads with Export to Revit; the issue form
+  opens under the row. The export footer keeps the note and the Revit panel and shows only with a memo.
 
 ### Title block
 The memo's header: an 18px title over a row of cells, each a Key over a 12.5px value, keys aligned
@@ -692,18 +724,17 @@ error (red), in the matching colour on a Line border.
 
 ### Walkthrough
 A spotlight cut from a dimmed page with a 2px blue ring, and a Panel card: a modal dialog named by
-its 14px heading, 12.5px text, Back / Next buttons and a Key counter ("3 of 15 · Esc closes"). Tab
+its 14px heading, 12.5px text, Back / Next buttons and a Key counter ("3 of 9 · Esc closes"). Tab
 stays inside the card, the arrows page through it except inside a field or the 3D view, and Esc
-returns focus to where it was. Its fifteen stops follow the manager's flow (rebuilt 3 Nov 2026): the
-mode switch, the rules date, the guided start's address, programs-and-reading and shaping stops, the
-Site and Option cards, Run (the eighth stop runs the real case), the three answers, the view switch
-(the page is put into the 3D preview for the drawings stop and back to Detailed for the ledger), past
-runs, Export and Issue, and the architect's and reader's layouts. A stop may set the page up for
-itself; the layout and the view the reader started in come back when the walkthrough ends.
+returns focus to where it was. Its nine stops follow the route (rebuilt 16 Nov 2026): the mode switch,
+the three stops, 01, 02 (the demo case is loaded if no site is), 03 (it runs the real case), the four
+answers, the memo's actions, the view switch, and the architect's and reader's layouts. A stop may set
+the page up for itself and wait for it; the layout and the view the reader started in come back when
+the walkthrough ends.
 
 ### The paper memo (PDF and Print)
 Download PDF and Print both lay the memo out for paper, for whoever reviews it, as one self-contained
-document built from the run (`paperDocument` in `app.js`): the local server prints it to a PDF file with
+document built from the run (`paperDocument` in `ffm/ui/paper.js`): the local server prints it to a PDF file with
 a headless Edge or Chrome; where there is no server or no such browser, it opens in the print dialog,
 where Save as PDF gives the same pages. US Letter, 20 / 16 / 18 mm margins.
 - **Order:** the address and a drawing-style title block (option, revision, rules date, proponent, site,

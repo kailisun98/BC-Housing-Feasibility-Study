@@ -26,7 +26,7 @@
   --focus: 2px solid var(--blue);
   --topbar-h: 52px;
   --strip-h: 36px;
-  --bars-h: 134px;   /* the three sticky bars together, for scroll margins */
+  --bars-h: 88px;    /* the top bar and the status line together, for scroll margins (16 Nov 2026: the step bar went) */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -106,27 +106,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .engine-chip.loading { color: #ebb45c; border-color: var(--b-amber-night); }
 .engine-chip.loading::before { content: ""; display: inline-block; width: 9px; height: 9px; border: 2px solid var(--amber); border-top-color: transparent; border-radius: 50%; margin-right: 6px; vertical-align: -1px; animation: ui-spin .9s linear infinite; }
 @keyframes ui-spin { to { transform: rotate(360deg); } }
+/* under reduced motion a spinner holds still: the open ring and the words still say it is working */
+@media (prefers-reduced-motion: reduce) { .engine-chip.loading::before, .strip.busy .dot { animation: none; } }
 
-/* ------------------------------------------------------------------ steps: a tab strip; the status strip under it */
-/* the steps: a progress line, the flows' four stops joined by hairlines; the current stop sits on a tab */
-.steps {
-  display: flex; align-items: center; gap: 0; padding: 6px 12px;
-  background: var(--panel); border-bottom: 1px solid var(--line); font-size: 12.5px; font-weight: 500;
-}
-.steps a { color: var(--muted); text-decoration: none; padding: 5px 12px 5px 8px; border-radius: 999px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; transition: background-color .12s ease-out, color .12s ease-out, box-shadow .12s ease-out; }
-.steps a[data-step] + a[data-step]::before { content: ""; width: 22px; height: 1px; background: var(--line); margin: 0 10px 0 -2px; flex: 0 0 22px; }
-.steps a:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); color: var(--ink); }
-.steps a.active { background: var(--group); color: var(--ink); }
-.steps a.active::before, .steps a:hover::before { background: var(--line); }
-.step-n, .badge {
+/* ------------------------------------------------------------------ the status line: one sentence for every action, and the walkthrough */
+/* (16 Nov 2026: the step bar and the walkthrough banner went; the route and the guide carry the progress, and the
+   walkthrough is a link at the end of this line, marked until it has been seen) */
+.badge {
   display: inline-flex; width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 600; background: var(--group); color: var(--ink); flex: 0 0 20px; letter-spacing: 0; border: 1px solid transparent;
 }
-.steps .step-n { background: transparent; border-color: var(--line); color: var(--muted); }
-.steps a.done .step-n { background: var(--ink); border-color: var(--ink); color: var(--panel); }
-.steps a.active .step-n { background: var(--b-signal-deep); border-color: var(--b-signal-deep); color: #fff; }
-.steps .tour-link { margin-left: auto; color: var(--blue); font-weight: 500; }
-.steps .tour-link:hover { color: var(--ink); }
+.strip .tour-link { margin-left: auto; padding-left: 12px; color: var(--blue); font-weight: 500; text-decoration: none; white-space: nowrap; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; }
+.strip .tour-link:hover { text-decoration: underline; }
+.strip .tour-link.unseen::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
 
 .strip { display: flex; align-items: center; gap: 10px; padding: 6px 16px; font-size: 12.5px; border-bottom: 1px solid var(--line); background: var(--status-info); min-width: 0; min-height: var(--strip-h); transition: background-color .25s ease-out; }
 .strip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex: 0 0 9px; transition: background-color .25s ease-out; }
@@ -136,7 +128,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .strip.busy { background: var(--status-busy); }
 .strip.busy .dot { border: 2px solid var(--amber); border-top-color: transparent; background: transparent; width: 10px; height: 10px; animation: ui-spin .9s linear infinite; }
 
-.tour-offer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 16px 0; padding: 8px 12px; background: var(--status-info); border-radius: 4px; font-size: 12.5px; }
 
 /* ------------------------------------------------------------------ layout: the step rail and the stage */
 .panes { display: grid; grid-template-columns: min(420px, 36vw) minmax(0, 1fr); gap: 0; min-height: calc(100vh - var(--bars-h)); transition: grid-template-columns .3s cubic-bezier(.16, 1, .3, 1); }
@@ -170,7 +161,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   /* stacked, the panes take their content's height; stretching them to the window opened gaps between the cards */
   .panes { grid-template-columns: 1fr; min-height: 0; align-content: start; }
   .inputs { align-self: start; border-right: 0; border-bottom: 1px solid var(--line); }
-  .inputs-body { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+  .inputs-body { display: flex; flex-direction: column; gap: 10px; }
   /* stacked over the memo, the rail folds up to its one row; the chevron points up to fold, down to open */
   .rail-toggle .chev { transform: rotate(90deg); }
   .panes.no-inputs { grid-template-columns: 1fr; }
@@ -185,8 +176,6 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .inputs-body { grid-template-columns: 1fr; }
   .topbar { padding: 8px 12px; }
   .wordmark em, .mode .eyebrow { display: none; }
-  /* the step tabs wrap to a second line rather than hide Export and Walkthrough past the edge */
-  .steps { flex-wrap: wrap; row-gap: 2px; }
   .input-card, .memo-pane, .memo .card, .export { scroll-margin-top: 8px; }
   /* the title block wraps two cells to a row, without a rule running into the empty space */
   .memo-meta > div { border-right: 0; margin-right: 0; padding-right: 12px; flex-basis: 45%; }
@@ -196,40 +185,24 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); padding: 12px 14px; box-shadow: var(--shadow); }
 .card h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 .input-card > .eyebrow { display: none; }
-/* an input card's head: the numbered heading and the Edit / Done toggle */
+/* a schedule card's head: its heading, and the file it is */
 .card-head { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; }
 .card-head h2 { margin: 0; }
-.card-head .btn { margin-left: auto; }
-/* collapsed, a card shows its file and a one-line summary; the form opens on Edit. The fold is a grid row that goes
-   from 0fr to 1fr, so the form unfolds and folds (320ms) instead of appearing; folded, it leaves the tab order. */
-.form-fold { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .32s cubic-bezier(.16, 1, .3, 1); }
-.form-fold-in { min-height: 0; overflow: hidden; padding: 2px; margin: -2px; visibility: visible; transition: visibility 0s; }
-.input-card.collapsed .form-fold { grid-template-rows: 0fr; }
-.input-card.collapsed .form-fold-in { visibility: hidden; transition: visibility 0s .32s; }
-@media (prefers-reduced-motion: reduce) { .form-fold { transition: none; } .input-card.collapsed .form-fold-in { transition: none; } }
-.input-summary { margin: 8px 0 0; font-size: 12.5px; color: var(--muted); }
-.input-summary b { color: var(--ink); font-weight: 600; }
-.input-card:not(.collapsed) .input-summary { display: none; }
+/* the schedule is always open (16 Nov 2026: the cards no longer fold to a summary line; the summary is kept in the
+   page for the paper and the route, and the schedule shows every figure itself) */
+.form-fold-in { min-width: 0; }
+.input-card .input-summary { display: none; }
 .form { display: flex; flex-direction: column; gap: 8px; }
-.form .group { display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
-.form .group + .group { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; }
-.form .group .eyebrow { margin: 0; }
 .field { display: flex; flex-direction: column; gap: 3px; }
 .field label, .field .label { font-size: 12px; color: var(--muted); font-weight: 500; }
 .field .help { font-size: 11px; color: var(--muted); }
 .field .help.warn { color: var(--s-uncertain-text); font-weight: 500; }
-.field input::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); font-style: italic; }
+/* a placeholder can carry meaning ("not sure"), so it takes the muted ink at full strength: 5.8:1 on the field */
+.field input::placeholder, .fin-rows input::placeholder, .keybox .key-input::placeholder, .issue-panel input::placeholder, .issue-panel textarea::placeholder { color: var(--muted); font-style: italic; opacity: 1; }
 .field input[type="text"], .field input[type="number"], .field select, .field textarea {
   width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; line-height: 1.35;
 }
 .field textarea { min-height: 56px; resize: vertical; }
-/* a row of related fields: three across where the rail allows about 110 px each, else two, else one; a label may
-   take two lines and its (i) stays on the first */
-.field-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 8px 10px; align-items: end; }
-.field-row .field { min-width: 0; }
-.field-row .field .label-line { align-items: flex-start; }
-.field-row .field .label-line label, .field-row .field .label-line .label { line-height: 1.3; }
-.field-row .field .info-btn { margin-top: 1px; }
 .live { font-size: 12px; color: var(--muted); }
 .live b { color: var(--ink); font-weight: 600; }
 
@@ -270,7 +243,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn[disabled], .btn[aria-disabled="true"] { opacity: .45; cursor: default; pointer-events: none; }
 .btn.busy { opacity: .7; cursor: progress; }
 @media (hover: none) { .btn:hover { background: var(--group); box-shadow: none; } .btn-primary:hover { background: var(--ink); } }
-@media (prefers-reduced-motion: reduce) { .btn, .steps a, .tri button { transition: none; } .btn:active { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .btn, .tri button { transition: none; } .btn:active { transform: none; } }
 
 /* ------------------------------------------------------------------ the memo */
 .memo-tools { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 16px; margin: 0 0 12px; }
@@ -323,7 +296,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .memo-figures { display: flex; flex-wrap: wrap; gap: 4px 0; margin: -4px 0 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .memo-figures > div { display: flex; flex-direction: column; gap: 1px; padding: 0 12px 0 0; margin-right: 12px; border-right: 1px solid var(--line); min-width: 0; flex: 1 1 120px; font-size: 13px; }
 .memo-figures > div:last-child { border-right: 0; margin-right: 0; }
-.memo-figures b { font-size: 10.5px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
+.memo-figures b { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
 .memo-figures .cont { color: var(--muted); font-size: 12px; }
 
 /* a revision, the drafting way: a delta with its letter beside what changed, and a revision row in the title block */
@@ -342,7 +315,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .answer[data-verdict="plain"] { --tone: var(--ink); --wash: var(--paper, #fff); }
 .answer .who { font-size: 12.5px; }
 /* the note that came with a run handed to this reader */
-.issue-note { padding: 10px 14px; margin: 0 0 12px; border-left: 3px solid var(--amber); background: color-mix(in srgb, var(--amber) 12%, transparent); font-size: 13px; }
+/* pending, so amber: a hairline and a faint wash all round, not a side stripe (16 Nov 2026) */
+.issue-note { padding: 10px 14px; margin: 0 0 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 9%, var(--panel)); font-size: 13px; }
 /* a warning in the guide or on the stage: amber words, no wash */
 .warn { margin: 8px 0 0; padding: 8px 10px; border-radius: 4px; background: var(--s-uncertain-wash); color: var(--s-uncertain-text); font-size: 12.5px; line-height: 1.45; }
 .warn-text { color: var(--s-uncertain-text); }
@@ -361,7 +335,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .save-inline { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2, var(--panel)); }
 .save-inline .field { flex: 1 1 180px; margin: 0; }
 .save-inline .help { flex-basis: 100%; }
-.stale-band { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; margin: 0 0 12px; border-left: 3px solid var(--amber); background: color-mix(in srgb, var(--amber) 14%, transparent); font-size: 13px; }
+.stale-band { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; margin: 0 0 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 11%, var(--panel)); font-size: 13px; }
 .stage-head .resume { margin-bottom: 8px; }
 /* the pickers and the view switch wait until there is a run to open or compare */
 [data-mode="manager"] .memo-pane.no-run .memo-tools { display: none; }
@@ -400,7 +374,7 @@ details.sg-group[open] > summary.sg-head::before { content: "▾ "; }
 .pf-lines summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 4px 0; }
 .pf-lines table.plain { margin-top: 6px; }
 .pf-lines td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.pf-lines code { font: 10.5px var(--mono); overflow-wrap: anywhere; }
+.pf-lines code { font: 11px var(--mono); overflow-wrap: anywhere; }
 .pf-lines .ph-tag, .prop-row .conf { font: 600 10px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--s-uncertain-text); white-space: nowrap; }
 .pf-lines p.cont { color: var(--muted); font-size: 11.5px; margin: 8px 0 0; max-width: 70ch; }
 
@@ -582,12 +556,12 @@ table.plain td.status { white-space: nowrap; }
 /* ------------------------------------------------------------------ export */
 .export { margin-top: 12px; padding: 12px 14px; border-radius: var(--r-panel); background: var(--panel); border: 1px solid var(--line); border-top: 2px solid var(--ink); box-shadow: var(--shadow); }
 /* the PDF leads the export bar: it is the one the board gets */
-.export .action-bar #pdf-btn { background: var(--ink); color: var(--panel); }
-.export .action-bar #pdf-btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) 76%, var(--panel)); color: var(--panel); }
+#export-actions #pdf-btn { background: var(--ink); color: var(--panel); }
+#export-actions #pdf-btn:hover:not([disabled]) { background: color-mix(in srgb, var(--ink) 76%, var(--panel)); color: var(--panel); }
 /* the inputs the memo read: notes can run long, so the list keeps a reading measure */
 .inputs-used li { max-width: 80ch; }
 .export h2 { margin: 0 0 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-.export .export-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); max-width: 80ch; }
+.export .export-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); max-width: 68ch; }
 .action-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 /* the three file formats fold behind one word; the bar shows the four actions a reader decides between */
 .more-formats { flex: 0 0 auto; }
@@ -596,11 +570,6 @@ table.plain td.status { white-space: nowrap; }
 .more-formats > summary::-webkit-details-marker { display: none; }
 .more-formats[open] > summary { background: var(--field); }
 .more-formats > .action-bar { padding-top: 6px; }
-/* in manager mode the guide is the progress; the four steps give way to its stop count */
-[data-mode="manager"] .steps a[data-step] { display: none; }
-.guide-progress { font: 500 12px/1.4 var(--sans); color: var(--muted); padding: 5px 0; }
-.guide-progress:empty { display: none; }
-[data-mode="manager"] .guide-progress { margin-right: auto; }
 .export-panel { margin-top: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
 .export-panel h3 { font-size: 14px; }
 .export-panel .block { display: flex; flex-direction: column; gap: 4px; }
@@ -629,15 +598,14 @@ table.plain td.status { white-space: nowrap; }
 
 /* ------------------------------------------------------------------ touch: 44px targets on a coarse pointer */
 @media (pointer: coarse) {
-  .btn, .steps a, .tri button, .segbtn, .rail-toggle, .seg-mode button { min-height: 44px; }
+  .btn, .tri button, .segbtn, .rail-toggle, .seg-mode button { min-height: 44px; }
   .field input[type="text"], .field input[type="number"], .field select, .tool select, .asof input[type="date"] { min-height: 44px; }
   .tree-row { grid-template-columns: 40px 1fr 64px 84px 44px; }
   .tree-row input, .tree-row select, .tree-row .x { min-height: 44px; }
   .checks label { min-height: 44px; align-items: center; }
   .checks input { width: 20px; height: 20px; margin: 0; }
-  /* these two selectors are more specific than .segbtn and .tri button above, so they are repeated here (15 Nov 2026) */
-  .sg-pick .segbtn, .answer-ctl .tri button { min-height: 44px; }
-  .info-btn, .field-row .field .info-btn { width: 44px; height: 44px; font-size: 14px; }
+  /* more specific than .segbtn above, so repeated here (15 Nov 2026) */
+  .sg-pick .segbtn { min-height: 44px; }
   .ledger summary { padding-block: 13px; }
   .tour-card .tour-close { min-width: 44px; min-height: 44px; }
   .wordmark a { display: inline-flex; align-items: center; min-height: 44px; }
@@ -647,16 +615,6 @@ table.plain td.status { white-space: nowrap; }
 .need-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 4px; padding: 6px 8px; font-size: 11.5px; color: var(--muted); background: var(--group); border-radius: 4px; }
 .need-legend b { color: var(--ink); font-weight: 600; }
 .need { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; border: 1.5px solid var(--ink); background: var(--ink); }
-.need-rule { background: transparent; }
-.need-figure { background: transparent; border-color: var(--muted); border-style: dashed; }
-.label-line { display: flex; align-items: center; gap: 6px; }
-.label-line label, .label-line .label { flex: 1 1 auto; min-width: 0; }
-.info-btn { flex: 0 0 auto; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--muted); background: transparent; color: var(--muted); font: 600 10px/1 var(--mono); padding: 0; cursor: pointer; min-height: 0; }
-.info-btn:hover, .info-btn[aria-expanded="true"] { background: var(--ink); border-color: var(--ink); color: var(--panel); }
-.pop { position: fixed; z-index: 40; margin: 0; padding: 8px 10px; background: var(--panel); border: 1px solid color-mix(in srgb, var(--ink) 40%, var(--line)); border-radius: 6px; box-shadow: 0 6px 20px rgba(20, 30, 40, .18); font-size: 12px; line-height: 1.5; color: var(--ink); pointer-events: none; }
-.pop p { margin: 0; }
-.field-row .field .label-line { gap: 4px; }
-@media (pointer: coarse) { .info-btn { width: 28px; height: 28px; font-size: 13px; } }
 
 /* ------------------------------------------------------------------ the clauses applied, and two runs side by side */
 .clauses .intro, .side .intro { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; max-width: 62ch; }
@@ -706,35 +664,17 @@ table.plain td.status { white-space: nowrap; }
   .clauses td { border: 0; padding: 2px 0; }
 }
 
-/* ------------------------------------------------------------------ the guided start: seven stops down the rail (manager mode) */
-.guide { padding: 10px 14px 8px; }
-.guide .card-head { margin-bottom: 4px; }
-.guide .card-head .help { margin-left: auto; font-size: 11px; color: var(--muted); }
-.guide .stop { border-top: 1px solid var(--line); scroll-margin-top: calc(var(--bars-h) + 12px); }
-.guide { scroll-margin-top: calc(var(--bars-h) + 8px); }
-.guide .stop-head { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 2px 10px; width: 100%; padding: 8px 2px; border: 0; background: transparent; color: var(--ink); text-align: left; cursor: pointer; border-radius: 4px; transition: background-color var(--t-fast); }
-.guide .stop-head:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
-.guide .stop-head .badge { grid-row: 1 / 3; align-self: start; margin-top: 1px; }
-.guide .stop.done .stop-head .badge { background: var(--ink); color: var(--panel); }
-.guide .stop.open .stop-head .badge { background: var(--b-signal-deep); color: #fff; }
-.guide .stop-title { font-weight: 600; font-size: 13px; }
-.guide .stop-what { font-size: 12px; color: var(--muted); }
-.guide .stop.open .stop-what { display: none; }
-.guide .stop-body { padding: 2px 0 12px 30px; display: flex; flex-direction: column; gap: 8px; }
-.guide .stop-body .form-actions { margin-top: 2px; flex-wrap: wrap; }
-.guide .stop-body .help { font-size: 11.5px; color: var(--muted); max-width: 44ch; }
-.guide .stop-or { margin: 0; }
-.guide .field input[type="text"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; }
 .found-site { margin: 4px 0 0; display: grid; gap: 4px; font-size: 12.5px; }
 .found-site > div { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 8px; }
 .found-site dt { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; padding-top: 2px; }
+/* a programme's terms are named by the rule file's keys, some forty characters long: a key that long is a phrase,
+   so it reads in sentence case at 12px, not as tracked capitals (the Key Rule names a group, not a sentence) */
+.found-site.terms dt { font-size: 12px; letter-spacing: 0; text-transform: none; font-weight: 500; padding-top: 0; }
 .found-site dd { margin: 0; }
-.found-site .cont, .guide .cont { color: var(--muted); }
+.found-site .cont { color: var(--muted); }
 .reading-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
 .reading-list li { display: flex; align-items: center; gap: 8px; }
 .cands { align-self: flex-start; }
-/* stop 6: the pro-forma's five lines and the manager's three figures */
-.pf-mini > div { grid-template-columns: 72px minmax(0, 1fr); }
 .fin-rows { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
 .fin-rows .field .label { font-size: 11px; }
 .fin-rows input { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
@@ -746,8 +686,7 @@ table.plain td.status { white-space: nowrap; }
 .keybox { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 7%, var(--panel)); border-radius: 4px; margin: 2px 0 8px; }
 .keybox .key-input, .fin-rows input, .sched-form input[type="text"], .sched-form input[type="url"], .proposal .field.inline input { min-height: 32px; }
 @media (pointer: coarse) {
-  .guide .stop-head { min-height: 44px; }
-  .keybox .key-input, .fin-rows input, .sched-form input[type="text"], .sched-form input[type="url"], .proposal .field.inline input, .guide .sg-input { min-height: 40px; }
+  .keybox .key-input, .fin-rows input, .sched-form input[type="text"], .sched-form input[type="url"], .proposal .field.inline input, .sg-input { min-height: 40px; }
   .pf-lines summary, .claude-fold > summary { min-height: 40px; display: flex; align-items: center; }
 }
 .keybox .field .label { font-size: 11px; }
@@ -758,18 +697,6 @@ table.plain td.status { white-space: nowrap; }
 .sched-form .field .label { font-size: 11px; }
 .sched-form input[type="text"], .sched-form input[type="url"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
 .sched-form input[type="file"] { font-size: 12px; max-width: 100%; }
-/* the manager's stage: one card per stop in the memo pane before a run, the current stop marked, empty ones quiet */
-.stage-head h1 { font-size: 26px; }
-.stage-list { display: flex; flex-direction: column; gap: 12px; }
-.stage h2 { font: 600 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
-.stage h2 .badge { width: auto; height: auto; border-radius: 0; background: transparent; color: var(--muted); font: 500 11px/1 var(--mono); letter-spacing: .08em; flex: 0 0 auto; border: 0; }
-.stage h2 .badge::before { content: "0"; }
-.stage.current { border-color: color-mix(in srgb, var(--ink) 35%, var(--line)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent), var(--shadow); }
-.stage.current h2 { color: var(--ink); }
-.stage.empty { background: var(--page); box-shadow: none; }
-.stage.empty .quiet { margin: 0; color: var(--muted); font-size: 12.5px; max-width: 60ch; }
-.stage .found-site { font-size: 12.5px; }
-.stage .found-site > div { grid-template-columns: 88px minmax(0, 1fr); }
 .stage-site { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 @media (min-width: 900px) { .stage-site { grid-template-columns: minmax(280px, 1.1fr) minmax(0, 1fr); align-items: start; } }
 .stage-map { height: 260px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--field); }
@@ -798,11 +725,6 @@ table.plain td.status { white-space: nowrap; }
 .stage-assumptions li:first-child { border-top: 0; padding-top: 0; }
 .stage-assumptions .cont { font-size: 12px; }
 .stage-assumptions .stage-src { margin-top: 2px; }
-.stage code.ph { color: var(--s-uncertain-text); }
-.stage code { font: 10.5px var(--mono); color: var(--muted); }
-.stage dd .cont { color: var(--muted); }
-.guide .way { align-self: flex-start; margin-bottom: 2px; }
-.guide .stop-or { margin: 6px 0 2px; font-weight: 500; color: var(--ink); }
 /* stop 1: what the model proposes, each line confirmed on its own */
 .proposal { border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 5%, var(--panel)); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
 .prop-top { display: flex; flex-direction: column; gap: 2px; }
@@ -811,16 +733,15 @@ table.plain td.status { white-space: nowrap; }
 .prop-row { display: flex; flex-direction: column; gap: 3px; padding: 6px 0; border-top: 1px solid var(--line); }
 .prop-row.confirmed { opacity: .72; }
 .prop-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
-.prop-head b { text-transform: capitalize; }
 .prop-val { font-weight: 500; }
 .prop-ev { font-size: 11.5px; line-height: 1.4; }
 .prop-row .btn { align-self: flex-start; }
 .proposal .field.inline { display: inline-flex; align-items: center; gap: 6px; }
 .proposal .field.inline input { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12px; min-width: 140px; }
 .sg-rows { display: flex; flex-direction: column; border-top: 1px solid var(--line); }
-/* the rough envelope line and the unit-mix controls under their groups at stop 4 (16 Nov 2026) */
-.sg-env, .sg-mix { margin: 8px 0 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--field); }
-.sg-env .help, .sg-mix .help { margin: 4px 0 0; }
+/* the unit-mix controls under the Homes figure at 02 (16 Nov 2026) */
+.sg-mix { margin: 8px 0 4px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--field); }
+.sg-mix .help { margin: 4px 0 0; }
 .mix-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px 8px; margin-top: 6px; }
 .mix-row .field { margin: 0; }
 .mix-row .field:first-child { flex: 1 1 100%; }
@@ -829,24 +750,12 @@ table.plain td.status { white-space: nowrap; }
 .cand-why li { margin: 2px 0; }
 .sg-row { display: grid; grid-template-columns: minmax(0, 1.2fr) auto minmax(72px, .9fr); grid-template-areas: "label pick value" "note note note"; gap: 2px 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .sg-label { grid-area: label; font-size: 12.5px; font-weight: 500; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
-.sg-label code { font: 10.5px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
-.sg-label code.ph { color: var(--s-uncertain-text); }
 .sg-pick { grid-area: pick; }
 .sg-pick .segbtn { padding: 2px 8px; min-height: 22px; font-size: 11px; }
 .sg-pick .segbtn[aria-pressed="true"]:last-child { background: var(--amber); color: var(--amber-ink); }
 .sg-value { grid-area: value; font-size: 12.5px; text-align: right; min-width: 0; }
 .sg-value .sg-input { width: 100%; border: 1px solid var(--amber); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12.5px; text-align: right; }
 .sg-note { grid-area: note; font-size: 11px; color: var(--muted); line-height: 1.4; }
-.sg-unsure { padding: 8px 10px; border-radius: 4px; background: var(--s-uncertain-wash); font-size: 12px; }
-.sg-unsure .eyebrow { color: var(--s-uncertain-text); margin-bottom: 4px; }
-.sg-unsure ul { margin: 0; padding-left: 16px; display: grid; gap: 3px; }
-.sg-unsure b { text-transform: capitalize; }
-.sg-unsure li { display: flex; flex-direction: column; gap: 4px; }
-.answer-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 2px 0 4px; }
-.answer-ctl .label { font-size: 11.5px; color: var(--ink); font-weight: 500; display: inline-flex; align-items: center; gap: 8px; }
-.answer-ctl .tri { font-size: 11.5px; }
-.answer-ctl .tri button { padding: 3px 8px; min-height: 24px; }
-.answer-ctl select, .answer-ctl input[type="text"] { border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12px; min-width: 160px; }
 /* the site's reading in the memo pane */
 .reading-findings { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
 .reading-findings .finding-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start; }
@@ -886,9 +795,9 @@ table.plain td.status { white-space: nowrap; }
 /* ------------------------------------------------------------------ who is reading: the three flows as three layouts
    manager (the default) is the page as above. architect opens the drawings beside the answers sooner and leads the export
    bar with Revit. reader takes the inputs, the run controls and the steps away and sets the memo in a reading column. */
-[data-mode="architect"] .export .action-bar #pdf-btn { background: var(--group); color: var(--ink); }
-[data-mode="architect"] .export .action-bar #revit-btn { order: -2; background: var(--ink); color: var(--panel); border-color: transparent; }
-[data-mode="architect"] .export .action-bar #dl-massing { order: -1; }
+[data-mode="architect"] #export-actions #pdf-btn { background: var(--group); color: var(--ink); }
+[data-mode="architect"] #export-actions #revit-btn { order: -2; background: var(--ink); color: var(--panel); border-color: transparent; }
+[data-mode="architect"] #export-actions #dl-massing { order: -1; }
 /* the architect reads the four answers, then the drawings at full width, two sheets to a row, the plans (and the
    block editor on them) across the whole width; the ledger follows */
 [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; }
@@ -905,8 +814,8 @@ table.plain td.status { white-space: nowrap; }
   [data-mode="architect"] .memo-body > .answers > .answer { break-inside: avoid; margin-bottom: 12px; }
   [data-mode="architect"] .memo-body > .answers > .answer:last-child { margin-bottom: 0; }
 }
-[data-mode="reader"] { --bars-h: 92px; }
-[data-mode="reader"] .steps, [data-mode="reader"] #tour-offer, [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,
+[data-mode="reader"] { --bars-h: 88px; }
+[data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,
 [data-mode="reader"] .inputs, [data-mode="reader"] .memo-tools, [data-mode="reader"] #tool-open, [data-mode="reader"] #tool-compare, [data-mode="reader"] #compare-note,
 [data-mode="reader"] #dl-massing, [data-mode="reader"] #revit-btn, [data-mode="reader"] #export-panel, [data-mode="reader"] .ledger .tools,
 [data-mode="reader"] #edit-blocks, [data-mode="reader"] #sheet-editor, [data-mode="reader"] .bnd-tools { display: none !important; }
@@ -934,6 +843,230 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .export { border-top: 1px solid var(--line); }
 [data-mode="reader"] .export .export-note { font-size: 12.5px; }
 
+/* ------------------------------------------------------------------ the route and the stage (manager, 16 Nov 2026; docs/ui-route-and-stage.md)
+   The left column is a short read-only route of three stops; the memo pane is the stage, one card at a time, its
+   input above what it found. After a run the route folds and the memo takes the width. */
+[data-mode="manager"] .panes { grid-template-columns: 236px minmax(0, 1fr); }
+[data-mode="manager"] .panes.no-inputs { grid-template-columns: 44px minmax(0, 1fr); }
+@media (pointer: coarse) and (min-width: 1101px) { [data-mode="manager"] .panes.no-inputs { grid-template-columns: 56px minmax(0, 1fr); } }
+[data-mode="manager"] .inputs { padding: 8px 12px 24px; }
+.route { display: flex; flex-direction: column; gap: 6px; position: sticky; top: calc(var(--bars-h) + 8px); }
+.route-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; position: relative; }
+/* a hairline joins the stops, as the brand's mark joins its stages */
+.route-list::before { content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 1px; background: var(--line); }
+.route-row, .route-memo { display: grid; grid-template-columns: 30px minmax(0, 1fr); grid-template-areas: "n t" "n s"; gap: 1px 8px; align-items: baseline; width: 100%; padding: 9px 10px 10px 6px; border: 0; border-radius: 6px; background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: inherit; position: relative; transition: background-color var(--t-fast); }
+.route-row:hover:not([disabled]), .route-memo:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.route-row.current, .route-memo.current { background: var(--group); }
+.route-row[disabled] { cursor: default; }
+.route-row[disabled] .route-t, .route-row[disabled] .route-s { color: var(--muted); }
+.route-n { grid-area: n; justify-self: center; font: 500 11px/1 var(--mono); letter-spacing: .04em; color: var(--muted); background: var(--page); padding: 3px 0; position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; min-width: 22px; }
+.route-row.current .route-n, .route-memo.current .route-n { background: var(--group); color: var(--ink); font-weight: 600; }
+.route-row:hover:not([disabled]) .route-n { background: transparent; }
+.route-check { width: 15px; height: 15px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.route-t { grid-area: t; font-weight: 600; font-size: 13px; }
+.route-s { grid-area: s; font-size: 12px; color: var(--muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.route-row.done:not(.current) .route-s { color: var(--ink); }
+.route-memo { grid-template-areas: "n t"; margin-top: 4px; border-top: 1px solid var(--line); border-radius: 0 0 6px 6px; padding-top: 11px; }
+.route-memo .route-n { font-weight: 600; color: var(--ink); }
+.route-then { margin: 4px 0 0; padding: 10px 6px 0 44px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); line-height: 1.45; }
+/* the rail's fold control reads Stops for the manager */
+[data-mode="manager"] .rail-toggle { margin-bottom: 2px; }
+
+/* the stage: a head, one card, and on a blank page the memo's title block in outline */
+.memo.stage-on { max-width: 900px; gap: 14px; }
+.stage-head { padding: 6px 2px 0; }
+.stage-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 14px; }
+.stage-title .btn { margin-left: auto; }
+.stage-head h1 { font-size: 30px; font-weight: 300; letter-spacing: -.025em; line-height: 1.1; margin: 0; text-wrap: balance; }
+.stage-head .quiet { margin: 8px 0 0; color: var(--muted); font-size: 13.5px; max-width: 60ch; }
+.stage-head .resume { margin-top: 12px; flex-wrap: wrap; }
+.stage-card { padding: 18px 20px 16px; scroll-margin-top: calc(var(--bars-h) + 8px); }
+.stage-card h2 { font-size: 18px; font-weight: 600; letter-spacing: -.012em; line-height: 1.25; margin: 0 0 16px; display: flex; align-items: baseline; gap: 12px; }
+.stage-card h2:focus { outline: none; }
+.stage-n { font: 500 12px/1 var(--mono); letter-spacing: .04em; color: var(--muted); }
+.stage-body { display: flex; flex-direction: column; gap: 14px; }
+.stage-body > .help { margin: -6px 0 0; font-size: 12px; color: var(--muted); }
+.stage-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.foot-quiet, .foot-main { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.foot-main { margin-left: auto; }
+.foot-main .btn-primary { padding: 7px 18px; min-height: 34px; }
+.kbd-help { font: 500 11px var(--mono); color: var(--muted); letter-spacing: .02em; }
+.stage-context { margin: -8px 0 0; font-size: 12.5px; color: var(--muted); }
+.stage-memos { margin: 0; font-size: 12.5px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.linkish { border: 0; background: none; padding: 0; color: var(--blue); font: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; cursor: pointer; }
+.linkish:hover { color: var(--ink); }
+/* 01: the address field leads, the other ways in follow it quietly */
+.addr-row { display: flex; gap: 8px; }
+.addr-row input { flex: 1 1 auto; min-width: 0; min-height: 40px; border: 1px solid color-mix(in srgb, var(--ink) 28%, var(--line)); border-radius: 6px; padding: 8px 12px; font-size: 15px; background: var(--field); }
+.addr-row input::placeholder { color: var(--muted); font-style: italic; }
+.addr-row .btn { min-height: 40px; padding: 8px 20px; }
+.addr-alt { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12.5px; }
+.addr-saved { display: inline-flex; align-items: center; gap: 8px; margin-right: 10px; }
+.addr-saved select { border: 1px solid var(--line); border-radius: 4px; padding: 4px 6px; background: var(--field); font-size: 12.5px; max-width: 280px; }
+/* the memo in outline: what the run will make, labels only */
+.ghost { margin: 0; }
+.ghost-sheet { border: 1px dashed color-mix(in srgb, var(--ink) 22%, var(--line)); border-radius: var(--r-panel); padding: 16px 18px 14px; background: color-mix(in srgb, var(--panel) 55%, transparent); }
+.ghost-h { height: 12px; width: 44%; border-radius: 3px; background: var(--group); margin: 2px 0 14px; }
+.ghost .memo-meta { background: transparent; opacity: .8; margin-bottom: 12px; }
+.ghost .memo-meta span { min-height: 17px; }
+.ghost-answers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; font-size: 12.5px; color: var(--muted); }
+.ghost-answers b { font: 500 11px/1 var(--mono); margin-right: 8px; color: var(--muted); }
+.ghost figcaption { font-size: 12.5px; color: var(--muted); margin-top: 8px; max-width: 64ch; }
+/* the questions a stop asks: a schedule of question, answer and who answers it */
+.ask-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.ask-table thead th { font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); text-align: left; padding: 0 12px 6px 0; border-bottom: 1px solid var(--line); }
+.ask-table tbody th { font-weight: 500; text-align: left; padding: 7px 14px 7px 0; color: var(--ink); width: 40%; border-bottom: 1px solid var(--line); }
+.ask-table td { padding: 5px 12px 5px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.ask-table .ask-who { color: var(--muted); font-size: 12px; width: 28%; line-height: 1.4; }
+.ask-table .tri { display: inline-flex; font-size: 12px; }
+.ask-table .tri button { padding: 4px 10px; min-height: 28px; }
+.ask-table select, .ask-table input[type="text"] { width: 100%; max-width: 280px; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; }
+.ask-table input[type="text"]::placeholder { color: var(--muted); font-style: italic; }
+/* 02 and 03: keys beside their content, the way the memo's title block sets them */
+.stage-dl { margin: 0; display: grid; }
+.stage-dl > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line); }
+.stage-dl > div:first-child { border-top: 0; padding-top: 2px; }
+.stage-dl dt { font: 600 11px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 4px; }
+.stage-dl dd { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px 4px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: 12.5px; cursor: pointer; background: var(--panel); transition: background-color var(--t-fast), border-color var(--t-fast); }
+.chip:hover { border-color: color-mix(in srgb, var(--ink) 40%, var(--line)); }
+.chip:has(input:checked) { border-color: color-mix(in srgb, var(--ink) 55%, var(--line)); background: var(--group); }
+.chip input { margin: 0; }
+.start-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.fold > summary { cursor: pointer; font-size: 12.5px; font-weight: 500; color: var(--ink); padding: 3px 0; list-style: none; display: inline-flex; align-items: center; gap: 8px; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .15s ease-out; margin-left: 2px; }
+.fold[open] > summary::before { transform: rotate(45deg); }
+.fold > summary .cont { font-weight: 400; color: var(--muted); }
+.fold[open] > summary { margin-bottom: 8px; }
+@media (prefers-reduced-motion: reduce) { .fold > summary::before { transition: none; } }
+/* the building in four figures under a 2 px ink rule, as the memo's title block; a figure is changed in place */
+.fig4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); }
+.fig4-cell { display: flex; flex-direction: column; gap: 3px; padding: 8px 12px 10px 0; margin-right: 12px; border-right: 1px solid var(--line); min-width: 0; }
+.fig4-cell:last-child { border-right: 0; margin-right: 0; }
+.fig4-k { font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.fig4-v { font: 300 28px/1.1 var(--sans); letter-spacing: -.02em; color: var(--ink); background: none; border: 0; border-bottom: 1px dashed transparent; padding: 0 0 1px; text-align: left; align-self: flex-start; font-variant-numeric: tabular-nums; }
+button.fig4-v { cursor: text; }
+button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, transparent); }
+.fig4-input { font: 300 22px/1.1 var(--sans); width: 100%; border: 1px solid var(--blue); border-radius: 4px; padding: 3px 6px; background: var(--field); }
+.fig4-sub { font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 6px; align-items: baseline; min-height: 18px; }
+.fig4-tag { font: 600 11px/1.3 var(--mono); color: var(--muted); }
+.fig4-tag.rough, .fig4-tag.ph { color: var(--s-uncertain-text); }
+.fig4-tag.yours { color: var(--ink); font-family: var(--sans); }
+.env-line { margin: 0; font-size: 12.5px; }
+.env-line .btn { margin-left: 6px; }
+.all-figures .sg-rows { border-top: 1px solid var(--line); }
+.all-figures .sg-group { margin: 6px 0 0; }
+.all-figures .sg-head { border-top: 0; padding-top: 4px; }
+.sg-ref { font: 600 11px/1.3 var(--mono); color: var(--muted); }
+.sg-ref.ph { color: var(--s-uncertain-text); font-family: var(--sans); font-weight: 500; }
+.left-list { margin: 4px 0 0; padding-left: 16px; font-size: 12px; display: grid; gap: 4px; }
+.left-list li { line-height: 1.45; }
+.money-fold .fin-rows { margin-top: 2px; }
+.dd-line { margin: 0; font-size: 13px; padding-top: 1px; }
+.dd-line .cont { color: var(--muted); }
+.dd-line .unsure-n { color: var(--s-uncertain-text); }
+.stage-dl .reading-list { gap: 5px; }
+@media (max-width: 1100px) {
+  /* stacked: the route is one line over the stage, three stops and the memo */
+  [data-mode="manager"] .panes, [data-mode="manager"] .panes.no-inputs { grid-template-columns: 1fr; }
+  [data-mode="manager"] .rail-toggle { display: none; }
+  [data-mode="manager"] .inputs, [data-mode="manager"] .panes.no-inputs .inputs { padding: 8px 16px; }
+  [data-mode="manager"] .inputs-body, [data-mode="manager"] .panes.no-inputs .inputs-body { display: block; }
+  .route { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
+  .route-list { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .route-list::before, .route-s, .route-then { display: none; }
+  .route-row, .route-memo { grid-template-columns: auto auto; grid-template-areas: "n t"; gap: 6px; padding: 6px 12px 6px 8px; width: auto; border-radius: 999px; margin: 0; border-top: 0; }
+  .route-n { background: transparent; padding: 0; min-width: 0; }
+  .route-row.current .route-n { background: transparent; }
+}
+@media (max-width: 760px) {
+  .memo.stage-on { gap: 10px; }
+  .stage-head h1 { font-size: 24px; }
+  .stage-card { padding: 14px 14px 0; }
+  .stage-card h2 { font-size: 17px; margin-bottom: 12px; }
+  /* the card's one filled button stays under the thumb */
+  .stage-foot { position: sticky; bottom: 0; z-index: 2; margin: 16px -14px 0; padding: 10px 14px; background: var(--panel); border-top: 1px solid var(--line); border-radius: 0 0 var(--r-panel) var(--r-panel); flex-wrap: nowrap; }
+  .foot-quiet { flex: 0 1 auto; min-width: 0; }
+  .foot-quiet .btn { white-space: normal; text-align: left; }
+  .kbd-help { display: none; }
+  .stage-dl > div { grid-template-columns: 1fr; gap: 6px; }
+  .fig4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fig4-cell:nth-child(2) { border-right: 0; margin-right: 0; }
+  .fig4-cell:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  .ghost-answers { grid-template-columns: 1fr; }
+  .ask-table, .ask-table tbody, .ask-table tr, .ask-table th, .ask-table td { display: block; width: auto; }
+  .ask-table thead { display: none; }
+  .ask-table tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .ask-table tbody th, .ask-table td { border: 0; padding: 2px 0; }
+  .ask-table .ask-who { width: auto; }
+}
+
+/* the architect's left column: two schedules under two tabs, one row per input */
+.rail-tabs { align-self: flex-start; }
+[data-mode="manager"] #rail-tabs, [data-mode="reader"] #rail-tabs { display: none; }
+.file-pick { flex-direction: row; align-items: center; gap: 8px; }
+.file-pick label { flex: 0 0 auto; }
+.file-pick select { flex: 1 1 auto; min-width: 0; }
+.site-claude:empty { display: none; }
+.site-claude { margin-top: 8px; }
+.schedule { gap: 0; }
+.schedule .need-legend { background: transparent; padding: 8px 0 6px; margin: 0; border-bottom: 1px solid var(--line); gap: 2px 16px; font-size: 12px; }
+.sch-group { padding: 10px 0 4px; }
+.sch-group + .sch-group { border-top: 1px solid var(--line); margin-top: 4px; }
+.sch-head { font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 2px; }
+.sch-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) auto; grid-template-areas: "item val ref"; gap: 4px 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
+.sch-row.wide { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "item ref" "val val"; }
+.sch-row.why-open { border-bottom-color: transparent; }
+.sch-item { grid-area: item; font-size: 12.5px; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
+.sch-item label, .sch-item > span:first-child { font-weight: 500; color: var(--ink); }
+.sch-item .need { width: 6px; height: 6px; margin: 0; }
+.sch-who { flex-basis: 100%; font-size: 11.5px; color: var(--muted); }
+.sch-val { grid-area: val; min-width: 0; }
+.sch-ref { grid-area: ref; justify-self: end; }
+.sch-val input[type="text"], .sch-val input[type="number"], .sch-val select, .sch-val textarea { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 7px; font-size: 12.5px; line-height: 1.35; }
+.sch-val textarea { min-height: 52px; resize: vertical; }
+.sch-val input::placeholder, .sch-val textarea::placeholder { color: var(--muted); font-style: italic; }
+.sch-val .tri button { padding: 3px 6px; min-height: 26px; font-size: 12px; }
+.sch-val .help.warn { display: block; font-size: 11px; color: var(--s-uncertain-text); margin-top: 2px; }
+.sch-val .checks { gap: 2px; padding: 2px 0; }
+.ref-btn { font: 600 11px/1 var(--mono); color: var(--ink); background: var(--group); border: 1px solid transparent; border-radius: 3px; padding: 4px 6px; cursor: pointer; white-space: nowrap; min-height: 22px; transition: background-color var(--t-fast), color var(--t-fast); }
+.ref-btn.word { font: 500 11px/1 var(--sans); background: transparent; color: var(--muted); border-color: var(--line); }
+.ref-btn:hover, .ref-btn[aria-expanded="true"] { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+.sch-note { margin: 0 0 6px; padding: 8px 10px; background: var(--group); border-radius: 4px; font-size: 12px; line-height: 1.5; }
+.sch-note p { margin: 0 0 4px; max-width: 70ch; }
+.sch-note p:last-child { margin: 0; }
+.sch-note .ref { margin: 0 5px 0 0; background: var(--panel); }
+.sch-reads { color: var(--ink); }
+.sch-live { padding: 6px 0 8px; font-size: 12px; border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
+.sch-slot:empty { display: none; }
+.sch-slot { padding: 6px 0; }
+.prop-by { font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+@media (pointer: coarse) {
+  .ref-btn { min-height: 36px; min-width: 44px; }
+  .sch-val .tri button, .ask-table .tri button, .chip { min-height: 44px; }
+  .route-row, .route-memo { min-height: 44px; }
+  .fig4-v { min-height: 44px; }
+}
+
+/* the top bar's Run for the manager: quiet, Run again, live only once the memo is out of date */
+.topbar .btn-primary.btn-again { background: transparent; color: var(--on-chrome); border-color: var(--chrome-line); }
+.topbar .btn-primary.btn-again:hover:not([aria-disabled="true"]) { background: rgba(255, 255, 255, .08); color: #fff; box-shadow: none; }
+
+/* the memo's actions in its title block; the export footer keeps the note and the Revit panel, and shows only
+   with a memo on screen */
+.memo-actions { display: flex; flex-direction: column; gap: 8px; margin: 2px 0 10px; }
+.memo-actions:empty { display: none; }
+.memo-actions .issue-panel { margin-top: 0; }
+.memo-pane:not(.has-memo) #step-export { display: none; }
+/* Revit is the architect's: the manager's row is the PDF, issuing, Print and the other formats */
+[data-mode="manager"] #revit-btn, [data-mode="manager"] #export-panel { display: none !important; }
+.memo-pane.staging .memo-tools { display: none; }
+.no-memo h1 { margin-bottom: 8px; }
+.no-memo .quiet { max-width: 62ch; }
+.no-memo .stage-memos { margin-top: 10px; }
+
 /* ------------------------------------------------------------------ print: the memo only, every ledger layer open */
 @media print {
   /* the selector matches the dark block's specificity, so a dark-mode browser prints light too */
@@ -943,7 +1076,7 @@ table.plain td.status { white-space: nowrap; }
           --s-pass-wash: #fff; --s-conditional-wash: #fff; --s-fail-wash: #fff; --s-uncertain-wash: #fff; --s-na-wash: #fff; --s-info-wash: #fff; }
   body { background: #fff; font-size: 10.5pt; }
   .side .pick-name { display: block; }
-  .bars, .skip, .inputs, .export, .memo-tools, .side .pick .tool, .tour-offer, .tour-spot, .tour-card, .seg, .fig-hint, .ledger .tools { display: none !important; }
+  .bars, .skip, .inputs, .export, .memo-tools, .memo-actions, .side .pick .tool, .tour-spot, .tour-card, .seg, .fig-hint, .ledger .tools { display: none !important; }
   .panes { display: block; min-height: 0; }
   .memo-pane { padding: 0; }
   .card { border: 0; padding: 0 0 10pt; break-inside: avoid; box-shadow: none; }

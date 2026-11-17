@@ -34,7 +34,10 @@ site (home) ──► the case ──► tool: memo on screen (R1)
    open and the memo pane is the stage: one card per stop, each saying what it holds or which stop fills
    it. The real case loads only from a link (`?run=`, `?tour=`, `?demo=1`) or the "Load the demo case"
    button on the stage. The inputs rail sits beside the memo and folds away.
-3. **Set up the run** (built 3 Nov 2026, the guided card at the top of the rail, seven stops):
+3. **Set up the run.** Since 16 Nov 2026 this is three stops, a route on the left and one card at a time on the stage
+   (01 the site and what the open data could not tell, 02 the option, 03 the money in and the run); the laid-out
+   flow is `docs/ui-route-and-stage.md`. What each stop asks is unchanged from the seven-stop guide below (built 3 Nov
+   2026), which it replaced; programs, the site's reading and the money became parts of the cards, not stops:
    1. *Find the site*: one way in at a time, an address or a saved site. The City's address list gives the
       point, its open data the zoning district and the parcel, which becomes the lot's area and an
       equivalent rectangle. The stage then shows the parcel on an OpenStreetMap map with its district, lot,

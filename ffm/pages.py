@@ -17,6 +17,8 @@ copied, whatever is on disk.
 from __future__ import annotations
 
 import json
+import posixpath
+import re
 import shutil
 from datetime import datetime
 from pathlib import Path
@@ -37,7 +39,42 @@ def _write_json(path: Path, obj) -> None:
     path.write_text(json.dumps(obj, ensure_ascii=False, indent=1), encoding="utf-8")
 
 
-ASSET_REFS = ("app.js", "app.css", "brand.css", "site.css", "site.js")
+ASSET_REFS = ("app.css", "brand.css", "site.css", "site.js")
+
+# The tool's scripts are native ES modules (16 Nov 2026: app.js split up). main.js is the entry; the rest are found
+# by following its imports, static and import(), so a module nothing reaches is not published.
+MODULE_ENTRY = "main.js"
+_IMPORT = re.compile(r"""(?:\bfrom\s*|\bimport\s*\(\s*|^\s*import\s+)["'](\.{1,2}/[^"']+)["']""", re.M)
+
+
+def module_graph(static_dir: Path, entry: str = MODULE_ENTRY) -> list[str]:
+    """Every module the entry reaches, as paths relative to static_dir (POSIX), the entry first."""
+    seen: list[str] = []
+    todo = [entry]
+    while todo:
+        rel = todo.pop(0)
+        if rel in seen:
+            continue
+        p = static_dir / rel
+        if not p.is_file():
+            raise FileNotFoundError(f"{rel} is imported but does not exist")
+        seen.append(rel)
+        base = posixpath.dirname(rel)
+        for spec in _IMPORT.findall(p.read_text(encoding="utf-8")):
+            todo.append(posixpath.normpath(posixpath.join(base, spec)))
+    return seen
+
+
+def _file_version(p: Path) -> str:
+    import hashlib
+    return hashlib.sha256(p.read_bytes()).hexdigest()[:10]
+
+
+def import_map(static_dir: Path, modules: list[str]) -> dict:
+    """Each module's URL with a hash of its own contents, so a browser holding last deploy's modules fetches exactly
+    the ones that changed and never runs an old module beside a new one. Specifiers are resolved against the page's
+    URL, which is also where every relative import between the modules lands."""
+    return {"imports": {f"./{m}": f"./{m}?v={_file_version(static_dir / m)}" for m in modules}}
 
 
 def _build_version(static_dir: Path) -> str:
@@ -52,7 +89,8 @@ def _build_version(static_dir: Path) -> str:
 
 
 def _versioned(html: str, v: str) -> str:
-    """`src="app.js"` and `href="site.css"` become `app.js?v=<hash>`; the local server keeps the plain names."""
+    """`src="site.js"` and `href="site.css"` become `site.css?v=<hash>`; the local server keeps the plain names. The
+    tool's modules have their own hashes (import_map)."""
     for name in ASSET_REFS:
         html = html.replace(f'src="{name}"', f'src="{name}?v={v}"').replace(f'href="{name}"', f'href="{name}?v={v}"')
     return html
@@ -84,12 +122,25 @@ def build(out: Path, pyodide_url: str = PYODIDE_URL) -> dict:
     marker = "<!-- static-config -->"
     if marker not in html:
         raise RuntimeError("index.html has no <!-- static-config --> marker")
-    html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>")
+    # the tool's modules: each named by a hash of its own contents through an import map, which must come before
+    # the first module script; the entry's own tag carries its hash too
+    modules = module_graph(ui.STATIC_DIR)
+    imap = import_map(ui.STATIC_DIR, modules)
+    entry_tag = f'<script type="module" src="{MODULE_ENTRY}"></script>'
+    if entry_tag not in html:
+        raise RuntimeError(f"index.html does not load {MODULE_ENTRY} as a module")
+    html = html.replace(entry_tag, f'<script type="module" src="{imap["imports"]["./" + MODULE_ENTRY][2:]}"></script>')
+    html = html.replace(marker, f"<script>window.FFM_STATIC = {json.dumps(config)};</script>\n"
+                                f'<script type="importmap">{json.dumps(imap, indent=1)}</script>')
+    for m in modules:
+        (out / m).parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(ui.STATIC_DIR / m, out / m)
+        n += 1
     # the build's own record, fetched by the page with the cache bypassed: a page served from an old cache
     # (Pages keeps HTML for ten minutes, browsers longer) sees a newer build here and reloads itself once
     _write_json(out / "data" / "build.json", {"built_at": config["built_at"], "engine_version": __version__})
     # every page names its scripts and styles with the build's version, so a browser that cached the last
-    # deploy's app.js (Pages serves it with max-age=600, and browsers keep it longer) fetches the new one
+    # deploy's files (Pages serves them with max-age=600, and browsers keep them longer) fetches the new ones
     v = _build_version(ui.STATIC_DIR)
     (out / "app.html").write_text(_versioned(html, v), encoding="utf-8")
     (out / "index.html").write_text(_versioned((ui.STATIC_DIR / "home.html").read_text(encoding="utf-8"), v), encoding="utf-8")

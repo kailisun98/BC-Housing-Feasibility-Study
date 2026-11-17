@@ -1,0 +1,108 @@
+/* What changed between two runs (engine diff.json): a change of rules (a revision) or two options under the same
+   rules, rule by rule. */
+
+import { $, h, pill, REV } from "../core/util.js";
+import { state } from "../core/state.js";
+import { api } from "../core/api.js";
+import { rev } from "../runs.js";
+import { compareKind, idBreak, optionName } from "./memo.js";
+
+/* The engine's words for a change (engine.diff), as a reader would say them. Between two options read under the same
+   rules a reworded finding is the option's numbers changing, not the rule. */
+export function changeWord(c, kind = "rules") {
+  if (c.change === "changed") return c.from_version !== c.to_version ? (c.from === c.to ? "new version" : "new version and status") : "status changed";
+  if (c.change === "finding_changed") return kind === "rules" ? "finding reworded" : "numbers changed";
+  return { added: "rule added", removed: "rule dropped" }[c.change] || String(c.change).replace(/_/g, " ");
+}
+
+/* A comparison in a few words for the status strip: how many statuses and versions moved, without the rule ids. */
+function changesPhrase(d) {
+  const ch = d.changes || [];
+  if (!ch.length) return "no rule changed version or status";
+  const st = ch.filter(c => c.from !== c.to).length;
+  const ver = ch.filter(c => c.from_version && c.to_version && c.from_version !== c.to_version).length;
+  const bits = [st && (st === 1 ? "1 status differs" : `${st} statuses differ`), ver && `${ver} new version${ver === 1 ? "" : "s"}`].filter(Boolean);
+  return bits.length ? bits.join(", ") : `the same statuses, ${ch.length} finding${ch.length === 1 ? "" : "s"} with other numbers`;
+}
+
+/* An option's name up to its colon: "As approved by Council, 25 Jul 2024", not the description after it. */
+export const shortName = s => String(s || "").split(":")[0].trim();
+
+/* What a comparison found, for the status strip and the toasts: the rules' dates when the rules moved, the compared
+   option's name when two options were read under the same rules. */
+export function compareSummary(run) {
+  const d = run.diff;
+  if (!d) return "";
+  return compareKind(d) === "rules"
+    ? `${rev(run.run_id)}, rules as of ${d.current_as_of}, against ${state.compareRun ? rev(state.compareRun) : "an earlier memo"}, rules as of ${d.previous_as_of}: ${changesPhrase(d)}`
+    : `${rev(run.run_id)} against ${state.compareRun ? `${rev(state.compareRun)}, ` : ""}${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a run as of ${d.previous_as_of}`}: ${changesPhrase(d)}`;
+}
+
+/* The note beside the pickers speaks only when the memo cannot: a comparison waiting for the next run, or a run
+   recorded against an earlier one that the list cannot tell apart. Once two runs are compared, the Side by side
+   card says it, so the note stays empty. */
+export function setCompareNote(d) {
+  const run = state.run;
+  let note = "";
+  if (!run && state.compareRun) note = "Applies to the next run.";
+  else if (run && d && !run.compareLedger) note = `This run was recorded against an earlier run as of ${d.previous_as_of}; choose it under Compare with… to see the two side by side.`;
+  $("#compare-note").textContent = note;
+}
+
+/* Why two stamps differ, as precisely as the two ledgers allow: the rule files, the as-of date, the site's or the
+   option's inputs. The inputs are compared key by key, whatever their order. */
+const stable = v => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(key => [key, x[key]])) : x));
+
+export async function attachCause(run) {
+  const d = run.diff;
+  if (!d || !state.compareRun) return;
+  try {
+    const [site, folder] = state.compareRun.split("/");
+    const prev = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
+    run.compareLedger = prev.ledger || null;   // for the side-by-side card
+    run.compareProforma = prev.proforma || null;   // its money, its drawings and its fit, for the same card (15 Nov 2026)
+    run.compareLayout = prev.layout || null;
+    run.compareMassing = prev.massing || null;
+    const a = (prev.ledger && prev.ledger.inputs) || {}, b = (run.ledger && run.ledger.inputs) || {};
+    const changed = [stable(a.site) !== stable(b.site) && "the site's inputs", stable(a.option) !== stable(b.option) && "the option's inputs"].filter(Boolean);
+    const date = d.previous_as_of !== d.current_as_of ? `the as-of date (${d.previous_as_of} → ${d.current_as_of})` : null;
+    const files = d.rules_changed ? "the rule files changed" : "same rule files";
+    const same = changed.length ? "" : ", same site and option";
+    const because = [date, ...changed].filter(Boolean);
+    d.cause = `${files}${same}; the difference is ${because.length ? because.join(" and ") : (d.rules_changed ? "in the rule files alone" : "not in the inputs or the date")}`;
+    d.kind = d.rules_changed || date ? "rules" : changed.length ? "options" : "same";
+  } catch (e) {
+    d.cause = null;   // the earlier run could not be read: fall back to the general sentence
+  }
+}
+
+/* What changed. When the rules moved it is a revision: the delta in its heading, the version in force on each row.
+   Between two options read under the same rules it is the options' numbers, so the version column goes. Rows are
+   named by the rule's title, the status read from the compared run (B) to this one (A). */
+export function renderChanges(d, L, run) {
+  const kind = compareKind(d), rules = kind === "rules";
+  const titles = Object.fromEntries(((L && L.results) || []).map(r => [r.rule_id, r.title]));
+  const changes = d.changes || [];
+  const rows = changes.map(c => {
+    const ver = c.from_version && c.to_version && c.from_version !== c.to_version;
+    const status = c.from && c.to ? (c.from === c.to ? `${pill(c.to)} <span class="cont">unchanged</span>` : `${pill(c.from)} → ${pill(c.to)}`) : (c.to ? pill(c.to) : c.from ? pill(c.from) : "—");
+    return `<tr>
+      <td data-label="Rule"><span class="rule-title">${h(titles[c.rule_id] || c.rule_id)}</span><code class="rule-id">${idBreak(c.rule_id)}</code><div class="cont">${h(changeWord(c, kind))}</div></td>
+      ${rules ? `<td class="ver" data-label="Version in force">${ver ? `<span class="was">${h(c.from_version)}</span> → ${h(c.to_version)}` : h(c.to_version || c.from_version || "—")}</td>` : ""}
+      <td class="trans" data-label="${rules ? "Status" : "Status, B → A"}">${status}</td>
+      <td data-label="Now reads">${h(c.finding)}</td>
+    </tr>`;
+  }).join("");
+  const sameVerdict = changes.length && changes.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
+  const cause = d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs");
+  const lead = rules
+    ? `<b>${h(state.compareRun ? rev(state.compareRun) : "The earlier memo")}</b> → <b>${h(rev(run && run.run_id))}</b> · ${h(cause)}.`
+    : `<b>${h(state.compareRun ? rev(state.compareRun) : "B")}</b> → <b>${h(rev(run && run.run_id))}</b> · same rules, as of ${h(d.current_as_of)}; ${h(cause.replace(/^same rule files(, same site and option)?; /, ""))}.`;
+  return `<section class="card section changes" id="changes">
+    <h2>${rules ? `${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}` : "What changed between the two options"}</h2>
+    <p class="stamps">${lead}</p>
+    ${changes.length ? `${sameVerdict ? `<p class="same">Same verdict${changes.length === 1 ? "" : "s"}, new version${changes.length === 1 ? "" : "s"}: the memo names the version it used.</p>` : ""}
+    <table class="plain"><thead><tr><th>Rule</th>${rules ? "<th>Version in force</th><th>Status</th>" : "<th>Status, B → A</th>"}<th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
+    : `<p>No rule changed version or status between the two runs.</p>`}
+  </section>`;
+}

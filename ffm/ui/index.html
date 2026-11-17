@@ -18,7 +18,7 @@
 
 <div class="bars">
 <header class="topbar">
-  <p class="wordmark"><a href="./" title="Back to the home page"><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg>First Read</a> <em>a funding-fit memo for BC non-profit housing</em></p>
+  <h1 class="wordmark"><a href="./" title="Back to the home page"><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg>First Read</a> <em>a funding-fit memo for BC non-profit housing</em></h1>
   <div class="mode" role="group" aria-label="Who is reading">
     <span class="eyebrow" id="mode-key">For the</span>
     <div class="seg-mode" id="mode-switch">
@@ -44,40 +44,31 @@
   </div>
 </header>
 
-<nav class="steps" aria-label="Steps">
-  <a href="#step-site" data-step="1"><span class="step-n">1</span> Site</a>
-  <a href="#step-option" data-step="2"><span class="step-n">2</span> Option</a>
-  <a href="#step-run" data-step="3"><span class="step-n">3</span> Run and read</a>
-  <a href="#step-export" data-step="4"><span class="step-n">4</span> Export</a>
-  <span id="guide-progress" class="guide-progress" aria-live="polite"></span>
-  <a href="#" id="tour-link" class="tour-link">Walkthrough</a>
-</nav>
-<div id="status" class="strip" role="status" aria-live="polite"><span class="dot"></span><span id="status-text">Loading the sites, options and rules…</span></div>
-</div>
-<div id="tour-offer" class="tour-offer" hidden>
-  <span>New here? A two-minute walkthrough shows the page: the guided start, the memo, its three views, issuing.</span>
-  <button id="tour-start" class="btn btn-primary btn-small" type="button">Take the walkthrough</button>
-  <button id="tour-dismiss" class="btn btn-quiet btn-small" type="button">Not now</button>
+<div id="status" class="strip"><span class="dot"></span><span id="status-text" role="status" aria-live="polite">Loading the sites, options and rules…</span><a href="#" id="tour-link" class="tour-link">Walkthrough</a></div>
 </div>
 
 <main class="panes">
   <aside class="inputs" id="inputs" aria-label="Inputs">
-    <button id="rail-toggle" class="rail-toggle" type="button" aria-expanded="true" aria-controls="inputs-body" title="Collapse the inputs">
-      <span class="rail-label">Inputs</span>
+    <button id="rail-toggle" class="rail-toggle" type="button" aria-expanded="true" aria-controls="inputs-body" title="Fold the stops">
+      <span class="rail-label">Stops</span>
       <svg class="chev" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5"/></svg>
     </button>
     <div id="inputs-body" class="inputs-body">
-    <section id="guide" class="card guide" aria-label="Guided start" hidden></section>
-    <section id="step-site" class="card input-card" tabindex="-1">
+    <nav id="guide" class="route" aria-label="Stops" hidden></nav>
+    <div id="rail-tabs" class="seg rail-tabs" role="group" aria-label="Which schedule">
+      <button class="segbtn" type="button" data-tab="site" aria-pressed="true">Site</button>
+      <button class="segbtn" type="button" data-tab="option" aria-pressed="false">Option</button>
+    </div>
+    <section id="step-site" class="card input-card" tabindex="-1" aria-labelledby="site-h">
       <div class="card-head">
-        <h2><span class="badge">1</span> Site</h2>
-        <button id="edit-site" class="btn btn-quiet btn-small" type="button" aria-expanded="true" aria-controls="site-form">Done</button>
+        <h2 id="site-h">Site schedule</h2>
       </div>
-      <div class="field">
-        <label for="site-select">Site file</label>
+      <div class="field file-pick">
+        <label for="site-select">File</label>
         <select id="site-select"></select>
       </div>
       <p id="site-summary" class="input-summary"></p>
+      <div id="site-claude" class="site-claude"></div>
       <div class="form-fold"><div class="form-fold-in">
       <form id="site-form" class="form" autocomplete="off"></form>
       <div class="form-actions">
@@ -93,13 +84,12 @@
       </div></div>
     </section>
 
-    <section id="step-option" class="card input-card" tabindex="-1">
+    <section id="step-option" class="card input-card" tabindex="-1" aria-labelledby="option-h" hidden>
       <div class="card-head">
-        <h2><span class="badge">2</span> Option</h2>
-        <button id="edit-option" class="btn btn-quiet btn-small" type="button" aria-expanded="true" aria-controls="option-form">Done</button>
+        <h2 id="option-h">Option schedule</h2>
       </div>
-      <div class="field">
-        <label for="option-select">Option file</label>
+      <div class="field file-pick">
+        <label for="option-select">File</label>
         <select id="option-select"></select>
       </div>
       <p id="option-summary" class="input-summary"></p>
@@ -141,12 +131,12 @@
     <div id="memo" class="memo"></div>
 
     <footer id="step-export" class="export" tabindex="-1">
-      <h2><span class="badge">4</span> Export</h2>
-      <div class="action-bar">
+      <h2>Export</h2>
+      <div class="action-bar" id="export-actions">
         <button id="pdf-btn" class="btn" type="button" disabled>Download PDF</button>
-        <button id="print-btn" class="btn" type="button" disabled>Print</button>
-        <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
         <button id="issue-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="issue-panel">Issue to the architect</button>
+        <button id="print-btn" class="btn btn-quiet" type="button" disabled>Print</button>
+        <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
         <details class="more-formats"><summary class="btn btn-quiet">More formats</summary>
           <div class="action-bar">
             <a id="dl-html" class="btn btn-quiet" download aria-disabled="true">Memo as HTML</a>
@@ -163,6 +153,6 @@
 </main>
 
 
-<script src="app.js"></script>
+<script type="module" src="main.js"></script>
 </body>
 </html>

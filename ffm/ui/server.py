@@ -6,7 +6,9 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
 
     GET  /                                  the site's home page (home.html beside this file; how.html, who.html,
                                             case.html and brand.html are its other pages, on site.css and site.js)
-    GET  /app.html                          the tool (index.html, app.js, app.css beside this file)
+    GET  /app.html                          the tool (index.html, app.css and main.js beside this file)
+    GET  /<module>.js, /<dir>/<module>.js   the tool's ES modules: main.js imports the rest, kept beside it and
+                                            under core/, memo/, figures/ and editors/ (MODULE_DIRS)
     GET  /brand/<file>.svg                  the brand's mark, wordmark and lockups; brand.css holds the tokens
     GET  /data/runs/<site>/<folder>/<file>  a run file at the path the GitHub Pages build gives it, so the
                                             home page's links work the same here and on the web
@@ -52,6 +54,8 @@ Runs are written to outputs/<site-id>/<timestamp>/, so they are also usable from
 
 from __future__ import annotations
 
+import gzip
+import hashlib
 import json
 import os
 import re
@@ -78,13 +82,19 @@ OUTPUTS_DIR = ROOT / "outputs"
 STATIC_DIR = Path(__file__).resolve().parent
 
 SLUG = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,120}$")
-# the static files beside this module: the tool (index.html as /app.html), the site's pages, their styles and
-# scripts, and the brand's SVGs under brand/. Anything else in the folder is not served.
+# the static files beside this module: the tool (index.html as /app.html, its ES modules beside it and in
+# MODULE_DIRS), the site's pages, their styles and scripts, and the brand's SVGs under brand/. Anything else in
+# the folder is not served.
+MODULE_DIRS = ("core", "memo", "figures", "editors")
 STATIC_TYPES = {".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
                 ".svg": "image/svg+xml", ".jpg": "image/jpeg", ".png": "image/png"}
-STATIC_PATH = re.compile(r"^(?:brand/)?[A-Za-z0-9][A-Za-z0-9_-]*\.(?:html|js|css|svg|jpg|png)$")
+STATIC_PATH = re.compile(r"^(?:(?:brand|%s)/)?[A-Za-z0-9][A-Za-z0-9_-]*\.(?:html|js|css|svg|jpg|png)$" % "|".join(MODULE_DIRS))
+# text worth compressing (the modules are about 430 KB together, a ledger up to 250 KB; gzip takes them to about a fifth)
+GZIP_TYPES = ("text/", "application/json", "image/svg+xml")
+_GZIP_CACHE: dict[str, bytes] = {}   # a static file's compressed bytes, by its ETag
 SITE_PAGES = ("home.html", "how.html", "who.html", "case.html", "brand.html")
-SITE_FILES = ("app.js", "app.css", "brand.css", "site.css", "site.js")
+# copied by the static build as they are; the tool's modules are found from main.js by ffm/pages.py
+SITE_FILES = ("app.css", "brand.css", "site.css", "site.js")
 RUN_FILES = {
     "memo.html": "text/html; charset=utf-8", "memo.md": "text/markdown; charset=utf-8",
     "ledger.json": "application/json; charset=utf-8", "massing.json": "application/json; charset=utf-8",
@@ -629,12 +639,20 @@ class Handler(BaseHTTPRequestHandler):
         sys.stderr.write("%s %s\n" % (self.command, self.path))
 
     # -- responses
-    def _send(self, status: int, body: bytes, ctype: str, extra: dict | None = None) -> None:
+    def _send(self, status: int, body: bytes, ctype: str, extra: dict | None = None, cache: str = "no-store",
+              gz: bytes | None = None) -> None:
+        """Text is sent gzipped where the browser takes it (16 Nov 2026: app.js, before it was split into modules,
+        went over the wire as 413 KB on every load). `gz` is the body already compressed, for a static file kept compressed by its ETag."""
+        extra = dict(extra or {})
+        if len(body) > 1024 and ctype.startswith(GZIP_TYPES) and "gzip" in (self.headers.get("Accept-Encoding") or ""):
+            body = gz if gz is not None else gzip.compress(body, compresslevel=6)
+            extra["Content-Encoding"] = "gzip"
+            extra["Vary"] = "Accept-Encoding"
         self.send_response(status)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Cache-Control", "no-store")
-        for k, v in (extra or {}).items():
+        self.send_header("Cache-Control", cache)
+        for k, v in extra.items():
             self.send_header(k, v)
         self.end_headers()
         if self.command != "HEAD":
@@ -644,10 +662,26 @@ class Handler(BaseHTTPRequestHandler):
         self._send(status, json.dumps(obj, ensure_ascii=False).encode("utf-8"), "application/json; charset=utf-8")
 
     def _static(self, name: str) -> None:
+        """The page's own files carry an ETag and are revalidated on every load (no-cache, not no-store): an edit
+        shows at once, an unchanged module comes back as a 304 with no body."""
         p = STATIC_DIR / name
         if not STATIC_PATH.match(name) or not p.is_file():
             raise ApiError(404, "Not found.")
-        self._send(200, p.read_bytes(), STATIC_TYPES[p.suffix])
+        data = p.read_bytes()
+        tag = '"%s"' % hashlib.sha1(data).hexdigest()[:20]
+        if self.headers.get("If-None-Match") == tag:
+            self.send_response(304)
+            self.send_header("ETag", tag)
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            return
+        ctype = STATIC_TYPES[p.suffix]
+        gz = None
+        if ctype.startswith(GZIP_TYPES) and len(data) > 1024:
+            gz = _GZIP_CACHE.get(tag)
+            if gz is None:
+                gz = _GZIP_CACHE[tag] = gzip.compress(data, compresslevel=6)
+        self._send(200, data, ctype, {"ETag": tag}, cache="no-cache", gz=gz)
 
     def _run_file(self, site_id: str, folder: str, name: str, download: bool) -> None:
         if name not in RUN_FILES:

@@ -185,9 +185,10 @@ reuses the saved centre, so Nominatim is asked once per site.
 
 The page also runs on GitHub Pages (https://kailisun98.github.io/BC-Housing-Feasibility-Study/):
 `python -m ffm pages` (`ffm/pages.py`) builds a static site (since 3 Nov 2026 every page names its scripts and
-styles with a hash of their contents, `app.js?v=…`, so a browser that cached the last deploy fetches the new
-one; Pages serves with max-age=600 and Edge kept the old app.js past that) whose `app.js` detects
-`window.FFM_STATIC`, reads the committed runs from `data/` and runs the engine in Pyodide from
+styles with a hash of their contents, `site.css?v=…`, so a browser that cached the last deploy fetches the new
+one; Pages serves with max-age=600 and Edge kept the old app.js past that; since 16 Nov 2026 the tool's ES
+modules each carry their own hash through an import map, below) whose modules detect
+`window.FFM_STATIC` (`core/state.js`), read the committed runs from `data/` and run the engine in Pyodide from
 `engine/`. Published by the Actions workflow in `.github/workflows/pages.yml` on every push to
 `main` (Pages is set to build from Actions; the old `gh-pages` branch is no longer used). The gh
 CLI login on this machine has the `workflow` scope since 22 Oct 2026. Never let the pages build
@@ -346,6 +347,88 @@ reader's order by CSS `order`, the Side by side card's building-and-money table 
 date, the block editor's snapping/`freeSpot`/oversize flag, the boundary editor's edge table and "Set the site
 area", the pyRevit script's levels and blocks from `layout.json`, and `.layout-sheet`/`.layout-wait` (the manager
 sees the plans only once the architect has issued the run; `memo[data-issued-manager]`).
+
+## The route and the stage (16 Nov 2026): the inputs rebuilt after an /impeccable audit
+
+The audit that day (technical 14/20, heuristics 24/40; `.impeccable/critique/2026-11-17T04-06-13Z__ffm-ui-index-html.md`)
+found the rail doing three jobs at once (a seven-stop accordion over a Site form of ~18 fields and an Option form of ~40)
+while what each stop found landed in the other column. Kai confirmed `docs/ui-route-and-stage.md` and it is built:
+- **One field list.** `FIELDS` in `app.js` holds every input once (`on`, `group`/`rowOf`, `type`, `need`, `reads` = the
+  checks in `ffm/checks.py` that read it, `ref`, `info`, `ask` {stop, q, who, when}, `figure`, `money`). `SITE_FIELDS`,
+  `OPTION_FIELDS` (`layoutOf`), `FIELD_META`, `GUIDE_FIELDS`, `FINANCE_FIELDS` and `ANSWERS` are views of it. A new input
+  is one entry there; add its checks to `reads` so the schedule cites the right rules.
+- **Manager:** the left column is the route (`renderRoute`, `#guide` is now a `nav.route`): three rows, 01 The site,
+  02 The option, 03 Run, done rows carrying their decision. The memo pane is the stage (`renderStage`, `stageHtml`,
+  `cardSite`, `cardOption`, `cardRun`, `wireStage`): one card, its input above what it found. `progress()` is the one
+  source for what is decided (Run, the route, `syncRunButton`). Entering 02 reads the site and derives an option without
+  a button (`enterOption`); the four-figure block edits `guide.mine` in place (`figureBlock`, `setFigure`); "All 21
+  figures" keeps Suggested | Mine (`allFigures`); Continue applies the suggestion (`useSuggestion`, which replaced
+  `guideUseOption`). The questions the open data could not answer are asked once, at 01 (`askTable(1)`: Community
+  Vision, transit area and tier, water and sewer, owner type, buildings staying, land tenure, the front of a corner
+  lot) and 02 (`askTable(2)`: developer partner, tenure, site control). After a run the route folds (`showInputs(false,
+  false)`) and the memo takes the pane; a route row brings its card over the memo (`guide.over`, Back to R1). The map is
+  kept across card renders by its `data-sig`. `guide.loading` became `guide.busy` {lookup, read, suggest, claude,
+  schedule}; drafts carry `version: 3`, and an older draft's step 1–7 folds to 1–3 (`stopOf`).
+- **Architect:** the left column holds the Site and Option schedules under two tabs (`#rail-tabs`, `setRailTab`,
+  localStorage `ffm.rail.tab`): `renderForm` now draws Item | Value | Ref rows (`scheduleRow`, `controlFor`, `refsFor`);
+  the Ref is the memo's own A1 count (`refNow`: before a run the engine's count over every rule in force, each layer
+  by rule id, checked equal to a run's `memoRefs` on 36 rules). The (i) popovers, `labelHtml`, `renderField` and the
+  Edit/Done collapse are gone. Claude lives here only (`renderClaude`, `wireClaude`: `#site-claude` at the Site
+  schedule's head, `#claude-schedule-slot` under the district row when the rules have no schedule).
+- **Chrome:** the step bar, `#guide-progress` and the walkthrough banner are gone (`--bars-h` 88px); the Walkthrough link
+  ends the status line, dotted until seen. The manager's top-bar Run is hidden until a memo exists, then "Run again",
+  live only when stale (`.btn-again`). The memo's action bar (`#export-actions`) moves into the title block
+  (`placeActions`, called from `placeRunTools`; it must leave the memo before `#memo` is redrawn); Revit is hidden for
+  the manager. Reader mode without a run shows "No memo is open" and the site's memos (`renderNoMemo`). Runs listed to a
+  person are in revision order (`byRev`). The walkthrough has nine stops; `showTourStep` awaits a stop's `before`.
+- Placeholders take `--muted` at full strength (5.8:1).
+- The polish pass the same evening (the rest of the audit's list): `.issue-note` and `.stale-band` lost their 3px amber
+  side stripe (a hairline and a wash all round); the 10.5px leftovers came up to the 11px floor; the export note has a
+  68ch measure; a programme's terms (`dl.found-site.terms`) read in sentence case; the spinners hold still under reduced
+  motion; coded values reach a sentence through `optWord(on, key, value)` (the field's own option label, so
+  "non-profit society", never `non_profit_society`); `stagePrograms` prints booleans as yes/no; the run pickers list
+  R1 first (`byRev`); the wordmark is the page's H1; the manager's Run again goes live the moment the memo is stale
+  (`syncStaleBand` calls `syncRunButton`); the mode switch's thumb is re-measured by a ResizeObserver on the top bar;
+  Leaflet loads with SRI (`LEAFLET_JS_SRI`, `LEAFLET_CSS_SRI`, cdnjs's own hashes); issue polling runs only while the
+  tab is visible. `server.py`: static files carry an ETag and `no-cache` (an edit shows at once, an unchanged file is a
+  304), and text (static files, API JSON, run files) is gzipped where the browser accepts it: app.js 421 KB → 126 KB
+  on the wire. About 70 lines of CSS the rebuild orphaned (the seven-stop guide, the (i) popovers, the field rows,
+  the old stage cards, `.answer-ctl`, `.sg-unsure`) are gone. Left by choice: ES modules (a separate piece of work),
+  the 9.5px glyph in the status marks and the mode thumb's width transition (both in DESIGN.md), the chip's #ffe3a6.
+
+## The page as ES modules (16 Nov 2026): where each piece of the old app.js lives
+
+`ffm/ui/app.js` (6,000 lines) is now native ES modules, still with no build step; `index.html` loads
+`<script type="module" src="main.js">`. The code moved verbatim: every DOM id, storage key and URL parameter is as
+before. Older sections that say "in `app.js`" mean the module below. Paths are under `ffm/ui/`:
+- `main.js`: `init`, `followLink`, the error handlers. Nothing imports it.
+- `core/`: `util.js` (`$`, `h`, `fmtNum`, `pill`, `setStatus`, `toast`, `getPath`/`setPath`, `copyText`); `state.js`
+  (`STATIC` and the shared objects `state`, `guide`, `bnd`, `editor`, mutated in place, because a module cannot
+  reassign another's binding; a top-level `let` stays in the module that writes it); `api.js` (`api`, `postJSON`,
+  `staticApi`); `engine.js` (Pyodide and its shim); `lazy.js` (`loadPaper`, `loadBlocks`, `loadBoundary`, `loaded`).
+- `fields.js` (`FIELDS` and its views, `optWord`, `cornerStreets`); `schedule.js` (the architect's schedules,
+  `renderForm`, `refNow`, `syncCards`); `files.js` (site and option files, `saveAs`, `markStale`, drafts); `runs.js`
+  (`runRules`, `openRun`, `applyCompare`, `rev`/`byRev`, `syncUrl`, `syncRunButton`).
+- `route-stage.js` (the manager's route and cards: `renderRoute`, `renderStage`, `cardSite`/`cardOption`/`cardRun`,
+  `wireStage`, `progress`, the Leaflet map); `guide.js` (`guideLookup`, `guideReadSite`, `guideSuggest`, `useSuggestion`).
+- `memo/`: `memo.js` (`renderMemo`, `renderQuiet`, `renderNoMemo`, `placeRunTools`, `refOf`), `answers.js`,
+  `clauses.js`, `ledger.js`, `side-by-side.js`, `changes.js` (What changed).
+- `figures/`: `common.js` (palette, context, labels), `plan.js` (`figPlan`, and the boundary editor's handles and
+  toolbar), `section.js`, `fig3d.js`, `cards.js` (`renderFigures`, `wireFigures`, the sheets, the mass placement,
+  `renderPreview3D`).
+- `revit.js`, `tour.js`, `issue.js`, `claude.js`, `modes.js` (`setMode`, `showInputs`, `setView`, the step strip).
+- Loaded with `import()` on first use, so the manager's first load (28 modules) does not carry them:
+  `editors/blocks.js` (the block editor), `editors/boundary.js` (its wiring and Use this boundary), `paper.js`
+  (`paperDocument`, PDF, Print). Code that runs only while an editor is open calls it through `loaded`.
+
+A new function goes in the module of the part it belongs to; import what it uses, and export it if another module
+calls it. `tests/test_ui_modules.py` checks that main.js reaches every module, that every named import is exported,
+and that the lazy modules are never imported statically. `server.py` serves the module folders (`MODULE_DIRS` in
+`STATIC_PATH`). `pages.py` finds the modules from main.js (`module_graph`) and writes an import map that names each by
+a hash of its own contents (`import_map`), so a deploy changes the URL of exactly the modules that changed and a
+cached old module never runs beside a new one. One fix came with the split: `paperDocument` read its section
+numbers before it declared them, so PDF and Print threw "Cannot access 's' before initialization" on every run with
+money (the committed app.js had it too); the numbering now comes first.
 
 ## The lot as a polygon (11 Nov 2026): odd sites, the parcel survey, the boundary editor
 

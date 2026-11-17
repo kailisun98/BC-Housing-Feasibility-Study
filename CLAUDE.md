@@ -248,6 +248,16 @@ Built and verified in the browser:
   10% over the BC Housing minimums, a starting mix). Candidates: outright, benchmark, funder-ready. On
   998 E 19th Ave funder-ready gives 6 storeys, 19.8 m, FSR 3.0, 109 units, tiers 33/54/22, 19 trees.
   `read_site(site, on)` runs layers A to C with a bare social-housing probe. Tests in `tests/test_suggest.py`.
+  `suggest(..., fixed={storeys, height_m, gfa_m2, units})` (17 Nov 2026) carries the derivation on from the
+  manager's own figures: the homes follow the floor area typed, and the rent tiers, the accessible count and the
+  below-market share follow the homes; `fields` keep the rules' own figures. The stage sends `fixed` on every
+  derivation (`guide.js` `fixedFigures`), and a changed storeys, height, floor area or unit count re-derives. Found
+  on 3475 E Hastings St (the City's 19-storey TOA application of 23 Feb 2026): 176 homes ran with tiers split for
+  99 and the Community Housing Fund "failed" on the tool's arithmetic. With FSR 6.01 typed the tool now derives 170
+  homes against the City's 176. `tests/test_suggest_fixed.py`. The FSR figure at 02 takes an FSR and writes the
+  floor area (it opened a floor-area field under the word FSR). `bc.toa.minimum_density` has a 2026-11-17 version
+  with the bus-exchange tiers 4 (12 storeys, 4.0) and 5 (8, 3.0), `verified: false` until B.C. Reg. 265/2023's
+  schedule is read.
 - `ffm/lookup.py`: `lookup(address)` finds the point in the City's own `property-addresses` dataset first
   (`parse_address` turns "609 heatley" into civic number 609 and street "HEATLEY" for an ODSQL `like`; the
   record's `site_id` names the parcel, fetched by id) and only otherwise geocodes with Nominatim kept inside

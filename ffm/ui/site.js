@@ -25,9 +25,11 @@
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const items = Array.from(document.querySelectorAll(".reveal"));
   if (!reduce && "IntersectionObserver" in window && items.length) {
+    // any edge inside the window reveals a section: 8% of a tall section was a screenful of scrolling, so a whole
+    // viewport stayed blank for more than a second (17 Nov 2026)
     const io = new IntersectionObserver(entries => {
       for (const e of entries) if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
-    }, { rootMargin: "0px 0px -10% 0px", threshold: 0.08 });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0 });
     items.forEach(el => io.observe(el));
     // if the observer is slow (a background tab, a print preview), what is already on screen shows anyway;
     // what is below the fold still waits to be scrolled to

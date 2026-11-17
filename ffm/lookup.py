@@ -449,7 +449,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         if street and street.get("cross_street"):
             x = street["cross_street"]
             notes.append(f"A corner lot: {x['name']} also runs beside it, {x['distance_m']} m from the centre. The frontage is taken on {street['name']} "
-                         f"({metrics['frontage_m']} m); the front could instead be the {metrics['depth_m']} m side on {x['name']} "
+                         f"({metrics['frontage_m']} m); the front could instead be the {metrics['depth_m']} m side on {x['name']}. "
                          f"Confirm which side is the front: it sets the yards, the envelope and the massing.")
         try:
             from .parcel_shapes import classify   # imported here: parcel_shapes builds on this module

@@ -82,6 +82,45 @@ def check_mix(mix: Any) -> dict[str, float] | None:
     return out
 
 
+FIXED_KEYS = ("storeys", "height_m", "gfa_m2")
+
+
+def check_fixed(fixed: Any) -> dict[str, Any]:
+    """The manager's own figures the derivation carries on from, checked: storeys (a whole number), height_m and gfa_m2
+    (positive numbers) and units (a count per bedroom type), each optional. None is {}. Raises ValueError with a plain
+    message otherwise."""
+    if fixed is None:
+        return {}
+    if not isinstance(fixed, dict):
+        raise ValueError("The fixed figures must be a set: storeys, height_m, gfa_m2, units.")
+    extra = [k for k in fixed if k not in FIXED_KEYS + ("units",)]
+    if extra:
+        raise ValueError(f"Unknown fixed figures: {', '.join(map(str, extra))}. Use storeys, height_m, gfa_m2, units.")
+    num = lambda v: not isinstance(v, bool) and isinstance(v, (int, float)) and v == v
+    out: dict[str, Any] = {}
+    for k in FIXED_KEYS:
+        v = fixed.get(k)
+        if v is None:
+            continue
+        if not num(v) or v <= 0 or (k == "storeys" and int(v) != v):
+            raise ValueError(f"{k} must be a positive {'whole ' if k == 'storeys' else ''}number (got {v!r}).")
+        out[k] = int(v) if k == "storeys" else float(v)
+    units = fixed.get("units")
+    if units is not None:
+        if not isinstance(units, dict) or any(k not in MIX_KEYS for k in units):
+            raise ValueError("The fixed units must be counts of studio, one_bed, two_bed, three_bed_plus.")
+        u = {}
+        for k, v in units.items():
+            if v is None:
+                continue
+            if not num(v) or v < 0 or int(v) != v:
+                raise ValueError(f"The count of {k} must be a whole number of 0 or more (got {v!r}).")
+            u[k] = int(v)
+        if u:
+            out["units"] = u
+    return out
+
+
 def _pct(shares: dict[str, float]) -> str:
     return " / ".join(f"{shares[k] * 100:.0f}" for k in MIX_KEYS) + "%"
 
@@ -387,8 +426,13 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
 
 
 def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "funder-ready",
-            rules: list[Rule] | None = None, rules_dir: Path = RULES_DIR, mix_shares: dict | None = None) -> dict[str, Any]:
+            rules: list[Rule] | None = None, rules_dir: Path = RULES_DIR, mix_shares: dict | None = None,
+            fixed: dict | None = None) -> dict[str, Any]:
+    """`fixed`: the manager's own storeys, height, floor area and unit counts. The suggestion's own figures stay in
+    `fields` (what the rules derive); the option takes the manager's, and everything downstream (the homes from the
+    floor area, the funders' tiers, the accessible count, the below-market share) follows them."""
     mine = check_mix(mix_shares)
+    fixed = check_fixed(fixed)
     rules = rules if rules is not None else load_rules(rules_dir)
     programs = list(programs or [])
     district = district_of(site)     # "CD-1 (324)" for a CD-1 site whose number is known: its own by-law's rules match
@@ -449,6 +493,12 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     env = _envelope(site, candidate, rules, on, fields, unsure, rough)
     gfa = env.get("gfa_m2")
     storeys = env.get("storeys")
+    height = env.get("height_m")
+    # the manager's own figures carry the derivation from here (17 Nov 2026: 176 homes on 13,071 m² ran with rent tiers
+    # and accessible units split for the 99 homes of the suggestion's own 7,612 m², and the fund "failed" on that)
+    gfa = fixed.get("gfa_m2", gfa)
+    storeys = fixed.get("storeys", storeys)
+    height = fixed.get("height_m", height)
 
     # the building
     option: dict[str, Any] = {
@@ -459,7 +509,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         "developer_partner": None,
         "tenure": "social_housing",
         "rezoning_path": fields.get("rezoning_path", {}).get("value"),
-        "storeys": storeys, "height_m": env.get("height_m"), "gfa_m2": gfa,
+        "storeys": storeys, "height_m": height, "gfa_m2": gfa,
         "residential_gfa_m2": gfa, "non_residential_gfa_m2": 0 if gfa else None,
         "units": {"studio": None, "one_bed": None, "two_bed": None, "three_bed_plus": None},
         "rent_tiers_units": None, "share_below_hils": None, "max_rent_share_of_income": None,
@@ -515,6 +565,12 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
             option["units"] = counts
             for k, v in counts.items():
                 fields[f"units.{k}"] = {"value": v, "rule_id": "bc.ssmuh.minimum_units", "basis": mix_basis, "note": f"{n} homes, the provincial minimum, in {shares_words}"}
+    # the manager's own counts, where given, stand over the derived ones; the tiers and the accessible units below
+    # are split from the total the option actually holds
+    if fixed.get("units"):
+        derived = option["units"]
+        option["units"] = {k: fixed["units"].get(k, derived.get(k) or 0) for k in MIX_KEYS}
+        n = sum(option["units"].values())
 
     # tenure terms, from layer C
     p_soc = _params(rules, on, "cov.social_housing_definition", district)

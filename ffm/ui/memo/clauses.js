@@ -1,12 +1,16 @@
 /* "Clauses applied": proposed, permitted or required, and the ask, one row per clause the run read. */
 
-import { fmtNum, h, pill, REV, STATUS_WORD, unverifiedTag } from "../core/util.js";
+import { fmtNum, h, paramWords, pill, REV, STATUS_WORD, unverifiedTag } from "../core/util.js";
 import { optWord } from "../fields.js";
 import { idBreak, refTagOf } from "./memo.js";
 
 const pct = x => (typeof x === "number" ? `${(100 * x).toFixed(x * 100 % 1 ? 1 : 0)}%` : "—");
 
-export const UNIT_WORD = { studio: "studio", one_bed: "1-bed", two_bed: "2-bed", three_bed_plus: "3-bed+" };
+// non-breaking hyphens: a count reads "70 1‑bed", never "70 1-" at a line's end and "bed" on the next (17 Nov 2026)
+export const UNIT_WORD = { studio: "studio", one_bed: "1‑bed", two_bed: "2‑bed", three_bed_plus: "3‑bed+" };
+
+/* Every figure a check carries that is a number, a word or a yes/no, in words. */
+const flatWords = v => Object.entries(v || {}).filter(([, x]) => x !== null && x !== undefined && typeof x !== "object").map(([k, x]) => paramWords(k, x));
 
 const num = x => (x === null || x === undefined ? "—" : fmtNum(x));
 
@@ -25,13 +29,21 @@ export function splitValues(r, L) {
                ask: v.height_m > v.max_height_m_outright ? `Height above the outright limit: ${path ? `relaxation by rezoning (${path})` : "a rezoning"}.` : "" };
     case "rezoning_policy_social_housing": {
       const b = v.benchmark_height_m || [];
-      return { proposed: `${num(v.height_m)} m, FSR ${num(v.fsr && Number(v.fsr).toFixed(2))}`, permitted: `staff benchmark ${num(b[0])} to ${num(b[1])} m, about FSR ${num(v.benchmark_fsr)} (negotiated, no maximum)`,
-               ask: b[1] && v.height_m > b[1] ? `${(v.height_m - b[1]).toFixed(1)} m above the benchmark: to be negotiated with staff.` : (b[1] && v.fsr > v.benchmark_fsr ? "Density above the benchmark: to be negotiated with staff." : "") };
+      // where the policy is not yet known to apply, the check carries no figures: the option's own, and the condition
+      // in words (17 Nov 2026: "— m, FSR —", "staff benchmark — to — m, about FSR —")
+      const site = (L.inputs && L.inputs.site) || {};
+      const height = v.height_m ?? opt.height_m, fsr = v.fsr ?? (opt.gfa_m2 && site.site_area_m2 ? opt.gfa_m2 / site.site_area_m2 : null);
+      return { proposed: height != null || fsr != null ? [height != null ? `${num(height)} m` : "", fsr != null ? `FSR ${num(Number(fsr).toFixed(2))}` : ""].filter(Boolean).join(", ") : "height and floor area not given",
+               permitted: b[0] != null ? `staff benchmark ${num(b[0])} to ${num(b[1])} m, about FSR ${num(v.benchmark_fsr)} (negotiated, no maximum)` : "applies inside a former Community Vision area; height and density negotiated, no maximum",
+               ask: b[1] && v.height_m > b[1] ? `${(v.height_m - b[1]).toFixed(1)} m above the benchmark: to be negotiated with staff.` : (b[1] && v.fsr > v.benchmark_fsr ? "Density above the benchmark: to be negotiated with staff." : ask) };
     }
-    case "parking_minimums":
-      return { proposed: `${num(v.parking_spaces)} vehicle, ${num(v.bicycle_spaces)} bicycle spaces`, permitted: "no minimum (June 2024); bicycle spaces set at development permit", ask: "" };
+    case "parking_minimums": {
+      const said = (x, what) => (x == null ? "" : `${num(x)} ${what}`);
+      const given = [said(v.parking_spaces ?? opt.parking_spaces, "vehicle"), said(v.bicycle_spaces ?? opt.bicycle_spaces, "bicycle")].filter(Boolean);
+      return { proposed: given.length ? `${given.join(", ")} spaces` : "parking not given", permitted: "no minimum (June 2024); bicycle spaces set at development permit", ask: "" };
+    }
     case "toa_status":
-      return { proposed: v.storeys != null ? `${num(v.storeys)} storeys` : `${num(opt.storeys)} storeys`, permitted: v.tier ? `tier ${v.tier}: at least ${num(v.min_storeys || v.floors)} storeys may not be refused` : "tier 1: 20, tier 2: 12, tier 3: 8 storeys minimum allowable", ask };
+      return { proposed: v.storeys != null ? `${num(v.storeys)} storeys` : `${num(opt.storeys)} storeys`, permitted: (v.toa_tier || v.tier) ? `tier ${v.toa_tier || v.tier}: at least ${num(v.minimum_allowable_storeys || v.min_storeys || v.floors)} storeys may not be refused` : "SkyTrain tiers 1 to 3: 20, 12, 8 storeys; bus-exchange tiers 4 and 5: 12, 8 storeys minimum allowable", ask };
     case "family_unit_share": {
       const m3 = v.min_three_plus_bed_share;
       return { proposed: v.units_total ? `${num(v.two_plus_bed_units)} of ${num(v.units_total)} units two-bed+ (${pct(v.two_plus_bed_share)}); ${num(v.three_plus_bed_units)} three-bed+ (${pct(v.three_plus_bed_share)})` : "unit mix not given",
@@ -74,11 +86,12 @@ export function splitValues(r, L) {
     case "dcl_cac":
       return { proposed: "social housing", permitted: `DCL ${v.dcl_exempt ? "exempt" : "payable"}, CAC ${v.cac_exempt ? "exempt" : "payable"}`, ask: "" };
     case "info_only":
-      return { proposed: "", permitted: Object.entries(v).filter(([, x]) => x !== null && typeof x !== "object").map(([k, x]) => `${k.replace(/_/g, " ")}: ${fmtNum(x)}`).join("; "), ask: "" };
+      // a rule that informs: its figures in one cell across the row (see renderClauses), each with its unit
+      return { info: flatWords(v).join("; ") };
     default: {
       const lim = k => /^(max_|min_|required|benchmark_|schedule_|eligible)/.test(k);
       const flat = Object.entries(v).filter(([, x]) => x !== null && x !== undefined && typeof x !== "object");
-      return { proposed: flat.filter(([k]) => !lim(k)).map(([k, x]) => `${k.replace(/_/g, " ")} ${fmtNum(x)}`).join("; "), permitted: flat.filter(([k]) => lim(k)).map(([k, x]) => `${k.replace(/_/g, " ")} ${fmtNum(x)}`).join("; "), ask };
+      return { proposed: flat.filter(([k]) => !lim(k)).map(([k, x]) => paramWords(k, x)).join("; "), permitted: flat.filter(([k]) => lim(k)).map(([k, x]) => paramWords(k, x)).join("; "), ask };
     }
   }
 }
@@ -94,9 +107,9 @@ export function renderClauses(res, L, changed = new Set()) {
     return `<tr class="st-${h(r.status)}">
       <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
       <td class="status">${pill(r.status)}</td>
-      <td class="nums">${h(s.proposed || "—")}</td>
+      ${s.info !== undefined ? `<td class="nums info-span" colspan="3">${h(s.info || "no figures")}</td>` : `<td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>
-      <td class="ask">${s.ask ? h(s.ask) : `<span class="cont">—</span>`}</td>
+      <td class="ask">${s.ask ? h(s.ask) : `<span class="cont">—</span>`}</td>`}
     </tr>`;
   }).join("");
   const counts = {};
@@ -108,6 +121,6 @@ export function renderClauses(res, L, changed = new Set()) {
     <div class="counts">${countPills}</div>
     <table class="plain"><colgroup><col class="c-rule"><col class="c-status"><col class="c-prop"><col class="c-perm"><col class="c-ask"></colgroup>
       <thead><tr><th>Clause</th><th>Status</th><th>Proposed (simulated)</th><th>Permitted or required</th><th>The ask</th></tr></thead><tbody>${rows}</tbody></table>
-    ${na.length ? `<p class="na">Not applicable here: ${na.map(r => `${h(r.title)} <code>${h(r.rule_id)}</code>`).join("; ")}.</p>` : ""}
+    ${na.length ? `<details class="fold na"><summary>Not applicable here: ${na.length} rule${na.length === 1 ? "" : "s"}, for other districts, policies or programs</summary><ul class="na-list">${na.map(r => `<li>${h(r.title)} <code class="rule-id">${idBreak(r.rule_id)}</code></li>`).join("")}</ul></details>` : ""}
   </section>`;
 }

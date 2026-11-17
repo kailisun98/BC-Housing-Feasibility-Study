@@ -10,6 +10,7 @@ No model is involved here. Same inputs, same output, every run.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Callable
 
 Site = dict[str, Any]
@@ -304,8 +305,13 @@ def rezoning_policy_social_housing(site, option, p) -> Result:
 
 
 def parking_minimums(site, option, p) -> Result:
-    return _r(INFO, f"No minimum off-street parking applies citywide since June 2024; the option provides {option.get('parking_spaces', 'n/a')} vehicle and {option.get('bicycle_spaces', 'n/a')} bicycle spaces, which are set by the Parking By-law at the development permit stage.",
-              {"parking_spaces": option.get("parking_spaces"), "bicycle_spaces": option.get("bicycle_spaces")})
+    # a count not given is said so, not printed as None (17 Nov 2026: "the option provides None vehicle and None
+    # bicycle spaces"; the key is present and null in a derived option, so get()'s default never applied)
+    car, bike = option.get("parking_spaces"), option.get("bicycle_spaces")
+    given = [f"{x} {what}" for x, what in ((car, "vehicle"), (bike, "bicycle")) if x is not None]
+    provides = f"the option provides {' and '.join(given)} spaces" if given else "the option gives no parking count"
+    return _r(INFO, f"No minimum off-street parking applies citywide since June 2024; {provides}. Bicycle spaces are set by the Parking By-law at the development permit stage.",
+              {"parking_spaces": car, "bicycle_spaces": bike})
 
 
 # ---------------------------------------------------------------- Layer B: provincial overrides
@@ -347,10 +353,13 @@ def toa_status(site, option, p) -> Result:
     tier = str(site.get("toa_tier") or "")
     floors = p["tiers_storeys"].get(tier)
     if floors is None:
-        return _r(UNSURE, "The site is in a transit-oriented area but the tier is not recorded.", action="Record the TOA tier from the City's map.")
+        return _r(UNSURE, "The site is in a transit-oriented area but the tier is not recorded.", action="Manager: record the TOA tier from the City's map.")
     st = option.get("storeys")
-    vals = {"toa_tier": tier, "minimum_allowable_storeys": floors, "storeys": st}
-    return _r(INFO, f"Tier {tier}: the City may not refuse at least {floors} storeys for this parcel; the option proposes {st}.", vals)
+    where = (p.get("tiers_where") or {}).get(tier)
+    fsr = (p.get("tiers_fsr") or {}).get(tier)
+    vals = {"toa_tier": tier, "minimum_allowable_storeys": floors, "minimum_allowable_fsr": fsr, "storeys": st}
+    return _r(INFO, f"Tier {tier}{f' ({where})' if where else ''}: the City may not refuse at least {floors} storeys"
+                    + (f" and an FSR of {fsr:g}" if fsr else "") + f" for this parcel; the option proposes {st if st is not None else 'no storey count'}.", vals)
 
 
 # ---------------------------------------------------------------- Layer C: City policies
@@ -614,13 +623,41 @@ def bc_builds_fit(site, option, p) -> Result:
     if fails:
         return _r(FAIL, "BC Builds: does not fit: " + "; ".join(fails) + ".", vals, action="Manager: resolve the failing criteria.")
     if unknown:
-        return _r(UNSURE, "BC Builds: fit cannot be confirmed without the " + "; ".join(unknown) + ". " + "; ".join(n[0].upper() + n[1:] for n in notes) + ".",
-                  vals, action="Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices.")
+        # the notes are one sentence, capitalised once (17 Nov 2026: each was, so it read "…under the 30% cap; Ground
+        # must break…"), and the action asks for what is actually missing, not always the below-market share
+        said = "; ".join(notes)
+        asks = (["say whether a developer or builder partner is in place"] if any("partner" in u for u in unknown) else []) \
+            + (["state the below-market share and discount"] if any("below market" in u for u in unknown) else [])
+        return _r(UNSURE, "BC Builds: fit cannot be confirmed without the " + "; ".join(unknown) + ". " + (said[:1].upper() + said[1:] + "." if said else ""),
+                  vals, action=f"Manager: {' and '.join(asks) or 'supply what is missing'}; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices.")
     return _r(PASS, "BC Builds: fits the published criteria: " + "; ".join(notes) + ".", vals)
 
 
+def param_words(k: str, v: Any) -> str:
+    """A rule parameter in words, as the memo prints it: the key without its unit suffix, the figure with its unit, an
+    identifier as written (17 Nov 2026: "max loan cad: 250000", "rate pct: 6.19"). Pure; the page's paramWords
+    (ffm/ui/core/util.js) is the same rule."""
+    words = lambda s: re.sub(r"\bm2\b", "m²", re.sub(r"\bmin\b", "minimum", re.sub(r"\bmax\b", "maximum", s.replace("_", " "))))
+    if isinstance(v, bool):
+        return f"{words(k)}: {'yes' if v else 'no'}"
+    if not isinstance(v, (int, float)) or re.search(r"(^|_)(id|vector|table|series|coordinate|code)$", k):
+        return f"{words(k)}: {v}"
+    num = lambda x: f"{x:,.0f}" if float(x).is_integer() else f"{x:,.3f}".rstrip("0").rstrip(".")
+    if re.search(r"_cad(_\d{4}(_\d{2})?)?$", k):
+        return f"{words(re.sub(r'_cad(_\d{4}(_\d{2})?)?$', '', k))}: ${num(v)}"
+    if k.endswith("_pct"):
+        return f"{words(k[:-4])}: {num(v)}%"
+    if k.endswith("_m2"):
+        return f"{words(k[:-3])}: {num(v)} m²"
+    if k.endswith("_m"):
+        return f"{words(k[:-2])}: {num(v)} m"
+    if re.search(r"(share|rate)(_of_\w+)?$", k) and 0 < v < 1:
+        return f"{words(k)}: {num(round(v * 100, 1))}%"
+    return f"{words(k)}: {num(v)}"
+
+
 def info_only(site, option, p) -> Result:
-    bits = [f"{k.replace('_', ' ')}: {v}" for k, v in p.items() if not isinstance(v, (dict, list))]
+    bits = [param_words(k, v) for k, v in p.items() if v is not None and not isinstance(v, (dict, list))]
     return _r(INFO, "; ".join(bits) + ".", dict(p))
 
 

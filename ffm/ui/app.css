@@ -334,7 +334,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 [data-mode="manager"] .memo:not([data-issued-manager="1"]) .layout-sheet { display: none; }
 [data-mode="manager"] .memo:not([data-issued-manager="1"]) .layout-wait { display: block; }
 /* the inline Save as… field under a card, and the band over a memo whose inputs changed */
-.save-inline { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2, var(--panel)); }
+.save-inline { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
 .save-inline .field { flex: 1 1 180px; margin: 0; }
 .save-inline .help { flex-basis: 100%; }
 .stale-band { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 14px; margin: 0 0 12px; border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); background: color-mix(in srgb, var(--amber) 11%, var(--panel)); font-size: 13px; }
@@ -377,7 +377,7 @@ details.sg-group[open] > summary.sg-head::before { content: "▾ "; }
 .pf-lines table.plain { margin-top: 6px; }
 .pf-lines td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .pf-lines code { font: 11px var(--mono); overflow-wrap: anywhere; }
-.pf-lines .ph-tag, .prop-row .conf { font: 600 10px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--s-uncertain-text); white-space: nowrap; }
+.pf-lines .ph-tag, .prop-row .conf { font: 600 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--s-uncertain-text); white-space: nowrap; }
 .pf-lines p.cont { color: var(--muted); font-size: 11.5px; margin: 8px 0 0; max-width: 70ch; }
 
 /* a status: a coloured mark with a glyph before the word, on a pill */
@@ -432,14 +432,20 @@ table.plain td.status { white-space: nowrap; }
 .stampbox li { font-size: 12px; }
 
 /* ------------------------------------------------------------------ figures: drawings on white paper, beside the answers when wide */
-.memo-body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; gap: 12px; }
+/* the clauses have their own area, after the figures and before the ledger, in the DOM's order (17 Nov 2026: the grid
+   named no area for them, so they fell to an implicit row under Sources and the stamp) */
+.memo-body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; gap: 12px; }
 .memo-body > .answers { grid-area: answers; }
 .memo-body > .figures { grid-area: figures; }
+.memo-body > .memo-clauses { grid-area: clauses; min-width: 0; }
 .memo-body > .memo-rest { grid-area: rest; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-/* wide: the figures beside the answers, then the ledger and the rest across the full width */
-@media (min-width: 1600px) { .memo-body { grid-template-columns: minmax(0, 1fr) 460px; grid-template-areas: "answers figures" "rest rest"; align-items: start; } }
+/* wide: the figures beside the answers, then the clauses, the ledger and the rest across the full width */
+@media (min-width: 1600px) { .memo-body { grid-template-columns: minmax(0, 1fr) 460px; grid-template-areas: "answers figures" "clauses clauses" "rest rest"; align-items: start; } }
 .figures { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.figure { padding: 10px 12px 10px; background: var(--c-paper); margin: 0; }
+/* a drawing's card is white paper in both themes, and the words on it take the paper's own ink (17 Nov 2026: at night
+   the sheet titles, notes and the exits fold stayed night ink on white, 1.2:1) */
+.figure { padding: 10px 12px 10px; background: var(--c-paper); margin: 0; color: var(--c-drawink); color-scheme: light;
+  --ink: var(--c-drawink); --muted: var(--c-drawmuted); --line: #e1e5ea; --field: #ffffff; --group: #e9eef4; --panel: var(--c-paper); --blue: var(--b-signal-deep); }
 .figure .eyebrow { color: var(--c-drawmuted); margin-bottom: 6px; }
 .figure svg { display: block; width: 100%; height: auto; }
 /* a drawing is as tall as it needs to be on a screen and no taller; its labels are set at a fixed size (app.js) */
@@ -470,7 +476,7 @@ table.plain td.status { white-space: nowrap; }
 .egress summary { cursor: pointer; display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
 .egress .finding-list { margin-top: 6px; }
 .egress .help { margin: 6px 0 0; }
-.unverified { display: inline-block; font: 600 10px/1 var(--mono); color: var(--s-uncertain-text); background: var(--s-uncertain-wash); border-radius: 3px; padding: 2px 5px; margin-left: 5px; vertical-align: middle; letter-spacing: .04em; text-transform: uppercase; cursor: help; }
+.unverified { display: inline-block; font: 600 11px/1 var(--mono); color: var(--s-uncertain-text); background: var(--s-uncertain-wash); border-radius: 3px; padding: 2px 5px; margin-left: 5px; vertical-align: middle; letter-spacing: .04em; text-transform: uppercase; cursor: help; }
 .sheet-rules .cont { color: var(--c-drawmuted); }
 .fig-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-left: auto; }
 /* the block editor is the architect's tool: the manager and the reader see the sheets without it */
@@ -739,7 +745,9 @@ table.plain td.status { white-space: nowrap; }
 .sched-form input[type="file"] { font-size: 12px; max-width: 100%; }
 .stage-site { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 @media (min-width: 900px) { .stage-site { grid-template-columns: minmax(280px, 1.1fr) minmax(0, 1fr); align-items: start; } }
-.stage-map { height: 260px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--field); }
+/* its own stacking context: Leaflet's panes (z 400) and controls (z 1000) stay inside the map instead of painting over
+   the sticky bars (z 10) as the card scrolls under them (17 Nov 2026) */
+.stage-map { position: relative; z-index: 0; isolation: isolate; height: 260px; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--field); }
 .stage-map .help { padding: 12px; }
 /* the map in the brand's half tone (16 Nov 2026): the OpenStreetMap tiles are drained to the paper greys the drawings
    use for roads and buildings, so the parcel's signal blue is the one colour on it; the controls take the tool's type */
@@ -749,8 +757,8 @@ table.plain td.status { white-space: nowrap; }
 /* the map is a drawing on white paper in both themes, so its controls take the drawing's fixed paper and ink */
 .stage-map .leaflet-control-zoom a { color: var(--c-drawink); background: var(--c-paper); border-bottom-color: var(--c-half-line); font: 500 16px/26px var(--sans); }
 .stage-map .leaflet-control-zoom a:hover { background: var(--field); }
-.stage-map .leaflet-control-attribution { font: 10px var(--sans); color: var(--muted); background: rgba(255, 255, 255, .78); }
-.stage-map .leaflet-control-attribution a { color: var(--muted); }
+.stage-map .leaflet-control-attribution { font: 11px var(--sans); color: var(--c-drawmuted); background: rgba(255, 255, 255, .85); }
+.stage-map .leaflet-control-attribution a { color: var(--c-drawmuted); }
 .stage-map .leaflet-tooltip { font: 12px var(--sans); color: var(--c-drawink); background: var(--c-paper); border: 1px solid var(--c-half-line); border-radius: 4px; box-shadow: var(--shadow); padding: 4px 8px; }
 .stage-map .leaflet-tooltip::before { display: none; }
 .stage-src { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
@@ -841,14 +849,17 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="architect"] #export-actions #dl-massing { order: -1; }
 /* the architect reads the four answers, then the drawings at full width, two sheets to a row, the plans (and the
    block editor on them) across the whole width; the ledger follows */
-[data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; }
+[data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; }
 @media (min-width: 1100px) {
-  [data-mode="architect"] .figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; align-items: start; }
-  [data-mode="architect"] .figure.sheet[data-sheet="plans"] { grid-column: 1 / -1; }
+  /* two columns that fill, the way the answers do at 1600: a grid row is as tall as its taller sheet, which left a
+     356 px band beside the section and an empty cell after FIG 06 (17 Nov 2026); the plans span both */
+  [data-mode="architect"] .figures { display: block; columns: 2; column-gap: 12px; }
+  [data-mode="architect"] .figures > * { break-inside: avoid; margin-bottom: 12px; }
+  [data-mode="architect"] .figure.sheet[data-sheet="plans"] { column-span: all; }
   [data-mode="architect"] .figure.sheet .sheet-body svg { max-height: none; }
 }
 @media (min-width: 1600px) {
-  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "rest"; }
+  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; }
   /* two columns that fill: a grid left a card-sized hole under a short answer (16 Nov 2026), so the answers flow
      down one column and into the next instead */
   [data-mode="architect"] .memo-body > .answers { display: block; columns: 2; column-gap: 12px; }
@@ -874,7 +885,9 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .memo .memo-clauses { order: 5; }
 [data-mode="reader"] .memo .figures { order: 6; }
 [data-mode="reader"] .memo .memo-rest { order: 7; }
-.ref { font: 600 11px/1 var(--mono); color: var(--ink); background: var(--panel-2, #eef1f4); border-radius: 3px; padding: 2px 5px; margin-right: 4px; white-space: nowrap; }
+/* a reference chip on the theme's own group fill (17 Nov 2026: `--panel-2` was never defined, so the chip kept a light
+   fallback under night ink, 1.06:1) */
+.ref { font: 600 11px/1 var(--mono); color: var(--ink); background: var(--group); border-radius: 3px; padding: 2px 5px; margin-right: 4px; white-space: nowrap; }
 .bnd-edges { margin: 6px 0 0; font-size: 12px; }
 .bnd-edges input { width: 90px; }
 [data-mode="reader"] .memo-head h1 { font-size: 34px; }
@@ -972,7 +985,8 @@ table.plain td.status { white-space: nowrap; }
 .stage-dl > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line); }
 .stage-dl > div:first-child { border-top: 0; padding-top: 2px; }
 .stage-dl dt { font: 600 11px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 4px; }
-.stage-dl dd { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+/* the card's own keys only: a list nested in a value (the money's "Yours") is not split into a column of fragments */
+.stage-dl > div > dd { margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chip { display: inline-flex; align-items: center; gap: 7px; padding: 4px 11px 4px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: 12.5px; cursor: pointer; background: var(--panel); transition: background-color var(--t-fast), border-color var(--t-fast); }
 .chip:hover { border-color: color-mix(in srgb, var(--ink) 40%, var(--line)); }
@@ -1061,8 +1075,9 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
 .sch-group { padding: 10px 0 4px; }
 .sch-group + .sch-group { border-top: 1px solid var(--line); margin-top: 4px; }
 .sch-head { font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 2px; }
-.sch-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) auto; grid-template-areas: "item val ref"; gap: 4px 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
-.sch-row.wide { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "item ref" "val val"; }
+/* the Ref column is a fixed width, so the Value column's edge does not jog from row to row with the chip's (17 Nov 2026) */
+.sch-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) 64px; grid-template-areas: "item val ref"; gap: 4px 10px; align-items: center; padding: 5px 0; border-bottom: 1px solid color-mix(in srgb, var(--line) 65%, transparent); }
+.sch-row.wide { grid-template-columns: minmax(0, 1fr) 64px; grid-template-areas: "item ref" "val val"; }
 .sch-row.why-open { border-bottom-color: transparent; }
 .sch-item { grid-area: item; font-size: 12.5px; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; }
 .sch-item label, .sch-item > span:first-child { font-weight: 500; color: var(--ink); }
@@ -1136,4 +1151,55 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
   .ledger summary::after { content: none; }
   a { color: #000; text-decoration: none; }
   .pill, .pill::before, .rev { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ------------------------------------------------------------------ 17 Nov 2026: the gaps and slips the review on
+   3475 E Hastings St found */
+/* a figure and its unit, a count and its word, stay on one line */
+.nw { white-space: nowrap; }
+/* the height the drawings will use, and the one figure that changes it, under the four figures */
+.fig4-note { margin: 6px 0 0; font-size: 12px; max-width: 72ch; }
+/* a rule that only informs: its figures in one cell across Proposed, Permitted and the ask */
+.clauses td.info-span { color: var(--muted); }
+/* the rules that did not apply, folded under the table rather than a paragraph of sixty ids */
+.clauses .na { margin: 10px 0 0; }
+.clauses .na > summary { font-size: 12px; color: var(--muted); }
+.clauses .na-list { list-style: none; margin: 0; padding: 0; columns: 2 280px; column-gap: 24px; font-size: 11.5px; color: var(--muted); }
+.clauses .na-list li { break-inside: avoid; margin: 0 0 4px; }
+.clauses .na-list .rule-id { display: inline; margin-left: 4px; }
+/* the first layout is placed, not animated (main.js adds .settled once init has opened what the link asks for) */
+html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
+/* a link on a status wash takes the card's ink, underlined in the signal colour (4.17:1 as plain blue on the fail wash) */
+.answer[data-verdict] a:not(.btn) { color: var(--ink); text-decoration: underline; text-decoration-color: var(--blue); text-underline-offset: 2px; }
+@media (max-width: 760px) {
+  /* the open items stack: each row a block with its keys, so the table never runs past the card (17 Nov 2026: 387 px
+     in a 355 px card scrolled the page sideways in all three modes) */
+  table.open-items, table.open-items tbody, table.open-items tr, table.open-items td { display: block; width: auto; }
+  table.open-items thead { display: none; }
+  table.open-items tr { padding: 8px 0; border-bottom: 1px solid var(--line); }
+  table.open-items tr:last-child { border-bottom: 0; }
+  table.open-items td { border: 0; padding: 2px 0; overflow-wrap: anywhere; }
+  table.open-items td[data-k]::before { content: attr(data-k); display: inline-block; min-width: 84px; font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  table.open-items td[data-k="Item"] { font-weight: 600; }
+  table.open-items td[data-k="Item"]::before { display: none; }
+  /* the money's lines: the source column wraps instead of widening the table */
+  .pf-lines table.plain { table-layout: fixed; }
+  .pf-lines table.plain td { overflow-wrap: anywhere; }
+  /* the title block and the option's figures: two even columns, a rule between rows, no border after the last cell */
+  .memo-meta, .memo-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .memo-meta > div, .memo-figures > div { border-right: 0; margin-right: 0; padding: 6px 8px 6px 0; }
+  .memo-meta > div:nth-child(odd), .memo-figures > div:nth-child(odd) { border-right: 1px solid var(--line); margin-right: 8px; }
+  .memo-meta > div:nth-child(n + 3), .memo-figures > div:nth-child(n + 3) { border-top: 1px solid var(--line); }
+}
+@media (max-width: 480px) {
+  /* the address field takes the whole row and the button goes under it, so the example in the field is not cut */
+  .addr-row { flex-wrap: wrap; }
+  .addr-row input { flex-basis: 100%; }
+  .addr-row .btn { flex: 1 1 auto; }
+  .addr-saved .cont { white-space: nowrap; }
+}
+/* the architect's schedules hold their place beside a long memo, scrolling on their own, instead of ending and leaving
+   a 420 px empty column beside the drawings and the ledger (17 Nov 2026) */
+@media (min-width: 1101px) {
+  [data-mode="architect"] .panes:not(.no-inputs) .inputs-body { position: sticky; top: calc(var(--bars-h) + 8px); max-height: calc(100vh - var(--bars-h) - 16px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
 }

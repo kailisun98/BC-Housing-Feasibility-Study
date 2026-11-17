@@ -140,7 +140,7 @@ export function paperDocument(run) {
   const clauses = `<table class="clauses">
       <colgroup><col style="width:5%"><col style="width:24%"><col style="width:11%"><col style="width:19%"><col style="width:20%"><col></colgroup>
       <thead><tr><th>Ref</th><th>Clause and version</th><th>Status</th><th>Proposed</th><th>Permitted or required</th><th>The ask</th></tr></thead>
-      <tbody>${applied.map(r => { const s = splitValues(r, L); return `<tr><td>${refTag(r.rule_id)}</td><td><b>${h(r.title)}</b><div class="mono muted">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</div></td><td>${mark(r.status)}</td><td>${h(s.proposed || "—")}</td><td>${h(s.permitted || "—")}</td><td>${s.ask ? h(s.ask) : `<span class="muted">—</span>`}</td></tr>`; }).join("")}</tbody></table>
+      <tbody>${applied.map(r => { const s = splitValues(r, L); return `<tr><td>${refTag(r.rule_id)}</td><td><b>${h(r.title)}</b><div class="mono muted">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</div></td><td>${mark(r.status)}</td>${s.info !== undefined ? `<td colspan="3">${h(s.info || "no figures")}</td>` : `<td>${h(s.proposed || "—")}</td><td>${h(s.permitted || "—")}</td><td>${s.ask ? h(s.ask) : `<span class="muted">—</span>`}</td>`}</tr>`; }).join("")}</tbody></table>
     ${na.length ? `<p class="note">Not applicable here: ${na.map(r => `${refTag(r.rule_id)} ${h(r.title)}`).join("; ")}.</p>` : ""}`;
 
   // 5. the massing, drawn from the same numbers

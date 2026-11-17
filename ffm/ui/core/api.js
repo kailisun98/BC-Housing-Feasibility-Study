@@ -191,7 +191,7 @@ async function staticApi(path, opts) {
     throw new Error(`The web version has no route for ${p}.`);
   }
   if (p === "/api/run") return staticRun(body);
-  if (p === "/api/suggest") { await loadEngine(); return JSON.parse(engine.suggest(JSON.stringify(body.site), JSON.stringify(body.programs || []), body.as_of || todayISO(), body.candidate || "funder-ready", body.mix_shares ? JSON.stringify(body.mix_shares) : "")); }
+  if (p === "/api/suggest") { await loadEngine(); return JSON.parse(engine.suggest(JSON.stringify(body.site), JSON.stringify(body.programs || []), body.as_of || todayISO(), body.candidate || "funder-ready", body.mix_shares ? JSON.stringify(body.mix_shares) : "", body.fixed ? JSON.stringify(body.fixed) : "")); }
   if (p === "/api/layout") { await loadEngine(); return JSON.parse(engine.layout(JSON.stringify(body.site), JSON.stringify(body.option), body.as_of || todayISO())); }
   if (p === "/api/read-site") { await loadEngine(); return JSON.parse(engine.readSite(JSON.stringify(body.site), body.as_of || todayISO())); }
   if (/^\/api\/runs\/[^/]+\/[^/]+\/issue$/.test(p)) throw new Error("Issuing a run to another reader needs the local server (python -m ffm ui).");

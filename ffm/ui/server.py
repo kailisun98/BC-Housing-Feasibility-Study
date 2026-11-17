@@ -31,7 +31,8 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
     POST /api/runs/<site>/<folder>/memo     rewrite memo.md / memo.html for that run (picks up a Revit result)
     GET  /api/lookup?q=<address>            a proposed site file from Nominatim and the City's open data (network)
     POST /api/read-site                     body {site, as_of?}: the site alone against layers A to C, nothing written
-    POST /api/suggest                       body {site, programs, as_of?, candidate?}: a rule-derived option, every
+    POST /api/suggest                       body {site, programs, as_of?, candidate?, mix_shares?, fixed?}: a rule-derived
+                                            option carried on from the manager's fixed figures, every
                                             figure with its rule (ffm/suggest.py)
     POST /api/layout                        body {site, option, as_of?}: the block editor's check; the option's
                                             layout.zones are measured and the rules read back; nothing written
@@ -551,7 +552,7 @@ def do_suggest(body: Any) -> dict:
     if mix is not None and not isinstance(mix, dict):
         raise ApiError(400, "mix_shares must be a set of shares (studio, one_bed, two_bed, three_bed_plus) or left out.")
     try:
-        return suggest.suggest(site, programs, on, body.get("candidate") or "funder-ready", mix_shares=mix)
+        return suggest.suggest(site, programs, on, body.get("candidate") or "funder-ready", mix_shares=mix, fixed=body.get("fixed"))
     except ValueError as e:
         raise ApiError(400, str(e))
 

@@ -53,6 +53,24 @@
             "webinar_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf",
             "verify": "Tier storey figures are the Province's SkyTrain-station tiers as commonly reported; confirm against the Transit-Oriented Areas Designation Regulation before the user sessions."
           }
+        },
+        {
+          "effective_from": "2026-11-17",
+          "params": {
+            "tiers_storeys": {"1": 20, "2": 12, "3": 8, "4": 12, "5": 8},
+            "tiers_fsr": {"1": 5.0, "2": 4.0, "3": 3.0, "4": 4.0, "5": 3.0},
+            "tiers_where": {"1": "within 200 m of a SkyTrain station", "2": "200 to 400 m of a SkyTrain station", "3": "400 to 800 m of a SkyTrain station", "4": "within 200 m of a bus exchange", "5": "200 to 400 m of a bus exchange"},
+            "note": "Minimum allowable heights and densities by tier: tiers 1 to 3 around SkyTrain stations, tiers 4 and 5 around bus exchanges. This version adds the bus-exchange tiers the 2024-06-30 version left out (found on 3475 E Hastings St, beside the Kootenay Loop bus exchange); they were in force from 30 June 2024, so a run dated before 17 Nov 2026 still reads the version without them. The tier comes from the City's TOA map, which this tool does not read; the user confirms it.",
+            "vancouver_toa_count": 29
+          },
+          "source": {
+            "title": "Province of BC, Transit-Oriented Development Areas overview webinar (18 Jan 2024); Vancouver Transit-Oriented Areas Regulation, B.C. Reg. 265/2023",
+            "url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-18_tod-area-overview.pdf",
+            "section": "Minimum allowable density and height by tier; bus exchanges tiers 4 and 5",
+            "regulation_url": "https://free.bcpublications.ca/civix/document/id/crbc/crbc/265_2023",
+            "verified": false,
+            "verify": "Tiers 4 and 5 (bus exchanges: 12 storeys and 4.0 FSR within 200 m, 8 storeys and 3.0 FSR within 400 m) are as the Province's overview and the City of Vancouver's TOA guidance give them; the regulation's own schedule was not read (its PDF text could not be extracted). Confirm against B.C. Reg. 265/2023 before relying on them."
+          }
         }
       ]
     }

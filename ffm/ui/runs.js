@@ -45,6 +45,9 @@ export async function loadRuns(siteId = null) {
   const sid = siteId || state.siteId || (state.site && state.site.id);
   state.runs = sid ? await api(`/api/runs?site=${encodeURIComponent(sid)}`) : [];
   noteRevisions(state.runs);
+  // the route names the memo by its revision: drawn before the revisions were known, it said "a new revision" for R1
+  // (17 Nov 2026)
+  renderRoute();
 }
 
 /* A memo's revision on its site, R1, R2 and so on, the way a drawing numbers its issues. The committed runs come

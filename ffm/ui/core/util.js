@@ -42,9 +42,32 @@ export function fmtValues(v) {
   const bits = [];
   for (const [k, x] of Object.entries(v || {})) {
     if (x === null || x === undefined || typeof x === "object") continue;
-    bits.push(`${k.replace(/_/g, " ")} = ${fmtNum(x)}`);
+    bits.push(paramWords(k, x));
   }
   return bits.join("; ");
+}
+
+/* A rule parameter in words: the key without the file's unit suffix, the figure with its unit, an id as written
+   (17 Nov 2026: "rate pct 6.19", "max loan cad: 250,000", "floor area m2: 150", "product id 18,100,289"). Pure. */
+export function paramWords(k, x) {
+  let key = String(k);
+  if (typeof x === "boolean") return `${keyWords(key)}: ${x ? "yes" : "no"}`;
+  if (typeof x !== "number") return `${keyWords(key)}: ${String(x)}`;
+  // an identifier is a label, never a quantity
+  if (/(^|_)(id|vector|table|series|coordinate|code)$/.test(key)) return `${keyWords(key)}: ${String(x)}`;
+  let shown;
+  if (/_cad(_\d{4}(_\d{2})?)?$/.test(key)) { key = key.replace(/_cad(_\d{4}(_\d{2})?)?$/, ""); shown = `$${fmtNum(Math.round(x * 100) / 100)}`; }
+  else if (/_pct$/.test(key)) { key = key.replace(/_pct$/, ""); shown = `${fmtNum(x)}%`; }
+  else if (/_m2$/.test(key)) { key = key.replace(/_m2$/, ""); shown = `${fmtNum(x)} m²`; }
+  else if (/_m$/.test(key)) { key = key.replace(/_m$/, ""); shown = `${fmtNum(x)} m`; }
+  else if (/(share|rate)(_of_\w+)?$/.test(key) && x > 0 && x < 1) shown = `${fmtNum(Math.round(x * 1000) / 10)}%`;
+  else shown = fmtNum(x);
+  return `${keyWords(key)}: ${shown}`;
+}
+
+/* A parameter key in words: max and min in full, m2 as m². */
+export function keyWords(k) {
+  return String(k).replace(/_/g, " ").replace(/\bmax\b/g, "maximum").replace(/\bmin\b/g, "minimum").replace(/\bm2\b/g, "m²").replace(/\bpct\b/g, "%").replace(/\brgi\b/g, "RGI").replace(/\bchf\b/g, "CHF");
 }
 
 /* Lead sentence in ink, the rest in grey. */

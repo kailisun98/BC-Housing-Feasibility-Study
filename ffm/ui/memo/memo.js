@@ -84,7 +84,7 @@ export function renderMemo(run) {
     <h1>${h(site.address || site.id)}</h1>
     <div class="memo-meta">
       <div><b>Option</b><span>${h(opt.name || opt.id)}</span></div>
-      <div><b>Proponent</b><span>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="cont">(${h(optWord("option", "proponent_type", opt.proponent_type))})</span>` : ""}</span></div>
+      <div><b>Proponent</b><span>${opt.proponent ? h(opt.proponent) : "<i>not named</i>"}${opt.proponent_type ? ` <span class="cont">· ${h(optWord("option", "proponent_type", opt.proponent_type))}</span>` : ""}</span></div>
       <div><b>Rules as of</b><span>${h(L.run.as_of)}</span></div>
       <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
       ${cmpCell}
@@ -151,11 +151,11 @@ function optionFiguresHtml(site, opt, run) {
   const pm = run && run.massing && run.massing.masses && run.massing.masses.find(x => x.name === "proposed");
   const cell = (k, v, sub) => `<div><b>${h(k)}</b><span>${v}${sub ? ` <span class="cont">${sub}</span>` : ""}</span></div>`;
   return `<div class="memo-figures">
-    ${cell("Storeys", opt.storeys != null ? h(opt.storeys) : "<i>not given</i>", opt.height_m != null ? `· ${h(opt.height_m)} m` : "")}
-    ${cell("Floor area", opt.gfa_m2 != null ? `${h(fmtNum(opt.gfa_m2))} m²` : "<i>not given</i>", fsr ? `· FSR ${h(fsr)}` : "")}
-    ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `${v} ${UNIT_WORD[k] || k}`).join(", ")}` : "")}
-    ${cell("Rent tiers", tiers ? `${h(tiers.market || 0)} market · ${h(tiers.rgi || 0)} RGI · ${h(tiers.deep_subsidy || 0)} deep subsidy` : "<i>not split</i>", "")}
-    ${cell("Tenure", h(optWord("option", "tenure", opt.tenure) || "not set"), opt.housing_agreement_years ? `· ${h(opt.housing_agreement_years)}-year agreement` : "")}
+    ${cell("Storeys", opt.storeys != null ? h(opt.storeys) : "<i>not given</i>", opt.height_m != null ? `· ${h(opt.height_m)}&nbsp;m` : "")}
+    ${cell("Floor area", opt.gfa_m2 != null ? `${h(fmtNum(opt.gfa_m2))}&nbsp;m²` : "<i>not given</i>", fsr ? `· FSR&nbsp;${h(fsr)}` : "")}
+    ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `<span class="nw">${v} ${UNIT_WORD[k] || k}</span>`).join(", ")}` : "")}
+    ${cell("Rent tiers", tiers ? tierWords(tiers, n) : "<i>not split</i>", "")}
+    ${cell("Tenure", h(optWord("option", "tenure", opt.tenure) || "not set"), opt.housing_agreement_years ? `· <span class="nw">${h(opt.housing_agreement_years)}‑year agreement</span>` : "")}
     ${plateCell(cell, pm)}
   </div>`;
 }
@@ -167,7 +167,15 @@ function plateCell(cell, pm) {
   if (!pm) return cell("Plate", "<i>no massing</i>", "");
   const w = Number(pm.plate_width_m), d = Number(pm.plate_depth_m), a = Number(pm.plate_area_m2);
   if (!(w > 0) || !(d > 0) || !(a > 0)) return cell("Plate", `<span class="warn-text">no plate fits</span>`, "· the yards leave no room on the lot; the architect checks the setbacks");
-  return cell("Plate", `${h(pm.plate_width_m)} × ${h(pm.plate_depth_m)} m`, `· ${h(fmtNum(pm.plate_area_m2))} m² a floor`);
+  return cell("Plate", `${h(pm.plate_width_m)} × ${h(pm.plate_depth_m)}&nbsp;m`, `· <span class="nw">${h(fmtNum(pm.plate_area_m2))} m²</span> a floor`);
+}
+
+/* The rent tiers, and a warning where they do not add up to the homes (17 Nov 2026: 30 / 49 / 20 printed under 176
+   homes, the split of an earlier 99, and the fund's check failed on it without the title block saying why). */
+function tierWords(t, n) {
+  const sum = (t.market || 0) + (t.rgi || 0) + (t.deep_subsidy || 0);
+  const words = `${h(t.market || 0)} market · ${h(t.rgi || 0)} RGI · ${h(t.deep_subsidy || 0)} deep subsidy`;
+  return n && sum !== n ? `${words} <span class="warn-text">· ${h(sum)} of ${h(n)} homes</span>` : words;
 }
 
 /* The paper memo's references, A1 to F7: the layer's letter and the rule's place in it, in the ledger's order. The
@@ -236,13 +244,18 @@ function placeActions(intoMemo) {
 
 function renderInputs(site, opt) {
   const u = opt.units || {};
-  const units = Object.entries(u).map(([k, v]) => `${k.replace(/_/g, " ")} ${v ?? "—"}`).join(", ");
+  // the counts as the title block gives them, and what is not given said in words (17 Nov 2026: "owner: —.",
+  // "units studio 35, one bed 70")
+  const units = Object.entries(u).filter(([, v]) => v != null).map(([k, v]) => `${v} ${UNIT_WORD[k] || k.replace(/_/g, " ")}`).join(", ");
   const tenure = optWord("option", "tenure", opt.tenure);
+  const owner = site.owner || optWord("site", "owner_type", site.owner_type);
+  const given = (x, unit) => (x == null ? null : `${fmtNum(x)}${unit}`);
+  const figs = [given(opt.storeys, " storeys"), given(opt.height_m, " m"), given(opt.gfa_m2, " m² of floor area")].filter(Boolean).join(", ") || "storeys, height and floor area not given";
   return `<section class="card section inputs-used">
     <h2>Inputs</h2>
     <ul>
-      <li>Site <code>${h(site.id)}</code>: ${h(site.zoning_district || "—")}, ${h(fmtNum(site.site_area_m2 ?? "—"))} m², ${h(site.frontage_m ?? "—")} × ${h(site.depth_m ?? "—")} m; owner: ${h(site.owner || "—")}.</li>
-      <li>Option <code>${h(opt.id)}</code>: ${h(opt.storeys ?? "—")} storeys, ${h(opt.height_m ?? "—")} m, ${h(fmtNum(opt.gfa_m2 ?? "—"))} m² GFA; units ${h(units || "—")}; tenure ${h(tenure || "—")}.</li>
+      <li>Site <code>${h(site.id)}</code>: ${h(site.zoning_district || "district not given")}, ${site.site_area_m2 != null ? `${h(fmtNum(site.site_area_m2))} m²` : "lot area not given"}${site.frontage_m != null ? `, ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}; ${owner ? `owner ${h(owner)}` : "owner not given"}.</li>
+      <li>Option <code>${h(opt.id)}</code>: ${h(figs)}; ${units ? `homes ${h(units)}` : "homes not given"}; ${tenure ? `tenure ${h(tenure)}` : "tenure not given"}.</li>
       ${site.notes ? `<li>Site notes: <span class="cont">${h(site.notes)}</span></li>` : ""}
       ${opt.notes ? `<li>Option notes: <span class="cont">${h(opt.notes)}</span></li>` : ""}
     </ul>
@@ -252,7 +265,10 @@ function renderInputs(site, opt) {
 function renderSources(res, site, opt) {
   const seen = new Set();
   const items = [];
+  // the documents behind the rules that applied here; a rule for another district or program is named under Clauses,
+  // its document is not this memo's source (17 Nov 2026: a C-2 memo listed the RM-1, RT-4 and CD-1 sources)
   for (const r of res) {
+    if (r.status === "not_applicable") continue;
     const s = r.source || {};
     const key = `${s.title || ""}|${s.url || ""}`;
     if (!s.title && !s.url) continue;

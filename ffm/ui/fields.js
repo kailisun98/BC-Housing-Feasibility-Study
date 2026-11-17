@@ -59,9 +59,10 @@ const FIELDS = [
     ask: { stop: 1, q: "Inside a transit-oriented area?", who: "you, from the City's TOA map" },
     info: "Bill 47 (2023): inside a provincially designated transit-oriented area the City may not refuse the minimum height and density for the tier. Vancouver designated 29 such areas in June 2024, around SkyTrain stations and bus exchanges. Check the City's TOA map; 'Not sure' comes back as uncertain." },
   { on: "site", key: "toa_tier", group: "Policy areas", label: "Transit-oriented area tier", type: "select", need: "rule", reads: ["toa_status"],
-    options: [["", "Not sure"], ["1", "Tier 1"], ["2", "Tier 2"], ["3", "Tier 3"]],
+    options: [["", "Not sure"], ["1", "Tier 1 · SkyTrain, within 200 m"], ["2", "Tier 2 · SkyTrain, 200 to 400 m"], ["3", "Tier 3 · SkyTrain, 400 to 800 m"],
+      ["4", "Tier 4 · bus exchange, within 200 m"], ["5", "Tier 5 · bus exchange, 200 to 400 m"]],
     ask: { stop: 1, q: "Which tier?", who: "you, from the same map", when: site => site.in_transit_oriented_area === true },
-    info: "Distance bands around a SkyTrain station: Tier 1 within 200 m, minimum allowable 20 storeys; Tier 2 200 to 400 m, 12 storeys; Tier 3 400 to 800 m, 8 storeys. Bus-exchange areas use lower tiers the stack does not code yet. The tier comes from the City's TOA map, which the tool does not read." },
+    info: "Distance bands: around a SkyTrain station Tier 1 within 200 m, minimum allowable 20 storeys; Tier 2 200 to 400 m, 12 storeys; Tier 3 400 to 800 m, 8 storeys. Around a bus exchange (the Kootenay Loop, say) Tier 4 within 200 m, 12 storeys; Tier 5 200 to 400 m, 8 storeys. The tier comes from the City's TOA map, which the tool does not read." },
   { on: "site", key: "frequent_bus_stop_within_400m", group: "Policy areas", label: "Frequent bus stop within 400 m", type: TRI, need: "", ref: "note",
     info: "Recorded for the record: no rule in the stack reads it yet. It will matter when frequent-transit policies are coded." },
   { on: "site", key: "has_water_and_sewer", group: "Policy areas", label: "Water and sewer service", type: TRI, need: "rule", reads: ["ssmuh_minimum_units"],
@@ -82,7 +83,7 @@ const FIELDS = [
     info: "The massing is drawn on a clear lot. Yes means a building stays and the architect must draw the kept footprint; No means the lot is cleared; Not sure becomes an open item with the manager's name." },
   { on: "site", key: "land_tenure_plan", group: "Owner", label: "Land tenure plan", type: "text", need: "rule", reads: ["chf_fit"],
     help: "Write “to confirm” if it is not settled; the funders' checks read that honestly.",
-    ask: { stop: 1, q: "How will the land be held?", who: "you", placeholder: "e.g. 60-year lease at nominal rent from the church" },
+    ask: { stop: 1, q: "How will the land be held?", who: "you", placeholder: "e.g. a 60-year nominal lease" },
     info: "Who will hold the land. The Community Housing Fund needs a lease of at least 60 years at nominal value, or ownership. Write 'to confirm' while it is unsettled: the check then returns uncertain instead of guessing. The option's own tenure plan overrides this one." },
   { on: "site", key: "notes", group: "Owner", label: "Notes", type: "textarea", need: "", ref: "note",
     info: "Placeholders, assumptions and what still needs checking. The memo prints them." },
@@ -234,13 +235,22 @@ export const OPTION_FIELDS = layoutOf("option");
 
 export const fieldOf = (on, key) => FIELDS.find(f => f.on === on && f.key === key) || null;
 
+/* A share (0 to 1 in the file) is shown and typed as a percentage on the manager's stage (17 Nov 2026: "Share below
+   HILs 0.7"); these two convert between the file's figure and the one on screen. */
+export const isShare = key => !!(fieldOf("option", key) || {}).share;
+export const shareToScreen = (key, v) => (isShare(key) && typeof v === "number" ? Math.round(v * 1000) / 10 : v);
+export const shareFromScreen = (key, v) => (isShare(key) && typeof v === "number" && Number.isFinite(v) ? Math.round(v * 10) / 1000 : v);
+
 /* A coded value in words, from the field's own options (non_profit_society → "non-profit society"), so no
    identifier from a file reaches a sentence on screen or on paper. */
 export function optWord(on, key, v) {
   if (v == null || v === "") return "";
   const f = fieldOf(on, key);
-  const o = f && f.options && f.options.find(([x]) => String(x) === String(v));
+  // the field's options, else the ones its question offers (the owner's type: "municipality" → "the City")
+  const opts = (f && (f.options || (f.ask && f.ask.options))) || [];
+  const o = opts.find(([x]) => String(x) === String(v));
   const w = o ? o[1] : String(v).replace(/_/g, " ");
+  // the first letter only goes to lower case, so a proper noun after it keeps its capital ("the City")
   return w.charAt(0).toLowerCase() + w.slice(1);
 }
 

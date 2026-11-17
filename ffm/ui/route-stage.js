@@ -15,7 +15,8 @@ import {
 import { guide, state } from "./core/state.js";
 import { loadScript } from "./core/engine.js";
 import {
-  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, OPTION_FIELDS, SITE_FIELDS
+  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, isShare, OPTION_FIELDS,
+  optWord, shareFromScreen, shareToScreen, SITE_FIELDS
 } from "./fields.js";
 import { optionSummary, refNow, renderForm } from "./schedule.js";
 import {
@@ -26,7 +27,7 @@ import { byRev, openRun, rev, runRules, syncRunButton } from "./runs.js";
 import { placeRunTools, renderMemo } from "./memo/memo.js";
 import { money } from "./memo/answers.js";
 import { tok } from "./figures/common.js";
-import { guideLookup, guideReadSite, guideSuggest, guideUseSite, useSuggestion } from "./guide.js";
+import { DERIVES, guideLookup, guideReadSite, guideSuggest, guideUseSite, useSuggestion } from "./guide.js";
 import { showInputs } from "./modes.js";
 
 /* A parcel's shape in a manager's words, without the classifier's figures. */
@@ -312,7 +313,7 @@ function stageHtml() {
         ${state.run && guide.over ? `<button type="button" class="btn btn-quiet btn-small" id="stage-back">Back to ${h(rev(state.run.run_id))}</button>` : ""}
       </div>
       ${blank ? `<p class="quiet">Three stops, one card at a time: the site, the option, the run. Each card asks one thing and shows what it found.</p>` : ""}
-      ${draft ? `<div class="form-actions resume"><button type="button" class="btn btn-small" id="stage-resume">Resume where you were</button><button type="button" class="btn btn-quiet btn-small" id="stage-discard">Start fresh</button><span class="help">${h((draft.site && (draft.site.address || draft.site.id)) || draft.siteId || (draft.guide && draft.guide.lookup && draft.guide.lookup.site && draft.guide.lookup.site.address) || "a site")}, left in this tab ${h(String(draft.saved_at || "").replace("T", " ").slice(0, 16))}.</span></div>` : ""}
+      ${draft ? `<div class="form-actions resume"><button type="button" class="btn btn-small" id="stage-resume">Resume where you were</button><button type="button" class="btn btn-quiet btn-small" id="stage-discard">Start fresh</button><span class="help">${h((draft.site && (draft.site.address || draft.site.id)) || ((state.sites || []).find(s => s.id === draft.siteId) || {}).address || draft.siteId ||(draft.guide && draft.guide.lookup && draft.guide.lookup.site && draft.guide.lookup.site.address) || "a site")}, left in this tab ${h(String(draft.saved_at || "").replace("T", " ").slice(0, 16))}.</span></div>` : ""}
     </header>`;
   const card = n === 1 ? cardSite() : n === 2 ? cardOption() : cardRun();
   return head + card + (blank && n === 1 ? ghostHtml() : "");
@@ -393,7 +394,7 @@ function siteFacts(site) {
         <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(districtOf(site))}</b>${districtWords(site)}` : "<i>not found: the architect enters it</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel</i>"}${p.shape ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand</span>' : ""}</dd></div>
         <div><dt>Street</dt><dd>${h(street)}${cornerStreets(site).length ? ` <span class="cont">· a corner lot</span>` : ""}</dd></div>
-        <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) : "<i>not given</i>"}</dd></div>
+        <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) : site.owner_type ? h(ansWord("owner_type", site.owner_type)) : "<i>not given</i>"}</dd></div>
       </dl>
     </div>`;
 }
@@ -413,6 +414,13 @@ function saveSiteInline() {
 }
 
 // ---- what the rules leave to a person: one schedule per stop
+
+/* A coded answer in the words its question offered ("municipality" → "The City"); free text as typed. */
+const ansWord = (key, v) => {
+  const a = ANSWERS[key];
+  const o = a && a.options && a.options.find(([x]) => String(x) === String(v));
+  return o ? o[1] : String(v);
+};
 
 /* The current answer to a question: the site's own, or the option's (the suggestion's until it is used). */
 function answerValue(key) {
@@ -450,7 +458,7 @@ function takeAnswer(key, raw) {
   const a = ANSWERS[key];
   if (!a) return;
   const v = a.kind === "tri" ? (raw === "yes" ? true : raw === "no" ? false : null) : (raw === "" ? null : raw);
-  const said = `${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v || "not sure"}`;
+  const said = `${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v ? ansWord(key, v) : "not sure"}`;
   if (a.on === "site") {
     if (!state.site) return;
     if (key === "front_street") {
@@ -513,7 +521,7 @@ function stageOptionNow() {
       if (guide.mine[k] === undefined) continue;
       const raw = String(guide.mine[k]).trim();
       if (raw === "") { setPath(o, k, null); continue; }
-      const v = kind === "text" ? raw : Number(raw);
+      const v = kind === "text" ? raw : shareFromScreen(k, Number(raw));
       if (kind === "text" || Number.isFinite(v)) setPath(o, k, v);
     }
     return o;
@@ -573,10 +581,13 @@ function figureBlock(o, S) {
     return `<span class="fig4-tag" title="${h(ruleTitle(x.rule_id))}">${h(refNow(x.rule_id) || "rule")}</span>`;
   };
   const homes = Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
-  const fsr = o.gfa_m2 && site.site_area_m2 ? (o.gfa_m2 / site.site_area_m2).toFixed(2) : null;
+  const lot = Number(site.site_area_m2) || 0;
+  const fsr = o.gfa_m2 && lot ? (o.gfa_m2 / lot).toFixed(2) : null;
   const cell = (key, k, shown, sub, editable = true) => {
     const editing = guide.editFig === key;
-    const raw = getPath(o, key);
+    // the FSR cell takes an FSR and writes the floor area from it (17 Nov 2026: it opened a floor-area field under
+    // the word FSR, so 6.01 typed there became 6.01 m²)
+    const raw = key === "fsr" ? fsr : getPath(o, key);
     const val = editing
       ? `<input type="number" class="fig4-input" data-fig-input="${h(key)}" value="${h(raw ?? "")}" step="${key === "storeys" ? 1 : "any"}" aria-label="${h(k)}, my figure">`
       : (editable ? `<button type="button" class="fig4-v" data-fig="${h(key)}" aria-label="${h(k)}: ${h(shown)}. Change it">${h(shown)}</button>` : `<span class="fig4-v">${h(shown)}</span>`);
@@ -587,19 +598,24 @@ function figureBlock(o, S) {
   const f2f = Number(o.floor_to_floor_m) || 3.0;
   const needs = o.storeys != null ? Math.round(o.storeys * f2f * 10) / 10 : null;
   const short = needs != null && o.height_m != null && Number(o.height_m) < needs - 0.5;
-  const heightSub = short ? `<span class="warn-text">${h(o.storeys)} storeys at ${h(fmtNum(f2f))} m need about ${h(fmtNum(needs))} m</span> ` : "";
+  const heightSub = short ? `<span class="warn-text">needs about ${h(fmtNum(needs))}&nbsp;m</span> ` : "";
+  // what the drawings will do about it, and the one figure that changes it, in a line under the four
+  const fitF2f = short && o.storeys ? Math.floor(Number(o.height_m) / o.storeys * 100) / 100 : null;
+  const heightLine = short ? `<p class="help warn-text fig4-note">The drawings use ${h(fmtNum(needs))}&nbsp;m: ${h(o.storeys)} storeys × ${h(fmtNum(f2f))}&nbsp;m floor to floor. To draw ${h(fmtNum(o.height_m))}&nbsp;m, set Floor to floor to ${h(fmtNum(fitF2f))}&nbsp;m under All figures.</p>` : "";
+  const floorCell = lot ? cell("fsr", "FSR", fsr || "—", o.gfa_m2 != null ? `${h(fmtNum(o.gfa_m2))}&nbsp;m² ` : "")
+    : cell("gfa_m2", "Floor area", o.gfa_m2 != null ? `${fmtNum(o.gfa_m2)} m²` : "—", "");
   const block = `<div class="fig4">
       ${cell("storeys", "Storeys", o.storeys != null ? String(o.storeys) : "—", "")}
       ${cell("height_m", "Height", o.height_m != null ? `${fmtNum(o.height_m)} m` : "—", heightSub)}
-      ${guide.editFig === "gfa_m2" ? cell("gfa_m2", "Floor area (m²)", "", "") : cell("gfa_m2", "FSR", fsr || "—", o.gfa_m2 != null ? `${h(fmtNum(o.gfa_m2))} m² ` : "")}
+      ${floorCell}
       <div class="fig4-cell"><span class="fig4-k">Homes</span>${S && S.mix ? `<button type="button" class="fig4-v" id="guide-homes" aria-expanded="${!!guide.mixOpen}" aria-controls="guide-mix" aria-label="Homes: ${homes || "none"}. Change the mix">${homes || "—"}</button>` : `<span class="fig4-v">${homes || "—"}</span>`}<span class="fig4-sub">${o.rent_tiers_units ? `${h(o.rent_tiers_units.market || 0)} / ${h(o.rent_tiers_units.rgi || 0)} / ${h(o.rent_tiers_units.deep_subsidy || 0)} tiers` : ""}</span></div>
     </div>`;
-  if (!S) return block + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
+  if (!S) return block + heightLine + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
   // the rough envelope from the lot and the code, offered as the manager's own three figures
   const E = S.envelope;
   const envDiffers = E && E.storeys != null && ["storeys", "height_m", "gfa_m2"].some(k => guide.mine[k] !== undefined || (S.fields[k] || {}).value !== E[k]);
-  const envLine = E && E.storeys != null ? `<p class="help env-line"><span class="cont">Rough allowed, from the lot and the code:</span> <b>${h(E.storeys)} storeys · ${h(E.height_m)} m · ${h(fmtNum(E.gfa_m2))} m²</b><span class="cont">${E.plate_w_m != null ? ` (a plate ${h(E.plate_w_m)} × ${h(E.plate_d_m)} m × ${h(E.storeys)})` : ""}. Not a permission.</span>${envDiffers ? ` <button class="btn btn-quiet btn-small" type="button" id="guide-use-envelope">Use these three</button>` : ""}</p>` : "";
-  return block + envLine + (guide.mixOpen ? mixPanel(S) : "") + allFigures(S);
+  const envLine = E && E.storeys != null ? `<p class="help env-line"><span class="cont">Rough allowed, from the lot and the code:</span> <b>${h(E.storeys)} storeys · ${h(E.height_m)} m · ${h(fmtNum(E.gfa_m2))} m²</b><span class="cont">${E.plate_w_m != null ? ` (a plate ${h(E.plate_w_m)} × ${h(E.plate_d_m)} m × ${h(E.storeys)})` : ""}. Not a permission.</span>${envDiffers ? ` <button class="btn btn-quiet btn-small" type="button" id="guide-use-envelope">Use the rough envelope</button>` : ""}</p>` : "";
+  return block + heightLine + envLine + (guide.mixOpen ? mixPanel(S) : "") + allFigures(S);
 }
 
 function mixPanel(S) {
@@ -615,6 +631,12 @@ function mixPanel(S) {
     </div>`;
 }
 
+/* A figure as the stage shows it and takes it: a share as a percentage. */
+const shareShown = (k, v) => (typeof v === "number" ? shareToScreen(k, v) : v);
+
+/* A row's label in a status sentence. */
+const rowLabel = k => { const r = GUIDE_FIELDS.find(([x]) => x === k); return r ? r[1] : (fieldOf("option", k) || {}).label || k; };
+
 /* The suggestion's every figure, each Suggested | Mine with what it rests on: behind one fold. */
 function allFigures(S) {
   const CORE = new Set(["storeys", "height_m", "gfa_m2"]);
@@ -623,7 +645,10 @@ function allFigures(S) {
     if (guide.mine[k] === undefined && (f.value === null || f.value === undefined) && CORE.has(k)) guide.mine[k] = "";
     const mine = guide.mine[k];
     const isMine = mine !== undefined;
-    const sv = f.value === null || f.value === undefined ? "—" : (typeof f.value === "number" ? fmtNum(f.value) : String(f.value));
+    if (isShare(k)) label = `${label} (%)`;
+    // a figure no rule derives says so in words, not a dash (17 Nov 2026: "Rezoning path —")
+    const sv = f.value === null || f.value === undefined ? (kind === "text" ? "not derived" : "—")
+      : (typeof f.value === "number" ? fmtNum(shareShown(k, f.value)) : String(f.value));
     const rests = f.rule_id ? `<span class="sg-ref" title="${h(ruleTitle(f.rule_id))}">${h(refNow(f.rule_id) || ruleTitle(f.rule_id))}</span>` : (f.basis === "envelope" ? `<span class="sg-ref ph">rough</span>` : `<span class="sg-ref ph">placeholder</span>`);
     return `<div class="sg-row" data-key="${h(k)}">
       <div class="sg-label">${h(label)}${rests}</div>
@@ -665,8 +690,9 @@ function cardRun() {
   const ownerType = String(site.owner_type || "").toLowerCase();
   const nominal = /church|society|non.?profit|co-?op|first.?nation|municipal|city|province|government/.test(ownerType);
   const busy = !!state.running;
-  const owner = ownerType.replace(/_/g, " ");
-  const ownerIs = /^(the|a|an) /.test(owner) ? owner : `${/^[aeiou]/.test(owner) ? "an" : "a"} ${owner}`;
+  // the owner in the words the question offered ("the City", not "a municipality"; 17 Nov 2026)
+  const owner = site.owner_type ? ansWord("owner_type", site.owner_type) : "";
+  const ownerIs = /^(the|a|an) /i.test(owner) ? owner.charAt(0).toLowerCase() + owner.slice(1) : `${/^[aeiou]/i.test(owner) ? "an" : "a"} ${owner.toLowerCase()}`;
   const fields = FINANCE_FIELDS.map(([k, label]) => `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? (nominal ? "blank: nominal" : "blank: unsure") : "blank: none"}"></label>`).join("");
   const money = `<details class="fold money-fold"${nominal && !Object.values(fin).some(v => v != null) ? "" : " open"}><summary>Land, equity and other grants <span class="cont">${nominal ? `· the land counts at a nominal value: the owner is ${h(ownerIs)}` : "· only you know these"}</span></summary>
       <div class="fin-rows">${fields}</div>
@@ -741,10 +767,10 @@ function wireStage(el) {
     const commit = keep => {
       if (done) return; done = true;
       const key = fi.dataset.figInput, raw = fi.value.trim();
-      if (keep) setFigure(key, raw);
       guide.editFig = null;
+      if (keep) setFigure(key, raw);
       renderGuide();
-      const b = $(`[data-fig="${key === "gfa_m2" ? "gfa_m2" : key}"]`); if (b) b.focus();
+      const b = $(`[data-fig="${key}"]`); if (b) b.focus();
     };
     fi.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); commit(true); } if (e.key === "Escape") { e.preventDefault(); commit(false); } });
     fi.addEventListener("blur", () => commit(true));
@@ -754,9 +780,7 @@ function wireStage(el) {
     const E = guide.suggestion && guide.suggestion.envelope; if (!E) return;
     guide.mine.storeys = String(E.storeys); guide.mine.height_m = String(E.height_m); guide.mine.gfa_m2 = String(E.gfa_m2);
     guide.suggestionUsed = false;
-    setStatus(`Storeys ${E.storeys}, height ${E.height_m} m and floor area ${fmtNum(E.gfa_m2)} m² are now yours, from the rough envelope: ${E.storeys_from}.`, "info");
-    applyAfterRun();
-    renderGuide();
+    guideSuggest({ said: `Storeys ${E.storeys}, height ${E.height_m} m and floor area ${fmtNum(E.gfa_m2)} m² are now yours, from the rough envelope: ${E.storeys_from}.` });
   });
   on("#guide-mix-apply", () => {
     const shares = {};
@@ -778,10 +802,14 @@ function wireStage(el) {
   $$(".sg-row", el).forEach(row => {
     const key = row.dataset.key;
     $$(".sg-pick .segbtn", row).forEach(b => b.addEventListener("click", () => {
-      if (b.dataset.pick === "mine") { if (guide.mine[key] === undefined) guide.mine[key] = guide.suggestion.fields[key].value ?? ""; }
+      if (b.dataset.pick === "mine") { if (guide.mine[key] === undefined) guide.mine[key] = shareShown(key, guide.suggestion.fields[key].value) ?? ""; }
       else delete guide.mine[key];
       guide.suggestionUsed = false;
-      if (b.dataset.pick === "suggested") applyAfterRun();   // back to the suggested figure: a change too
+      // back to the suggested figure: a change too, and the figures that follow it are derived again
+      if (b.dataset.pick === "suggested") {
+        if (DERIVES(key)) { guideSuggest({ said: `${rowLabel(key)}: the suggested figure again.` }); return; }
+        applyAfterRun();
+      }
       renderGuide();
       const inp = $(`.sg-row[data-key="${CSS.escape(key)}"] .sg-input`);
       if (inp) inp.focus();
@@ -789,7 +817,10 @@ function wireStage(el) {
     const inp = $(".sg-input", row);
     if (inp) {
       inp.addEventListener("input", () => { guide.mine[key] = inp.value; guide.suggestionUsed = false; });
-      inp.addEventListener("change", () => { applyAfterRun(); renderGuide(); });
+      inp.addEventListener("change", () => {
+        if (DERIVES(key)) { guideSuggest({ said: `${rowLabel(key)}: ${inp.value.trim() === "" ? "blank" : inp.value.trim()}, yours.` }); return; }
+        applyAfterRun(); renderGuide();
+      });
     }
   });
   on("#guide-next-2", continueToRun);
@@ -818,11 +849,25 @@ function applyAfterRun() {
 
 /* A figure typed into the four-figure block: the manager's own over the suggestion, or straight into a saved option. */
 function setFigure(key, raw) {
+  const asked = key;
+  let said = null;
+  if (key === "fsr") {
+    const lot = Number((state.site || {}).site_area_m2) || 0;
+    const f = raw === "" ? null : Number(raw);
+    if (raw !== "" && !(Number.isFinite(f) && f > 0)) { toast("Not a floor space ratio: enter a number such as 2.5.", true); return; }
+    key = "gfa_m2";
+    raw = f == null ? "" : String(Math.round(f * lot));
+    if (f != null) said = `FSR ${fmtNum(f)}, yours: ${fmtNum(Math.round(f * lot))} m² on the ${fmtNum(lot)} m² lot.`;
+  }
   if (guide.suggestion && !state.optionId) {
     if (raw === "" && guide.mine[key] === undefined) return;
     guide.mine[key] = raw;
     guide.suggestionUsed = false;
-    setStatus(raw === "" ? `${fieldOf("option", key).label}: blank, so not assessed.` : `${fieldOf("option", key).label}: ${raw}, yours. Continue to the run when it reads right.`, "info");
+    const label = fieldOf("option", key).label;
+    const msg = raw === "" ? `${label}: blank, so not assessed.` : (said || `${label}: ${Number.isFinite(Number(raw)) ? fmtNum(Number(raw)) : raw}, yours.`);
+    // storeys, height and floor area carry the homes, the tiers and the accessible units: derive them again
+    if (DERIVES(key)) { guideSuggest({ said: msg, focus: `[data-fig="${asked}"]` }); return; }
+    setStatus(`${msg} Continue to the run when it reads right.`, "info");
     applyAfterRun();
     return;
   }

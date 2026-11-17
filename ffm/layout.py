@@ -1039,6 +1039,18 @@ def svg_axon(L: dict) -> str:
     return "\n".join(out)
 
 
+def _wrap_words(text: str, width: int) -> list[str]:
+    """A line of words broken at spaces into lines of at most `width` characters (a longer word stands alone). Pure."""
+    lines, cur = [], ""
+    for w in text.split():
+        if cur and len(cur) + 1 + len(w) > width:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = f"{cur} {w}" if cur else w
+    return lines + ([cur] if cur else [])
+
+
 def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     """The code site plan: the lot, the yards with their dimensions, the setback envelope, the footprint, the
     retained trees' protection barriers where the site records positions, and the table a plan checker reads:
@@ -1070,10 +1082,22 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     trees = massing.get("trees") or {}
     rows.append(("Trees", f'{trees.get("after", "?")} after development', f'Schedule C requires {trees.get("required", "?")}', "pass" if trees and (trees.get("shortfall") or 0) == 0 else "conditional") if trees else ("Trees", "no survey on file", "", "uncertain"))
     ans = ledger["summary"]["answers"]["allowed"]
-    rows.append(("Allowed", f'outright: {ans["outright"]["verdict"]}' + (f'; by rezoning: {ans["by_rezoning"]["verdict"]}' if ans.get("rezoning_path") else ""), ans.get("rezoning_path") or "no rezoning path stated", ""))
-    table_h = 20 + 18 * len(rows)
-    height = pad + 24 + pd + 50 + table_h + 40
-    width = max(pad + pw + 60 + 400, 760)
+    # the verdict and the path run long: they go under the table as lines of their own, not in its columns
+    # (17 Nov 2026: fixed columns at 110/250/330 px let "no schedule in the stack" print over its status and the
+    # path run off the drawing)
+    allowed = [f'Allowed outright: {ans["outright"]["verdict"]}' + (f'; by rezoning: {ans["by_rezoning"]["verdict"]}' if ans.get("rezoning_path") else ""),
+               f'Path: {ans["rezoning_path"]}' if ans.get("rezoning_path") else "No rezoning path stated"]
+    # columns sized to what they hold, at about 6.3 px a character of 11 px Plex Sans
+    cw = 6.3
+    widest = lambda i: max(len(r[i]) for r in rows) * cw
+    cols = (0, widest(0) + 16, widest(0) + widest(1) + 32, widest(0) + widest(1) + widest(2) + 48)
+    table_w = cols[3] + max(len(r[3]) for r in rows) * 6.0 + 4
+    allowed = [ln for a in allowed for ln in _wrap_words(a, max(40, int(table_w / cw)))]
+    table_h = 34 + 18 * len(rows) + 10 + 16 * len(allowed)
+    # the table stands beside the plan, so the drawing is as tall as the taller of the two, not their sum
+    body_h = max(pd + 30, table_h)
+    height = pad + 24 + body_h + 40
+    width = max(pad + 30 + pw + 60 + table_w + pad, 760)
     out = _svg_open(width, height, "Code site plan")
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>')
     ox, oy = pad + 30, pad + 24
@@ -1121,17 +1145,20 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     # the table
     tx, ty = ox + pw + 60, oy
     out.append(f'<text x="{tx}" y="{ty + 12}" font-size="12" font-weight="600">What the plan checker reads</text>')
-    cols = (0, 110, 250, 330)
     for i, (k, v, lim, st) in enumerate(rows):
         y = ty + 34 + i * 18
-        out.append(f'<line x1="{tx}" y1="{y + 5}" x2="{tx + 380}" y2="{y + 5}" stroke="{TONES["rule"]}" stroke-width="0.8"/>')
-        out.append(f'<text x="{tx + cols[0]}" y="{y}" font-size="11" fill="{TONES["muted"]}">{_esc(k)}</text>')
-        out.append(f'<text x="{tx + cols[1]}" y="{y}" font-size="11">{_esc(v)}</text>')
-        out.append(f'<text x="{tx + cols[2]}" y="{y}" font-size="11" fill="{TONES["muted"]}">{_esc(lim)}</text>')
+        out.append(f'<line x1="{tx}" y1="{y + 5}" x2="{tx + table_w:.1f}" y2="{y + 5}" stroke="{TONES["rule"]}" stroke-width="0.8"/>')
+        out.append(f'<text x="{tx + cols[0]:.1f}" y="{y}" font-size="11" fill="{TONES["muted"]}">{_esc(k)}</text>')
+        out.append(f'<text x="{tx + cols[1]:.1f}" y="{y}" font-size="11">{_esc(v)}</text>')
+        out.append(f'<text x="{tx + cols[2]:.1f}" y="{y}" font-size="11" fill="{TONES["muted"]}">{_esc(lim)}</text>')
         if st:
             colour = {"pass": "#2f7d4a", "conditional": "#9a6b00", "fail": "#c81e1e", "uncertain": "#a3640c", "info": "#5f6672"}.get(st, "#5f6672")
-            out.append(f'<text x="{tx + cols[3]}" y="{y}" font-size="10.5" font-weight="600" fill="{colour}">{_esc(st)}</text>')
-    out += _foot([_stamp_line(L)], pad, oy + pd + 50 + table_h)
+            out.append(f'<text x="{tx + cols[3]:.1f}" y="{y}" font-size="10.5" font-weight="600" fill="{colour}">{_esc(st)}</text>')
+    ay = ty + 34 + len(rows) * 18 + 14
+    for i, ln in enumerate(allowed):
+        weight = "" if i else ' font-weight="600"'
+        out.append(f'<text x="{tx}" y="{ay + i * 16}" font-size="11"{weight}>{_esc(ln)}</text>')
+    out += _foot([_stamp_line(L)], pad, oy + body_h + 24)
     out.append("</svg>")
     return "\n".join(out)
 

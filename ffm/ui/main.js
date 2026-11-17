@@ -183,6 +183,9 @@ window.addEventListener("unhandledrejection", e => {
   if (s && msg) setStatus(`Something went wrong: ${msg}. Reload the page; saved sites, options and runs are files and are kept.`, "error");
 });
 
+// the page's first layout is placed, not animated: until init has opened what the link asks for, the mode thumb and
+// the route column take their places without sliding in (17 Nov 2026: both moved on every load)
+const settle = () => setTimeout(() => document.documentElement.classList.add("settled"), 300);
 // a module runs before DOMContentLoaded; the check keeps init from being missed if this file ever runs after it
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-else init();
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => init().finally(settle));
+else init().finally(settle);

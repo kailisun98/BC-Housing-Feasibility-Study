@@ -4,7 +4,7 @@
 import { $, cap, fmtNum, getPath, h, leadCont, pill, setPath, setStatus, toast, todayISO } from "./core/util.js";
 import { guide, state } from "./core/state.js";
 import { api, postJSON } from "./core/api.js";
-import { ANSWERS, GUIDE_FIELDS, OPTION_FIELDS, SITE_FIELDS } from "./fields.js";
+import { ANSWERS, GUIDE_FIELDS, OPTION_FIELDS, shareFromScreen, SITE_FIELDS } from "./fields.js";
 import { refreshSummary, renderForm } from "./schedule.js";
 import { blankOption, blankSite, loadOptions, markStale, onOptionChange, onSiteChange } from "./files.js";
 import { fillRunSelects, loadRuns, rev } from "./runs.js";
@@ -98,13 +98,40 @@ function renderSiteReading(R) {
   $("#memo").className = "memo landed";
 }
 
-export async function guideSuggest() {
+/* The manager's own storeys, height, floor area and unit counts, as the derivation takes them: the homes, the rent
+   tiers and the accessible units then follow what the manager typed, not the suggestion's own envelope (17 Nov 2026). */
+function fixedFigures() {
+  const num = k => {
+    const raw = guide.mine[k];
+    if (raw === undefined || String(raw).trim() === "") return null;
+    const v = Number(String(raw).trim());
+    return Number.isFinite(v) && v > 0 ? v : null;
+  };
+  const out = {};
+  for (const k of ["storeys", "height_m", "gfa_m2"]) { const v = num(k); if (v != null) out[k] = k === "storeys" ? Math.round(v) : v; }
+  const units = {};
+  for (const u of ["studio", "one_bed", "two_bed", "three_bed_plus"]) {
+    const raw = guide.mine[`units.${u}`];
+    if (raw === undefined || String(raw).trim() === "") continue;
+    const v = Number(String(raw).trim());
+    if (Number.isFinite(v) && v >= 0) units[u] = Math.round(v);
+  }
+  if (Object.keys(units).length) out.units = units;
+  return Object.keys(out).length ? out : null;
+}
+
+/* The figures that other figures follow: a change to one re-derives the option. */
+export const DERIVES = k => ["storeys", "height_m", "gfa_m2"].includes(k) || k.startsWith("units.");
+
+/* `said`: the sentence for the status line when a figure of the manager's caused the derivation; the derived homes
+   follow it, rather than the suggestion's own summary, which would contradict the figure just typed. */
+export async function guideSuggest(opts = {}) {
   if (!state.site) return;
   guide.busy.suggest = true; guide.suggestStale = false; guide.editFig = null; renderGuide();
-  setStatus(`Deriving the ${guide.candidate} option from the rules…`, "busy");
+  setStatus(opts.said ? `${opts.said} Deriving the homes and the funders' figures from it…` : `Deriving the ${guide.candidate} option from the rules…`, "busy");
   try {
     const programs = guide.programs || (state.option && state.optionId && state.option.target_programs) || defaultPrograms();
-    guide.suggestion = await postJSON("/api/suggest", { site: state.site, programs, as_of: $("#as-of").value || todayISO(), candidate: guide.candidate, mix_shares: guide.mixShares || null });
+    guide.suggestion = await postJSON("/api/suggest", { site: state.site, programs, as_of: $("#as-of").value || todayISO(), candidate: guide.candidate, mix_shares: guide.mixShares || null, fixed: fixedFigures() });
     guide.suggestionUsed = false;   // a fresh suggestion waits for Continue; the stage shows it as such
     if (state.optionId) { state.optionId = null; $("#option-select").value = "__new__"; }   // a derived option replaces the saved one on the stage until Continue
     // a blank Mine row that stood in for a figure no rule gave gives way once the derivation has one (16 Nov 2026)
@@ -115,13 +142,17 @@ export async function guideSuggest() {
     const cv = guide.suggestion.unsure.some(u => u.key === "in_former_community_vision_area") && guide.candidate !== "outright";
     const rough = ["storeys", "height_m", "gfa_m2"].some(k => (guide.suggestion.fields[k] || {}).basis === "envelope");
     const swapped = guide.suggestion.candidate_note && asked !== guide.candidate;
-    setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} homes.${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ? " The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
+    const homes = Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0);
+    if (opts.said) setStatus(`${opts.said} ${homes ? `${homes} homes follow from the figures, the rent tiers and accessible units with them.` : "No homes follow yet: enter a floor area."} Continue to the run when it reads right.`, "info");
+    else setStatus(`Suggested, ${guide.candidate}:${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} homes.${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ? " The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
     // after a run, a new derivation (another candidate, a mix, the programs) is a change to the memo's option
     if (state.run) useSuggestion({ live: true });
   } catch (e) {
     toast(`Could not derive the option: ${e.message}`, true);
   } finally {
     guide.busy.suggest = false; renderGuide();
+    // the figure just typed keeps the keyboard's place once the card is drawn again
+    if (opts.focus) { const b = $(opts.focus); if (b) b.focus(); }
   }
 }
 
@@ -153,7 +184,7 @@ function useSuggestionNow({ live = false } = {}) {
   for (const [k, label, kind] of GUIDE_FIELDS) {
     if (guide.mine[k] === undefined) continue;
     const raw = String(guide.mine[k]).trim();
-    const v = kind === "text" ? (raw || null) : (raw === "" ? null : (kind === "int" ? parseInt(raw, 10) : Number(raw)));
+    const v = kind === "text" ? (raw || null) : (raw === "" ? null : (kind === "int" ? parseInt(raw, 10) : shareFromScreen(k, Number(raw))));
     if (kind !== "text" && raw !== "" && !Number.isFinite(v)) { toast(`${label}: not a number.`, true); return false; }
     setPath(opt, k, v);
   }
@@ -166,8 +197,12 @@ function useSuggestionNow({ live = false } = {}) {
   const blank = GUIDE_FIELDS.filter(([k]) => ["storeys", "height_m", "gfa_m2"].includes(k) && getPath(opt, k) == null).map(([, label]) => label);
   const chosen = typed.length;
   opt.notes = (opt.notes || "") + (chosen ? ` ${chosen} figure${chosen === 1 ? "" : "s"} entered by the manager: ${typed.map(([, label]) => label).join(", ")}.` : "");
-  if (blank.length) opt.name = `${opt.name || cap(guide.candidate) + " option"}; ${blank.join(", ").toLowerCase()} not given`;
-  else if (chosen) opt.name = `${opt.name || cap(guide.candidate) + " option"}; ${typed.map(([, label]) => label).join(", ").toLowerCase()} entered by the manager`;
+  // the name is a name: the candidate and how much of it is the manager's; the figures typed are listed in the notes
+  // (17 Nov 2026: the name ran "…; rezoning path, storeys, height (m), floor area (m²), studios… entered by the
+  // manager" across ten lines of the title block and cut off every run picker)
+  const base = `${cap(guide.candidate)} option`;
+  if (blank.length) opt.name = `${base}, ${blank.join(", ").toLowerCase()} not given`;
+  else if (chosen) opt.name = `${base} with ${chosen === 1 ? "one figure" : `${chosen} figures`} of the manager's`;
   state.optionId = null;
   state.option = opt;
   state.optionDirty = true;

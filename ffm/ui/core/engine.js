@@ -85,9 +85,10 @@ def ffm_layout(site_json, option_json, as_of):
 
 from ffm import suggest, lookup
 
-def ffm_suggest(site_json, programs_json, as_of, candidate, mix_json=None):
+def ffm_suggest(site_json, programs_json, as_of, candidate, mix_json=None, fixed_json=None):
     mix = json.loads(mix_json) if mix_json else None
-    return json.dumps(suggest.suggest(json.loads(site_json), json.loads(programs_json), date.fromisoformat(as_of), candidate, mix_shares=mix))
+    fixed = json.loads(fixed_json) if fixed_json else None
+    return json.dumps(suggest.suggest(json.loads(site_json), json.loads(programs_json), date.fromisoformat(as_of), candidate, mix_shares=mix, fixed=fixed))
 
 def ffm_read_site(site_json, as_of):
     return json.dumps(suggest.read_site(json.loads(site_json), date.fromisoformat(as_of)))

@@ -88,9 +88,13 @@ export function answerUnsure(L, run) {
   const items = [...(L.summary.answers.unsure || []), ...layoutOpenItems(run)];
   const n = items.length;
   const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}. Each names who resolves it.` : "Nothing outstanding.";
-  const who = u => { const m = /^(Manager|Architect|Owner|Planner|Both|Manager and owner|Manager and architect)\b/i.exec(u.action || ""); return m ? m[1] : "—"; };
-  const table = n ? `<table class="plain"><thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
-    ${items.map(u => `<tr><td>${refOf(u.rule_id) ? `<b class="ref">${h(refOf(u.rule_id))}</b>` : "—"}</td><td>${h(u.title)}</td><td class="status">${pill(u.status)}</td><td class="who">${h(who(u))}</td><td class="who">${h((u.action || "—").replace(/^(Manager and owner|Manager and architect|Manager|Architect|Owner|Planner|Both):\s*/i, ""))}</td></tr>`).join("")}
+  // the longest name first, so "Manager and owner" is not read as "Manager"; an action with no name is the
+  // manager's, who carries the memo (17 Nov 2026: a "—" under Who beside "Each names who resolves it")
+  const WHO = /^(Manager and owner|Manager and architect|Manager|Architect|Owner|Planner|Both)\b:?\s*/i;
+  const who = u => { const m = WHO.exec(u.action || ""); return m ? cap(m[1]) : "Manager"; };
+  const todo = u => cap((u.action || "").replace(WHO, "")) || "—";
+  const table = n ? `<table class="plain open-items"><thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
+    ${items.map(u => `<tr><td data-k="Ref">${refOf(u.rule_id) ? `<b class="ref" title="${h(u.title)}">${h(refOf(u.rule_id))}</b>` : "—"}</td><td data-k="Item">${h(u.title)}</td><td class="status" data-k="Status">${pill(u.status)}</td><td class="who" data-k="Who">${h(who(u))}</td><td class="todo" data-k="What to do">${h(todo(u))}</td></tr>`).join("")}
   </tbody></table>` : "";
   // a count of open items is not a verdict: the card carries no status wash; each row wears its own
   return `<section class="card answer" data-verdict="${n ? "plain" : "pass"}">

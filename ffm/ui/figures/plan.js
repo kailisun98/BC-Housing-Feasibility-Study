@@ -26,8 +26,20 @@ export function figPlan(m, ctx, fsIn = null) {
   s += `<rect x="0" y="0" width="${vbW.toFixed(2)}" height="${vbH.toFixed(2)}" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
   for (const g of ctx.ground) s += polyEl(P(g.ring), g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
   for (const b of ctx.buildings) s += polyEl(P(b.polygon), `fill="${HALF.building}" stroke="${HALF.line}" stroke-width="0.6"`);
+  // the frontage's dimension text sits just in front of the lot, where the front street's name is often set: a name
+  // that would print under it moves along the street past its end (17 Nov 2026: "E Hastings St" under "extent 58.4 m
+  // · equivalent frontage 58.5 m" on 3475 E Hastings St)
+  const polyLot = !!(m.lot.bbox || bnd.open);
+  const dimText = polyLot ? `extent ${Math.round(bW * 10) / 10} m · equivalent frontage ${W} m` : `frontage ${W} m`;
+  const dimX = X((bb[0] + bb[2]) / 2), dimY = Y(bb[1]) + fs * 0.55 + fs * 1.2;
+  const dimHalf = dimText.length * fs * 0.27 + fs;
   for (const l of ctx.labels) {
-    const [lx, ly] = [X(l.at[0]), Y(l.at[1])];
+    let [lx, ly] = [X(l.at[0]), Y(l.at[1])];
+    const half = String(l.text).length * fs * 0.25;
+    if (Math.abs(ly - dimY) < fs * 1.3 && lx + half > dimX - dimHalf && lx - half < dimX + dimHalf) {
+      const right = dimX + dimHalf + half + fs * 0.5, left = dimX - dimHalf - half - fs * 0.5;
+      lx = right + half < vbW ? right : (left - half > 0 ? left : lx);
+    }
     s += `<text x="${lx.toFixed(2)}" y="${(ly + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${l.strong ? FIG.grey : HALF.text}"${l.strong ? ` font-weight="600"` : ""} ${halo(fs)}${l.angle ? ` transform="rotate(${(-l.angle).toFixed(1)} ${lx.toFixed(2)} ${ly.toFixed(2)})"` : ""}>${h(l.text)}</text>`;
   }
   for (const t of ctx.streetTrees.concat(ctx.osmTrees)) s += `<circle cx="${X(t.x).toFixed(2)}" cy="${Y(t.y).toFixed(2)}" r="${t.crown}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6" ${NS}/>`;
@@ -48,13 +60,13 @@ export function figPlan(m, ctx, fsIn = null) {
   }
   // dimension strings: the frontage along the front line, the depth along the right-hand lot line, each with ticks
   const tick = fs * 0.35;
-  const poly = !!(m.lot.bbox || bnd.open);
+  const poly = polyLot;
   const [bx0, by0, bx1, by1] = bb;
   const fy = Y(by0) + fs * 0.55;
   s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${X(bx0).toFixed(2)}" y1="${fy.toFixed(2)}" x2="${X(bx1).toFixed(2)}" y2="${fy.toFixed(2)}"/>`
      + `<line x1="${(X(bx0) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(bx0) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/>`
      + `<line x1="${(X(bx1) - tick).toFixed(2)}" y1="${(fy + tick).toFixed(2)}" x2="${(X(bx1) + tick).toFixed(2)}" y2="${(fy - tick).toFixed(2)}"/></g>`;
-  s += `<text x="${X((bx0 + bx1) / 2).toFixed(2)}" y="${(fy + fs * 1.2).toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>${poly ? `extent ${h(Math.round(bW * 10) / 10)} m · equivalent frontage ${h(W)} m` : `frontage ${h(W)} m`}</text>`;
+  s += `<text x="${dimX.toFixed(2)}" y="${dimY.toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>${h(dimText)}</text>`;
   const dx = X(bx1) + fs * 0.6;
   s += `<g stroke="${FIG.grey}" stroke-width="0.8" ${NS}><line x1="${dx.toFixed(2)}" y1="${Y(by0).toFixed(2)}" x2="${dx.toFixed(2)}" y2="${Y(by1).toFixed(2)}"/>`
      + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(by0) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(by0) - tick).toFixed(2)}"/>`

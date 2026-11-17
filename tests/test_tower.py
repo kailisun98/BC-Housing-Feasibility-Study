@@ -56,6 +56,53 @@ class FitAndExits(unittest.TestCase):
         self.assertGreater(cores[1]["y"], p["y"])
 
 
+class ScissorStair(unittest.TestCase):
+    """A slim tower (17 Nov 2026: 19 storeys with no floor area typed, a 400 m² plate on 3475 E Hastings St): too short a
+    corridor for a stair at each end, and the 7 m core's stairs 4.8 m apart against 9 m. A scissor stair, its doors at
+    the core's two ends along the corridor, makes the separation; contiguous stairs are not for a 5 or 6 storey
+    wood-frame building, so only above six storeys."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.o = suggest.suggest(SITE, PROGRAMS, ON, "funder-ready", fixed={"storeys": 19, "height_m": 61.6})["option"]
+        cls.L = evaluate(SITE, cls.o, ON)
+        cls.m = massing.build(SITE, cls.o, cls.L)
+        cls.lay = layout.solve(SITE, cls.o, cls.L, cls.m)
+
+    def test_a_slim_tower_takes_a_scissor_stair_and_every_floor_exits(self):
+        p, eg = self.lay["plate"], self.lay["egress"]
+        sw = layout.LAYOUT_ASSUMPTIONS["stair_width_m"][0]
+        self.assertLess(p["width_m"], layout.LAYOUT_ASSUMPTIONS["core_bay_m"][0] + 2 * 6 + 2 * sw)   # no room for end stairs
+        for fl in self.lay["floors"]:
+            cores = [z for z in fl["zones"] if z["block"] == "core"]
+            self.assertEqual(len(cores), 1, fl["name"])
+            self.assertEqual(cores[0].get("stairs"), "scissor", fl["name"])
+        self.assertEqual(eg["status"], "pass", eg["summary"])
+        self.assertTrue(eg["scissor_stair"])
+        self.assertIn("scissor stair", eg["summary"])
+        self.assertIn("smoke-tight", eg["summary"])
+        for f in eg["floors"]:
+            self.assertGreaterEqual(f["separation_m"] + 1e-6, f["separation_min_m"], f["notes"])
+            self.assertLessEqual(f["dead_end_m"], f["dead_end_limit_m"] + 1e-6, f["notes"])
+        self.assertEqual(self.lay["units_placed"], sum(self.o["units"].values()))
+        self.assertIn("scissor stair", layout.svg_plans(self.lay))
+
+    def test_the_block_editor_keeps_the_scissor_stair(self):
+        again = layout.place_zones(SITE, self.o, self.L, self.m, layout.zones_of(self.lay))
+        self.assertTrue(again["egress"]["scissor_stair"])
+        self.assertEqual(again["egress"]["status"], "pass", again["egress"]["summary"])
+
+    def test_six_storeys_never_take_one_but_the_core_still_ends_the_dead_ends(self):
+        m6 = {**self.m, "masses": [{**x, "storeys": 6} if x["name"] == "proposed" else x for x in self.m["masses"]]}
+        lay = layout.solve(SITE, self.o, self.L, m6)
+        cores = [z for z in lay["floors"][1]["zones"] if z["block"] == "core"]
+        self.assertFalse(any(z.get("stairs") == "scissor" for z in cores))
+        self.assertFalse(lay["egress"]["scissor_stair"])
+        for f in lay["egress"]["floors"]:
+            self.assertLessEqual(f["dead_end_m"], f["dead_end_limit_m"] + 1e-6, f["notes"])
+            self.assertNotEqual(f["status"], "fail", f["notes"])   # the deep core's front-and-rear stairs: the architect's to draw
+
+
 class TransitTier(unittest.TestCase):
     def test_tier_4_raises_funder_ready_to_twelve_storeys_and_fsr_four_by_the_toa_path(self):
         S = suggest.suggest(SITE, PROGRAMS, ON, "funder-ready")

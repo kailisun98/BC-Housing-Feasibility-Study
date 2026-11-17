@@ -24,6 +24,7 @@ import math
 from pathlib import Path
 from typing import Any
 
+from .massing import MIDRISE_MAX_STOREYS
 from .suggest import ASSUMPTIONS
 
 # Declared placeholders of the layout, not rules: a person can change them and the memo says they were used.
@@ -218,7 +219,10 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     # core took a third of a tower's floor, and one centred core left 22 m dead ends on a 51.5 m slab, against the
     # 6 m of BCBC 3.3.1.9: no floor of 3475 E Hastings St could pass). The architect's own cores stand as drawn.
     stair_w, _ = LAYOUT_ASSUMPTIONS["stair_width_m"]
-    dead_lim = float(((_find(ledger["results"], rule_id=EGRESS_RULE) or {}).get("values") or {}).get("dead_end_max_m") or 6.0)
+    ev = (_find(ledger["results"], rule_id=EGRESS_RULE) or {}).get("values") or {}
+    dead_lim = float(ev.get("dead_end_max_m") or 6.0)
+    # the exits' separation the floor needs (3.4.2.3), as egress() reads it: half the diagonal, not more than 9 m
+    sep_need = round(min(float(ev.get("separation_min_m") or 9.0), float(ev.get("separation_share_of_diagonal") or 0.5) * math.hypot(W, D)), 2)
     core_y, core_d = (corr_y, D - strip) if double else (y0, D)
     if given:
         cores = given
@@ -231,6 +235,23 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
             # on a grid the far stair stands on the last module line it fits behind, so its walls are on the module
             rx = x0 + (math.floor((W - sw) / mod + 1e-6) * mod if grid else W - sw)
             cores = [{"x": x0, "y": core_y, "w": sw, "d": core_d}] + cores + [{"x": rx, "y": core_y, "w": sw, "d": core_d}]
+        else:
+            # too short a corridor for a stair at each end (17 Nov 2026, a 19 × 21 m tower plate: the 7 m core's
+            # stairs 4.8 m apart against 9 m, and the corridor 6.04 m past it against a 6 m dead end):
+            # - a corridor running past the core further than a dead end may: the core grows until it does not;
+            # - a tower whose core stairs would stand closer than 3.4.2.3 asks: a scissor stair, two stairs interlocked
+            #   in one shaft along the corridor, their doors at its two ends the separation apart. Contiguous stairs
+            #   are not permitted in a 5 or 6 storey wood-frame building (VBBL 2014 3.4.1.2.(3)), so only above six
+            #   storeys; below, the deep core's front-and-rear arrangement stays the architect's to draw (egress()).
+            want, scissor = cw, False
+            if W - cw > 2 * dead_lim + 1e-6:
+                want = W - 2 * dead_lim
+            if storeys > MIDRISE_MAX_STOREYS and want - sw + 1e-6 < sep_need and sep_need + sw <= W + 1e-6:
+                want, scissor = max(want, sep_need + sw), True
+            if want > cw + 1e-6:
+                cw = min(W, q(want)) if grid else min(W, round(want + 0.005, 2))
+                cx = x0 + (round(max(0.0, (W - cw) / 2) / mod) * mod if grid else (W - cw) / 2)
+                cores = [{"x": cx, "y": core_y, "w": cw, "d": core_d, **({"stairs": "scissor"} if scissor else {})}]
     legacy = False   # every plate's runs are the lengths its cores leave free, side by side (band_runs)
     seg_len = max(0.0, (W - core_w) / 2)
 
@@ -259,7 +280,8 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
 
     floors: list[dict] = []
     for lv in range(storeys):
-        zones = [{"block": "core", "label": BLOCK_LABEL["core"], "x": round(c["x"], 2), "y": round(c["y"], 2), "w": round(c["w"], 2), "d": round(c["d"], 2), "area_m2": round(c["w"] * c["d"], 1)} for c in cores]
+        zones = [{"block": "core", "label": BLOCK_LABEL["core"], "x": round(c["x"], 2), "y": round(c["y"], 2), "w": round(c["w"], 2), "d": round(c["d"], 2), "area_m2": round(c["w"] * c["d"], 1),
+                  **({"stairs": "scissor"} if c.get("stairs") == "scissor" else {})} for c in cores]
         zones.append({"block": "corridor", "label": "Corridor", "x": round(x0, 2), "y": round(corr_y, 2), "w": round(W, 2), "d": corr, "area_m2": round(W * corr, 1), "through": "core"})
         # the runs a floor offers: on the street side, then (a double-loaded plate) on the lane side
         runs = band_runs("front", y0)
@@ -597,11 +619,15 @@ def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinkle
         overall = "conditional"
     else:
         overall = "pass"
+    scissor = next((z for fl in L_floors for z in fl["zones"] if z.get("block") == "core" and z.get("stairs") == "scissor"), None)
     return {"rule_id": EGRESS_RULE, "sprinklered": bool(sprinklered), "sprinklered_is_placeholder": True, "limits": limits,
-            "floors": out_floors, "status": overall, "summary": _egress_summary(out_floors, overall, sprinklered, travel_limit, dead_limit)}
+            "floors": out_floors, "status": overall, "scissor_stair": bool(scissor),
+            "summary": _egress_summary(out_floors, overall, sprinklered, travel_limit, dead_limit,
+                                       scissor_doors_m=(float(scissor["w"]) - stair_w) if scissor else None)}
 
 
-def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_limit: float, dead_limit: float) -> str:
+def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_limit: float, dead_limit: float,
+                    scissor_doors_m: float | None = None) -> str:
     n = {s: sum(1 for f in floors if f["status"] == s) for s in ("pass", "conditional", "fail", "uncertain")}
     counts = ", ".join(f"{v} {k}" for k, v in n.items() if v)
     bits = []
@@ -618,6 +644,10 @@ def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_
     de = [f["dead_end_m"] for f in floors if f["dead_end_m"] is not None]
     if de and max(de) > dead_limit + 1e-6:
         bits.append(f"dead-end corridors up to {max(de):.1f} m, limit {dead_limit:g} m")
+    if scissor_doors_m is not None:
+        # the arrangement that made the separation, and what it asks of the drawing (VBBL 2014 3.4.4.4.(2), (3))
+        bits.append(f"the core's two exits are a scissor stair, its doors {scissor_doors_m:.1f} m apart along the corridor; "
+                    f"the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings")
     return (f"Egress ({'sprinklered' if sprinklered else 'unsprinklered'}, BCBC 2024 Part 3): {overall}; {len(floors)} floor{'s' if len(floors) != 1 else ''}: {counts}"
             + (f"; {'; '.join(bits)}" if bits else "") + ".")
 
@@ -676,6 +706,8 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                 zone["accessible"] = bool(z.get("accessible"))
             if block == "corridor":
                 zone["through"] = "core"
+            if block == "core" and z.get("stairs") == "scissor":
+                zone["stairs"] = "scissor"   # the solver's scissor stair, kept through the block editor
             zones.append(zone)
             # inside the plate?
             if x < x0 - 0.05 or y < y0 - 0.05 or x + w > x0 + W + 0.05 or y + d > y0 + D + 0.05:
@@ -725,6 +757,7 @@ def zones_of(L: dict) -> dict[str, list[dict]]:
     out: dict[str, list[dict]] = {}
     for fl in L["floors"]:
         out[str(fl["level"])] = [{k: z[k] for k in ("block", "x", "y", "w", "d")} | ({"accessible": True} if z.get("accessible") else {}) | ({"label": z["label"]} if z["block"] == "other" else {})
+                                 | ({"stairs": "scissor"} if z.get("stairs") == "scissor" else {})
                                  for z in fl["zones"] if z["block"] != "spare"]
     return out
 
@@ -762,7 +795,9 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
         out.update(status="pass" if ok else "conditional", note="on the ground floor, lane side" if ok else (f"on the ground floor but facing the street: {street_why}" if zs and all(fl["level"] == 0 for fl, _ in zs) else "services could not all stay on the ground floor"))
     elif key == "core":
         n_cores = max((sum(1 for z in fl["zones"] if z["block"] == "core") for fl in floors), default=0)
-        out.update(status="pass", note="one core bay at the centre of every floor, the corridor through it"
+        sc = next((z for fl, z in zones if z["block"] == "core" and z.get("stairs") == "scissor"), None)
+        out.update(status="pass", note=(f"one core at the centre of every floor, {sc['w']:g} m along the corridor to hold a scissor stair, the corridor along it"
+                                        if sc else "one core bay at the centre of every floor, the corridor through it")
                    + (", and an exit stair at each end of the corridor" if n_cores >= 3 else ""))
     elif key == "units":
         sides = {z.get("side") for fl, z in zones if z.get("unit")}
@@ -881,6 +916,8 @@ def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float,
             out.append(f'<circle cx="{x + 7:.1f}" cy="{y + 7:.1f}" r="3.2" fill="{TONES["accessible"]}"/>')
         if w > 26 and d > 14:
             lab = {"three_bed_plus": "3b", "two_bed": "2b", "one_bed": "1b", "studio": "st", "corridor": "corridor", "core": "core", "services": "services", "amenity": "amenity", "non_residential": "non-res", "spare": "spare"}.get(z["block"], str(z.get("label") or "")[:12].lower())
+            if z.get("stairs") == "scissor" and w > 70:
+                lab = "core · scissor stair"
             out.append(f'<text x="{x + w / 2:.1f}" y="{y + d / 2 + 3.5:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["ink"]}">{lab}</text>')
     # the farthest travel path: the unit's door, across to the corridor's axis, along it to the exit
     fu = (eg or {}).get("farthest_unit")
@@ -933,7 +970,9 @@ def svg_plans(L: dict) -> str:
     lines = [f'Unit depth {p["unit_depth_m"]} m either side of a {LAYOUT_ASSUMPTIONS["corridor_width_m"][0]} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;',
              f'partitions +{int((LAYOUT_ASSUMPTIONS["partition_allowance"][0] - 1) * 100)}% over net areas (declared placeholders). The rules read back from the plates are listed with the figure.',
              *([f'Egress (BC Building Code 2024, Part 3; figures to be verified): dashed, the farthest unit door to its exit along the corridor;',
-                f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.']
+                f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.',
+                *(['The scissor stair: two stairs interlocked in one shaft, its doors at the core\'s two ends; a smoke-tight rated separation between them.']
+                  if eg.get("scissor_stair") else [])]
                if eg else []),
              _stamp_line(L)]
     height = pad + 24 + len(levels) * row + 20 + 30 + 16 * len(lines) + 16

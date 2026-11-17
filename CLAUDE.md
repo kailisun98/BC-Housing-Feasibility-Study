@@ -286,6 +286,17 @@ Built and verified in the browser:
   outright") to the figure. FIG 02 draws each mass at its own footprint width and names the outright limit beside
   its storeys (`massing.outright_height_limit_m`, kept off the mass record so the committed massing.json compares).
   who.html's grid, stacked on a phone, drops its empty cells and labels each entry with its stage (`data-stage`).
+  A scissor stair for a slim tower (17 Nov 2026): where the corridor is too short for a stair at each end, `solve`
+  first lengthens the core until the corridor runs no further past it than a dead end may (any height: a 19-23.4 m
+  plate had run 6-8 m dead ends), and above six storeys, where the core's stairs would stand closer than 3.4.2.3 asks
+  (half the diagonal, not more than 9 m), runs it to that separation + one stair (11.2 m) as a scissor stair, its
+  doors at the core's two ends (`stairs: "scissor"` on the core zone, kept through `zones_of`, `place_zones` and the
+  block editor). Basis read from the Vancouver Building By-law 2014 text on bcpublications.ca, not yet BCBC 2024:
+  3.4.4.4.(2)-(3) (a smoke-tight rated separation between the two stairs, no openings in it), 3.4.1.2.(3) (no
+  contiguous stairs in a 5 or 6 storey wood-frame building, so only above six), 3.4.2.3.(3) (separation measured as
+  smoke travels). The egress summary and FIG 05 say so. On 3475 E Hastings with no floor area typed (19 storeys,
+  a 19.1 × 21 m plate): every floor passes, 48 homes against 55, since the 3.9 m left either side of the core on
+  the lane side holds no home. `tests/test_tower.py` `ScissorStair`.
 - `ffm/lookup.py`: `lookup(address)` finds the point in the City's own `property-addresses` dataset first
   (`parse_address` turns "609 heatley" into civic number 609 and street "HEATLEY" for an ODSQL `like`; the
   record's `site_id` names the parcel, fetched by id) and only otherwise geocodes with Nominatim kept inside

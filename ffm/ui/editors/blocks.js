@@ -47,7 +47,7 @@ const unitW = (gross, minGross, strip) => {
 
 function zonesFromLayout(L) {
   const out = {};
-  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}), ...(z.block === "other" ? { label: z.label } : {}) }));
+  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}), ...(z.block === "other" ? { label: z.label } : {}), ...(z.stairs === "scissor" ? { stairs: "scissor" } : {}) }));
   return out;
 }
 

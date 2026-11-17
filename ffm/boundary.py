@@ -248,6 +248,14 @@ def apply_orientation(o: dict, pt) -> Point:
     return (c * x - s * y + float(o["tx"]), s * x + c * y + float(o["ty"]))
 
 
+def unapply_orientation(o: dict, pt) -> Point:
+    """The inverse of apply_orientation: old = R(−θ)·(new − t). What the boundary editor does to a ring drawn in
+    the turned frame before it is kept as `site.boundary_m`, which lot_ring reads in the frame as found."""
+    c, s = _rot(float(o["rotate_deg"]))
+    x, y = float(pt[0]) - float(o["tx"]), float(pt[1]) - float(o["ty"])
+    return (c * x + s * y, -s * x + c * y)
+
+
 def oriented_ring(site: dict) -> dict[str, Any] | None:
     """The lot turned so the face `site.front_face` names is the street side, or None where the site names none
     (then everything stays in the frame `lot_ring` gives).

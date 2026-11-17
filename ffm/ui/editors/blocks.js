@@ -14,6 +14,7 @@ import { refreshSummary, renderForm } from "../schedule.js";
 import { markStale, onOptionChange, tidyOption } from "../files.js";
 import { OPTION_FIELDS } from "../fields.js";
 import { egressLine } from "../memo/answers.js";
+import { refreshPlanFloor } from "../figures/cards.js";
 
 const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"]];
 
@@ -736,7 +737,8 @@ function updateSheets(res) {
   const fig = $('.figure.sheet[data-sheet="plans"]');
   if (!fig || !res.sheets) return;
   const ax = $('.sheet-body[data-view="axon"]', fig); if (ax) ax.innerHTML = res.sheets.axon || "";
-  const pl = $('.sheet-body[data-view="plans"]', fig); if (pl) pl.innerHTML = res.sheets.plans || "";
+  const pl = $('.sheet-body[data-view="plans"] .plans-overview', fig); if (pl) pl.innerHTML = res.sheets.plans || "";
+  refreshPlanFloor();   // the floor picked on Plans by program follows the check
   for (const b of $$(".figure.sheet .sheet-body")) {
     const card = b.closest(".figure"); const eb = card && $(".eyebrow", card); const t = eb ? eb.textContent : "";
     if (/Stacking/.test(t)) b.innerHTML = res.sheets.stacking || ""; else if (/elevations/i.test(t)) b.innerHTML = res.sheets.elevations || ""; else if (/site plan/i.test(t)) b.innerHTML = res.sheets["site-plan"] || "";

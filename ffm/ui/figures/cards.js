@@ -258,6 +258,8 @@ export function renderFigures(run) {
 function renderSheets(run, n0) {
   const L = run.layout, S = run.sheets;
   editor.open = false;   // a re-rendered memo starts with the editor closed; its state lives in the option once applied
+  editor.result = null;  // and the floor picker reads this run's layout until the editor has checked a placement
+  if (planFloor != null && !L.floors[planFloor]) planFloor = null;
   const fig = k => `FIG ${String(k).padStart(2, "0")}`;
   const rules = (L.adjacencies || []).filter(c => c.status !== "info");
   const prog = (L.program || []).map(b => `${b.count > 1 ? `${b.count} ` : ""}${b.label.toLowerCase()} ${fmtNum(Math.round(b.area_m2))} m²`).join(", ");
@@ -272,7 +274,11 @@ function renderSheets(run, n0) {
     <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>
       <div class="fig-tools"><div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div>
       <button type="button" class="btn btn-small" id="edit-blocks" aria-expanded="false" title="Drag, resize, add or remove the blocks; the engine checks every move">Edit blocks</button></div></div>
-    <div class="sheet-body" data-view="plans">${S.plans || ""}</div>
+    <div class="sheet-body" data-view="plans">
+      <div class="seg plans-floors" role="group" aria-label="Which floor plan to show">${planFloorButtons(L)}</div>
+      <div class="plans-overview"${planFloor == null ? "" : " hidden"}>${S.plans || ""}</div>
+      <div class="plans-floor"${planFloor == null ? " hidden" : ""}>${planFloor == null ? "" : floorPlanHtml(L, planFloor)}</div>
+    </div>
     <div class="sheet-body" data-view="axon" hidden>${S.axon || ""}</div>
     <div class="sheet-editor" id="sheet-editor" hidden></div>
     <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.arrangement === "point" ? `a point tower, the homes round a corridor ringing the core, ${h(L.plate.unit_depth_m)} m deep in front and behind and ${h(L.plate.side_depth_m)} m beside` : `${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep`}. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
@@ -286,6 +292,64 @@ function renderSheets(run, n0) {
   out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 3)} · Code site plan</div><div class="sheet-body">${S["site-plan"] || ""}</div>
     <figcaption>The lot, the yards dimensioned, the setback envelope dashed red, the footprint blue, tree protection barriers where the survey gives positions; the table reads FSR, height, coverage and yards against the schedule where the stack has one.</figcaption></figure>`);
   return out;
+}
+
+/* The floor picker on Plans by program (17 Nov 2026): the engine's sheet draws the ground, a typical and the top
+   floor; the architect picks any floor and its plan is drawn here from the same layout record (`layout.floors`),
+   to the same conventions: metres, the street at the bottom, the blocks in their tones, the exits read beside the
+   title. The block editor's checks redraw it (`refreshPlanFloor`). */
+let planFloor = null;   // null: the sheet's overview; else the level shown
+
+const PLAN_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0", spare: "#ffffff" };
+const PLAN_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res", spare: "" };
+const PLAN_UNITS = [["three_bed_plus", "three-bedroom"], ["two_bed", "two-bedroom"], ["one_bed", "one-bedroom"], ["studio", "studio"]];
+const planLayout = run => editor.result || run.layout;
+const floorShort = lv => lv === 0 ? "Ground" : `L${lv + 1}`;
+
+function planFloorButtons(L) {
+  return `<button type="button" class="segbtn" data-plan-floor="" aria-pressed="${planFloor == null}" title="The sheet: the ground, a typical and the top floor">Overview</button>`
+    + L.floors.map(fl => `<button type="button" class="segbtn" data-plan-floor="${fl.level}" aria-pressed="${planFloor === fl.level}" title="${h(fl.name)}">${h(floorShort(fl.level))}</button>`).join("");
+}
+
+function floorPlanHtml(L, lv) {
+  const fl = L.floors[lv], p = L.plate;
+  if (!fl) return "";
+  const W = 760, M = 34, scale = (W - 2 * M) / (p.width_m || 1), H = p.depth_m * scale + 2 * M;
+  const f = v => v.toFixed(1);
+  const zones = fl.zones.map(z => {
+    const x = M + (z.x - p.x) * scale, y = M + (p.depth_m - (z.y - p.y) - z.d) * scale, w = Math.max(1, z.w * scale), d = Math.max(1, z.d * scale);
+    const name = z.block === "other" ? String(z.label || "other").toLowerCase() : (PLAN_SHORT[z.block] ?? z.block);
+    const two = w > 44 && d > 34 && z.block !== "corridor" && z.block !== "spare";
+    return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(d)}" fill="${PLAN_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "spare" ? ` stroke-dasharray="4 3"` : ""}/>
+      ${z.accessible ? `<circle cx="${f(x + 8)}" cy="${f(y + 8)}" r="3.6" fill="#245f9c"/>` : ""}
+      ${name && w > 24 && d > 12 ? `<text x="${f(x + w / 2)}" y="${f(y + d / 2 + (two ? -2 : 4))}" font-size="11" text-anchor="middle" fill="#1f2933">${h(name)}</text>` : ""}
+      ${two ? `<text x="${f(x + w / 2)}" y="${f(y + d / 2 + 12)}" font-size="9.5" text-anchor="middle" fill="#5f6672">${h(fmtNum(Math.round(z.area_m2 ?? z.w * z.d)))} m²</text>` : ""}`;
+  }).join("");
+  const counts = PLAN_UNITS.map(([k, word]) => [fl.zones.filter(z => z.unit === k || (z.unit == null && z.block === k)).length, word]).filter(([c]) => c).map(([c, word]) => `${c} ${word}`).join(", ");
+  const eg = L.egress && (L.egress.floors || []).find(e => e.level === lv);
+  return `<div class="plans-floor-head"><b>${h(fl.name)}</b><span class="cont">${counts ? ` · ${h(counts)}` : " · no units"}${fl.spare_m2 ? ` · ${h(fmtNum(Math.round(fl.spare_m2)))} m² spare` : ""}</span></div>
+    ${eg ? `<div class="help">${pill(eg.status)} Exits: ${h(egressLine(eg))}${eg.notes && eg.notes.length ? ` <span class="cont">· ${h(eg.notes[0])}</span>` : ""}</div>` : ""}
+    <svg viewBox="0 0 ${W} ${f(H)}" width="${W}" height="${f(H)}" role="img" aria-label="Plan of ${h(fl.name)}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
+      <rect x="${M}" y="${M}" width="${f(p.width_m * scale)}" height="${f(p.depth_m * scale)}" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
+      ${zones}
+      <rect x="${M}" y="${M}" width="${f(p.width_m * scale)}" height="${f(p.depth_m * scale)}" fill="none" stroke="#1f2933" stroke-width="1.2"/>
+      <text x="${f(M + p.width_m * scale / 2)}" y="${f(H - 10)}" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.width_m)} m · street side</text>
+      <text transform="translate(${M - 12} ${f(M + p.depth_m * scale / 2)}) rotate(-90)" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.depth_m)} m</text>
+    </svg>`;
+}
+
+/* Show the picked floor (or the overview) in the plans figure; called by the picker and after an editor check. */
+export function refreshPlanFloor(run = state.run) {
+  const fig = $('.figure.sheet[data-sheet="plans"]');
+  if (!fig || !run || !run.layout) return;
+  const L = planLayout(run);
+  if (planFloor != null && !L.floors[planFloor]) planFloor = null;
+  const bar = $(".plans-floors", fig), over = $(".plans-overview", fig), one = $(".plans-floor", fig);
+  if (!bar || !over || !one) return;
+  bar.innerHTML = planFloorButtons(L);
+  $$("[data-plan-floor]", bar).forEach(b => b.addEventListener("click", () => { planFloor = b.dataset.planFloor === "" ? null : Number(b.dataset.planFloor); refreshPlanFloor(run); }));
+  over.hidden = planFloor != null; one.hidden = planFloor == null;
+  one.innerHTML = planFloor == null ? "" : floorPlanHtml(L, planFloor);
 }
 
 /* The exits on every floor, from the building code: under the plans, each floor a line with its status; the
@@ -308,6 +372,7 @@ function wireSheets() {
     if (editor.open) loaded.blocks.closeEditor();   // open means its module is in
     $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== b.dataset.sheetView; });
   }));
+  refreshPlanFloor();
   const eb = $("#edit-blocks");
   if (eb) eb.addEventListener("click", () => loadBlocks()
     .then(b => (editor.open ? b.closeEditor() : b.openEditor()))

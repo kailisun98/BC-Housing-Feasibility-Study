@@ -593,6 +593,16 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   them into the option, redraws the Option schedule and marks the memo stale. Committed `layout.json` files predate
   `capacity`; the editor reads it from its first check.
 
+- **Two fixes the same day.** (1) The boundary editor on a lot turned to a chosen front (`site.front_face`): the
+  handles are in the turned frame the plan is drawn in, `site.boundary_m` is kept in the frame as found, so
+  `editors/boundary.js` turns a saved ring on the way in (`toShown`) and back on the way out (`toStored`, the inverse of
+  massing's `lot.orientation`; `boundary.unapply_orientation` is the engine's twin). Before, the shown ring was saved as
+  it was and turned a second time: the lot jumped on Use this boundary. A boundary saved by the old code is wrong in the
+  site file; "Back to the parcel" clears it. `tests/test_boundary.py`, `DrawnOnATurnedLot`. (2) Plans by program has a
+  floor picker (`planFloor`, `floorPlanHtml`, `refreshPlanFloor` in `figures/cards.js`): Overview is the engine's sheet
+  (ground, typical, top), any other button draws that floor from `layout.floors` in the page; the block editor's checks
+  redraw it and write the sheet into `.plans-overview`.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

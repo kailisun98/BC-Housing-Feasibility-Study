@@ -147,5 +147,50 @@ class MassingOnAPolygon(unittest.TestCase):
         self.assertNotIn("box", m["envelope"])
 
 
+class DrawnOnATurnedLot(unittest.TestCase):
+    """The boundary editor on a lot turned to a chosen front (site.front_face): the handles are in the turned frame
+    the plan is drawn in, the site keeps its boundary in the frame as found. Kept as shown (the defect of
+    17 Nov 2026), the engine turns the ring a second time and the lot is not the one drawn."""
+
+    def setUp(self):
+        self.site = dict(engine.load_json(ROOT / "sites" / "1010-expo-blvd.json"), front_face={"side": "right"})
+        self.site.pop("boundary_m", None)
+        self.option = engine.load_json(ROOT / "options" / "1010-expo-blvd-as-permitted.json")
+        self.ledger = engine.evaluate(self.site, self.option, date(2026, 10, 23))
+        self.m0 = massing.build(self.site, self.option, self.ledger)
+
+    def _lot(self, shown):
+        o = self.m0["lot"]["orientation"]
+        site = dict(self.site, boundary_m=[[round(v, 2) for v in boundary.unapply_orientation(o, p)] for p in shown])
+        return massing.build(site, self.option, engine.evaluate(site, self.option, date(2026, 10, 23)))["lot"]
+
+    @staticmethod
+    def _shape(pts):
+        x0, y0 = min(p[0] for p in pts), min(p[1] for p in pts)
+        return sorted((round(p[0] - x0, 1), round(p[1] - y0, 1)) for p in pts)
+
+    def test_the_corners_as_shown_come_back_where_they_were(self):
+        shown = self.m0["lot"]["corners"]
+        self.assertNotEqual(self.m0["lot"]["orientation"]["rotate_deg"], 0)
+        lot = self._lot(shown)
+        self.assertEqual(lot["source"], "drawn")
+        for a, b in zip(sorted(map(tuple, lot["corners"])), sorted(map(tuple, shown))):
+            self.assertAlmostEqual(a[0], b[0], delta=0.1)
+            self.assertAlmostEqual(a[1], b[1], delta=0.1)
+        # kept in the turned frame instead, the ring is turned twice: a different lot
+        twice = massing.build(dict(self.site, boundary_m=shown), self.option, self.ledger)["lot"]
+        self.assertNotEqual(self._shape(twice["corners"]), self._shape(shown))
+
+    def test_a_dragged_corner_is_the_lot_that_was_drawn(self):
+        shown = [list(p) for p in self.m0["lot"]["corners"]]
+        i = (self.m0["lot"]["front_edge"] + 2) % len(shown)       # a corner off the front face
+        shown[i] = [shown[i][0] + 4.0, shown[i][1] + 5.0]
+        lot = self._lot(shown)
+        got, want = self._shape(lot["corners"]), self._shape(shown)
+        self.assertEqual(len(got), len(want))
+        for a, b in zip(got, want):
+            self.assertAlmostEqual(a[0], b[0], delta=0.15)
+            self.assertAlmostEqual(a[1], b[1], delta=0.15)
+
 if __name__ == "__main__":
     unittest.main()

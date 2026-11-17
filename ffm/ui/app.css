@@ -554,6 +554,11 @@ table.plain td.status { white-space: nowrap; }
 .ed-newprog input[type=number] { width: 64px; }
 /* the line over the plate: what is selected; a fixed height, so selecting does not move the plate */
 .ed-selbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; min-height: 30px; font-size: 12px; }
+/* the floor picker on Plans by program: every floor a button, wrapping on a tall building */
+.seg.plans-floors, .seg.ed-floors { flex-wrap: wrap; }
+.plans-floors { margin-bottom: 8px; }
+.plans-floor-head { font-size: 14px; margin-bottom: 2px; }
+.plans-floor svg { display: block; width: 100%; max-width: 760px; height: auto; margin-top: 6px; }
 .ed-selbar .ed-kind { font-weight: 600; }
 .ed-bar select, .ed-selbar select { width: auto; flex: none; }
 .ed-selbar .field.inline { flex-direction: row; }

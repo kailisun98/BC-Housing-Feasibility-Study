@@ -15,6 +15,22 @@ import { boundaryHandles } from "../figures/plan.js";
 import { VIEW3D } from "../figures/fig3d.js";
 import { rerenderFigures } from "../figures/cards.js";
 
+/* Two frames. The site keeps its boundary (`boundary_m`) in the lot frame as found; where the architect chose a
+   front face (`site.front_face`), the engine turns the lot to it and the plan is drawn in the turned frame, with
+   the transform in massing's `lot.orientation`: shown = R(θ)·stored + t (boundary.apply_orientation). The handles
+   work in the frame shown, so a saved boundary is turned on the way in and turned back on the way out. Before
+   17 Nov 2026 the shown ring was saved as it was and the engine turned it a second time: on a lot with a chosen
+   front the boundary jumped on Use this boundary and the lot no longer matched what was drawn. */
+const rotOf = deg => {
+  const q = deg / 90;
+  if (Math.abs(q - Math.round(q)) < 1e-9) return [[1, 0], [0, 1], [-1, 0], [0, -1]][((Math.round(q) % 4) + 4) % 4];   // quarter turns exactly, as the engine
+  const t = deg * Math.PI / 180;
+  return [Math.cos(t), Math.sin(t)];
+};
+const toShown = (o, p) => { if (!o) return [p[0], p[1]]; const [c, s] = rotOf(o.rotate_deg); return [c * p[0] - s * p[1] + o.tx, s * p[0] + c * p[1] + o.ty]; };
+const toStored = (o, p) => { if (!o) return [p[0], p[1]]; const [c, s] = rotOf(o.rotate_deg), x = p[0] - o.tx, y = p[1] - o.ty; return [c * x + s * y, -s * x + c * y]; };
+const r2 = v => Math.round(v * 100) / 100 + 0;
+
 /* Edit boundary | Close: handles on the lot line, or put away. */
 export function toggleBoundary(run, redraw) {
   const m = run.massing;
@@ -24,7 +40,7 @@ export function toggleBoundary(run, redraw) {
     bnd.open = true; bnd.sel = null;
     // a boundary drawn before reopens exactly as it was saved; the City's parcel opens as its simplified corners
     const drawn = state.site && state.site.boundary_m && state.site.boundary_m.length >= 3 ? state.site.boundary_m : null;
-    bnd.ring = (drawn || m.lot.corners || m.lot.polygon).map(p => [p[0], p[1]]);
+    bnd.ring = drawn ? drawn.map(p => toShown(m.lot.orientation, p).map(r2)) : (m.lot.corners || m.lot.polygon).map(p => [p[0], p[1]]);
   }
   redraw();
   if (bnd.open) setStatus("Drag a corner of the lot line; click a square on an edge to add a corner; Delete removes the selected one; or type an edge length in the table. Use this boundary rebuilds the massing and the sheets from it.", "info");
@@ -100,7 +116,11 @@ async function applyBoundary(backToParcel, run, redraw) {
   const site = state.site;
   if (!site || !state.option || bnd.busy) return;
   if (backToParcel) delete site.boundary_m;
-  else site.boundary_m = bnd.ring.map(p => [Math.round(p[0] * 10) / 10, Math.round(p[1] * 10) / 10]);
+  else {
+    // out of the frame shown, back into the frame the site keeps (the one the streets and buildings are stored in)
+    const o = run.massing && run.massing.lot && run.massing.lot.orientation;
+    site.boundary_m = bnd.ring.map(p => toStored(o, p).map(r2));
+  }
   state.siteDirty = true; $("#site-dirty").hidden = false;
   bnd.busy = true; redraw();
   try {

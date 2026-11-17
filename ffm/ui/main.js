@@ -18,7 +18,7 @@ import { enterOption, renderGuide, renderStage } from "./route-stage.js";
 import { renderClaude } from "./claude.js";
 import { closeIssuePanel, issueButtonLabel, openIssuePanel, startIssuePolling } from "./issue.js";
 import {
-  firstOpenStep, initialMode, MODES, placeModeThumb, RAIL_KEY, setMode, setStep, setView, showInputs, VIEW_KEY,
+  firstOpenStep, initialMode, initTheme, MODES, placeModeThumb, RAIL_KEY, setMode, setStep, setView, showInputs, VIEW_KEY,
   watchSteps
 } from "./modes.js";
 import { loadPaper } from "./core/lazy.js";
@@ -67,6 +67,7 @@ async function init() {
   // who is reading: the switch in the top bar; the mode from the link or the last visit applies before the inputs load
   $$("#mode-switch button").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
   setMode(initialMode(), false, false);
+  initTheme();
   // the thumb is measured: again once the web font is in, and whenever the bar re-wraps (the issue chip arriving
   // wraps it without a window resize, which once left the thumb under the wrong reader)
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeModeThumb);

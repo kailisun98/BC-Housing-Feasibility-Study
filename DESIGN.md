@@ -594,7 +594,11 @@ here, including opening a past run, a comparison and reading the Revit result; t
   engine chip, and the memo's revision: a "Revision" key and R1, R2… in a small 1px Ink box. For the
   architect Run the rules is the signal-blue button; for the manager, who runs from the card at 03, it
   is absent until a memo exists and then reads Run again, quiet on the ink, live only once an edit has
-  left the memo out of date. A skip link to the memo comes first in the tab order.
+  left the memo out of date. A skip link to the memo comes first in the tab order. Last on the bar, a 30px
+  round button (44px on touch) on a chrome-line border switches the page between day and night (17 Nov 2026):
+  a drawn moon by day, a sun by night, named "Dark page" with `aria-pressed`. Until it is pressed the OS
+  decides; a press sets `data-theme` on `<html>` and is kept (`ffm.theme`), applied in the head before the first
+  paint. The drawings stay on white paper either way.
 - **The memo's actions:** in its title block, under the option's figures: Download PDF (Ink), Issue to
   the architect, Print, More formats; the architect's row leads with Export to Revit; the issue form
   opens under the row. The export footer keeps the note and the Revit panel and shows only with a memo.
@@ -656,7 +660,12 @@ The signature component. A heading set as the site's key (a mono "01" then the q
 caps), the verdict at 24px 400, light and large the way the site sets its headlines, with the operative
 words in the status text colour, then findings in lead-and-continuation prose or a pill-led list;
 the third card holds a table of open items with a Who / what column in Muted. Wash and tone come
-from one `data-verdict` attribute.
+from one `data-verdict` attribute. The fourth, the money, says "Needs more sources" on the conditional wash
+where it said "Unlikely" on the fail wash (17 Nov 2026: a gap is the manager's cue to look further, not a no),
+with a line "For the development manager:" naming the sources to try. For the architect it folds under its
+verdict: one line under a tinted hairline, "Show the pro-forma · capital $54.1M, funding $41.6M, gap $12.5M ·
+the development manager's figures", reading "Fold the pro-forma" once open; ledger layer F follows it, and
+the choice is kept.
 
 ### Segmented control
 Plan | 3D on FIG 01 (the pattern for any two-or-three-way view switch): one 4px box with a Line border, 11.5px weight 500
@@ -682,7 +691,7 @@ azimuth and any tilt, so a drag never rescales it. FIG 03 is the Revit sheet ima
 The tool's top bar carries a three-way pill, Manager · Architect · Reader, after the lockup: the flows in
 `docs/user-flows.md` as three layouts of the same page. The pressed segment is paper on the ink bar. Manager
 (the default): the memo first, the inputs beside it as summaries, Download PDF leads the export bar.
-Architect: the Site and Option forms open, every ledger layer open, the figures beside the answers from
+Architect: the Site and Option forms open, every ledger layer open but F (it opens with the money), the figures beside the answers from
 1280px, Export to Revit and massing.json lead. Reader: the rail, the steps, the date, Run, the run pickers and
 the Revit buttons are gone; the memo alone sits in a 980px reading column at 14px with Download PDF and
 Print. The status strip says which layout is on; the page title says who it is for; a link can carry

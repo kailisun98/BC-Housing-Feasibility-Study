@@ -6,7 +6,7 @@ import { state, STATIC } from "./core/state.js";
 import { optWord } from "./fields.js";
 import { rev } from "./runs.js";
 import { compareKind, idBreak, optionName, refOf } from "./memo/memo.js";
-import { layoutOpenItems, money, MONEY_STATUS } from "./memo/answers.js";
+import { layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyWord } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
 import { tradeOff } from "./memo/side-by-side.js";
 import { changeWord, shortName } from "./memo/changes.js";
@@ -91,7 +91,7 @@ export function paperDocument(run) {
         <tr><th scope="row">Is it allowed by rezoning?</th><td>${vmark(ans.allowed.by_rezoning.verdict)}</td><td>${decidedBy(ans.allowed.by_rezoning)}${ans.allowed.rezoning_path ? `<p class="note">Path: ${h(ans.allowed.rezoning_path)}.</p>` : ""}</td></tr>
         <tr><th scope="row">Does it fit the funders?</th><td>${vmark(ans.funded.verdict)}</td><td>${decidedBy(ans.funded)}${(opt.target_programs || []).length ? `<p class="note">Programs the option targets: ${h(opt.target_programs.map(id => titleOf[id] ? `${ref(id)} ${titleOf[id]}` : id).join("; "))}.</p>` : ""}</td></tr>
         <tr><th scope="row">What is still unsure?</th><td>${unsure.length ? `<span class="st st-${unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${unsure.length} open item${unsure.length === 1 ? "" : "s"}</span>` : `<span class="st st-pass">Nothing open</span>`}</td><td>${unsure.length ? `Each with the person who resolves it, in section 2: ${unsure.map(u => refTag(u.rule_id)).join(", ")}.` : `<span class="muted">Every rule that applies is settled.</span>`}</td></tr>
-        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(cap(run.proforma.verdict.word))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Every line, its rule and its source are in section ${s.money}.</td></tr>` : ""}
+        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(moneyWord(run.proforma.verdict))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Every line, its rule and its source are in section ${s.money}.${moneyNext(run.proforma) ? `<p class="note">For the development manager: ${h(moneyNext(run.proforma))}</p>` : ""}</td></tr>` : ""}
       </tbody></table>`;
 
   // 2. open items

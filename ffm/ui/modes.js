@@ -10,6 +10,7 @@ import { closeExportPanel } from "./revit.js";
 import { renderGuide } from "./route-stage.js";
 import { closeIssuePanel, issueButtonLabel, pollIssues } from "./issue.js";
 import { loaded } from "./core/lazy.js";
+import { architectMoneyOpen } from "./memo/answers.js";
 
 /* The step bar: the current step is the one the reader is working in (aria-current); a step is done when its work is
    done (a site and an option chosen, a memo on screen), not when the page has scrolled past it. */
@@ -94,7 +95,7 @@ const MODE_KEY = "ffm.mode";
 
 export const MODES = {
   manager: { who: "the development manager", line: "three stops, the site, the option and the run, then the memo with Download PDF for the board." },
-  architect: { who: "the architect", line: "the Site and Option schedules beside the memo, every ledger layer open, two runs compared, the block editor on FIG 03, and the massing to Revit." },
+  architect: { who: "the architect", line: "the Site and Option schedules beside the memo, every ledger layer open but the money's (Show the pro-forma on answer 4 opens it), two runs compared, the block editor on FIG 03, and the massing to Revit." },
   reader: { who: "a reader", line: "the memo alone, as on paper, with Download PDF and Print. Switch to Manager or Architect to change anything." },
 };
 
@@ -137,10 +138,42 @@ export function setMode(mode, remember = true, announce = true) {
   if (announce) { setStatus(`Laid out for ${MODES[mode].who}: ${MODES[mode].line}`, "info"); pollIssues(); }
 }
 
-/* What a mode does to the memo on screen: the architect reads every ledger layer open, the others start closed. */
+/* What a mode does to the memo on screen: the architect reads every ledger layer open, the others start closed.
+   Layer F, the pro-forma's assumptions, opens for the architect only with the money (17 Nov 2026). */
 export function applyModeToMemo() {
-  const open = state.mode === "architect";
-  $$(".ledger details.layer").forEach(d => { if (d.open !== open) d.open = open; });
+  const arch = state.mode === "architect";
+  $$(".ledger details.layer").forEach(d => {
+    const open = arch && (d.dataset.layer !== "F" || architectMoneyOpen());
+    if (d.open !== open) d.open = open;
+  });
+}
+
+/* Day or night (17 Nov 2026, Kai: "add toggle for light/dark mode"). With no choice made the page follows the OS,
+   and the button follows the OS with it; a press sets data-theme on <html> and keeps the choice for the next visit
+   (index.html's head applies a kept choice before the first paint, so the page never flashes the other theme). */
+export const THEME_KEY = "ffm.theme";
+const darkOS = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+const isDark = () => { const t = document.documentElement.dataset.theme; return t ? t === "dark" : !!(darkOS && darkOS.matches); };
+
+function syncThemeButton() {
+  const b = $("#theme-btn");
+  if (!b) return;
+  const dark = isDark();
+  b.setAttribute("aria-pressed", String(dark));
+  b.title = dark ? "Switch to the light page" : "Switch to the dark page";
+}
+
+export function setTheme(theme, remember = true) {
+  document.documentElement.dataset.theme = theme;
+  syncThemeButton();
+  if (remember) { try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* the choice lasts this visit */ } }
+}
+
+export function initTheme() {
+  const b = $("#theme-btn");
+  if (b) b.addEventListener("click", () => { setTheme(isDark() ? "light" : "dark"); setStatus(`The ${isDark() ? "dark" : "light"} page; the drawings stay on white paper.`, "info"); });
+  if (darkOS && darkOS.addEventListener) darkOS.addEventListener("change", syncThemeButton);
+  syncThemeButton();
 }
 
 export function initialMode() {

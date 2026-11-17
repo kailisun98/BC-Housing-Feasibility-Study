@@ -698,6 +698,22 @@ Phase 2, the cost layer and the pro-forma:
   "Every line and its source" folded) in Summary and Detailed; the paper memo's answers table gets a row; the
   guide has **seven stops** (6 is Pro-forma: the five lines from the run, the three finance inputs, "Run again
   with these"; 7 is Issue).
+- The money's words (17 Nov 2026, Kai): the key `verdict.word` stays likely / unlikely / unsure in `proforma.json`,
+  but nothing a person reads says "Unlikely" any more. `proforma.VERDICT_WORDS` shows "unlikely" as **Needs more
+  sources** and `proforma.next_step(pf)` adds a line for the development manager (more sources as well: other grants
+  with CMHC's Affordable Housing Fund named, equity, a land contribution, a partner; then enter them and run again;
+  for an "unsure" gap inside 15% with the land settled, "another source, or firmer placeholders"). The tool mirrors
+  both (`MONEY_WORD`, `moneyNext` in `memo/answers.js`; the paper memo uses them) and the card reads
+  `conditional`, no longer `fail`. The committed memos were rewritten with `python -m ffm memo --out <run>` (the
+  ledgers untouched); home, case, how and who say "Needs more sources". The Expo as-permitted run still shows a
+  100% gap because its option has no homes entered: the verdict should say so instead (not yet changed).
+- The architect's money folds (17 Nov 2026, Kai: "too long … more of a developer's thing"): answer 4 keeps its
+  verdict and puts the next step, the four figures, the reasons and the line table behind "Show the pro-forma ·
+  capital, funding, gap" (`details.money-more`); the choice is kept (`ffm.architect.money`) and ledger layer F
+  opens and folds with it (`wireMoneyFold`, `applyModeToMemo`). The line table is folded in every mode now.
+- Day or night by hand (17 Nov 2026): `#theme-btn` at the end of the top bar, `initTheme` / `setTheme` in
+  `modes.js`, `ffm.theme` in localStorage applied by a one-line script in index.html's head; app.css repeats the
+  night tokens under `:root[data-theme="dark"]` (brand.css already did for the statuses). The site pages stay dark.
 
 Phase 6, Claude in the loop (the model proposes, a person confirms, the engine decides):
 - `ffm/propose.py`, behind `FFM_CLAUDE_KEY` in the environment (never in the repository; `available()` is what

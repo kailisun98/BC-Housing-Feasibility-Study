@@ -122,7 +122,28 @@ export const money = x => (x === null || x === undefined ? "not given" : `$${fmt
 /* A source's short name for a table cell: the publisher and the document up to the first comma or semicolon. */
 const shortSource = s => { const t = String((s && s.title) || (s && s.url) || ""); const cut = t.split(/[;(]/)[0]; return (cut.length > 72 ? cut.slice(0, 70).replace(/\s+\S*$/, "") + "…" : cut).trim(); };
 
-export const MONEY_STATUS = { likely: "pass", unlikely: "fail", unsure: "uncertain" };
+/* How a verdict is worded and what it asks of the development manager (17 Nov 2026, Kai: "Unlikely" read as "will not
+   be funded"; a gap past the screen's line is the cue to look for more sources, so it reads Conditional, not Fail).
+   The key stays the engine's; proforma.VERDICT_WORDS and proforma.next_step say the same in the memo file. */
+export const MONEY_STATUS = { likely: "pass", unlikely: "conditional", unsure: "uncertain" };
+export const MONEY_WORD = { likely: "Likely", unlikely: "Needs more sources", unsure: "Unsure" };
+export const moneyWord = v => MONEY_WORD[v.word] || cap(v.word);
+export function moneyNext(pf) {
+  const v = pf.verdict || {}, gap = (pf.gap || {}).value, c = pf.capital || {};
+  if (v.word === "unlikely") return "Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.";
+  if (v.word === "unsure" && gap != null && gap > 0 && c.total != null && c.land != null) return "Another source, or firmer figures for the placeholders, would settle it.";
+  return "";
+}
+
+/* The architect reads the money folded (17 Nov 2026, Kai: "the financials are too long … more of a developer's
+   thing"): the verdict stays on the card; the figures, the reasons and the line table wait behind one disclosure,
+   and ledger layer F follows it. The architect's choice is kept for the next visit. */
+export const MONEY_FOLD_KEY = "ffm.architect.money";
+export function architectMoneyOpen() { try { return localStorage.getItem(MONEY_FOLD_KEY) === "open"; } catch (e) { return false; } }
+export function rememberArchitectMoney(open) { try { localStorage.setItem(MONEY_FOLD_KEY, open ? "open" : "folded"); } catch (e) { /* the choice lasts this visit */ } }
+
+/* A figure in millions for the folded line: $54.1M. */
+const millions = x => (x == null ? "not given" : `${x < 0 ? "−" : ""}$${(Math.abs(x) / 1e6).toFixed(1)}M`);
 
 export function answerMoney(run) {
   const pf = run.proforma;
@@ -133,6 +154,7 @@ export function answerMoney(run) {
       <p class="verdict"><em>Not computed.</em></p><p class="finding">${h(pf.why || "")}</p></section>`;
   }
   const v = pf.verdict, c = pf.capital, o = pf.operating, f = pf.funding, g = pf.gap;
+  const next = moneyNext(pf);
   const grants = (f.grants || []).reduce((t, x) => t + (x.value || 0), 0);
   const unit = u => (u === "$/yr" ? " a year" : u === "$/m²" ? " per m²" : "");
   const shown = ln => (ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + unit(ln.unit) : (ln.value == null ? "not given" : fmtNum(ln.value)));
@@ -144,9 +166,7 @@ export function answerMoney(run) {
     const from = ln.rule_id ? `${refTagOf(ln.rule_id)}<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>${s ? `<div class="cont">${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener" title="${h(s.title || s.url)}">${h(shortSource(s))}</a>` : h(shortSource(s))}</div>` : ""}` : `<span class="cont">the option's own figures</span>`;
     return `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${from}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont">${h(ln.note || "")}</td></tr>`;
   }).join("");
-  return `<section class="card answer money" data-verdict="${MONEY_STATUS[v.word] || "uncertain"}">
-    <h2><span class="badge">4</span> Does the money work?</h2>
-    <p class="verdict"><em>${h(cap(v.word))}.</em> ${h(v.why[0] ? v.why[0][0].toUpperCase() + v.why[0].slice(1) + "." : "")}</p>
+  const body = `${next ? `<p class="finding money-next"><span class="cont">For the development manager:</span> ${leadCont(next)}</p>` : ""}
     <dl class="pf-four">
       <div><dt>Capital cost</dt><dd><b>${h(money(c.total))}</b><span class="cont">hard ${h(money(c.hard))} (escalated ×${h(c.escalation)}), soft ${h(money(c.soft))}, contingency ${h(money(c.contingency))}, land ${h(money(c.land))}</span></dd></div>
       <div><dt>Net operating income</dt><dd><b>${h(money(o.noi))} a year</b><span class="cont">rent ${h(money(o.gross))} less vacancy, operating cost and reserve</span></dd></div>
@@ -155,9 +175,32 @@ export function answerMoney(run) {
     </dl>
     ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
     ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
-    <details class="pf-lines"${state.mode === "architect" ? " open" : ""}><summary>Every line, where it came from, and its source <span class="cont">(${(pf.lines || []).length} lines)</span></summary>
+    <details class="pf-lines"><summary>Every line, where it came from, and its source <span class="cont">(${(pf.lines || []).length} lines)</span></summary>
       <table class="plain"><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="cont">A feasibility screen, not a lender's model. Hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked.</p>
-    </details>
+    </details>`;
+  // the architect's card: the verdict, then the pro-forma behind one line that carries its three figures
+  const fold = state.mode === "architect"
+    ? `<details class="money-more"${architectMoneyOpen() ? " open" : ""}>
+        <summary><span class="mm-closed"><span class="mm-act">Show the pro-forma</span> <span class="cont">· capital ${h(millions(c.total))}, funding ${h(millions(f.total))}, gap ${h(millions(g.value))} · the development manager's figures</span></span><span class="mm-open"><span class="mm-act">Fold the pro-forma</span></span></summary>
+        <div class="money-body">${body}</div>
+      </details>`
+    : body;
+  return `<section class="card answer money" data-verdict="${MONEY_STATUS[v.word] || "uncertain"}">
+    <h2><span class="badge">4</span> Does the money work?</h2>
+    <p class="verdict"><em>${h(moneyWord(v))}.</em> ${h(v.why[0] ? v.why[0][0].toUpperCase() + v.why[0].slice(1) + "." : "")}</p>
+    ${fold}
   </section>`;
+}
+
+/* The architect's fold on the money card is one switch for the financials: it is remembered, and ledger layer F
+   (the pro-forma's assumptions) opens and folds with it. */
+export function wireMoneyFold() {
+  const d = document.querySelector(".answer.money details.money-more");
+  if (!d) return;
+  d.addEventListener("toggle", () => {
+    rememberArchitectMoney(d.open);
+    const f = document.querySelector('.ledger details.layer[data-layer="F"]');
+    if (f && f.open !== d.open) f.open = d.open;
+  });
 }

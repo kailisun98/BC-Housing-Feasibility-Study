@@ -7,7 +7,7 @@ the ledger so the version in force on the run date is the one used and the memo'
         "operating": revenue by tier, vacancy, operating cost, reserve, net operating income
         "funding":   grants (from layer E), equity, supportable debt (NOI at the DCR), total
         "gap":       capital less funding, and as a share of capital
-        "verdict":   {"word": "likely" | "unlikely" | "unsure", "why": [...], "unsure": [...]}
+        "verdict":   {"word": "likely" | "unlikely" | "unsure", "why": [...], "unsure": [...]}   (worded by VERDICT_WORDS)
         "lines":     every figure with its rule id, its note and whether it is a placeholder, in memo order
     }
 
@@ -24,6 +24,27 @@ from typing import Any
 UNIT_KEYS = ("studio", "one_bed", "two_bed", "three_bed_plus")
 TIER_KEYS = ("market", "rgi", "deep_subsidy")
 GAP_UNLIKELY_SHARE = 0.15   # a gap above this share of the capital cost reads "unlikely"; below it, "unsure"
+
+# How the memo words each verdict (17 Nov 2026, Kai: "Unlikely" read as "will not be funded"; a gap past the screen's
+# line is the development manager's cue to look for more sources). The key in proforma.json stays "unlikely", so the
+# committed runs read the same; only the words a person sees change. The tool mirrors these in memo/answers.js.
+VERDICT_WORDS = {"likely": "Likely", "unlikely": "Needs more sources", "unsure": "Unsure"}
+MORE_SOURCES = ("Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, "
+                "a land contribution or a partner. Enter what is found as Other grants or Equity and run again.")
+CLOSE_GAP = "Another source, or firmer figures for the placeholders, would settle it."
+
+
+def next_step(pf: dict) -> str | None:
+    """What the verdict asks of the development manager: more sources for a gap past the screen's line; another
+    source or firmer placeholders for a gap inside it; nothing when the stack covers the cost, or when a figure is
+    missing (the memo's "Left to a person" names that one)."""
+    v = (pf or {}).get("verdict") or {}
+    gap, cap = ((pf or {}).get("gap") or {}).get("value"), (pf or {}).get("capital") or {}
+    if v.get("word") == "unlikely":
+        return MORE_SOURCES
+    if v.get("word") == "unsure" and gap is not None and gap > 0 and cap.get("total") is not None and cap.get("land") is not None:
+        return CLOSE_GAP
+    return None
 
 
 def _layer(ledger: dict, layer: str) -> dict[str, dict]:
@@ -320,8 +341,12 @@ def markdown(pf: dict) -> list[str]:
     v = pf["verdict"]
     c, o, f, g = pf["capital"], pf["operating"], pf["funding"], pf["gap"]
     L.append("## 4. Does the money work? (feasibility grade)")
-    L.append(f"**{v['word'].capitalize()}.** " + " ".join(w[0].upper() + w[1:] + "." for w in v["why"]))
+    L.append(f"**{VERDICT_WORDS.get(v['word'], v['word'].capitalize())}.** " + " ".join(w[0].upper() + w[1:] + "." for w in v["why"]))
     L.append("")
+    nxt = next_step(pf)
+    if nxt:
+        L.append(f"**For the development manager:** {nxt}")
+        L.append("")
     L.append(f"- Capital cost **{_money(c['total'])}**: hard {_money(c['hard'])} (escalated ×{c['escalation']}), soft {_money(c['soft'])}, contingency {_money(c['contingency'])}, land {_money(c['land'])}.")
     L.append(f"- Net operating income **{_money(o['noi'])} a year**: rent {_money(o['gross'])} less vacancy {_money(o['vacancy'])}, operating cost {_money(o['operating_cost'])} and reserve {_money(o['reserve'])}.")
     L.append(f"- Funding **{_money(f['total'])}**: grants {_money(sum(x['value'] for x in f['grants']))}, equity {_money(f['equity'])}, supportable debt {_money(f['debt']['supportable'])} at {f['debt']['rate_pct']}% over {f['debt']['amortization_years']} years, {f['debt']['dcr']:.2f} coverage.")

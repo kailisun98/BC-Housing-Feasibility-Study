@@ -38,6 +38,16 @@
     --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   }
 }
+/* the same night chosen by hand with the top bar's switch (17 Nov 2026); data-theme="light" keeps the day under a
+   dark OS, and with no choice made the OS decides */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e6ebf1; --muted: #9aa4b1; --page: #14181d; --panel: #1c2128; --line: #2c343d; --field: #12161b; --group: #232c37;
+  --amber: var(--b-amber-night); --amber-ink: #14181d; --blue: #5aa2ea; --signal: var(--b-signal-night); --red: #e0554f; --teal: #3fb3a4; --ok: #4cae6d; --warn: #e0b43a;
+  --on-signal: #14181d; --on-warn: #14181d;
+  --chrome: #0e1116; --chrome-2: #161b22;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+}
 /* the browser's own surfaces in the palette */
 ::selection { background: color-mix(in srgb, var(--blue) 28%, transparent); }
 html { accent-color: var(--ink); }
@@ -101,6 +111,15 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .stamp .eyebrow { margin: 0; }
 .stamp b { display: inline-block; min-width: 30px; padding: 2px 8px; border: 1px solid var(--on-chrome); border-radius: 4px; font: 600 12.5px/1.25 var(--sans); color: var(--on-chrome); text-align: center; }
 .engine-chip { font: 500 11px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--on-chrome-muted); padding: 5px 10px; border: 1px solid var(--chrome-line); border-radius: 999px; background: transparent; white-space: nowrap; }
+/* the page's day or night, by hand (17 Nov 2026): a round button at the end of the ink band, the moon by day and the
+   sun by night; the OS decides until it is pressed, and the choice is kept for the next visit */
+.theme-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; padding: 0; flex: none; border-radius: 999px; border: 1px solid var(--chrome-line); background: transparent; color: var(--on-chrome-muted); cursor: pointer; transition: color var(--t-fast), background-color var(--t-fast); }
+.theme-btn:hover { color: var(--on-chrome); background: rgba(255, 255, 255, .08); }
+.theme-btn:active { transform: translateY(1px); }
+.theme-btn:focus-visible { outline: 2px solid var(--b-signal-night); outline-offset: 1px; }
+.theme-btn svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.theme-btn[aria-pressed="true"] .moon, .theme-btn[aria-pressed="false"] .sun { display: none; }
+@media (pointer: coarse) { .theme-btn { width: 44px; height: 44px; } }
 .engine-chip.ready { color: #6fcb8d; border-color: #4cae6d; }
 .engine-chip.error { color: #ef8a85; border-color: #e0554f; white-space: normal; }
 .engine-chip.loading { color: #ebb45c; border-color: var(--b-amber-night); }
@@ -385,6 +404,17 @@ details.sg-group[open] > summary.sg-head::before { content: "▾ "; }
 .pf-lines code { font: 11px var(--mono); overflow-wrap: anywhere; }
 .pf-lines .ph-tag, .prop-row .conf { font: 600 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--s-uncertain-text); white-space: nowrap; }
 .pf-lines p.cont { color: var(--muted); font-size: 11.5px; margin: 8px 0 0; max-width: 70ch; }
+.money-next { max-width: 70ch; }
+/* the architect's money (17 Nov 2026): the verdict, then the pro-forma behind one line that carries its three figures;
+   the line reads Show or Fold, and the figures leave it once the pro-forma is open beneath */
+.money-more { border-top: 1px solid color-mix(in srgb, var(--tone) 18%, var(--wash)); }
+.money-more > summary { cursor: pointer; padding: 9px 0 1px; font-size: 12.5px; line-height: 1.45; color: var(--ink); }
+.money-more > summary .mm-act { font-weight: 500; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 2px; transition: text-decoration-color var(--t-fast); }
+.money-more > summary:hover .mm-act { text-decoration-color: currentColor; }
+.money-more > summary .cont { color: var(--muted); }
+.money-more:not([open]) .mm-open, .money-more[open] .mm-closed { display: none; }
+.money-more[open] > summary { margin-bottom: 10px; }
+@media (pointer: coarse) { .money-more > summary { padding: 13px 0 9px; } }
 
 /* a status: a coloured mark with a glyph before the word, on a pill */
 .pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px 2px 3px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; vertical-align: middle; background: var(--s-na-wash); color: var(--s-na-text); }
@@ -589,6 +619,7 @@ table.plain td.status { white-space: nowrap; }
 .fig3d svg:focus-visible { outline: var(--focus); outline-offset: 2px; }
 .fig-hint { font-size: 11px; color: var(--c-drawmuted); margin-top: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .figure { border-color: var(--line); } }
+:root[data-theme="dark"] .figure { border-color: var(--line); }
 
 /* what changed: a revision sheet under the title block, the comparison's answer before anything else */
 .changes h2 .rev { width: 18px; height: 16px; }

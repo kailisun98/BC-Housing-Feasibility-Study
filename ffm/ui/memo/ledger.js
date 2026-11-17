@@ -53,7 +53,7 @@ export function renderLedger(res, changed = new Set()) {
         <table class="plain"><tbody>${na.map(row).join("")}</tbody></table></details></td></tr>` : "";
     const rows = applied.map(row).join("") + naRow;
     const revised = L.rows.some(r => changed.has(r.rule_id));
-    return `<details class="layer"${revised ? " open" : ""}>
+    return `<details class="layer" data-layer="${h(L.layer)}"${revised ? " open" : ""}>
       <summary><span class="layer">Layer ${h(L.layer)}</span><span class="layer-title">${h(L.title)}</span>${revised ? REV : ""}<span class="counts">${countPills}</span></summary>
       <table class="plain"><colgroup><col class="c-rule"><col class="c-status"><col class="c-finding"><col class="c-nums"><col class="c-src"></colgroup><thead><tr><th>Rule</th><th>Status</th><th>Finding</th><th>Numbers used</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>
     </details>`;

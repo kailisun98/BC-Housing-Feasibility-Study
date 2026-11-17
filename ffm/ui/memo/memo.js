@@ -6,7 +6,7 @@ import { state, STATIC } from "../core/state.js";
 import { optWord } from "../fields.js";
 import { syncStaleBand } from "../files.js";
 import { byRev, openRun, rev } from "../runs.js";
-import { answerAllowed, answerFunders, answerMoney, answerUnsure } from "./answers.js";
+import { answerAllowed, answerFunders, answerMoney, answerUnsure, wireMoneyFold } from "./answers.js";
 import { renderClauses, UNIT_WORD, withPlans } from "./clauses.js";
 import { renderLedger, wireLedger } from "./ledger.js";
 import { renderSideBySide } from "./side-by-side.js";
@@ -142,6 +142,7 @@ export function renderMemo(run) {
   wireFigures(run);
   wireLedger();
   applyModeToMemo();
+  wireMoneyFold();
   setPrintFooter(run);
   syncStaleBand();
 }

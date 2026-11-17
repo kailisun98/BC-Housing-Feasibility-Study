@@ -132,5 +132,32 @@ class InTheMemo(unittest.TestCase):
         self.assertIn("Does the money work", html)
 
 
+class Wording(unittest.TestCase):
+    """17 Nov 2026: a gap past the screen's line reads "Needs more sources" with a next step for the development
+    manager, never "Unlikely"; the key in proforma.json stays "unlikely"."""
+
+    def _md(self, pf):
+        return "\n".join(proforma.markdown(pf))
+
+    def test_a_wide_gap_asks_the_manager_for_more_sources(self):
+        L = evaluate(SITE, OPTION, AS_OF)
+        pf = proforma.build(SITE, OPTION, L)
+        self.assertEqual(pf["verdict"]["word"], "unlikely")   # the real funder-ready what-if: a gap past 15%
+        md = self._md(pf)
+        self.assertIn("**Needs more sources.**", md)
+        self.assertIn("**For the development manager:** Look for more sources as well", md)
+        self.assertNotIn("Unlikely", md)
+        self.assertEqual(proforma.next_step(pf), proforma.MORE_SOURCES)
+
+    def test_a_narrow_gap_names_another_source_and_a_missing_figure_names_nothing(self):
+        pf = {"verdict": {"word": "unsure"}, "gap": {"value": 1_000_000}, "capital": {"total": 20_000_000, "land": 0}}
+        self.assertEqual(proforma.next_step(pf), proforma.CLOSE_GAP)
+        no_land = {"verdict": {"word": "unsure"}, "gap": {"value": 1_000_000}, "capital": {"total": 20_000_000, "land": None}}
+        self.assertIsNone(proforma.next_step(no_land))
+        covered = {"verdict": {"word": "likely"}, "gap": {"value": -5}, "capital": {"total": 20_000_000, "land": 0}}
+        self.assertIsNone(proforma.next_step(covered))
+        self.assertEqual(set(proforma.VERDICT_WORDS), {"likely", "unlikely", "unsure"})
+
+
 if __name__ == "__main__":
     unittest.main()

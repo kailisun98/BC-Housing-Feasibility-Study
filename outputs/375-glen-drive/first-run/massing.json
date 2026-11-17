@@ -1,0 +1,157 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "375-glen-drive",
+  "option_id": "375-glen-drive-as-proposed",
+  "as_of": "2026-11-17",
+  "stamp": "8a8459a0c650a9c2",
+  "lot": {
+    "polygon": [
+      [
+        2.99,
+        44.64
+      ],
+      [
+        2.18,
+        0.21
+      ],
+      [
+        39.17,
+        0.06
+      ],
+      [
+        40.26,
+        59.78
+      ]
+    ],
+    "frontage_m": 34.6,
+    "depth_m": 56.1,
+    "area_m2": 2134.4,
+    "street_side": "y = 0",
+    "corners": [
+      [
+        2.99,
+        44.64
+      ],
+      [
+        2.18,
+        0.21
+      ],
+      [
+        39.17,
+        0.06
+      ],
+      [
+        40.26,
+        59.78
+      ]
+    ],
+    "bbox": [
+      2.18,
+      0.06,
+      40.26,
+      59.78
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 1926.4,
+    "shape": {
+      "class": "trapezoid",
+      "note": "Four sides but not square-cornered (86% of its 60.3 x 37.0 m bounding rectangle), 1,926 m2.",
+      "rectangularity": 0.864,
+      "vertices": 4,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in)"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        5.95,
+        42.61
+      ],
+      [
+        5.23,
+        3.2
+      ],
+      [
+        36.22,
+        3.07
+      ],
+      [
+        37.18,
+        55.29
+      ]
+    ],
+    "width_m": 30.0,
+    "depth_m": 38.5,
+    "area_m2": 1420.0,
+    "setbacks_m": {
+      "front": 3.0,
+      "rear": 3.0,
+      "side": 3.0
+    },
+    "box": {
+      "x": 6.23,
+      "y": 4.07,
+      "w": 30.0,
+      "d": 38.5,
+      "area_m2": 1155.0
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 15 storeys, FSR 6.90",
+      "footprint": [
+        [
+          6.23,
+          4.07
+        ],
+        [
+          36.23,
+          4.07
+        ],
+        [
+          36.23,
+          36.801
+        ],
+        [
+          6.23,
+          36.801
+        ]
+      ],
+      "plate_width_m": 30.0,
+      "plate_depth_m": 32.73,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 51.0,
+      "storeys": 15,
+      "floor_to_floor_m": 3.05,
+      "plate_area_m2": 981.9,
+      "gfa_m2": 14729.0,
+      "fsr": 6.901,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 12,
+    "after": 36,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.",
+    "The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.",
+    "Option height 51.0 m exceeds 15 x 3.05 m = 45.8 m; the extra 5.2 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
+  ]
+}

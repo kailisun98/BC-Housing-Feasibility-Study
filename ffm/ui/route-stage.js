@@ -561,15 +561,36 @@ function cardOption() {
       <div><dt>The building</dt><dd>${guide.busy.suggest ? `<p class="help">Deriving the ${h(guide.candidate)} option from the rules…</p>` : (o ? figureBlock(o, fromSaved ? null : S) : `<p class="help">Choose where to start.</p>`)}</dd></div>
       <div><dt>Left to you</dt><dd>${askTable(2)}${leftToPerson(S, fromSaved)}</dd></div>
     </dl>`;
-  const ready = !!(o && !guide.busy.suggest);
+  // a building the figures cannot make waits here: Continue stays off and says which figure to change (17 Nov 2026:
+  // 19 storeys in 19.8 m and a floor larger than the lot both went on to the run)
+  const probs = o && !guide.busy.suggest ? figureProblems(o, S) : [];
+  const ready = !!(o && !guide.busy.suggest) && !probs.length;
   const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-back-1">Back to the site</button>`;
-  const main = `<button type="button" class="btn btn-primary" id="guide-next-2"${ready ? "" : " disabled"}>${guide.confirmUse ? "Replace the edited option →" : "Continue to the run →"}</button>`;
+  const blocked = probs.length ? `<p class="help warn-text stage-block" id="stage-block">Continue waits for ${probs.length === 1 ? "one figure" : `${probs.length} figures`}: ${h(probs.join("; "))}.</p>` : "";
+  const main = `${blocked}<button type="button" class="btn btn-primary" id="guide-next-2"${ready ? "" : " disabled"}${probs.length ? ' aria-describedby="stage-block"' : ""}>${guide.confirmUse ? "Replace the edited option →" : "Continue to the run →"}</button>`;
   const lot = [site.zoning_district, site.site_area_m2 ? `${fmtNum(site.site_area_m2)} m²` : "", site.frontage_m != null ? `${fmtNum(site.frontage_m)} × ${fmtNum(site.depth_m)} m` : ""].filter(Boolean).join(" · ");
   const context = `<p class="stage-context">${h(lot)}${districtWords(site)}</p>`;
   return stageCard(2, "What goes on it?", context + dl, foot(quiet, main));
 }
 
 export const defaultPrograms = () => state.rules.filter(r => r.layer === "E" && /chf|bcbuilds/.test(r.id)).map(r => r.id);
+
+/* What the four figures cannot make, in a few words each: storeys taller than the height, a floor larger than the
+   plate the setbacks leave. Empty when the building can stand. Pure. */
+function figureProblems(o, S) {
+  const out = [];
+  // impossible, not merely tight: no floor to floor of 2.8 m or more makes the storeys in the height (a height a
+  // little under storeys × 3.3 m is a lower floor to floor, which the note above the block offers)
+  const MIN_F2F = 2.8;
+  if (o.storeys && o.height_m != null && Number(o.height_m) / o.storeys < MIN_F2F)
+    out.push(`the height or the storeys (${fmtNum(o.storeys)} storeys in ${fmtNum(o.height_m)} m is ${fmtNum(Math.round(Number(o.height_m) / o.storeys * 100) / 100)} m a floor, under the ${MIN_F2F} m any floor needs)`);
+  const E0 = S && S.envelope;
+  const lot = Number((state.site || {}).site_area_m2) || 0;
+  const box = E0 && E0.plate_w_m && E0.plate_d_m ? E0.plate_w_m * E0.plate_d_m : (lot || null);
+  if (o.gfa_m2 && o.storeys && box && o.gfa_m2 / o.storeys > box * 1.01)
+    out.push(`the floor area or the storeys (${fmtNum(Math.round(o.gfa_m2 / o.storeys))} m² a floor, more than the ${fmtNum(Math.round(box))} m² the setbacks leave)`);
+  return out;
+}
 
 /* The building in four figures, each changed in place; the rest of the suggestion behind one fold. */
 function figureBlock(o, S) {
@@ -714,7 +735,7 @@ function cardRun() {
       <p class="help">${nominal ? "A blank land figure carries the land at a nominal value on a long lease." : (site.owner_type ? "Enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Name the owner at 01, or enter a land price here.")} The Community Housing Fund's provisional grant is counted on its own when the fund is targeted.</p>
     </details>`;
   const dl = `<dl class="stage-dl">
-      <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o)}</p></dd></div>
+      <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p></dd></div>
       <div><dt>Money in</dt><dd>${money}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
       <div><dt>Rules as of</dt><dd><p class="dd-line"><code>${h($("#as-of").value || todayISO())}</code> <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
     </dl>`;

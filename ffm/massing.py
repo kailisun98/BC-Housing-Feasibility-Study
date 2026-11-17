@@ -31,6 +31,23 @@ from . import boundary
 
 
 PLATE_MIN_DEPTH_M = 12.0   # a floor plate keeps at least this depth before it gives up any width (a double-loaded corridor)
+# A tower (more storeys than a mid-rise) keeps a tower's depth instead: two unit strips of about 9.6 m and a 1.8 m
+# corridor (17 Nov 2026: 3475 E Hastings St, 19 storeys of 688 m², was drawn as a 51.5 × 13.4 m slab, a third of
+# its homes did not fit and every floor ran 22 m dead ends; a tower plate is compact, not a strip across the lot)
+PLATE_TOWER_DEPTH_M = 21.0
+MIDRISE_MAX_STOREYS = 6
+
+
+def plate_dims(plate_m2: float, env_w: float, env_d: float, storeys: int) -> tuple[float, float]:
+    """The proposed plate's width and depth inside the plate box (env_w × env_d): it keeps a usable depth, a mid-rise's
+    12 m or a tower's 21 m, as far as the box allows, and gives up width instead. Pure; massing.build and the
+    suggestion's homes (suggest.py) both read it, so the homes are counted on the plate that is drawn."""
+    if not env_w:
+        return 0.0, float(env_d)
+    want = PLATE_TOWER_DEPTH_M if int(storeys or 1) > MIDRISE_MAX_STOREYS else PLATE_MIN_DEPTH_M
+    d = min(env_d, max(plate_m2 / env_w, min(env_d, want)))
+    w = min(env_w, plate_m2 / d) if d else env_w
+    return w, d
 PLATE_GRID_M = 0.5         # the grid the plate box is found on inside a polygon envelope
 
 
@@ -185,9 +202,8 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         # The old street side's outward normal (0, -1) turns to (sin θ, -cos θ); it is on the right where sin θ > 0.7.
         at_right = math.sin(math.radians(oriented["orientation"]["rotate_deg"])) > 0.7
 
-    def footprint(plate_m2: float) -> tuple[list[list[float]], float, float]:
-        d = min(env_d, max(plate_m2 / env_w, min(env_d, PLATE_MIN_DEPTH_M))) if env_w else env_d
-        w = min(env_w, plate_m2 / d) if d else env_w
+    def footprint(plate_m2: float, n_storeys: int = 1) -> tuple[list[list[float]], float, float]:
+        w, d = plate_dims(plate_m2, env_w, env_d, n_storeys)
         x0 = box["x"] + (env_w - w if at_right else 0.0)
         return _rect(x0, box["y"], w, d), w, d
 
@@ -203,7 +219,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         where = f"the plate box of {plate_cap:,.0f} m² (the largest rectangle inside the {env_area:,.0f} m² envelope)" if ring and env.get("box") else f"the setback envelope of {env_area:,.0f} m²"
         warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}; the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.")
         plate = plate_cap
-    p_ring, p_w, depth = footprint(plate)
+    p_ring, p_w, depth = footprint(plate, storeys)
     placement = None
     if option.get("massing") is not None:
         p_ring, p_w, depth, placement = place(option["massing"], plate, p_w, depth, box, "front-right" if at_right else "front-left", warnings)
@@ -236,7 +252,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
                       and r["status"] != "not_applicable" and (r.get("values") or {}).get("fsr_site_area_fixed")), None)
         o_gfa = max_fsr * (fixed or area)
         o_plate = min(o_gfa / o_storeys, plate_cap)
-        o_ring, o_w, o_d = footprint(o_plate)
+        o_ring, o_w, o_d = footprint(o_plate, o_storeys)
         masses.append({
             "name": "outright", "label": f"Outright: FSR {max_fsr}, {max_h} m",
             "footprint": o_ring, "plate_width_m": round(o_w, 2), "plate_depth_m": round(o_d, 2), "at_street_corner": "right" if at_right else "left",

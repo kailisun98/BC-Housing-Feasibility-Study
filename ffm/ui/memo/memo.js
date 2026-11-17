@@ -50,6 +50,12 @@ export function renderNoMemo() {
   const runs = byRev(state.runs || []);
   const memo = $("#memo");
   memo.className = "memo landed";
+  // a link that names a run is opening one: say so, not "No memo is open" (17 Nov 2026: it flashed while the run loaded)
+  const asked = new URLSearchParams(location.search).get("run");
+  if (asked && !state.run && !state.runLinkFailed) {
+    memo.innerHTML = `<div class="card memo-head no-memo"><h1>Opening the memo…</h1><p class="quiet">${h(asked.split("/")[0].replace(/-/g, " "))}, ${h(asked.split("/")[1] || "")}</p></div>`;
+    return;
+  }
   memo.innerHTML = `<div class="card memo-head no-memo">
       <h1>No memo is open</h1>
       <p class="quiet">A memo opens here from the link the development manager or the architect sends you (it ends in <code>?run=…</code>), or from the PDF they attach. To make one, switch to Manager in the top bar.</p>

@@ -77,9 +77,10 @@ class Editor(unittest.TestCase):
         for z in units:
             for v in (z["x"] - p["x"], z["w"]):
                 self.assertAlmostEqual(v / 3.0, round(v / 3.0), places=6, msg=str(z))
-        core = next(z for z in lay["floors"][0]["zones"] if z["block"] == "core")
-        self.assertAlmostEqual((core["x"] - p["x"]) / 3.0, round((core["x"] - p["x"]) / 3.0), places=6)
-        self.assertGreaterEqual(core["w"], 7.0)
+        cores = [z for z in lay["floors"][0]["zones"] if z["block"] == "core"]
+        for c in cores:   # the centre core and the end stairs (17 Nov 2026), every one on the module
+            self.assertAlmostEqual((c["x"] - p["x"]) / 3.0, round((c["x"] - p["x"]) / 3.0), places=6)
+        self.assertGreaterEqual(max(c["w"] for c in cores), 7.0)
         # the suggestion round-trips through the editor's form with nothing broken
         again = layout.solve(SITE, dict(OPTION, layout={"grid": {"bay_m": 6, "divide": 2}, "zones": layout.zones_of(lay)}), self.L, self.m)
         self.assertEqual(again["geometry"], [])

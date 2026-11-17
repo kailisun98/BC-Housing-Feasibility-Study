@@ -231,7 +231,7 @@ export function renderFigures(run) {
       <div id="fig-01">${figOne(m, ctx)}</div>
       <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-building"></i>building</span><span><i class="fig-context"></i>road</span></div>
       <figcaption>${m.lot.bbox
-        ? `Lot ${m.lot.source === "drawn" ? "as drawn in the tool" : "from the City's parcel polygon"}: ${h(String((m.lot.shape || {}).class || "polygon").replace(/_/g, " "))}, ${h(m.lot.polygon.length)} corners, ${fmtNum(Math.round(m.lot.polygon_area_m2 || m.lot.area_m2))} m² (recorded site area ${fmtNum(m.lot.area_m2)} m²; equivalent rectangle ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m). The setback envelope follows the lot lines (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m) and the masses stand in the plate box, the largest rectangle inside it, ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m, dotted.`
+        ? `Lot ${m.lot.source === "drawn" ? "as drawn in the tool" : "from the City's parcel polygon"}: ${h(String((m.lot.shape || {}).class || "polygon").replace(/_/g, " "))}, ${h(cornerCount(m.lot))} corners, ${fmtNum(Math.round(m.lot.polygon_area_m2 || m.lot.area_m2))} m² (recorded site area ${fmtNum(m.lot.area_m2)} m²; equivalent rectangle ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m). The setback envelope follows the lot lines (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m) and the masses stand in the plate box, the largest rectangle inside it, ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m, dotted.`
         : `Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back, so the outright mass is drawn dashed over the proposed one, here and in the section.`} ${contextNote}${treeNote}${ctx.osm && ctx.osm.bearing != null ? " The north arrow follows the OpenStreetMap frame; the plan is drawn with the street at the bottom." : ""}</figcaption>
     </figure>`);
     const bench = m.policy_benchmark;
@@ -267,7 +267,7 @@ function renderSheets(run, n0) {
   // the plans and the stacking are the architect's working drawings: the manager sees them once the architect has
   // issued the run to them (Kai, 15 Nov 2026); until then a quiet card holds their place
   out.push(`<div class="card figure layout-wait"><div class="eyebrow">${fig(n0)} and ${fig(n0 + 1)} · Plans by program and stacking</div>
-    <p class="note">The schematic plans are the architect's to draw and check. They appear here once the architect issues this run back to you; the massing above and the elevations and site plan below are the rule-derived envelope.</p></div>`);
+    <p class="note">The schematic plans are the architect's to draw and check. They appear here once the architect issues this run back${state.mode === "reader" ? " to the development manager" : " to you"}; the massing above and the elevations and site plan below are the rule-derived envelope.</p></div>`);
   out.push(`<figure class="card figure sheet layout-sheet" data-sheet="plans">
     <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>
       <div class="fig-tools"><div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div>
@@ -367,4 +367,13 @@ export function renderPreview3D() {
     svg.addEventListener("pointermove", e => { if (!drag) return; turn((e.clientX - drag.x) * 0.5, (e.clientY - drag.y) * 0.4); drag = { x: e.clientX, y: e.clientY }; });
     for (const ev of ["pointerup", "pointercancel", "lostpointercapture"]) svg.addEventListener(ev, () => { drag = null; });
   }
+}
+
+/* A lot's corners as a hand counts them: the simplified corners where the massing records them, else the ring less the
+   point that closes it (17 Nov 2026: a rectangle was captioned with 5 corners). Pure. */
+function cornerCount(lot) {
+  if (Array.isArray(lot.corners) && lot.corners.length) return lot.corners.length;
+  const r = lot.polygon || [];
+  const closed = r.length > 1 && r[0][0] === r[r.length - 1][0] && r[0][1] === r[r.length - 1][1];
+  return closed ? r.length - 1 : r.length;
 }

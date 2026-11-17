@@ -251,7 +251,8 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .ptable tr:last-child td { border-bottom: 0; }
 .ptable td.who { color: var(--paper-muted); }
 .ptable td.who b { color: var(--paper-ink); }
-.ptable .rid { display: block; font: 11px var(--mono); color: var(--paper-muted); margin-top: 2px; overflow-wrap: anywhere; }
+/* the memo's reference and the rule in words, the way a board reads it on the PDF (not the rule file's id) */
+.ptable .rid { display: block; font: 500 11.5px/1.4 var(--sans); color: var(--paper-muted); margin-top: 3px; overflow-wrap: anywhere; }
 /* a phone: each open item a block, its keys before its values, so the last column is never cut off the paper (17 Nov
    2026: the table was 404 px in a 309 px sheet and body overflow hid "Who resolves it") */
 @media (max-width: 640px) {

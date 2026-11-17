@@ -52,16 +52,18 @@ class Egress(unittest.TestCase):
             for k in ("level", "name", "exits", "exits_required", "separation_m", "separation_min_m", "farthest_travel_m", "travel_limit_m",
                       "farthest_unit", "dead_end_m", "dead_end_limit_m", "status", "notes"):
                 self.assertIn(k, f)
-            # one 7 m core bay on a 69.6 m plate: two stairs 4.8 m apart against 9 m, not hidden
-            self.assertEqual(f["exits"], 2)
-            self.assertAlmostEqual(f["separation_m"], 4.8, places=2)
+            # a 69.6 m plate (17 Nov 2026): the centre core and an exit stair at each end of the corridor, four
+            # stairs, the end ones 67.4 m apart, no dead end; before, one 7 m core left two stairs 4.8 m apart and
+            # 22 m dead ends, and no floor could pass
+            self.assertEqual(f["exits"], 4)
+            self.assertAlmostEqual(f["separation_m"], 67.4, places=1)
             self.assertEqual(f["separation_min_m"], 9.0)
-            self.assertIn(f["status"], ("conditional", "fail"))
-        self.assertIn(eg["status"], ("conditional", "fail"))
-        self.assertIn("4.8 m apart", eg["summary"])
+            self.assertEqual(f["dead_end_m"], 0.0)
+            self.assertEqual(f["status"], "pass", f["notes"])
+        self.assertEqual(eg["status"], "pass")
         md = "\n".join(layout.markdown(self.solved))
         self.assertIn("### Egress", md)
-        self.assertIn("separation 4.8 m of 9", md)
+        self.assertIn("dead end 0.0 m of 6", md)
 
     def test_a_single_7m_core_on_a_30m_plate_has_two_stairs_too_close(self):
         x0 = self.p["x"]

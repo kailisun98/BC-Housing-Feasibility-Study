@@ -292,25 +292,29 @@ function countUnsure(obj, schema) {
   return n;
 }
 
-function unsureNote(n) { return n ? ` · <span class="unsure-n">${n} answer${n === 1 ? "" : "s"} not sure</span>` : ""; }
+/* The count says whose answers it counts (17 Nov 2026: the run card's "1 answer not sure" was the option's alone,
+   with five of the site's left on Not sure). */
+function unsureNote(n, whose) { return n ? ` · <span class="unsure-n">${n} ${whose} answer${n === 1 ? "" : "s"} not sure</span>` : ""; }
 
 function siteSummary(s) {
   if (!s) return "";
   const dims = s.frontage_m != null && s.depth_m != null ? ` · ${h(s.frontage_m)} × ${h(s.depth_m)} m` : "";
-  return `<b>${h(s.address || s.id || "A new site")}</b> · ${h(districtOf(s) || "district not set")} · ${s.site_area_m2 != null ? `${h(fmtNum(s.site_area_m2))} m²` : "area not set"}${dims}${unsureNote(countUnsure(s, SITE_FIELDS))}`;
+  return `<b>${h(s.address || s.id || "A new site")}</b> · ${h(districtOf(s) || "district not set")} · ${s.site_area_m2 != null ? `${h(fmtNum(s.site_area_m2))} m²` : "area not set"}${dims}${unsureNote(countUnsure(s, SITE_FIELDS), "site")}`;
 }
 
-export function optionSummary(o) {
+/* The option in a line, in the route's words (homes, floor area), with what is still not sure on the option and, on
+   the run card, on the site. */
+export function optionSummary(o, site = null) {
   if (!o) return "";
   const u = o.units || {};
   const total = ["studio", "one_bed", "two_bed", "three_bed_plus"].reduce((t, k) => t + (Number(u[k]) || 0), 0);
   const bits = [];
   if (o.storeys != null) bits.push(`${h(o.storeys)} storeys`);
   if (o.height_m != null) bits.push(`${h(o.height_m)} m`);
-  if (o.gfa_m2 != null) bits.push(`${h(fmtNum(o.gfa_m2))} m² GFA`);
-  if (total) bits.push(`${total} units`);
+  if (o.gfa_m2 != null) bits.push(`${h(fmtNum(o.gfa_m2))} m² of floor area`);
+  if (total) bits.push(`${total} homes`);
   if (o.tenure) bits.push(h(optWord("option", "tenure", o.tenure)));
-  return `<b>${h(o.name || o.id || "A new option")}</b>${bits.length ? ` · ${bits.join(" · ")}` : ""}${unsureNote(countUnsure(o, OPTION_FIELDS))}`;
+  return `<b>${h(o.name || o.id || "A new option")}</b>${bits.length ? ` · ${bits.join(" · ")}` : ""}${unsureNote(countUnsure(o, OPTION_FIELDS), "option")}${site ? unsureNote(countUnsure(site, SITE_FIELDS), "site") : ""}`;
 }
 
 /* The schedules are always open now (16 Nov 2026: the cards no longer fold to a summary; the architect's column is

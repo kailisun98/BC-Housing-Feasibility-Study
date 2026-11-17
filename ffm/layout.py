@@ -213,15 +213,26 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         """A width on the grid's module, rounded up; as it is without a grid."""
         return math.ceil(width / mod - 1e-6) * mod if mod else width
 
+    # On a double-loaded plate the core stands on the lane side of the corridor, and the street side's homes run past
+    # it; a corridor longer than the core and two dead ends gets an exit stair at each end (17 Nov 2026: a full-depth
+    # core took a third of a tower's floor, and one centred core left 22 m dead ends on a 51.5 m slab, against the
+    # 6 m of BCBC 3.3.1.9: no floor of 3475 E Hastings St could pass). The architect's own cores stand as drawn.
+    stair_w, _ = LAYOUT_ASSUMPTIONS["stair_width_m"]
+    dead_lim = float(((_find(ledger["results"], rule_id=EGRESS_RULE) or {}).get("values") or {}).get("dead_end_max_m") or 6.0)
+    core_y, core_d = (corr_y, D - strip) if double else (y0, D)
     if given:
         cores = given
-    elif grid:
-        cw = min(W, q(core_w))
-        cores = [{"x": x0 + round(max(0.0, (W - cw) / 2) / mod) * mod, "y": y0, "w": cw, "d": D}]
     else:
-        cores = [{"x": x0 + (W - core_w) / 2, "y": y0, "w": core_w, "d": D}]
-    legacy = not grid and not given
-    seg_len = max(0.0, (W - core_w) / 2)  # a run of units on one side of the centred core
+        cw = min(W, q(core_w)) if grid else core_w
+        cx = x0 + (round(max(0.0, (W - cw) / 2) / mod) * mod if grid else (W - cw) / 2)
+        cores = [{"x": cx, "y": core_y, "w": cw, "d": core_d}]
+        sw = q(stair_w) if grid else stair_w
+        if W > cw + 2 * dead_lim + 2 * sw:
+            # on a grid the far stair stands on the last module line it fits behind, so its walls are on the module
+            rx = x0 + (math.floor((W - sw) / mod + 1e-6) * mod if grid else W - sw)
+            cores = [{"x": x0, "y": core_y, "w": sw, "d": core_d}] + cores + [{"x": rx, "y": core_y, "w": sw, "d": core_d}]
+    legacy = False   # every plate's runs are the lengths its cores leave free, side by side (band_runs)
+    seg_len = max(0.0, (W - core_w) / 2)
 
     def band_runs(side: str, y: float) -> list[dict]:
         """The runs one strip offers: the lengths of it the cores leave free, each filled outward from a core."""
@@ -746,7 +757,9 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
         ok = bool(zs) and all(fl["level"] == 0 and z.get("side") == "rear" for fl, z in zs)
         out.update(status="pass" if ok else "conditional", note="on the ground floor, lane side" if ok else ("on the ground floor but facing the street: the plate is single-loaded" if zs and all(fl["level"] == 0 for fl, _ in zs) else "services could not all stay on the ground floor"))
     elif key == "core":
-        out.update(status="pass", note="one core bay at the centre of every floor, the corridor through it")
+        n_cores = max((sum(1 for z in fl["zones"] if z["block"] == "core") for fl in floors), default=0)
+        out.update(status="pass", note="one core bay at the centre of every floor, the corridor through it"
+                   + (", and an exit stair at each end of the corridor" if n_cores >= 3 else ""))
     elif key == "units":
         sides = {z.get("side") for fl, z in zones if z.get("unit")}
         ok = sides >= {"front", "rear"}

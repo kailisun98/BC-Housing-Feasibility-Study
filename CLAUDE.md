@@ -258,6 +258,16 @@ Built and verified in the browser:
   floor area (it opened a floor-area field under the word FSR). `bc.toa.minimum_density` has a 2026-11-17 version
   with the bus-exchange tiers 4 (12 storeys, 4.0) and 5 (8, 3.0), `verified: false` until B.C. Reg. 265/2023's
   schedule is read.
+  A tower and plans that hold it (17 Nov 2026, second pass): above six storeys `massing.plate_dims` keeps a 21 m
+  plate depth (PLATE_TOWER_DEPTH_M) and gives up width; `layout.solve` stands the core on the lane side of the
+  corridor on a double-loaded plate (the street side's homes run past it) and, where the corridor is longer than the
+  core and two 6 m dead ends, puts an exit stair at each end; `suggest.fit_to_plans` cuts the derived homes to what
+  `homes_placed` (the layout's own solver on a bare massing) places, and the units' note says so. Funder-ready on a
+  site with a recorded TOA tier is raised to the tier's storeys and FSR by the TOA rezoning path (`toa_tier`). On
+  3475 E Hastings at the City's figures: 135 homes on a 32.8 × 21 m plate, all placed, exits pass on every floor
+  (the City's 176 are smaller homes than BC Housing's minimums + 10%). On 998 E 19th Ave funder-ready now derives 99
+  homes (the plate's), and exits pass with the end stairs. Stop 02's Continue waits while a figure is impossible
+  (under 2.8 m a floor; a floor larger than the plate box): `figureProblems` in route-stage.js. `tests/test_tower.py`.
 - `ffm/lookup.py`: `lookup(address)` finds the point in the City's own `property-addresses` dataset first
   (`parse_address` turns "609 heatley" into civic number 609 and street "HEATLEY" for an ODSQL `like`; the
   record's `site_id` names the parcel, fetched by id) and only otherwise geocodes with Nominatim kept inside

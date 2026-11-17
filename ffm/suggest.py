@@ -316,6 +316,56 @@ def _largest_remainder(total: int, shares: dict[str, float]) -> dict[str, int]:
     return out
 
 
+def homes_placed(counts: dict[str, int], plate_w: float, plate_d: float, storeys: int, mins: dict[str, float]) -> int:
+    """How many of these homes the plans place on `storeys` plates of plate_w × plate_d m: the layout's own solver
+    (ffm/layout.py) on a bare massing, the ground floor's amenity and services first, as a run lays them. Pure."""
+    from . import layout   # layout reads this module's ASSUMPTIONS, so it is imported here, not at the top
+    n = sum(int(v or 0) for v in counts.values())
+    if not (plate_w > 0 and plate_d > 0 and storeys and n):
+        return n
+    ring = [[0.0, 0.0], [plate_w, 0.0], [plate_w, plate_d], [0.0, plate_d]]
+    m = {"origin": "", "warnings": [], "masses": [{"name": "proposed", "footprint": ring, "plate_width_m": plate_w, "plate_depth_m": plate_d,
+                                                  "storeys": int(storeys), "floor_to_floor_m": ASSUMPTIONS["floor_to_floor_m"][0],
+                                                  "plate_area_m2": plate_w * plate_d, "gfa_m2": plate_w * plate_d * storeys}]}
+    ledger = {"results": [{"rule_id": "bch.design_guidelines.unit_areas", "check": "unit_area_flags", "status": "info",
+                           "values": {"min_net_area_m2": dict(mins)}}], "run": {"as_of": "", "stamp": {"stamp": ""}}}
+    return int(layout.solve({}, {"units": dict(counts)}, ledger, m)["units_placed"])
+
+
+def fit_to_plans(net_area_m2: float, mins: dict[str, float], family: dict | None, allowance: float, shares: dict[str, float],
+                 plate_w: float, plate_d: float, storeys: int) -> tuple[dict[str, int], float, int]:
+    """The homes `unit_mix` gives, cut to the most the plans place on the plate (17 Nov 2026: the floor area held 170
+    homes at the minimums while the plans placed 114, and the money and the funders counted all 170). Returns the
+    counts, the average area and how many the floor area alone held. A search on the net area keeps the mix and the
+    family-unit minimums whole. Pure."""
+    counts, avg = unit_mix(net_area_m2, mins, family, allowance, shares)
+    alone = sum(counts.values())
+    if not alone or homes_placed(counts, plate_w, plate_d, storeys, mins) >= alone:
+        return counts, avg, alone
+    lo, hi, best = 0.0, net_area_m2, None
+    for _ in range(14):
+        mid = (lo + hi) / 2
+        c, a = unit_mix(mid, mins, family, allowance, shares)
+        k = sum(c.values())
+        if k and homes_placed(c, plate_w, plate_d, storeys, mins) >= k:
+            lo, best = mid, (c, a)
+        else:
+            hi = mid
+    if best is None:
+        best = unit_mix(0.0, mins, family, allowance, shares)
+    return best[0], best[1], alone
+
+
+def toa_tier(site: dict, rules: list[Rule], on: date, district: str) -> dict | None:
+    """The transit-oriented area tier the site records, with the Province's minimum allowable storeys and FSR for it
+    (bc.toa.minimum_density); None outside one or with no tier recorded."""
+    p = _params(rules, on, "bc.toa.minimum_density", district)
+    tier = str(site.get("toa_tier") or "").strip()
+    if not p or site.get("in_transit_oriented_area") is not True or tier not in (p.get("tiers_storeys") or {}):
+        return None
+    return {"tier": tier, "storeys": int(p["tiers_storeys"][tier]), "fsr": (p.get("tiers_fsr") or {}).get(tier), "where": (p.get("tiers_where") or {}).get(tier)}
+
+
 def unit_mix(net_area_m2: float, mins: dict[str, float], family: dict | None, allowance: float, shares: dict[str, float]) -> tuple[dict[str, int], float]:
     """The most units the net area holds at the minimum areas (plus the design allowance) in the starting mix,
     moved toward family units until the family-unit minimums hold. Returns the counts and the average area used."""
@@ -395,6 +445,30 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
         fields["gfa_m2"] = {"value": gfa, "rule_id": id_fsr, "basis": "rule",
                             "note": fsr_word + plate_words if floor_cap is not None else f"{fsr_word} × the site area {fsr_area:,.0f} m²" + (" the by-law fixes for its FSR" if p_fsr.get("fsr_site_area_m2") else "")}
         fields["rezoning_path"] = {"value": None, "rule_id": id_fsr, "basis": "rule", "note": "outright: no rezoning" + ("; the height is the Director's variance for social housing, asked for with the development permit" if max_h != hl["max"] else "")}
+        # a transit-oriented area's tier raises funder-ready to the height and density the City may not refuse, by a
+        # rezoning under the TOA policy (17 Nov 2026: 3475 E Hastings St, tier 4 beside the Kootenay Loop, a 12-storey
+        # minimum, was still offered C-2's outright 6)
+        t = toa_tier(site, rules, on, district) if candidate == "funder-ready" else None
+        if t and t["storeys"] > storeys:
+            st = t["storeys"]
+            g = round(t["fsr"] * area, 0) if t["fsr"] and area else None
+            box = (rough or {}).get("plate_m2")
+            held = round(box * st, 0) if box else None
+            if g is None or (held is not None and held < g):
+                g = held
+            where = f" ({t['where']})" if t["where"] else ""
+            out.update({"storeys": st, "height_m": round(st * f2f, 1), "fsr": round(g / area, 2) if g and area else t["fsr"], "gfa_m2": g})
+            fields["storeys"] = {"value": st, "rule_id": "bc.toa.minimum_density", "basis": "toa",
+                                 "note": f"the minimum allowable height in a tier {t['tier']} transit-oriented area{where}: {st} storeys the City may not refuse; above {district}'s outright {storeys}, by rezoning"}
+            fields["height_m"] = {"value": out["height_m"], "rule_id": "bc.toa.minimum_density", "basis": "toa", "note": f"{st} storeys × {f2f} m"}
+            fields["gfa_m2"] = {"value": g, "rule_id": "bc.toa.minimum_density", "basis": "toa",
+                                "note": (f"the tier's minimum allowable FSR of {t['fsr']:g} × the site area {area:,.0f} m²" if t["fsr"] else f"the plate × {st} storeys")
+                                        + (f"; the plate the setbacks leave holds {held:,.0f} m² at {st} storeys, which governs" if held is not None and t["fsr"] and held < t["fsr"] * area else "")}
+            fields["rezoning_path"] = {"value": "CD-1 under the Transit-Oriented Areas Rezoning Policy", "rule_id": "bc.toa.minimum_density", "basis": "toa",
+                                       "note": f"the site is in a tier {t['tier']} transit-oriented area; the City's TOA rezoning policy is the path above the district schedule"}
+        elif candidate == "funder-ready" and site.get("in_transit_oriented_area") is True and not str(site.get("toa_tier") or "").strip():
+            unsure.append({"key": "toa_tier", "why": "the site is in a transit-oriented area, and its tier sets the height and density the City may not refuse",
+                           "who": "Manager: record the tier from the City's TOA map at 01"})
         return out
     if p_ssmuh and area and area < p_ssmuh["exempt_lot_min_m2"] and site.get("has_water_and_sewer") is not False and site.get("in_transit_oriented_area") is not True:
         near = site.get("frequent_bus_stop_within_400m")
@@ -542,6 +616,17 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     p_areas = _params(rules, on, "bch.design_guidelines.unit_areas", district)
     if gfa and p_areas:
         counts, avg = unit_mix(gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares)
+        # the homes are the ones the plans place on the plate the massing draws, not only what the floor area holds;
+        # counts the manager typed are theirs, and the memo says what does not fit
+        fit_words = ""
+        if storeys and (rough or {}).get("plate_w_m") and not fixed.get("units"):
+            from .massing import plate_dims   # massing builds on the checks this module imports
+            bw, bd = float(rough["plate_w_m"]), float(rough["plate_d_m"])
+            pw, pd = plate_dims(min(gfa / storeys, bw * bd), bw, bd, int(storeys))
+            counts, avg, alone = fit_to_plans(gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares, pw, pd, int(storeys))
+            if alone > sum(counts.values()):
+                fit_words = (f"; the floor area alone holds {alone} at these sizes, the plans place {sum(counts.values())} on {int(storeys)} floors "
+                             f"of {pw:.1f} × {pd:.1f} m, so {sum(counts.values())} it is")
         option["units"] = counts
         n = sum(counts.values())
         # how many homes the family-unit minimums moved up from the shares
@@ -551,7 +636,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
                        if moved else "")
         for k, v in counts.items():
             fields[f"units.{k}"] = {"value": v, "rule_id": "bch.design_guidelines.unit_areas", "basis": mix_basis,
-                                    "note": f"{n} units at an average {avg} m² net ({int((allowance - 1) * 100)}% over the BC Housing minimums) in {gfa * eff:,.0f} m² net, in {shares_words}; family minimums from cov.family_units" + moved_words}
+                                    "note": f"{n} units at an average {avg} m² net ({int((allowance - 1) * 100)}% over the BC Housing minimums) in {gfa * eff:,.0f} m² net, in {shares_words}; family minimums from cov.family_units" + moved_words + fit_words}
         if p_fam and n:
             two_plus = counts["two_bed"] + counts["three_bed_plus"]
             fields["units.two_bed"]["note"] = f"{two_plus} of {n} units ({two_plus / n * 100:.0f}%) have two or more bedrooms, against the {p_fam['min_two_plus_bed_share'] * 100:.0f}% minimum, in {shares_words}" + moved_words

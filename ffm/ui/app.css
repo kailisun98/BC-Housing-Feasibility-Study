@@ -333,6 +333,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .layout-wait { display: none; }
 [data-mode="manager"] .memo:not([data-issued-manager="1"]) .layout-sheet { display: none; }
 [data-mode="manager"] .memo:not([data-issued-manager="1"]) .layout-wait { display: block; }
+/* the board reads the plans only once the architect has issued them back (17 Nov 2026: the reader saw plans the
+   manager was told were still the architect's to check) */
+[data-mode="reader"] .memo:not([data-issued-manager="1"]) .layout-sheet { display: none; }
+[data-mode="reader"] .memo:not([data-issued-manager="1"]) .layout-wait { display: block; }
 /* the inline Save as… field under a card, and the band over a memo whose inputs changed */
 .save-inline { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
 .save-inline .field { flex: 1 1 180px; margin: 0; }
@@ -803,7 +807,9 @@ table.plain td.status { white-space: nowrap; }
 .sg-label { grid-area: label; font-size: 12.5px; font-weight: 500; display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .sg-pick { grid-area: pick; }
 .sg-pick .segbtn { padding: 2px 8px; min-height: 22px; font-size: 11px; }
-.sg-pick .segbtn[aria-pressed="true"]:last-child { background: var(--amber); color: var(--amber-ink); }
+/* Mine chosen takes the ink fill every chosen segment takes: amber is for what is pending, and a figure the manager
+   typed is settled (17 Nov 2026) */
+.sg-pick .segbtn[aria-pressed="true"]:last-child { background: var(--ink); color: var(--panel); }
 .sg-value { grid-area: value; font-size: 12.5px; text-align: right; min-width: 0; }
 .sg-value .sg-input { width: 100%; border: 1px solid var(--amber); background: var(--field); border-radius: 4px; padding: 3px 6px; font-size: 12.5px; text-align: right; }
 .sg-note { grid-area: note; font-size: 11px; color: var(--muted); line-height: 1.4; }
@@ -1213,3 +1219,16 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 @media (min-width: 1101px) {
   [data-mode="architect"] .panes:not(.no-inputs) .inputs-body { position: sticky; top: calc(var(--bars-h) + 8px); max-height: calc(100vh - var(--bars-h) - 16px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
 }
+/* the clause text folded under its first words; open, it reads as the short ones do */
+.clauses .rule-sec-fold { margin-top: 1px; font-size: 11px; color: var(--muted); }
+.clauses .rule-sec-fold > summary { cursor: pointer; list-style: none; }
+.clauses .rule-sec-fold > summary::-webkit-details-marker { display: none; }
+.clauses .rule-sec-fold > summary::after { content: " more"; color: var(--blue); }
+.clauses .rule-sec-fold[open] > summary { display: none; }
+/* Summary is the title block, the four answers and the massing: the clauses and the architect's sheets wait for
+   Detailed (17 Nov 2026: Summary ran 8,400 px against Detailed's 10,300) */
+.memo-pane[data-view="summary"] .memo-clauses, .memo-pane[data-view="summary"] .figure.sheet, .memo-pane[data-view="summary"] .sheet-hint { display: none; }
+/* the note that holds Continue back sits beside it */
+.foot-main .stage-block { margin: 0; max-width: 46ch; font-size: 12px; text-align: right; }
+.stage-foot:has(.stage-block) { flex-wrap: wrap; }
+@media (max-width: 760px) { .foot-main .stage-block { text-align: left; } }

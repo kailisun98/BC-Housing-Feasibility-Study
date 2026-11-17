@@ -97,8 +97,9 @@ async function init() {
     panel.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
   });
   // printing opens every ledger layer, and closes the ones it opened afterwards
-  window.addEventListener("beforeprint", () => $$(".ledger details:not([open])").forEach(d => { d.open = true; d.dataset.printOpened = "1"; }));
-  window.addEventListener("afterprint", () => $$(".ledger details[data-print-opened]").forEach(d => { d.open = false; delete d.dataset.printOpened; }));
+  // the ledger's layers and the clauses' folded text print open
+  window.addEventListener("beforeprint", () => $$(".ledger details:not([open]), .rule-sec-fold:not([open])").forEach(d => { d.open = true; d.dataset.printOpened = "1"; }));
+  window.addEventListener("afterprint", () => $$("details[data-print-opened]").forEach(d => { d.open = false; delete d.dataset.printOpened; }));
   $("#tour-link").addEventListener("click", e => { e.preventDefault(); $("#tour-link").classList.remove("unseen"); startTour(0); });
   $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the four answers and the figures." : "Detailed: the whole memo.", "info"); }));
   try { setView(localStorage.getItem(VIEW_KEY) || "detailed", false); } catch (e) { setView("detailed", false); }
@@ -167,6 +168,9 @@ async function followLink() {
       $("#step-run").scrollIntoView({ block: "start" });
     } catch (e) {
       toast(`Could not open run ${run}: ${e.message}`, true);
+      // the reader's pane stops saying "Opening the memo…" and offers what it can
+      state.runLinkFailed = true;
+      if (state.mode === "reader") renderNoMemo();
     }
   }
   if (q.get("tour")) startTour(0);

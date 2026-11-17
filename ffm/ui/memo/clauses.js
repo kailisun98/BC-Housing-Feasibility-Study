@@ -103,6 +103,17 @@ export function splitValues(r, L) {
 
 /* Every clause that applied to this site and option, in one table: its status, the numbers the option proposes,
    what the clause permits or requires, and the ask where they differ. Not-applicable rules are named underneath. */
+/* A rule's clause text: a short one in the row, a long one folded under its first words (17 Nov 2026: paragraphs of
+   up to 900 characters in the 24% clause column made one row 396 px tall and the table about 3,700 px). The fold
+   prints open. */
+function secHtml(sec) {
+  if (!sec) return "";
+  const s = String(sec);
+  if (s.length <= 140) return `<span class="rule-sec">${h(s)}</span>`;
+  const cut = s.lastIndexOf(" ", 90);
+  return `<details class="rule-sec-fold"><summary>${h(s.slice(0, cut > 40 ? cut : 90))}…</summary><span class="rule-sec">${h(s)}</span></details>`;
+}
+
 /* A rule the plans test (the exits, bcbc.exits) takes the plans' own status and summary, so the clause row and the open
    item agree (17 Nov 2026: Exits read Fail in answer 3 and Info here). Pure. */
 export function withPlans(res, run) {
@@ -120,7 +131,7 @@ export function renderClauses(res, L, changed = new Set(), run = null) {
   const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
     const s = splitValues(r, L);
     return `<tr class="st-${h(r.status)}">
-      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · <span class="nw">v ${h(r.version_effective_from || "—")}</span></code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
+      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · <span class="nw">v ${h(r.version_effective_from || "—")}</span></code>${secHtml(r.source && r.source.section)}</td>
       <td class="status">${pill(r.status)}</td>
       ${s.info !== undefined ? `<td class="nums info-span" colspan="3">${h(s.info || "no figures")}${r.status !== "info" && r.action ? `<span class="ask info-ask">${h(r.action)}</span>` : ""}</td>` : `<td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>

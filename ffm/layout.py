@@ -186,7 +186,8 @@ def _plate(massing: dict) -> tuple[dict, float, float, float, float, int, float]
     pm = next((x for x in massing["masses"] if x["name"] == "proposed"), None)
     if pm is None:
         raise ValueError("The massing has no proposed mass to lay out.")
-    ring = pm["footprint"]
+    # a turned mass (`angle_deg`) keeps its plate in its own frame: the front-left corner before the turn
+    ring = [pm["plate_origin"]] if pm.get("plate_origin") else pm["footprint"]
     # a plate is never negative (a massing.json from before 16 Nov 2026 can carry one where the yards exceeded the lot)
     return pm, float(ring[0][0]), float(ring[0][1]), max(0.0, float(pm["plate_width_m"])), max(0.0, float(pm["plate_depth_m"])), int(pm["storeys"]), float(pm["floor_to_floor_m"])
 
@@ -481,6 +482,9 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
     if exits_rule and exits_rule.get("version_effective_from") and exits_rule.get("values"):
         eg = egress(floors, plate, prog, exits_rule["values"], SPRINKLERED_DEFAULT if sprk is None else bool(sprk))
         eg["sprinklered_is_placeholder"] = sprk is None
+    turned = next((x.get("angle_deg") for x in massing["masses"] if x["name"] == "proposed"), None)
+    if turned:
+        plate["angle_deg"] = turned   # the mass is turned on the lot; the plate and its blocks are drawn in the plate's own frame
     return {
         "site_id": site.get("id"), "option_id": option.get("id"), "as_of": ledger["run"]["as_of"], "stamp": ledger["run"]["stamp"]["stamp"],
         "units": "m", "origin": massing.get("origin"), "edited": edited,
@@ -1298,8 +1302,9 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
         out.append(f'<rect x="{T(bx["x"], bx["y"] + bx["d"])[0]:.1f}" y="{T(bx["x"], bx["y"] + bx["d"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
     fp_x = min(x for x, _ in pm["footprint"]); fp_y = max(y for _, y in pm["footprint"])
     fx, fy = T(fp_x, fp_y)
-    out.append(f'<rect x="{fx:.1f}" y="{fy:.1f}" width="{pm["plate_width_m"] * scale:.1f}" height="{pm["plate_depth_m"] * scale:.1f}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
-    out.append(f'<text x="{fx + 6:.1f}" y="{fy + 14:.1f}" font-size="10" fill="{TONES["ink"]}">{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys</text>')
+    # the footprint as the massing has it: a rectangle, turned where the architect turned the mass
+    out.append(f'<polygon points="{pts(pm["footprint"])}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
+    out.append(f'<text x="{fx + 6:.1f}" y="{fy + 14:.1f}" font-size="10" fill="{TONES["ink"]}">{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys' + (f', turned {pm["angle_deg"]:g}°' if pm.get("angle_deg") else "") + '</text>')
     # the yards, dimensioned on a rectangular lot (front at the bottom); on a polygon the envelope's own line shows the setbacks
     dims = [] if polygon_lot else [
             (ox + pw / 2, oy + pd - sb.get("front", 0) * scale, oy + pd, f'front {sb.get("front")} m', True),

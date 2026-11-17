@@ -84,6 +84,27 @@ ANCHORS = {   # anchor -> (x: 0 left, 0.5 centre, 1 right; y: 0 front, 0.5 middl
 }
 
 
+def _given_angle(spec) -> float:
+    """The angle the option turns the mass by (`massing.angle_deg`), in (-180, 180], 0 without one."""
+    if not isinstance(spec, dict):
+        return 0.0
+    try:
+        a = float(spec.get("angle_deg") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+    a = round(((a + 180.0) % 360.0) - 180.0, 2)
+    return 180.0 if a == -180.0 else a + 0.0
+
+
+def _turn(ring: list[list[float]], angle_deg: float) -> list[list[float]]:
+    """A ring turned counter-clockwise about the middle of its bounding box (for a rectangle, its centre)."""
+    xs, ys = [p[0] for p in ring], [p[1] for p in ring]
+    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    t = math.radians(angle_deg)
+    c, s = math.cos(t), math.sin(t)
+    return [[round(cx + (x - cx) * c - (y - cy) * s, 2), round(cy + (x - cx) * s + (y - cy) * c, 2)] for x, y in ring]
+
+
 def _given_plate(spec) -> tuple[float, float] | None:
     """The plate dimensions the option states (`massing.width_m`, `massing.depth_m`), or None without both."""
     if not isinstance(spec, dict):
@@ -263,6 +284,19 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     })
     if placement:
         masses[-1]["placement"] = placement
+    # the mass turned on the lot (`option.massing.angle_deg`, counter-clockwise in the lot frame, about the plate's
+    # centre): `footprint` is the turned outline, which the plan, the 3D view and the Revit masses draw; the plate
+    # itself, and every block laid out on it, stays in its own frame, whose front-left corner is `plate_origin`.
+    # Nothing is moved back: a corner past the setback envelope is said in a warning.
+    angle = _given_angle(option.get("massing"))
+    if angle:
+        turned = _turn(p_ring, angle)
+        masses[-1].update({"angle_deg": angle, "plate_origin": [round(p_ring[0][0], 2), round(p_ring[0][1], 2)], "footprint": turned})
+        masses[-1]["derived_from"].append("option.massing.angle_deg")
+        env_ring = [(float(x), float(y)) for x, y in env["polygon"]]
+        out = sum(1 for x, y in turned if not boundary.point_in((x, y), env_ring))
+        if out:
+            warnings.append(f"Turned {angle:g}°, the mass has {out} corner{'s' if out != 1 else ''} past the setback envelope: turn it less, move it, or make the plate smaller.")
 
     # Outright mass: what the schedule allows with no rezoning.
     max_fsr, max_h, used = _outright_params(results)

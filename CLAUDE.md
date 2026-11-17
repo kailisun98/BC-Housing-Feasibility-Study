@@ -627,6 +627,18 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   engine's own sheets (the Plans by program overview, the code site plan, the PDF's figures other than FIG 01) are
   still drawn with the street at the bottom, as are the floor picker's plans.
 
+- **Turning the mass (17 Nov 2026).** `option.massing.angle_deg` (counter-clockwise in the lot frame, about the plate's
+  centre; `massing._given_angle`, `_turn`) turns the proposed mass on the lot by any angle; the older `rotate` flag is
+  still the quarter turn that swaps width and depth. The mass's `footprint` is then the turned outline (FIG 01's plan,
+  the 3D view, `massing.svg`, the code site plan and the Revit masses draw it), with `angle_deg` and `plate_origin` (the
+  plate's front-left corner before the turn); the plate and every block on it stay in the plate's own frame
+  (`layout._plate` reads `plate_origin`, the layout's `plate.angle_deg` says it is turned), so a turn moves no block.
+  Nothing is clamped: corners past the setback envelope are a massing warning. In the block editor: Turn ⟲ [°] ⟳
+  (`setAngle`, 15° a click), the plate, grid and blocks in one group (`.ed-mass-turn`) turned over the site context,
+  pointers read in that group; Apply writes the angle. FIG 01's "Place the mass" has a Turn (°) box and no longer drops
+  the plate's `width_m`/`depth_m`. Not turned: the Plans by program sheets and the floor picker (the plate's own frame,
+  by design), and the Revit script's floor blocks from `layout.json` (the masses turn, the blocks do not yet).
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

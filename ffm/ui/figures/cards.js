@@ -62,12 +62,13 @@ function massTools(m) {
   const ffVal = ff ? (ff.street ? `street:${ff.street}` : ff.side ? `side:${ff.side}` : ff.edge != null ? `edge:${ff.edge}` : "") : "";
   const corners = m.lot.corners || null;
   const box = m.envelope.box || {};
-  return `<details class="mass-tools"${mass.open ? " open" : ""}><summary>Place the mass and choose the front <span class="cont">· ${h(ANCHOR_NAMES.find(([k]) => k === cur.anchor)?.[1] || cur.anchor)}${cur.dx_m || cur.dy_m ? `, shifted ${h(cur.dx_m)} / ${h(cur.dy_m)} m` : ""}${cur.rotate ? ", turned a quarter" : ""}${pl.clamped ? " · held inside the envelope" : ""}</span></summary>
+  return `<details class="mass-tools"${mass.open ? " open" : ""}><summary>Place the mass and choose the front <span class="cont">· ${h(ANCHOR_NAMES.find(([k]) => k === cur.anchor)?.[1] || cur.anchor)}${cur.dx_m || cur.dy_m ? `, shifted ${h(cur.dx_m)} / ${h(cur.dy_m)} m` : ""}${cur.rotate ? ", turned a quarter" : ""}${cur.angle_deg ? `, turned ${h(cur.angle_deg)}°` : ""}${pl.clamped ? " · held inside the envelope" : ""}</span></summary>
     <div class="mass-row">
       <div class="mass-anchor" role="group" aria-label="Where the mass stands in the plate box">${ANCHOR_NAMES.map(([k, l]) => `<button type="button" class="segbtn" data-anchor="${k}" aria-pressed="${cur.anchor === k}" title="${h(l)}"><span class="sr-only">${h(l)}</span></button>`).join("")}</div>
       <label class="field inline"><span class="label">Across (m)</span><input type="number" step="0.5" id="mass-dx" value="${h(cur.dx_m)}" aria-label="Shift along the frontage in metres"></label>
       <label class="field inline"><span class="label">Back (m)</span><input type="number" step="0.5" id="mass-dy" value="${h(cur.dy_m)}" aria-label="Shift into the lot in metres"></label>
       <label class="ed-acc"><input type="checkbox" id="mass-rotate"${cur.rotate ? " checked" : ""}> turn a quarter</label>
+      <label class="field inline"><span class="label">Turn (°)</span><input type="number" step="1" min="-180" max="180" id="mass-angle" value="${h(cur.angle_deg || 0)}" aria-label="Turn the mass on the lot, degrees counter-clockwise" title="Turn the mass on the lot by any angle, counter-clockwise; a corner past the setback envelope is said, not moved back"></label>
       <label class="field inline"><span class="label">Front</span><select id="mass-front" aria-label="Which face of the lot is the street side">
         <option value=""${ffVal === "" ? " selected" : ""}>as found (${h((state.site.context && state.site.context.street && state.site.context.street.name) || "the lookup's street")})</option>
         ${roads.map(r => `<option value="street:${h(r)}"${ffVal === `street:${r}` ? " selected" : ""}>${h(r)}</option>`).join("")}
@@ -96,6 +97,10 @@ function wireMassTools(fig, run, redraw) {
     else if (fv.startsWith("side:")) state.site.front_face = { side: fv.slice(5) };
     else if (fv.startsWith("edge:")) state.site.front_face = { edge: Number(fv.slice(5)) };
     const frontChanged = JSON.stringify(state.site.front_face || null) !== before;
+    // the plate's own dimensions (set in the block editor) stay; the angle is this control's as well
+    const was = state.option.massing || {}, angle = Number($("#mass-angle", box).value) || 0;
+    if (was.width_m > 0 && was.depth_m > 0) Object.assign(spec, { width_m: was.width_m, depth_m: was.depth_m });
+    if (angle) spec.angle_deg = Math.max(-180, Math.min(180, angle));
     state.option.massing = spec;
     state.optionDirty = true; $("#option-dirty").hidden = false;
     if (frontChanged) { state.siteDirty = true; $("#site-dirty").hidden = false; }
@@ -109,8 +114,8 @@ function wireMassTools(fig, run, redraw) {
       markStale("the massing placement");
       rerenderFigures(run);
       const pm = run.massing.masses.find(x => x.name === "proposed") || {};
-      const warn = (run.massing.warnings || []).filter(w => /moved|turned plate|front/i.test(w));
-      setStatus(`The mass stands ${ANCHOR_NAMES.find(([k]) => k === anchor)?.[1].toLowerCase() || anchor}${spec.rotate ? ", turned a quarter" : ""}: plate ${pm.plate_width_m} × ${pm.plate_depth_m} m${frontChanged ? `; the front is ${state.site.front_face ? frontFaceWords(state.site.front_face) : "as found"} and the lot is turned to it` : ""}.${warn.length ? ` ${warn[0]}` : ""} The sheets follow; Run the rules makes the memo from it.`, warn.length ? "info" : "ok");
+      const warn = (run.massing.warnings || []).filter(w => /moved|turned plate|front|past the setback/i.test(w));
+      setStatus(`The mass stands ${ANCHOR_NAMES.find(([k]) => k === anchor)?.[1].toLowerCase() || anchor}${spec.rotate ? ", turned a quarter" : ""}${spec.angle_deg ? `, turned ${spec.angle_deg}°` : ""}: plate ${pm.plate_width_m} × ${pm.plate_depth_m} m${frontChanged ? `; the front is ${state.site.front_face ? frontFaceWords(state.site.front_face) : "as found"} and the lot is turned to it` : ""}.${warn.length ? ` ${warn[0]}` : ""} The sheets follow; Run the rules makes the memo from it.`, warn.length ? "info" : "ok");
     } catch (e) {
       mass.busy = false; redraw();
       toast(`Could not place the mass: ${e.message}`, true);

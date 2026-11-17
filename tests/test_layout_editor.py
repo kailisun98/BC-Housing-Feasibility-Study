@@ -166,6 +166,34 @@ class Editor(unittest.TestCase):
         # no dimensions on the option: the plate the floor area and the storeys give, as before
         self.assertEqual(self.m["masses"][0]["plate_area_m2"], 1400.0)
 
+    def test_a_turned_mass_turns_its_footprint_and_keeps_its_plate(self):
+        opt = dict(OPTION, massing={"width_m": 40.0, "depth_m": 16.0, "angle_deg": 20})
+        m = massing.build(SITE, opt, self.L)
+        pm = next(x for x in m["masses"] if x["name"] == "proposed")
+        flat = next(x for x in massing.build(SITE, dict(OPTION, massing={"width_m": 40.0, "depth_m": 16.0}), self.L)["masses"] if x["name"] == "proposed")
+        self.assertEqual(pm["angle_deg"], 20.0)
+        self.assertEqual(pm["plate_origin"], flat["footprint"][0])
+        self.assertNotEqual(pm["footprint"], flat["footprint"])
+        # the same rectangle, turned about its centre: the sides keep their lengths, the centre stays
+        side = lambda r, i: ((r[i][0] - r[i - 1][0]) ** 2 + (r[i][1] - r[i - 1][1]) ** 2) ** 0.5
+        for i in range(4):
+            self.assertAlmostEqual(side(pm["footprint"], i), side(flat["footprint"], i), delta=0.03)
+        centre = lambda r: (sum(p[0] for p in r) / 4, sum(p[1] for p in r) / 4)
+        self.assertAlmostEqual(centre(pm["footprint"])[0], centre(flat["footprint"])[0], delta=0.02)
+        self.assertAlmostEqual(centre(pm["footprint"])[1], centre(flat["footprint"])[1], delta=0.02)
+        # the plate and its blocks stay in the plate's own frame: the layout is the unturned one, and says it is turned
+        lay = layout.solve(SITE, opt, self.L, m)
+        ref = layout.solve(SITE, dict(opt, massing={"width_m": 40.0, "depth_m": 16.0}), self.L, massing.build(SITE, dict(opt, massing={"width_m": 40.0, "depth_m": 16.0}), self.L))
+        self.assertEqual(lay["plate"]["angle_deg"], 20.0)
+        self.assertEqual((lay["plate"]["x"], lay["plate"]["y"]), (ref["plate"]["x"], ref["plate"]["y"]))
+        self.assertEqual(lay["floors"], ref["floors"])
+        self.assertNotIn("angle_deg", ref["plate"])
+        self.assertEqual(set(layout.sheets(lay, SITE, m, self.L)), set(layout.SHEETS))
+        # a corner past the setback envelope is said, and nothing is moved back
+        wide = massing.build(SITE, dict(OPTION, massing={"angle_deg": 45}), self.L)
+        self.assertTrue(any("past the setback envelope" in w for w in wide["warnings"]), wide["warnings"])
+        self.assertNotIn("angle_deg", self.m["masses"][0])
+
     def test_the_memo_section_says_it_was_placed_by_hand(self):
         lay = layout.solve(SITE, dict(OPTION, layout={"zones": self.zones}), self.L, self.m)
         md = "\n".join(layout.markdown(lay))

@@ -107,6 +107,7 @@ export function openEditor() {
   // the plate's own dimensions, where the option already states them; the site behind the plate, on unless put away
   const ms = state.option && state.option.massing;
   editor.plate = ms && ms.width_m > 0 && ms.depth_m > 0 ? { w: Number(ms.width_m), d: Number(ms.depth_m) } : null;
+  editor.angle = Number(ms && ms.angle_deg) || 0;
   editor.massing = run.massing || null;
   try { editor.context = localStorage.getItem("ffm.ed.context") !== "0"; } catch (e) { editor.context = true; }
   editor.zones = JSON.parse(JSON.stringify(fromOption || zonesFromLayout(run.layout)));
@@ -136,7 +137,7 @@ export function closeEditor() {
 /* ---------------------------------------------------------------- undo, and the cores that stand on every floor */
 
 function snapshot() {
-  (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null }));
+  (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0 }));
   if (editor.history.length > 60) editor.history.shift();
 }
 
@@ -144,7 +145,7 @@ function undo() {
   const s = (editor.history || []).pop();
   if (!s) return;
   const was = JSON.parse(s);
-  editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.sel = null; editor.dirty = true;
+  editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.angle = was.t || 0; editor.sel = null; editor.dirty = true;
   renderEditor(); scheduleCheck();
   setStatus("Undone.", "info");
 }
@@ -187,6 +188,13 @@ function viewOf(p, m, width) {
   if (editor.context && m && m.lot) {
     const bb = m.lot.bbox || [0, 0, m.lot.frontage_m, m.lot.depth_m], pad = 9;
     v = { x0: Math.min(bb[0], p.x) - pad, y0: Math.min(bb[1], p.y) - pad - 5, x1: Math.max(bb[2], p.x + p.width_m) + pad, y1: Math.max(bb[3], p.y + p.depth_m) + pad, ctx: true };
+  }
+  // a turned mass reaches past its own rectangle: the view takes the turned outline in
+  const t = (editor.angle || 0) * Math.PI / 180;
+  if (t) {
+    const hw = (Math.abs(p.width_m * Math.cos(t)) + Math.abs(p.depth_m * Math.sin(t))) / 2, hd = (Math.abs(p.width_m * Math.sin(t)) + Math.abs(p.depth_m * Math.cos(t))) / 2;
+    const cx = p.x + p.width_m / 2, cy = p.y + p.depth_m / 2, pad = v.ctx ? 2 : 0;
+    v.x0 = Math.min(v.x0, cx - hw - pad); v.x1 = Math.max(v.x1, cx + hw + pad); v.y0 = Math.min(v.y0, cy - hd - pad); v.y1 = Math.max(v.y1, cy + hd + pad);
   }
   v.s = (width - 2 * M) / Math.max(1, v.x1 - v.x0);
   v.X = x => M + (x - v.x0) * v.s;
@@ -316,6 +324,10 @@ function renderEditor() {
   // the bearing; the pointer is read back in the turned group's own coordinates (wireEditor)
   const site = editor.massing && editor.massing.lot ? siteContext(state.site, editor.massing) : null;
   const turn = turnOf(site && site.osm && site.osm.bearing), frame = turnFrame(width, H, turn), U = s => upright(s, turn);
+  // the mass turned on the lot (counter-clockwise in the lot frame, so the other way on the canvas, whose y runs
+  // down): the plate, its grid and its blocks are one group turned about the plate's centre, over the site
+  const ang = editor.angle || 0, UM = s => upright(s, turn - ang);
+  const past = ((editor.massing && editor.massing.warnings) || []).find(w => /past the setback envelope/.test(w));
   const px0 = V.X(p.x), py0 = V.Y(p.y + p.depth_m), pw = p.width_m * scale, pd = p.depth_m * scale;   // the plate on the canvas
   const env = editor.massing && editor.massing.envelope, maxW = env ? ((env.box && env.box.w) || env.width_m) : p.width_m, maxD = env ? ((env.box && env.box.d) || env.depth_m) : p.depth_m;
   const bad = clashes(zs);
@@ -372,6 +384,11 @@ function renderEditor() {
         <input type="number" id="ed-plate-d" min="6" max="${h(maxD)}" step="0.5" value="${h(p.depth_m)}" aria-label="Plate depth in metres" title="Plate depth into the lot, up to the ${h(maxD)} m the setbacks leave">
         <span class="label">m</span>
         ${editor.plate ? `<button type="button" class="btn btn-small btn-quiet" id="ed-plate-auto" title="Back to the plate the floor area and the storeys give">Auto</button>` : ""}
+        <span class="label">Turn</span>
+        <button type="button" class="btn btn-small btn-quiet" data-ed-turn="15" title="Turn the mass 15° counter-clockwise on the lot">⟲</button>
+        <input type="number" id="ed-angle" min="-180" max="180" step="1" value="${h(ang)}" aria-label="The angle the mass is turned by, in degrees, counter-clockwise" title="The angle the mass is turned on the lot, in degrees (counter-clockwise); the blocks turn with it">
+        <span class="label">°</span>
+        <button type="button" class="btn btn-small btn-quiet" data-ed-turn="-15" title="Turn the mass 15° clockwise on the lot">⟳</button>
         <label class="ed-acc" title="The property line, the setback envelope, the streets and the neighbours behind the plate"><input type="checkbox" id="ed-context"${editor.context ? " checked" : ""}> site context</label>
       </span>
       <span class="ed-tools">
@@ -388,18 +405,20 @@ function renderEditor() {
           <rect x="0" y="0" width="100%" height="100%" fill="${V.ctx && site && site.osm ? HALF.parcel : "#ffffff"}"/>
           ${frame.open}${U(`
           <defs><pattern id="ed-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab4c0" stroke-width="1.4"/></pattern></defs>
-          ${V.ctx ? contextSvg(editor.massing, V) : ""}
+          ${V.ctx ? contextSvg(editor.massing, V) : ""}`)}
+          <g class="ed-mass-turn" transform="rotate(${(-ang).toFixed(2)} ${(px0 + pw / 2).toFixed(1)} ${(py0 + pd / 2).toFixed(1)})">${UM(`
           <rect x="${px0.toFixed(1)}" y="${py0.toFixed(1)}" width="${pw.toFixed(1)}" height="${pd.toFixed(1)}" fill="#fbfbfa" stroke="#1f2933" stroke-width="1.2"/>
           ${grid}${bandLines}${ticks}
           ${svgZones}
           <rect class="ed-plate-handle ed-plate-w" x="${(px0 + pw + 3).toFixed(1)}" y="${(py0 + pd / 2 - 11).toFixed(1)}" width="8" height="22" rx="2" fill="#1f2933"><title>Drag to widen or narrow the plate</title></rect>
           <rect class="ed-plate-handle ed-plate-d" x="${(px0 + pw / 2 - 11).toFixed(1)}" y="${(py0 - 11).toFixed(1)}" width="22" height="8" rx="2" fill="#1f2933"><title>Drag to deepen or shallow the plate</title></rect>
-          <g id="ed-ghost" pointer-events="none"></g>`)}</g>
+          <g id="ed-ghost" pointer-events="none"></g>`)}</g></g>
           <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${turn ? "north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
           ${turn || (site && site.osm && site.osm.bearing != null) ? northArrow(frame.W - 24, 26, 90, 10) : ""}
         </svg>
         <div class="ed-status">
           ${floorChecks.length ? `<ul class="finding-list">${floorChecks.map(g => `<li>${pill("fail")}<span>${h(g.note)}</span></li>`).join("")}</ul>` : `<span class="help">Nothing broken on ${h(floorWords(editor.level))}.${problems ? ` ${problems} on other floors (marked ! above).` : ""}</span>`}
+          ${past ? `<span class="help warn-text">${h(past)}</span>` : ""}
           ${egF ? `<span class="help">${pill(egF.status)} Exits on this floor: ${h(egressLine(egF))}${egF.notes && egF.notes.length ? ` <span class="cont">· ${h(egF.notes[0])}</span>` : ""}</span>` : ""}
           <span class="help">${h((L.adjacencies || []).filter(c => c.status === "pass").length)} adjacency rules hold, ${h((L.adjacencies || []).filter(c => c.status === "conditional").length)} conditional.</span>
         </div>
@@ -416,7 +435,7 @@ function renderEditor() {
     $(".ed-newprog", box).open = true; $("#ed-prog-label", box).value = typed.label; $("#ed-prog-area", box).value = typed.area;
     if (typed.focus === "ed-prog-label" || typed.focus === "ed-prog-area") $(`#${typed.focus}`, box).focus({ preventScroll: true });
   }
-  wireEditor(box, { L, p, B, zs, scale, width, H, V, maxW, maxD, U });
+  wireEditor(box, { L, p, B, zs, scale, width, H, V, maxW, maxD, U: UM });
   if (hadFocus && editor.sel != null) { const g = $(`.ed-zone[data-i="${editor.sel}"]`, box); if (g) g.focus({ preventScroll: true }); }
 }
 
@@ -532,7 +551,7 @@ function wireEditor(box, ctx) {
   const { L, p, B, zs, scale, width, H, V, maxW, maxD, U } = ctx;
   const svg = $(".ed-canvas", box);
   // the pointer in the canvas's own coordinates, inside the group that turns the plan north up
-  const turned = $(".plan-turn", svg);
+  const turned = $(".ed-mass-turn", svg);
   const loc = e => { const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(turned.getScreenCTM().inverse()); return [pt.x, pt.y]; };
   const m = mod();
 
@@ -548,6 +567,18 @@ function wireEditor(box, ctx) {
   $("#ed-plate-w", box).addEventListener("change", plateFromInputs);
   $("#ed-plate-d", box).addEventListener("change", plateFromInputs);
   const auto = $("#ed-plate-auto", box); if (auto) auto.addEventListener("click", () => setPlate(null));
+  // turning the mass on the lot: the blocks stay where they are on the plate, the plate turns about its centre
+  const setAngle = a => {
+    if (!isFinite(a)) return;
+    a = Math.round((((a + 180) % 360) + 360) % 360 - 180); if (a === -180) a = 180;
+    if (a === (editor.angle || 0)) { renderEditor(); return; }
+    snapshot();
+    editor.angle = a; editor.dirty = true;
+    renderEditor(); scheduleCheck();
+    setStatus(a ? `The mass is turned ${a}° on the lot${editor.context ? "" : " (turn the site context on to see it against the property line)"}; its blocks turn with it. The engine says if a corner passes the setback envelope. Apply writes the angle into the option.` : "The mass is square to the lot again.", "info");
+  };
+  $("#ed-angle", box).addEventListener("change", e => setAngle(Number(e.target.value)));
+  $$("[data-ed-turn]", box).forEach(b => b.addEventListener("click", () => setAngle((editor.angle || 0) + Number(b.dataset.edTurn))));
   $("#ed-context", box).addEventListener("change", e => {
     editor.context = e.target.checked;
     try { localStorage.setItem("ffm.ed.context", editor.context ? "1" : "0"); } catch (err) { /* a private window: the choice lasts the session */ }
@@ -808,6 +839,7 @@ function optionFor(extra) {
 /* The plate the architect set, on an option: its width and depth for the massing (`massing.width_m`, `depth_m`),
    and the floor area that plate gives at the option's storeys, so the rules and the FSR read the plate drawn. */
 function withPlate(opt) {
+  if (editor.angle || (opt.massing && opt.massing.angle_deg)) opt.massing = Object.assign({}, opt.massing || {}, { angle_deg: editor.angle || 0 });
   const pl = editor.plate;
   if (!pl) return opt;
   opt.massing = Object.assign({}, opt.massing || {}, { width_m: pl.w, depth_m: pl.d });
@@ -960,6 +992,13 @@ function applyEditor() {
   const Lr = editor.result || state.run.layout, storeys = Number(state.option.storeys) || Lr.floors.length;
   const cut = Object.entries(editor.zones).filter(([k]) => Number(k) < storeys).reduce((t, [, zs]) => t + zs.filter(z => z.block === "void").reduce((a, z) => a + z.w * z.d, 0), 0);
   if (cut > 0 && !editor.plate) editor.plate = { w: Lr.plate.width_m, d: Lr.plate.depth_m };
+  // the angle the mass is turned by, where it changed
+  const wasAngle = Number((state.option.massing || {}).angle_deg) || 0, nowAngle = editor.angle || 0;
+  if (nowAngle !== wasAngle) {
+    state.option.massing = Object.assign({}, state.option.massing || {}, { angle_deg: nowAngle });
+    if (!nowAngle) delete state.option.massing.angle_deg;
+    markStale("the option");
+  }
   const shaped = !!editor.plate;
   if (shaped) {
     const o = state.option, g = Math.round((editor.plate.w * editor.plate.d * storeys - cut) * 10) / 10;
@@ -975,5 +1014,5 @@ function applyEditor() {
   renderEditor();
   refreshSummary("option");
   const n = Object.values(editor.zones).reduce((t, a) => t + a.length, 0);
-  setStatus(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones, with the ${editor.bay} m grid. ${shaped ? `The plate is ${editor.plate.w} × ${editor.plate.d} m${cut ? `, ${fmtNum(Math.round(cut))} m² of it cut out` : ""}: the option's floor area is ${fmtNum(state.option.gfa_m2)} m². ` : ""}${added ? `The option is now ${state.option.storeys} storeys${state.option.gfa_m2 != null ? `, ${fmtNum(state.option.gfa_m2)} m²` : ""}: the memo on screen is from before, so run the rules again.` : (shaped ? "The memo on screen is from before, so run the rules again." : "Run the rules to make the memo from them;")} Save option as… keeps them.`, "ok");
+  setStatus(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones, with the ${editor.bay} m grid. ${nowAngle !== wasAngle ? `The mass is turned ${nowAngle}° on the lot. ` : ""}${shaped ? `The plate is ${editor.plate.w} × ${editor.plate.d} m${cut ? `, ${fmtNum(Math.round(cut))} m² of it cut out` : ""}: the option's floor area is ${fmtNum(state.option.gfa_m2)} m². ` : ""}${added ? `The option is now ${state.option.storeys} storeys${state.option.gfa_m2 != null ? `, ${fmtNum(state.option.gfa_m2)} m²` : ""}: the memo on screen is from before, so run the rules again.` : (shaped || nowAngle !== wasAngle ? "The memo on screen is from before, so run the rules again." : "Run the rules to make the memo from them;")} Save option as… keeps them.`, "ok");
 }

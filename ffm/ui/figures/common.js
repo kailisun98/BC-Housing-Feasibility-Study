@@ -214,7 +214,10 @@ function osmContext(site, m, base) {
     ground, labels, buildings, osmTrees, streetTrees: [],
     xmin: W / 2 - r, xmax: W / 2 + r, ymin: D / 2 - r, ymax: D / 2 + r, frameRadius: r * 0.75,
     osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: front || (o.frame && o.frame.front_street),
-           bearing: o.frame && typeof o.frame.x_axis_bearing_deg === "number" ? (o.frame.x_axis_bearing_deg - (m.lot.orientation ? m.lot.orientation.rotate_deg : 0) + 360) % 360 : null },
+           // the turned lot's x axis: new = R(θ)·old with θ counter-clockwise (boundary.oriented_ring), so the new x axis
+           // is the old one turned θ clockwise, and a bearing counts clockwise from north: the stored bearing plus θ
+           // (it was minus, which drew 375 Glen Drive fronted on E Hastings St upside down under a north-up arrow)
+           bearing: o.frame && typeof o.frame.x_axis_bearing_deg === "number" ? (((o.frame.x_axis_bearing_deg + (m.lot.orientation ? m.lot.orientation.rotate_deg : 0)) % 360) + 360) % 360 : null },
   });
 }
 

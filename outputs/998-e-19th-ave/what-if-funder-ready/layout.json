@@ -2,7 +2,7 @@
   "site_id": "998-e-19th-ave",
   "option_id": "998-e-19th-ave-what-if-funder-ready",
   "as_of": "2026-10-23",
-  "stamp": "e51e3a0350b87718",
+  "stamp": "f04c09783591820f",
   "units": "m",
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
@@ -23,6 +23,7 @@
       "count": 8,
       "net_m2_each": 94.6,
       "gross_m2_each": 102.2,
+      "min_gross_m2_each": 92.9,
       "area_m2": 817.6,
       "source": "bch.design_guidelines.unit_areas",
       "note": "8 × 94.6 m² net (86 m² minimum + 10%), 102.2 m² gross with partitions"
@@ -33,6 +34,7 @@
       "count": 24,
       "net_m2_each": 73.7,
       "gross_m2_each": 79.6,
+      "min_gross_m2_each": 72.4,
       "area_m2": 1910.4,
       "source": "bch.design_guidelines.unit_areas",
       "note": "24 × 73.7 m² net (67 m² minimum + 10%), 79.6 m² gross with partitions"
@@ -43,6 +45,7 @@
       "count": 32,
       "net_m2_each": 53.9,
       "gross_m2_each": 58.2,
+      "min_gross_m2_each": 52.9,
       "area_m2": 1862.4,
       "source": "bch.design_guidelines.unit_areas",
       "note": "32 × 53.9 m² net (49 m² minimum + 10%), 58.2 m² gross with partitions"
@@ -53,6 +56,7 @@
       "count": 24,
       "net_m2_each": 36.3,
       "gross_m2_each": 39.2,
+      "min_gross_m2_each": 35.6,
       "area_m2": 940.8,
       "source": "bch.design_guidelines.unit_areas",
       "note": "24 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions"
@@ -142,6 +146,173 @@
     }
   ],
   "geometry": [],
+  "egress": {
+    "rule_id": "bcbc.exits",
+    "sprinklered": true,
+    "sprinklered_is_placeholder": true,
+    "limits": {
+      "two_exits_over_floor_area_m2": 150.0,
+      "two_exits_over_occupant_load": 60.0,
+      "separation_min_m": 9.0,
+      "separation_share_of_diagonal": 0.5,
+      "travel_limit_m": 45.0,
+      "travel_limit_sprinklered_m": 45,
+      "travel_limit_unsprinklered_m": 30,
+      "dead_end_max_m": 6.0,
+      "occupant_load_persons_per_sleeping_room": 2.0,
+      "sleeping_rooms_by_unit": {
+        "studio": 1,
+        "one_bed": 1,
+        "two_bed": 2,
+        "three_bed_plus": 3
+      },
+      "stair_width_m": 2.2,
+      "core_bay_m": 7.0
+    },
+    "floors": [
+      {
+        "level": 0,
+        "name": "Ground floor",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 31.3,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 20.1 m deep, so stairs at its front and rear ends could be 17.9 m apart: an arrangement for the architect to draw",
+          "the corridor runs 31.3 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 1,
+        "name": "Level 2",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 27.58,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "two_bed",
+          "x": 3.28,
+          "y": 3.7,
+          "door": [
+            7.62,
+            12.85
+          ],
+          "exit": [
+            34.3,
+            13.76
+          ]
+        },
+        "dead_end_m": 31.3,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 20.1 m deep, so stairs at its front and rear ends could be 17.9 m apart: an arrangement for the architect to draw",
+          "the corridor runs 31.3 m past the last exit, over the 6 m a dead end may be (3.3.1.9)"
+        ]
+      },
+      {
+        "level": 2,
+        "name": "Level 3",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 29.13,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 3.93,
+          "y": 14.66,
+          "door": [
+            6.07,
+            14.66
+          ],
+          "exit": [
+            34.3,
+            13.76
+          ]
+        },
+        "dead_end_m": 31.3,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 20.1 m deep, so stairs at its front and rear ends could be 17.9 m apart: an arrangement for the architect to draw",
+          "the corridor runs 31.3 m past the last exit, over the 6 m a dead end may be (3.3.1.9)"
+        ]
+      },
+      {
+        "level": 3,
+        "name": "Level 4",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 29.14,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 3.93,
+          "y": 3.7,
+          "door": [
+            6.07,
+            12.85
+          ],
+          "exit": [
+            34.3,
+            13.76
+          ]
+        },
+        "dead_end_m": 31.3,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 20.1 m deep, so stairs at its front and rear ends could be 17.9 m apart: an arrangement for the architect to draw",
+          "the corridor runs 31.3 m past the last exit, over the 6 m a dead end may be (3.3.1.9)"
+        ]
+      },
+      {
+        "level": 4,
+        "name": "Level 5",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 28.48,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 66.73,
+          "y": 3.7,
+          "door": [
+            68.87,
+            12.85
+          ],
+          "exit": [
+            41.3,
+            13.76
+          ]
+        },
+        "dead_end_m": 31.3,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 20.1 m deep, so stairs at its front and rear ends could be 17.9 m apart: an arrangement for the architect to draw",
+          "the corridor runs 31.3 m past the last exit, over the 6 m a dead end may be (3.3.1.9)"
+        ]
+      }
+    ],
+    "status": "fail",
+    "summary": "Egress (sprinklered, BCBC 2024 Part 3): fail; 5 floors: 5 fail; exits 4.8 m apart against 9 m on 5 floors; farthest travel 29.1 m of 45; dead-end corridors up to 31.3 m against 6."
+  },
   "floors": [
     {
       "level": 0,
@@ -1197,6 +1368,19 @@
       "cov.rm1.outright_height"
     ]
   },
+  "capacity": {
+    "site_area_m2": 2810.7,
+    "storeys": 5,
+    "plate_m2": 1400.0,
+    "gfa_m2": 7000.0,
+    "fsr": 2.49,
+    "fsr_limit": 3.0,
+    "limit_from": "the rezoning policy's benchmark",
+    "rule_id": "cov.irp.social_housing_rezoning",
+    "room_m2": 1432.1,
+    "levels_room": 1,
+    "fsr_with_one_more": 2.989
+  },
   "totals": {
     "plates_m2": 6998.3,
     "used_m2": 6873.8,
@@ -1243,6 +1427,11 @@
       "key": "window_width_m",
       "value": 1.5,
       "note": "one window per unit on the elevation, the unit module as the rhythm"
+    },
+    {
+      "key": "stair_width_m",
+      "value": 2.2,
+      "note": "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"
     }
   ],
   "warnings": [

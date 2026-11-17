@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-10-27",
-      "rules_hash": "9209630adb35220b8e7e9d43f4b0b8c636e9557b8f7d61a6111e6aed3d9a7823",
+      "rules_hash": "c22d992157a0fb74e68bc1843ab8faaf4f79f1da662aeb5da24277a72085c40d",
       "rules_files": {
-        "a_zoning_district.json": "ef2791008abaf57c509921f14d0601c146e3dcf6fd4c637eccb2bb2b46aa01d3",
+        "a_zoning_district.json": "34cf7331061aa33c945b8f35f7cc44f87d36af82214ac7f0574972d0a01d83e0",
         "b_provincial.json": "0fede33e5d62b1bd85ea63435ef0012ef3c0772df8c0192d1e74b8a29f807cb8",
         "c_city_policies.json": "961f8f2e91ce2d3ff3924b839b5a40bcdf6eb702d5cc528e82dc8c7e6aee8ea0",
-        "d_design_standards.json": "dc53a9b24d8090907c86f9da969579022518645d7dae1e09cfda67cac3b81302",
+        "d_design_standards.json": "666cc2f2cc4405706d3b103715cdf6bef2812ac674e4eaa29ff088d00f2b0b85",
         "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb",
         "f_assumptions.json": "942a6dbab04d93fca08a7cb84f3af5ce4d95eb22ba165262176185aac691ae26"
       },
-      "stamp": "83993057d297734a",
+      "stamp": "8a8459a0c650a9c2",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -30,6 +30,83 @@
           "version_effective_from": "2023-01-01",
           "version_effective_to": null,
           "source_url": "https://council.vancouver.ca/20240625/documents/rr1.pdf"
+        },
+        {
+          "rule_id": "cov.rt3.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf"
+        },
+        {
+          "rule_id": "cov.rt3.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf"
+        },
+        {
+          "rule_id": "cov.rt3.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf"
+        },
+        {
+          "rule_id": "cov.rt.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rt.outright_height",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rm3.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf"
+        },
+        {
+          "rule_id": "cov.rm3.outright_height",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf"
+        },
+        {
+          "rule_id": "cov.rm3a.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf"
+        },
+        {
+          "rule_id": "cov.rm3a.outright_height",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf"
+        },
+        {
+          "rule_id": "cov.rm4.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf"
+        },
+        {
+          "rule_id": "cov.rm4.outright_height",
+          "layer": "A",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf"
         },
         {
           "rule_id": "cov.irp.social_housing_rezoning",
@@ -107,6 +184,13 @@
           "version_effective_from": "2025-09-15",
           "version_effective_to": null,
           "source_url": "https://vancouver.ca/files/cov/guide-to-2025-vbbl-updates-v1.01.pdf"
+        },
+        {
+          "rule_id": "bcbc.exits",
+          "layer": "D",
+          "version_effective_from": "2025-03-10",
+          "version_effective_to": null,
+          "source_url": "https://www.bccodes.ca/building-code.html"
         },
         {
           "rule_id": "bch.chf.eligibility",
@@ -287,6 +371,259 @@
         "storeys": 6
       },
       "action": "Architect: confirm the height staff will support under the policy."
+    },
+    {
+      "rule_id": "cov.rm3.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-3 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-3 District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf",
+        "section": "Density: outright 1.00; max_fsr_conditional 1.45 is the Director of Planning's discretionary increase, not an outright figure. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-3 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rm3.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-3 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-3 District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf",
+        "section": "Building height: outright 10.7 m; the conditional height for apartment towers is higher and not entered. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-3 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rm3a.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-3A outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-3A District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf",
+        "section": "Density: outright 1.00; the conditional increase is not entered. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-3A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rm3a.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-3A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-3A District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf",
+        "section": "Building height: outright 10.7 m; the conditional height is not entered. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-3A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rm4.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-4 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
+        "section": "Density (RM-4 and RM-4N): outright 0.75; max_fsr_conditional 1.45 is the Director of Planning's discretionary increase for multiple dwellings, not an outright figure. Where unsure between two recalled outright figures the lower was entered. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-4, RM-4N districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rm4.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-4 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
+        "section": "Building height (RM-4 and RM-4N): outright 10.7 m; the conditional height is not entered. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-4, RM-4N districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rt.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT districts (family level) outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "Family-level figure, not one schedule: a base outright FSR of 0.60 recalled as common to the RT-4, RT-5, RT-6, RT-7, RT-8, RT-10 and RT-11 schedules (each has its own PDF at the same address with its own code), with conditional increases that differ by schedule and are not entered. RT-1, RT-2 and RT-9 are left out. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4, RT-4A, RT-4N, RT-4AN, RT-5, RT-5A, RT-5N, RT-5AN, RT-6, RT-7, RT-8, RT-10, RT-10N, RT-11, RT-11N districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rt.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT districts (family level) outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 District Schedule",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "Family-level figure, not one schedule: a maximum height of 10.7 m recalled as common to the RT-4, RT-5, RT-6, RT-7, RT-8, RT-10 and RT-11 schedules; storey limits differ by schedule and are not entered. The effective date is a placeholder.",
+        "verified": false,
+        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf before relying on it"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4, RT-4A, RT-4N, RT-4AN, RT-5, RT-5A, RT-5N, RT-5AN, RT-6, RT-7, RT-8, RT-10, RT-10N, RT-11, RT-11N districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rt3.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-3 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf",
+        "section": "s.3.1.1.1: maximum FSR 0.60; the Director of Planning may increase it to 0.75 (multiple dwelling, duplex, single detached house, rooming house and others) or 0.95 for infill retaining an existing building (conditional). s.3.1.1.2: 1.00 for multiple dwelling and seniors housing where at least 25% of the units are owned or leased by a government or non-profit housing society and secured as housing for persons with disabilities or low income. Multiple dwelling is a conditional use (s.2.1).",
+        "verified": true,
+        "read_from": "inbox/zoning-by-law-district-schedule-rt-3.pdf (saved by hand from the by-law site), page 7"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-3 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rt3.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-3 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf",
+        "section": "s.3.1.2.3: maximum building height 10.7 m and 3 storeys; s.3.1.2.11: the third storey must be a partial storey not exceeding 50% of the storey below; s.3.1.2.12: the Director of Planning may increase it (to at most 11.9 m on a site below street grade).",
+        "verified": true,
+        "read_from": "inbox/zoning-by-law-district-schedule-rt-3.pdf (saved by hand from the by-law site), pages 8 and 9"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-3 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.rt3.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-3 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf",
+        "section": "s.3.1.2.4 and 3.1.2.5 (front yard: average of the adjacent sites, at most 3.7 m), s.3.1.2.6 (side yard: 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.7 and 3.1.2.17 (rear yard 20.0 m, reduced by the distance to the lane's ultimate centre line), s.3.1.2.8 (site coverage 45%); s.3.1.2.21 lets the Director of Planning vary them for affordable housing meeting s.3.1.1.2.",
+        "verified": true,
+        "read_from": "inbox/zoning-by-law-district-schedule-rt-3.pdf (saved by hand from the by-law site), pages 8 to 11"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-3 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": ""
     },
     {
       "rule_id": "bc.ssmuh.minimum_units",
@@ -480,6 +817,42 @@
       "values": {
         "storeys": 6,
         "part": 3
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bcbc.exits",
+      "layer": "D",
+      "layer_title": "Building code and funder design standards (flags, not checks, at this stage)",
+      "title": "Exits from a floor area: number, separation, travel distance, dead-end corridors (BC Building Code 2024, Part 3)",
+      "jurisdiction": "Province of BC; City of Vancouver (Vancouver Building By-law 2025 follows these clauses)",
+      "check": "info_only",
+      "source": {
+        "title": "BC Building Code 2024, Division B, Part 3 (Safety within floor areas; Exits)",
+        "url": "https://www.bccodes.ca/building-code.html",
+        "section": "Div B 3.4.2.1 (minimum number of exits: two, unless the floor area is not more than 150 m² and the occupant load not more than 60); 3.4.2.3 (least distance between two required exits: one half the maximum overall diagonal dimension of the floor area, but need not be more than 9 m for a sprinklered floor area or one with a public corridor); 3.4.2.4 and 3.4.2.5 (travel distance, measured from a suite door to the nearest exit where suites open on a public corridor; 45 m in a sprinklered floor area, 30 m otherwise, residential occupancy); 3.3.1.9 (dead-end corridors not more than 6 m long); 3.1.17.1 (occupant load of a dwelling unit: two persons per sleeping room)",
+        "verify": "The figures and clause numbers were entered from recollection of the NBC 2020 / BCBC 2024 clauses (3.4.2.1, 3.4.2.3, 3.4.2.4, 3.4.2.5, 3.3.1.9, 3.1.17.1), not read from the code text, and must be confirmed against it; in particular the exact wording of 3.4.2.3 (the 9 m cap is quoted as applying to a sprinklered floor area), the sentence of 3.3.1.9 that sets the 6 m dead end, the in-force date of BCBC 2024 (entered as 10 March 2025), and the Province's single-exit-stair provisions for residential buildings up to six storeys, which this rule does not model.",
+        "verified": false
+      },
+      "version_effective_from": "2025-03-10",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "two exits over floor area m2: 150; two exits over occupant load: 60; separation min m: 9; separation share of diagonal: 0.5; travel limit sprinklered m: 45; travel limit unsprinklered m: 30; dead end max m: 6; occupant load persons per sleeping room: 2.",
+      "values": {
+        "two_exits_over_floor_area_m2": 150,
+        "two_exits_over_occupant_load": 60,
+        "separation_min_m": 9,
+        "separation_share_of_diagonal": 0.5,
+        "travel_limit_sprinklered_m": 45,
+        "travel_limit_unsprinklered_m": 30,
+        "dead_end_max_m": 6,
+        "occupant_load_persons_per_sleeping_room": 2,
+        "sleeping_rooms_by_unit": {
+          "studio": 1,
+          "one_bed": 1,
+          "two_bed": 2,
+          "three_bed_plus": 3
+        }
       },
       "action": ""
     },
@@ -844,8 +1217,8 @@
       "conditional": 2,
       "uncertain": 4,
       "pass": 2,
-      "info": 13,
-      "not_applicable": 3
+      "info": 14,
+      "not_applicable": 14
     },
     "answers": {
       "allowed": {

@@ -2,7 +2,7 @@
   "site_id": "1010-expo-blvd",
   "option_id": "1010-expo-blvd-as-permitted",
   "as_of": "2026-10-23",
-  "stamp": "e51e3a0350b87718",
+  "stamp": "f04c09783591820f",
   "units": "m",
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
@@ -86,6 +86,585 @@
     }
   ],
   "geometry": [],
+  "egress": {
+    "rule_id": "bcbc.exits",
+    "sprinklered": true,
+    "sprinklered_is_placeholder": true,
+    "limits": {
+      "two_exits_over_floor_area_m2": 150.0,
+      "two_exits_over_occupant_load": 60.0,
+      "separation_min_m": 9.0,
+      "separation_share_of_diagonal": 0.5,
+      "travel_limit_m": 45.0,
+      "travel_limit_sprinklered_m": 45,
+      "travel_limit_unsprinklered_m": 30,
+      "dead_end_max_m": 6.0,
+      "occupant_load_persons_per_sleeping_room": 2.0,
+      "sleeping_rooms_by_unit": {
+        "studio": 1,
+        "one_bed": 1,
+        "two_bed": 2,
+        "three_bed_plus": 3
+      },
+      "stair_width_m": 2.2,
+      "core_bay_m": 7.0
+    },
+    "floors": [
+      {
+        "level": 0,
+        "name": "Ground floor",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 1,
+        "name": "Level 2",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 2,
+        "name": "Level 3",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 3,
+        "name": "Level 4",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 4,
+        "name": "Level 5",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 5,
+        "name": "Level 6",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 6,
+        "name": "Level 7",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 7,
+        "name": "Level 8",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 8,
+        "name": "Level 9",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 9,
+        "name": "Level 10",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 10,
+        "name": "Level 11",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 11,
+        "name": "Level 12",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 12,
+        "name": "Level 13",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 13,
+        "name": "Level 14",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 14,
+        "name": "Level 15",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 15,
+        "name": "Level 16",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 16,
+        "name": "Level 17",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 17,
+        "name": "Level 18",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 18,
+        "name": "Level 19",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 19,
+        "name": "Level 20",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 20,
+        "name": "Level 21",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 21,
+        "name": "Level 22",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 22,
+        "name": "Level 23",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 23,
+        "name": "Level 24",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 24,
+        "name": "Level 25",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 25,
+        "name": "Level 26",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 26,
+        "name": "Level 27",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 27,
+        "name": "Level 28",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      },
+      {
+        "level": 28,
+        "name": "Level 29",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": null,
+        "travel_limit_m": 45.0,
+        "farthest_unit": null,
+        "dead_end_m": 12.25,
+        "dead_end_limit_m": 6.0,
+        "status": "fail",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
+          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
+          "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
+        ]
+      }
+    ],
+    "status": "fail",
+    "summary": "Egress (sprinklered, BCBC 2024 Part 3): fail; 29 floors: 29 fail; exits 4.8 m apart against 9 m on 29 floors; dead-end corridors up to 12.2 m against 6."
+  },
   "floors": [
     {
       "level": 0,
@@ -2037,6 +2616,19 @@
     "height_m": null,
     "rule_ids": []
   },
+  "capacity": {
+    "site_area_m2": 3908.0,
+    "storeys": 29,
+    "plate_m2": 800.5,
+    "gfa_m2": 23215.0,
+    "fsr": 5.94,
+    "fsr_limit": null,
+    "limit_from": null,
+    "rule_id": null,
+    "room_m2": null,
+    "levels_room": null,
+    "fsr_with_one_more": 6.145
+  },
   "totals": {
     "plates_m2": 23212.0,
     "used_m2": 7379.4,
@@ -2083,6 +2675,11 @@
       "key": "window_width_m",
       "value": 1.5,
       "note": "one window per unit on the elevation, the unit module as the rhythm"
+    },
+    {
+      "key": "stair_width_m",
+      "value": 2.2,
+      "note": "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"
     }
   ],
   "warnings": [

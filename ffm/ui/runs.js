@@ -182,7 +182,7 @@ export function fillRunSelects() {
   const runs = byRev(state.runs);   // R1 first, as the labels read (16 Nov 2026: they listed R4, R2, R1, R3)
   open.innerHTML = (listed ? "" : `<option value="">${state.run ? "This run" : "Choose a run…"}</option>`) +
     runs.map(r => `<option value="${h(r.run_id)}"${r.run_id === cur ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
-  cmp.innerHTML = `<option value="">Nothing</option>` +
+  cmp.innerHTML = `<option value="">No comparison</option>` +
     runs.filter(r => r.run_id !== cur).map(r => `<option value="${h(r.run_id)}"${r.run_id === state.compareRun ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
 }
 

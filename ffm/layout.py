@@ -1094,10 +1094,11 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     table_w = cols[3] + max(len(r[3]) for r in rows) * 6.0 + 4
     allowed = [ln for a in allowed for ln in _wrap_words(a, max(40, int(table_w / cw)))]
     table_h = 34 + 18 * len(rows) + 10 + 16 * len(allowed)
-    # the table stands beside the plan, so the drawing is as tall as the taller of the two, not their sum
-    body_h = max(pd + 30, table_h)
+    # the table stands under the plan: beside it the drawing grew to about 1,060 units wide and its 11 px type was set
+    # at 9 px in a 1024 px window and 4 px in the architect's two columns (17 Nov 2026)
+    body_h = pd + 44 + table_h
     height = pad + 24 + body_h + 40
-    width = max(pad + 30 + pw + 60 + table_w + pad, 760)
+    width = max(pad + 30 + pw + 30 + pad, pad + table_w + pad, 640)
     out = _svg_open(width, height, "Code site plan")
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>')
     ox, oy = pad + 30, pad + 24
@@ -1143,7 +1144,7 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
                  if polygon_lot else f'lot {W} × {D} m · dashed red: setback envelope {env["width_m"]} × {env["depth_m"]} m')
     out.append(f'<text x="{ox}" y="{oy + pd + 16:.1f}" font-size="11" fill="{TONES["muted"]}">{lot_words} · blue: footprint' + (f' · {drawn} protection barrier{"s" if drawn != 1 else ""} (By-law 9958, Schedule A)' if drawn else (' · retained trees have no surveyed position: barriers not drawn' if barriers else "")) + '</text>')
     # the table
-    tx, ty = ox + pw + 60, oy
+    tx, ty = pad, oy + pd + 36
     out.append(f'<text x="{tx}" y="{ty + 12}" font-size="12" font-weight="600">What the plan checker reads</text>')
     for i, (k, v, lim, st) in enumerate(rows):
         y = ty + 34 + i * 18

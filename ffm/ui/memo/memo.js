@@ -114,7 +114,7 @@ export function renderMemo(run) {
   parts.push(`<div class="memo-body">
     <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L, run)}${answerMoney(run)}</div>
     ${renderFigures(run)}
-    <div class="memo-clauses">${renderClauses(res, L, changed)}</div>
+    <div class="memo-clauses">${renderClauses(res, L, changed, run)}</div>
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
 
@@ -149,11 +149,16 @@ function optionFiguresHtml(site, opt, run) {
   const fsr = opt.gfa_m2 && site.site_area_m2 ? (opt.gfa_m2 / site.site_area_m2).toFixed(2) : null;
   const tiers = opt.rent_tiers_units;
   const pm = run && run.massing && run.massing.masses && run.massing.masses.find(x => x.name === "proposed");
-  const cell = (k, v, sub) => `<div><b>${h(k)}</b><span>${v}${sub ? ` <span class="cont">${sub}</span>` : ""}</span></div>`;
+  // the interpunct that opens a cell's second part is tied to what follows it, so it never hangs at a line's end
+  const cell = (k, v, sub) => `<div><b>${h(k)}</b><span>${v}${sub ? ` <span class="cont">${String(sub).replace(/^· /, "·&nbsp;")}</span>` : ""}</span></div>`;
+  // the homes the plans place, beside the count the money and the funders read (17 Nov 2026: the title block said 170
+  // while answer 3 said 114 fit, and nothing near the 170 said so)
+  const lay = run && run.layout;
+  const placed = lay && lay.units_total && lay.units_placed != null && lay.units_placed < lay.units_total ? lay.units_placed : null;
   return `<div class="memo-figures">
     ${cell("Storeys", opt.storeys != null ? h(opt.storeys) : "<i>not given</i>", opt.height_m != null ? `· ${h(opt.height_m)}&nbsp;m` : "")}
     ${cell("Floor area", opt.gfa_m2 != null ? `${h(fmtNum(opt.gfa_m2))}&nbsp;m²` : "<i>not given</i>", fsr ? `· FSR&nbsp;${h(fsr)}` : "")}
-    ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `<span class="nw">${v} ${UNIT_WORD[k] || k}</span>`).join(", ")}` : "")}
+    ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `<span class="nw">${v} ${UNIT_WORD[k] || k}</span>`).join(", ")}${placed != null ? ` <span class="warn-text">· ${h(placed)} fit the plate (answer 3)</span>` : ""}` : "")}
     ${cell("Rent tiers", tiers ? tierWords(tiers, n) : "<i>not split</i>", "")}
     ${cell("Tenure", h(optWord("option", "tenure", opt.tenure) || "not set"), opt.housing_agreement_years ? `· <span class="nw">${h(opt.housing_agreement_years)}‑year agreement</span>` : "")}
     ${plateCell(cell, pm)}

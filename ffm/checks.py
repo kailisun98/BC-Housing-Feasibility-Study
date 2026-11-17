@@ -591,10 +591,11 @@ def chf_fit(site, option, p) -> Result:
     if fails:
         return _r(FAIL, head + "does not fit: " + "; ".join(fails) + ".", vals, action="Manager: resolve the failing criteria or target another program.")
     if unknown:
-        return _r(UNSURE, head + "fit cannot be confirmed without the " + "; ".join(unknown) + ". " + "; ".join(n[0].upper() + n[1:] for n in notes) + ".",
+        said = "; ".join(notes)   # one sentence, capitalised once ("; Construction must…" was each note's capital)
+        return _r(UNSURE, head + "fit cannot be confirmed without the " + "; ".join(unknown) + ". " + (said[:1].upper() + said[1:] + "." if said else ""),
                   vals, action="Manager: supply the missing figures; the indicative grant at 2025-26 rates would be "
                   + (f"${vals['indicative_grant_cad']:,.0f} for {total} units." if total else "set by unit count."))
-    return _r(PASS, head + "Fits the eligibility criteria: " + "; ".join(notes) + ".", vals)
+    return _r(PASS, head + "fits the eligibility criteria: " + "; ".join(notes) + ".", vals)
 
 
 def bc_builds_fit(site, option, p) -> Result:

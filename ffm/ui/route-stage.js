@@ -10,7 +10,7 @@
    loaded only when a site is on the stage. The route's actions (look up, read, derive) are guide.js. */
 
 import {
-  $, $$, cap, fmtNum, getPath, h, pill, scrollBehavior, setPath, setStatus, toast, todayISO
+  $, $$, cap, fmtNum, getPath, h, keyWords, pill, scrollBehavior, setPath, setStatus, toast, todayISO
 } from "./core/util.js";
 import { guide, state } from "./core/state.js";
 import { loadScript } from "./core/engine.js";
@@ -38,8 +38,10 @@ const shapeWords = shape => shape.class === "rectangle" ? "a rectangle"
 function stagePrograms(ids) {
   const rules = state.rules.filter(r => r.layer === "E" && ids.includes(r.id));
   if (!rules.length) return `<p class="quiet">No program chosen: the funders' answer will list every program as information.</p>`;
-  const human = k => k.replace(/_cad(_\d{4}_\d{2})?$/, " ($)").replace(/_m2$/, " (m²)").replace(/_/g, " ");
-  const val = v => typeof v === "boolean" ? (v ? "yes" : "no") : Array.isArray(v) ? v.map(val).join(", ") : (v && typeof v === "object" ? Object.entries(v).map(([k, x]) => `${k.replace(/_/g, " ")} ${typeof x === "number" && x <= 1 ? Math.round(x * 100) + "%" : fmtNum(x)}`).join(" / ") : (typeof v === "number" ? (v <= 1 && String(v).includes(".") ? Math.round(v * 100) + "%" : fmtNum(v)) : String(v)));
+  // the file's keys and codes in words (17 Nov 2026: "non_profit_society, housing_cooperative", "rgi 50%",
+  // "Min lease years nominal")
+  const human = k => keyWords(k.replace(/_cad(_\d{4}_\d{2})?$/, " ($)").replace(/_m2$/, " (m²)"));
+  const val = v => typeof v === "boolean" ? (v ? "yes" : "no") : Array.isArray(v) ? v.map(val).join(", ") : (v && typeof v === "object" ? Object.entries(v).map(([k, x]) => `${keyWords(k)} ${typeof x === "number" && x <= 1 ? Math.round(x * 100) + "%" : fmtNum(x)}`).join(" / ") : (typeof v === "number" ? (v <= 1 && String(v).includes(".") ? Math.round(v * 100) + "%" : fmtNum(v)) : String(v).replace(/_/g, " ")));
   return rules.map(r => {
     const p = r.params || {}, s = r.source || {};
     const rows = Object.entries(p).filter(([k, v]) => !["status", "submission", "criteria_note"].includes(k) && v !== null && v !== undefined && typeof v !== "string").slice(0, 7)
@@ -355,7 +357,7 @@ function cardSite() {
   const body = `
     <div class="addr-row">
       <label class="sr-only" for="guide-address">Address</label>
-      <input type="text" id="guide-address" value="${h(guide.address)}" placeholder="a civic number and a street, e.g. 609 Heatley Ave" autocomplete="street-address">
+      <input type="text" id="guide-address" value="${h(guide.address)}" placeholder="e.g. 609 Heatley Ave" autocomplete="street-address">
       <button class="btn btn-primary" type="button" id="guide-lookup"${busy ? " disabled" : ""}>${busy ? "Looking up…" : "Look up"}</button>
     </div>
     <p class="help">${busy ? "The City's address list, then the district and the parcel; the streets, buildings and trees around it take a few seconds more." : "The City's address list gives the point; its open data the zoning district and the parcel."}</p>
@@ -394,7 +396,7 @@ function siteFacts(site) {
         <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(districtOf(site))}</b>${districtWords(site)}` : "<i>not found: the architect enters it</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel</i>"}${p.shape ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand</span>' : ""}</dd></div>
         <div><dt>Street</dt><dd>${h(street)}${cornerStreets(site).length ? ` <span class="cont">· a corner lot</span>` : ""}</dd></div>
-        <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) : site.owner_type ? h(ansWord("owner_type", site.owner_type)) : "<i>not given</i>"}</dd></div>
+        <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) : site.owner_type ? h(ansWord("owner_type", site.owner_type)) : "<i>not sure</i>"}</dd></div>
       </dl>
     </div>`;
 }
@@ -458,7 +460,8 @@ function takeAnswer(key, raw) {
   const a = ANSWERS[key];
   if (!a) return;
   const v = a.kind === "tri" ? (raw === "yes" ? true : raw === "no" ? false : null) : (raw === "" ? null : raw);
-  const said = `${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v ? ansWord(key, v) : "not sure"}`;
+  const word = v ? ansWord(key, v) : "";
+  const said = `${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v ? word.charAt(0).toLowerCase() + word.slice(1) : "not sure"}`;
   if (a.on === "site") {
     if (!state.site) return;
     if (key === "front_street") {
@@ -600,8 +603,20 @@ function figureBlock(o, S) {
   const short = needs != null && o.height_m != null && Number(o.height_m) < needs - 0.5;
   const heightSub = short ? `<span class="warn-text">needs about ${h(fmtNum(needs))}&nbsp;m</span> ` : "";
   // what the drawings will do about it, and the one figure that changes it, in a line under the four
+  // the fix offered is one a building can take: a floor to floor of 2.8 m or more, else a taller height or fewer
+  // storeys (17 Nov 2026: 19 storeys in 19.8 m advised a 1.04 m floor to floor)
   const fitF2f = short && o.storeys ? Math.floor(Number(o.height_m) / o.storeys * 100) / 100 : null;
-  const heightLine = short ? `<p class="help warn-text fig4-note">The drawings use ${h(fmtNum(needs))}&nbsp;m: ${h(o.storeys)} storeys × ${h(fmtNum(f2f))}&nbsp;m floor to floor. To draw ${h(fmtNum(o.height_m))}&nbsp;m, set Floor to floor to ${h(fmtNum(fitF2f))}&nbsp;m under All figures.</p>` : "";
+  const fitStoreys = short ? Math.floor(Number(o.height_m) / f2f) : null;
+  const heightFix = fitF2f >= 2.8 ? `To draw ${h(fmtNum(o.height_m))}&nbsp;m, set Floor to floor to ${h(fmtNum(fitF2f))}&nbsp;m under All figures.`
+    : `Raise the height to about ${h(fmtNum(needs))}&nbsp;m, or plan ${h(fitStoreys)} storeys: that is what ${h(fmtNum(o.height_m))}&nbsp;m holds at ${h(fmtNum(f2f))}&nbsp;m a floor.`;
+  const heightLine = short ? `<p class="help warn-text fig4-note">The drawings use ${h(fmtNum(needs))}&nbsp;m: ${h(o.storeys)} storeys × ${h(fmtNum(f2f))}&nbsp;m floor to floor. ${heightFix}</p>` : "";
+  // a floor area the storeys cannot hold: each floor larger than the plate the setbacks leave (17 Nov 2026: FSR 6.01
+  // on 6 storeys asked for 2,178 m² a floor on a 2,174.9 m² lot and passed without a word)
+  const E0 = S && S.envelope;
+  const boxArea = E0 && E0.plate_w_m && E0.plate_d_m ? E0.plate_w_m * E0.plate_d_m : (lot || null);
+  const perFloor = o.gfa_m2 && o.storeys ? o.gfa_m2 / o.storeys : null;
+  const floorLine = perFloor && boxArea && perFloor > boxArea * 1.01
+    ? `<p class="help warn-text fig4-note">${h(fmtNum(o.gfa_m2))}&nbsp;m² on ${h(o.storeys)} floors is ${h(fmtNum(Math.round(perFloor)))}&nbsp;m² a floor, more than the ${h(fmtNum(Math.round(boxArea)))}&nbsp;m² ${E0 && E0.plate_w_m ? `the setbacks leave (${h(E0.plate_w_m)} × ${h(E0.plate_d_m)}&nbsp;m)` : "of the lot"}: plan ${h(Math.ceil(o.gfa_m2 / boxArea))} storeys or more, or less floor area.</p>` : "";
   const floorCell = lot ? cell("fsr", "FSR", fsr || "—", o.gfa_m2 != null ? `${h(fmtNum(o.gfa_m2))}&nbsp;m² ` : "")
     : cell("gfa_m2", "Floor area", o.gfa_m2 != null ? `${fmtNum(o.gfa_m2)} m²` : "—", "");
   const block = `<div class="fig4">
@@ -610,12 +625,12 @@ function figureBlock(o, S) {
       ${floorCell}
       <div class="fig4-cell"><span class="fig4-k">Homes</span>${S && S.mix ? `<button type="button" class="fig4-v" id="guide-homes" aria-expanded="${!!guide.mixOpen}" aria-controls="guide-mix" aria-label="Homes: ${homes || "none"}. Change the mix">${homes || "—"}</button>` : `<span class="fig4-v">${homes || "—"}</span>`}<span class="fig4-sub">${o.rent_tiers_units ? `${h(o.rent_tiers_units.market || 0)} / ${h(o.rent_tiers_units.rgi || 0)} / ${h(o.rent_tiers_units.deep_subsidy || 0)} tiers` : ""}</span></div>
     </div>`;
-  if (!S) return block + heightLine + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
+  if (!S) return block + heightLine + floorLine + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
   // the rough envelope from the lot and the code, offered as the manager's own three figures
   const E = S.envelope;
   const envDiffers = E && E.storeys != null && ["storeys", "height_m", "gfa_m2"].some(k => guide.mine[k] !== undefined || (S.fields[k] || {}).value !== E[k]);
-  const envLine = E && E.storeys != null ? `<p class="help env-line"><span class="cont">Rough allowed, from the lot and the code:</span> <b>${h(E.storeys)} storeys · ${h(E.height_m)} m · ${h(fmtNum(E.gfa_m2))} m²</b><span class="cont">${E.plate_w_m != null ? ` (a plate ${h(E.plate_w_m)} × ${h(E.plate_d_m)} m × ${h(E.storeys)})` : ""}. Not a permission.</span>${envDiffers ? ` <button class="btn btn-quiet btn-small" type="button" id="guide-use-envelope">Use the rough envelope</button>` : ""}</p>` : "";
-  return block + heightLine + envLine + (guide.mixOpen ? mixPanel(S) : "") + allFigures(S);
+  const envLine = E && E.storeys != null ? `<p class="help env-line"><span class="cont">Rough allowed, from the lot and the code:</span> <b>${h(E.storeys)} storeys · ${h(E.height_m)} m · ${h(fmtNum(E.gfa_m2))} m²</b><span class="cont">${E.plate_w_m != null ? ` (${h(E.storeys)} floors inside a ${h(E.plate_w_m)} × ${h(E.plate_d_m)} m plate box)` : ""}. Not a permission.</span>${envDiffers ? ` <button class="btn btn-quiet btn-small" type="button" id="guide-use-envelope">Use the rough envelope</button>` : ""}</p>` : "";
+  return block + heightLine + floorLine + envLine + (guide.mixOpen ? mixPanel(S) : "") + allFigures(S);
 }
 
 function mixPanel(S) {

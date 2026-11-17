@@ -50,7 +50,7 @@ export function splitValues(r, L) {
                permitted: `at least ${pct(v.min_two_plus_bed_share ?? 0.35)} two-bed+${m3 != null ? `, ${pct(m3)} three-bed+` : ""}`, ask };
     }
     case "social_housing_definition":
-      return { proposed: `${pct(v.share_below_hils)} of units below HILs; ${num(v.housing_agreement_years)}-year agreement; owner ${optWord("option", "owner_type_at_completion", v.owner_type_at_completion) || "—"}`,
+      return { proposed: `${pct(v.share_below_hils)} of units below HILs; ${num(v.housing_agreement_years)}‑year agreement; owner ${optWord("option", "owner_type_at_completion", v.owner_type_at_completion) || "—"}`,
                permitted: "at least 30% below HILs at rent of at most 30% of income; 60 years or the life of the building; non-profit, co-op or government owner", ask };
     case "tree_replacement":
       return { proposed: `${num(v.existing)} existing, ${num(v.removed)} removed, ${num(v.replacements_proposed)} replacements, ${num(v.trees_after)} after`, permitted: `Schedule C: at least ${num(v.schedule_c_required)} trees on ${num(v.site_area_m2)} m²`,
@@ -91,23 +91,38 @@ export function splitValues(r, L) {
     default: {
       const lim = k => /^(max_|min_|required|benchmark_|schedule_|eligible)/.test(k);
       const flat = Object.entries(v).filter(([, x]) => x !== null && x !== undefined && typeof x !== "object");
-      return { proposed: flat.filter(([k]) => !lim(k)).map(([k, x]) => paramWords(k, x)).join("; "), permitted: flat.filter(([k]) => lim(k)).map(([k, x]) => paramWords(k, x)).join("; "), ask };
+      const proposed = flat.filter(([k]) => !lim(k)).map(([k, x]) => paramWords(k, x)).join("; ");
+      const permitted = flat.filter(([k]) => lim(k)).map(([k, x]) => paramWords(k, x)).join("; ");
+      // a rule with figures and no limit or ask (the cost assumptions) reads in one cell, as the informing rules do
+      // (17 Nov 2026: layer F printed its figures under Proposed and "— —" across the rest)
+      if (!permitted && !ask) return { info: proposed };
+      return { proposed, permitted, ask };
     }
   }
 }
 
 /* Every clause that applied to this site and option, in one table: its status, the numbers the option proposes,
    what the clause permits or requires, and the ask where they differ. Not-applicable rules are named underneath. */
-export function renderClauses(res, L, changed = new Set()) {
+/* A rule the plans test (the exits, bcbc.exits) takes the plans' own status and summary, so the clause row and the open
+   item agree (17 Nov 2026: Exits read Fail in answer 3 and Info here). Pure. */
+export function withPlans(res, run) {
+  const eg = run && run.layout && run.layout.egress;
+  if (!eg || !eg.rule_id || !eg.status) return res;
+  return res.map(r => r.rule_id === eg.rule_id && r.status !== "not_applicable"
+    ? { ...r, status: eg.status, action: eg.summary ? `The plans: ${eg.summary}` : r.action } : r);
+}
+
+export function renderClauses(res, L, changed = new Set(), run = null) {
+  res = withPlans(res, run);
   const applied = res.filter(r => r.status !== "not_applicable");
   const na = res.filter(r => r.status === "not_applicable");
   const order = { fail: 0, conditional: 1, uncertain: 2, pass: 3, info: 4 };
   const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
     const s = splitValues(r, L);
     return `<tr class="st-${h(r.status)}">
-      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
+      <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · <span class="nw">v ${h(r.version_effective_from || "—")}</span></code>${r.source && r.source.section ? `<span class="rule-sec">${h(r.source.section)}</span>` : ""}</td>
       <td class="status">${pill(r.status)}</td>
-      ${s.info !== undefined ? `<td class="nums info-span" colspan="3">${h(s.info || "no figures")}</td>` : `<td class="nums">${h(s.proposed || "—")}</td>
+      ${s.info !== undefined ? `<td class="nums info-span" colspan="3">${h(s.info || "no figures")}${r.status !== "info" && r.action ? `<span class="ask info-ask">${h(r.action)}</span>` : ""}</td>` : `<td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>
       <td class="ask">${s.ask ? h(s.ask) : `<span class="cont">—</span>`}</td>`}
     </tr>`;

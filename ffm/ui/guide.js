@@ -144,7 +144,7 @@ export async function guideSuggest(opts = {}) {
     const swapped = guide.suggestion.candidate_note && asked !== guide.candidate;
     const homes = Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0);
     if (opts.said) setStatus(`${opts.said} ${homes ? `${homes} homes follow from the figures, the rent tiers and accessible units with them.` : "No homes follow yet: enter a floor area."} Continue to the run when it reads right.`, "info");
-    else setStatus(`Suggested, ${guide.candidate}:${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} homes.${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ? " The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
+    else setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} homes.${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ? " The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
     // after a run, a new derivation (another candidate, a mix, the programs) is a change to the memo's option
     if (state.run) useSuggestion({ live: true });
   } catch (e) {

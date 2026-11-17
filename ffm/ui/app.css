@@ -354,7 +354,9 @@ details.sg-group[open] > summary.sg-head::before { content: "▾ "; }
 .answer h2 { font: 600 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; display: flex; align-items: center; gap: 10px; }
 .answer h2 .badge { width: auto; height: auto; border-radius: 0; background: transparent; color: var(--muted); font: 500 11px/1 var(--mono); letter-spacing: .08em; flex: 0 0 auto; border: 0; }
 .answer h2 .badge::before { content: "0"; }
-.verdict { font-size: 24px; line-height: 1.22; font-weight: 400; margin: 0 0 12px; letter-spacing: -.02em; max-width: 30ch; text-wrap: balance; }
+/* a two-sentence verdict breaks between its sentences, not inside the second (17 Nov 2026: at 30ch "Six open items. Each
+   / names who resolves it.") */
+.verdict { font-size: 24px; line-height: 1.22; font-weight: 400; margin: 0 0 12px; letter-spacing: -.02em; max-width: 44ch; text-wrap: balance; }
 .verdict em { font-style: normal; color: var(--tone); }
 .verdict.quiet { font-size: 13px; color: var(--muted); font-weight: 400; }
 .finding { margin: 0 0 8px; font-size: 13px; }
@@ -851,12 +853,14 @@ table.plain td.status { white-space: nowrap; }
    block editor on them) across the whole width; the ledger follows */
 [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; }
 @media (min-width: 1100px) {
-  /* two columns that fill, the way the answers do at 1600: a grid row is as tall as its taller sheet, which left a
-     356 px band beside the section and an empty cell after FIG 06 (17 Nov 2026); the plans span both */
+  [data-mode="architect"] .figure.sheet .sheet-body svg { max-height: none; }
+}
+/* the sheets two to a column only where a column is wide enough to read them: from 1100 px two columns shrank them to
+   416 px and their 11 px labels to 4 to 6 px (17 Nov 2026). The columns fill rather than leave a row-high band. */
+@media (min-width: 1800px) {
   [data-mode="architect"] .figures { display: block; columns: 2; column-gap: 12px; }
   [data-mode="architect"] .figures > * { break-inside: avoid; margin-bottom: 12px; }
   [data-mode="architect"] .figure.sheet[data-sheet="plans"] { column-span: all; }
-  [data-mode="architect"] .figure.sheet .sheet-body svg { max-height: none; }
 }
 @media (min-width: 1600px) {
   [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; }
@@ -1161,6 +1165,8 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
 .fig4-note { margin: 6px 0 0; font-size: 12px; max-width: 72ch; }
 /* a rule that only informs: its figures in one cell across Proposed, Permitted and the ask */
 .clauses td.info-span { color: var(--muted); }
+/* where the plans decide the rule (the exits), their finding follows the clause's figures in the row */
+.clauses td.info-span .info-ask { display: block; margin-top: 4px; color: var(--s-fail-text); }
 /* the rules that did not apply, folded under the table rather than a paragraph of sixty ids */
 .clauses .na { margin: 10px 0 0; }
 .clauses .na > summary { font-size: 12px; color: var(--muted); }
@@ -1184,7 +1190,7 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
   table.open-items td[data-k="Item"]::before { display: none; }
   /* the money's lines: the source column wraps instead of widening the table */
   .pf-lines table.plain { table-layout: fixed; }
-  .pf-lines table.plain td { overflow-wrap: anywhere; }
+  .pf-lines table.plain td, .pf-lines table.plain td.num { overflow-wrap: anywhere; white-space: normal; }
   /* the title block and the option's figures: two even columns, a rule between rows, no border after the last cell */
   .memo-meta, .memo-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .memo-meta > div, .memo-figures > div { border-right: 0; margin-right: 0; padding: 6px 8px 6px 0; }
@@ -1196,7 +1202,11 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
   .addr-row { flex-wrap: wrap; }
   .addr-row input { flex-basis: 100%; }
   .addr-row .btn { flex: 1 1 auto; }
+  /* the saved-site row: its words, then the select across what is left (17 Nov 2026: a 280 px select beside an
+     unbroken label made the page 404 px wide) */
+  .addr-saved { display: flex; flex-wrap: wrap; width: 100%; margin-right: 0; }
   .addr-saved .cont { white-space: nowrap; }
+  .addr-saved select { flex: 1 1 160px; min-width: 0; max-width: 100%; }
 }
 /* the architect's schedules hold their place beside a long memo, scrolling on their own, instead of ending and leaving
    a 420 px empty column beside the drawings and the ledger (17 Nov 2026) */

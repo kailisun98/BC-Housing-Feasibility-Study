@@ -59,8 +59,9 @@ const FIELDS = [
     ask: { stop: 1, q: "Inside a transit-oriented area?", who: "you, from the City's TOA map" },
     info: "Bill 47 (2023): inside a provincially designated transit-oriented area the City may not refuse the minimum height and density for the tier. Vancouver designated 29 such areas in June 2024, around SkyTrain stations and bus exchanges. Check the City's TOA map; 'Not sure' comes back as uncertain." },
   { on: "site", key: "toa_tier", group: "Policy areas", label: "Transit-oriented area tier", type: "select", need: "rule", reads: ["toa_status"],
-    options: [["", "Not sure"], ["1", "Tier 1 · SkyTrain, within 200 m"], ["2", "Tier 2 · SkyTrain, 200 to 400 m"], ["3", "Tier 3 · SkyTrain, 400 to 800 m"],
-      ["4", "Tier 4 · bus exchange, within 200 m"], ["5", "Tier 5 · bus exchange, 200 to 400 m"]],
+    // short enough for the architect's schedule (17 Nov 2026: "Tier 4 · bus exchange, within 200 m" was cut in it)
+    options: [["", "Not sure"], ["1", "1 · SkyTrain, 200 m"], ["2", "2 · SkyTrain, 400 m"], ["3", "3 · SkyTrain, 800 m"],
+      ["4", "4 · bus exchange, 200 m"], ["5", "5 · bus exchange, 400 m"]],
     ask: { stop: 1, q: "Which tier?", who: "you, from the same map", when: site => site.in_transit_oriented_area === true },
     info: "Distance bands: around a SkyTrain station Tier 1 within 200 m, minimum allowable 20 storeys; Tier 2 200 to 400 m, 12 storeys; Tier 3 400 to 800 m, 8 storeys. Around a bus exchange (the Kootenay Loop, say) Tier 4 within 200 m, 12 storeys; Tier 5 200 to 400 m, 8 storeys. The tier comes from the City's TOA map, which the tool does not read." },
   { on: "site", key: "frequent_bus_stop_within_400m", group: "Policy areas", label: "Frequent bus stop within 400 m", type: TRI, need: "", ref: "note",

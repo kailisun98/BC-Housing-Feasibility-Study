@@ -209,9 +209,13 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         p_ring, p_w, depth, placement = place(option["massing"], plate, p_w, depth, box, "front-right" if at_right else "front-left", warnings)
     h = storeys * f2f
     parapet = option.get("height_m")
-    if parapet and parapet > h:
+    # a height within 5 cm of storeys × floor to floor is that height, rounded (17 Nov 2026: 61.6 m against 19 × 3.24
+    # = 61.56 m warned of "the extra 0.0 m")
+    if parapet and parapet > h + 0.05:
         warnings.append(f"Option height {parapet} m exceeds {storeys} x {f2f} m = {h:.1f} m; the extra {parapet - h:.1f} m is parapet, roof structure or taller ground floor, and the mass uses the stated height.")
         h = float(parapet)
+    elif parapet and parapet > h:
+        h = float(parapet)   # the stated height, drawn as stated
     masses.append({
         "name": "proposed", "label": (f"Proposed: {storeys} storeys, FSR {gfa / area:.2f}" if gfa else f"Proposed: {storeys} storeys") if storeys_given else "Proposed: storeys not given, drawn at one storey as a placeholder",
         "footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "at_street_corner": "right" if at_right else "left",

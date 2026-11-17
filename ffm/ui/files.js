@@ -59,7 +59,7 @@ export function blankSite() {
 }
 
 export function blankOption(siteId) {
-  return { id: siteId ? `${siteId}-option` : null, name: null, proponent: null, proponent_type: "non_profit_society", developer_partner: null,
+  return { id: siteId ? `${siteId}-option` : null, site: siteId || null, name: null, proponent: null, proponent_type: "non_profit_society", developer_partner: null,
     tenure: "social_housing", rezoning_path: null, storeys: null, height_m: null, gfa_m2: null, residential_gfa_m2: null, non_residential_gfa_m2: null,
     units: { studio: null, one_bed: null, two_bed: null, three_bed_plus: null }, rent_tiers_units: null, share_below_hils: null, max_rent_share_of_income: null,
     owner_type_at_completion: null, housing_agreement_years: null, accessible_units: null, below_market_unit_share: null, below_market_discount: null,
@@ -106,15 +106,14 @@ export function onSiteChange() {
   saveDraft();
 }
 
+/* Only the site's own options are offered (17 Nov 2026: the others were listed as "(other site)…", so choosing 375
+   Glen Drive offered 998 E 19th Ave's). A site with no saved file yet (a lookup) has none: its option is new. */
 export async function loadOptions() {
   const sid = state.siteId || (state.site && state.site.id) || "";
-  state.options = await api(`/api/options?site=${encodeURIComponent(sid)}`);
-  const forSite = state.options.filter(o => o.for_site);
-  const others = state.options.filter(o => !o.for_site);
-  const items = forSite.map(o => ({ value: o.id, label: o.name })).concat(others.map(o => ({ value: o.id, label: `(other site) ${o.name}` })));
+  state.options = sid ? await api(`/api/options?site=${encodeURIComponent(sid)}`) : [];
   // the option stays only if it is the site's own: a site switch takes the new site's first option, not the old site's
-  const current = (state.optionId && forSite.some(o => o.id === state.optionId)) ? state.optionId : (forSite[0] ? forSite[0].id : "__new__");
-  fillSelect($("#option-select"), items, current, "New option…");
+  const current = (state.optionId && state.options.some(o => o.id === state.optionId)) ? state.optionId : (state.options[0] ? state.options[0].id : "__new__");
+  fillSelect($("#option-select"), state.options.map(o => ({ value: o.id, label: o.name })), current, "New option…");
   await selectOption(current);
 }
 
@@ -180,7 +179,12 @@ export async function saveNow(kind, given = null) {
   if (!id || !id.trim()) { toast("Give the file an id first.", true); if (!given) idEl.focus(); return false; }
   const clean = id.trim().toLowerCase().replace(/[^a-z0-9._-]+/g, "-");
   const body = Object.assign({}, obj, { id: clean });
-  if (kind === "option") body.name = ((given ? given.name : $("#save-option-name").value) || "").trim() || obj.name || clean;
+  if (kind === "option") {
+    body.name = ((given ? given.name : $("#save-option-name").value) || "").trim() || obj.name || clean;
+    // the option names its site, so it stays that site's whatever its id (17 Nov 2026)
+    const sid = state.siteId || (state.site && state.site.id) || obj.site || null;
+    if (sid) body.site = sid;
+  }
   try {
     const r = await postJSON(kind === "site" ? "/api/sites" : "/api/options", body);
     if (r.downloaded) {
@@ -198,9 +202,8 @@ export async function saveNow(kind, given = null) {
       state.optionDirty = false; $("#option-dirty").hidden = true;
       state.optionId = clean;
       const sid = state.siteId || (state.site && state.site.id) || "";
-      state.options = await api(`/api/options?site=${encodeURIComponent(sid)}`);
-      const forSite = state.options.filter(o => o.for_site), others = state.options.filter(o => !o.for_site);
-      fillSelect($("#option-select"), forSite.map(o => ({ value: o.id, label: o.name })).concat(others.map(o => ({ value: o.id, label: `(other site) ${o.name}` }))), clean, "New option…");
+      state.options = sid ? await api(`/api/options?site=${encodeURIComponent(sid)}`) : [];
+      fillSelect($("#option-select"), state.options.map(o => ({ value: o.id, label: o.name })), clean, "New option…");
       renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
     }
     $(`#save-${kind}-inline`).hidden = true;

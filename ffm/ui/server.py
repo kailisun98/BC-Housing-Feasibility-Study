@@ -16,7 +16,7 @@ folder (ledger, memo, massing, diff) and hands the results back as JSON.
     GET  /api/sites                         [{id, address, zoning_district, file}]
     GET  /api/sites/<id>                    site JSON
     POST /api/sites                         save a new site JSON (body: site); refuses to overwrite
-    GET  /api/options?site=<id>             [{id, name, file, for_site}]
+    GET  /api/options?site=<id>             that site's options only: [{id, name, file, site, for_site}]
     GET  /api/options/<id>                  option JSON
     POST /api/options                       save a new option JSON (body: option); refuses to overwrite
     POST /api/run                           body {site, option, as_of, previous_run?}; site and option are
@@ -157,7 +157,21 @@ def load_option(ident: str) -> dict:
     return _read(_find_input(OPTIONS_DIR, "option", ident))
 
 
+def option_site(option: dict, oid: str, site_ids: list[str]) -> str | None:
+    """The site an option belongs to: the one its file names (`site`), else the site whose id begins its own id. The
+    longest such site id wins, so a site called "998-e-19th" could never claim the options of "998-e-19th-ave". An
+    option that matches no site belongs to none. Pure."""
+    if option.get("site"):
+        return option["site"]
+    hits = [s for s in site_ids if oid == s or oid.startswith(s + "-")]
+    return max(hits, key=len) if hits else None
+
+
 def list_options(site_id: str | None) -> list[dict]:
+    """The options of one site (17 Nov 2026: every other site's options were listed too, as "(other site)…", so
+    choosing 375 Glen Drive offered 998 E 19th Ave's), or every option with its site when no site is asked for (the
+    static build writes them all, and the page filters by `site` in the browser)."""
+    site_ids = [s["id"] for s in list_sites()]
     out = []
     for p in sorted(OPTIONS_DIR.glob("*.json")):
         try:
@@ -165,9 +179,11 @@ def list_options(site_id: str | None) -> list[dict]:
         except Exception:
             continue
         oid = d.get("id") or p.stem
-        for_site = bool(site_id) and (d.get("site") == site_id or oid.startswith(site_id + "-") or oid == site_id)
-        out.append({"id": oid, "name": d.get("name", oid), "file": p.name, "for_site": for_site})
-    out.sort(key=lambda o: (not o["for_site"], o["id"]))
+        owner = option_site(d, oid, site_ids)
+        if site_id and owner != site_id:
+            continue
+        out.append({"id": oid, "name": d.get("name", oid), "file": p.name, "site": owner, "for_site": bool(site_id)})
+    out.sort(key=lambda o: o["id"])
     return out
 
 

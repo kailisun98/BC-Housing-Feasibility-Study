@@ -162,10 +162,11 @@ async function staticApi(path, opts) {
     if (p === "/api/sites") return fetchJSON("data/sites.json");
     if ((m = p.match(/^\/api\/sites\/([^/]+)$/))) return fetchJSON(`data/sites/${decodeURIComponent(m[1])}.json`);
     if (p === "/api/options") {
+      // only the asked site's options, as the local server answers (17 Nov 2026); pages.py writes each option's site
       const site = q.get("site") || "";
       const all = await fetchJSON("data/options.json");
-      return all.map(o => ({ ...o, for_site: !!site && (o.id === site || o.id.startsWith(site + "-")) }))
-                .sort((a, b) => (a.for_site === b.for_site ? a.id.localeCompare(b.id) : (a.for_site ? -1 : 1)));
+      const ownerOf = o => o.site !== undefined ? o.site : (o.id === site || o.id.startsWith(site + "-") ? site : null);
+      return all.filter(o => site && ownerOf(o) === site).map(o => ({ ...o, for_site: true })).sort((a, b) => a.id.localeCompare(b.id));
     }
     if ((m = p.match(/^\/api\/options\/([^/]+)$/))) return fetchJSON(`data/options/${decodeURIComponent(m[1])}.json`);
     if (p === "/api/runs") {

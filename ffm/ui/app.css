@@ -1218,6 +1218,9 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
    a 420 px empty column beside the drawings and the ledger (17 Nov 2026) */
 @media (min-width: 1101px) {
   [data-mode="architect"] .panes:not(.no-inputs) .inputs-body { position: sticky; top: calc(var(--bars-h) + 8px); max-height: calc(100vh - var(--bars-h) - 16px); overflow-y: auto; overscroll-behavior: contain; padding-right: 4px; }
+  /* in the rail that scrolls on its own nothing shrinks to fit it: the Site | Option tabs had squashed to 2 px, so the
+     architect could not change schedules (17 Nov 2026) */
+  [data-mode="architect"] .panes:not(.no-inputs) .inputs-body > * { flex-shrink: 0; }
 }
 /* the clause text folded under its first words; open, it reads as the short ones do */
 .clauses .rule-sec-fold { margin-top: 1px; font-size: 11px; color: var(--muted); }

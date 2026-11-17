@@ -63,7 +63,7 @@ class Egress(unittest.TestCase):
         self.assertEqual(eg["status"], "pass")
         md = "\n".join(layout.markdown(self.solved))
         self.assertIn("### Egress", md)
-        self.assertIn("dead end 0.0 m of 6", md)
+        self.assertIn("dead end 0.0 m, limit 6 m", md)
 
     def test_a_single_7m_core_on_a_30m_plate_has_two_stairs_too_close(self):
         x0 = self.p["x"]
@@ -96,7 +96,7 @@ class Egress(unittest.TestCase):
         self.assertEqual(f["status"], "fail")
         self.assertTrue(any("3.4.2.5" in n for n in f["notes"]), f["notes"])
         svg = layout.svg_plans(layout.place_zones(SITE, OPTION, self.L, self.m, {**layout.zones_of(self.solved), "1": zones}))
-        self.assertIn("Egress: exits", svg)
+        self.assertIn("Egress: 2 exits, 2 required · travel 50.9 m, limit 45 m", svg)
         self.assertIn('stroke-dasharray="4 2"', svg)
 
     def test_sprinklered_false_switches_the_travel_limit_to_30m(self):

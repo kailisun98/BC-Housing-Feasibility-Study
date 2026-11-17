@@ -648,17 +648,21 @@ def param_words(k: str, v: Any) -> str:
         return f"{words(re.sub(r'_cad(_\d{4}(_\d{2})?)?$', '', k))}: ${num(v)}"
     if k.endswith("_pct"):
         return f"{words(k[:-4])}: {num(v)}%"
-    if k.endswith("_m2"):
-        return f"{words(k[:-3])}: {num(v)} m²"
-    if k.endswith("_m"):
-        return f"{words(k[:-2])}: {num(v)} m"
+    # the unit token can sit mid-key too ("max_height_m_outright": "maximum height m outright: 10.7"); it moves to the
+    # figure wherever it is
+    if re.search(r"_m2(_|$)", k):
+        return f"{words(re.sub(r'_m2(?=_|$)', '', k))}: {num(v)} m²"
+    if re.search(r"_m(_|$)", k):
+        return f"{words(re.sub(r'_m(?=_|$)', '', k))}: {num(v)} m"
     if re.search(r"(share|rate)(_of_\w+)?$", k) and 0 < v < 1:
         return f"{words(k)}: {num(round(v * 100, 1))}%"
     return f"{words(k)}: {num(v)}"
 
 
 def info_only(site, option, p) -> Result:
-    bits = [param_words(k, v) for k, v in p.items() if v is not None and not isinstance(v, (dict, list))]
+    # an encoder's note to self ("criteria_note": … "pull from cmhc.ca/ahf before encoding") stays in the values, out
+    # of the finding the memo prints
+    bits = [param_words(k, v) for k, v in p.items() if v is not None and not isinstance(v, (dict, list)) and not re.search(r"(^|_)notes?$", k)]
     return _r(INFO, "; ".join(bits) + ".", dict(p))
 
 

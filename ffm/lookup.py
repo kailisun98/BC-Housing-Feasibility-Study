@@ -444,8 +444,12 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         notes.append("No zoning district found at that point in the City's dataset; enter it by hand.")
     shape = None
     if metrics:
-        front_how = (f"the side along {street['name']}" + ("" if street["matched_by_name"] else ", the nearest road") + f" from OpenStreetMap, {street['distance_m']} m away") if street else metrics["frontage_from"]
-        notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon ({metrics['vertices']} vertices" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"); frontage taken as {front_how}.")
+        # the distance is the lot's centre to the road's centre line, said so (17 Nov 2026: "from OpenStreetMap, 29.0 m
+        # away" read as the side being 29 m off); the corners are counted once, by the shape classifier below, which
+        # drops the in-line points the raw polygon carries (the raw count disagreed with "4 corners" in the next note)
+        front_how = (f"the side along {street['name']}" + ("" if street["matched_by_name"] else ", the nearest road")
+                     + f" (OpenStreetMap; its centre line {street['distance_m']} m from the lot's centre)") if street else metrics["frontage_from"]
+        notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"; frontage taken as {front_how}.")
         if street and street.get("cross_street"):
             x = street["cross_street"]
             notes.append(f"A corner lot: {x['name']} also runs beside it, {x['distance_m']} m from the centre. The frontage is taken on {street['name']} "

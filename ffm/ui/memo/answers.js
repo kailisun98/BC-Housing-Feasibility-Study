@@ -78,10 +78,11 @@ export function layoutOpenItems(run) {
 
 /* One floor's egress in a line, as the plans sheet prints it. Pure. */
 export function egressLine(f) {
-  const parts = [`exits ${f.exits} of ${f.exits_required}`];
-  if (f.farthest_travel_m != null) parts.push(`travel ${f.farthest_travel_m.toFixed(1)} m of ${f.travel_limit_m}`);
-  if (f.separation_min_m != null && f.separation_m != null) parts.push(`separation ${f.separation_m.toFixed(1)} m of ${f.separation_min_m}`);
-  if (f.dead_end_m != null) parts.push(`dead end ${f.dead_end_m.toFixed(1)} m of ${f.dead_end_limit_m}`);
+  // as layout.egress_line words it: each figure with its unit and which side of it the limit is
+  const parts = [`${f.exits} exit${f.exits === 1 ? "" : "s"}, ${f.exits_required} required`];
+  if (f.farthest_travel_m != null) parts.push(`travel ${f.farthest_travel_m.toFixed(1)} m, limit ${f.travel_limit_m} m`);
+  if (f.separation_min_m != null && f.separation_m != null) parts.push(`separation ${f.separation_m.toFixed(1)} m, at least ${f.separation_min_m} m`);
+  if (f.dead_end_m != null) parts.push(`dead end ${f.dead_end_m.toFixed(1)} m, limit ${f.dead_end_limit_m} m`);
   return parts.join(" · ");
 }
 

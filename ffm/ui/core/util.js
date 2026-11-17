@@ -58,16 +58,17 @@ export function paramWords(k, x) {
   let shown;
   if (/_cad(_\d{4}(_\d{2})?)?$/.test(key)) { key = key.replace(/_cad(_\d{4}(_\d{2})?)?$/, ""); shown = `$${fmtNum(Math.round(x * 100) / 100)}`; }
   else if (/_pct$/.test(key)) { key = key.replace(/_pct$/, ""); shown = `${fmtNum(x)}%`; }
-  else if (/_m2$/.test(key)) { key = key.replace(/_m2$/, ""); shown = `${fmtNum(x)} m²`; }
-  else if (/_m$/.test(key)) { key = key.replace(/_m$/, ""); shown = `${fmtNum(x)} m`; }
+  // the unit token moves to the figure wherever it sits in the key (17 Nov 2026: "maximum height m outright: 10.7")
+  else if (/_m2(_|$)/.test(key)) { key = key.replace(/_m2(?=_|$)/, ""); shown = `${fmtNum(x)} m²`; }
+  else if (/_m(_|$)/.test(key)) { key = key.replace(/_m(?=_|$)/, ""); shown = `${fmtNum(x)} m`; }
   else if (/(share|rate)(_of_\w+)?$/.test(key) && x > 0 && x < 1) shown = `${fmtNum(Math.round(x * 1000) / 10)}%`;
   else shown = fmtNum(x);
   return `${keyWords(key)}: ${shown}`;
 }
 
-/* A parameter key in words: max and min in full, m2 as m². */
+/* A parameter key in words: max and min in full, m2 as m², a bare unit token in brackets ("height (m) outright"). */
 export function keyWords(k) {
-  return String(k).replace(/_/g, " ").replace(/\bmax\b/g, "maximum").replace(/\bmin\b/g, "minimum").replace(/\bm2\b/g, "m²").replace(/\bpct\b/g, "%").replace(/\brgi\b/g, "RGI").replace(/\bchf\b/g, "CHF");
+  return String(k).replace(/_m_/g, " (m) ").replace(/_m$/, " (m)").replace(/_/g, " ").replace(/\bmax\b/g, "maximum").replace(/\bmin\b/g, "minimum").replace(/\bm2\b/g, "m²").replace(/\bpct\b/g, "%").replace(/\brgi\b/g, "RGI").replace(/\bchf\b/g, "CHF");
 }
 
 /* Lead sentence in ink, the rest in grey. */

@@ -487,9 +487,15 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
   .when { grid-template-columns: 1fr; border-top: 0; }
   .when .h { display: none; }
   .when > div { border-bottom: 0; padding: 6px 0; }
+  /* stacked, an empty stage is no row at all, and each entry says which stage it is (the header row is gone) */
+  .when > div:empty { display: none; }
+  .when > div[data-stage]::before { content: attr(data-stage); display: block; padding-left: 32px; margin-bottom: 4px; font: 600 10.5px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--fg-3); }
+  .when > .memo-col[data-stage]::before { color: var(--signal); }
   .when .lay { padding-top: 18px; border-top: 1px solid var(--line-2); }
-  .when .who { padding-left: 32px; display: flex; gap: 8px; align-items: baseline; }
-  .when .who::before { margin: 0; flex: 0 0 9px; }
+  /* the name and its note flow as one line of text, the dot hung in the margin (a flex row split "Planners and an
+     arborist" and "once a site plan exists" into two columns) */
+  .when .who { position: relative; padding-left: 49px; }
+  .when .who::before { position: absolute; left: 32px; top: .5em; margin: 0; }
   .when .who b { display: inline; }
   .when .who b::after { content: " · "; color: var(--fg-3); }
   .when .memo-col { box-shadow: none; background: transparent; }

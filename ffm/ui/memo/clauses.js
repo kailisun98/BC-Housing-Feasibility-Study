@@ -14,6 +14,18 @@ const flatWords = v => Object.entries(v || {}).filter(([, x]) => x !== null && x
 
 const num = x => (x === null || x === undefined ? "—" : fmtNum(x));
 
+/* The exit clauses in a sentence, from the rule's own figures (17 Nov 2026: nine "key: value" pairs, "separation share
+   of diagonal: 50%; occupant load persons per sleeping room: 2"). */
+const EXITS_RULE = /^bcbc\.exits$/;
+function exitsWords(v) {
+  const bits = [];
+  if (v.two_exits_over_floor_area_m2 != null) bits.push(`two exits from a floor over ${num(v.two_exits_over_floor_area_m2)} m²${v.two_exits_over_occupant_load != null ? ` or ${num(v.two_exits_over_occupant_load)} people` : ""}`);
+  if (v.separation_min_m != null) bits.push(`at least ${num(v.separation_min_m)} m apart${v.separation_share_of_diagonal != null ? `, or ${pct(v.separation_share_of_diagonal)} of the floor's diagonal` : ""}`);
+  if (v.travel_limit_sprinklered_m != null) bits.push(`travel to an exit at most ${num(v.travel_limit_sprinklered_m)} m sprinklered${v.travel_limit_unsprinklered_m != null ? `, ${num(v.travel_limit_unsprinklered_m)} m without` : ""}`);
+  if (v.dead_end_max_m != null) bits.push(`dead-end corridors at most ${num(v.dead_end_max_m)} m`);
+  return bits.length ? bits.join("; ").replace(/^./, c => c.toUpperCase()) : flatWords(v).join("; ");
+}
+
 /* Each check's numbers split three ways: what the option proposes (the simulation's input), what the clause permits
    or requires, and the ask when the two differ. Checks the table does not know fall back to a split by key name. */
 export function splitValues(r, L) {
@@ -85,9 +97,15 @@ export function splitValues(r, L) {
     }
     case "dcl_cac":
       return { proposed: "social housing", permitted: `DCL ${v.dcl_exempt ? "exempt" : "payable"}, CAC ${v.cac_exempt ? "exempt" : "payable"}`, ask: "" };
+    case "assumption":
+      // layer F: the assumption's own summary, which the finding carries; its table ids, vectors and coordinates are
+      // for the pro-forma's citation, not the reader (17 Nov 2026: F2 printed "vector: v1617916836; coordinate: …")
+      return { info: String(r.finding || "").replace(/\.$/, "") };
     case "info_only":
-      // a rule that informs: its figures in one cell across the row (see renderClauses), each with its unit
-      return { info: flatWords(v).join("; ") };
+      if (EXITS_RULE.test(r.rule_id || "")) return { info: exitsWords(v) };
+      // a rule that informs: its figures in one cell across the row (see renderClauses), each with its unit; an
+      // encoder's note to self is not a figure (17 Nov 2026: "criteria note: … pull from cmhc.ca/ahf before encoding")
+      return { info: flatWords(Object.fromEntries(Object.entries(v).filter(([k]) => !/(^|_)notes?$/.test(k)))).join("; ") };
     default: {
       const lim = k => /^(max_|min_|required|benchmark_|schedule_|eligible)/.test(k);
       const flat = Object.entries(v).filter(([, x]) => x !== null && x !== undefined && typeof x !== "object");
@@ -120,7 +138,8 @@ export function withPlans(res, run) {
   const eg = run && run.layout && run.layout.egress;
   if (!eg || !eg.rule_id || !eg.status) return res;
   return res.map(r => r.rule_id === eg.rule_id && r.status !== "not_applicable"
-    ? { ...r, status: eg.status, action: eg.summary ? `The plans: ${eg.summary}` : r.action } : r);
+    // the ledger's finding is the plans' too, so a Fail never stands beside the rule's bare figures (17 Nov 2026)
+    ? { ...r, status: eg.status, finding: eg.summary || r.finding, action: eg.summary ? `The plans: ${eg.summary}` : r.action } : r);
 }
 
 export function renderClauses(res, L, changed = new Set(), run = null) {

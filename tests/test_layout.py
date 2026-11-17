@@ -83,13 +83,16 @@ class Stacking(unittest.TestCase):
         self.assertIn("roof_garden", ids)
         self.assertEqual(next(c for c in lay["adjacencies"] if c["id"] == "family_low")["rule"], "wherever they fit")
 
-    def test_the_sheets_are_well_formed_svg_with_the_stamp(self):
+    def test_the_sheets_are_well_formed_svg_with_the_rules_date(self):
         S = layout.sheets(self.lay, SITE, self.m, self.L)
         self.assertEqual(set(S), set(layout.SHEETS))
         for name, text in S.items():
             root = ET.fromstring(text)
             self.assertTrue(root.tag.endswith("svg"), name)
-            self.assertIn(self.lay["stamp"], text, name)
+            # each sheet says which rules it read; the stamp's hash stays in the ledger and off the drawing, as the UI
+            # dropped it (17 Nov 2026)
+            self.assertIn(f"Rules as of {self.lay['as_of']}", text, name)
+            self.assertNotIn(self.lay["stamp"], text, name)
         self.assertIn("front 3.7 m", S["site-plan"])
         self.assertIn("outright 10.7 m", S["elevations"])
         self.assertIn("Ground floor", S["plans"])

@@ -278,6 +278,14 @@ Built and verified in the browser:
   (the City's 176 are smaller homes than BC Housing's minimums + 10%). On 998 E 19th Ave funder-ready now derives 99
   homes (the plate's), and exits pass with the end stairs. Stop 02's Continue waits while a figure is impossible
   (under 2.8 m a floor; a floor larger than the plate box): `figureProblems` in route-stage.js. `tests/test_tower.py`.
+  Machine text out of the reading path (17 Nov 2026, third pass): the drawings' foot line is "Rules as of … · drawn
+  from …, not a design / not a survey" (the stamp's hash stays in the ledger, as the UI dropped it); egress reads
+  "4 exits, 2 required · travel 30.1 m, limit 45 m · separation …, at least 9 m" (`layout.egress_line`, answers.js
+  `egressLine`); in Clauses applied a layer F row is the assumption's summary, the exits row (bcbc.exits) a sentence
+  (`exitsWords`), and a `*_note` key never prints; `paramWords`/`param_words` move a mid-key unit ("max_height_m_
+  outright") to the figure. FIG 02 draws each mass at its own footprint width and names the outright limit beside
+  its storeys (`massing.outright_height_limit_m`, kept off the mass record so the committed massing.json compares).
+  who.html's grid, stacked on a phone, drops its empty cells and labels each entry with its stage (`data-stage`).
 - `ffm/lookup.py`: `lookup(address)` finds the point in the City's own `property-addresses` dataset first
   (`parse_address` turns "609 heatley" into civic number 609 and street "HEATLEY" for an ODSQL `like`; the
   record's `site_id` names the parcel, fetched by id) and only otherwise geocodes with Nominatim kept inside

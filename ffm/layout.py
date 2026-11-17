@@ -610,26 +610,27 @@ def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_
         bits.append(f"too few exits on {len(short)} floor{'s' if len(short) != 1 else ''}")
     sep = [f for f in floors if f["separation_m"] is not None and f["separation_min_m"] is not None and f["separation_m"] + 1e-6 < f["separation_min_m"]]
     if sep:
-        bits.append(f"exits {min(f['separation_m'] for f in sep):.1f} m apart against {sep[0]['separation_min_m']:g} m on {len(sep)} floor{'s' if len(sep) != 1 else ''}")
+        bits.append(f"exits {min(f['separation_m'] for f in sep):.1f} m apart, at least {sep[0]['separation_min_m']:g} m needed, on {len(sep)} floor{'s' if len(sep) != 1 else ''}")
     tr = [f["farthest_travel_m"] for f in floors if f["farthest_travel_m"] is not None]
     if tr:
-        bits.append(f"farthest travel {max(tr):.1f} m of {travel_limit:g}")
+        # every figure carries its unit and says which side of it the limit is (17 Nov 2026: "travel 30.1 m of 45")
+        bits.append(f"farthest travel {max(tr):.1f} m, limit {travel_limit:g} m")
     de = [f["dead_end_m"] for f in floors if f["dead_end_m"] is not None]
     if de and max(de) > dead_limit + 1e-6:
-        bits.append(f"dead-end corridors up to {max(de):.1f} m against {dead_limit:g}")
+        bits.append(f"dead-end corridors up to {max(de):.1f} m, limit {dead_limit:g} m")
     return (f"Egress ({'sprinklered' if sprinklered else 'unsprinklered'}, BCBC 2024 Part 3): {overall}; {len(floors)} floor{'s' if len(floors) != 1 else ''}: {counts}"
             + (f"; {'; '.join(bits)}" if bits else "") + ".")
 
 
 def egress_line(f: dict) -> str:
     """One floor's egress in a line: exits, travel, separation, dead end against their limits."""
-    parts = [f"exits {f['exits']} of {f['exits_required']}"]
+    parts = [f"{f['exits']} exit{'s' if f['exits'] != 1 else ''}, {f['exits_required']} required"]
     if f["farthest_travel_m"] is not None:
-        parts.append(f"travel {f['farthest_travel_m']:.1f} m of {f['travel_limit_m']:g}")
+        parts.append(f"travel {f['farthest_travel_m']:.1f} m, limit {f['travel_limit_m']:g} m")
     if f["separation_min_m"] is not None and f["separation_m"] is not None:
-        parts.append(f"separation {f['separation_m']:.1f} m of {f['separation_min_m']:g}")
+        parts.append(f"separation {f['separation_m']:.1f} m, at least {f['separation_min_m']:g} m")
     if f["dead_end_m"] is not None:
-        parts.append(f"dead end {f['dead_end_m']:.1f} m of {f['dead_end_limit_m']:g}")
+        parts.append(f"dead end {f['dead_end_m']:.1f} m, limit {f['dead_end_limit_m']:g} m")
     return " · ".join(parts) + f" · {f['status']}"
 
 
@@ -821,7 +822,8 @@ def _foot(lines: list[str], x: float, y: float) -> list[str]:
 
 
 def _stamp_line(L: dict) -> str:
-    return f'Rules as of {L["as_of"]} · stamp {L["stamp"]} · derived by ffm from the option and the massing, not a design'
+    # the run's stamp stays in the ledger and the memo's title block; on the drawing it read as machine text
+    return f'Rules as of {L["as_of"]} · drawn from the option and the massing, not a design'
 
 
 def svg_stacking(L: dict) -> str:
@@ -930,7 +932,7 @@ def svg_plans(L: dict) -> str:
     width = pad + 30 + pw + pad
     lines = [f'Unit depth {p["unit_depth_m"]} m either side of a {LAYOUT_ASSUMPTIONS["corridor_width_m"][0]} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;',
              f'partitions +{int((LAYOUT_ASSUMPTIONS["partition_allowance"][0] - 1) * 100)}% over net areas (declared placeholders). The rules read back from the plates are listed with the figure.',
-             *([f'Egress ({eg["rule_id"]}, BCBC 2024 Part 3, figures to be verified): dashed, the farthest unit door to its exit along the corridor;',
+             *([f'Egress (BC Building Code 2024, Part 3; figures to be verified): dashed, the farthest unit door to its exit along the corridor;',
                 f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.']
                if eg else []),
              _stamp_line(L)]

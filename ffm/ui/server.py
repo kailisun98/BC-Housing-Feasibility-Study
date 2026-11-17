@@ -73,7 +73,7 @@ from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 from .. import engine, layout, massing, memo, proforma, suggest
-from ..rules_loader import RULES_DIR, load_rules
+from ..rules_loader import RULES_DIR, district_of, load_rules
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 SITES_DIR = ROOT / "sites"
@@ -129,7 +129,7 @@ def list_sites() -> list[dict]:
             d = _read(p)
         except Exception:
             continue
-        out.append({"id": d.get("id") or p.stem, "address": d.get("address", ""), "zoning_district": d.get("zoning_district", ""),
+        out.append({"id": d.get("id") or p.stem, "address": d.get("address", ""), "zoning_district": district_of(d),
                     "municipality": d.get("municipality", ""), "file": p.name})
     return out
 
@@ -194,7 +194,7 @@ def list_rules(as_of: str | None) -> list[dict]:
         # program's terms or an assumption's figure and cite it before any run
         params = {k: x for k, x in (v.params if v else {}).items() if k != "observations"}
         out.append({"id": r.id, "layer": r.layer, "layer_title": r.layer_title, "title": r.title, "jurisdiction": r.jurisdiction,
-                    "applies_to_districts": r.applies_to_districts, "check": r.check,
+                    "applies_to_districts": r.applies_to_districts, "applies_to_cd1": r.applies_to_cd1, "check": r.check,
                     "version_effective_from": v.effective_from.isoformat() if v else None,
                     "params": params, "source": (v.source if v else {})})
     return out

@@ -5,6 +5,7 @@ import { cap, fmtNum, h, leadCont, pill, VERDICT_OUTRIGHT, verdictStatus, withou
 import { state } from "../core/state.js";
 import { refOf, refTagOf } from "./memo.js";
 import { ruleTitle } from "../route-stage.js";
+import { districtOf } from "../fields.js";
 
 export function answerAllowed(L) {
   const res = L.results, ans = L.summary.answers, site = L.inputs.site;
@@ -14,10 +15,11 @@ export function answerAllowed(L) {
   const policy = res.filter(r => ["A", "B", "C"].includes(r.layer) && ["fail", "conditional", "uncertain"].includes(r.status) && !(r.check || "").startsWith("district_outright"));
   let verdict = `${h(VERDICT_OUTRIGHT[o.verdict] || cap(o.verdict) + ".")}`;
   if (path) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
-  let body = `<p class="path">Outright under ${h(site.zoning_district || "the district")}${path ? ` · rezoning path: ${h(path)}` : " · no rezoning path stated"}</p>`;
+  let body = `<p class="path">Outright under ${h(districtOf(site) || "the district")}${path ? ` · rezoning path: ${h(path)}` : " · no rezoning path stated"}</p>`;
   // nothing was tested: say why, in the words answer 3 repeats with the person who settles it
   if (o.why) body += `<p class="finding"><b>Not assessed:</b> ${h(o.why)}. The storeys, height and floor area in this memo are the option's own figures, not permitted ones; answer 3 names who reads the schedule.</p>`;
-  body += outLines.map(r => `<p class="finding">${leadCont(r.finding)}</p>`).join("");
+  // each finding cites the rule it came from (A1, its title), so a CD-1 site shows its own by-law's rules (17 Nov 2026)
+  body += outLines.map(r => `<p class="finding">${refTagOf(r.rule_id)}${leadCont(r.finding)} <span class="cont">(${h(r.title)})</span></p>`).join("");
   if (path && policy.length) {
     body += `<ul class="finding-list">${policy.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
   }

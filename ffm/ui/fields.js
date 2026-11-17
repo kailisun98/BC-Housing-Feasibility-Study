@@ -34,7 +34,15 @@ const FIELDS = [
   { on: "site", key: "zoning_district", group: "Identity", label: "Zoning district", type: "text", need: "run",
     reads: ["district_outright_fsr", "district_outright_height", "district_setbacks", "ssmuh_minimum_units"],
     help: "As written in the by-law: RM-1, RS-1, RT-3, R1-1 …",
-    info: "The district schedule that applies without a rezoning, as the by-law writes it. The rule stack holds outright limits for RM-1/RM-1N and RT-3 (read from the schedules), and for RM-3, RM-3A, RM-4 and most of the RT family entered unverified (the memo says so), plus the SSMUH rule for R1-1, RS and RT. A district with no schedule, such as CD-1 (its own by-law), reads 'not assessed' and the rough envelope stands in." },
+    info: "The district schedule that applies without a rezoning, as the by-law writes it. The rule stack holds outright limits for RM-1/RM-1N, RT-3 and RM-4 (read from the schedules), and for RM-3, RM-3A and most of the RT family entered unverified (the memo says so), plus the SSMUH rule for R1-1, RS and RT. A CD-1 is its own by-law: its rules are matched on the CD-1 number (CD-1 (324) is in, read from its by-law; CD-1 (819) from its referral report, unverified). A district or CD-1 not in the stack reads 'not assessed', says so, and the rough envelope stands in." },
+  { on: "site", key: "cd1_bylaw_number", group: "Identity", label: "CD-1 number", type: "text", need: "",
+    reads: ["district_outright_fsr", "district_outright_height", "district_setbacks"],
+    help: "For a CD-1 site only: 324 for CD-1 (324). The lookup fills it from the City's zoning data.",
+    info: "Each CD-1 is its own by-law, so a CD-1 site is matched to its rules by this number and no other: CD-1 (324)'s rules never apply to CD-1 (819). Blank on a CD-1 site, no by-law can be matched and the outright answer reads 'not assessed'. Leave it blank for any other district." },
+  { on: "site", key: "cd1_sub_area", group: "Identity", label: "CD-1 sub-area", type: "text", need: "",
+    reads: ["district_outright_fsr"],
+    help: "Where the CD-1 by-law sets figures by sub-area: B for 1010 Expo Blvd in CD-1 (324).",
+    info: "Some CD-1 by-laws fix the floor area per sub-area drawn on their Schedule A (CD-1 (324): sub-area A 19,300 m², B 23,600 m² of residential floor area). Read the site's sub-area off that map; blank, the floor area reads 'uncertain' and says so." },
   { on: "site", key: "site_area_m2", group: "Lot", rowOf: "lot", label: "Area (m²)", type: "number", need: "run",
     reads: ["district_outright_fsr", "ssmuh_minimum_units", "tree_replacement"],
     info: "Divides the option's floor area into an FSR, sets Schedule C's minimum tree count (2,551 to 2,900 m² needs 20 trees) and sizes the outright mass." },
@@ -254,8 +262,33 @@ export const ANSWERS = Object.fromEntries(FIELDS.filter(f => f.ask).map(f => [f.
 
 const NEED_WORD = { run: "needed to run", rule: "read by a rule; blank means uncertain", figure: "drawings only" };
 
-/* A rule applies to this site's district, or to every district. */
-export function appliesHere(r, district) {
+/* The CD-1 number of a site zoned CD-1 (as rules_loader.cd1_number): the site's cd1_bylaw_number, else the number in
+   "CD-1 (324)"; null for any other district or a CD-1 with no number known. */
+export function cd1Of(district, given) {
+  const m = String(district || "").match(/^\s*CD-1(?![0-9A-Za-z])\s*(?:\(\s*([0-9A-Za-z]+)\s*\))?/i);
+  if (!m) return null;
+  let v = given != null && given !== "" ? String(given).trim() : (m[1] || "");
+  if (!v) return null;
+  const f = Number(v);
+  if (Number.isFinite(f) && Number.isInteger(f)) v = String(f);
+  return v.toUpperCase();
+}
+
+/* The site's district as the rules read it (rules_loader.district_of): "CD-1 (324)" for a CD-1 whose number is known. */
+export function districtOf(site) {
+  const d = (site && site.zoning_district) || "";
+  const n = cd1Of(d, site && site.cd1_bylaw_number);
+  return n ? `CD-1 (${n})` : d;
+}
+
+/* A rule applies to this site's district, or to every district. A rule keyed to CD-1 numbers (applies_to_cd1) applies
+   only to a CD-1 site with one of them, as Rule.applies_to in the engine. */
+export function appliesHere(r, district, cd1) {
+  const nums = r.applies_to_cd1 || [];
+  if (nums.length) {
+    const n = cd1Of(district, cd1);
+    return n != null && nums.some(x => String(x).trim().toUpperCase() === n);
+  }
   const ds = r.applies_to_districts || [];
   if (!ds.length || ds.includes("*")) return true;
   const d = String(district || "").toUpperCase();

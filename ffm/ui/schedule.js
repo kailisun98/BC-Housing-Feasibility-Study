@@ -3,7 +3,7 @@
 
 import { $, $$, fmtNum, getPath, h, setPath } from "./core/util.js";
 import { state } from "./core/state.js";
-import { appliesHere, OPTION_FIELDS, optWord, SITE_FIELDS, TRI } from "./fields.js";
+import { appliesHere, districtOf, OPTION_FIELDS, optWord, SITE_FIELDS, TRI } from "./fields.js";
 import { syncRunButton } from "./runs.js";
 import { memoRefs } from "./memo/memo.js";
 import { renderClaude } from "./claude.js";
@@ -27,8 +27,8 @@ export function refNow(id) {
 /* What a field's Ref says: the rules that read it, or the word for what else it is for. */
 function refsFor(f) {
   const reads = f.reads || [];
-  const district = (state.site || {}).zoning_district;
-  const list = state.rules.filter(r => reads.includes(r.check) && appliesHere(r, district)).map(r => ({ id: r.id, title: r.title, ref: refNow(r.id) })).filter(r => r.ref)
+  const district = (state.site || {}).zoning_district, cd1 = (state.site || {}).cd1_bylaw_number;
+  const list = state.rules.filter(r => reads.includes(r.check) && appliesHere(r, district, cd1)).map(r => ({ id: r.id, title: r.title, ref: refNow(r.id) })).filter(r => r.ref)
     .sort((a, b) => a.ref[0].localeCompare(b.ref[0]) || Number(a.ref.slice(1)) - Number(b.ref.slice(1)));
   if (list.length) {
     const refs = list.map(r => r.ref);
@@ -297,7 +297,7 @@ function unsureNote(n) { return n ? ` · <span class="unsure-n">${n} answer${n =
 function siteSummary(s) {
   if (!s) return "";
   const dims = s.frontage_m != null && s.depth_m != null ? ` · ${h(s.frontage_m)} × ${h(s.depth_m)} m` : "";
-  return `<b>${h(s.address || s.id || "A new site")}</b> · ${h(s.zoning_district || "district not set")} · ${s.site_area_m2 != null ? `${h(fmtNum(s.site_area_m2))} m²` : "area not set"}${dims}${unsureNote(countUnsure(s, SITE_FIELDS))}`;
+  return `<b>${h(s.address || s.id || "A new site")}</b> · ${h(districtOf(s) || "district not set")} · ${s.site_area_m2 != null ? `${h(fmtNum(s.site_area_m2))} m²` : "area not set"}${dims}${unsureNote(countUnsure(s, SITE_FIELDS))}`;
 }
 
 export function optionSummary(o) {

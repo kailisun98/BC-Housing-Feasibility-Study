@@ -31,6 +31,26 @@
       ]
     },
     {
+      "id": "cov.dtes.family_units",
+      "title": "Downtown Eastside Plan: family-unit target in rezonings",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": ["*"],
+      "check": "family_unit_share",
+      "versions": [
+        {
+          "effective_from": "2014-03-15",
+          "params": {"area_plan": "downtown_eastside", "min_two_plus_bed_share": 0.25, "min_three_plus_bed_share": null, "exclude_supportive_units": true},
+          "source": {
+            "title": "City of Vancouver referral report, CD-1 Rezoning: 1015 East Hastings Street (5 Jan 2021), stating the Downtown Eastside Plan's family housing target",
+            "url": "https://council.vancouver.ca/20210119/documents/rr5.pdf",
+            "section": "Policy context: 'a family housing target of 25% two- and three-bedroom units (except seniors and supportive housing)'; Housing, Unit Mix: 25% of all units for social housing and market rental housing designed for families, met by 35 two-bedroom and 5 three-bedroom units of 163",
+            "verified": false,
+            "verify": "Read from the referral report's account of the Plan, not from the Downtown Eastside Plan itself (section 9, Housing); the effective date is the Plan's adoption in March 2014, entered as a placeholder. Confirm both against the Plan. The rule applies only where a person has set site.area_plan to 'downtown_eastside'."
+          }
+        }
+      ]
+    },
+    {
       "id": "cov.social_housing_definition",
       "title": "Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755)",
       "jurisdiction": "City of Vancouver",

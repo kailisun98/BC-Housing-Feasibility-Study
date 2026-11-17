@@ -53,19 +53,186 @@ def fsr(site: Site, option: Option) -> float | None:
 
 # ---------------------------------------------------------------- Layer A: zoning district
 
+# What a district schedule permits depends on more than the district (17 Nov 2026, the schedules Kai saved): the
+# tenure (RM-4, RM-3A: 3.00 for 100% social housing; C-2: 3.50 for a building with every home rental), the site's size
+# and shape (RR-1, RR-2A/2B: a table by site area, depth and a corner's frontage), the Director's discretion (RM-5:
+# up to 2.75, a conditional approval), formula increases (RM-3: by site coverage and parking) and, in a CD-1, a floor
+# area fixed per sub-area (CD-1 (324)). `fsr_limit` and `height_limit` read all of it once, for the checks below and
+# the suggester alike. A row of a table names the site conditions it needs; the most it allows is taken.
+SOCIAL = "social_housing"
+RENTAL_TENURES = ("social_housing", "secured_market_rental")
+
+
+def _is_corner(site: Site) -> bool:
+    return bool(site.get("corner_lot")) or bool(corner_streets(site))
+
+
+def _row_fits(site: Site, option: Option, row: dict) -> bool:
+    """A table row's conditions on the site (and, where it says so, the tenure)."""
+    area = float(site.get("site_area_m2") or 0)
+    W, D = lot_as_fronted(site)
+    if row.get("min_site_area_m2") and area + 1e-9 < row["min_site_area_m2"]:
+        return False
+    if row.get("max_site_depth_m") and not (D and D <= row["max_site_depth_m"] + 1e-9):
+        return False
+    if row.get("min_frontage_m") and not (W and W + 1e-9 >= row["min_frontage_m"]):
+        return False
+    if row.get("corner") and not _is_corner(site):
+        return False
+    if row.get("social_housing") and option.get("tenure") != SOCIAL:
+        return False
+    if row.get("rental") and option.get("tenure") not in RENTAL_TENURES:
+        return False
+    return True
+
+
+def _best_row(site: Site, option: Option, rows: list[dict], key: str) -> dict | None:
+    fits = [r for r in rows if r.get(key) is not None and _row_fits(site, option, r)]
+    return max(fits, key=lambda r: r[key]) if fits else None
+
+
+def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
+    """The FSR a schedule's rule allows this site and option: `max` the most allowed without discretion (None where the
+    site meets no row of the schedule's table), `words` how the schedule gets there, `discretionary` what the Director
+    may allow above it and its clause, `increases` formula increases not computed here, `floor_area_cap` a CD-1's fixed
+    floor area in m² (its `max` is then that area over the site), `short` why no figure applies."""
+    tenure = option.get("tenure")
+    out: dict[str, Any] = {"max": p.get("max_fsr"), "base": p.get("max_fsr"), "words": "", "discretionary": None, "discretionary_clause": None,
+                           "increases": p.get("fsr_increases"), "floor_area_cap": None, "short": None}
+    if p.get("fsr_table"):
+        row = _best_row(site, option, p["fsr_table"], "max_fsr")
+        if row is None:
+            out.update({"max": None, "short": p.get("fsr_table_short") or "the site meets none of the schedule's rows (its area, depth or frontage is short)"})
+            return out
+        out.update({"max": row["max_fsr"], "words": f" for {row['label']}" if row.get("label") else ""})
+    if p.get("sub_area_residential_floor_area_m2"):
+        sub = str(site.get("cd1_sub_area") or "").strip().upper()
+        cap = (p["sub_area_residential_floor_area_m2"] or {}).get(sub)
+        if cap is None:
+            caps = ", ".join(f"{k} {v:,.0f} m²" for k, v in p["sub_area_residential_floor_area_m2"].items())
+            out.update({"max": None, "short": f"the by-law fixes the residential floor area by sub-area ({caps}) and the site's sub-area (cd1_sub_area) is not recorded"})
+            return out
+        area = float(p.get("fsr_site_area_m2") or site.get("site_area_m2") or 0)
+        out.update({"floor_area_cap": float(cap), "sub_area": sub, "max": round(cap / area, 2) if area else None,
+                    "words": f" (sub-area {sub}'s {cap:,.0f} m² of residential floor area)"})
+    best = out["max"]
+    if tenure in RENTAL_TENURES and p.get("max_fsr_rental") and (best is None or p["max_fsr_rental"] > best):
+        r = p["max_fsr_rental"]
+        if p.get("max_fsr_rental_corner") and _row_fits(site, option, p["max_fsr_rental_corner"]):
+            r = max(r, p["max_fsr_rental_corner"]["max_fsr"])
+        out.update({"max": r, "words": f" for a building with every home secured as rental ({p.get('rental_fsr_clause') or 'the schedule'}; {out['base']} otherwise)"})
+    if tenure == SOCIAL and p.get("max_fsr_social_housing") and (out["max"] is None or p["max_fsr_social_housing"] > out["max"]):
+        out.update({"max": p["max_fsr_social_housing"], "words": f" for 100% social housing ({p.get('social_housing_fsr_clause') or 'the schedule'}; {out['base']} otherwise)"})
+    disc = p.get("max_fsr_discretionary")
+    if disc:
+        clause = p.get("fsr_discretionary_clause") or "the schedule"
+        narrow = p.get("narrow_site")
+        W, _ = lot_as_fronted(site)
+        if narrow and W and W <= narrow["max_width_m"] + 1e-9:
+            corner_ok = _is_corner(site) and float(site.get("site_area_m2") or 0) >= narrow.get("corner_min_site_area_m2", 0)
+            cap = narrow["corner_max_fsr"] if corner_ok else narrow["max_fsr"]
+            if cap < disc:
+                disc, clause = cap, f"{clause}, at most {cap} on a site {narrow['max_width_m']} m wide or less ({narrow['clause']})"
+        if out["max"] is None or disc > out["max"]:
+            out.update({"discretionary": disc, "discretionary_clause": clause})
+    return out
+
+
+def height_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
+    """The height a schedule's rule allows: `max` and `storeys` without discretion (tenure, a transit-oriented area and
+    the site's row of a table counted), `words`, and `discretionary` with its clause and whether it is for social
+    housing only (RM-4 s.3.1.2.11) or for any building (RM-5 s.3.1.2.7)."""
+    tenure = option.get("tenure")
+    out: dict[str, Any] = {"max": p.get("max_height_m"), "storeys": p.get("max_storeys"), "base": p.get("max_height_m"), "words": "",
+                           "discretionary": None, "discretionary_clause": None, "discretionary_social": False}
+    if p.get("height_table"):
+        row = _best_row(site, option, p["height_table"], "max_height_m")
+        if row is not None:
+            out.update({"max": row["max_height_m"], "storeys": row.get("max_storeys"), "words": f" for {row['label']}" if row.get("label") else ""})
+
+    def lift(h, storeys, words):
+        if h and (out["max"] is None or h > out["max"]):
+            out.update({"max": h, "storeys": storeys, "words": words})
+
+    if tenure in RENTAL_TENURES:
+        lift(p.get("max_height_m_rental"), p.get("max_storeys_rental"),
+             f" for a building with every home secured as rental ({p.get('rental_height_clause') or 'the schedule'}; {out['base']} m otherwise)")
+    if tenure == SOCIAL:
+        lift(p.get("max_height_m_social_housing"), p.get("max_storeys_social_housing"),
+             f" for social housing ({p.get('social_housing_height_clause') or 'the schedule'}; {out['base']} m otherwise)")
+    if site.get("in_transit_oriented_area") is True:
+        lift(p.get("max_height_m_toa"), p.get("max_storeys_toa") or out["storeys"],
+             f" in a transit-oriented area ({p.get('toa_height_clause') or 'the schedule'}; {out['base']} m otherwise)")
+    var = p.get("max_height_m_social_housing_variance")
+    if var and tenure == SOCIAL and (out["max"] is None or var > out["max"]):
+        out.update({"discretionary": var, "discretionary_clause": p.get("social_housing_height_clause") or "the schedule", "discretionary_social": True})
+    disc = p.get("max_height_m_discretionary")
+    if disc and (out["max"] is None or disc > out["max"]) and (out["discretionary"] is None or disc > out["discretionary"]):
+        out.update({"discretionary": disc, "discretionary_clause": p.get("height_discretionary_clause") or "the schedule", "discretionary_social": False})
+    return out
+
+
 def district_outright_fsr(site, option, p) -> Result:
-    f = fsr(site, option)
+    tenure = option.get("tenure")
+    # a schedule that houses only rental (RR districts): any other tenure is not permitted, whatever its size
+    if p.get("rental_only") and tenure not in RENTAL_TENURES:
+        return _r(FAIL, f"Every home in this district must be secured as residential rental tenure ({p.get('rental_only_clause') or 'the schedule'}); "
+                  f"this option's tenure is {str(tenure or 'not stated').replace('_', ' ')}.", {"tenure": tenure},
+                  action="Choose social housing or secured rental, or a site in another district.")
+    lim = fsr_limit(site, option, p)
+    # a CD-1 by-law can fix the site area its FSR is computed on (CD-1 (819) s.5.1: the site before dedications)
+    fixed = p.get("fsr_site_area_m2")
+    area = fixed or site.get("site_area_m2")
+    gfa = option.get("gfa_m2")
+    if lim["floor_area_cap"] is not None:
+        gfa = option.get("residential_gfa_m2") or gfa     # the by-law caps residential floor area
+    f = gfa / area if (area and gfa) else None
+    if lim["short"]:
+        return _r(UNSURE, f"No floor space ratio applies yet: {lim['short']}.", {"fsr": round(f, 3) if f else None},
+                  action="Architect: check the site against the schedule's site-size rows, or record what is missing.")
     if f is None:
         return _r(UNSURE, "Floor space ratio cannot be computed: site area or gross floor area missing.",
                   action="Enter the site area and the option's gross floor area.")
-    mx = p["max_fsr"]
-    vals = {"fsr": round(f, 3), "max_fsr_outright": mx, "gfa_m2": option["gfa_m2"], "site_area_m2": site["site_area_m2"]}
-    if f <= mx:
-        return _r(PASS, f"FSR {f:.2f} ({option['gfa_m2']:,.0f} m² over {site['site_area_m2']:,.1f} m²) is within the outright maximum of {mx}.", vals)
+    mx = lim["max"]
+    vals = {"fsr": round(f, 3), "max_fsr_outright": mx, "gfa_m2": gfa, "site_area_m2": area}
+    over = f"{gfa:,.0f} m² over {area:,.1f} m²" + (", the site area the by-law fixes for its FSR" if fixed else "")
+    if fixed:
+        vals["fsr_site_area_fixed"] = True
+    if mx != lim["base"] and lim["base"] is not None:
+        vals["max_fsr_base"] = lim["base"]
+    if lim["floor_area_cap"] is not None:
+        vals["max_floor_area_m2"] = lim["floor_area_cap"]
+    # a schedule's cap on the number of homes (R1-1 s.3.1.1.3: 8 when all are rental, else 6)
+    units = _units_total(option)
+    cap_units = (p.get("max_dwelling_units_rental") if tenure in RENTAL_TENURES else None) or p.get("max_dwelling_units")
+    if cap_units and units > cap_units:
+        vals["max_dwelling_units"] = cap_units
+        return _r(FAIL if not option.get("rezoning_path") else UNSURE,
+                  f"{units} homes exceed the schedule's {cap_units} for this form ({p.get('dwelling_units_clause') or 'the schedule'}); a larger building needs another district or a rezoning.",
+                  vals, action="Reduce the homes to the schedule's cap or state a rezoning path.")
+    # compared at two decimals, the precision a schedule and a referral report state an FSR to (Kai, 17 Nov 2026):
+    # 14,729 m² on CD-1 (819)'s 2,134.4 m² is 6.9008, which the report gives as 6.90 against a maximum of 6.90
+    if lim["floor_area_cap"] is not None and gfa <= lim["floor_area_cap"] + 1e-6:
+        return _r(PASS, f"Residential floor area {gfa:,.0f} m² is within sub-area {lim['sub_area']}'s {lim['floor_area_cap']:,.0f} m², the most the by-law allows there (FSR {f:.2f} on {area:,.1f} m²).", vals)
+    if lim["floor_area_cap"] is None and round(f, 2) <= mx:
+        return _r(PASS, f"FSR {f:.2f} ({over}) is within the outright maximum of {mx}{lim['words']}.", vals)
+    fs = f"{f:.2f}"
+    said = f"the outright maximum of {mx}{lim['words']}"
+    subject = f"FSR {fs}"
+    if lim["floor_area_cap"] is not None:     # a by-law that fixes the floor area is read in m², not as an FSR
+        subject = f"Residential floor area {gfa:,.0f} m²"
+        said = f"sub-area {lim['sub_area']}'s {lim['floor_area_cap']:,.0f} m², the most the by-law allows there"
+    if lim["discretionary"] and round(f, 2) <= lim["discretionary"]:
+        vals["max_fsr_discretionary"] = lim["discretionary"]
+        return _r(COND, f"{subject} exceeds {said}; the Director of Planning may increase it to at most {lim['discretionary']} ({lim['discretionary_clause']}), a discretionary approval, not assumed.",
+                  vals, action=f"Architect: make the case for the increase under {lim['discretionary_clause']} with the development permit application.")
+    if lim["increases"] and not option.get("rezoning_path"):
+        return _r(UNSURE, f"{subject} exceeds the base of {mx}; the schedule's increases ({lim['increases']}) may reach it, and they are not computed here.",
+                  vals, action="Architect: work out the schedule's increases for this site's coverage, area and parking, and enter the result as the option's floor area.")
     if option.get("rezoning_path"):
-        return _r(UNSURE, f"FSR {f:.2f} exceeds the outright maximum of {mx}; it can proceed only by rezoning ({option['rezoning_path']}), where density is negotiated.",
+        return _r(UNSURE, f"{subject} exceeds {said}; it can proceed only by rezoning ({option['rezoning_path']}), where density is negotiated.",
                   vals, action="Architect and manager: confirm the rezoning path and the density staff will support.")
-    return _r(FAIL, f"FSR {f:.2f} exceeds the outright maximum of {mx} and no rezoning path is stated.", vals,
+    return _r(FAIL, f"{subject} exceeds {said} and no rezoning path is stated.", vals,
               action="Reduce the floor area or state a rezoning path.")
 
 
@@ -73,14 +240,32 @@ def district_outright_height(site, option, p) -> Result:
     h = option.get("height_m")
     if h is None:
         return _r(UNSURE, "Height missing.", action="Enter the proposed height to the roof parapet in metres.")
-    mx = p["max_height_m"]
-    vals = {"height_m": h, "max_height_m_outright": mx, "storeys": option.get("storeys")}
-    if h <= mx:
-        return _r(PASS, f"Height {h} m is within the outright maximum of {mx} m.", vals)
+    lim = height_limit(site, option, p)
+    mx, ms = lim["max"], lim["storeys"]
+    st = option.get("storeys")
+    vals = {"height_m": h, "max_height_m_outright": mx, "storeys": st}
+    if ms:
+        vals["max_storeys_outright"] = ms
+    if mx != lim["base"]:
+        vals["max_height_m_base"] = lim["base"]
+    limit_words = f"{mx} m" + (f" and {ms} storeys" if ms else "") + lim["words"]
+    over_storeys = bool(ms and st and st > ms)
+    if h <= mx and not over_storeys:
+        return _r(PASS, f"Height {h} m{f', {st} storeys,' if (ms and st) else ''} is within the outright maximum of {limit_words}.", vals)
+    what = f"Height {h} m" + (f" and {st} storeys" if over_storeys else "")
+    # the Director of Planning's discretion to vary the height (RM-4 s.3.1.2.11: up to 19.9 m for 100% social housing;
+    # RM-5 s.3.1.2.7: up to 58.0 m for any building): a conditional approval to ask for, never assumed
+    var = lim["discretionary"]
+    if var and h <= var:
+        clause = lim["discretionary_clause"]
+        vals["max_height_m_variance"] = var
+        return _r(COND, f"{what} exceeds the outright maximum of {limit_words}; " + ("for 100% social housing " if lim["discretionary_social"] else "")
+                  + f"the Director of Planning may vary it to at most {var} m ({clause}), a discretionary approval, not assumed.",
+                  vals, action=f"Architect: ask for the height variance under {clause} with the development permit application.")
     if option.get("rezoning_path"):
-        return _r(UNSURE, f"Height {h} m exceeds the outright maximum of {mx} m; it can proceed only by rezoning ({option['rezoning_path']}), where height is negotiated.",
+        return _r(UNSURE, f"{what} exceeds the outright maximum of {limit_words}; it can proceed only by rezoning ({option['rezoning_path']}), where height is negotiated.",
                   vals, action="Architect: confirm the height staff will support under the policy.")
-    return _r(FAIL, f"Height {h} m exceeds the outright maximum of {mx} m and no rezoning path is stated.", vals,
+    return _r(FAIL, f"{what} exceeds the outright maximum of {limit_words} and no rezoning path is stated.", vals,
               action="Reduce the height or state a rezoning path.")
 
 
@@ -159,17 +344,40 @@ def toa_status(site, option, p) -> Result:
 
 # ---------------------------------------------------------------- Layer C: City policies
 
+# Area plans that carry their own family-unit target, by the value of `site.area_plan`. A rule whose params name
+# one (`area_plan`) applies only inside it; the city-wide rule (no `area_plan` param) steps aside there. Keep this
+# in step with the rules in rules/c_city_policies.json that carry an `area_plan` param.
+AREA_PLAN_FAMILY_TARGETS = {"downtown_eastside": "Downtown Eastside Plan"}
+
+
 def family_unit_share(site, option, p) -> Result:
+    plan, site_plan = p.get("area_plan"), (site or {}).get("area_plan")
+    if plan:
+        if site_plan != plan:
+            return _r(NA, f"The site is not recorded inside the {AREA_PLAN_FAMILY_TARGETS.get(plan, plan)} area (site.area_plan); the city-wide family-unit rule applies.")
+    elif site_plan in AREA_PLAN_FAMILY_TARGETS:
+        return _r(NA, f"The site is inside the {AREA_PLAN_FAMILY_TARGETS[site_plan]} area, whose own family-unit target applies in place of the city-wide one.")
     u = option.get("units") or {}
-    total = _units_total(option)
+    all_units = total = _units_total(option)
     if total == 0:
         return _r(UNSURE, "Unit mix missing.", action="Enter the unit counts by bedroom type.")
     two_plus = int(u.get("two_bed", 0) or 0) + int(u.get("three_bed_plus", 0) or 0)
     three_plus = int(u.get("three_bed_plus", 0) or 0)
+    left_out = ""
+    if p.get("exclude_supportive_units"):
+        supportive = int(option.get("supportive_units") or 0)
+        if 0 < supportive < total:
+            total -= supportive
+            left_out = f"; the {supportive} supportive homes are left out of the count, as the plan allows ({two_plus} of all {all_units} is {_pct(two_plus / all_units)})"
+        elif option.get("supportive_units") is None:
+            left_out = "; supportive homes are not stated on the option, so every home is counted (the plan leaves seniors and supportive housing out)"
     s2, s3 = two_plus / total, three_plus / total
     vals = {"units_total": total, "two_plus_bed_units": two_plus, "two_plus_bed_share": round(s2, 4),
             "three_plus_bed_units": three_plus, "three_plus_bed_share": round(s3, 4),
             "min_two_plus_bed_share": p["min_two_plus_bed_share"], "min_three_plus_bed_share": p.get("min_three_plus_bed_share")}
+    if left_out:
+        vals["units_all"] = all_units
+        vals["two_plus_bed_share_of_all"] = round(two_plus / all_units, 4)
     parts, ok = [], True
     if s2 + 1e-9 >= p["min_two_plus_bed_share"]:
         parts.append(f"{two_plus} of {total} units ({_pct(s2)}) have two or more bedrooms, against a {_pct(p['min_two_plus_bed_share'])} minimum")
@@ -183,7 +391,7 @@ def family_unit_share(site, option, p) -> Result:
         else:
             ok = False
             parts.append(f"only {three_plus} ({_pct(s3)}) have three or more, below the {_pct(m3)} minimum")
-    finding = "; ".join(parts) + "."
+    finding = "; ".join(parts) + left_out + "."
     if ok:
         return _r(PASS, finding[0].upper() + finding[1:], vals)
     return _r(FAIL, finding[0].upper() + finding[1:], vals, action="Change the unit mix: add family units until both minimums are met.")

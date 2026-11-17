@@ -171,7 +171,7 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     if not outside and not yards_tested and any(v is not None for v in sb.values()):
         extra_open.append({"rule_id": "coverage.yards", "title": f"Yards not checked: no {district} yard rule in the rules", "status": "uncertain",
                            "finding": f"The setbacks on the site plan (front {sb.get('front')}, rear {sb.get('rear')}, side {sb.get('side')} m) are the option's own figures; no rule in the stack tested them against {district}'s minimum yards.",
-                           "action": f"Architect: read the {district} schedule's yard clauses and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for."})
+                           "action": f"Architect: read the yard clauses in {written_in} and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for."})
     # what stands on the lot, and heritage: the massing draws a clear lot; a church site or a kept building is a question
     # with a person (15 Nov 2026, from an architect's test of a West End church site)
     owner = f"{site.get('owner_type') or ''} {site.get('owner') or ''}".lower()

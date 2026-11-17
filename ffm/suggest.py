@@ -28,9 +28,10 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from .checks import LANE_TO_CENTRE_LINE_M, _schedule_c_required, district_setbacks, lot_as_fronted, yard_minimums
+from .checks import (LANE_TO_CENTRE_LINE_M, _schedule_c_required, district_setbacks, fsr_limit, height_limit, lot_as_fronted,
+                     yard_minimums)
 from .engine import evaluate
-from .rules_loader import RULES_DIR, Rule, load_rules, stamp
+from .rules_loader import RULES_DIR, Rule, district_of, load_rules, stamp
 
 # Declared placeholders, not rules: a person can change them, and the memo says they were used.
 ASSUMPTIONS = {
@@ -114,7 +115,7 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
     lets in (else the Province's transit-oriented minimum for the tier, else the staff benchmark, else the wood-frame
     standard), and the plate the setbacks leave times the storeys, capped by the schedule's FSR where there is one.
     Rough, not a permission: the schedule, a rezoning or the Development Permit Board decides."""
-    district = site.get("zoning_district") or ""
+    district = district_of(site)     # "CD-1 (324)" for a CD-1 site whose number is known: its own by-law's rules match
     area = float(site.get("site_area_m2") or 0)
     f2f, _ = ASSUMPTIONS["floor_to_floor_m"]
     r_fsr = _district_rule(rules, on, "district_outright_fsr", district)
@@ -132,14 +133,21 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
     if r_fsr and r_h:
         id_fsr, p_fsr = r_fsr
         id_h, p_h = r_h
-        storeys = min(int(math.floor(p_h["max_height_m"] / f2f)), wood_max)
-        if p_h.get("max_storeys"):
-            storeys = min(storeys, int(p_h["max_storeys"]))
+        max_h, h_word = _social_height(site, p_h)     # the suggestion is 100% social housing (RM-4: the Director's variance)
+        hl = height_limit(site, SOCIAL_PROBE, p_h)
+        cap_storeys = hl["storeys"] if (hl["storeys"] and max_h == hl["max"]) else None
+        storeys = min(int(math.floor(max_h / f2f)), wood_max)
+        if cap_storeys:
+            storeys = min(storeys, int(cap_storeys))
         basis = "schedule"
-        storeys_from = (f"the most storeys of {f2f} m under {district}'s outright height of {p_h['max_height_m']} m"
-                        + (f", at most {p_h['max_storeys']} storeys" if p_h.get("max_storeys") else "")
+        storeys_from = (f"the most storeys of {f2f} m under {h_word} ({id_h}, {district})"
+                        + (f", at most {cap_storeys} storeys" if cap_storeys else "")
                         + (f", capped at the wood-frame standard of {wood_max}" if storeys == wood_max else ""))
-        fsr_cap = (float(p_fsr["max_fsr"]), id_fsr)
+        s_fsr, _, s_cap = _social_fsr(site, p_fsr)
+        if s_cap is not None:
+            fsr_cap = (s_cap / area if area else 0.0, id_fsr, area)    # a CD-1 sub-area's fixed floor area, as an FSR on the site
+        elif s_fsr is not None:
+            fsr_cap = (s_fsr, id_fsr, float(p_fsr.get("fsr_site_area_m2") or area))   # a CD-1 can fix the area its FSR is on
         rule_ids = [id_h, id_fsr]
     elif tier_storeys:
         storeys = int(tier_storeys)
@@ -151,7 +159,7 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
         storeys = min(int(math.floor(hi / f2f)), wood_max)
         basis = "benchmark"
         storeys_from = f"the most storeys of {f2f} m inside the staff benchmark of up to {hi} m for social housing (cov.irp.social_housing_rezoning)"
-        fsr_cap = (float(p_irp["benchmark_fsr"]), "cov.irp.social_housing_rezoning")
+        fsr_cap = (float(p_irp["benchmark_fsr"]), "cov.irp.social_housing_rezoning", area)
         rule_ids = ["cov.irp.social_housing_rezoning"]
     else:
         storeys = wood_max
@@ -174,14 +182,14 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
                     f"leave no envelope on a lot {W:g} m wide and {D:g} m deep as fronted")
     else:
         gfa_from = "no frontage, depth or lot polygon, so no plate to multiply"
-    if fsr_cap and area:
-        cap = round(fsr_cap[0] * area, 0)
+    if fsr_cap and fsr_cap[2]:
+        cap = round(fsr_cap[0] * fsr_cap[2], 0)
         if gfa is None or gfa > cap:
-            gfa_from += (f"; capped by the FSR of {fsr_cap[0]} × the site area {area:,.0f} m² = {cap:,.0f} m² ({fsr_cap[1]}): the FSR governs" if gfa is not None
-                         else f"; the FSR of {fsr_cap[0]} × the site area {area:,.0f} m² = {cap:,.0f} m² ({fsr_cap[1]})")
+            gfa_from += (f"; capped by the FSR of {fsr_cap[0]} × the site area {fsr_cap[2]:,.0f} m² = {cap:,.0f} m² ({fsr_cap[1]}): the FSR governs" if gfa is not None
+                         else f"; the FSR of {fsr_cap[0]} × the site area {fsr_cap[2]:,.0f} m² = {cap:,.0f} m² ({fsr_cap[1]})")
             gfa = cap
         else:
-            gfa_from += f"; under the FSR of {fsr_cap[0]} × {area:,.0f} m² = {cap:,.0f} m² ({fsr_cap[1]}): the setbacks govern"
+            gfa_from += f"; under the FSR of {fsr_cap[0]} × {fsr_cap[2]:,.0f} m² = {cap:,.0f} m² ({fsr_cap[1]}): the setbacks govern"
     return {
         "storeys": storeys, "height_m": height, "gfa_m2": gfa,
         "plate_m2": plate["area"] if plate else None, "plate_w_m": plate["w"] if plate else None, "plate_d_m": plate["d"] if plate else None,
@@ -234,6 +242,32 @@ def _district_rule(rules: list[Rule], on: date, check: str, district: str) -> tu
     return None
 
 
+SOCIAL_PROBE = {"tenure": "social_housing"}     # every suggestion is 100% social housing
+
+
+def _social_fsr(site: dict, p_fsr: dict) -> tuple[float | None, str, float | None]:
+    """The FSR a 100% social housing suggestion takes from a schedule (checks.fsr_limit: the schedule's social housing
+    or rental figure, the site's row of a table, a CD-1 sub-area's fixed floor area), the words for it, and the floor
+    area in m² where the by-law fixes one. None where no figure applies to the site (a sub-area not recorded)."""
+    lim = fsr_limit(site, SOCIAL_PROBE, p_fsr)
+    if lim["max"] is None:
+        return None, lim["short"] or "no figure applies to this site", None
+    if lim["floor_area_cap"] is not None:
+        return float(lim["max"]), f"the floor area the by-law fixes{lim['words']}", lim["floor_area_cap"]
+    return float(lim["max"]), f"the outright FSR of {lim['max']}{lim['words']}", None
+
+
+def _social_height(site: dict, p_h: dict) -> tuple[float, str]:
+    """The height a 100% social housing suggestion takes from a schedule, and the words for it: the most the Director of
+    Planning may vary it to for social housing where the schedule says so (RM-4 s.3.1.2.11), a discretionary approval,
+    else the outright maximum for this site and tenure (checks.height_limit)."""
+    lim = height_limit(site, SOCIAL_PROBE, p_h)
+    if lim["discretionary"] and lim["discretionary_social"]:
+        return float(lim["discretionary"]), (f"the {lim['discretionary']} m the Director of Planning may allow for 100% social housing ({lim['discretionary_clause']}; "
+                                             f"{lim['max']} m outright), a variance to ask for, not a right")
+    return float(lim["max"]), f"the outright maximum of {lim['max']} m{lim['words']}"
+
+
 def _largest_remainder(total: int, shares: dict[str, float]) -> dict[str, int]:
     raw = {k: total * s for k, s in shares.items()}
     out = {k: int(math.floor(v)) for k, v in raw.items()}
@@ -263,7 +297,7 @@ def unit_mix(net_area_m2: float, mins: dict[str, float], family: dict | None, al
 def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: dict, unsure: list, rough: dict | None = None) -> dict[str, Any]:
     """Storeys, height, FSR and GFA for the candidate, from layer A (or B on a small lot); with neither, the rough
     envelope (`envelope_for`) fills them, each field marked basis "envelope" and citing no rule."""
-    district = site.get("zoning_district") or ""
+    district = district_of(site)     # "CD-1 (324)" for a CD-1 site whose number is known: its own by-law's rules match
     area = float(site.get("site_area_m2") or 0)
     f2f, _ = ASSUMPTIONS["floor_to_floor_m"]
     out: dict[str, Any] = {"storeys": None, "height_m": None, "gfa_m2": None, "fsr": None}
@@ -292,15 +326,36 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
         if in_cv is None and p_irp is not None:
             unsure.append({"key": "in_former_community_vision_area", "why": "whether the site is inside a former Community Vision area (Map 1 of the policy) decides whether the benchmark applies", "who": "Architect: check Map 1 for this address"})
         # fall through to outright
-    if p_fsr and p_h:
-        storeys = min(int(math.floor(p_h["max_height_m"] / f2f)), wood_max)
-        if p_h.get("max_storeys"):
-            storeys = min(storeys, int(p_h["max_storeys"]))
-        out.update({"storeys": storeys, "height_m": round(min(storeys * f2f, p_h["max_height_m"]), 1), "fsr": p_fsr["max_fsr"], "gfa_m2": round(p_fsr["max_fsr"] * area, 0)})
-        fields["storeys"] = {"value": storeys, "rule_id": id_h, "basis": "rule", "note": f"the most storeys of {f2f} m under the outright maximum of {p_h['max_height_m']} m" + (f", at most {p_h['max_storeys']} storeys" if p_h.get("max_storeys") else "")}
-        fields["height_m"] = {"value": out["height_m"], "rule_id": id_h, "basis": "rule", "note": f"{storeys} storeys × {f2f} m, under {p_h['max_height_m']} m"}
-        fields["gfa_m2"] = {"value": out["gfa_m2"], "rule_id": id_fsr, "basis": "rule", "note": f"the outright FSR of {p_fsr['max_fsr']} × the site area {area:,.0f} m²"}
-        fields["rezoning_path"] = {"value": None, "rule_id": id_fsr, "basis": "rule", "note": "outright: no rezoning"}
+    max_fsr, fsr_word, floor_cap = _social_fsr(site, p_fsr) if p_fsr else (None, "", None)
+    if p_fsr and p_h and max_fsr is None:
+        # the schedule's figure needs a fact the site does not carry yet (a CD-1 sub-area): said, and the rough envelope stands in
+        unsure.append({"key": "cd1_sub_area" if p_fsr.get("sub_area_residential_floor_area_m2") else "gfa_m2", "why": f"{id_fsr}: {fsr_word}",
+                       "who": "Architect: find the site on the by-law's map and record it"})
+    if p_fsr and p_h and max_fsr is not None:
+        # every suggestion is 100% social housing: where the schedule gives social housing its own FSR and lets the
+        # Director vary the height for it (RM-4 s.3.1.1.3 and s.3.1.2.11), those are the figures, the height a variance;
+        # a CD-1 that fixes a sub-area's floor area (CD-1 (324)) gives that area
+        max_h, h_word = _social_height(site, p_h)
+        hl = height_limit(site, SOCIAL_PROBE, p_h)
+        cap_storeys = hl["storeys"] if (hl["storeys"] and max_h == hl["max"]) else None
+        storeys = min(int(math.floor(max_h / f2f)), wood_max)
+        if cap_storeys:
+            storeys = min(storeys, int(cap_storeys))
+        fsr_area = float(p_fsr.get("fsr_site_area_m2") or area)    # a CD-1 by-law can fix the site area its FSR is computed on
+        gfa = round(floor_cap, 0) if floor_cap is not None else round(max_fsr * fsr_area, 0)
+        plate_words = ""
+        if floor_cap is not None and (rough or {}).get("gfa_m2") is not None and rough["gfa_m2"] < gfa:
+            # a fixed floor area can exceed what the storeys stack on the plate (CD-1 (324) sub-area B: 23,600 m² for a
+            # 91 m tower, at the wood-frame standard's 6 storeys): the plate times the storeys governs, and the note says so
+            gfa = round(rough["gfa_m2"], 0)
+            plate_words = f"; at {storeys} storeys the plate the yards leave holds {gfa:,.0f} m², which governs"
+        out.update({"storeys": storeys, "height_m": round(min(storeys * f2f, max_h), 1), "fsr": round(gfa / area, 2) if (floor_cap is not None and area) else max_fsr, "gfa_m2": gfa})
+        fields["storeys"] = {"value": storeys, "rule_id": id_h, "basis": "rule", "note": f"the most storeys of {f2f} m under {h_word}" + (f", at most {cap_storeys} storeys" if cap_storeys else "")
+                             + (f", capped at the wood-frame standard of {wood_max}" if storeys == wood_max and max_h > wood_max * f2f else "")}
+        fields["height_m"] = {"value": out["height_m"], "rule_id": id_h, "basis": "rule", "note": f"{storeys} storeys × {f2f} m, under {h_word}"}
+        fields["gfa_m2"] = {"value": gfa, "rule_id": id_fsr, "basis": "rule",
+                            "note": fsr_word + plate_words if floor_cap is not None else f"{fsr_word} × the site area {fsr_area:,.0f} m²" + (" the by-law fixes for its FSR" if p_fsr.get("fsr_site_area_m2") else "")}
+        fields["rezoning_path"] = {"value": None, "rule_id": id_fsr, "basis": "rule", "note": "outright: no rezoning" + ("; the height is the Director's variance for social housing, asked for with the development permit" if max_h != hl["max"] else "")}
         return out
     if p_ssmuh and area and area < p_ssmuh["exempt_lot_min_m2"] and site.get("has_water_and_sewer") is not False and site.get("in_transit_oriented_area") is not True:
         near = site.get("frequent_bus_stop_within_400m")
@@ -323,7 +378,8 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
         fields["height_m"] = {"value": h, "rule_id": None, "basis": "envelope", "note": f"rough: {st} storeys × {f2f} m; not a permitted figure"}
         if g is not None:
             fields["gfa_m2"] = {"value": g, "rule_id": None, "basis": "envelope", "note": f"rough: the plate the setbacks leave, {rough['plate_w_m']} × {rough['plate_d_m']} m, × {st} storeys; not a permitted figure"}
-    unsure.append({"key": "gfa_m2", "why": f"the rule stack has no outright schedule for {district or 'this district'}" + (": a CD-1 site's limits are whatever the rezoning sets" if district.upper().startswith("CD-1") else "")
+    unsure.append({"key": "gfa_m2", "why": (f"the rule stack holds nothing from {district}'s by-law: a CD-1 site's limits are whatever its by-law and rezoning set" if district.upper().startswith("CD-1")
+                                             else f"the rule stack has no {district or 'district'} schedule")
                    + ("; the rough envelope figures (the plate the setbacks leave times the storeys) stand in until the schedule is read" if rough.get("storeys") else ""),
                    "who": "Architect: read the district schedule and enter the storeys, height and floor area it permits (or read it with Claude at stop 3)" + ("" if rough.get("storeys") else ". Left blank, the memo says the envelope was not assessed and draws no building")})
     fields["rezoning_path"] = {"value": None, "rule_id": None, "note": "not derived: enter the path the site takes"}
@@ -335,7 +391,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     mine = check_mix(mix_shares)
     rules = rules if rules is not None else load_rules(rules_dir)
     programs = list(programs or [])
-    district = site.get("zoning_district") or ""
+    district = district_of(site)     # "CD-1 (324)" for a CD-1 site whose number is known: its own by-law's rules match
     area = float(site.get("site_area_m2") or 0)
     fields: dict[str, dict] = {}
     unsure: list[dict] = []
@@ -369,7 +425,8 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     cands = []
     for c in CANDIDATES:
         if c["id"] == "outright":
-            ok, why = has_outright, "" if has_outright else f"no outright schedule for {district or 'this district'} in the rule stack"
+            ok, why = has_outright, "" if has_outright else (f"{district}'s by-law is not in the rule stack" if district.upper().startswith("CD-1 (")
+                                                             else f"no outright schedule for {district or 'this district'} in the rule stack")
         elif c["id"] == "benchmark":
             ok = p_irp is not None and site.get("in_former_community_vision_area") is not False
             why = "" if ok else ("no social housing rezoning policy in the rule stack for this site" if p_irp is None else
@@ -536,8 +593,12 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     # what no rule settles
     if site.get("in_transit_oriented_area") is None:
         unsure.append({"key": "in_transit_oriented_area", "why": "inside a transit-oriented area the Province sets a minimum height by tier; the City's map decides", "who": "Architect: check the City's transit-oriented areas map"})
-    if district.upper().startswith("CD-1"):
-        unsure.append({"key": "zoning_district", "why": "a CD-1 site's limits are whatever its rezoning set", "who": "Manager: read the CD-1 by-law for the site"})
+    if district.upper().startswith("CD-1") and _district_rule(rules, on, "district_outright_fsr", district) is None:
+        # a CD-1 whose by-law is in the stack is read like any district; one that is not is said plainly (17 Nov 2026)
+        unsure.append({"key": "zoning_district", "why": (f"{district}'s by-law is not in the rules, and a CD-1 site's limits are whatever its by-law and rezoning set"
+                                                         if district.upper() != "CD-1" else "the site's CD-1 number is not recorded, so no CD-1 by-law can be matched to it"),
+                       "who": "Architect: save the site's CD-1 by-law into inbox/ to have its rules entered" if district.upper() != "CD-1"
+                              else "Manager: find the address again (the lookup records the CD-1 number) or enter it on the site"})
 
     fields["target_programs"] = {"value": programs, "rule_id": None, "note": "the programs chosen"}
     fields["id"] = {"value": option["id"], "rule_id": None, "note": "named after the site and the candidate"}

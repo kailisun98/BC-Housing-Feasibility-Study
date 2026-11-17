@@ -227,7 +227,10 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     max_fsr, max_h, used = _outright_params(results)
     if max_fsr and max_h:
         o_storeys = max(1, int(math.floor(max_h / f2f)))
-        o_gfa = max_fsr * area
+        # a CD-1 by-law can fix the site area its FSR is computed on (the check records it in its values)
+        fixed = next((r["values"]["site_area_m2"] for r in results if r.get("check") == "district_outright_fsr"
+                      and r["status"] != "not_applicable" and (r.get("values") or {}).get("fsr_site_area_fixed")), None)
+        o_gfa = max_fsr * (fixed or area)
         o_plate = min(o_gfa / o_storeys, plate_cap)
         o_ring, o_w, o_d = footprint(o_plate)
         masses.append({

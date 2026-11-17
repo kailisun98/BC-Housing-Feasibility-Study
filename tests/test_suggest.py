@@ -13,6 +13,8 @@ from ffm.engine import evaluate, load_json
 ROOT = Path(__file__).resolve().parent.parent
 SITE = load_json(ROOT / "sites" / "998-e-19th-ave.json")
 EXPO = load_json(ROOT / "sites" / "1010-expo-blvd.json")
+# a CD-1 whose by-law is not in the rule stack (17 Nov 2026: Expo's own CD-1 (324) is matched by its number once read)
+CD1_ELSEWHERE = {**EXPO, "id": "cd1-not-in-the-stack", "zoning_district": "CD-1 (9999)", "cd1_bylaw_number": 9999}
 AS_OF = date(2026, 10, 23)
 PROGRAMS = ["bch.chf.eligibility", "bc.bcbuilds.eligibility"]
 
@@ -86,7 +88,7 @@ class OtherCandidates(unittest.TestCase):
 
     def test_cd1_site_comes_back_unsure_on_the_envelope(self):
         # since 16 Nov 2026 the rough envelope fills the figures (basis "envelope", no rule); the unsure item stays
-        S = suggest.suggest(EXPO, PROGRAMS, AS_OF, "funder-ready")
+        S = suggest.suggest(CD1_ELSEWHERE, PROGRAMS, AS_OF, "funder-ready")
         self.assertEqual(S["option"]["storeys"], 6)
         self.assertGreater(S["option"]["gfa_m2"], 0)
         for k in ("storeys", "height_m", "gfa_m2"):
@@ -121,13 +123,13 @@ class Envelope(unittest.TestCase):
         self.assertIn("not a permission", E["note"])
 
     def test_cd1_envelope_is_the_wood_frame_standard(self):
-        S = suggest.suggest(EXPO, PROGRAMS, AS_OF, "funder-ready")
+        S = suggest.suggest(CD1_ELSEWHERE, PROGRAMS, AS_OF, "funder-ready")
         self.assertEqual(S["envelope"]["basis"], "wood_frame")
         self.assertEqual(S["envelope"]["storeys"], 6)
         self.assertEqual(S["option"]["gfa_m2"], S["envelope"]["gfa_m2"])
 
     def test_cd1_in_a_transit_oriented_area_takes_the_tier(self):
-        site = copy.deepcopy(EXPO)
+        site = copy.deepcopy(CD1_ELSEWHERE)
         site.update({"in_transit_oriented_area": True, "toa_tier": 3})
         S = suggest.suggest(site, PROGRAMS, AS_OF, "funder-ready")
         self.assertEqual(S["envelope"]["basis"], "toa")

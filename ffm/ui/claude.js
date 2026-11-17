@@ -5,7 +5,7 @@ import { $, $$, cap, h, setPath, setStatus, toast, todayISO } from "./core/util.
 import { guide, state, STATIC } from "./core/state.js";
 import { api, CLAUDE_MODEL, postJSON } from "./core/api.js";
 import { engine, loadEngine } from "./core/engine.js";
-import { SITE_FIELDS } from "./fields.js";
+import { districtOf, SITE_FIELDS } from "./fields.js";
 import { refreshSummary, renderForm } from "./schedule.js";
 import { onSiteChange } from "./files.js";
 import { scheduleFor } from "./route-stage.js";
@@ -68,15 +68,15 @@ export function renderClaude() {
     wireClaude(top);
   }
   if (slot) {
-    const district = String((state.site || {}).zoning_district || "").toUpperCase();
-    const known = scheduleFor(district);
+    const district = districtOf(state.site || {}).toUpperCase();
+    const known = scheduleFor(district, (state.site || {}).cd1_bylaw_number);
     slot.innerHTML = district && (!known || guide.ruleProposal) ? `<details class="claude-fold"${hasClaude() || guide.ruleProposal ? " open" : ""}><summary>Read the ${h(district)} schedule with Claude <span class="cont">(the rules have ${known ? "it now" : "none for it"})</span></summary>
       <p class="help">Save the schedule's PDF from the City's by-law site (it refuses scripts), choose it here, and the model proposes its clauses with the quote behind each. You check the quotes against the PDF and confirm under your name; the rules file then cites the schedule, the model and you.</p>
       ${renderKeyBox("keybox-rule")}
       ${hasClaude() ? `<div class="sched-form">
         <label class="field"><span class="label">Schedule PDF</span><input type="file" id="sched-file" accept=".pdf,.png,.jpg,.jpeg,.txt"></label>
         <label class="field"><span class="label">District</span><input type="text" id="sched-district" value="${h(guide.scheduleDistrict || district)}" placeholder="RT-3"></label>
-        <label class="field"><span class="label">Its address on the City's site</span><input type="url" id="sched-url" value="${h(guide.scheduleUrl || `https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-${district.toLowerCase()}.pdf`)}" placeholder="https://bylaws.vancouver.ca/zoning/…"></label>
+        <label class="field"><span class="label">Its address on the City's site</span><input type="url" id="sched-url" value="${h(guide.scheduleUrl || (/^CD-1 \(/.test(district) ? `https://cd1-bylaws.vancouver.ca/${district.replace(/\s+/g, "").toLowerCase()}.PDF` : `https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-${district.toLowerCase()}.pdf`))}" placeholder="https://bylaws.vancouver.ca/zoning/…"></label>
         <div class="form-actions"><button class="btn btn-small" type="button" id="guide-read-schedule"${guide.busy.schedule ? " disabled" : ""}>${guide.busy.schedule ? "Reading…" : "Read the schedule"}</button><span class="help">The PDF goes to the model and nowhere else; the log keeps its name and hash.</span></div>
       </div>${renderRuleProposal(guide.ruleProposal)}` : ""}
     </details>` : "";

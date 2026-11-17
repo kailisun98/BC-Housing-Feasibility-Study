@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from .engine import counts_outright
+from .rules_loader import district_of
 
 STATUS_WORD = {
     "pass": "Pass", "conditional": "Conditional", "fail": "Fail", "uncertain": "Uncertain",
@@ -82,7 +83,7 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     L.append("## 1. Is it allowed?")
     o, bz = ans["allowed"]["outright"], ans["allowed"]["by_rezoning"]
     out_lines = [r for r in res if counts_outright(r) and r["status"] != "not_applicable"]
-    L.append(f"**Outright, under {site.get('zoning_district', 'the district')}: {o['verdict']}.** " + " ".join(r["finding"] for r in out_lines)
+    L.append(f"**Outright, under {district_of(site) or 'the district'}: {o['verdict']}.** " + " ".join(f"{r['finding']} ({r['rule_id']})" for r in out_lines)
              + (f" Not assessed: {o['why']}; the envelope is the option's own figure, not a permitted one." if o.get("why") else ""))
     L.append("")
     if ans["allowed"].get("rezoning_path"):

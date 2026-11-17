@@ -315,23 +315,24 @@
       "title": "RM-4 outright floor space ratio",
       "jurisdiction": "City of Vancouver",
       "applies_to_districts": [
-        "RM-4",
-        "RM-4N"
+        "RM-4"
       ],
       "check": "district_outright_fsr",
       "versions": [
         {
-          "effective_from": "2023-01-01",
+          "effective_from": "2026-10-01",
           "params": {
-            "max_fsr": 0.75,
-            "max_fsr_conditional": 1.45
+            "max_fsr": 1.45,
+            "max_fsr_social_housing": 3.0,
+            "social_housing_fsr_clause": "s.3.1.1.3",
+            "max_fsr_other_uses": 0.75
           },
           "source": {
-            "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule",
+            "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule (consolidation dated October 2026)",
             "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
-            "section": "Density (RM-4 and RM-4N): outright 0.75; max_fsr_conditional 1.45 is the Director of Planning's discretionary increase for multiple dwellings, not an outright figure. Where unsure between two recalled outright figures the lower was entered. The effective date is a placeholder.",
-            "verified": false,
-            "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf before relying on it"
+            "section": "s.3.1.1.2: for multiple dwelling and a mixed-use residential building that includes a child day care facility, the maximum floor space ratio is 1.45; s.3.1.1.3: 3.00 if 100% of the residential floor area is developed as social housing; s.3.1.1.1: developments requiring social housing are subject to Schedule J. Multiple dwelling is a conditional use (s.2.1) on a site of at least 550 m² (s.3.1.2.1). Other uses take 0.75 (s.3.5.1.1). The effective date is the consolidation's; the clauses may be older. RM-4N is not in this schedule and is not entered.",
+            "verified": true,
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-4.pdf (saved by hand from the by-law site), pages 2, 7 and 16"
           }
         }
       ]
@@ -341,22 +342,175 @@
       "title": "RM-4 outright maximum height",
       "jurisdiction": "City of Vancouver",
       "applies_to_districts": [
-        "RM-4",
-        "RM-4N"
+        "RM-4"
       ],
       "check": "district_outright_height",
       "versions": [
         {
-          "effective_from": "2023-01-01",
+          "effective_from": "2026-10-01",
           "params": {
-            "max_height_m": 10.7
+            "max_height_m": 10.7,
+            "max_height_m_social_housing_variance": 19.9,
+            "social_housing_height_clause": "s.3.1.2.11"
           },
           "source": {
-            "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule",
+            "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule (consolidation dated October 2026)",
             "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
-            "section": "Building height (RM-4 and RM-4N): outright 10.7 m; the conditional height is not entered. The effective date is a placeholder.",
+            "section": "s.3.1.2.3: maximum building height 10.7 m; s.3.1.2.8: within an envelope from 7.3 m at the north, northeast or northwest property line rising at 120 degrees; s.3.1.2.11: where 100% of the residential floor area is social housing, the Director of Planning or the Development Permit Board may vary the height to at most 19.9 m (discretionary, entered as the variance, not as an outright figure). The effective date is the consolidation's.",
+            "verified": true,
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-4.pdf (saved by hand from the by-law site), pages 7 to 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm4.setbacks",
+      "title": "RM-4 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-4"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 6.1,
+            "min_side_yard_m": 2.1,
+            "min_rear_yard_m": 10.7,
+            "max_site_frontage_m": 45.8,
+            "side_yard_note": "2.1 m; on a corner site the exterior side yard is 20% of the site width, at least 3.0 m and at most 6.0 m (s.3.1.2.9), not tested here.",
+            "rear_yard_note": "10.7 m, less the lane width between the rear property line and the lane's ultimate centre line where the rear abuts a lane (s.3.1.2.10(a)); narrow wings may extend 3.0 m into it (s.3.1.2.10(b), (c)).",
+            "rear_yard_lane_reduction": "s.3.1.2.10(a)",
+            "affordable_variance": {
+              "clause": "s.3.1.2.11",
+              "needs": "open where 100% of the residential floor area is developed as social housing: the Director of Planning or the Development Permit Board may vary the front, side and rear yards"
+            }
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
+            "section": "s.3.1.2.2 (maximum site frontage 45.8 m), s.3.1.2.4 (minimum front yard 6.1 m), s.3.1.2.5 and 3.1.2.9 (side yard 2.1 m; a corner site's exterior side yard 20% of the width, 3.0 to 6.0 m), s.3.1.2.6 and 3.1.2.10 (rear yard 10.7 m, reduced by the distance to the lane's ultimate centre line); s.3.1.2.11 lets the Director of Planning vary them for 100% social housing. These are the multiple dwelling regulations (s.3.1).",
+            "verified": true,
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-4.pdf (saved by hand from the by-law site), pages 7 to 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.cd1_819.outright_fsr",
+      "title": "CD-1 (819) maximum floor space ratio (1015 E Hastings St)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "CD-1"
+      ],
+      "applies_to_cd1": [
+        "819"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2021-01-19",
+          "params": {
+            "max_fsr": 6.9,
+            "fsr_site_area_m2": 2134.4
+          },
+          "source": {
+            "title": "City of Vancouver referral report, CD-1 Rezoning: 1015 East Hastings Street (report dated 5 Jan 2021, Council 19 Jan 2021), Appendix A: draft CD-1 by-law provisions",
+            "url": "https://council.vancouver.ca/20210119/documents/rr5.pdf",
+            "section": "Appendix A s.5.1: the floor space ratio is computed on a site of 2,134.4 m², the site before any dedications; s.5.2: the floor space ratio for all uses combined must not exceed 6.90. Uses (s.3): dwelling units with cultural and recreational, institutional, office, retail and service uses. The effective date is the Council meeting the report went to, a placeholder for the by-law's enactment.",
             "verified": false,
-            "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf before relying on it"
+            "unverified_because": "taken from the draft by-law provisions in the referral report of 5 Jan 2021, not from the enacted by-law",
+            "verify": "Read on 17 Nov 2026 from the draft provisions in the referral report (rr5.pdf, saved by hand), not from the enacted by-law, which can differ; the City's CD-1 index (https://cd1-bylaws.vancouver.ca/index.htm) lists CD-1 (819) as 1015 East Hastings Street with no PDF posted, and https://cd1-bylaws.vancouver.ca/cd-1(819).PDF returns 404, so ask the City (rezoning@vancouver.ca) for the enacted by-law and confirm every figure against it before relying on it",
+            "read_from": "inbox/rr5.pdf (the referral report, saved by hand), Appendix A, pages 25 and 26"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.cd1_819.outright_height",
+      "title": "CD-1 (819) maximum height (1015 E Hastings St)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "CD-1"
+      ],
+      "applies_to_cd1": [
+        "819"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2021-01-19",
+          "params": {
+            "max_height_m": 51.0
+          },
+          "source": {
+            "title": "City of Vancouver referral report, CD-1 Rezoning: 1015 East Hastings Street (report dated 5 Jan 2021, Council 19 Jan 2021), Appendix A: draft CD-1 by-law provisions",
+            "url": "https://council.vancouver.ca/20210119/documents/rr5.pdf",
+            "section": "Appendix A s.6: building height, measured from the building grades at the Glen Drive property line to the top of the parapet above the rooftop amenity space, must not exceed 51.0 m; s.4.2: no dwelling units above the 14th storey of the lane-facing wing or the 12th storey of the Glen Drive wing (not entered as a storey limit). The draft sets no yards. The effective date is a placeholder, as for the FSR.",
+            "verified": false,
+            "unverified_because": "taken from the draft by-law provisions in the referral report of 5 Jan 2021, not from the enacted by-law",
+            "verify": "Read on 17 Nov 2026 from the draft provisions in the referral report (rr5.pdf, saved by hand), not from the enacted by-law, which can differ; the City's CD-1 index (https://cd1-bylaws.vancouver.ca/index.htm) lists CD-1 (819) as 1015 East Hastings Street with no PDF posted, and https://cd1-bylaws.vancouver.ca/cd-1(819).PDF returns 404, so ask the City (rezoning@vancouver.ca) for the enacted by-law and confirm every figure against it before relying on it",
+            "read_from": "inbox/rr5.pdf (the referral report, saved by hand), Appendix A, pages 26 and 27"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.cd1_324.floor_area",
+      "title": "CD-1 (324) maximum residential floor area by sub-area (800-1100 Pacific Blvd)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "CD-1"
+      ],
+      "applies_to_cd1": [
+        "324"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2024-04-23",
+          "params": {
+            "sub_area_residential_floor_area_m2": {
+              "A": 19300,
+              "B": 23600
+            },
+            "cd1_residential_floor_area_m2": 249543,
+            "min_two_plus_bed_share_sub_areas_a_b": 0.35
+          },
+          "source": {
+            "title": "City of Vancouver CD-1 (324) By-law No. 7248, 800-1100 Pacific Boulevard (consolidated to By-law No. 14009, 23 Apr 2024)",
+            "url": "https://cd1-bylaws.vancouver.ca/cd-1(324).pdf",
+            "section": "s.6.2 and Table 1a [By-law 14009, 2024]: the residential floor area in sub-area A must not exceed 19,300 m² and in sub-area B 23,600 m²; the sub-areas are drawn on Schedule A (sub-area B is the triangle between Expo Blvd, Pacific Blvd and the Cambie Bridge approach). s.6.1 Table 1: 249,543 m² of residential floor area for the whole CD-1, which a site outside the sub-areas shares and this rule does not test. s.6.4 and 6.5: exclusions (balconies up to 12% of the residential floor area, amenity up to 10%). s.6.6: the Development Permit Board may permit up to 1% more within Table 2's neighbourhood totals. s.5.2: in sub-areas A and B at least 35% of the units must suit families, with two or more bedrooms (not tested by this rule). The effective date is By-law 14009's enactment.",
+            "verified": true,
+            "read_from": "inbox/cd-1(324).PDF (saved by hand from cd1-bylaws.vancouver.ca), pages 1, 4, 5, 7 and 11 (Schedule A)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.cd1_324.outright_height",
+      "title": "CD-1 (324) maximum height (800-1100 Pacific Blvd)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "CD-1"
+      ],
+      "applies_to_cd1": [
+        "324"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2024-04-23",
+          "params": {
+            "max_height_m": 91.0
+          },
+          "source": {
+            "title": "City of Vancouver CD-1 (324) By-law No. 7248, 800-1100 Pacific Boulevard (consolidated to By-law No. 14009, 23 Apr 2024)",
+            "url": "https://cd1-bylaws.vancouver.ca/cd-1(324).pdf",
+            "section": "s.7.1 [By-law 8715, 2003]: the maximum building height measured above the base surface, excluding the mechanical penthouse and roof, will be 91 m. The by-law sets no yards; the form of development decides them. The effective date is the consolidation's (By-law 14009).",
+            "verified": true,
+            "read_from": "inbox/cd-1(324).PDF (saved by hand from cd1-bylaws.vancouver.ca), page 7"
           }
         }
       ]

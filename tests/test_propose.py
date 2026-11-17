@@ -148,6 +148,21 @@ class Confirm(unittest.TestCase):
         tight = dict(o, setbacks_m={"front": 3.0, "rear": 10.7, "side": 1.5})
         self.assertEqual(evaluate(site, tight, date(2026, 11, 3), rules_dir=self.rules)["results"][[r["rule_id"] for r in L["results"]].index("cov.rt9.setbacks")]["status"], "conditional")
 
+    def test_a_confirmed_cd1_bylaw_is_keyed_by_its_number(self):
+        # 17 Nov 2026: a CD-1's by-law confirms into rules keyed by the CD-1 number, which match that site and no other
+        res = propose.propose_rule(CASE / "document.txt", "CD-1 (324)", url="https://cd1-bylaws.vancouver.ca/cd-1(324).PDF", caller=stub_caller())
+        p = propose.save(res, self.tmp / "proposals" / "cd1-324.json")
+        rep = propose.confirm(p, "Kai Sun", rules_dir=self.rules, on=date(2026, 11, 17))
+        self.assertIn("cov.cd1_324.outright_fsr", rep["confirmed"])
+        rules = {r.id: r for r in load_rules(self.rules)}
+        self.assertEqual(rules["cov.cd1_324.outright_fsr"].applies_to_cd1, ["324"])
+        lot = {"id": "c", "zoning_district": "CD-1", "cd1_bylaw_number": 324, "site_area_m2": 1000, "frontage_m": 25, "depth_m": 40}
+        opt = {"id": "o", "storeys": 2, "height_m": 6.0, "gfa_m2": 500}
+        by = {r["rule_id"]: r for r in evaluate(lot, opt, date(2026, 11, 17), rules_dir=self.rules)["results"]}
+        self.assertEqual(by["cov.cd1_324.outright_fsr"]["status"], "pass")
+        other = {r["rule_id"]: r for r in evaluate(dict(lot, cd1_bylaw_number=819), opt, date(2026, 11, 17), rules_dir=self.rules)["results"]}
+        self.assertEqual(other["cov.cd1_324.outright_fsr"]["status"], "not_applicable")
+
 
 class SiteProposal(unittest.TestCase):
     def test_site_items_confirm_into_the_site_file(self):

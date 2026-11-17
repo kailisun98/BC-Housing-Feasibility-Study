@@ -692,16 +692,46 @@ Phase 6, Claude in the loop (the model proposes, a person confirms, the engine d
 - RM-1 outright figures (FSR 1.20, 10.7 m) are cited from the referral report; verify against the
   consolidated district schedule when convenient.
 - District schedules (16 Nov 2026, `rules/a_zoning_district.json`): RT-3 is read from Kai's saved PDF
-  (`inbox/`, `source.verified: true`); the RT family (RT-4 to RT-11 bar RT-9), RM-3, RM-3A and RM-4/4N are typed
+  (`inbox/`, `source.verified: true`); the RT family (RT-4 to RT-11 bar RT-9), RM-3 and RM-3A are typed
   from recollection (`source.verified: false` plus a `verify` sentence) and raise `coverage.schedule_unverified`
   in `engine.summarise` until a person confirms them against the PDF. Districts not entered read "not assessed";
   CD-1 sites carry `cd1_bylaw_number` from the lookup.
+- Each site picks its own schedule (17 Nov 2026): a CD-1 rule carries `applies_to_cd1` (the CD-1 number) and matches only
+  a CD-1 site with that number (`site.cd1_bylaw_number`, else the number in "CD-1 (819)"; `rules_loader.cd1_number`,
+  `district_of`, `Rule.applies_to_site`; in the page `cd1Of`, `districtOf`, `appliesHere` in `fields.js`); a CD-1 with no
+  number matches none. `propose confirm` writes a CD-1's clauses that way (`cov.cd1_<n>.*`). A district or CD-1 not in
+  the stack says so ("No I-2 schedule in the rules", "CD-1 (9999) is not in the rules", "A CD-1 site with no CD-1
+  number"). RM-4 is now read from Kai's October 2026 PDF (multiple dwelling: FSR 1.45, 3.00 for 100% social housing
+  `max_fsr_social_housing`; 10.7 m, the Director's 19.9 m for social housing `max_height_m_social_housing_variance` →
+  conditional; yards 6.1/2.1/10.7 m `cov.rm4.setbacks`); the recalled 0.75 was wrong and RM-4N, not in that PDF, is out.
+  CD-1 (819) (375 Glen Dr / 1015 E Hastings) is from the draft by-law in its referral report (`inbox/rr5.pdf`,
+  `verified: false`, `unverified_because`; FSR 6.90 on the fixed 2,134.4 m², `fsr_site_area_m2`; 51.0 m).
+  The City posts no PDF for CD-1 (819) (its CD-1 index lists 1015 East Hastings Street with no link), so it stays unverified.
+  CD-1 (324) (By-law No. 7248, consolidated to No. 14009, 23 Apr 2024, `inbox/cd-1(324).PDF`, verified):
+  `cov.cd1_324.floor_area` caps the residential floor area by sub-area (s.6.2 Table 1a: A 19,300 m², B 23,600 m²;
+  `sub_area_residential_floor_area_m2`, read against `site.cd1_sub_area`, uncertain where it is not recorded) and
+  `cov.cd1_324.outright_height` is 91 m (s.7.1). `sites/1010-expo-blvd.json` carries `cd1_bylaw_number` 324 and
+  `cd1_sub_area` "B" (read off Schedule A), so Expo's outright answer is now assessed; its committed runs and `case.html` still
+  say "not assessed" until they are regenerated. The checks read every schedule through `checks.fsr_limit` / `height_limit`
+  (tenure, site-size tables, social-housing and rental figures, the Director's discretion as conditional, formula increases,
+  unit caps, a sub-area's fixed floor area); the suggester takes its figures from them. Kai saved the October 2026 PDFs of
+  RM-3, RM-3A, RM-5 (all), R1-1, C-2, C-2A, C-2B, C-2C, C-2C1, RR-1, RR-2A/2B and RR-3A/3B/3C into `inbox/` on 17 Nov 2026;
+  Kai asked for CD-1 first, so their rules are still to be entered (the RM-3/RM-3A rules in the stack are still the
+  recollection ones, and the PDFs differ: RM-3's height is 36.6 m, RM-3A has 3.00 FSR and 19.9 m for social housing).
 - Also 16 Nov 2026: `bcbc.exits` (`rules/d_design_standards.json`, `verified: false`) is read by `layout.egress`
   into `L["egress"]`; `option.sprinklered` switches its limits. `option.massing` {anchor, dx_m, dy_m, rotate} and
   `site.front_face` {street | side | edge} place the mass and turn the lot (`massing.place`,
   `boundary.oriented_ring`; the page applies `lot.orientation` to the stored context). `option.layout.extra_programs`
   [{label, area_m2}] are the architect's own blocks (kind `other`). `suggest()` takes `mix_shares` and returns
   `envelope`, `mix` and `candidate_note`. An issue note carries `name`.
+- Area-plan family target (17 Nov 2026): `cov.dtes.family_units` (`rules/c_city_policies.json`, `verified: false`, read
+  from the 1015 East Hastings referral report, not the Plan) is the Downtown Eastside Plan's 25% two-bedroom-plus
+  target; it applies only where a person set `site.area_plan` to `downtown_eastside`, leaves `option.supportive_units`
+  out of the count (`exclude_supportive_units`), and the city-wide `cov.family_units` then reads not applicable
+  (`checks.AREA_PLAN_FAMILY_TARGETS`, `tests/test_area_plan_family.py`). Neither field is in `FIELDS` yet, so the page
+  has no input for them. Third case study: `sites/375-glen-drive.json` with
+  `options/375-glen-drive-as-proposed.json` (the referral report's figures; the report PDF is `02 A2\rr5.pdf`, outside
+  the repository) and the run in `outputs/375-glen-drive/as-proposed/`.
 - `rules/f_assumptions.json`: soft costs 25%, contingency 10%, operating $6,500 and reserve $600 per unit,
   the RGI income at half the fund's limit are declared placeholders (`placeholder: true`); the hard-cost base
   is a 2- to 4-unit catalogue figure; bachelor, one-bedroom and three-bedroom rents are null until typed from

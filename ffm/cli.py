@@ -258,7 +258,7 @@ def cmd_rules(a: argparse.Namespace) -> int:
     rules = load_rules(Path(a.rules) if a.rules else RULES_DIR)
     for r in rules:
         v = r.version_on(on)
-        print(f"{r.layer} {r.id:40} {r.title[:50]:50} v {v.effective_from if v else '—'}  applies to {','.join(r.applies_to_districts)}")
+        print(f"{r.layer} {r.id:40} {r.title[:50]:50} v {v.effective_from if v else '—'}  applies to {','.join(f'CD-1 ({x})' for x in r.applies_to_cd1) if r.applies_to_cd1 else ','.join(r.applies_to_districts)}")
     return 0
 
 

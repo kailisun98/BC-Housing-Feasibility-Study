@@ -15,7 +15,7 @@ import {
 import { guide, state } from "./core/state.js";
 import { loadScript } from "./core/engine.js";
 import {
-  ANSWERS, cornerStreets, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, OPTION_FIELDS, SITE_FIELDS
+  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, OPTION_FIELDS, SITE_FIELDS
 } from "./fields.js";
 import { optionSummary, refNow, renderForm } from "./schedule.js";
 import {
@@ -135,22 +135,24 @@ export function ruleTitle(id) {
   return r ? r.title : id;
 }
 
-/* The rule stack's outright schedule for a district (RM-1, RT-3 read from the PDF; RM-4 and the RT family entered
-   unverified; CD-1 none), or null. */
-export function scheduleFor(district) {
+/* The rule stack's outright schedule for a district, or null: RM-1, RT-3, RM-4 read from the schedules; others entered
+   unverified; a CD-1 site's own by-law, matched on its CD-1 number (`cd1`, the site's cd1_bylaw_number) and no other. */
+export function scheduleFor(district, cd1) {
   const d = String(district || "").toUpperCase();
   if (!d) return null;
-  return state.rules.find(r => r.check === "district_outright_fsr" && (r.applies_to_districts || []).some(x => x.toUpperCase() === d || (d.startsWith(x.toUpperCase() + "-") && !x.includes("-")))) || null;
+  return state.rules.find(r => r.check === "district_outright_fsr" && !(r.applies_to_districts || []).includes("*") && appliesHere(r, d, cd1)) || null;
 }
 
 /* What to say beside the district: the schedule in the rules (verified or not), or the CD-1 by-law, or that a rough
    envelope stands in and the architect confirms it. The manager is not asked to read a schedule in. */
 function districtWords(site) {
   const d = site.zoning_district; if (!d) return "";
-  const r = scheduleFor(d);
-  const cd1 = site.cd1_bylaw_number;
-  if (r) return r.source && r.source.verified === false ? ` <span class="cont warn-text">· its schedule was entered unverified; the architect confirms the figures</span>` : ` <span class="cont">· schedule in the rules</span>`;
-  if (/^CD-1/i.test(d)) return ` <span class="cont warn-text">· a site-specific district (CD-1 by-law${cd1 ? ` No. ${h(cd1)}` : ""}): a rough envelope stands in; the architect confirms it</span>`;
+  const cd1 = cd1Of(d, site.cd1_bylaw_number);
+  const r = scheduleFor(d, cd1);
+  const what = cd1 ? `CD-1 (${h(cd1)})'s by-law` : "its schedule";
+  if (r) return r.source && r.source.verified === false ? ` <span class="cont warn-text">· ${what} is in the rules, entered unverified; the architect confirms the figures</span>` : ` <span class="cont">· ${cd1 ? `${what} is in the rules` : "schedule in the rules"}</span>`;
+  if (cd1) return ` <span class="cont warn-text">· a site-specific district: ${what} is not in the rules, so a rough envelope stands in; the architect confirms it</span>`;
+  if (/^CD-1/i.test(d)) return ` <span class="cont warn-text">· a site-specific district with no CD-1 number recorded, so no by-law can be matched: a rough envelope stands in; the architect confirms it</span>`;
   return ` <span class="cont warn-text">· no ${h(d)} schedule in the rules: a rough envelope stands in; the architect confirms it</span>`;
 }
 
@@ -371,7 +373,7 @@ function previewFacts(found) {
       <div class="stage-map" id="stage-map" data-sig="${h(mapSig(found))}" role="img" aria-label="The parcel the lookup found, on a map"><p class="help">Map loading…</p></div>
       <dl class="found-site">
         <div><dt>Found</dt><dd><b>${h(found.address)}</b><span class="cont"> · from the ${info.geocoded_as && String(info.geocoded_as).includes("property address") ? "City's address list" : "address as geocoded"}</span></dd></div>
-        <div><dt>District</dt><dd>${found.zoning_district ? `<b>${h(found.zoning_district)}</b>${districtWords(found)}` : "<i>not found</i>"}</dd></div>
+        <div><dt>District</dt><dd>${found.zoning_district ? `<b>${h(districtOf(found))}</b>${districtWords(found)}` : "<i>not found</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${found.site_area_m2 ? `<b>${h(fmtNum(found.site_area_m2))} m²</b> · ${h(found.frontage_m)} × ${h(found.depth_m)} m` : "<i>no parcel polygon at the point</i>"}${p.shape && p.shape.class !== "rectangle" ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : ""}</dd></div>
         ${info.civic_mismatch ? `<div><dt>Check</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street. This is the nearest parcel: use it only if it is the site.</dd></div>` : ""}
         ${info.outside_vancouver ? `<div><dt>Check</dt><dd class="warn-text">${h(found.municipality)} is outside the City of Vancouver: the rules here cannot read its zoning.</dd></div>` : ""}
@@ -388,7 +390,7 @@ function siteFacts(site) {
   return `<div class="stage-site">
       <div class="stage-map" id="stage-map" data-sig="${h(mapSig(site))}" role="img" aria-label="The parcel on a map"><p class="help">Map loading…</p></div>
       <dl class="found-site">
-        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(site.zoning_district)}</b>${districtWords(site)}` : "<i>not found: the architect enters it</i>"}</dd></div>
+        <div><dt>District</dt><dd>${site.zoning_district ? `<b>${h(districtOf(site))}</b>${districtWords(site)}` : "<i>not found: the architect enters it</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${site.site_area_m2 ? `<b>${h(fmtNum(site.site_area_m2))} m²</b>${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}` : "<i>no parcel</i>"}${p.shape ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : (m.vertices ? ` <span class="cont">(${h(m.vertices)} corners${m.rectangular ? ", a rectangle" : ", not a rectangle: the massing follows the polygon"})</span>` : "")}${site.boundary_m ? ' <span class="cont">· boundary drawn by hand</span>' : ""}</dd></div>
         <div><dt>Street</dt><dd>${h(street)}${cornerStreets(site).length ? ` <span class="cont">· a corner lot</span>` : ""}</dd></div>
         <div><dt>Owner</dt><dd>${site.owner ? h(site.owner) : "<i>not given</i>"}</dd></div>

@@ -35,7 +35,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Callable
 
-from .rules_loader import RULES_DIR
+from .rules_loader import RULES_DIR, cd1_number
 
 ROOT = Path(__file__).resolve().parent.parent
 PROPOSALS_DIR = ROOT / "proposals"
@@ -359,7 +359,8 @@ def clauses_from(items: list[dict], district: str) -> list[dict]:
     """The rule entries a rule proposal becomes, in the engine's own shape (id, check, params); a person confirms
     them. The base maximum is the outright figure; conditions travel in the source's verify note."""
     by = {it["key"]: it for it in items if it.get("key")}
-    slug = _slug(district).replace("-", "")
+    n = cd1_number(district)
+    slug = f"cd1_{n.lower()}" if n else _slug(district).replace("-", "")     # a CD-1's rules are keyed by its number
     out: list[dict] = []
 
     def num(k: str) -> float | None:
@@ -427,7 +428,10 @@ def confirm(proposal: Path, by: str, only: list[str] | None = None, rules_dir: P
             if existing:
                 existing["versions"].append(version)
             else:
-                doc["rules"].append({"id": c["id"], "title": c["title"], "jurisdiction": "City of Vancouver", "applies_to_districts": [district],
+                n = cd1_number(district)
+                # a CD-1 by-law's rules match its CD-1 number and no other site (17 Nov 2026)
+                where = {"applies_to_districts": ["CD-1"], "applies_to_cd1": [n]} if n else {"applies_to_districts": [district]}
+                doc["rules"].append({"id": c["id"], "title": c["title"], "jurisdiction": "City of Vancouver", **where,
                                      "check": c["check"], "versions": [version]})
             confirmed.append(c["id"])
         path.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")

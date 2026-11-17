@@ -7,7 +7,7 @@ import { optWord } from "./fields.js";
 import { rev } from "./runs.js";
 import { compareKind, idBreak, optionName, refOf } from "./memo/memo.js";
 import { layoutOpenItems, money, MONEY_STATUS } from "./memo/answers.js";
-import { splitValues } from "./memo/clauses.js";
+import { splitValues, withPlans } from "./memo/clauses.js";
 import { tradeOff } from "./memo/side-by-side.js";
 import { changeWord, shortName } from "./memo/changes.js";
 import { siteContext } from "./figures/common.js";
@@ -40,7 +40,8 @@ function paperFit(build, boxW, boxH, mm = 2.3) {
    everywhere, so a reader can follow any answer to its clause and its document. One self-contained HTML document:
    the server prints it to PDF, and Print opens it in the browser's print dialog. */
 export function paperDocument(run) {
-  const L = run.ledger, res = L.results, ans = L.summary.answers;
+  // the exits as the plans found them, the same on paper as on screen (withPlans)
+  const L = run.ledger, res = withPlans(L.results, run), ans = L.summary.answers;
   const site = L.inputs.site || {}, opt = L.inputs.option || {};
   const st = L.run.stamp, d = run.diff, B = d && run.compareLedger ? run.compareLedger : null;
   const kind = d ? compareKind(d) : null;

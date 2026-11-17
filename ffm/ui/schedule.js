@@ -168,7 +168,10 @@ function controlFor(f, obj, onChange, id) {
   const el = document.createElement("div");
   el.className = "sch-ctl";
   if (f.type === "select") {
-    const opts = f.options.map(([v, lab]) => `<option value="${h(v)}"${String(value ?? "") === String(v) ? " selected" : ""}>${h(lab)}</option>`).join("");
+    // a value the file carries that the list does not offer is kept and shown, not dropped to the first choice
+    let options = f.options;
+    if (value != null && value !== "" && !options.some(([v]) => String(v) === String(value))) options = [...options, [String(value), String(value)]];
+    const opts = options.map(([v, lab]) => `<option value="${h(v)}"${String(value ?? "") === String(v) ? " selected" : ""}>${h(lab)}</option>`).join("");
     el.innerHTML = `<select id="${id}">${opts}</select>`;
     $("select", el).addEventListener("change", e => { setPath(obj, f.key, e.target.value === "" ? null : e.target.value); onChange(f.key); });
     return el;

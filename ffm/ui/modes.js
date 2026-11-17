@@ -140,7 +140,7 @@ export function setMode(mode, remember = true, announce = true) {
 /* What a mode does to the memo on screen: the architect reads every ledger layer open, the others start closed. */
 export function applyModeToMemo() {
   const open = state.mode === "architect";
-  $$(".ledger details").forEach(d => { if (d.open !== open) d.open = open; });
+  $$(".ledger details.layer").forEach(d => { if (d.open !== open) d.open = open; });
 }
 
 export function initialMode() {

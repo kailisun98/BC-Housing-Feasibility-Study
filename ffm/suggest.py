@@ -595,6 +595,13 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         "notes": f"Rule-derived suggestion ({candidate}) as of {on.isoformat()}; every figure cites its rule in the run's suggestion record. Placeholders: floor to floor {f2f} m, setbacks {sb['front']}/{sb['rear']}/{sb['side']} m, net efficiency {eff}, units {int((allowance - 1) * 100)}% above the BC Housing minimums.",
         "sources": [{"title": "Derived by First Read from the rule stack in force on the as-of date", "url": ""}],
     }
+    # the manager's own height and storeys set the floor to floor, so the drawings draw the height they typed
+    # (17 Nov 2026: 61.6 m for 19 storeys was drawn 62.7 m, at the placeholder 3.3 m, until a buried field was found)
+    if fixed.get("height_m") and fixed.get("storeys"):
+        ftf = fixed["height_m"] / fixed["storeys"]
+        if 2.8 <= ftf <= 4.5:
+            option["floor_to_floor_m"] = round(ftf, 2)
+            option["notes"] = option["notes"].replace(f"Placeholders: floor to floor {f2f} m, ", f"Floor to floor {round(ftf, 2)} m, the manager's height ÷ storeys. Placeholders: ")
     fields["proponent_type"] = {"value": "non_profit_society", "rule_id": "bch.chf.eligibility", "note": "assumed a society; change for a co-operative, a municipal provider or a First Nation"}
     fields["tenure"] = {"value": "social_housing", "rule_id": "cov.social_housing_definition", "note": "100% social housing: exempt from levies and the path the rezoning policy takes"}
     fields["floor_to_floor_m"] = {"value": f2f, "rule_id": None, "note": "placeholder"}

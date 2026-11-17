@@ -575,6 +575,14 @@ function cardOption() {
 
 export const defaultPrograms = () => state.rules.filter(r => r.layer === "E" && /chf|bcbuilds/.test(r.id)).map(r => r.id);
 
+/* The status line's last words after a figure changes: on to the run, or what Continue waits for (17 Nov 2026: it
+   said "Continue to the run" while Continue was disabled). */
+export function continueWords() {
+  const o = stageOptionNow();
+  const probs = o ? figureProblems(o, guide.suggestion) : [];
+  return probs.length ? `Continue waits for ${probs.length === 1 ? "one figure" : `${probs.length} figures`}: ${probs.map(p => p.split(" (")[0]).join(" and ")}.` : "Continue to the run when it reads right.";
+}
+
 /* What the four figures cannot make, in a few words each: storeys taller than the height, a floor larger than the
    plate the setbacks leave. Empty when the building can stand. Pure. */
 function figureProblems(o, S) {
@@ -630,7 +638,9 @@ function figureBlock(o, S) {
   const fitStoreys = short ? Math.floor(Number(o.height_m) / f2f) : null;
   const heightFix = fitF2f >= 2.8 ? `To draw ${h(fmtNum(o.height_m))}&nbsp;m, set Floor to floor to ${h(fmtNum(fitF2f))}&nbsp;m under All figures.`
     : `Raise the height to about ${h(fmtNum(needs))}&nbsp;m, or plan ${h(fitStoreys)} storeys: that is what ${h(fmtNum(o.height_m))}&nbsp;m holds at ${h(fmtNum(f2f))}&nbsp;m a floor.`;
-  const heightLine = short ? `<p class="help warn-text fig4-note">The drawings use ${h(fmtNum(needs))}&nbsp;m: ${h(o.storeys)} storeys × ${h(fmtNum(f2f))}&nbsp;m floor to floor. ${heightFix}</p>` : "";
+  // an impossible height is said once, in the note that holds Continue back; a tight one here, with its fix
+  const impossible = o.storeys && o.height_m != null && Number(o.height_m) / o.storeys < 2.8;
+  const heightLine = short && !impossible ? `<p class="help warn-text fig4-note">The drawings use ${h(fmtNum(needs))}&nbsp;m: ${h(o.storeys)} storeys × ${h(fmtNum(f2f))}&nbsp;m floor to floor. ${heightFix}</p>` : "";
   // a floor area the storeys cannot hold: each floor larger than the plate the setbacks leave (17 Nov 2026: FSR 6.01
   // on 6 storeys asked for 2,178 m² a floor on a 2,174.9 m² lot and passed without a word)
   const E0 = S && S.envelope;
@@ -899,11 +909,13 @@ function setFigure(key, raw) {
     if (raw === "" && guide.mine[key] === undefined) return;
     guide.mine[key] = raw;
     guide.suggestionUsed = false;
-    const label = fieldOf("option", key).label;
-    const msg = raw === "" ? `${label}: blank, so not assessed.` : (said || `${label}: ${Number.isFinite(Number(raw)) ? fmtNum(Number(raw)) : raw}, yours.`);
+    // the unit after the figure, as the four figures show it ("Height: 61.6 m", not "Height (m): 61.6")
+    const label = fieldOf("option", key).label.replace(/ \((m|m²)\)$/, "");
+    const unit = key === "height_m" ? " m" : key === "gfa_m2" ? " m²" : "";
+    const msg = raw === "" ? `${label}: blank, so not assessed.` : (said || `${label}: ${Number.isFinite(Number(raw)) ? fmtNum(Number(raw)) : raw}${unit}, yours.`);
     // storeys, height and floor area carry the homes, the tiers and the accessible units: derive them again
     if (DERIVES(key)) { guideSuggest({ said: msg, focus: `[data-fig="${asked}"]` }); return; }
-    setStatus(`${msg} Continue to the run when it reads right.`, "info");
+    setStatus(`${msg} ${continueWords()}`, "info");
     applyAfterRun();
     return;
   }

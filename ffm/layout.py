@@ -292,7 +292,7 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     by_key = {b["key"]: b for b in prog["blocks"]}
     ground = floors[0]
     # the ground floor's other uses first, by their rules
-    for key, prefer in (("non_residential", [("front", "left"), ("front", "right")]), ("amenity", [("front", "right"), ("front", "left")]), ("services", [("rear", "left"), ("rear", "right")])):
+    for key, prefer in (("non_residential", [("front", "left"), ("front", "right")]), ("amenity", [("front", "right"), ("front", "left")]), ("services", [("rear", "left"), ("rear", "right"), ("rear", "mid")])):
         b = by_key.get(key)
         if not b:
             continue
@@ -755,7 +755,10 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
     elif key == "services":
         zs = [(fl, z) for fl, z in zones if z["block"] == key]
         ok = bool(zs) and all(fl["level"] == 0 and z.get("side") == "rear" for fl, z in zs)
-        out.update(status="pass" if ok else "conditional", note="on the ground floor, lane side" if ok else ("on the ground floor but facing the street: the plate is single-loaded" if zs and all(fl["level"] == 0 for fl, _ in zs) else "services could not all stay on the ground floor"))
+        # why they face the street, from the plate itself (17 Nov 2026: "single-loaded" was said of a double-loaded plate)
+        double = any(z.get("side") == "rear" for fl, z in zones)
+        street_why = "the lane side has no room left beside the core" if double else "the plate is single-loaded"
+        out.update(status="pass" if ok else "conditional", note="on the ground floor, lane side" if ok else (f"on the ground floor but facing the street: {street_why}" if zs and all(fl["level"] == 0 for fl, _ in zs) else "services could not all stay on the ground floor"))
     elif key == "core":
         n_cores = max((sum(1 for z in fl["zones"] if z["block"] == "core") for fl in floors), default=0)
         out.update(status="pass", note="one core bay at the centre of every floor, the corridor through it"
@@ -780,8 +783,15 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
         if not acc:
             out["note"] = "no accessible units stated on the option"
             return out
-        lv = min(fl["level"] for fl, _ in acc)
-        out.update(status="pass", note=f"{len(acc)} accessible units on {'the ground floor' if lv == 0 else f'level {lv + 1}'}, nearest the core")
+        # where they are, floor by floor (17 Nov 2026: "7 accessible units on the ground floor" of a ground floor of 3 homes)
+        by: dict[int, int] = {}
+        for fl, _ in acc:
+            by[fl["level"]] = by.get(fl["level"], 0) + 1
+        where = lambda lv: "the ground floor" if lv == 0 else f"level {lv + 1}"
+        lv = min(by)
+        note = (f"{len(acc)} accessible units on {where(lv)}, nearest the core" if len(by) == 1
+                else f"{len(acc)} accessible units from {where(lv)} ({by[lv]} there) to {where(max(by))}, nearest the core")
+        out.update(status="pass", note=note)
     return out
 
 

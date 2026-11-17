@@ -75,8 +75,8 @@ const FIELDS = [
     info: "Drawn along the frontage in the figures; no rule reads it." },
   { on: "site", key: "owner", group: "Owner", label: "Owner", type: "text", need: "", reads: ["dcl_cac"],
     info: "Printed in the memo's inputs." },
-  { on: "site", key: "owner_type", group: "Owner", label: "Owner type", type: "text", need: "", reads: ["dcl_cac"],
-    help: "church, society, municipality, private …",
+  // the architect's schedule offers the manager's choices (17 Nov 2026: it was free text showing "municipality")
+  { on: "site", key: "owner_type", group: "Owner", label: "Owner type", type: "select", options: OWNER_TYPES, need: "", reads: ["dcl_cac"],
     ask: { stop: 1, q: "Who owns the land?", who: "you", kind: "select", options: OWNER_TYPES },
     info: "A note for the memo: church, society, municipality, private. The DCL exemption for church use is read from the referral report, not from this field. The pro-forma carries the land at a nominal value where the owner is a church, a society or a government on a long lease." },
   { on: "site", key: "keep_existing_buildings", group: "Owner", label: "The buildings on the lot stay", type: TRI, need: "rule", ref: "open item",

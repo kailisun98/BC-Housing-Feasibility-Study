@@ -4,6 +4,7 @@
 import { cap, fmtNum, h, leadCont, pill, VERDICT_OUTRIGHT, verdictStatus, withoutRepeat } from "../core/util.js";
 import { state } from "../core/state.js";
 import { refOf, refTagOf } from "./memo.js";
+import { withPlans } from "./clauses.js";
 import { ruleTitle } from "../route-stage.js";
 import { districtOf } from "../fields.js";
 
@@ -96,11 +97,20 @@ export function answerUnsure(L, run) {
   const table = n ? `<table class="plain open-items"><thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
     ${items.map(u => `<tr><td data-k="Ref">${refOf(u.rule_id) ? `<b class="ref" title="${h(u.title)}">${h(refOf(u.rule_id))}</b>` : "—"}</td><td data-k="Item">${h(u.title)}</td><td class="status" data-k="Status">${pill(u.status)}</td><td class="who" data-k="Who">${h(who(u))}</td><td class="todo" data-k="What to do">${h(todo(u))}</td></tr>`).join("")}
   </tbody></table>` : "";
+  // the clauses also marked uncertain that are not open items here, named, so the two counts reconcile (17 Nov 2026:
+  // "Four open items" over a clause table counting 6 Uncertain); the outright limits are answered by the rezoning
+  const covered = new Set(items.map(u => u.rule_id).filter(Boolean));
+  const also = withPlans(L.results, run).filter(r => r.status === "uncertain" && !covered.has(r.rule_id));
+  const outright = also.filter(r => String(r.check || "").startsWith("district_outright"));
+  const rest = also.filter(r => !outright.includes(r));
+  const refList = rs => rs.map(r => `${refOf(r.rule_id) ? `${refOf(r.rule_id)} ` : ""}${r.title}`).join("; ");
+  const alsoLine = also.length ? `<p class="cont also-uncertain">Also uncertain in Clauses applied, with no open item of their own: ${h(refList(also))}.${outright.length && L.summary.answers.allowed.rezoning_path ? ` ${outright.length === 1 ? "The outright limit is" : "The outright limits are"} answered in 1: the rezoning decides ${outright.length === 1 ? "it" : "them"}.` : ""}${rest.length ? " The clause rows say what each needs." : ""}</p>` : "";
   // a count of open items is not a verdict: the card carries no status wash; each row wears its own
   return `<section class="card answer" data-verdict="${n ? "plain" : "pass"}">
     <h2><span class="badge">3</span> What is still unsure, and who resolves it?</h2>
     <p class="verdict">${verdict}</p>
     ${table}
+    ${alsoLine}
   </section>`;
 }
 

@@ -411,13 +411,13 @@ table.plain td.status { white-space: nowrap; }
 .section ul { margin: 0; padding-left: 18px; }
 .section li { margin: 3px 0; }
 
-.ledger details { border-top: 1px solid var(--line); }
-.ledger details:first-of-type { border-top: 0; }
-.ledger summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; padding: 8px 4px; margin: 0 -4px; border-radius: 4px; font-weight: 600; user-select: none; transition: background-color .12s ease-out; }
-.ledger summary:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
-.ledger summary::-webkit-details-marker { display: none; }
-.ledger summary::after { content: ""; margin-left: auto; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(-45deg); flex: 0 0 auto; transition: transform .15s; }
-.ledger details[open] summary::after { transform: rotate(45deg); }
+.ledger details.layer { border-top: 1px solid var(--line); }
+.ledger details.layer:first-of-type { border-top: 0; }
+.ledger details.layer > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 8px; padding: 8px 4px; margin: 0 -4px; border-radius: 4px; font-weight: 600; user-select: none; transition: background-color .12s ease-out; }
+.ledger details.layer > summary:hover { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.ledger details.layer > summary::-webkit-details-marker { display: none; }
+.ledger details.layer > summary::after { content: ""; margin-left: auto; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); transform: rotate(-45deg); flex: 0 0 auto; transition: transform .15s; }
+.ledger details.layer[open] > summary::after { transform: rotate(45deg); }
 .ledger summary .layer { font-size: 13px; }
 .ledger summary .layer-title { color: var(--muted); font-weight: 400; font-size: 12px; }
 .ledger summary .counts { display: flex; gap: 4px; flex-wrap: wrap; margin-right: 14px; }
@@ -430,7 +430,7 @@ table.plain td.status { white-space: nowrap; }
 .ledger .nums { color: var(--muted); font: 11px/1.5 var(--mono); }
 .ledger td.src a { font-size: 11.5px; }
 @media (max-width: 1365px) { .ledger col.c-finding { width: 34%; } .ledger col.c-nums { width: 16%; } .ledger col.c-src { width: 20%; } }
-@media (prefers-reduced-motion: reduce) { .ledger summary::after, .ledger summary { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .ledger details.layer > summary::after, .ledger details.layer > summary { transition: none; } }
 
 .sources li { font-size: 12.5px; }
 .sources .verify { color: var(--muted); font-style: italic; }
@@ -1158,7 +1158,7 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
   /* closed layers print open: the arithmetic and the clauses are the point of the memo (app.js also opens them on beforeprint) */
   .ledger details::details-content { content-visibility: visible; display: contents; }
   .ledger details:not([open]) > *:not(summary) { display: table; }
-  .ledger summary::after { content: none; }
+  .ledger details.layer > summary::after { content: none; }
   a { color: #000; text-decoration: none; }
   .pill, .pill::before, .rev { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
@@ -1232,3 +1232,17 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .foot-main .stage-block { margin: 0; max-width: 46ch; font-size: 12px; text-align: right; }
 .stage-foot:has(.stage-block) { flex-wrap: wrap; }
 @media (max-width: 760px) { .foot-main .stage-block { text-align: left; } }
+/* inside a layer: the rules that did not apply, folded into one row; a long source section under its first words */
+.ledger tr.na-row > td { padding: 4px 0; }
+.ledger .na-fold > summary { font-size: 12px; color: var(--muted); }
+.ledger .na-fold table.plain { margin: 6px 0 4px; }
+.ledger td.src .rule-sec { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.ledger .rule-sec-fold { margin-top: 2px; font-size: 11px; color: var(--muted); }
+.ledger .rule-sec-fold > summary { cursor: pointer; list-style: none; }
+.ledger .rule-sec-fold > summary::-webkit-details-marker { display: none; }
+.ledger .rule-sec-fold > summary::after { content: " more"; color: var(--blue); }
+.ledger .rule-sec-fold[open] > summary { display: none; }
+/* prose in the answers keeps a reading measure, tables keep the card's width (17 Nov 2026: findings ran about 190
+   characters a line at 1366 px) */
+.memo-body .answer p:not(.verdict), .memo-body .answer li, .memo-body .answer .finding { max-width: 82ch; }
+.memo-body .answer .also-uncertain { margin-top: 10px; font-size: 12px; }

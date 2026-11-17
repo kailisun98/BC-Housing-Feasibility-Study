@@ -7,7 +7,7 @@ import { optWord } from "../fields.js";
 import { syncStaleBand } from "../files.js";
 import { byRev, openRun, rev } from "../runs.js";
 import { answerAllowed, answerFunders, answerMoney, answerUnsure } from "./answers.js";
-import { renderClauses, UNIT_WORD } from "./clauses.js";
+import { renderClauses, UNIT_WORD, withPlans } from "./clauses.js";
 import { renderLedger, wireLedger } from "./ledger.js";
 import { renderSideBySide } from "./side-by-side.js";
 import { renderChanges } from "./changes.js";
@@ -112,7 +112,9 @@ export function renderMemo(run) {
   const changed = new Set(kind === "rules" ? (d.changes || []).map(c => c.rule_id) : []);
   state.refOf = memoRefs(res);   // the paper's A1, C4 references, the same on screen (15 Nov 2026)
   const rest = [];
-  rest.push(renderLedger(res, changed));
+  // the ledger reads the exits as the plans found them, as the clauses and answer 3 do (17 Nov 2026: Pass in the
+  // clauses, Info in the ledger)
+  rest.push(renderLedger(withPlans(res, run), changed));
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));

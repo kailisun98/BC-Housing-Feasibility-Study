@@ -267,6 +267,9 @@ async function syncInputsTo(run) {
     renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
     $("#site-dirty").hidden = false;
     refreshSummary("site");
+    // the site's saved options first (none, for a lookup), then the run's own option over the blank that leaves
+    // (17 Nov 2026: loadOptions ran last and put a blank "New option…" beside the run's 19-storey memo)
+    await loadOptions();
     if (inputs.option) {
       state.optionId = null;
       state.option = Object.assign(blankOption(state.site.id), JSON.parse(JSON.stringify(inputs.option)));
@@ -276,7 +279,6 @@ async function syncInputsTo(run) {
       $("#option-dirty").hidden = false;
       refreshSummary("option");
     }
-    await loadOptions();
     syncCards();
     setStatus(`${state.site.address || siteId} was never saved: its facts and the option are in the cards from the run itself; Save site as… keeps them.`, "info");
   } else if (optId && state.options.some(o => o.id === optId) && $("#option-select").value !== optId) {

@@ -68,8 +68,12 @@ TONES = {
     "corridor": "#f4f4f2", "core": "#c9c9c5", "services": "#e2e2df", "amenity": "#f6e7c1", "non_residential": "#f0cf9a",
     "spare": "#ffffff", "envelope": "#c81e1e", "outright": "#8e8e8e", "benchmark": "#c77d14", "tree": "#9fb07f", "tree_line": "#7f9664",
     "accessible": "#245f9c", "other": "#e6dfd0",
+    # the architect's own blocks (17 Nov 2026): design space (a lobby, an atrium), commercial space, and a cut-out
+    # (open to below, a notch, a courtyard: not floor area), which is how a plate takes a shape other than a rectangle
+    "design_space": "#d9e6d2", "commercial": "#f3c9b5", "void": "#ffffff",
 }
-BLOCK_LABEL = {"corridor": "Corridor", "core": "Core (stairs, elevator)", "services": "Services, bicycles", "amenity": "Amenity", "non_residential": "Non-residential", "spare": "Spare", **UNIT_LABEL}
+BLOCK_LABEL = {"corridor": "Corridor", "core": "Core (stairs, elevator)", "services": "Services, bicycles", "amenity": "Amenity", "non_residential": "Non-residential", "spare": "Spare",
+               "design_space": "Design space", "commercial": "Commercial", "void": "Cut-out", **UNIT_LABEL}
 
 
 def _find(results: list[dict], check: str | None = None, rule_id: str | None = None) -> dict | None:
@@ -467,7 +471,8 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
     h_rule = _find(ledger["results"], check="district_outright_height")
     outright = {"fsr": (fsr_rule or {}).get("values", {}).get("max_fsr_outright"), "height_m": (h_rule or {}).get("values", {}).get("max_height_m_outright"),
                 "rule_ids": [r["rule_id"] for r in (fsr_rule, h_rule) if r]}
-    used = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] != "spare"), 1)
+    used = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] not in ("spare", "void")), 1)
+    cut = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] == "void"), 1)
     exits_rule = _find(ledger["results"], rule_id=EGRESS_RULE)
     sprk = option.get("sprinklered")
     if sprk is None:
@@ -482,8 +487,9 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
         "plate": plate,
         "program": prog["blocks"], "parking": prog["parking"], "units_total": prog["units_total"], "units_placed": placed_units,
         "adjacencies": checks, "geometry": geometry, "egress": eg, "floors": floors, "shortfall": shortfall, "outright": outright,
-        "capacity": capacity(site, massing, outright),
-        "totals": {"plates_m2": gross_plates, "used_m2": used, "spare_m2": round(gross_plates - used, 1), "gfa_m2": massing["masses"][0].get("gfa_m2")},
+        "capacity": capacity(site, massing, outright, cut),
+        "totals": {"plates_m2": gross_plates, "used_m2": used, "spare_m2": round(gross_plates - used - cut, 1), "gfa_m2": massing["masses"][0].get("gfa_m2"),
+                   **({"void_m2": cut, "floor_area_m2": round(gross_plates - cut, 1)} if cut else {})},
         "assumptions": prog["assumptions"], "warnings": warnings + list(massing.get("warnings") or []),
         "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + (["option.layout.grid"] if plate.get("grid") else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
     }
@@ -491,7 +497,7 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
 
 # ---------------------------------------------------------------- the floor space ratio left for another level
 
-def capacity(site: dict, massing: dict, outright: dict) -> dict | None:
+def capacity(site: dict, massing: dict, outright: dict, void_m2: float = 0.0) -> dict | None:
     """How much floor area the FSR still leaves, and how many more levels of the proposed plate that is: against
     the rezoning policy's benchmark FSR where one fired (the massing's `policy_benchmark`), else the district
     schedule's outright maximum; `fsr_limit` is None where the rules carry neither. The block editor reads it
@@ -509,12 +515,13 @@ def capacity(site: dict, massing: dict, outright: dict) -> dict | None:
         limit, frm, rule_id = float(bench["fsr"]), "the rezoning policy's benchmark", bench.get("rule_id")
     elif isinstance(outright.get("fsr"), (int, float)) and outright["fsr"] > 0:
         limit, frm, rule_id = float(outright["fsr"]), "the district schedule's outright maximum", (outright.get("rule_ids") or [None])[0]
-    gfa, plate = float(pm["gfa_m2"]), float(pm["plate_area_m2"])
+    # the cut-outs the architect drew (`void` zones) are not floor area: they come off the plates' total
+    gfa, plate = max(0.0, float(pm["gfa_m2"]) - float(void_m2 or 0)), float(pm["plate_area_m2"])
     room = None if limit is None else round(limit * area - gfa, 1)
     return {"site_area_m2": area, "storeys": pm["storeys"], "plate_m2": plate, "gfa_m2": gfa, "fsr": round(gfa / area, 3),
             "fsr_limit": limit, "limit_from": frm, "rule_id": rule_id, "room_m2": room,
             "levels_room": None if limit is None else max(0, int((room + 0.5) // plate)),
-            "fsr_with_one_more": round((gfa + plate) / area, 3)}
+            "fsr_with_one_more": round((gfa + plate) / area, 3), **({"void_m2": round(float(void_m2), 1)} if void_m2 else {})}
 
 
 # ---------------------------------------------------------------- egress, read back from the plates
@@ -758,7 +765,11 @@ def egress_line(f: dict) -> str:
 
 # ---------------------------------------------------------------- a placement drawn by hand, re-checked
 
-EDITABLE_BLOCKS = ("studio", "one_bed", "two_bed", "three_bed_plus", "non_residential", "amenity", "services", "core", "corridor", "other")
+# `design_space` (a lobby, an atrium), `commercial` and `void` (a cut-out: open to below, a notch, a courtyard) are
+# the architect's own: no program asks for them, so they are measured and drawn but never short; a void is not
+# floor area, so it comes off the floor area the FSR is read on (`capacity`) and is never spare.
+EDITABLE_BLOCKS = ("studio", "one_bed", "two_bed", "three_bed_plus", "non_residential", "amenity", "services", "core", "corridor", "other",
+                   "design_space", "commercial", "void")
 
 
 def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_level: dict | list) -> dict[str, Any]:
@@ -820,8 +831,11 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             geometry.append({"kind": "no_corridor", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has units but no corridor"})
         if zones and not any(z["block"] == "core" for z in zones):
             geometry.append({"kind": "no_core", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has no core: the stairs and the elevator must land on every floor"})
-        used = sum(z["area_m2"] for z in zones if z["block"] != "spare")
-        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "spare_m2": round(max(0.0, W * D - used), 1)})
+        used = sum(z["area_m2"] for z in zones if z["block"] not in ("spare", "void"))
+        cut = sum(z["area_m2"] for z in zones if z["block"] == "void")
+        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "spare_m2": round(max(0.0, W * D - used - cut), 1)})
+        if cut:
+            floors[-1]["void_m2"] = round(cut, 1)
 
     # what the program still lacks, and what was placed beyond it
     shortfall: list[dict] = []

@@ -84,6 +84,17 @@ ANCHORS = {   # anchor -> (x: 0 left, 0.5 centre, 1 right; y: 0 front, 0.5 middl
 }
 
 
+def _given_plate(spec) -> tuple[float, float] | None:
+    """The plate dimensions the option states (`massing.width_m`, `massing.depth_m`), or None without both."""
+    if not isinstance(spec, dict):
+        return None
+    try:
+        w, d = float(spec.get("width_m") or 0), float(spec.get("depth_m") or 0)
+    except (TypeError, ValueError):
+        return None
+    return (w, d) if w > 0 and d > 0 else None
+
+
 def place(spec: dict, plate_m2: float, w: float, d: float, box: dict, default_anchor: str,
           warnings: list[str]) -> tuple[list[list[float]], float, float, dict[str, Any]]:
     """Where the architect put the proposed plate (`option.massing`): against a side or corner of the plate box
@@ -220,6 +231,15 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}; the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.")
         plate = plate_cap
     p_ring, p_w, depth = footprint(plate, storeys)
+    # the plate's own dimensions, where the architect set them in the block editor (`option.massing.width_m`,
+    # `depth_m`): the plate is that rectangle, kept inside the plate box, and its area no longer follows the GFA
+    given = _given_plate(option.get("massing"))
+    if given:
+        gw, gd = min(given[0], env_w), min(given[1], env_d)
+        if gw < given[0] - 0.01 or gd < given[1] - 0.01:
+            warnings.append(f"The plate of {given[0]:g} × {given[1]:g} m set on the option does not fit the {env_w:.1f} × {env_d:.1f} m the setbacks leave; it is drawn {gw:.1f} × {gd:.1f} m.")
+        p_w, depth, plate = gw, gd, gw * gd
+        p_ring = _rect(box["x"] + (env_w - p_w if at_right else 0.0), box["y"], p_w, depth)
     placement = None
     if option.get("massing") is not None:
         p_ring, p_w, depth, placement = place(option["massing"], plate, p_w, depth, box, "front-right" if at_right else "front-left", warnings)
@@ -238,6 +258,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         "base_z": 0.0, "height_m": round(h, 2), "storeys": storeys, "floor_to_floor_m": f2f,
         "plate_area_m2": round(plate, 1), "gfa_m2": round(plate * storeys, 1), "fsr": round(plate * storeys / area, 3),
         "derived_from": ["option.gfa_m2", "option.storeys", "option.setbacks_m", "option.floor_to_floor_m"]
+                        + (["option.massing.width_m", "option.massing.depth_m"] if given else [])
                         + (["option.massing"] if placement else []) + (["site.front_face"] if oriented else []),
     })
     if placement:

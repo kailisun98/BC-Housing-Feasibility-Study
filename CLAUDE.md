@@ -603,6 +603,30 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   (ground, typical, top), any other button draws that floor from `layout.floors` in the page; the block editor's checks
   redraw it and write the sheet into `.plans-overview`.
 
+- **The architect's own blocks, the plate's shape, the site behind it (17 Nov 2026, later).** Three block kinds no
+  program asks for (`layout.EDITABLE_BLOCKS`): `design_space` (a lobby, an atrium), `commercial`, and `void` (a cut-out:
+  open to below, a notch, a courtyard). They are measured and drawn, never short; a `void` is not floor area, so it
+  comes off the floor area `layout.capacity` reads the FSR on (`void_m2`) and is never spare. Commercial is not counted
+  toward `non_residential_gfa_m2`. The plate: `option.massing.width_m` / `depth_m` (`massing._given_plate`) set its
+  dimensions, kept inside the plate box with a warning; without them the plate is GFA over storeys as before. In the
+  editor: Plate W × D inputs and two dark handles on the plate's right and far edges (`setPlate`: width to the module,
+  depth to 0.5 m, the program laid out again, cut-outs that still fit kept by `suggestPlan`), `withPlate` sends the
+  dimensions and the floor area they give with every check, and Apply writes `massing.width_m/depth_m` and
+  `gfa_m2` = plate × storeys less the cut-outs (a cut-out pins the plate's dimensions first). A plate is still a
+  rectangle everywhere (massing, sheets, Revit): another shape is that rectangle with cut-outs. The canvas draws the
+  site behind the plate (`viewOf`, `contextSvg`, from `figures/common.js` `siteContext`): streets, neighbours, trees, the
+  property line dash-dot, the setback envelope red; the "site context" box (localStorage `ffm.ed.context`) puts it away
+  and the plate fills the canvas again.
+
+- **North up (17 Nov 2026, Kai: "plan needs to show north as up always").** FIG 01's plan (`figures/plan.js`) and the
+  block editor's canvas are still drawn in the lot frame (the street along x) but turned as a whole so north is up the
+  page, wherever the context gives the bearing of the x axis (`ctx.osm.bearing`): `turnOf`, `turnFrame` and `upright`
+  in `figures/common.js` (the rotation, the larger frame and the `.plan-turn` group, and labels kept readable). The
+  scale bar and the north arrow stay level. Pointers are read in the turned group's coordinates (`loc` in the block
+  editor, `toLot` in the boundary editor). A site with no context frame has no bearing and stays street-down. The
+  engine's own sheets (the Plans by program overview, the code site plan, the PDF's figures other than FIG 01) are
+  still drawn with the street at the bottom, as are the floor picker's plans.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

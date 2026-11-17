@@ -15,12 +15,17 @@ import { markStale, onOptionChange, tidyOption } from "../files.js";
 import { OPTION_FIELDS } from "../fields.js";
 import { egressLine } from "../memo/answers.js";
 import { refreshPlanFloor } from "../figures/cards.js";
+import { HALF, northArrow, siteContext, turnFrame, turnOf, upright } from "../figures/common.js";
 
-const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"]];
+const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"],
+  ["design_space", "Design space"], ["commercial", "Commercial"], ["void", "Cut-out"]];
 
-const ZONE_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0" };
+/* the architect's own blocks: no program asks for them, so they are never short; a cut-out is not floor area */
+const OPTIONAL = [["design_space", "Design space", "a lobby, an atrium"], ["commercial", "Commercial", "shops, offices, a café"]];
 
-const ZONE_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res" };
+const ZONE_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0", design_space: "#d9e6d2", commercial: "#f3c9b5", void: "url(#ed-hatch)" };
+
+const ZONE_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res", design_space: "design", commercial: "commercial", void: "open" };
 
 const UNIT_KEYS = ["studio", "one_bed", "two_bed", "three_bed_plus"];
 const isUnit = k => UNIT_KEYS.includes(k);
@@ -99,6 +104,11 @@ export function openEditor() {
   // the levels the architect adds here sit on top of the option's own storeys until Apply writes them into it
   editor.added = 0;
   editor.base = { plate: (run.layout.capacity && run.layout.capacity.plate_m2) || Math.round(run.layout.plate.width_m * run.layout.plate.depth_m * 10) / 10, f2f: run.layout.plate.floor_to_floor_m || 0 };
+  // the plate's own dimensions, where the option already states them; the site behind the plate, on unless put away
+  const ms = state.option && state.option.massing;
+  editor.plate = ms && ms.width_m > 0 && ms.depth_m > 0 ? { w: Number(ms.width_m), d: Number(ms.depth_m) } : null;
+  editor.massing = run.massing || null;
+  try { editor.context = localStorage.getItem("ffm.ed.context") !== "0"; } catch (e) { editor.context = true; }
   editor.zones = JSON.parse(JSON.stringify(fromOption || zonesFromLayout(run.layout)));
   editor.result = run.layout;
   const fig = $('.figure.sheet[data-sheet="plans"]');
@@ -126,7 +136,7 @@ export function closeEditor() {
 /* ---------------------------------------------------------------- undo, and the cores that stand on every floor */
 
 function snapshot() {
-  (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0 }));
+  (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null }));
   if (editor.history.length > 60) editor.history.shift();
 }
 
@@ -134,7 +144,7 @@ function undo() {
   const s = (editor.history || []).pop();
   if (!s) return;
   const was = JSON.parse(s);
-  editor.zones = was.z; editor.added = was.a; editor.sel = null; editor.dirty = true;
+  editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.sel = null; editor.dirty = true;
   renderEditor(); scheduleCheck();
   setStatus("Undone.", "info");
 }
@@ -170,13 +180,48 @@ function commit(core) {
 
 /* ---------------------------------------------------------------- the drawing */
 
-const rectOf = (z, p, scale) => ({ x: M + (z.x - p.x) * scale, y: M + (p.depth_m - (z.y - p.y) - z.d) * scale, w: Math.max(1, z.w * scale), d: Math.max(1, z.d * scale) });
+/* What the canvas shows, in the lot's metres: the plate alone, or (with the context on) the lot with a margin
+   round it, so the property line, the setback envelope, the streets and the neighbours stand behind the plate. */
+function viewOf(p, m, width) {
+  let v = { x0: p.x, y0: p.y, x1: p.x + p.width_m, y1: p.y + p.depth_m, ctx: false };
+  if (editor.context && m && m.lot) {
+    const bb = m.lot.bbox || [0, 0, m.lot.frontage_m, m.lot.depth_m], pad = 9;
+    v = { x0: Math.min(bb[0], p.x) - pad, y0: Math.min(bb[1], p.y) - pad - 5, x1: Math.max(bb[2], p.x + p.width_m) + pad, y1: Math.max(bb[3], p.y + p.depth_m) + pad, ctx: true };
+  }
+  v.s = (width - 2 * M) / Math.max(1, v.x1 - v.x0);
+  v.X = x => M + (x - v.x0) * v.s;
+  v.Y = y => M + (v.y1 - y) * v.s;
+  v.H = (v.y1 - v.y0) * v.s + 2 * M + 2;
+  return v;
+}
+
+const rectOf = (z, v) => ({ x: v.X(z.x), y: v.Y(z.y + z.d), w: Math.max(1, z.w * v.s), d: Math.max(1, z.d * v.s) });
+
+/* The site behind the plate: the streets, the neighbouring buildings and trees in half tone, the lot with its
+   property line (long dash, two dots), the setback envelope dashed red. From the same context FIG 01 draws. */
+function contextSvg(m, v) {
+  const ctx = siteContext(state.site, m), f = n => n.toFixed(1);
+  const P = pts => pts.map(([x, y]) => `${f(v.X(x))},${f(v.Y(y))}`).join(" ");
+  let s = `<rect x="0" y="0" width="100%" height="100%" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
+  for (const g of ctx.ground) s += `<polygon points="${P(g.ring)}" fill="${g.fill}" stroke="${g.seam ? g.fill : HALF.line}" stroke-width="0.6"${g.dash ? ` stroke-dasharray="3 2"` : ""}/>`;
+  for (const b of ctx.buildings) s += `<polygon points="${P(b.polygon)}" fill="${HALF.building}" stroke="${HALF.line}" stroke-width="0.6"/>`;
+  for (const t of ctx.streetTrees.concat(ctx.osmTrees)) s += `<circle cx="${f(v.X(t.x))}" cy="${f(v.Y(t.y))}" r="${f(Math.max(1.5, t.crown * v.s))}" fill="${HALF.tree}" fill-opacity="0.35" stroke="${HALF.treeLine}" stroke-width="0.6"/>`;
+  s += `<polygon points="${P(m.lot.polygon)}" fill="#ffffff" stroke="#1f2933" stroke-width="1.2" stroke-dasharray="12 3 2 3 2 3"/>`;
+  for (const t of ctx.trees) s += `<circle cx="${f(v.X(t.x))}" cy="${f(v.Y(t.y))}" r="${f(Math.max(1.5, t.crown * v.s))}" fill="${t.retained ? HALF.tree : "none"}" fill-opacity="0.4" stroke="${t.retained ? HALF.treeLine : HALF.gone}" stroke-width="0.6"${t.retained ? "" : ` stroke-dasharray="2 2"`}/>`;
+  if (m.envelope && m.envelope.polygon) s += `<polygon points="${P(m.envelope.polygon)}" fill="none" stroke="#c81e1e" stroke-width="0.9" stroke-dasharray="4 3"/>`;
+  for (const l of ctx.labels) {
+    const x = v.X(l.at[0]), y = v.Y(l.at[1]);
+    if (x < 0 || y < 0 || !l.text) continue;
+    s += `<text x="${f(x)}" y="${f(y + 3)}" font-size="9.5" text-anchor="middle" fill="${HALF.text}"${l.strong ? ` font-weight="600"` : ""}${l.angle ? ` transform="rotate(${(-l.angle).toFixed(1)} ${f(x)} ${f(y)})"` : ""}>${h(l.text)}</text>`;
+  }
+  return `<g class="ed-context" pointer-events="none">${s}</g>`;
+}
 
 /* one block: its rectangle, the accessible mark, its name and width, and the three handles (shown when selected) */
 function zoneInner(z, r) {
   const f = v => v.toFixed(1);
   const two = r.w > 34 && r.d > 30 && z.block !== "corridor";
-  return `<rect x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.d)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"/>
+  return `<rect x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.d)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "void" ? ` stroke-dasharray="5 3"` : ""}/>
     ${z.accessible ? `<circle cx="${f(r.x + 7)}" cy="${f(r.y + 7)}" r="3.2" fill="#245f9c"/>` : ""}
     ${r.w > 22 && r.d > 11 ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + (two ? -1 : 3.5))}" font-size="9.5" font-weight="500" text-anchor="middle" fill="#1f2933">${h(zoneShort(z))}</text>` : ""}
     ${two ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + 10)}" font-size="8.5" text-anchor="middle" fill="#5f6672">${h(z.w)} m</text>` : ""}
@@ -195,7 +240,7 @@ function selBarHtml(L, zs) {
   // a program block can be turned into another program where it stands; the cores and corridors are structure
   const structure = sel.block === "core" || sel.block === "corridor";
   const valOf = b => b.key === "other" ? `other:${b.label}` : b.key, mine = sel.block === "other" ? `other:${sel.label || "Other"}` : sel.block;
-  const kinds = (L.program || []).map(b => [valOf(b), b.label]);
+  const kinds = (L.program || []).map(b => [valOf(b), b.label]).concat(OPTIONAL.map(([k, l]) => [k, l]), [["void", "Cut-out (not floor)"]]);
   if (!structure && !kinds.some(([v]) => v === mine)) kinds.unshift([mine, blockName(sel)]);
   const name = structure ? `<b>${h(blockName(sel))}</b>` : `<select id="ed-kind" class="ed-kind" aria-label="The program of this block" title="Change this block's program">${kinds.map(([v, l]) => `<option value="${h(v)}"${v === mine ? " selected" : ""}>${h(l)}</option>`).join("")}</select>`;
   return `${name} <span>${h(sel.w)} × ${h(sel.d)} m, ${h(fmtNum(Math.round(a)))} m²${over}</span>
@@ -230,12 +275,19 @@ function programHtml(L, tr, zs, B) {
   const hereCorr = zs.some(z => z.block === "corridor");
   const structure = row("core", "Core", ZONE_TONE.core, "stairs, elevator · the same on every floor", nCore ? `${nCore} on every floor` : "<b>none</b>", nCore ? "done" : "short", null, `Core: ${nCore} on every floor. Enter adds one.`)
     + row("corridor", "Corridor", ZONE_TONE.corridor, `${withCorr} of ${L.floors.length} floors have one`, hereCorr ? "on this floor" : "<b>none here</b>", hereCorr ? "done" : "short", null, `Corridor: ${hereCorr ? "on this floor" : "none on this floor"}. Enter adds one.`);
+  // the architect's own blocks: placed area only, nothing asked for
+  const areaOf = kind => Math.round(Object.values(editor.zones).flat().filter(z => z.block === kind).reduce((t, z) => t + z.w * z.d, 0));
+  const optional = OPTIONAL.map(([k, l, what]) => row(k, l, ZONE_TONE[k], what, areaOf(k) ? `${fmtNum(areaOf(k))} m²` : "add", "done", null, `${l}, ${what}: ${areaOf(k)} square metres placed. Enter adds one to this floor.`)).join("");
+  const cut = areaOf("void");
+  const cutRow = row("void", "Cut-out", "repeating-linear-gradient(45deg, #fff 0 3px, #aab4c0 3px 4px)", "open to below, a notch, a courtyard · not floor area", cut ? `${fmtNum(cut)} m²` : "add", "done", null, `Cut-out, not floor area: ${cut} square metres. Enter adds one to this floor.`);
   const head = tr.unitsLeft ? `<b>${tr.unitsLeft}</b> of ${tr.unitsNeed} units to place` : `All <b>${tr.unitsNeed}</b> units placed`;
   return `<aside class="ed-program" aria-label="The program, placed and left to place">
       <div class="ed-prog-head"><span class="eyebrow">Program</span><span class="ed-left ${tr.done ? "done" : "short"}">${head}${tr.areasShort ? ` · ${tr.areasShort} other block${tr.areasShort === 1 ? "" : "s"} short` : ""}</span></div>
       <ul class="ed-prog-list">${rows}</ul>
-      <div class="ed-prog-sub">Structure</div>
-      <ul class="ed-prog-list">${structure}</ul>
+      <div class="ed-prog-sub">Yours to add · lobbies, atriums, commercial</div>
+      <ul class="ed-prog-list">${optional}</ul>
+      <div class="ed-prog-sub">Structure and plate shape</div>
+      <ul class="ed-prog-list">${structure}${cutRow}</ul>
       <details class="ed-newprog"><summary>Add a program of your own</summary>
         <input type="text" id="ed-prog-label" placeholder="e.g. Childcare" maxlength="40" aria-label="Program name">
         <input type="number" id="ed-prog-area" placeholder="m²" min="1" step="1" aria-label="Program area in square metres">
@@ -259,23 +311,28 @@ function renderEditor() {
   const boxW = Math.max(320, box.clientWidth || 600);
   const wide = boxW >= 760;
   const width = (wide ? boxW - 272 : boxW) - 4;
-  const scale = (width - 2 * M) / p.width_m;
-  const H = p.depth_m * scale + 2 * M + 2;
+  const V = viewOf(p, editor.massing, width), scale = V.s, H = V.H;
+  // north up, as every plan: the canvas is drawn in the lot frame and turned as a whole where the context gives
+  // the bearing; the pointer is read back in the turned group's own coordinates (wireEditor)
+  const site = editor.massing && editor.massing.lot ? siteContext(state.site, editor.massing) : null;
+  const turn = turnOf(site && site.osm && site.osm.bearing), frame = turnFrame(width, H, turn), U = s => upright(s, turn);
+  const px0 = V.X(p.x), py0 = V.Y(p.y + p.depth_m), pw = p.width_m * scale, pd = p.depth_m * scale;   // the plate on the canvas
+  const env = editor.massing && editor.massing.envelope, maxW = env ? ((env.box && env.box.w) || env.width_m) : p.width_m, maxD = env ? ((env.box && env.box.d) || env.depth_m) : p.depth_m;
   const bad = clashes(zs);
   const order = zs.map((z, i) => i).filter(i => i !== editor.sel).concat(editor.sel != null ? [editor.sel] : []);   // the selected block on top
   const svgZones = order.map(i => {
     const z = zs[i];
-    return `<g class="ed-zone${i === editor.sel ? " sel" : ""}${bad.has(i) ? " clash" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(blockName(z))}, ${z.w} by ${z.d} m, at ${z.x}, ${z.y} m${bad.has(i) ? ", overlapping another block" : ""}">${zoneInner(z, rectOf(z, p, scale))}</g>`;
+    return `<g class="ed-zone${i === editor.sel ? " sel" : ""}${bad.has(i) ? " clash" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(blockName(z))}, ${z.w} by ${z.d} m, at ${z.x}, ${z.y} m${bad.has(i) ? ", overlapping another block" : ""}">${zoneInner(z, rectOf(z, V))}</g>`;
   }).join("");
   // the grid: a line at every bay, a fainter one at every module, the bays' distances along the top
   let grid = "", ticks = "";
   for (let k = 0; k * m <= p.width_m + 1e-6; k++) {
-    const x = (M + k * m * scale).toFixed(1), bay = k % editor.divide === 0;
-    grid += `<line x1="${x}" y1="${M}" x2="${x}" y2="${(M + p.depth_m * scale).toFixed(1)}" stroke="${bay ? "#aab4c0" : "#cfd6de"}" stroke-width="${bay ? 0.8 : 0.5}"${bay ? "" : ` stroke-dasharray="2 3"`}/>`;
-    if (bay && editor.bay * scale >= 22) ticks += `<text x="${x}" y="${M - 6}" font-size="8.5" text-anchor="middle" fill="#5f6672">${r2(k * m)}</text>`;
+    const x = (px0 + k * m * scale).toFixed(1), bay = k % editor.divide === 0;
+    grid += `<line x1="${x}" y1="${py0.toFixed(1)}" x2="${x}" y2="${(py0 + pd).toFixed(1)}" stroke="${bay ? "#aab4c0" : "#cfd6de"}" stroke-width="${bay ? 0.8 : 0.5}"${bay ? "" : ` stroke-dasharray="2 3"`}/>`;
+    if (bay && editor.bay * scale >= 22) ticks += `<text x="${x}" y="${(py0 - 6).toFixed(1)}" font-size="8.5" text-anchor="middle" fill="#5f6672">${r2(k * m)}</text>`;
   }
-  const bandY = v => (M + (p.depth_m - (v - p.y)) * scale).toFixed(1);
-  const bandLines = [B.corr, B.rear].filter(v => v != null && v < p.y + p.depth_m - 0.05).map(v => `<line x1="${M}" y1="${bandY(v)}" x2="${(M + p.width_m * scale).toFixed(1)}" y2="${bandY(v)}" stroke="#aab4c0" stroke-width="0.6" stroke-dasharray="5 4"/>`).join("");
+  const bandY = v => V.Y(v).toFixed(1);
+  const bandLines = [B.corr, B.rear].filter(v => v != null && v < p.y + p.depth_m - 0.05).map(v => `<line x1="${px0.toFixed(1)}" y1="${bandY(v)}" x2="${(px0 + pw).toFixed(1)}" y2="${bandY(v)}" stroke="#aab4c0" stroke-width="0.6" stroke-dasharray="5 4"/>`).join("");
   const floorsBtns = L.floors.map(fl => {
     const n = (editor.zones[String(fl.level)] || []).filter(z => isUnit(z.block)).length;
     const broken = (L.geometry || []).some(g => g.level === fl.level);
@@ -308,6 +365,15 @@ function renderEditor() {
         <input type="number" id="ed-bay-other" min="3" max="12" step="0.1" placeholder="other" value="${otherBay ? editor.bay : ""}" aria-label="Another bay width in metres" title="Another bay width, 3 to 12 m">
         <select id="ed-divide" aria-label="What the walls sit on" title="What the blocks' walls sit on">${DIVIDES.map(([v, l]) => `<option value="${v}"${v === editor.divide ? " selected" : ""}>walls on ${h(l)}</option>`).join("")}</select>
       </span>
+      <span class="ed-plate" role="group" aria-label="Floor plate">
+        <span class="label">Plate</span>
+        <input type="number" id="ed-plate-w" min="6" max="${h(maxW)}" step="0.5" value="${h(p.width_m)}" aria-label="Plate width in metres" title="Plate width along the street, up to the ${h(maxW)} m the setbacks leave">
+        <span class="label">×</span>
+        <input type="number" id="ed-plate-d" min="6" max="${h(maxD)}" step="0.5" value="${h(p.depth_m)}" aria-label="Plate depth in metres" title="Plate depth into the lot, up to the ${h(maxD)} m the setbacks leave">
+        <span class="label">m</span>
+        ${editor.plate ? `<button type="button" class="btn btn-small btn-quiet" id="ed-plate-auto" title="Back to the plate the floor area and the storeys give">Auto</button>` : ""}
+        <label class="ed-acc" title="The property line, the setback envelope, the streets and the neighbours behind the plate"><input type="checkbox" id="ed-context"${editor.context ? " checked" : ""}> site context</label>
+      </span>
       <span class="ed-tools">
         <span class="help ed-busy" id="ed-busy"${editor.busy ? "" : " hidden"}>Checking…</span>
         <button type="button" class="btn btn-small btn-quiet" id="ed-undo"${(editor.history || []).length ? "" : " disabled"} title="Undo the last change (Ctrl+Z)">Undo</button>
@@ -318,12 +384,19 @@ function renderEditor() {
       ${programHtml(L, tr, zs, B)}
       <div class="ed-stage">
         <div class="ed-selbar" id="ed-selbar">${selBarHtml(L, zs)}</div>
-        <svg class="ed-canvas" viewBox="0 0 ${width} ${H.toFixed(0)}" width="${width}" height="${H.toFixed(0)}" role="application" aria-label="Block editor, ${h(L.floors[editor.level].name)}">
-          <rect x="${M}" y="${M}" width="${(p.width_m * scale).toFixed(1)}" height="${(p.depth_m * scale).toFixed(1)}" fill="#fbfbfa" stroke="#1f2933" stroke-width="1.2"/>
+        <svg class="ed-canvas" viewBox="0 0 ${frame.W.toFixed(1)} ${frame.H.toFixed(1)}" width="${width}" height="${(frame.H * width / frame.W).toFixed(0)}" role="application" aria-label="Block editor, ${h(L.floors[editor.level].name)}${turn ? ", north up" : ""}">
+          <rect x="0" y="0" width="100%" height="100%" fill="${V.ctx && site && site.osm ? HALF.parcel : "#ffffff"}"/>
+          ${frame.open}${U(`
+          <defs><pattern id="ed-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab4c0" stroke-width="1.4"/></pattern></defs>
+          ${V.ctx ? contextSvg(editor.massing, V) : ""}
+          <rect x="${px0.toFixed(1)}" y="${py0.toFixed(1)}" width="${pw.toFixed(1)}" height="${pd.toFixed(1)}" fill="#fbfbfa" stroke="#1f2933" stroke-width="1.2"/>
           ${grid}${bandLines}${ticks}
-          <text x="${(M + p.width_m * scale / 2).toFixed(1)}" y="${(H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672">street · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay</text>
           ${svgZones}
-          <g id="ed-ghost" pointer-events="none"></g>
+          <rect class="ed-plate-handle ed-plate-w" x="${(px0 + pw + 3).toFixed(1)}" y="${(py0 + pd / 2 - 11).toFixed(1)}" width="8" height="22" rx="2" fill="#1f2933"><title>Drag to widen or narrow the plate</title></rect>
+          <rect class="ed-plate-handle ed-plate-d" x="${(px0 + pw / 2 - 11).toFixed(1)}" y="${(py0 - 11).toFixed(1)}" width="22" height="8" rx="2" fill="#1f2933"><title>Drag to deepen or shallow the plate</title></rect>
+          <g id="ed-ghost" pointer-events="none"></g>`)}</g>
+          <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${turn ? "north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
+          ${turn || (site && site.osm && site.osm.bearing != null) ? northArrow(frame.W - 24, 26, 90, 10) : ""}
         </svg>
         <div class="ed-status">
           ${floorChecks.length ? `<ul class="finding-list">${floorChecks.map(g => `<li>${pill("fail")}<span>${h(g.note)}</span></li>`).join("")}</ul>` : `<span class="help">Nothing broken on ${h(floorWords(editor.level))}.${problems ? ` ${problems} on other floors (marked ! above).` : ""}</span>`}
@@ -343,7 +416,7 @@ function renderEditor() {
     $(".ed-newprog", box).open = true; $("#ed-prog-label", box).value = typed.label; $("#ed-prog-area", box).value = typed.area;
     if (typed.focus === "ed-prog-label" || typed.focus === "ed-prog-area") $(`#${typed.focus}`, box).focus({ preventScroll: true });
   }
-  wireEditor(box, { L, p, B, zs, scale, width, H });
+  wireEditor(box, { L, p, B, zs, scale, width, H, V, maxW, maxD, U });
   if (hadFocus && editor.sel != null) { const g = $(`.ed-zone[data-i="${editor.sel}"]`, box); if (g) g.focus({ preventScroll: true }); }
 }
 
@@ -456,9 +529,30 @@ function removeSel(zs) {
 }
 
 function wireEditor(box, ctx) {
-  const { L, p, B, zs, scale, width, H } = ctx;
+  const { L, p, B, zs, scale, width, H, V, maxW, maxD, U } = ctx;
   const svg = $(".ed-canvas", box);
+  // the pointer in the canvas's own coordinates, inside the group that turns the plan north up
+  const turned = $(".plan-turn", svg);
+  const loc = e => { const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(turned.getScreenCTM().inverse()); return [pt.x, pt.y]; };
   const m = mod();
+
+  // the plate's own dimensions: typed, or pulled by the two dark handles on its right and far edges; the width goes
+  // to the module, the depth to 0.5 m, neither past what the setbacks leave; the program is laid out again on it
+  const fitW = w => r2(Math.max(Math.min(6, maxW), Math.min(maxW, Math.round(w / m) * m > maxW ? maxW : Math.round(w / m) * m)));
+  const fitD = d => r2(Math.max(Math.min(6, maxD), Math.min(maxD, Math.round(d * 2) / 2)));
+  const plateFromInputs = () => {
+    const w = Number($("#ed-plate-w", box).value), d = Number($("#ed-plate-d", box).value);
+    if (!(w > 0) || !(d > 0)) { toast("The plate needs a width and a depth in metres.", true); renderEditor(); return; }
+    setPlate(Math.max(Math.min(6, maxW), Math.min(maxW, r2(w))), Math.max(Math.min(6, maxD), Math.min(maxD, r2(d))));
+  };
+  $("#ed-plate-w", box).addEventListener("change", plateFromInputs);
+  $("#ed-plate-d", box).addEventListener("change", plateFromInputs);
+  const auto = $("#ed-plate-auto", box); if (auto) auto.addEventListener("click", () => setPlate(null));
+  $("#ed-context", box).addEventListener("change", e => {
+    editor.context = e.target.checked;
+    try { localStorage.setItem("ffm.ed.context", editor.context ? "1" : "0"); } catch (err) { /* a private window: the choice lasts the session */ }
+    renderEditor();
+  });
   $$("[data-ed-level]", box).forEach(b => b.addEventListener("click", () => { editor.level = Number(b.dataset.edLevel); editor.sel = null; renderEditor(); }));
 
   // the grid
@@ -488,10 +582,9 @@ function wireEditor(box, ctx) {
 
   // the pointer in plate metres, or null off the canvas
   const toPlate = e => {
-    const bb = svg.getBoundingClientRect(), k = bb.width / width;
-    const sx = (e.clientX - bb.left) / k, sy = (e.clientY - bb.top) / k;
+    const [sx, sy] = loc(e);
     if (sx < 0 || sy < 0 || sx > width || sy > H) return null;
-    return [p.x + (sx - M) / scale, p.y + p.depth_m - (sy - M) / scale];
+    return [V.x0 + (sx - M) / scale, V.y1 - (sy - M) / scale];
   };
   const ghost = $("#ed-ghost", box);
 
@@ -516,9 +609,9 @@ function wireEditor(box, ctx) {
       pal.over = !!pt;
       if (!pt) { ghost.innerHTML = ""; return; }
       placeAt(pal.z, pt, zs, p, B);
-      const r = rectOf(pal.z, p, scale), hit = !clearOf(pal.z, zs.filter(o => o.block !== "corridor" && pal.z.block !== "corridor"))(pal.z.x, pal.z.y);
-      ghost.innerHTML = `<rect x="${r.x.toFixed(1)}" y="${r.y.toFixed(1)}" width="${r.w.toFixed(1)}" height="${r.d.toFixed(1)}" fill="${ZONE_TONE[kind] || "#eee"}" fill-opacity="0.75" stroke="${hit ? "#c81e1e" : "#245f9c"}" stroke-width="1.6" stroke-dasharray="5 3"/>
-        <text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(zoneShort(pal.z))} · ${pal.z.w} m</text>`;
+      const r = rectOf(pal.z, V), hit = !clearOf(pal.z, zs.filter(o => o.block !== "corridor" && pal.z.block !== "corridor"))(pal.z.x, pal.z.y);
+      ghost.innerHTML = U(`<rect x="${r.x.toFixed(1)}" y="${r.y.toFixed(1)}" width="${r.w.toFixed(1)}" height="${r.d.toFixed(1)}" fill="${ZONE_TONE[kind] || "#eee"}" fill-opacity="0.75" stroke="${hit ? "#c81e1e" : "#245f9c"}" stroke-width="1.6" stroke-dasharray="5 3"/>
+        <text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(zoneShort(pal.z))} · ${pal.z.w} m</text>`);
     });
     const done = e => {
       if (!pal) return;
@@ -586,7 +679,7 @@ function wireEditor(box, ctx) {
   const select = i => {
     editor.sel = i;
     $$(".ed-zone", svg).forEach(g => g.classList.toggle("sel", Number(g.dataset.i) === i));
-    if (i != null) { const g = $(`.ed-zone[data-i="${i}"]`, svg); if (g) { svg.insertBefore(g, ghost); g.focus({ preventScroll: true }); } }
+    if (i != null) { const g = $(`.ed-zone[data-i="${i}"]`, svg); if (g) { ghost.parentNode.insertBefore(g, ghost); g.focus({ preventScroll: true }); } }
     $("#ed-selbar", box).innerHTML = selBarHtml(L, zs);
     wireSel(box, ctx);
   };
@@ -595,28 +688,43 @@ function wireEditor(box, ctx) {
     $$(".ed-zone", svg).forEach(g => {
       const j = Number(g.dataset.i);
       g.classList.toggle("clash", bad.has(j));
-      if (j === i) g.innerHTML = zoneInner(zs[j], rectOf(zs[j], p, scale));
+      if (j === i) g.innerHTML = U(zoneInner(zs[j], rectOf(zs[j], V)));
     });
     $("#ed-selbar", box).innerHTML = selBarHtml(L, zs);
   };
   let drag = null;
   svg.addEventListener("pointerdown", e => {
     if (e.button) return;
+    if (e.target.classList.contains("ed-plate-handle")) {
+      drag = { plate: e.target.classList.contains("ed-plate-w") ? "w" : "d", x0: e.clientX, y0: e.clientY, p0: loc(e), w: p.width_m, d: p.depth_m, moved: false };
+      svg.setPointerCapture(e.pointerId); e.preventDefault(); return;
+    }
     const g = e.target.closest(".ed-zone");
     if (!g) { if (editor.sel != null) select(null); return; }
     const i = Number(g.dataset.i);
     const mode = e.target.classList.contains("ed-handle-w") ? "w" : e.target.classList.contains("ed-handle-l") ? "l" : e.target.classList.contains("ed-handle-d") ? "d" : "move";
     if (editor.sel !== i) select(i);
-    drag = { i, mode, x0: e.clientX, y0: e.clientY, z0: { ...zs[i] }, moved: false, k: svg.getBoundingClientRect().width / width };
+    drag = { i, mode, x0: e.clientX, y0: e.clientY, p0: loc(e), z0: { ...zs[i] }, moved: false };
     svg.setPointerCapture(e.pointerId); e.preventDefault();
   });
   svg.addEventListener("pointermove", e => {
     if (!drag) return;
+    const at = loc(e);
+    if (drag.plate) {
+      // the plate as it would be, dashed, from its front-left corner, with its size and floor area
+      drag.moved = true; editor.dragging = true;
+      if (drag.plate === "w") drag.w = fitW(p.width_m + (at[0] - drag.p0[0]) / scale);
+      else drag.d = fitD(p.depth_m - (at[1] - drag.p0[1]) / scale);
+      const x = V.X(p.x), y = V.Y(p.y + drag.d);
+      ghost.innerHTML = U(`<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(drag.w * scale).toFixed(1)}" height="${(drag.d * scale).toFixed(1)}" fill="#245f9c" fill-opacity="0.08" stroke="#245f9c" stroke-width="1.6" stroke-dasharray="6 3"/>
+        <text x="${(x + drag.w * scale / 2).toFixed(1)}" y="${(y + drag.d * scale / 2).toFixed(1)}" font-size="12" font-weight="600" text-anchor="middle" fill="#245f9c" stroke="#ffffff" stroke-width="3" paint-order="stroke">${drag.w} × ${drag.d} m · ${fmtNum(Math.round(drag.w * drag.d))} m² a floor</text>`);
+      return;
+    }
     if (!drag.moved) {
       if (Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0) < 3) return;
       drag.moved = true; editor.dragging = true; snapshot(); svg.classList.add("dragging");
     }
-    const dx = (e.clientX - drag.x0) / drag.k / scale, dy = -(e.clientY - drag.y0) / drag.k / scale;   // the screen's down is toward the street
+    const dx = (at[0] - drag.p0[0]) / scale, dy = -(at[1] - drag.p0[1]) / scale;   // the canvas's down is toward the street
     const z = zs[drag.i], z0 = drag.z0, right = p.x + p.width_m, far = p.y + p.depth_m;
     if (drag.mode === "move") {
       // the left or the right wall, the near or the far edge, whichever finds another block's wall first
@@ -642,6 +750,12 @@ function wireEditor(box, ctx) {
     if (!drag) return;
     const d = drag; drag = null;
     svg.classList.remove("dragging"); editor.dragging = false;
+    if (d.plate) {
+      ghost.innerHTML = "";
+      if (d.moved && e.type === "pointerup" && (d.w !== p.width_m || d.d !== p.depth_m)) setPlate(d.w, d.d);
+      else if (editor.pendingRender) renderEditor();
+      return;
+    }
     if (!d.moved) { if (editor.pendingRender) renderEditor(); return; }
     const z = zs[d.i], core = z && z.block === "core";
     // a block dropped back on the program leaves the plate
@@ -688,7 +802,33 @@ function optionFor(extra) {
   opt.layout = Object.assign({}, opt.layout || {}, { grid: { bay_m: editor.bay, divide: editor.divide } });
   delete opt.layout.zones; delete opt.layout.cores;
   Object.assign(opt.layout, extra);
-  return withLevels(opt);
+  return withLevels(withPlate(opt));
+}
+
+/* The plate the architect set, on an option: its width and depth for the massing (`massing.width_m`, `depth_m`),
+   and the floor area that plate gives at the option's storeys, so the rules and the FSR read the plate drawn. */
+function withPlate(opt) {
+  const pl = editor.plate;
+  if (!pl) return opt;
+  opt.massing = Object.assign({}, opt.massing || {}, { width_m: pl.w, depth_m: pl.d });
+  if (opt.gfa_m2 != null) {
+    const g = Math.round(pl.w * pl.d * (Number(opt.storeys) || 1) * 10) / 10;
+    if (opt.residential_gfa_m2 != null) opt.residential_gfa_m2 = Math.max(0, Math.round((g - (Number(opt.non_residential_gfa_m2) || 0)) * 10) / 10);
+    opt.gfa_m2 = g;
+  }
+  return opt;
+}
+
+/* A new plate (or, with null, the plate the floor area and the storeys give again): the program is laid out on
+   it afresh, the cut-outs that still fit kept; Undo brings back the plate and the blocks as they were. */
+async function setPlate(w, d) {
+  snapshot();
+  editor.plate = w == null ? null : { w, d };
+  if (editor.plate) editor.base.plate = Math.round(w * d * 10) / 10;
+  editor.dirty = true;
+  await suggestPlan(false, true);
+  const L = editor.result, c = L.capacity || {}, left = L.units_total - L.units_placed;
+  setStatus(`The plate is ${L.plate.width_m} × ${L.plate.depth_m} m, ${fmtNum(Math.round(L.plate.width_m * L.plate.depth_m))} m² a floor${w == null ? ", as the floor area and the storeys give it" : ""}${c.fsr != null ? `: FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)}` : ""}` : ""}. The program is laid out on it again: ${L.units_placed} of ${L.units_total} units placed${left > 0 ? `, ${left} left to place` : ""}. Undo brings back the plate as it was; Apply writes it into the option.`, left > 0 ? "busy" : "ok");
 }
 
 /* The levels added in the editor, on an option: a storey each, and (where the option states them) a plate more of
@@ -749,6 +889,7 @@ async function ask(opt) {
   const res = await postJSON("/api/layout", { site: state.site, option: opt, as_of: $("#as-of").value || todayISO() });
   // the plate a level adds, as the engine has it (a run read from disk may predate the figure)
   if (!editor.added && res.layout && res.layout.capacity) editor.base.plate = res.layout.capacity.plate_m2;
+  if (res.massing) editor.massing = res.massing;   // the lot, the envelope and the context the canvas draws behind the plate
   return res;
 }
 
@@ -772,8 +913,10 @@ async function checkPlacement() {
 
 /* The suggested plan: the engine lays the whole program out on the grid, round the cores where the architect
    stood them (the solver's own core without one); what does not fit stays in the program as left to place. */
-async function suggestPlan(first) {
+async function suggestPlan(first, noSnapshot) {
   if (!editor.open || !state.site || !state.option) return;
+  // the cut-outs are the architect's shape of the plate: they stay where they are, and the program goes round them
+  const cuts = Object.fromEntries(Object.entries(editor.zones || {}).map(([k, zs]) => [k, zs.filter(z => z.block === "void")]).filter(([, v]) => v.length));
   const cores = editor.coreMoved ? coresNow() : [];   // the solver's own core, on the grid, until one is moved by hand
   const seq = editor.seq = (editor.seq || 0) + 1;
   clearTimeout(editor.timer);
@@ -781,8 +924,17 @@ async function suggestPlan(first) {
   try {
     const res = await ask(optionFor(cores.length ? { cores } : {}));
     if (seq !== editor.seq) return;
-    if (!first) snapshot();
+    if (!first && !noSnapshot) snapshot();
     editor.result = res.layout; editor.zones = zonesFromLayout(res.layout); editor.sel = null; editor.dirty = true;
+    const P = res.layout.plate, hits = (a, b) => !(a.x + a.w <= b.x + 0.01 || b.x + b.w <= a.x + 0.01 || a.y + a.d <= b.y + 0.01 || b.y + b.d <= a.y + 0.01);
+    let kept = 0;
+    for (const [k, vs] of Object.entries(cuts)) {
+      const inside = vs.filter(v => v.x >= P.x - 0.01 && v.y >= P.y - 0.01 && v.x + v.w <= P.x + P.width_m + 0.01 && v.y + v.d <= P.y + P.depth_m + 0.01);
+      if (!editor.zones[k] || !inside.length) continue;
+      editor.zones[k] = editor.zones[k].filter(z => z.block === "core" || z.block === "corridor" || !inside.some(v => hits(z, v))).concat(inside.map(v => ({ ...v })));
+      kept += inside.length;
+    }
+    if (kept) scheduleCheck();   // the engine counts again what the cut-outs displaced
     updateSheets(res);
     const L = res.layout, left = L.units_total - L.units_placed;
     setStatus(`${first ? "A suggested plan to start from" : "Suggested plan"}, on a ${editor.bay} m bay${cores.length ? ` round your core${cores.length === 1 ? "" : "s"}` : ""}: ${L.units_placed} of ${L.units_total} units placed${left > 0 ? `; ${left} did not fit and stay in the program as left to place` : ""}. Drag to adjust${first ? "" : "; Undo brings back what was there"}.`, left > 0 ? "busy" : "ok");
@@ -803,11 +955,25 @@ function applyEditor() {
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
     markStale("the option");
   }
+  // the plate as drawn: its dimensions for the massing, and the floor area it gives less the cut-outs, which are
+  // not floor; a cut-out on a plate the floor area still sizes pins the plate first, so it does not shrink
+  const Lr = editor.result || state.run.layout, storeys = Number(state.option.storeys) || Lr.floors.length;
+  const cut = Object.entries(editor.zones).filter(([k]) => Number(k) < storeys).reduce((t, [, zs]) => t + zs.filter(z => z.block === "void").reduce((a, z) => a + z.w * z.d, 0), 0);
+  if (cut > 0 && !editor.plate) editor.plate = { w: Lr.plate.width_m, d: Lr.plate.depth_m };
+  const shaped = !!editor.plate;
+  if (shaped) {
+    const o = state.option, g = Math.round((editor.plate.w * editor.plate.d * storeys - cut) * 10) / 10;
+    o.massing = Object.assign({}, o.massing || {}, { width_m: editor.plate.w, depth_m: editor.plate.d });
+    if (o.residential_gfa_m2 != null) o.residential_gfa_m2 = Math.max(0, Math.round((g - (Number(o.non_residential_gfa_m2) || 0)) * 10) / 10);
+    o.gfa_m2 = g;
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    markStale("the option");
+  }
   state.option.layout = Object.assign({}, state.option.layout || {}, { zones: JSON.parse(JSON.stringify(editor.zones)), grid: { bay_m: editor.bay, divide: editor.divide } });
   state.optionDirty = true; $("#option-dirty").hidden = false;
   editor.applied = true; editor.dirty = false;
   renderEditor();
   refreshSummary("option");
   const n = Object.values(editor.zones).reduce((t, a) => t + a.length, 0);
-  setStatus(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones, with the ${editor.bay} m grid. ${added ? `The option is now ${state.option.storeys} storeys${state.option.gfa_m2 != null ? `, ${fmtNum(state.option.gfa_m2)} m²` : ""}: the memo on screen is from before, so run the rules again.` : "Run the rules to make the memo from them;"} Save option as… keeps them.`, "ok");
+  setStatus(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones, with the ${editor.bay} m grid. ${shaped ? `The plate is ${editor.plate.w} × ${editor.plate.d} m${cut ? `, ${fmtNum(Math.round(cut))} m² of it cut out` : ""}: the option's floor area is ${fmtNum(state.option.gfa_m2)} m². ` : ""}${added ? `The option is now ${state.option.storeys} storeys${state.option.gfa_m2 != null ? `, ${fmtNum(state.option.gfa_m2)} m²` : ""}: the memo on screen is from before, so run the rules again.` : (shaped ? "The memo on screen is from before, so run the rules again." : "Run the rules to make the memo from them;")} Save option as… keeps them.`, "ok");
 }

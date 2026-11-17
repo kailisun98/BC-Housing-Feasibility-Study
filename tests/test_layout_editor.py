@@ -123,6 +123,49 @@ class Editor(unittest.TestCase):
         self.assertEqual(lay["capacity"]["levels_room"], 0)
         self.assertGreater(lay["units_placed"], self.solved["units_placed"])
 
+    def test_design_space_commercial_and_a_cut_out_are_the_architects_own_blocks(self):
+        z = json.loads(json.dumps(self.zones))
+        p = self.solved["plate"]
+        top = str(p["storeys"] - 1)
+        z[top] = [u for u in z[top] if u["block"] in ("core", "corridor")]
+        # the widest run of the street strip the cores leave free, now empty
+        edges = [p["x"]] + [e for c in sorted((u for u in z[top] if u["block"] == "core"), key=lambda u: u["x"]) for e in (c["x"], c["x"] + c["w"])] + [p["x"] + p["width_m"]]
+        x0, free = max(((edges[i], edges[i + 1] - edges[i]) for i in range(0, len(edges), 2)), key=lambda g: g[1])
+        self.assertGreater(free, 18)
+        y, d = p["y"], p["unit_depth_m"]
+        z[top] += [{"block": "design_space", "x": x0, "y": y, "w": 6, "d": d}, {"block": "commercial", "x": x0 + 6, "y": y, "w": 6, "d": d},
+                   {"block": "void", "x": x0 + 12, "y": y, "w": 6, "d": d}]
+        lay = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        self.assertFalse([g for g in lay["geometry"] if g["kind"] in ("bad_zone", "overlap", "outside")], lay["geometry"])
+        labels = {u["block"]: u["label"] for u in lay["floors"][int(top)]["zones"]}
+        self.assertEqual((labels["design_space"], labels["commercial"], labels["void"]), ("Design space", "Commercial", "Cut-out"))
+        # a cut-out is not floor area: off the floor area the FSR reads, and not spare
+        cut = round(6 * d, 1)
+        self.assertEqual(lay["capacity"]["void_m2"], cut)
+        self.assertAlmostEqual(lay["capacity"]["gfa_m2"], self.solved["capacity"]["gfa_m2"] - cut, places=1)
+        self.assertEqual(lay["floors"][int(top)]["void_m2"], cut)
+        self.assertEqual(lay["totals"]["void_m2"], cut)
+        # no program asks for them, so nothing is short on their account
+        self.assertFalse([s for s in lay["shortfall"] if s["block"] in ("design_space", "commercial", "void")])
+        self.assertEqual(set(layout.sheets(lay, SITE, self.m, self.L)), set(layout.SHEETS))
+
+    def test_the_plate_takes_the_dimensions_the_architect_set(self):
+        opt = dict(OPTION, massing={"width_m": 48.0, "depth_m": 18.0})
+        m = massing.build(SITE, opt, self.L)
+        pm = next(x for x in m["masses"] if x["name"] == "proposed")
+        self.assertEqual((pm["plate_width_m"], pm["plate_depth_m"], pm["plate_area_m2"]), (48.0, 18.0, 864.0))
+        self.assertIn("option.massing.width_m", pm["derived_from"])
+        lay = layout.solve(SITE, opt, self.L, m)
+        self.assertEqual((lay["plate"]["width_m"], lay["plate"]["depth_m"]), (48.0, 18.0))
+        self.assertEqual(lay["capacity"]["plate_m2"], 864.0)
+        # a plate past what the setbacks leave is drawn at what they leave, and the massing says so
+        big = massing.build(SITE, dict(OPTION, massing={"width_m": 500, "depth_m": 500}), self.L)
+        bm = next(x for x in big["masses"] if x["name"] == "proposed")
+        self.assertLessEqual(bm["plate_width_m"], big["envelope"]["width_m"] + 0.01)
+        self.assertTrue(any("does not fit" in w for w in big["warnings"]))
+        # no dimensions on the option: the plate the floor area and the storeys give, as before
+        self.assertEqual(self.m["masses"][0]["plate_area_m2"], 1400.0)
+
     def test_the_memo_section_says_it_was_placed_by_hand(self):
         lay = layout.solve(SITE, dict(OPTION, layout={"zones": self.zones}), self.L, self.m)
         md = "\n".join(layout.markdown(lay))

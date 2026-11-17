@@ -51,6 +51,31 @@ export function scaleBar(x, y, frameW, fs) {
   </g>`;
 }
 
+/* North up (17 Nov 2026, Kai: "plan needs to show north as up always"). The lot frame has the street along x, so a
+   plan drawn in it faces wherever the street does. Where the site's context frame gives the bearing of the x axis,
+   the plan's drawing is turned as a whole so north is up the page: `turnOf(bearing)` is the SVG rotation (degrees,
+   clockwise), 0 where no bearing is known and the plan stays street-down. `turnFrame` gives the larger frame the
+   turned drawing needs and the group that turns it; `upright` keeps every label readable, turning any that the
+   rotation leaves upside down half a turn about its own middle. The scale bar and the north arrow stay level. */
+export const turnOf = bearing => (typeof bearing === "number" && isFinite(bearing) ? (((bearing - 90) % 360) + 540) % 360 - 180 : 0);
+
+export function turnFrame(w, h, a) {
+  const t = a * Math.PI / 180, W = Math.abs(w * Math.cos(t)) + Math.abs(h * Math.sin(t)), H = Math.abs(w * Math.sin(t)) + Math.abs(h * Math.cos(t));
+  return { W, H, open: `<g class="plan-turn" transform="translate(${((W - w) / 2).toFixed(2)} ${((H - h) / 2).toFixed(2)}) rotate(${a.toFixed(2)} ${(w / 2).toFixed(2)} ${(h / 2).toFixed(2)})">` };
+}
+
+export function upright(s, a) {
+  if (!a) return s;
+  return s.replace(/<text\b([^>]*)>/g, (all, attrs) => {
+    const num = k => { const m = attrs.match(new RegExp(`(?:^|\\s)${k}="(-?[\\d.]+)"`)); return m ? parseFloat(m[1]) : 0; };
+    const tm = attrs.match(/transform="rotate\((-?[\d.]+)/);
+    const total = (((a + (tm ? parseFloat(tm[1]) : 0)) % 360) + 540) % 360 - 180;
+    if (total <= 90 && total > -90) return all;
+    const flip = `rotate(180 ${num("x").toFixed(2)} ${(num("y") - 0.35 * (num("font-size") || 10)).toFixed(2)})`;
+    return /transform="/.test(attrs) ? `<text${attrs.replace(/transform="([^"]*)"/, (m, v) => `transform="${v} ${flip}"`)}>` : `<text${attrs} transform="${flip}">`;
+  });
+}
+
 /* A north arrow, only where the site's OpenStreetMap frame says which way the lot faces; the plan is drawn with the
    street at the bottom, so north is wherever the frame puts it. x_axis_bearing_deg is the bearing of the lot's x axis
    (along the frontage); the plan's up is the y axis, 90 degrees anticlockwise of it. */

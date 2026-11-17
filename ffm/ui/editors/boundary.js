@@ -84,7 +84,8 @@ export function wireBoundaryCanvas(fig, redraw) {
   if (!svg || svg.dataset.bnd) return;
   svg.dataset.bnd = "1";
   const toLot = e => {
-    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse());
+    // the plan is turned north up inside the SVG: the pointer is read in the turned group's own coordinates
+    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(($(".plan-turn", svg) || svg).getScreenCTM().inverse());
     return [Math.round((pt.x + parseFloat(svg.dataset.x0)) * 10) / 10, Math.round((parseFloat(svg.dataset.y1) - pt.y) * 10) / 10];
   };
   svg.setAttribute("tabindex", "0");

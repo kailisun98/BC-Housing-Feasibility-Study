@@ -3,7 +3,7 @@
 
 import { fmtNum, h } from "../core/util.js";
 import { bnd, state } from "../core/state.js";
-import { FIG, HALF, halo, northArrow, NS, polyEl, scaleBar, SVG_OPEN } from "./common.js";
+import { FIG, HALF, halo, northArrow, NS, polyEl, scaleBar, SVG_OPEN, turnFrame, turnOf, upright } from "./common.js";
 
 export function figPlan(m, ctx, fsIn = null) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
@@ -22,8 +22,12 @@ export function figPlan(m, ctx, fsIn = null) {
   const X = x => x - x0;
   const P = pts => pts.map(([x, y]) => [X(x), Y(y)]);
   const vbW = x1 - x0, vbH = y1 - y0;
-  let s = `<svg ${SVG_OPEN} viewBox="0 0 ${vbW.toFixed(2)} ${vbH.toFixed(2)}" data-x0="${x0.toFixed(3)}" data-y1="${y1.toFixed(3)}" aria-label="Plan: the lot with its streets, buildings and trees in half tone, the setback envelope and the two massing footprints">`;
-  s += `<rect x="0" y="0" width="${vbW.toFixed(2)}" height="${vbH.toFixed(2)}" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
+  // north up: the drawing below is made in the lot frame (the street along x) and turned as a whole, in a frame
+  // large enough to hold it, wherever the context gives the bearing; the scale bar and the north arrow stay level
+  const turn = turnOf(ctx.osm && ctx.osm.bearing), frame = turnFrame(vbW, vbH, turn);
+  const head = `<svg ${SVG_OPEN} viewBox="0 0 ${frame.W.toFixed(2)} ${frame.H.toFixed(2)}" data-x0="${x0.toFixed(3)}" data-y1="${y1.toFixed(3)}" aria-label="Plan${turn ? ", north up" : ""}: the lot with its streets, buildings and trees in half tone, the setback envelope and the two massing footprints">`
+    + `<rect x="0" y="0" width="${frame.W.toFixed(2)}" height="${frame.H.toFixed(2)}" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
+  let s = `<rect x="0" y="0" width="${vbW.toFixed(2)}" height="${vbH.toFixed(2)}" fill="${ctx.osm ? HALF.parcel : "#ffffff"}"/>`;
   for (const g of ctx.ground) s += polyEl(P(g.ring), g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
   for (const b of ctx.buildings) s += polyEl(P(b.polygon), `fill="${HALF.building}" stroke="${HALF.line}" stroke-width="0.6"`);
   // the frontage's dimension text sits just in front of the lot, where the front street's name is often set: a name
@@ -73,11 +77,11 @@ export function figPlan(m, ctx, fsIn = null) {
      + `<line x1="${(dx - tick).toFixed(2)}" y1="${(Y(by1) + tick).toFixed(2)}" x2="${(dx + tick).toFixed(2)}" y2="${(Y(by1) - tick).toFixed(2)}"/></g>`;
   const rx = dx + fs * 0.95, ry = Y((by0 + by1) / 2);
   s += `<text x="${rx.toFixed(2)}" y="${ry.toFixed(2)}" font-size="${fs.toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)} transform="rotate(90 ${rx.toFixed(2)} ${ry.toFixed(2)})">${poly ? `extent ${h(Math.round(bD * 10) / 10)} m` : `depth ${h(D)} m`}</text>`;
-  s += scaleBar(fs * 1.4, vbH - fs * 0.9, x1 - x0, fs);
-  if (ctx.osm && ctx.osm.bearing != null) s += northArrow(vbW - fs * 2.2, fs * 2.4, ctx.osm.bearing, fs);
   if (bnd.open && bnd.ring) s += boundaryHandles(bnd.ring, X, Y, fs);
-  s += `</svg>`;
-  return s;
+  let out = head + frame.open + upright(s, turn) + `</g>`;
+  out += scaleBar(fs * 1.4, frame.H - fs * 0.9, x1 - x0, fs);
+  if (ctx.osm && ctx.osm.bearing != null) out += northArrow(frame.W - fs * 2.2, fs * 2.4, 90, fs);   // the page's up is north
+  return out + `</svg>`;
 }
 
 function ringBox(ring) {

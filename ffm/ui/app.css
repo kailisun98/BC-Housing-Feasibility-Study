@@ -589,6 +589,11 @@ table.plain td.status { white-space: nowrap; }
 .plans-floors { margin-bottom: 8px; }
 .plans-floor-head { font-size: 14px; margin-bottom: 2px; }
 .plans-floor svg { display: block; width: 100%; max-width: 760px; height: auto; margin-top: 6px; }
+.ed-plate { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.ed-plate input[type=number] { width: 58px; }
+.ed-canvas .ed-plate-w { cursor: ew-resize; }
+.ed-canvas .ed-plate-d { cursor: ns-resize; }
+.ed-canvas .ed-plate-handle:hover { fill: #245f9c; }
 .ed-selbar .ed-kind { font-weight: 600; }
 .ed-bar select, .ed-selbar select { width: auto; flex: none; }
 .ed-selbar .field.inline { flex-direction: row; }

@@ -300,8 +300,8 @@ function renderSheets(run, n0) {
    title. The block editor's checks redraw it (`refreshPlanFloor`). */
 let planFloor = null;   // null: the sheet's overview; else the level shown
 
-const PLAN_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0", spare: "#ffffff" };
-const PLAN_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res", spare: "" };
+const PLAN_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0", spare: "#ffffff", design_space: "#d9e6d2", commercial: "#f3c9b5", void: "#ffffff" };
+const PLAN_SHORT = { studio: "st", one_bed: "1b", two_bed: "2b", three_bed_plus: "3b", corridor: "corridor", core: "core", services: "services", amenity: "amenity", non_residential: "non-res", spare: "", design_space: "design space", commercial: "commercial", void: "open" };
 const PLAN_UNITS = [["three_bed_plus", "three-bedroom"], ["two_bed", "two-bedroom"], ["one_bed", "one-bedroom"], ["studio", "studio"]];
 const planLayout = run => editor.result || run.layout;
 const floorShort = lv => lv === 0 ? "Ground" : `L${lv + 1}`;
@@ -320,7 +320,7 @@ function floorPlanHtml(L, lv) {
     const x = M + (z.x - p.x) * scale, y = M + (p.depth_m - (z.y - p.y) - z.d) * scale, w = Math.max(1, z.w * scale), d = Math.max(1, z.d * scale);
     const name = z.block === "other" ? String(z.label || "other").toLowerCase() : (PLAN_SHORT[z.block] ?? z.block);
     const two = w > 44 && d > 34 && z.block !== "corridor" && z.block !== "spare";
-    return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(d)}" fill="${PLAN_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "spare" ? ` stroke-dasharray="4 3"` : ""}/>
+    return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(d)}" fill="${PLAN_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "spare" || z.block === "void" ? ` stroke-dasharray="4 3"` : ""}/>
       ${z.accessible ? `<circle cx="${f(x + 8)}" cy="${f(y + 8)}" r="3.6" fill="#245f9c"/>` : ""}
       ${name && w > 24 && d > 12 ? `<text x="${f(x + w / 2)}" y="${f(y + d / 2 + (two ? -2 : 4))}" font-size="11" text-anchor="middle" fill="#1f2933">${h(name)}</text>` : ""}
       ${two ? `<text x="${f(x + w / 2)}" y="${f(y + d / 2 + 12)}" font-size="9.5" text-anchor="middle" fill="#5f6672">${h(fmtNum(Math.round(z.area_m2 ?? z.w * z.d)))} m²</text>` : ""}`;

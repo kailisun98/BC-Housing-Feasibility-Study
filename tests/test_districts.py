@@ -97,7 +97,9 @@ class Unverified(unittest.TestCase):
         self.assertIn("cov.rm4.outright_fsr", items[0]["finding"])
         self.assertIn("cov.rm4.outright_height", items[0]["finding"])
         self.assertEqual(items[0]["status"], "uncertain")
-        self.assertTrue(items[0]["action"].startswith("Architect: open the RM-4 schedule PDF"))
+        # the wording names the schedule the figures should be read from (17 Nov 2026); the shape is what is tested
+        self.assertTrue(items[0]["action"].startswith("Architect: open "))
+        self.assertIn("FSR, height and yards", items[0]["action"])
 
     def test_rm1_run_has_none(self):
         L = evaluate(site("RM-1", 2810.7), OPTION, AS_OF)
@@ -111,7 +113,9 @@ class CD1(unittest.TestCase):
         out = L["summary"]["answers"]["allowed"]["outright"]
         self.assertEqual(out["verdict"], "not assessed")
         item = next(u for u in L["summary"]["answers"]["unsure"] if u["rule_id"] == "coverage.district_schedule")
-        self.assertIn("CD-1 by-law No. 324", item["finding"])
+        # the finding names the CD-1 and says its limits are in its own by-law (the wording moved on 17 Nov 2026)
+        self.assertIn("CD-1 (324)", item["finding"])
+        self.assertIn("by-law", item["finding"])
         self.assertNotIn("coverage.schedule_unverified", open_ids(L))
 
     def test_assemble_sets_the_bylaw_number(self):

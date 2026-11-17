@@ -238,6 +238,16 @@ redesigned from those flows, and a brand package. State now:
   `display: none`; the answers land staggered; the rail column and the status wash ease. Every effect has a
   reduced-motion path. The preview pane throttles transitions while hidden, so measure after a wait.
 - Not done: no screenshot of the tool is used anywhere (by design).
+- Hero drawings on the inner pages (17 Nov 2026): `how.html`, `who.html` and `case.html` carry `hero page two` (the home
+  page's two columns) with an inline SVG beside the text, each on the home hero's classes and motion (`hero-iso` plus
+  `hero-hw` / `hero-who` / `hero-case`; site.js adds `.play` to the first `.hero-iso`): the option over the six exploded
+  rule layers beside the R1 memo sheet; the memo three times, one sheet a reader, fanned from the mark's diamond on the
+  five-stage timeline; the case's street elevation at 6.2 px to the metre with the outright line, the benchmark band and
+  the twenty trees. Two things learned: an animated SVG `<g>` must not carry a `transform` attribute (the CSS animation's
+  `transform: none` replaces it), so each who sheet's translate sits on an inner group; and the preview pane, hidden, runs
+  the page as a background tab, where delayed CSS animations never leave their delay: finish them with
+  `document.getAnimations().forEach(a => a.finish())` before a screenshot. The pane's `ffm-pages` server serves the
+  `_site` folder named in its command line (a different scratchpad path than the session's own), so build there.
 
 ## Phase 1 of the workflows proposal (3 Nov 2026; `docs/proposal-workflows.md`)
 

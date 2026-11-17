@@ -28,11 +28,93 @@
 
 <main id="main">
 
-<section class="hero page wrap" aria-labelledby="hero-h">
+<section class="hero page two wrap" aria-labelledby="hero-h">
   <div class="hero-text">
     <p class="eyebrow">Who it's for</p>
     <h1 id="hero-h">One memo,<br><span class="dim">three kinds of reader.</span></h1>
     <p class="lede">Housing societies, co-ops, churches and First Nations build homes that rent below market, and they have no development profit to absorb a wrong guess. The people working on one of their sites each read different documents at different times. The memo gives them one document they all read.</p>
+  </div>
+  <div class="hero-art">
+    <!-- the same memo three times, as each reader holds it, fanned from the diamond on the brand mark's five-stage
+         timeline: the memo arrives at feasibility, the second stage -->
+    <svg class="hero-iso hero-who" viewBox="0 0 640 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="who-t who-d">
+      <title id="who-t">One memo in three readers' hands</title>
+      <desc id="who-d">Three copies of the memo for 998 E 19th Ave: the development manager's shows the four answers, the architect's the plan and the section, the board's the open items with a person on each. Lines join all three to the second stage of a five-stage timeline, feasibility, where the memo arrives.</desc>
+      <defs>
+        <!-- the mark, copied from brand/mark.svg, so the drawing fetches nothing while it builds -->
+        <g id="who-mark-shape"><rect x="3" y="15.25" width="26" height="1.5" rx=".75"/><rect x="4.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="16.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="22.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="28.25" y="12.5" width="1.5" height="7" rx=".75"/><path d="M11 9.4 17.6 16 11 22.6 4.4 16Z"/></g>
+      </defs>
+      <g class="who-name"><text class="n1" x="40" y="30"><tspan class="long">The development manager</tspan><tspan class="short">Manager</tspan></text><text class="n2 who-s" x="40" y="46">runs it and reads the four answers</text></g>
+      <g class="who-name"><text class="n1" x="235" y="30"><tspan class="long">The architect</tspan><tspan class="short">Architect</tspan></text><text class="n2 who-s" x="235" y="46">places the mass and draws the plans</text></g>
+      <g class="who-name"><text class="n1" x="430" y="30"><tspan class="long">Board, planner, funder</tspan><tspan class="short">Board</tspan></text><text class="n2 who-s" x="430" y="46">reads it cold and decides</text></g>
+
+      <!-- each sheet's translate sits on an inner group: the outer one is animated with a CSS transform, which would
+           replace a transform attribute on the same element -->
+      <g class="who-sheet" data-k="0"><g transform="translate(40 60)">
+        <rect class="pg" width="170" height="230" rx="6"/>
+        <use class="who-mark" href="#who-mark-shape" transform="translate(12 9) scale(.34375)"/>
+        <text class="t1" x="27" y="18">998 E 19th Ave</text><text class="t2 who-s" x="158" y="18" text-anchor="end">R1 · 23 Oct 2026</text>
+        <line class="rule" x1="12" y1="26" x2="158" y2="26"/>
+        <text class="t3 who-s" x="12" y="39">As approved · 6 storeys · 105 homes</text>
+        <g class="row fail"><rect x="12" y="52" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="65">1 · Is it allowed?</text><text class="v" x="20" y="80">By rezoning: yes</text></g>
+        <g class="row uncertain"><rect x="12" y="94" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="107">2 · Does it fit the funders?</text><text class="v" x="20" y="122">Not yet confirmed</text></g>
+        <g class="row conditional"><rect x="12" y="136" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="149">3 · What is still unsure?</text><text class="v" x="20" y="164">Eight open items</text></g>
+        <g class="row fail"><rect x="12" y="178" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="191">4 · Does the money work?</text><text class="v" x="20" y="206">Unlikely, a 23% gap</text></g>
+      </g></g>
+
+      <g class="who-sheet" data-k="1"><g transform="translate(235 60)">
+        <rect class="pg" width="170" height="230" rx="6"/>
+        <use class="who-mark" href="#who-mark-shape" transform="translate(12 9) scale(.34375)"/>
+        <text class="t1" x="27" y="18">998 E 19th Ave</text><text class="t2 who-s" x="158" y="18" text-anchor="end">R1 · 23 Oct 2026</text>
+        <line class="rule" x1="12" y1="26" x2="158" y2="26"/>
+        <text class="t3 who-s" x="12" y="39">As approved · 6 storeys · 105 homes</text>
+        <g class="fig">
+          <text class="fg who-s" x="12" y="55">FIG 01 · Plan</text>
+          <rect class="lot" x="20" y="60" width="130" height="86"/>
+          <rect class="road" x="12" y="146" width="146" height="9"/>
+          <rect class="env" x="28" y="72" width="114" height="66"/>
+          <rect class="plate" x="34" y="80" width="102" height="50"/>
+          <line class="corr" x1="34" y1="105" x2="136" y2="105"/>
+          <g class="units">
+            <rect x="34" y="80" width="17" height="23"/><rect x="51" y="80" width="17" height="23"/><rect x="68" y="80" width="17" height="23"/><rect class="core" x="85" y="80" width="17" height="23"/><rect x="102" y="80" width="17" height="23"/><rect x="119" y="80" width="17" height="23"/>
+            <rect x="34" y="107" width="17" height="23"/><rect x="51" y="107" width="17" height="23"/><rect x="68" y="107" width="17" height="23"/><rect x="85" y="107" width="17" height="23"/><rect x="102" y="107" width="17" height="23"/><rect x="119" y="107" width="17" height="23"/>
+          </g>
+          <text class="fg who-s" x="12" y="169">FIG 02 · Section</text>
+          <line class="bench" x1="28" y1="177" x2="142" y2="177"/>
+          <line class="outright" x1="28" y1="199" x2="142" y2="199"/>
+          <rect class="mass" x="48" y="172" width="74" height="48"/>
+          <g class="floors"><line x1="48" y1="180" x2="122" y2="180"/><line x1="48" y1="188" x2="122" y2="188"/><line x1="48" y1="196" x2="122" y2="196"/><line x1="48" y1="204" x2="122" y2="204"/><line x1="48" y1="212" x2="122" y2="212"/></g>
+          <line class="ground" x1="20" y1="220" x2="150" y2="220"/>
+        </g>
+      </g></g>
+
+      <g class="who-sheet" data-k="2"><g transform="translate(430 60)">
+        <rect class="pg" width="170" height="230" rx="6"/>
+        <use class="who-mark" href="#who-mark-shape" transform="translate(12 9) scale(.34375)"/>
+        <text class="t1" x="27" y="18">998 E 19th Ave</text><text class="t2 who-s" x="158" y="18" text-anchor="end">R1 · 23 Oct 2026</text>
+        <line class="rule" x1="12" y1="26" x2="158" y2="26"/>
+        <text class="t3 who-s" x="12" y="39">As approved · 6 storeys · 105 homes</text>
+        <g class="bars"><rect x="12" y="52" width="134" height="3.5" rx="1.75"/><rect x="12" y="60" width="146" height="3.5" rx="1.75"/><rect x="12" y="68" width="120" height="3.5" rx="1.75"/><rect x="12" y="76" width="146" height="3.5" rx="1.75"/><rect x="12" y="84" width="92" height="3.5" rx="1.75"/></g>
+        <text class="q who-s" x="12" y="108">Open items · 8, each with a person</text>
+        <g class="item"><circle cx="18" cy="125" r="4"/><text class="i1 who-s" x="28" y="124">3 more trees, or $3,000 in lieu</text><text class="i2 who-s" x="28" y="135">the architect</text></g>
+        <g class="item"><circle cx="18" cy="149" r="4"/><text class="i1 who-s" x="28" y="148">The plate holds 69 of the 105 homes</text><text class="i2 who-s" x="28" y="159">the architect</text></g>
+        <g class="item"><circle cx="18" cy="173" r="4"/><text class="i1 who-s" x="28" y="172">Units below market, the rent tiers</text><text class="i2 who-s" x="28" y="183">the development manager</text></g>
+        <g class="item"><circle cx="18" cy="197" r="4"/><text class="i1 who-s" x="28" y="196">Land tenure</text><text class="i2 who-s" x="28" y="207">the development manager</text></g>
+      </g></g>
+
+      <g class="who-line"><line x1="125" y1="290" x2="195" y2="322"/><line x1="320" y1="290" x2="195" y2="322"/><line x1="515" y1="290" x2="195" y2="322"/></g>
+      <g class="who-tl">
+        <line class="axis" x1="20" y1="322" x2="620" y2="322"/>
+        <rect class="tick" x="69.25" y="317" width="1.5" height="10" rx=".75"/><rect class="tick" x="319.25" y="317" width="1.5" height="10" rx=".75"/><rect class="tick" x="444.25" y="317" width="1.5" height="10" rx=".75"/><rect class="tick" x="569.25" y="317" width="1.5" height="10" rx=".75"/>
+        <path class="dia" d="M195 314 203 322 195 330 187 322Z"/>
+        <text class="st who-s" x="70" y="346" text-anchor="middle">Site found</text>
+        <text class="st on" x="195" y="346" text-anchor="middle">Feasibility</text>
+        <text class="st2 who-s" x="195" y="360" text-anchor="middle">the memo, day one</text>
+        <text class="st who-s" x="320" y="346" text-anchor="middle">Pre-development</text>
+        <text class="st who-s" x="445" y="346" text-anchor="middle">Funding bid</text>
+        <text class="st who-s" x="570" y="346" text-anchor="middle">Design and build</text>
+      </g>
+    </svg>
   </div>
 </section>
 

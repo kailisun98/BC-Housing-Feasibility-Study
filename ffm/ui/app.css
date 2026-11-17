@@ -312,7 +312,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .answer[data-verdict="fail"] { --tone: var(--s-fail-text); --wash: var(--s-fail-wash); }
 .answer[data-verdict="uncertain"] { --tone: var(--s-uncertain-text); --wash: var(--s-uncertain-wash); }
 /* a count of open items is not a verdict: the card is plain, each row wears its own status (15 Nov 2026) */
-.answer[data-verdict="plain"] { --tone: var(--ink); --wash: var(--paper, #fff); }
+/* (17 Nov 2026: the wash was var(--paper, #fff), a token the tool never defines, so at night the card stayed white
+   under light text, 1.2:1) */
+.answer[data-verdict="plain"] { --tone: var(--ink); --wash: var(--panel); }
 .answer .who { font-size: 12.5px; }
 /* the note that came with a run handed to this reader */
 /* pending, so amber: a hairline and a faint wash all round, not a side stripe (16 Nov 2026) */
@@ -744,11 +746,12 @@ table.plain td.status { white-space: nowrap; }
 .stage-map .leaflet-tile-pane { filter: grayscale(1) brightness(1.07) contrast(0.74); }
 .stage-map .leaflet-container { font-family: var(--sans); background: var(--c-half-road); }
 .stage-map .leaflet-bar { border: 1px solid var(--line); box-shadow: none; border-radius: 4px; }
-.stage-map .leaflet-control-zoom a { color: var(--ink); background: var(--paper); border-bottom-color: var(--line); font: 500 16px/26px var(--sans); }
+/* the map is a drawing on white paper in both themes, so its controls take the drawing's fixed paper and ink */
+.stage-map .leaflet-control-zoom a { color: var(--c-drawink); background: var(--c-paper); border-bottom-color: var(--c-half-line); font: 500 16px/26px var(--sans); }
 .stage-map .leaflet-control-zoom a:hover { background: var(--field); }
 .stage-map .leaflet-control-attribution { font: 10px var(--sans); color: var(--muted); background: rgba(255, 255, 255, .78); }
 .stage-map .leaflet-control-attribution a { color: var(--muted); }
-.stage-map .leaflet-tooltip { font: 12px var(--sans); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); padding: 4px 8px; }
+.stage-map .leaflet-tooltip { font: 12px var(--sans); color: var(--c-drawink); background: var(--c-paper); border: 1px solid var(--c-half-line); border-radius: 4px; box-shadow: var(--shadow); padding: 4px 8px; }
 .stage-map .leaflet-tooltip::before { display: none; }
 .stage-src { font-size: 11.5px; color: var(--muted); margin: 8px 0 0; }
 .stage-src a { color: var(--blue, #2a6fb8); }
@@ -888,7 +891,11 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="manager"] .panes.no-inputs { grid-template-columns: 44px minmax(0, 1fr); }
 @media (pointer: coarse) and (min-width: 1101px) { [data-mode="manager"] .panes.no-inputs { grid-template-columns: 56px minmax(0, 1fr); } }
 [data-mode="manager"] .inputs { padding: 8px 12px 24px; }
-.route { display: flex; flex-direction: column; gap: 6px; position: sticky; top: calc(var(--bars-h) + 8px); }
+/* the route stays in view while a tall card or the memo scrolls. The column (.inputs) runs the page's full height, so
+   the body inside it is what sticks (17 Nov 2026: the route itself was sticky, inside a body only as tall as the
+   route, so it scrolled away and left an empty column) */
+[data-mode="manager"] .inputs-body { position: sticky; top: calc(var(--bars-h) + 8px); }
+.route { display: flex; flex-direction: column; gap: 6px; }
 .route-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; position: relative; }
 /* a hairline joins the stops, as the brand's mark joins its stages */
 .route-list::before { content: ""; position: absolute; left: 21px; top: 22px; bottom: 22px; width: 1px; background: var(--line); }
@@ -1011,7 +1018,7 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
   [data-mode="manager"] .panes, [data-mode="manager"] .panes.no-inputs { grid-template-columns: 1fr; }
   [data-mode="manager"] .rail-toggle { display: none; }
   [data-mode="manager"] .inputs, [data-mode="manager"] .panes.no-inputs .inputs { padding: 8px 16px; }
-  [data-mode="manager"] .inputs-body, [data-mode="manager"] .panes.no-inputs .inputs-body { display: block; }
+  [data-mode="manager"] .inputs-body, [data-mode="manager"] .panes.no-inputs .inputs-body { display: block; position: static; }
   .route { position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
   .route-list { flex-direction: row; flex-wrap: wrap; gap: 4px; }
   .route-list::before, .route-s, .route-then { display: none; }

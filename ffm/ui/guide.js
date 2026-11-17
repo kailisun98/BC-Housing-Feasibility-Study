@@ -7,7 +7,7 @@ import { api, postJSON } from "./core/api.js";
 import { ANSWERS, GUIDE_FIELDS, OPTION_FIELDS, SITE_FIELDS } from "./fields.js";
 import { refreshSummary, renderForm } from "./schedule.js";
 import { blankOption, blankSite, loadOptions, markStale, onOptionChange, onSiteChange } from "./files.js";
-import { fillRunSelects, loadRuns } from "./runs.js";
+import { fillRunSelects, loadRuns, rev } from "./runs.js";
 import { placeRunTools } from "./memo/memo.js";
 import { defaultPrograms, focusStage, renderGuide, renderStage } from "./route-stage.js";
 import { setStep } from "./modes.js";
@@ -116,6 +116,8 @@ export async function guideSuggest() {
     const rough = ["storeys", "height_m", "gfa_m2"].some(k => (guide.suggestion.fields[k] || {}).basis === "envelope");
     const swapped = guide.suggestion.candidate_note && asked !== guide.candidate;
     setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} homes.${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ? " The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
+    // after a run, a new derivation (another candidate, a mix, the programs) is a change to the memo's option
+    if (state.run) useSuggestion({ live: true });
   } catch (e) {
     toast(`Could not derive the option: ${e.message}`, true);
   } finally {
@@ -123,18 +125,23 @@ export async function guideSuggest() {
   }
 }
 
-/* The suggestion, with the manager's own figures where they chose Mine, becomes the option; true when it did. */
-export function useSuggestion() {
-  try { return useSuggestionNow(); }
+/* The suggestion, with the manager's own figures where they chose Mine, becomes the option; true when it did.
+   `live`: a change made at 02 after a run, applied at once so the memo on screen is marked out of date (17 Nov
+   2026: the figure waited for Continue, and the memo kept reading as current). */
+export function useSuggestion(opts = {}) {
+  try { return useSuggestionNow(opts); }
   catch (e) { toast(`Could not use the option: ${e.message}`, true); console.error(e); return false; }
 }
 
-function useSuggestionNow() {
+function useSuggestionNow({ live = false } = {}) {
   const S = guide.suggestion;
   if (!S) return false;
-  // an option the manager typed into and never saved is asked about on the page itself (no browser dialog): the
-  // first click warns and marks the button, the second goes ahead. A new, untouched option is replaced without asking.
-  const touched = state.optionDirty && state.option && !guide.suggestionUsed && (state.optionId || (state.option.storeys != null && state.option.name && !/option$/.test(state.option.name)));
+  // an option edited some other way and never saved (a saved option changed in the architect's schedule) is asked
+  // about on the page itself: the first click warns and marks the button, the second goes ahead. The option this
+  // suggestion wrote itself is the manager's own and is replaced without asking (17 Nov 2026: it was mistaken for
+  // "edits that were never saved", so every change after a run needed a second Continue).
+  const touched = !live && state.optionDirty && state.option && state.option !== guide.appliedOption
+    && (state.optionId || state.option.storeys != null);
   if (touched && !guide.confirmUse) {
     guide.confirmUse = true;
     renderGuide();
@@ -165,12 +172,17 @@ function useSuggestionNow() {
   state.option = opt;
   state.optionDirty = true;
   guide.suggestionUsed = true;
+  guide.appliedOption = opt;
   $("#option-select").value = "__new__";
   renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
   $("#option-dirty").hidden = false;
   refreshSummary("option");
   markStale("the option");
   setStep(2);
+  if (live) {
+    setStatus(`The option changed after ${rev(state.run.run_id)}: the memo on screen is ${rev(state.run.run_id)}'s until the rules run again.${blank.length ? ` ${blank.join(", ")} ${blank.length === 1 ? "is" : "are"} blank.` : ""}`, "busy");
+    return true;
+  }
   if (blank.length) setStatus(`The ${guide.candidate} option is set${chosen ? ` with ${chosen} of your own figures` : ""}, but ${blank.join(", ").toLowerCase()} ${blank.length === 1 ? "is" : "are"} blank: the run will answer allowed and funders, say the money is unsure and draw the plate the setbacks leave. Enter ${blank.length === 1 ? "it" : "them"} at 02 for all four answers, or run as it stands.`, "busy");
   else setStatus(`The ${guide.candidate} option is set${chosen ? `, with ${chosen} of your own figures` : ""}. Enter the money only you know, then run the rules.`, "ok");
   return true;

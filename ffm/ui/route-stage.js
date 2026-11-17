@@ -580,11 +580,17 @@ function figureBlock(o, S) {
       : (editable ? `<button type="button" class="fig4-v" data-fig="${h(key)}" aria-label="${h(k)}: ${h(shown)}. Change it">${h(shown)}</button>` : `<span class="fig4-v">${h(shown)}</span>`);
     return `<div class="fig4-cell"><span class="fig4-k">${h(k)}</span>${val}<span class="fig4-sub">${sub || ""}${tag(key === "fsr" ? "gfa_m2" : key)}</span></div>`;
   };
+  // the storeys at the option's floor-to-floor need a height; a stated height below that is said here, before the run
+  // (17 Nov 2026: 4 storeys at 9.9 m made a memo "within 10.7 m" while the elevations drew 13.2 m)
+  const f2f = Number(o.floor_to_floor_m) || 3.0;
+  const needs = o.storeys != null ? Math.round(o.storeys * f2f * 10) / 10 : null;
+  const short = needs != null && o.height_m != null && Number(o.height_m) < needs - 0.5;
+  const heightSub = short ? `<span class="warn-text">${h(o.storeys)} storeys at ${h(fmtNum(f2f))} m need about ${h(fmtNum(needs))} m</span> ` : "";
   const block = `<div class="fig4">
       ${cell("storeys", "Storeys", o.storeys != null ? String(o.storeys) : "—", "")}
-      ${cell("height_m", "Height", o.height_m != null ? `${fmtNum(o.height_m)} m` : "—", "")}
+      ${cell("height_m", "Height", o.height_m != null ? `${fmtNum(o.height_m)} m` : "—", heightSub)}
       ${guide.editFig === "gfa_m2" ? cell("gfa_m2", "Floor area (m²)", "", "") : cell("gfa_m2", "FSR", fsr || "—", o.gfa_m2 != null ? `${h(fmtNum(o.gfa_m2))} m² ` : "")}
-      <div class="fig4-cell"><span class="fig4-k">Homes</span>${S && S.mix ? `<button type="button" class="fig4-v" id="guide-homes" aria-expanded="${!!guide.mixOpen}" aria-controls="guide-mix">${homes || "—"}</button>` : `<span class="fig4-v">${homes || "—"}</span>`}<span class="fig4-sub">${o.rent_tiers_units ? `${h(o.rent_tiers_units.market || 0)} / ${h(o.rent_tiers_units.rgi || 0)} / ${h(o.rent_tiers_units.deep_subsidy || 0)} tiers` : ""}</span></div>
+      <div class="fig4-cell"><span class="fig4-k">Homes</span>${S && S.mix ? `<button type="button" class="fig4-v" id="guide-homes" aria-expanded="${!!guide.mixOpen}" aria-controls="guide-mix" aria-label="Homes: ${homes || "none"}. Change the mix">${homes || "—"}</button>` : `<span class="fig4-v">${homes || "—"}</span>`}<span class="fig4-sub">${o.rent_tiers_units ? `${h(o.rent_tiers_units.market || 0)} / ${h(o.rent_tiers_units.rgi || 0)} / ${h(o.rent_tiers_units.deep_subsidy || 0)} tiers` : ""}</span></div>
     </div>`;
   if (!S) return block + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
   // the rough envelope from the lot and the code, offered as the manager's own three figures
@@ -746,8 +752,9 @@ function wireStage(el) {
     const E = guide.suggestion && guide.suggestion.envelope; if (!E) return;
     guide.mine.storeys = String(E.storeys); guide.mine.height_m = String(E.height_m); guide.mine.gfa_m2 = String(E.gfa_m2);
     guide.suggestionUsed = false;
-    renderGuide();
     setStatus(`Storeys ${E.storeys}, height ${E.height_m} m and floor area ${fmtNum(E.gfa_m2)} m² are now yours, from the rough envelope: ${E.storeys_from}.`, "info");
+    applyAfterRun();
+    renderGuide();
   });
   on("#guide-mix-apply", () => {
     const shares = {};
@@ -772,6 +779,7 @@ function wireStage(el) {
       if (b.dataset.pick === "mine") { if (guide.mine[key] === undefined) guide.mine[key] = guide.suggestion.fields[key].value ?? ""; }
       else delete guide.mine[key];
       guide.suggestionUsed = false;
+      if (b.dataset.pick === "suggested") applyAfterRun();   // back to the suggested figure: a change too
       renderGuide();
       const inp = $(`.sg-row[data-key="${CSS.escape(key)}"] .sg-input`);
       if (inp) inp.focus();
@@ -779,7 +787,7 @@ function wireStage(el) {
     const inp = $(".sg-input", row);
     if (inp) {
       inp.addEventListener("input", () => { guide.mine[key] = inp.value; guide.suggestionUsed = false; });
-      inp.addEventListener("change", () => renderGuide());
+      inp.addEventListener("change", () => { applyAfterRun(); renderGuide(); });
     }
   });
   on("#guide-next-2", continueToRun);
@@ -799,6 +807,13 @@ function wireStage(el) {
   on("#guide-run", () => runRules());
 }
 
+/* After a run, a change at 02 is a change to the option the memo was made from: it is applied at once, so the memo
+   is marked out of date, Run again goes live and the route shows the new figures (17 Nov 2026: the change waited for
+   Continue, and Back to R1 showed a memo that still read as current). Before a run, Continue applies it. */
+function applyAfterRun() {
+  if (state.run && guide.suggestion && !state.optionId) useSuggestion({ live: true });
+}
+
 /* A figure typed into the four-figure block: the manager's own over the suggestion, or straight into a saved option. */
 function setFigure(key, raw) {
   if (guide.suggestion && !state.optionId) {
@@ -806,6 +821,7 @@ function setFigure(key, raw) {
     guide.mine[key] = raw;
     guide.suggestionUsed = false;
     setStatus(raw === "" ? `${fieldOf("option", key).label}: blank, so not assessed.` : `${fieldOf("option", key).label}: ${raw}, yours. Continue to the run when it reads right.`, "info");
+    applyAfterRun();
     return;
   }
   if (!state.option) return;

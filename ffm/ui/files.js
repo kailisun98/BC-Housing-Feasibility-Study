@@ -228,6 +228,10 @@ export function syncStaleBand() {
   const stale = !!(state.run && state.runStale);
   syncRunButton();   // the manager's Run again is live exactly while the memo is out of date
   if (!stale) { if (band) band.remove(); $("#issue-btn").disabled = !state.run || !!STATIC; $("#issue-btn").title = ""; return; }
+  $("#issue-btn").disabled = true;
+  $("#issue-btn").title = "The inputs changed after this run: run the rules again before issuing it.";
+  // a card brought over the memo (the manager's route) holds the pane: the band waits for the memo, which draws it
+  if (memo.classList.contains("stage-on")) return;
   if (!band) { band = document.createElement("div"); band.id = "stale-band"; band.className = "card stale-band"; band.setAttribute("role", "status"); memo.prepend(band); }
   band.innerHTML = `<b>${h(state.runStale[0].toUpperCase() + state.runStale.slice(1))} changed after ${h(rev(state.run.run_id))}.</b> The answers and the drawings below are ${h(rev(state.run.run_id))}'s. <button type="button" class="btn btn-primary btn-small" id="stale-run">Run the rules again</button>`;
   $("#stale-run", band).addEventListener("click", runRules);

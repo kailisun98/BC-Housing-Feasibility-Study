@@ -395,6 +395,18 @@ while what each stop found landed in the other column. Kai confirmed `docs/ui-ro
   on the wire. About 70 lines of CSS the rebuild orphaned (the seven-stop guide, the (i) popovers, the field rows,
   the old stage cards, `.answer-ctl`, `.sg-unsure`) are gone. Left by choice: ES modules (a separate piece of work),
   the 9.5px glyph in the status marks and the mode thumb's width transition (both in DESIGN.md), the chip's #ffe3a6.
+- The 17 Nov 2026 critique's four tool P1s (`.impeccable/critique/2026-11-17T07-53-36Z__ffm-ui-index-html.md`):
+  - **Edits after a run go stale.** A change at 02 after a run (a figure, "Use these three", an "All 21 figures" row,
+    a new derivation) is applied to the option at once (`applyAfterRun` in route-stage.js, `useSuggestion({live:true})`
+    in guide.js). So the memo is marked stale, Run again goes live and the route shows the new figures; the band waits
+    for the memo while a card is over it (`syncStaleBand`). The replace guard now protects only an option the
+    suggestion did not write (`guide.appliedOption`).
+  - **Answer 3 at night.** `.answer[data-verdict="plain"]` takes `--panel`: `--paper` was never defined in the tool, so
+    the card stayed white under light text. The map's zoom and tooltip take the drawing's `--c-paper` / `--c-drawink`.
+  - **Impossible numbers.** The memo's Plate cell reads "no plate fits" instead of a negative width (`plateCell` in
+    memo/memo.js), and the Height figure at 02 warns when the storeys at the floor-to-floor need more height.
+  - **The route sticks.** `[data-mode="manager"] .inputs-body` is the sticky element (the route inside it was sticky
+    in a box no taller than itself).
 
 ## The page as ES modules (16 Nov 2026): where each piece of the old app.js lives
 

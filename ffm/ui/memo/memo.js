@@ -156,8 +156,18 @@ function optionFiguresHtml(site, opt, run) {
     ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `${v} ${UNIT_WORD[k] || k}`).join(", ")}` : "")}
     ${cell("Rent tiers", tiers ? `${h(tiers.market || 0)} market · ${h(tiers.rgi || 0)} RGI · ${h(tiers.deep_subsidy || 0)} deep subsidy` : "<i>not split</i>", "")}
     ${cell("Tenure", h(optWord("option", "tenure", opt.tenure) || "not set"), opt.housing_agreement_years ? `· ${h(opt.housing_agreement_years)}-year agreement` : "")}
-    ${cell("Plate", pm ? `${h(pm.plate_width_m)} × ${h(pm.plate_depth_m)} m` : "<i>no massing</i>", pm ? `· ${h(fmtNum(pm.plate_area_m2))} m² a floor` : "")}
+    ${plateCell(cell, pm)}
   </div>`;
+}
+
+/* The plate, or why there is none: a dimension at or below zero means the yards leave no room on the lot, and the
+   memo says so in words instead of printing a negative width (17 Nov 2026: 609 Heatley Ave read "34.2 × -6.6 m ·
+   -225.7 m² a floor" under "Allowed outright"). */
+function plateCell(cell, pm) {
+  if (!pm) return cell("Plate", "<i>no massing</i>", "");
+  const w = Number(pm.plate_width_m), d = Number(pm.plate_depth_m), a = Number(pm.plate_area_m2);
+  if (!(w > 0) || !(d > 0) || !(a > 0)) return cell("Plate", `<span class="warn-text">no plate fits</span>`, "· the yards leave no room on the lot; the architect checks the setbacks");
+  return cell("Plate", `${h(pm.plate_width_m)} × ${h(pm.plate_depth_m)} m`, `· ${h(fmtNum(pm.plate_area_m2))} m² a floor`);
 }
 
 /* The paper memo's references, A1 to F7: the layer's letter and the rule's place in it, in the ledger's order. The

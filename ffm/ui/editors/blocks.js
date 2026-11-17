@@ -51,10 +51,11 @@ function zonesFromLayout(L) {
   return out;
 }
 
-/* The strips a plate offers: the street strip, the corridor behind it, the lane strip (a double-loaded plate). */
+/* The strips a plate offers: the street strip, the corridor behind it, the lane strip (a double-loaded plate; a
+   point tower's lane strip is the plate's back, the ring and the core between). */
 function bandsOf(p) {
   const strip = p.unit_depth_m, corr = r2(p.y + strip);
-  return { strip, front: p.y, corr, rear: p.double_loaded ? r2(corr + CORR) : null };
+  return { strip, front: p.y, corr, rear: p.double_loaded ? r2(corr + CORR) : p.arrangement === "point" ? r2(p.y + p.depth_m - strip) : null };
 }
 
 /* What the program asks for against what the editor has placed on every floor: one row per block, with what is

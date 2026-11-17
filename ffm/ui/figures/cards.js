@@ -275,7 +275,7 @@ function renderSheets(run, n0) {
     <div class="sheet-body" data-view="plans">${S.plans || ""}</div>
     <div class="sheet-body" data-view="axon" hidden>${S.axon || ""}</div>
     <div class="sheet-editor" id="sheet-editor" hidden></div>
-    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
+    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.arrangement === "point" ? `a point tower, the homes round a corridor ringing the core, ${h(L.plate.unit_depth_m)} m deep in front and behind and ${h(L.plate.side_depth_m)} m beside` : `${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep`}. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
     <ul class="finding-list sheet-rules">${broken}${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
     ${egressHtml(L.egress)}
   </figure>`);

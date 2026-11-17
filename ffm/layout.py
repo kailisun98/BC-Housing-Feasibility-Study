@@ -38,6 +38,7 @@ LAYOUT_ASSUMPTIONS = {
     "parking_m2_per_space": (30.0, "a below-grade stall with its aisle share; not on the plates"),
     "window_width_m": (1.5, "one window per unit on the elevation, the unit module as the rhythm"),
     "stair_width_m": (2.2, "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"),
+    "min_home_depth_m": (4.0, "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"),
 }
 
 # Whether the floor areas are sprinklered: a Part 3 residential building over three storeys is sprinklered in
@@ -186,14 +187,69 @@ def _plate(massing: dict) -> tuple[dict, float, float, float, float, int, float]
     return pm, float(ring[0][0]), float(ring[0][1]), max(0.0, float(pm["plate_width_m"])), max(0.0, float(pm["plate_depth_m"])), int(pm["storeys"]), float(pm["floor_to_floor_m"])
 
 
+# A point tower's plate: no longer than this many times its width (a longer one reads as a slab, its corridor through
+# it), and every strip of homes round the ring at least MIN_HOME_DEPTH_M deep.
+POINT_ASPECT_MAX = 1.4
+
+
+def _point_geometry(option: dict, massing: dict) -> dict | None:
+    """A compact tower plate laid out as a point tower (17 Nov 2026): a core at the centre (a scissor stair, the
+    elevators and the risers, `core_bay_m` square), a corridor ringing it, and the homes round that on all four
+    sides, the street and lane strips taking the corners. Only above six storeys (the scissor stair: none in a 5 or 6
+    storey wood-frame building, VBBL 2014 3.4.1.2.(3)), without a grid or cores the architect placed, on a plate no
+    longer than POINT_ASPECT_MAX times its width with every strip at least `min_home_depth_m` deep. None otherwise.
+    Pure."""
+    pm, x0, y0, W, D, storeys, f2f = _plate(massing)
+    if storeys <= MIDRISE_MAX_STOREYS or grid_of(option) is not None or _cores_of(option, x0, y0, W, D):
+        return None
+    if min(W, D) <= 0 or max(W, D) / min(W, D) > POINT_ASPECT_MAX + 1e-9:
+        return None
+    corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
+    cw = cd = LAYOUT_ASSUMPTIONS["core_bay_m"][0]
+    iw, idp = cw + 2 * corr, cd + 2 * corr                 # the core and its ring
+    ux, uy = (W - iw) / 2, (D - idp) / 2                   # the homes' depth beside it, and in front and behind
+    if min(ux, uy) < LAYOUT_ASSUMPTIONS["min_home_depth_m"][0] - 1e-9:
+        return None
+    ix0, iy0 = x0 + ux, y0 + uy
+    r2 = lambda v: round(v, 2)
+    seg = lambda x, y, w, d: {"block": "corridor", "label": "Corridor", "x": r2(x), "y": r2(y), "w": r2(w), "d": r2(d), "area_m2": round(w * d, 1), "through": "core"}
+    core = {"block": "core", "label": BLOCK_LABEL["core"], "x": r2(ix0 + corr), "y": r2(iy0 + corr), "w": cw, "d": cd, "area_m2": round(cw * cd, 1), "stairs": "scissor"}
+    ring = [seg(ix0, iy0, iw, corr), seg(ix0, iy0 + idp - corr, iw, corr),                # in front of it and behind it
+            seg(ix0, iy0 + corr, corr, cd), seg(ix0 + iw - corr, iy0 + corr, corr, cd)]   # beside it
+    run = lambda side, end, axis, edge, at, depth, length: {"side": side, "end": end, "axis": axis, "edge": edge, "dir": 1, "at": at, "depth": depth, "len": length, "left": length}
+    runs = [run("front", "left", "x", x0, y0, uy, W), run("rear", "left", "x", x0, y0 + D - uy, uy, W),
+            run("left", "mid", "y", y0 + uy, x0, ux, D - 2 * uy), run("right", "mid", "y", y0 + uy, x0 + W - ux, ux, D - 2 * uy)]
+    return {"core": core, "ring": ring, "runs": runs, "ux": ux, "uy": uy, "core_m": [cw, cd]}
+
+
+def _run_rect(r: dict, length: float) -> tuple[float, float, float, float]:
+    """The rectangle the next `length` of a run takes, from where it is filled to, in its direction: along x a strip
+    of the run's depth, along y (a point tower's sides) the same turned. Pure."""
+    s = r["edge"] + r["dir"] * (r["len"] - r["left"]) + (0 if r["dir"] > 0 else -length)
+    return (s, r["at"], length, r["depth"]) if r["axis"] == "x" else (r["at"], s, r["depth"], length)
+
+
 def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, Any]:
     """Place the blocks on the proposed mass's plates, floor by floor, and say what held and what did not. Where
     the option carries a placement of its own (`layout.zones`, written by the block editor), that placement is
-    re-checked instead, so a run reproduces what a person drew."""
+    re-checked instead, so a run reproduces what a person drew. A compact tower plate is laid out both ways, along a
+    corridor and as a point tower (`_point_geometry`), and the one that places more homes with exits no worse is
+    kept, the point tower on a tie."""
     zones = (option.get("layout") or {}).get("zones")
     if zones:
         return place_zones(site, option, ledger, massing, zones)
     prog = blocks(option, ledger)
+    slab = _solve(site, option, ledger, massing, prog, None)
+    pt = _point_geometry(option, massing)
+    if pt is None:
+        return slab
+    point = _solve(site, option, ledger, massing, prog, pt)
+    rank = lambda L: _STATUS_RANK.get((L.get("egress") or {}).get("status") or "pass", 0)
+    return point if point["units_placed"] >= slab["units_placed"] and rank(point) <= rank(slab) else slab
+
+
+def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, point: dict | None) -> dict[str, Any]:
+    """One arrangement of the plates: along a corridor (`point` None), or the point tower `_point_geometry` drew."""
     pm, x0, y0, W, D, storeys, f2f = _plate(massing)
     corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
     core_w, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
@@ -252,15 +308,10 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
                 cw = min(W, q(want)) if grid else min(W, round(want + 0.005, 2))
                 cx = x0 + (round(max(0.0, (W - cw) / 2) / mod) * mod if grid else (W - cw) / 2)
                 cores = [{"x": cx, "y": core_y, "w": cw, "d": core_d, **({"stairs": "scissor"} if scissor else {})}]
-    legacy = False   # every plate's runs are the lengths its cores leave free, side by side (band_runs)
-    seg_len = max(0.0, (W - core_w) / 2)
-
     def band_runs(side: str, y: float) -> list[dict]:
-        """The runs one strip offers: the lengths of it the cores leave free, each filled outward from a core."""
-        if legacy:
-            cx = cores[0]["x"]
-            return [{"side": side, "end": "left", "x_edge": cx, "dir": -1, "y": y, "len": seg_len, "left": seg_len},
-                    {"side": side, "end": "right", "x_edge": cx + core_w, "dir": 1, "y": y, "len": seg_len, "left": seg_len}]
+        """The runs one strip offers: the lengths of it the cores leave free, each filled outward from a core. A run
+        lies along x (`edge` where it is filled from, `at` the strip's y, `depth` the strip's): see _run_rect."""
+        run = lambda end, edge, d, length: {"side": side, "end": end, "axis": "x", "edge": edge, "dir": d, "at": y, "depth": strip, "len": length, "left": length}
         spans: list[list[float]] = []
         for c in sorted(cores, key=lambda c: c["x"]):
             if c["y"] < y + strip - 0.05 and c["y"] + c["d"] > y + 0.05:
@@ -269,17 +320,21 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
                 else:
                     spans.append([c["x"], c["x"] + c["w"]])
         if not spans:
-            return [{"side": side, "end": "left", "x_edge": x0, "dir": 1, "y": y, "len": W, "left": W}]
-        out = [{"side": side, "end": "left", "x_edge": spans[0][0], "dir": -1, "y": y, "len": max(0.0, spans[0][0] - x0)}]
+            return [run("left", x0, 1, W)]
+        out = [run("left", spans[0][0], -1, max(0.0, spans[0][0] - x0))]
         for a, b in zip(spans, spans[1:]):
-            out.append({"side": side, "end": "mid", "x_edge": a[1], "dir": 1, "y": y, "len": max(0.0, b[0] - a[1])})
-        out.append({"side": side, "end": "right", "x_edge": spans[-1][1], "dir": 1, "y": y, "len": max(0.0, x0 + W - spans[-1][1])})
-        for r in out:
-            r["left"] = r["len"]
+            out.append(run("mid", a[1], 1, max(0.0, b[0] - a[1])))
+        out.append(run("right", spans[-1][1], 1, max(0.0, x0 + W - spans[-1][1])))
         return out
 
     floors: list[dict] = []
     for lv in range(storeys):
+        if point:
+            # the point tower: its core, the ring round it, and the four strips of homes round that
+            zones = [dict(point["core"]), *(dict(z) for z in point["ring"])]
+            runs = [dict(r) for r in point["runs"]]
+            floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "runs": runs, "spare_m2": 0.0})
+            continue
         zones = [{"block": "core", "label": BLOCK_LABEL["core"], "x": round(c["x"], 2), "y": round(c["y"], 2), "w": round(c["w"], 2), "d": round(c["d"], 2), "area_m2": round(c["w"] * c["d"], 1),
                   **({"stairs": "scissor"} if c.get("stairs") == "scissor" else {})} for c in cores]
         zones.append({"block": "corridor", "label": "Corridor", "x": round(x0, 2), "y": round(corr_y, 2), "w": round(W, 2), "d": corr, "area_m2": round(W * corr, 1), "through": "core"})
@@ -298,16 +353,16 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
                 break
             if r["left"] <= 0.05:
                 continue
-            width = min(r["left"], q(left / strip)) if strip else 0
+            width = min(r["left"], q(left / r["depth"])) if r["depth"] else 0
             if width <= 0.05:
                 continue
-            x = r["x_edge"] + (r["dir"] * (r["len"] - r["left"])) + (0 if r["dir"] > 0 else -width)
-            z = {"block": block, "label": label, "x": round(x, 2), "y": round(r["y"], 2), "w": round(width, 2), "d": round(strip, 2), "area_m2": round(width * strip, 1), "side": r["side"]}
+            x, y, w, d = _run_rect(r, width)
+            z = {"block": block, "label": label, "x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "d": round(d, 2), "area_m2": round(width * r["depth"], 1), "side": r["side"]}
             if extra:
                 z.update(extra)
             floor["zones"].append(z)
             r["left"] -= width
-            left -= width * strip
+            left -= width * r["depth"]
         return max(0.0, left)
 
     shortfall: list[dict] = []
@@ -337,15 +392,28 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
 
     # units: each one whole, in the first run with room for it, family units lowest and studios highest; the
     # accessible ones are the first placed, so they sit nearest the core on the lowest residential floor
-    def place_unit(key: str, width: float, flagged: bool) -> bool:
+    def unit_width(b: dict, depth: float) -> float:
+        """How long a unit runs along a strip of this depth: its gross area over the depth; on a grid the nearest
+        whole number of modules, as long as that keeps it at or over the BC Housing minimum with its partitions,
+        otherwise the next module up."""
+        width = b["gross_m2_each"] / depth
+        if mod:
+            near = max(1, round(width / mod)) * mod
+            width = near if near * depth + 0.5 >= b["min_gross_m2_each"] else q(width)
+        return width
+
+    def place_unit(key: str, b: dict, flagged: bool) -> bool:
         for fl in floors:
             runs = sorted(fl["runs"], key=lambda r: (r["side"] != "front", r["end"] != "left"))
             for r in runs:
+                if r["depth"] <= 0:
+                    continue
+                width = unit_width(b, r["depth"])   # a point tower's strips differ in depth, so per run
                 if r["left"] + 1e-9 < width:
                     continue
-                x = r["x_edge"] + (r["dir"] * (r["len"] - r["left"])) + (0 if r["dir"] > 0 else -width)
-                fl["zones"].append({"block": key, "label": UNIT_LABEL[key], "x": round(x, 2), "y": round(r["y"], 2), "w": round(width, 2), "d": round(strip, 2),
-                                    "area_m2": round(width * strip, 1), "side": r["side"], "unit": key, "accessible": flagged})
+                x, y, w, d = _run_rect(r, width)
+                fl["zones"].append({"block": key, "label": UNIT_LABEL[key], "x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "d": round(d, 2),
+                                    "area_m2": round(width * r["depth"], 1), "side": r["side"], "unit": key, "accessible": flagged})
                 r["left"] -= width
                 return True
         return False
@@ -353,17 +421,11 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     accessible_left = int(option.get("accessible_units") or 0)
     for key in UNIT_KEYS:
         b = by_key.get(key)
-        if not b or not strip:
+        if not b or not (strip or point):
             continue
-        width = b["gross_m2_each"] / strip
-        if mod:
-            # on a grid a unit takes the nearest whole number of modules, as long as that keeps it at or over
-            # the BC Housing minimum with its partitions; otherwise the next module up
-            near = max(1, round(width / mod)) * mod
-            width = near if near * strip + 0.5 >= b["min_gross_m2_each"] else q(width)
         for _ in range(b["count"]):
             flagged = accessible_left > 0
-            if place_unit(key, width, flagged):
+            if place_unit(key, b, flagged):
                 if flagged:
                     accessible_left -= 1
                 continue
@@ -379,13 +441,18 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         spare = 0.0
         for r in fl["runs"]:
             if r["left"] > 0.3:
-                x = r["x_edge"] + (r["dir"] * (r["len"] - r["left"])) + (0 if r["dir"] > 0 else -r["left"])
-                fl["zones"].append({"block": "spare", "label": "Spare", "x": round(x, 2), "y": round(r["y"], 2), "w": round(r["left"], 2), "d": round(strip, 2), "area_m2": round(r["left"] * strip, 1), "side": r["side"]})
-                spare += r["left"] * strip
+                x, y, w, d = _run_rect(r, r["left"])
+                fl["zones"].append({"block": "spare", "label": "Spare", "x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "d": round(d, 2), "area_m2": round(r["left"] * r["depth"], 1), "side": r["side"]})
+                spare += r["left"] * r["depth"]
         fl["spare_m2"] = round(spare, 1)
         del fl["runs"]
 
-    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
+    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2),
+             "arrangement": "double" if double else "single"}
+    if point:
+        # the homes' depth in front of and behind the ring (`unit_depth_m`, as the editor's street strip reads it)
+        # and beside it (`side_depth_m`)
+        plate.update(arrangement="point", double_loaded=False, unit_depth_m=round(point["uy"], 2), side_depth_m=round(point["ux"], 2), core_m=point["core_m"])
     if grid:
         plate["grid"] = grid
     return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
@@ -467,6 +534,17 @@ def _touches(a: dict, b: dict, tol: float = 0.05) -> bool:
     return not (a["x"] + a["w"] < b["x"] - tol or b["x"] + b["w"] < a["x"] - tol or a["y"] + a["d"] < b["y"] - tol or b["y"] + b["d"] < a["y"] - tol)
 
 
+def _ringed(core: dict, corridors: list[dict], tol: float = 0.05) -> bool:
+    """Whether a corridor runs round a core: along both its left and right faces, and across its front or rear from
+    one to the other (a point tower's ring). Pure."""
+    over_y = lambda z: z["y"] < core["y"] + core["d"] - tol and z["y"] + z["d"] > core["y"] + tol
+    left = any(abs(z["x"] + z["w"] - core["x"]) <= tol and over_y(z) for z in corridors)
+    right = any(abs(z["x"] - (core["x"] + core["w"])) <= tol and over_y(z) for z in corridors)
+    across = any(z["x"] <= core["x"] + tol and z["x"] + z["w"] >= core["x"] + core["w"] - tol
+                 and (abs(z["y"] + z["d"] - core["y"]) <= tol or abs(z["y"] - (core["y"] + core["d"])) <= tol) for z in corridors)
+    return left and right and across
+
+
 def _gap(a: dict, b: dict) -> float:
     dx = max(0.0, b["x"] - (a["x"] + a["w"]), a["x"] - (b["x"] + b["w"]))
     dy = max(0.0, b["y"] - (a["y"] + a["d"]), a["y"] - (b["y"] + b["d"]))
@@ -478,7 +556,8 @@ def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinkle
     needs and has (3.4.2.1), how far apart they are (3.4.2.3), how far the farthest unit door is from an exit
     along the corridor (3.4.2.4, 3.4.2.5), and how far a corridor runs past the last exit (3.3.1.9). Exits are the
     `core` zones: a core at least one core bay wide is read as two stairs at its ends along x, a narrower one as
-    one stair (stair width a declared placeholder). Travel is measured from the midpoint of a unit's edge on its
+    one stair (stair width a declared placeholder); a scissor stair in a core the corridor rings (a point tower) as
+    two doors on its opposite faces, apart by half its perimeter. Travel is measured from the midpoint of a unit's edge on its
     corridor, along the corridor's axis (Manhattan), to the nearest core's edge on that corridor. Pure."""
     stair_w, _ = LAYOUT_ASSUMPTIONS["stair_width_m"]
     bay, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
@@ -508,11 +587,17 @@ def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinkle
         units = [z for z in zones if z.get("unit")]
         load = sum(per_room * float(rooms.get(z["unit"], 1)) for z in units)
         required = 2 if (floor_area > area_cap + 1e-9 or load > load_cap + 1e-9) else 1
-        # the stairs: two at the ends of a core a bay wide or wider, one in a narrower core
+        # the stairs: two at the ends of a core a bay wide or wider, one in a narrower core; a scissor stair in a core
+        # the corridor rings (a point tower) has its doors on the core's opposite faces, and the separation is the way
+        # smoke would go between them, round the fire-separated core (3.4.2.3.(3)): half its perimeter
         stairs: list[tuple[float, float, int]] = []
+        round_core: dict[int, float] = {}
         for i, c in enumerate(cores):
             cy = c["y"] + c["d"] / 2
-            if c["w"] + 1e-6 >= bay:
+            if c.get("stairs") == "scissor" and _ringed(c, [z for z in zones if z["block"] == "corridor"]):
+                stairs += [(c["x"], cy, i), (c["x"] + c["w"], cy, i)]
+                round_core[i] = c["w"] + c["d"]
+            elif c["w"] + 1e-6 >= bay:
                 stairs += [(c["x"] + stair_w / 2, cy, i), (c["x"] + c["w"] - stair_w / 2, cy, i)]
             else:
                 stairs.append((c["x"] + c["w"] / 2, cy, i))
@@ -539,7 +624,8 @@ def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinkle
             notes.append(f"{len(stairs)} exit{'s' if len(stairs) != 1 else ''} where {required} are required: {why} (3.4.2.1)")
         # 3.4.2.3: the separation of the two exits farthest apart
         if len(stairs) >= 2:
-            best = max(((((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5, a, b) for i, a in enumerate(stairs) for b in stairs[i + 1:]), key=lambda t: t[0])
+            apart = lambda a, b: round_core[a[2]] if a[2] == b[2] and a[2] in round_core else ((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2) ** 0.5
+            best = max(((apart(a, b), a, b) for i, a in enumerate(stairs) for b in stairs[i + 1:]), key=lambda t: t[0])
             rec["separation_m"] = round(best[0], 2)
             if required >= 2 and best[0] + 1e-6 < sep_min:
                 one = best[1][2] == best[2][2]
@@ -619,15 +705,22 @@ def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinkle
         overall = "conditional"
     else:
         overall = "pass"
-    scissor = next((z for fl in L_floors for z in fl["zones"] if z.get("block") == "core" and z.get("stairs") == "scissor"), None)
+    scissor = next(((fl, z) for fl in L_floors for z in fl["zones"] if z.get("block") == "core" and z.get("stairs") == "scissor"), None)
+    words = None
+    if scissor:
+        fl, z = scissor
+        if _ringed(z, [c for c in fl["zones"] if c["block"] == "corridor"]):
+            words = (f"the core's two exits are a scissor stair, its doors on the core's opposite faces, {float(z['w']) + float(z['d']):.1f} m apart "
+                     f"as smoke would go round the core (3.4.2.3.(3))")
+        else:
+            words = f"the core's two exits are a scissor stair, its doors {float(z['w']) - stair_w:.1f} m apart along the corridor"
     return {"rule_id": EGRESS_RULE, "sprinklered": bool(sprinklered), "sprinklered_is_placeholder": True, "limits": limits,
             "floors": out_floors, "status": overall, "scissor_stair": bool(scissor),
-            "summary": _egress_summary(out_floors, overall, sprinklered, travel_limit, dead_limit,
-                                       scissor_doors_m=(float(scissor["w"]) - stair_w) if scissor else None)}
+            "summary": _egress_summary(out_floors, overall, sprinklered, travel_limit, dead_limit, scissor_words=words)}
 
 
 def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_limit: float, dead_limit: float,
-                    scissor_doors_m: float | None = None) -> str:
+                    scissor_words: str | None = None) -> str:
     n = {s: sum(1 for f in floors if f["status"] == s) for s in ("pass", "conditional", "fail", "uncertain")}
     counts = ", ".join(f"{v} {k}" for k, v in n.items() if v)
     bits = []
@@ -644,10 +737,9 @@ def _egress_summary(floors: list[dict], overall: str, sprinklered: bool, travel_
     de = [f["dead_end_m"] for f in floors if f["dead_end_m"] is not None]
     if de and max(de) > dead_limit + 1e-6:
         bits.append(f"dead-end corridors up to {max(de):.1f} m, limit {dead_limit:g} m")
-    if scissor_doors_m is not None:
+    if scissor_words:
         # the arrangement that made the separation, and what it asks of the drawing (VBBL 2014 3.4.4.4.(2), (3))
-        bits.append(f"the core's two exits are a scissor stair, its doors {scissor_doors_m:.1f} m apart along the corridor; "
-                    f"the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings")
+        bits.append(f"{scissor_words}; the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings")
     return (f"Egress ({'sprinklered' if sprinklered else 'unsprinklered'}, BCBC 2024 Part 3): {overall}; {len(floors)} floor{'s' if len(floors) != 1 else ''}: {counts}"
             + (f"; {'; '.join(bits)}" if bits else "") + ".")
 
@@ -746,7 +838,14 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             placed = sum(z["area_m2"] for fl in floors for z in fl["zones"] if same(z))
             if placed + 1.0 < b["area_m2"]:
                 shortfall.append({"block": b["key"], "label": b["label"], "area_m2": round(b["area_m2"] - placed, 1)})
-    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2)}
+    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2),
+             "arrangement": "double" if double else "single"}
+    # a placement round a ringed core (the solver's point tower, kept or moved by hand) is still a point tower
+    ring = next(((fl, z) for fl in floors for z in fl["zones"] if z["block"] == "core" and _ringed(z, [c for c in fl["zones"] if c["block"] == "corridor"])), None)
+    if ring:
+        c = ring[1]
+        plate.update(arrangement="point", double_loaded=False, unit_depth_m=round(max(0.0, c["y"] - corr - y0), 2), side_depth_m=round(max(0.0, c["x"] - corr - x0), 2),
+                     core_m=[c["w"], c["d"]])
     if grid_of(option):
         plate["grid"] = grid_of(option)
     return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
@@ -795,8 +894,10 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
         out.update(status="pass" if ok else "conditional", note="on the ground floor, lane side" if ok else (f"on the ground floor but facing the street: {street_why}" if zs and all(fl["level"] == 0 for fl, _ in zs) else "services could not all stay on the ground floor"))
     elif key == "core":
         n_cores = max((sum(1 for z in fl["zones"] if z["block"] == "core") for fl in floors), default=0)
-        sc = next((z for fl, z in zones if z["block"] == "core" and z.get("stairs") == "scissor"), None)
-        out.update(status="pass", note=(f"one core at the centre of every floor, {sc['w']:g} m along the corridor to hold a scissor stair, the corridor along it"
+        sc = next(((fl, z) for fl, z in zones if z["block"] == "core" and z.get("stairs") == "scissor"), None)
+        ringed = bool(sc) and _ringed(sc[1], [z for z in sc[0]["zones"] if z["block"] == "corridor"])
+        out.update(status="pass", note=(f"one {sc[1]['w']:g} × {sc[1]['d']:g} m core at the centre of every floor holding a scissor stair, the corridor round it and the homes round that"
+                                        if ringed else f"one core at the centre of every floor, {sc[1]['w']:g} m along the corridor to hold a scissor stair, the corridor along it"
                                         if sc else "one core bay at the centre of every floor, the corridor through it")
                    + (", and an exit stair at each end of the corridor" if n_cores >= 3 else ""))
     elif key == "units":
@@ -967,11 +1068,18 @@ def svg_plans(L: dict) -> str:
     head = 14 if eg else 0
     row = pd + 64 + head
     width = pad + 30 + pw + pad
-    lines = [f'Unit depth {p["unit_depth_m"]} m either side of a {LAYOUT_ASSUMPTIONS["corridor_width_m"][0]} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;',
+    point = p.get("arrangement") == "point"
+    corr_m = LAYOUT_ASSUMPTIONS["corridor_width_m"][0]
+    lines = [(f'A point tower: homes {p["unit_depth_m"]} m deep in front and behind, {p.get("side_depth_m")} m beside, round a {corr_m} m corridor ringing the core;'
+              if point else f'Unit depth {p["unit_depth_m"]} m either side of a {corr_m} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;'),
              f'partitions +{int((LAYOUT_ASSUMPTIONS["partition_allowance"][0] - 1) * 100)}% over net areas (declared placeholders). The rules read back from the plates are listed with the figure.',
+             *(['Each home is a block of its area: in a shallow strip it runs long along the facade, where a design would turn the corner.'] if point else []),
              *([f'Egress (BC Building Code 2024, Part 3; figures to be verified): dashed, the farthest unit door to its exit along the corridor;',
-                f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.',
-                *(['The scissor stair: two stairs interlocked in one shaft, its doors at the core\'s two ends; a smoke-tight rated separation between them.']
+                f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}'
+                + ('.' if point else f'; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.'),
+                *([("The scissor stair: two stairs interlocked in one shaft, its doors on the core's opposite faces, apart by the way round it; "
+                    if point else "The scissor stair: two stairs interlocked in one shaft, its doors at the core's two ends; ")
+                   + "a smoke-tight rated separation between them."]
                   if eg.get("scissor_stair") else [])]
                if eg else []),
              _stamp_line(L)]
@@ -1251,7 +1359,10 @@ def markdown(L: dict) -> list[str]:
     M: list[str] = []
     M.append("## Layouts derived from the option")
     p = L["plate"]
-    M.append(f"{p['storeys']} floors of {p['width_m']} × {p['depth_m']} m ({p['width_m'] * p['depth_m']:,.0f} m² each); {'a double-loaded corridor' if p['double_loaded'] else 'a single-loaded plate, the depth is the limit'}, units {p['unit_depth_m']} m deep; {L['units_placed']} of {L['units_total']} units placed.")
+    shape = (f"a point tower, the homes round a corridor ringing the core, {p['unit_depth_m']} m deep in front and behind and {p.get('side_depth_m')} m beside"
+             if p.get("arrangement") == "point" else
+             f"{'a double-loaded corridor' if p['double_loaded'] else 'a single-loaded plate, the depth is the limit'}, units {p['unit_depth_m']} m deep")
+    M.append(f"{p['storeys']} floors of {p['width_m']} × {p['depth_m']} m ({p['width_m'] * p['depth_m']:,.0f} m² each); {shape}; {L['units_placed']} of {L['units_total']} units placed.")
     if p.get("grid"):
         M.append(f"Laid out on a {p['grid']['bay_m']:g} m structural bay, the blocks' walls on a {p['grid']['module_m']:g} m module (`layout.grid` on the option, the architect's choice).")
     M.append("")

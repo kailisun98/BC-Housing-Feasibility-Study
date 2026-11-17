@@ -296,7 +296,21 @@ Built and verified in the browser:
   contiguous stairs in a 5 or 6 storey wood-frame building, so only above six), 3.4.2.3.(3) (separation measured as
   smoke travels). The egress summary and FIG 05 say so. On 3475 E Hastings with no floor area typed (19 storeys,
   a 19.1 × 21 m plate): every floor passes, 48 homes against 55, since the 3.9 m left either side of the core on
-  the lane side holds no home. `tests/test_tower.py` `ScissorStair`.
+  the lane side holds no home. `tests/test_tower.py` `SlimTower`.
+  A point tower (17 Nov 2026, after the scissor stair): `solve` lays a compact tower plate out both ways, along a
+  corridor (`_solve(..., None)`) and as a point tower (`_point_geometry`: above six storeys, no grid or architect's
+  cores, sides within POINT_ASPECT_MAX 1.4 of each other, every strip at least `min_home_depth_m` 4.0 deep), and
+  keeps the one that places more homes with exits no worse, the point tower on a tie. The point tower: a
+  `core_bay_m`-square core at the centre holding a scissor stair, a corridor ringing it (four corridor zones), and
+  the homes in four strips round that, the street and lane strips taking the corners (runs now carry `axis`,
+  `edge`, `at`, `depth`; `_run_rect` turns a run's next length into a rectangle). egress() reads a scissor stair in
+  a ringed core (`_ringed`) as doors on opposite faces, apart by half the core's perimeter as smoke goes round it
+  (3.4.2.3.(3)): 14 m for 7 × 7. The plate record says `arrangement` ("double", "single", "point") with
+  `side_depth_m` for a point tower; place_zones recognises an edited one. Homes per plate width (21 m deep, 19
+  storeys, the default mix): 19.1-21 m the same both ways (the side strips beside the ring are too short for more than
+  studios), 21.8 m 79 against 55, 23 m 91 against 66, 27 m 111 against 100; 3475 E Hastings with no floor area
+  typed (19.1 m) stays a corridor plan with 48 homes. The homes are blocks of their area, so a shallow strip's home
+  runs long along the facade (the plans say so).
 - `ffm/lookup.py`: `lookup(address)` finds the point in the City's own `property-addresses` dataset first
   (`parse_address` turns "609 heatley" into civic number 609 and street "HEATLEY" for an ODSQL `like`; the
   record's `site_id` names the parcel, fetched by id) and only otherwise geocodes with Nominatim kept inside

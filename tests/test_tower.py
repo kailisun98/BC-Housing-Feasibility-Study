@@ -56,11 +56,12 @@ class FitAndExits(unittest.TestCase):
         self.assertGreater(cores[1]["y"], p["y"])
 
 
-class ScissorStair(unittest.TestCase):
+class SlimTower(unittest.TestCase):
     """A slim tower (17 Nov 2026: 19 storeys with no floor area typed, a 400 m² plate on 3475 E Hastings St): too short a
-    corridor for a stair at each end, and the 7 m core's stairs 4.8 m apart against 9 m. A scissor stair, its doors at
-    the core's two ends along the corridor, makes the separation; contiguous stairs are not for a 5 or 6 storey
-    wood-frame building, so only above six storeys."""
+    corridor for a stair at each end, and the 7 m core's stairs 4.8 m apart against 9 m. A compact plate is laid out as
+    a point tower, the homes round a corridor ringing the core, its scissor stair's doors on the core's opposite faces;
+    a narrow one keeps its corridor and runs the core along it to hold a scissor stair. Contiguous stairs are not for a
+    5 or 6 storey wood-frame building, so neither below seven storeys."""
 
     @classmethod
     def setUpClass(cls):
@@ -69,28 +70,50 @@ class ScissorStair(unittest.TestCase):
         cls.m = massing.build(SITE, cls.o, cls.L)
         cls.lay = layout.solve(SITE, cls.o, cls.L, cls.m)
 
-    def test_a_slim_tower_takes_a_scissor_stair_and_every_floor_exits(self):
+    def test_a_compact_tower_is_a_point_tower_its_homes_round_the_core(self):
         p, eg = self.lay["plate"], self.lay["egress"]
-        sw = layout.LAYOUT_ASSUMPTIONS["stair_width_m"][0]
-        self.assertLess(p["width_m"], layout.LAYOUT_ASSUMPTIONS["core_bay_m"][0] + 2 * 6 + 2 * sw)   # no room for end stairs
+        self.assertEqual(p["arrangement"], "point")
+        self.assertGreaterEqual(min(p["unit_depth_m"], p["side_depth_m"]), layout.LAYOUT_ASSUMPTIONS["min_home_depth_m"][0])
         for fl in self.lay["floors"]:
             cores = [z for z in fl["zones"] if z["block"] == "core"]
             self.assertEqual(len(cores), 1, fl["name"])
             self.assertEqual(cores[0].get("stairs"), "scissor", fl["name"])
+            self.assertEqual(sum(1 for z in fl["zones"] if z["block"] == "corridor"), 4, fl["name"])   # the ring
+        typical = self.lay["floors"][len(self.lay["floors"]) // 2]
+        self.assertEqual({z["side"] for z in typical["zones"] if z.get("unit")}, {"front", "rear", "left", "right"})
+        self.assertEqual(self.lay["units_placed"], sum(self.o["units"].values()))
+        # the doors on opposite faces: smoke goes round the 7 × 7 m core, 14 m, against 9
         self.assertEqual(eg["status"], "pass", eg["summary"])
         self.assertTrue(eg["scissor_stair"])
-        self.assertIn("scissor stair", eg["summary"])
+        self.assertIn("opposite faces", eg["summary"])
         self.assertIn("smoke-tight", eg["summary"])
+        c = next(z for z in typical["zones"] if z["block"] == "core")
         for f in eg["floors"]:
-            self.assertGreaterEqual(f["separation_m"] + 1e-6, f["separation_min_m"], f["notes"])
+            self.assertAlmostEqual(f["separation_m"], c["w"] + c["d"], places=1)
             self.assertLessEqual(f["dead_end_m"], f["dead_end_limit_m"] + 1e-6, f["notes"])
-        self.assertEqual(self.lay["units_placed"], sum(self.o["units"].values()))
-        self.assertIn("scissor stair", layout.svg_plans(self.lay))
+        self.assertIn("A point tower", layout.svg_plans(self.lay))
 
-    def test_the_block_editor_keeps_the_scissor_stair(self):
+    def test_it_places_more_homes_than_the_corridor_would(self):
+        slab = layout._solve(SITE, self.o, self.L, self.m, layout.blocks(self.o, self.L), None)
+        self.assertGreater(self.lay["units_placed"], slab["units_placed"])
+
+    def test_the_block_editor_keeps_the_point_tower(self):
         again = layout.place_zones(SITE, self.o, self.L, self.m, layout.zones_of(self.lay))
+        self.assertEqual(again["plate"]["arrangement"], "point")
         self.assertTrue(again["egress"]["scissor_stair"])
         self.assertEqual(again["egress"]["status"], "pass", again["egress"]["summary"])
+
+    def test_a_narrow_tower_keeps_its_corridor_and_runs_the_core_along_it(self):
+        # 14.5 m wide on a 21 m depth: longer than POINT_ASPECT_MAX, and too short a corridor for end stairs
+        mn = {**self.m, "masses": [{**x, "plate_width_m": 14.5} if x["name"] == "proposed" else x for x in self.m["masses"]]}
+        lay = layout.solve(SITE, self.o, self.L, mn)
+        self.assertNotEqual(lay["plate"]["arrangement"], "point")
+        cores = [z for z in lay["floors"][1]["zones"] if z["block"] == "core"]
+        self.assertEqual([z.get("stairs") for z in cores], ["scissor"])
+        sw = layout.LAYOUT_ASSUMPTIONS["stair_width_m"][0]
+        self.assertGreaterEqual(cores[0]["w"] - sw + 1e-6, 9.0)
+        self.assertEqual(lay["egress"]["status"], "pass", lay["egress"]["summary"])
+        self.assertIn("along the corridor", lay["egress"]["summary"])
 
     def test_six_storeys_never_take_one_but_the_core_still_ends_the_dead_ends(self):
         m6 = {**self.m, "masses": [{**x, "storeys": 6} if x["name"] == "proposed" else x for x in self.m["masses"]]}

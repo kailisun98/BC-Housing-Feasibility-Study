@@ -1,0 +1,3135 @@
+{
+  "site_id": "375-glen-drive",
+  "option_id": "375-glen-drive-what-if-chf",
+  "as_of": "2026-11-17",
+  "stamp": "4227307d738e56fe",
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "edited": false,
+  "plate": {
+    "x": 18.05,
+    "y": 3.0,
+    "width_m": 38.5,
+    "depth_m": 18.8,
+    "storeys": 15,
+    "floor_to_floor_m": 3.05,
+    "double_loaded": true,
+    "unit_depth_m": 8.5,
+    "arrangement": "double"
+  },
+  "program": [
+    {
+      "key": "three_bed_plus",
+      "label": "Three-bedroom+",
+      "count": 5,
+      "net_m2_each": 94.6,
+      "gross_m2_each": 102.2,
+      "min_gross_m2_each": 92.9,
+      "area_m2": 511.0,
+      "source": "bch.design_guidelines.unit_areas",
+      "note": "5 × 94.6 m² net (86 m² minimum + 10%), 102.2 m² gross with partitions"
+    },
+    {
+      "key": "two_bed",
+      "label": "Two-bedroom",
+      "count": 30,
+      "net_m2_each": 73.7,
+      "gross_m2_each": 79.6,
+      "min_gross_m2_each": 72.4,
+      "area_m2": 2388.0,
+      "source": "bch.design_guidelines.unit_areas",
+      "note": "30 × 73.7 m² net (67 m² minimum + 10%), 79.6 m² gross with partitions"
+    },
+    {
+      "key": "one_bed",
+      "label": "One-bedroom",
+      "count": 39,
+      "net_m2_each": 53.9,
+      "gross_m2_each": 58.2,
+      "min_gross_m2_each": 52.9,
+      "area_m2": 2269.8,
+      "source": "bch.design_guidelines.unit_areas",
+      "note": "39 × 53.9 m² net (49 m² minimum + 10%), 58.2 m² gross with partitions"
+    },
+    {
+      "key": "studio",
+      "label": "Studio",
+      "count": 36,
+      "net_m2_each": 36.3,
+      "gross_m2_each": 39.2,
+      "min_gross_m2_each": 35.6,
+      "area_m2": 1411.2,
+      "source": "bch.design_guidelines.unit_areas",
+      "note": "36 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions"
+    },
+    {
+      "key": "amenity",
+      "label": "Amenity",
+      "count": 1,
+      "area_m2": 165.0,
+      "source": "placeholder",
+      "note": "1.5 m² per unit, at least 40 m²"
+    },
+    {
+      "key": "services",
+      "label": "Services, bicycles",
+      "count": 1,
+      "area_m2": 248.0,
+      "source": "placeholder",
+      "note": "40 m² services + 208 bicycle spaces × 1.0 m²"
+    }
+  ],
+  "parking": {
+    "spaces": 40,
+    "area_m2": 1200.0,
+    "where": "below grade, not on the plates",
+    "source": "placeholder"
+  },
+  "units_total": 110,
+  "units_placed": 110,
+  "adjacencies": [
+    {
+      "id": "non_residential_street",
+      "block": "non_residential",
+      "rule": "on the ground floor, facing the street",
+      "status": "info",
+      "note": "no non-residential space in the option"
+    },
+    {
+      "id": "amenity_entry",
+      "block": "amenity",
+      "rule": "on the ground floor, next to the entry",
+      "status": "pass",
+      "note": "on the ground floor beside the core, where the entry is"
+    },
+    {
+      "id": "services_lane",
+      "block": "services",
+      "rule": "on the ground floor, away from the street",
+      "status": "conditional",
+      "note": "on the ground floor but facing the street: the lane side has no room left beside the core"
+    },
+    {
+      "id": "core_centre",
+      "block": "core",
+      "rule": "at the centre of every floor, the corridor through it",
+      "status": "pass",
+      "note": "one core bay at the centre of every floor, the corridor through it, and an exit stair at each end of the corridor"
+    },
+    {
+      "id": "units_both_sides",
+      "block": "units",
+      "rule": "on both sides of the corridor, above whatever the ground floor gives to other uses",
+      "status": "pass",
+      "note": "units on both sides of the corridor"
+    },
+    {
+      "id": "family_low",
+      "block": "three_bed_plus",
+      "rule": "on the lowest residential floors",
+      "status": "pass",
+      "note": "three-bedroom units on levels 1 to 2"
+    },
+    {
+      "id": "accessible_core",
+      "block": "accessible",
+      "rule": "next to the core, on the lowest residential floor",
+      "status": "pass",
+      "note": "6 accessible units from the ground floor (1 there) to level 2, nearest the core"
+    }
+  ],
+  "geometry": [],
+  "egress": {
+    "rule_id": "bcbc.exits",
+    "sprinklered": true,
+    "sprinklered_is_placeholder": true,
+    "limits": {
+      "two_exits_over_floor_area_m2": 150.0,
+      "two_exits_over_occupant_load": 60.0,
+      "separation_min_m": 9.0,
+      "separation_share_of_diagonal": 0.5,
+      "travel_limit_m": 45.0,
+      "travel_limit_sprinklered_m": 45,
+      "travel_limit_unsprinklered_m": 30,
+      "dead_end_max_m": 6.0,
+      "occupant_load_persons_per_sleeping_room": 2.0,
+      "sleeping_rooms_by_unit": {
+        "studio": 1,
+        "one_bed": 1,
+        "two_bed": 2,
+        "three_bed_plus": 3
+      },
+      "stair_width_m": 2.2,
+      "core_bay_m": 7.0
+    },
+    "floors": [
+      {
+        "level": 0,
+        "name": "Ground floor",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.65,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "three_bed_plus",
+          "x": 39.54,
+          "y": 3.0,
+          "door": [
+            45.55,
+            11.5
+          ],
+          "exit": [
+            40.8,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 1,
+        "name": "Level 2",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 7.14,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "three_bed_plus",
+          "x": 42.1,
+          "y": 3.0,
+          "door": [
+            48.11,
+            11.5
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 2,
+        "name": "Level 3",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.58,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "two_bed",
+          "x": 20.25,
+          "y": 13.3,
+          "door": [
+            24.93,
+            13.3
+          ],
+          "exit": [
+            20.25,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 3,
+        "name": "Level 4",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.58,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "two_bed",
+          "x": 20.25,
+          "y": 13.3,
+          "door": [
+            24.93,
+            13.3
+          ],
+          "exit": [
+            20.25,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 4,
+        "name": "Level 5",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.58,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "two_bed",
+          "x": 20.25,
+          "y": 13.3,
+          "door": [
+            24.93,
+            13.3
+          ],
+          "exit": [
+            20.25,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 5,
+        "name": "Level 6",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.58,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "two_bed",
+          "x": 20.25,
+          "y": 13.3,
+          "door": [
+            24.93,
+            13.3
+          ],
+          "exit": [
+            20.25,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 6,
+        "name": "Level 7",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.58,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "two_bed",
+          "x": 20.25,
+          "y": 13.3,
+          "door": [
+            24.93,
+            13.3
+          ],
+          "exit": [
+            20.25,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 7,
+        "name": "Level 8",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 6.39,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "one_bed",
+          "x": 45.44,
+          "y": 3.0,
+          "door": [
+            48.86,
+            11.5
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 8,
+        "name": "Level 9",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 6.39,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "one_bed",
+          "x": 45.44,
+          "y": 3.0,
+          "door": [
+            48.86,
+            11.5
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 9,
+        "name": "Level 10",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 6.39,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "one_bed",
+          "x": 45.44,
+          "y": 3.0,
+          "door": [
+            48.86,
+            11.5
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 10,
+        "name": "Level 11",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 6.39,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "one_bed",
+          "x": 45.44,
+          "y": 3.0,
+          "door": [
+            48.86,
+            11.5
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 11,
+        "name": "Level 12",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 6.39,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "one_bed",
+          "x": 45.44,
+          "y": 3.0,
+          "door": [
+            48.86,
+            11.5
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 12,
+        "name": "Level 13",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 7.54,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 45.41,
+          "y": 13.3,
+          "door": [
+            47.71,
+            13.3
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 13,
+        "name": "Level 14",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 7.54,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 45.41,
+          "y": 13.3,
+          "door": [
+            47.71,
+            13.3
+          ],
+          "exit": [
+            54.35,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      },
+      {
+        "level": 14,
+        "name": "Level 15",
+        "exits": 4,
+        "exits_required": 2,
+        "separation_m": 36.3,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 5.62,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 22.66,
+          "y": 3.0,
+          "door": [
+            24.96,
+            11.5
+          ],
+          "exit": [
+            20.25,
+            12.4
+          ]
+        },
+        "dead_end_m": 0.0,
+        "dead_end_limit_m": 6.0,
+        "status": "pass",
+        "notes": []
+      }
+    ],
+    "status": "pass",
+    "scissor_stair": false,
+    "summary": "Egress (sprinklered, BCBC 2024 Part 3): pass; 15 floors: 15 pass; farthest travel 7.5 m, limit 45 m."
+  },
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground floor",
+      "z": 0.0,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "amenity",
+          "label": "Amenity",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 19.41,
+          "d": 8.5,
+          "area_m2": 165.0,
+          "side": "front"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 13.55,
+          "d": 8.5,
+          "area_m2": 115.2,
+          "side": "rear"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 13.55,
+          "d": 8.5,
+          "area_m2": 115.2,
+          "side": "rear"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 37.46,
+          "y": 3.0,
+          "w": 2.08,
+          "d": 8.5,
+          "area_m2": 17.7,
+          "side": "front"
+        },
+        {
+          "block": "three_bed_plus",
+          "label": "Three-bedroom+",
+          "x": 39.54,
+          "y": 3.0,
+          "w": 12.02,
+          "d": 8.5,
+          "area_m2": 102.2,
+          "side": "front",
+          "unit": "three_bed_plus",
+          "accessible": true
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 51.56,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 56.17,
+          "y": 3.0,
+          "w": 0.38,
+          "d": 8.5,
+          "area_m2": 3.2,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 3.2
+    },
+    {
+      "level": 1,
+      "name": "Level 2",
+      "z": 3.05,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "three_bed_plus",
+          "label": "Three-bedroom+",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 12.02,
+          "d": 8.5,
+          "area_m2": 102.2,
+          "side": "front",
+          "unit": "three_bed_plus",
+          "accessible": true
+        },
+        {
+          "block": "three_bed_plus",
+          "label": "Three-bedroom+",
+          "x": 30.07,
+          "y": 3.0,
+          "w": 12.02,
+          "d": 8.5,
+          "area_m2": 102.2,
+          "side": "front",
+          "unit": "three_bed_plus",
+          "accessible": true
+        },
+        {
+          "block": "three_bed_plus",
+          "label": "Three-bedroom+",
+          "x": 42.1,
+          "y": 3.0,
+          "w": 12.02,
+          "d": 8.5,
+          "area_m2": 102.2,
+          "side": "front",
+          "unit": "three_bed_plus",
+          "accessible": true
+        },
+        {
+          "block": "three_bed_plus",
+          "label": "Three-bedroom+",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 12.02,
+          "d": 8.5,
+          "area_m2": 102.2,
+          "side": "rear",
+          "unit": "three_bed_plus",
+          "accessible": true
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": true
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 54.12,
+          "y": 3.0,
+          "w": 2.43,
+          "d": 8.5,
+          "area_m2": 20.7,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 32.27,
+          "y": 13.3,
+          "w": 1.53,
+          "d": 8.5,
+          "area_m2": 13.0,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.16,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 69.2
+    },
+    {
+      "level": 2,
+      "name": "Level 3",
+      "z": 6.1,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 27.41,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 36.78,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 46.14,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 55.51,
+          "y": 3.0,
+          "w": 1.04,
+          "d": 8.5,
+          "area_m2": 8.9,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.61,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.16,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 80.0
+    },
+    {
+      "level": 3,
+      "name": "Level 4",
+      "z": 9.15,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 27.41,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 36.78,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 46.14,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 55.51,
+          "y": 3.0,
+          "w": 1.04,
+          "d": 8.5,
+          "area_m2": 8.9,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.61,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.16,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 80.0
+    },
+    {
+      "level": 4,
+      "name": "Level 5",
+      "z": 12.2,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 27.41,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 36.78,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 46.14,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 55.51,
+          "y": 3.0,
+          "w": 1.04,
+          "d": 8.5,
+          "area_m2": 8.9,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.61,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.16,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 80.0
+    },
+    {
+      "level": 5,
+      "name": "Level 6",
+      "z": 15.25,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 27.41,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 36.78,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 46.14,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 55.51,
+          "y": 3.0,
+          "w": 1.04,
+          "d": 8.5,
+          "area_m2": 8.9,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.61,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.16,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 80.0
+    },
+    {
+      "level": 6,
+      "name": "Level 7",
+      "z": 18.3,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 27.41,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 36.78,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 46.14,
+          "y": 3.0,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "front",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "two_bed",
+          "label": "Two-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 9.36,
+          "d": 8.5,
+          "area_m2": 79.6,
+          "side": "rear",
+          "unit": "two_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.65,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 55.51,
+          "y": 3.0,
+          "w": 1.04,
+          "d": 8.5,
+          "area_m2": 8.9,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.61,
+          "y": 13.3,
+          "w": 4.19,
+          "d": 8.5,
+          "area_m2": 35.6,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.26,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 62.2
+    },
+    {
+      "level": 7,
+      "name": "Level 8",
+      "z": 21.35,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 24.9,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 31.74,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 38.59,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 45.44,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.1,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.65,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.29,
+          "y": 3.0,
+          "w": 4.26,
+          "d": 8.5,
+          "area_m2": 36.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 31.71,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.26,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 71.8
+    },
+    {
+      "level": 8,
+      "name": "Level 9",
+      "z": 24.4,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 24.9,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 31.74,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 38.59,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 45.44,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.1,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.65,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.29,
+          "y": 3.0,
+          "w": 4.26,
+          "d": 8.5,
+          "area_m2": 36.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 31.71,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.26,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 71.8
+    },
+    {
+      "level": 9,
+      "name": "Level 10",
+      "z": 27.45,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 24.9,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 31.74,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 38.59,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 45.44,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.1,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.65,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.29,
+          "y": 3.0,
+          "w": 4.26,
+          "d": 8.5,
+          "area_m2": 36.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 31.71,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.26,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 71.8
+    },
+    {
+      "level": 10,
+      "name": "Level 11",
+      "z": 30.5,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 24.9,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 31.74,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 38.59,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 45.44,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.1,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.65,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.29,
+          "y": 3.0,
+          "w": 4.26,
+          "d": 8.5,
+          "area_m2": 36.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 31.71,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.26,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 71.8
+    },
+    {
+      "level": 11,
+      "name": "Level 12",
+      "z": 33.55,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 24.9,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 31.74,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 38.59,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 45.44,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "rear",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.1,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.65,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.29,
+          "y": 3.0,
+          "w": 4.26,
+          "d": 8.5,
+          "area_m2": 36.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 31.71,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.26,
+          "y": 13.3,
+          "w": 2.09,
+          "d": 8.5,
+          "area_m2": 17.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 71.8
+    },
+    {
+      "level": 12,
+      "name": "Level 13",
+      "z": 36.6,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 24.9,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "one_bed",
+          "label": "One-bedroom",
+          "x": 31.74,
+          "y": 3.0,
+          "w": 6.85,
+          "d": 8.5,
+          "area_m2": 58.2,
+          "side": "front",
+          "unit": "one_bed",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 38.59,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 43.2,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 47.81,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 24.86,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 45.41,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 52.43,
+          "y": 3.0,
+          "w": 4.12,
+          "d": 8.5,
+          "area_m2": 35.0,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.47,
+          "y": 13.3,
+          "w": 4.33,
+          "d": 8.5,
+          "area_m2": 36.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.02,
+          "y": 13.3,
+          "w": 4.33,
+          "d": 8.5,
+          "area_m2": 36.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 108.6
+    },
+    {
+      "level": 13,
+      "name": "Level 14",
+      "z": 39.65,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 22.66,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.27,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 31.89,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 36.5,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 41.11,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 45.72,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 50.33,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 24.86,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 45.41,
+          "y": 13.3,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 54.94,
+          "y": 3.0,
+          "w": 1.61,
+          "d": 8.5,
+          "area_m2": 13.6,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.47,
+          "y": 13.3,
+          "w": 4.33,
+          "d": 8.5,
+          "area_m2": 36.8,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 50.02,
+          "y": 13.3,
+          "w": 4.33,
+          "d": 8.5,
+          "area_m2": 36.8,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 87.2
+    },
+    {
+      "level": 14,
+      "name": "Level 15",
+      "z": 42.7,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 33.8,
+          "y": 11.5,
+          "w": 7.0,
+          "d": 10.3,
+          "area_m2": 72.1
+        },
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 54.35,
+          "y": 11.5,
+          "w": 2.2,
+          "d": 10.3,
+          "area_m2": 22.7
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.05,
+          "y": 11.5,
+          "w": 38.5,
+          "d": 1.8,
+          "area_m2": 69.3,
+          "through": "core"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 22.66,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 27.27,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 31.89,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 36.5,
+          "y": 3.0,
+          "w": 4.61,
+          "d": 8.5,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 41.11,
+          "y": 3.0,
+          "w": 15.44,
+          "d": 8.5,
+          "area_m2": 131.2,
+          "side": "front"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 20.25,
+          "y": 13.3,
+          "w": 13.55,
+          "d": 8.5,
+          "area_m2": 115.2,
+          "side": "rear"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 40.8,
+          "y": 13.3,
+          "w": 13.55,
+          "d": 8.5,
+          "area_m2": 115.2,
+          "side": "rear"
+        }
+      ],
+      "spare_m2": 361.6
+    }
+  ],
+  "shortfall": [],
+  "outright": {
+    "fsr": 6.9,
+    "height_m": 51.0,
+    "rule_ids": [
+      "cov.cd1_819.outright_fsr",
+      "cov.cd1_819.outright_height"
+    ]
+  },
+  "capacity": {
+    "site_area_m2": 2134.4,
+    "storeys": 15,
+    "plate_m2": 723.8,
+    "gfa_m2": 10857.0,
+    "fsr": 5.087,
+    "fsr_limit": 6.9,
+    "limit_from": "the district schedule's outright maximum",
+    "rule_id": "cov.cd1_819.outright_fsr",
+    "room_m2": 3870.4,
+    "levels_room": 5,
+    "fsr_with_one_more": 5.426
+  },
+  "totals": {
+    "plates_m2": 10857.0,
+    "used_m2": 9795.1,
+    "spare_m2": 1061.9,
+    "gfa_m2": 10857.0
+  },
+  "assumptions": [
+    {
+      "key": "partition_allowance",
+      "value": 1.08,
+      "note": "gross unit area over net: walls and the entry, 8% at this stage (the net areas already carry the suggestion's 10% design allowance)"
+    },
+    {
+      "key": "corridor_width_m",
+      "value": 1.8,
+      "note": "a double-loaded corridor, the wider of the two usual widths"
+    },
+    {
+      "key": "core_bay_m",
+      "value": 7.0,
+      "note": "one bay across the plate at its centre for two stairs, the elevator and risers"
+    },
+    {
+      "key": "services_base_m2",
+      "value": 40.0,
+      "note": "mechanical, electrical, garbage and recycling on the ground floor"
+    },
+    {
+      "key": "bicycle_m2_per_space",
+      "value": 1.0,
+      "note": "a bicycle space with its aisle share"
+    },
+    {
+      "key": "amenity_m2_per_unit",
+      "value": 1.5,
+      "note": "indoor amenity, at least 40 m²; a placeholder until the operator's brief"
+    },
+    {
+      "key": "parking_m2_per_space",
+      "value": 30.0,
+      "note": "a below-grade stall with its aisle share; not on the plates"
+    },
+    {
+      "key": "window_width_m",
+      "value": 1.5,
+      "note": "one window per unit on the elevation, the unit module as the rhythm"
+    },
+    {
+      "key": "stair_width_m",
+      "value": 2.2,
+      "note": "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"
+    },
+    {
+      "key": "min_home_depth_m",
+      "value": 4.0,
+      "note": "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"
+    }
+  ],
+  "warnings": [
+    "Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.",
+    "The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site."
+  ],
+  "derived_from": [
+    "option.units",
+    "option.non_residential_gfa_m2",
+    "option.accessible_units",
+    "option.bicycle_spaces",
+    "massing.masses[proposed]",
+    "bch.design_guidelines.unit_areas"
+  ]
+}

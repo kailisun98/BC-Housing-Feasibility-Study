@@ -1,0 +1,58 @@
+{
+  "id": "375-glen-drive-what-if-chf",
+  "name": "375 Glen Drive, what-if (hypothetical): the 110 social homes alone on a 38.5 × 18.8 m plate, rents at the Community Housing Fund's 30/50/20",
+  "proponent": "BC Housing with the Vancouver Aboriginal Friendship Centre Society, on City land",
+  "proponent_type": "non_profit_society",
+  "developer_partner": true,
+  "tenure": "social_housing",
+  "rezoning_path": "CD-1 (819) as enacted; a smaller building inside it",
+  "storeys": 15,
+  "height_m": 45.75,
+  "gfa_m2": 10857.0,
+  "residential_gfa_m2": null,
+  "non_residential_gfa_m2": null,
+  "units": {
+    "studio": 36,
+    "one_bed": 39,
+    "two_bed": 30,
+    "three_bed_plus": 5
+  },
+  "rent_tiers_units": {
+    "market": 33,
+    "rgi": 55,
+    "deep_subsidy": 22
+  },
+  "share_below_hils": 0.7,
+  "max_rent_share_of_income": 0.3,
+  "owner_type_at_completion": "province",
+  "housing_agreement_years": 99,
+  "accessible_units": 6,
+  "below_market_unit_share": null,
+  "below_market_discount": null,
+  "site_control": "council_resolution",
+  "parking_spaces": 40,
+  "bicycle_spaces": 208,
+  "replacement_trees_proposed": 36,
+  "target_programs": [
+    "bch.chf.eligibility"
+  ],
+  "floor_to_floor_m": 3.05,
+  "setbacks_m": {
+    "front": 3.0,
+    "rear": 3.0,
+    "side": 3.0
+  },
+  "notes": "Hypothetical, written on 17 Nov 2026 to answer two questions; none of it is BC Housing's or the City's. (1) What would fit a funder? The 110 social housing homes of the referred scheme alone (the 85 social homes 15/35/30/5 and the 25 supportive homes, 21 studios and 4 one-bedrooms), without the 53 market rentals, with the rents re-split to the Community Housing Fund's mix: 33 market, 55 rent geared to income, 22 deep subsidy (the referred scheme has a third of the social homes at each level). 6 accessible homes (5% of 110) and the 99-year nominal ground lease are entered so the fund's other criteria can be read. (2) What plate is realistic? A plate study on this lot, run through the engine: fronted on Glen Drive the setbacks leave a box 30 m wide, where a bar 18.8 m deep places only 70 of the 110 homes on 15 floors; fronted on E Hastings St the box is 38.5 × 30.5 m. There, at the same 38.5 m width: 16.8 m deep (homes 7.5 m deep) needs 16 storeys; 17.8 m (8.0 m) 16; 18.8 m (8.5 m) 15; 19.8 m (9.0 m) 13; 20.8 m (9.5 m) 12. The option takes 38.5 × 18.8 m, 724 m² a floor, because the referral report gives the lane-facing wing's floorplate as about 7,700 to 7,850 sq ft (715 to 730 m²) and 15 storeys: homes 8.5 m deep either side of a 1.8 m corridor, a studio about 4.6 m wide, a one-bedroom 6.8 m, a two-bedroom 9.4 m, a three-bedroom 12.0 m. Placeholders: 40 vehicle and 208 bicycle spaces (the referred 59 and 308 scaled by 110 of 163); the setbacks; 3.05 m floor to floor; no shelter or day centre floors (the real wing carries them on its lower levels, so its 110 homes sit on fewer floors than here); the unit areas are BC Housing's minimums plus the tool's allowances.",
+  "sources": [
+    {
+      "title": "Derived by hand from the option as referred, for demonstration; the floorplate figure is from the referral report (5 Jan 2021), Form of Development",
+      "url": "https://council.vancouver.ca/20210119/documents/rr5.pdf"
+    }
+  ],
+  "land_tenure_plan": "99-year ground lease at a nominal rate from the City to BC Housing (conditionally approved by Council in 2017)",
+  "supportive_units": 25,
+  "massing": {
+    "width_m": 38.5,
+    "depth_m": 18.8
+  }
+}

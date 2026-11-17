@@ -1,10 +1,47 @@
 {
   "previous_stamp": "8a8459a0c650a9c2",
-  "current_stamp": "5bf5b7f5123bd0a3",
+  "current_stamp": "4227307d738e56fe",
   "previous_as_of": "2026-11-17",
   "current_as_of": "2026-11-17",
   "rules_changed": true,
   "changes": [
+    {
+      "rule_id": "bc.bcbuilds.eligibility",
+      "change": "finding_changed",
+      "from": "uncertain",
+      "to": "uncertain",
+      "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter."
+    },
+    {
+      "rule_id": "bc.toa.minimum_density",
+      "change": "changed",
+      "from": "not_applicable",
+      "to": "not_applicable",
+      "from_version": "2024-06-30",
+      "to_version": "2026-11-17",
+      "finding": "The site is outside the transit-oriented areas; no provincial minimum height applies."
+    },
+    {
+      "rule_id": "bcbc.exits",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "two exits over floor area: 150 m²; two exits over occupant load: 60; separation minimum: 9 m; separation share of diagonal: 50%; travel limit sprinklered: 45 m; travel limit unsprinklered: 30 m; dead end maximum: 6 m; occupant load persons per sleeping room: 2."
+    },
+    {
+      "rule_id": "bch.pdf.predevelopment_loan",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "maximum loan: $250,000; eligible costs: due diligence, feasibility and design."
+    },
+    {
+      "rule_id": "cmhc.ahf.readiness",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist."
+    },
     {
       "rule_id": "cov.c2.outright_fsr",
       "change": "added",
@@ -153,6 +190,13 @@
       "from_version": "2026-10-27",
       "to_version": "2026-10-27",
       "finding": "The site is inside the Downtown Eastside Plan area, whose own family-unit target applies in place of the city-wide one."
+    },
+    {
+      "rule_id": "cov.parking_minimums",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 59 vehicle and 308 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage."
     },
     {
       "rule_id": "cov.r1_1.outright_fsr",

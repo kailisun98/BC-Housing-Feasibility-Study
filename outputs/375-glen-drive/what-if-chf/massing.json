@@ -1,0 +1,222 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "375-glen-drive",
+  "option_id": "375-glen-drive-what-if-chf",
+  "as_of": "2026-11-17",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        15.82,
+        0.0
+      ],
+      [
+        60.25,
+        0.0
+      ],
+      [
+        59.73,
+        36.99
+      ],
+      [
+        0.0,
+        36.99
+      ]
+    ],
+    "frontage_m": 60.25,
+    "depth_m": 36.99,
+    "area_m2": 2134.4,
+    "street_side": "y = 0",
+    "front_face": {
+      "street": "E Hastings St"
+    },
+    "orientation": {
+      "rotate_deg": 91.044439,
+      "tx": 60.504,
+      "ty": -2.176
+    },
+    "front_edge": 0,
+    "corners": [
+      [
+        15.82,
+        0.0
+      ],
+      [
+        60.25,
+        0.0
+      ],
+      [
+        59.73,
+        36.99
+      ],
+      [
+        0.0,
+        36.99
+      ]
+    ],
+    "bbox": [
+      0.0,
+      0.0,
+      60.25,
+      36.99
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 1926.4,
+    "shape": {
+      "class": "trapezoid",
+      "note": "Four sides but not square-cornered (86% of its 60.2 x 37.0 m bounding rectangle), 1,926 m2.",
+      "rectangularity": 0.864,
+      "vertices": 4,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in); turned so lot edge 0 is the front (front_face {'street': 'E Hastings St'})"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        17.8,
+        3.0
+      ],
+      [
+        57.21,
+        3.0
+      ],
+      [
+        56.77,
+        33.99
+      ],
+      [
+        4.55,
+        33.99
+      ]
+    ],
+    "width_m": 38.5,
+    "depth_m": 30.5,
+    "area_m2": 1419.8,
+    "setbacks_m": {
+      "front": 3.0,
+      "rear": 3.0,
+      "side": 3.0
+    },
+    "box": {
+      "x": 18.05,
+      "y": 3.0,
+      "w": 38.5,
+      "d": 30.5,
+      "area_m2": 1174.2
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 15 storeys, FSR 5.09",
+      "footprint": [
+        [
+          18.05,
+          3.0
+        ],
+        [
+          56.55,
+          3.0
+        ],
+        [
+          56.55,
+          21.8
+        ],
+        [
+          18.05,
+          21.8
+        ]
+      ],
+      "plate_width_m": 38.5,
+      "plate_depth_m": 18.8,
+      "at_street_corner": "right",
+      "base_z": 0.0,
+      "height_m": 45.75,
+      "storeys": 15,
+      "floor_to_floor_m": 3.05,
+      "plate_area_m2": 723.8,
+      "gfa_m2": 10857.0,
+      "fsr": 5.087,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m",
+        "option.massing.width_m",
+        "option.massing.depth_m",
+        "option.massing",
+        "site.front_face"
+      ],
+      "placement": {
+        "anchor": "front-right",
+        "dx_m": 0.0,
+        "dy_m": 0.0,
+        "rotate": false,
+        "clamped": false,
+        "box": {
+          "x": 18.05,
+          "y": 3.0,
+          "w": 38.5,
+          "d": 30.5
+        }
+      }
+    },
+    {
+      "name": "outright",
+      "label": "Outright: FSR 6.9, 51.0 m",
+      "footprint": [
+        [
+          18.05,
+          3.0
+        ],
+        [
+          56.55,
+          3.0
+        ],
+        [
+          56.55,
+          26.908
+        ],
+        [
+          18.05,
+          26.908
+        ]
+      ],
+      "plate_width_m": 38.5,
+      "plate_depth_m": 23.91,
+      "at_street_corner": "right",
+      "base_z": 0.0,
+      "height_m": 48.8,
+      "storeys": 16,
+      "floor_to_floor_m": 3.05,
+      "plate_area_m2": 920.5,
+      "gfa_m2": 14727.4,
+      "fsr": 6.9,
+      "derived_from": [
+        "cov.cd1_819.outright_fsr",
+        "cov.cd1_819.outright_height",
+        "option.setbacks_m",
+        "option.floor_to_floor_m",
+        "site.front_face"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 12,
+    "after": 36,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.",
+    "The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site."
+  ],
+  "outright_height_limit_m": 51.0
+}

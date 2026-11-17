@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="609" viewBox="0 0 640 609" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Code site plan">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>
+<polygon points="177.8,305.3 458.0,305.3 454.7,72.0 78.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5"/>
+<polygon points="190.3,286.4 438.8,286.4 436.1,90.9 106.7,90.9" fill="none" stroke="#c81e1e" stroke-width="1.2" stroke-dasharray="6 4"/>
+<rect x="191.8" y="94.0" width="242.8" height="192.4" fill="none" stroke="#c81e1e" stroke-width="0.8" stroke-dasharray="2 2"/>
+<polygon points="191.8,286.4 434.7,286.4 434.7,167.8 191.8,167.8" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
+<text x="197.8" y="181.8" font-size="10" fill="#1f2933">38.5 × 18.8 m, 15 storeys</text>
+<text x="78" y="321.3" font-size="11" fill="#5f6672">lot polygon 1,926 m² (trapezoid) · dashed red: setback envelope, dotted: plate box 38.5 × 30.5 m · blue: footprint</text>
+<text x="48" y="353.29792531120336" font-size="12" font-weight="600">What the plan checker reads</text>
+<line x1="48" y1="380.29792531120336" x2="571.3" y2="380.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="375.29792531120336" font-size="11" fill="#5f6672">Site area</text>
+<text x="171.1" y="375.29792531120336" font-size="11">2,134.4 m²</text>
+<text x="313.1" y="375.29792531120336" font-size="11" fill="#5f6672"></text>
+<line x1="48" y1="398.29792531120336" x2="571.3" y2="398.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="393.29792531120336" font-size="11" fill="#5f6672">Floor space ratio</text>
+<text x="171.1" y="393.29792531120336" font-size="11">5.09 (10,857 m²)</text>
+<text x="313.1" y="393.29792531120336" font-size="11" fill="#5f6672">6.9 outright</text>
+<text x="543.3" y="393.29792531120336" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
+<line x1="48" y1="416.29792531120336" x2="571.3" y2="416.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="411.29792531120336" font-size="11" fill="#5f6672">Height</text>
+<text x="171.1" y="411.29792531120336" font-size="11">45.75 m, 15 storeys</text>
+<text x="313.1" y="411.29792531120336" font-size="11" fill="#5f6672">51.0 m outright</text>
+<text x="543.3" y="411.29792531120336" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
+<line x1="48" y1="434.29792531120336" x2="571.3" y2="434.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="429.29792531120336" font-size="11" fill="#5f6672">Site coverage</text>
+<text x="171.1" y="429.29792531120336" font-size="11">34% (724 m²)</text>
+<text x="313.1" y="429.29792531120336" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="543.3" y="429.29792531120336" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="452.29792531120336" x2="571.3" y2="452.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="447.29792531120336" font-size="11" fill="#5f6672">Front yard</text>
+<text x="171.1" y="447.29792531120336" font-size="11">3.0 m</text>
+<text x="313.1" y="447.29792531120336" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="543.3" y="447.29792531120336" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="470.29792531120336" x2="571.3" y2="470.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="465.29792531120336" font-size="11" fill="#5f6672">Rear yard</text>
+<text x="171.1" y="465.29792531120336" font-size="11">3.0 m</text>
+<text x="313.1" y="465.29792531120336" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="543.3" y="465.29792531120336" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="488.29792531120336" x2="571.3" y2="488.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="483.29792531120336" font-size="11" fill="#5f6672">Side yard</text>
+<text x="171.1" y="483.29792531120336" font-size="11">3.0 m</text>
+<text x="313.1" y="483.29792531120336" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="543.3" y="483.29792531120336" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="506.29792531120336" x2="571.3" y2="506.29792531120336" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="501.29792531120336" font-size="11" fill="#5f6672">Trees</text>
+<text x="171.1" y="501.29792531120336" font-size="11">36 after development</text>
+<text x="313.1" y="501.29792531120336" font-size="11" fill="#5f6672">Schedule C requires 12</text>
+<text x="543.3" y="501.29792531120336" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
+<text x="48" y="533.2979253112034" font-size="11" font-weight="600">Allowed outright: yes; by rezoning: not yet confirmed</text>
+<text x="48" y="549.2979253112034" font-size="11">Path: CD-1 (819) as enacted; a smaller building inside it</text>
+<text x="48.0" y="593.3" fill="#1f2933">Rules as of 2026-11-17 · drawn from the option and the massing, not a design</text>
+</svg>

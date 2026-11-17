@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-11-17",
-      "rules_hash": "4ea4d9682e172983c8a931edbd4bff345f834f1ec1ea3c1c43ef59c10fa099d2",
+      "rules_hash": "280b574d21bda783a480a372f034f9efbef4e7ac704b1c2c1dd79c010850ff8c",
       "rules_files": {
         "a_zoning_district.json": "bc89fd02e4bd0a63bd28788c71a42b80e692ba1949ef6d4f69c874579e4615e5",
-        "b_provincial.json": "0fede33e5d62b1bd85ea63435ef0012ef3c0772df8c0192d1e74b8a29f807cb8",
+        "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
         "d_design_standards.json": "666cc2f2cc4405706d3b103715cdf6bef2812ac674e4eaa29ff088d00f2b0b85",
         "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb",
         "f_assumptions.json": "942a6dbab04d93fca08a7cb84f3af5ce4d95eb22ba165262176185aac691ae26"
       },
-      "stamp": "5bf5b7f5123bd0a3",
+      "stamp": "4227307d738e56fe",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -461,9 +461,9 @@
         {
           "rule_id": "bc.toa.minimum_density",
           "layer": "B",
-          "version_effective_from": "2024-06-30",
+          "version_effective_from": "2026-11-17",
           "version_effective_to": null,
-          "source_url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx"
+          "source_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-18_tod-area-overview.pdf"
         },
         {
           "rule_id": "cov.family_units",
@@ -1091,7 +1091,7 @@
       "version_effective_from": "2024-06-26",
       "version_effective_to": null,
       "status": "info",
-      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 59 vehicle and 308 bicycle spaces, which are set by the Parking By-law at the development permit stage.",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 59 vehicle and 308 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage.",
       "values": {
         "parking_spaces": 59,
         "bicycle_spaces": 308
@@ -2069,13 +2069,14 @@
       "jurisdiction": "Province of British Columbia",
       "check": "toa_status",
       "source": {
-        "title": "Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024",
-        "url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx",
-        "section": "Bill 47; Local Government Act transit-oriented areas; Vancouver Charter amendments",
-        "webinar_url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf",
-        "verify": "Tier storey figures are the Province's SkyTrain-station tiers as commonly reported; confirm against the Transit-Oriented Areas Designation Regulation before the user sessions."
+        "title": "Province of BC, Transit-Oriented Development Areas overview webinar (18 Jan 2024); Vancouver Transit-Oriented Areas Regulation, B.C. Reg. 265/2023",
+        "url": "https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-18_tod-area-overview.pdf",
+        "section": "Minimum allowable density and height by tier; bus exchanges tiers 4 and 5",
+        "regulation_url": "https://free.bcpublications.ca/civix/document/id/crbc/crbc/265_2023",
+        "verified": false,
+        "verify": "Tiers 4 and 5 (bus exchanges: 12 storeys and 4.0 FSR within 200 m, 8 storeys and 3.0 FSR within 400 m) are as the Province's overview and the City of Vancouver's TOA guidance give them; the regulation's own schedule was not read (its PDF text could not be extracted). Confirm against B.C. Reg. 265/2023 before relying on them."
       },
-      "version_effective_from": "2024-06-30",
+      "version_effective_from": "2026-11-17",
       "version_effective_to": null,
       "status": "not_applicable",
       "finding": "The site is outside the transit-oriented areas; no provincial minimum height applies.",
@@ -2268,7 +2269,7 @@
       "version_effective_from": "2025-03-10",
       "version_effective_to": null,
       "status": "info",
-      "finding": "two exits over floor area m2: 150; two exits over occupant load: 60; separation min m: 9; separation share of diagonal: 0.5; travel limit sprinklered m: 45; travel limit unsprinklered m: 30; dead end max m: 6; occupant load persons per sleeping room: 2.",
+      "finding": "two exits over floor area: 150 m²; two exits over occupant load: 60; separation minimum: 9 m; separation share of diagonal: 50%; travel limit sprinklered: 45 m; travel limit unsprinklered: 30 m; dead end maximum: 6 m; occupant load persons per sleeping room: 2.",
       "values": {
         "two_exits_over_floor_area_m2": 150,
         "two_exits_over_occupant_load": 60,
@@ -2330,7 +2331,7 @@
       "version_effective_from": "2024-02-13",
       "version_effective_to": null,
       "status": "uncertain",
-      "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter.",
+      "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
       "values": {
         "fails": [],
         "unknown": [
@@ -2409,7 +2410,7 @@
       "version_effective_from": "2025-01-01",
       "version_effective_to": null,
       "status": "info",
-      "finding": "max loan cad: 250000; eligible costs: due diligence, feasibility and design.",
+      "finding": "maximum loan: $250,000; eligible costs: due diligence, feasibility and design.",
       "values": {
         "max_loan_cad": 250000,
         "eligible_costs": "due diligence, feasibility and design"
@@ -2431,7 +2432,7 @@
       "version_effective_from": "2024-03-13",
       "version_effective_to": null,
       "status": "info",
-      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding.",
+      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist.",
       "values": {
         "construction_start_months_after_approval": 6,
         "intake": "continuous",
@@ -2707,7 +2708,7 @@
           "rule_id": "bc.bcbuilds.eligibility",
           "title": "BC Builds: eligibility and below-market requirement",
           "status": "uncertain",
-          "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter.",
+          "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
           "action": "Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices."
         },
         {
@@ -2747,7 +2748,7 @@
           "name": "Glen Drive"
         }
       },
-      "notes": "Found by First Read on the address '375 Glen Drive': the City's property address '375 Glen Drive, Vancouver, BC (City of Vancouver property address, Strathcona)'. Zoning district CD-1 (819) (CD-1 by-law 819) from the City's zoning districts dataset at that point. A CD-1 district has no general schedule: its limits are in CD-1 by-law No. 819. Lot area 1,941.7 m² from the parcel polygon (4 vertices, not a rectangle: the frontage and depth are an equivalent rectangle with the same area); frontage taken as the side along Glen Drive from OpenStreetMap, 36.2 m away. A corner lot: E Hastings St also runs beside it, 33.3 m from the centre. The frontage is taken on Glen Drive (34.6 m); the front could instead be the 56.1 m side on E Hastings St Confirm which side is the front: it sets the yards, the envelope and the massing. Four sides but not square-cornered (86% of its 60.4 x 37.2 m bounding rectangle), 1,942 m2. The massing uses the polygon itself: the setback envelope follows the lot lines and the plate is the largest rectangle inside it. Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'. Answers added by hand for the 17 Nov 2026 demonstration: owner City of Vancouver (Daily Hive, 17 Feb 2021); not a former Community Vision area (the site is inside the Downtown Eastside Plan area; confirm on the City's map); transit-oriented area No (no SkyTrain station within 800 m; confirm on the City's TOA map); frequent bus stop Yes (E Hastings St; confirm against TransLink's frequent transit network). Site area set by hand to 2,134.4 m2: the draft CD-1 by-law (s.5.1) says the floor space ratio must be computed on the site as it was at the rezoning application, before any dedications. The City's parcel today is 1,941.7 m2, the figure the lookup found; the referral report requires a 5 m dedication to CN Rail along the western property line, which accounts for the difference. The parcel polygon is today's, so the massing warns that it is smaller than the recorded area. The report gives the lot as about 50 m on Hastings St and 37 m on Glen Drive, with no trees on the site or the street, and Hastings St as Frequent Transit Network. area_plan set by hand to downtown_eastside: the referral report places the site in the Hastings East sub-area of the Downtown Eastside Plan.",
+      "notes": "Found by First Read on the address '375 Glen Drive': the City's property address '375 Glen Drive, Vancouver, BC (City of Vancouver property address, Strathcona)'. Zoning district CD-1 (819) (CD-1 by-law 819) from the City's zoning districts dataset at that point. A CD-1 district has no general schedule: its limits are in CD-1 by-law No. 819. Lot area 1,941.7 m² from the parcel polygon (4 vertices, not a rectangle: the frontage and depth are an equivalent rectangle with the same area); frontage taken as the side along Glen Drive from OpenStreetMap, 36.2 m away. A corner lot: E Hastings St also runs beside it, 33.3 m from the centre. The frontage is taken on Glen Drive (34.6 m); the front could instead be the 56.1 m side on E Hastings St Confirm which side is the front: it sets the yards, the envelope and the massing. Four sides but not square-cornered (86% of its 60.4 x 37.2 m bounding rectangle), 1,942 m2. The massing uses the polygon itself: the setback envelope follows the lot lines and the plate is the largest rectangle inside it. Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'. Answers added by hand for the 17 Nov 2026 demonstration: owner City of Vancouver (Daily Hive, 17 Feb 2021); not a former Community Vision area (the site is inside the Downtown Eastside Plan area; confirm on the City's map); transit-oriented area No (no SkyTrain station within 800 m; confirm on the City's TOA map); frequent bus stop Yes (E Hastings St; confirm against TransLink's frequent transit network). Site area set by hand to 2,134.4 m2: the draft CD-1 by-law (s.5.1) says the floor space ratio must be computed on the site as it was at the rezoning application, before any dedications. The City's parcel today is 1,941.7 m2, the figure the lookup found; the referral report requires a 5 m dedication to CN Rail along the western property line, which accounts for the difference. The parcel polygon is today's, so the massing warns that it is smaller than the recorded area. The report gives the lot as about 50 m on Hastings St and 37 m on Glen Drive, with no trees on the site or the street, and Hastings St as Frequent Transit Network. area_plan set by hand to downtown_eastside: the referral report places the site in the Hastings East sub-area of the Downtown Eastside Plan. front_face set by hand to E Hastings St (17 Nov 2026): the referral report gives the lot as about 50 m on Hastings St and 37 m on Glen Drive, the rezoning address is 1015 East Hastings St, and the social housing wing and the shelter are entered from Hastings; fronted on Glen Drive the setbacks leave a plate box only 30 m wide, too short for a double-loaded bar.",
       "parcel": {
         "polygon_lonlat": [
           [
@@ -4716,7 +4717,10 @@
         "query": "City of Vancouver Open Data within 120 m: 19 streets, 39 buildings, 29 trees"
       },
       "keep_existing_buildings": false,
-      "area_plan": "downtown_eastside"
+      "area_plan": "downtown_eastside",
+      "front_face": {
+        "street": "E Hastings St"
+      }
     },
     "option": {
       "id": "375-glen-drive-as-proposed",

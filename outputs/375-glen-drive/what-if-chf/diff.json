@@ -1,0 +1,53 @@
+{
+  "previous_stamp": "4227307d738e56fe",
+  "current_stamp": "4227307d738e56fe",
+  "previous_as_of": "2026-11-17",
+  "current_as_of": "2026-11-17",
+  "rules_changed": false,
+  "changes": [
+    {
+      "rule_id": "bch.chf.eligibility",
+      "change": "changed",
+      "from": "fail",
+      "to": "pass",
+      "from_version": "2025-05-30",
+      "to_version": "2025-05-30",
+      "finding": "Community Housing Fund: fits the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award; program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)."
+    },
+    {
+      "rule_id": "cov.cd1_819.outright_fsr",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "FSR 5.09 (10,857 m² over 2,134.4 m², the site area the by-law fixes for its FSR) is within the outright maximum of 6.9."
+    },
+    {
+      "rule_id": "cov.cd1_819.outright_height",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "Height 45.75 m is within the outright maximum of 51.0 m."
+    },
+    {
+      "rule_id": "cov.dtes.family_units",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "35 of 85 units (41.2%) have two or more bedrooms, against a 25.0% minimum; the 25 supportive homes are left out of the count, as the plan allows (35 of all 110 is 31.8%)."
+    },
+    {
+      "rule_id": "cov.parking_minimums",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 40 vehicle and 208 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage."
+    },
+    {
+      "rule_id": "cov.social_housing_definition",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "Meets the City's social housing definition: 70.0% of units for households below HILs (minimum 30.0%), owned by a province, secured for 99 years."
+    }
+  ]
+}

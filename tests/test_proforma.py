@@ -112,6 +112,16 @@ class Verdicts(unittest.TestCase):
         if pf["gap"]["value"] > pf["capital"]["total"] * proforma.GAP_UNLIKELY_SHARE:
             self.assertEqual(pf["verdict"]["word"], "unlikely")
 
+    def test_no_homes_entered_is_unsure_on_the_unit_mix_not_a_gap(self):
+        # 17 Nov 2026: Expo as permitted, floor area but no unit mix, read a 100% gap as "unlikely"
+        opt = dict(OPTION, units={"studio": None, "one_bed": None, "two_bed": None, "three_bed_plus": None}, rent_tiers_units=None)
+        pf = proforma.build(SITE, opt, evaluate(SITE, opt, AS_OF))
+        self.assertIsNotNone(pf["capital"]["total"])
+        self.assertEqual(pf["verdict"]["word"], "unsure")
+        self.assertIn("no homes entered", pf["verdict"]["why"][0])
+        self.assertTrue(pf["verdict"]["unsure"][0].startswith("the unit mix"))
+        self.assertIsNone(proforma.next_step(pf))   # no "look for more sources" for a building with no homes
+
     def test_no_floor_area_is_unsure(self):
         opt = dict(OPTION, gfa_m2=None, units={"studio": None, "one_bed": None, "two_bed": None, "three_bed_plus": None})
         pf = proforma.build(SITE, opt, evaluate(SITE, opt, AS_OF))
@@ -150,8 +160,9 @@ class Wording(unittest.TestCase):
         self.assertEqual(proforma.next_step(pf), proforma.MORE_SOURCES)
 
     def test_a_narrow_gap_names_another_source_and_a_missing_figure_names_nothing(self):
-        pf = {"verdict": {"word": "unsure"}, "gap": {"value": 1_000_000}, "capital": {"total": 20_000_000, "land": 0}}
+        pf = {"verdict": {"word": "unsure"}, "gap": {"value": 1_000_000}, "capital": {"total": 20_000_000, "land": 0}, "inputs": {"units_total": 60}}
         self.assertEqual(proforma.next_step(pf), proforma.CLOSE_GAP)
+        self.assertIsNone(proforma.next_step(dict(pf, inputs={"units_total": 0})))   # no homes: the unit mix is the open item
         no_land = {"verdict": {"word": "unsure"}, "gap": {"value": 1_000_000}, "capital": {"total": 20_000_000, "land": None}}
         self.assertIsNone(proforma.next_step(no_land))
         covered = {"verdict": {"word": "likely"}, "gap": {"value": -5}, "capital": {"total": 20_000_000, "land": 0}}

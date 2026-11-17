@@ -32,14 +32,13 @@
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply the missing figures; the indicative grant at 2025-26 rates would be set by unit count. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $151,374,523, 100% of the capital cost, more than the 15% a feasibility screen can call close. Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.
-
-**For the development manager:** Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.
+**Unsure.** The option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost. Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.
 
 - Capital cost **$151,374,523**: hard $112,129,276 (escalated ×1.0292), soft $28,032,319, contingency $11,212,928, land $0.
 - Net operating income **not given a year**: rent not given less vacancy not given, operating cost not given and reserve not given.
 - Funding **$0**: grants $0, equity $0, supportable debt not given at 6.19% over 40 years, 1.10 coverage.
 - Gap **$151,374,523** (100% of the capital cost).
+- Left to a person: the unit mix (homes by type: studio, one-, two- and three-bedroom).
 
 | Line | Figure | From | Note |
 |---|---|---|---|

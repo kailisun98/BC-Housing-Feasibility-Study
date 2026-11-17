@@ -129,9 +129,9 @@ export const MONEY_STATUS = { likely: "pass", unlikely: "conditional", unsure: "
 export const MONEY_WORD = { likely: "Likely", unlikely: "Needs more sources", unsure: "Unsure" };
 export const moneyWord = v => MONEY_WORD[v.word] || cap(v.word);
 export function moneyNext(pf) {
-  const v = pf.verdict || {}, gap = (pf.gap || {}).value, c = pf.capital || {};
+  const v = pf.verdict || {}, gap = (pf.gap || {}).value, c = pf.capital || {}, homes = (pf.inputs || {}).units_total;
   if (v.word === "unlikely") return "Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.";
-  if (v.word === "unsure" && gap != null && gap > 0 && c.total != null && c.land != null) return "Another source, or firmer figures for the placeholders, would settle it.";
+  if (v.word === "unsure" && homes && gap != null && gap > 0 && c.total != null && c.land != null) return "Another source, or firmer figures for the placeholders, would settle it.";
   return "";
 }
 

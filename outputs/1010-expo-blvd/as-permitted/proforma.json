@@ -51,12 +51,14 @@
     "share_of_capital": 1.0
   },
   "verdict": {
-    "word": "unlikely",
+    "word": "unsure",
     "why": [
-      "the gap is $151,374,523, 100% of the capital cost, more than the 15% a feasibility screen can call close",
+      "the option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost",
       "placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve"
     ],
-    "unsure": []
+    "unsure": [
+      "the unit mix (homes by type: studio, one-, two- and three-bedroom)"
+    ]
   },
   "lines": [
     {

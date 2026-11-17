@@ -705,8 +705,11 @@ Phase 2, the cost layer and the pro-forma:
   for an "unsure" gap inside 15% with the land settled, "another source, or firmer placeholders"). The tool mirrors
   both (`MONEY_WORD`, `moneyNext` in `memo/answers.js`; the paper memo uses them) and the card reads
   `conditional`, no longer `fail`. The committed memos were rewritten with `python -m ffm memo --out <run>` (the
-  ledgers untouched); home, case, how and who say "Needs more sources". The Expo as-permitted run still shows a
-  100% gap because its option has no homes entered: the verdict should say so instead (not yet changed).
+  ledgers untouched); home, case, how and who say "Needs more sources". An option with a floor area but no homes
+  entered reads **unsure** ("no homes entered, so there is no rent, debt or grant to set against the capital cost",
+  the unit mix left to a person) before any gap is read, and gets no next step: Expo as permitted had read a 100%
+  gap as "unlikely". Its committed `proforma.json` was rebuilt from its own ledger and massing (only the verdict
+  moved; the other six runs rebuild unchanged).
 - The architect's money folds (17 Nov 2026, Kai: "too long … more of a developer's thing"): answer 4 keeps its
   verdict and puts the next step, the four figures, the reasons and the line table behind "Show the pro-forma ·
   capital, funding, gap" (`details.money-more`); the choice is kept (`ffm.architect.money`) and ledger layer F

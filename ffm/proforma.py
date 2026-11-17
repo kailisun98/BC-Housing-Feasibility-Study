@@ -40,9 +40,10 @@ def next_step(pf: dict) -> str | None:
     missing (the memo's "Left to a person" names that one)."""
     v = (pf or {}).get("verdict") or {}
     gap, cap = ((pf or {}).get("gap") or {}).get("value"), (pf or {}).get("capital") or {}
+    homes = ((pf or {}).get("inputs") or {}).get("units_total")
     if v.get("word") == "unlikely":
         return MORE_SOURCES
-    if v.get("word") == "unsure" and gap is not None and gap > 0 and cap.get("total") is not None and cap.get("land") is not None:
+    if v.get("word") == "unsure" and homes and gap is not None and gap > 0 and cap.get("total") is not None and cap.get("land") is not None:
         return CLOSE_GAP
     return None
 
@@ -247,6 +248,12 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         word = "unsure"
         why.append("no floor area, so no capital cost")
         unsure.insert(0, "floor area and unit count")
+    elif not n:
+        # no homes entered: no rent, no debt and no grant can be counted, so the gap is the whole capital cost and
+        # says nothing about the funders (17 Nov 2026: Expo as permitted read a 100% gap as a verdict)
+        word = "unsure"
+        why.append(f"the option has no homes entered, so there is no rent, debt or grant to set against the ${capital:,.0f} capital cost")
+        unsure.insert(0, "the unit mix (homes by type: studio, one-, two- and three-bedroom)")
     elif land_cost is None:
         word = "unsure"
         why.append("the land cost is not settled")

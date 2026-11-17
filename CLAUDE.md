@@ -714,10 +714,19 @@ Phase 6, Claude in the loop (the model proposes, a person confirms, the engine d
   `cd1_sub_area` "B" (read off Schedule A), so Expo's outright answer is now assessed; its committed runs and `case.html` still
   say "not assessed" until they are regenerated. The checks read every schedule through `checks.fsr_limit` / `height_limit`
   (tenure, site-size tables, social-housing and rental figures, the Director's discretion as conditional, formula increases,
-  unit caps, a sub-area's fixed floor area); the suggester takes its figures from them. Kai saved the October 2026 PDFs of
-  RM-3, RM-3A, RM-5 (all), R1-1, C-2, C-2A, C-2B, C-2C, C-2C1, RR-1, RR-2A/2B and RR-3A/3B/3C into `inbox/` on 17 Nov 2026;
-  Kai asked for CD-1 first, so their rules are still to be entered (the RM-3/RM-3A rules in the stack are still the
-  recollection ones, and the PDFs differ: RM-3's height is 36.6 m, RM-3A has 3.00 FSR and 19.9 m for social housing).
+  unit caps, a sub-area's fixed floor area); the suggester takes its figures from them.
+- Twelve more schedules read from the PDFs Kai saved into `inbox/` (17 Nov 2026; October 2026 consolidations, R1-1 June
+  2026), 46 rules, all `verified: true` with `read_from` pages, written by a generator that found each clause's page in the
+  extracted text: RM-3 (FSR 1.00 plus the formula increases, `fsr_increases` → uncertain above 1.00; 36.6 m; replaces the
+  recollection rule, whose 10.7 m was wrong), RM-3A (3.00 and the Director's 19.9 m for 100% social housing), RM-5 family
+  (`cov.rm5*`: 1.00, the Director's 1.50 / 2.20 / 2.75 as conditional, `narrow_site` caps; RM-5D 7.00 and 58.0 m with social
+  housing), R1-1 multiplex (1.00, 8 homes rental / 6 otherwise, 11.5 m and 3 storeys), C-2, C-2B, C-2C, C-2C1 (a rental
+  mixed-use building 3.50, 3.70 on a big corner, 19.8 m and 6 storeys; other tenures 0.75 with the Director's 2.50 / 2.50 /
+  3.00 / 3.00), C-2A (3.50 rental, 2.50 other, 23.0 m, 27.5 m in a transit-oriented area), RR-1, RR-2A, RR-2B (rental only;
+  `fsr_table` rows by site area, depth and a corner's frontage; RR-2B 3.00 and 27.5 m for social housing) and RR-3A, RR-3B/3C
+  (2.40 / 3.40, the Director's +0.10 only on a big corner, 920 m² minimum). Side yards that apply only beside an R district
+  are left untested (the site does not record its neighbours). The tool reads social housing and secured market rental as
+  rental tenure. Only the RT family (bar RT-3) is still typed from memory.
 - Also 16 Nov 2026: `bcbc.exits` (`rules/d_design_standards.json`, `verified: false`) is read by `layout.egress`
   into `L["egress"]`; `option.sprinklered` switches its limits. `option.massing` {anchor, dx_m, dy_m, rotate} and
   `site.front_face` {street | side | edge} place the mass and turn the lot (`massing.place`,

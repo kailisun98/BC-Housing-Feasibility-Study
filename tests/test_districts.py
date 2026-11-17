@@ -159,20 +159,21 @@ class Unverified(unittest.TestCase):
                         self.assertIn(v.source["url"], v.source["verify"], r.id)
                         self.assertTrue(v.source["url"].startswith("https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-"), r.id)
 
-    def test_rm3_run_raises_one_unverified_item(self):
-        L = evaluate(site("RM-3"), OPTION, AS_OF)
+    def test_rt4_run_raises_one_unverified_item(self):
+        L = evaluate(site("RT-4"), OPTION, AS_OF)
         items = [u for u in L["summary"]["answers"]["unsure"] if u["rule_id"] == "coverage.schedule_unverified"]
         self.assertEqual(len(items), 1)
-        self.assertEqual(items[0]["title"], "District schedule figures entered unverified (RM-3)")
-        self.assertIn("cov.rm3.outright_fsr", items[0]["finding"])
-        self.assertIn("cov.rm3.outright_height", items[0]["finding"])
-        self.assertIn("entered from recollection of the RM-3 schedule", items[0]["finding"])
+        self.assertEqual(items[0]["title"], "District schedule figures entered unverified (RT-4)")
+        self.assertIn("cov.rt.outright_fsr", items[0]["finding"])
+        self.assertIn("cov.rt.outright_height", items[0]["finding"])
+        self.assertIn("entered from recollection of the RT-4 schedule", items[0]["finding"])
         self.assertEqual(items[0]["status"], "uncertain")
-        self.assertTrue(items[0]["action"].startswith("Architect: open the RM-3 schedule"))
+        self.assertTrue(items[0]["action"].startswith("Architect: open the RT-4 schedule"))
 
-    def test_rm1_and_rm4_runs_have_none(self):
+    def test_rm1_and_the_schedules_read_from_pdfs_have_none(self):
         self.assertNotIn("coverage.schedule_unverified", open_ids(evaluate(site("RM-1", 2810.7), OPTION, AS_OF)))
-        self.assertNotIn("coverage.schedule_unverified", open_ids(evaluate(site("RM-4"), OPTION, AS_OF)))
+        for d in ("RM-3", "RM-3A", "RM-4", "RM-5B", "R1-1", "C-2", "C-2A", "RR-2B", "RR-3B"):
+            self.assertNotIn("coverage.schedule_unverified", open_ids(evaluate(site(d), OPTION, AS_OF)), d)
 
 
 class CD1(unittest.TestCase):
@@ -298,6 +299,136 @@ class CD1(unittest.TestCase):
         res = lookup.assemble("1 Example St, Vancouver, BC", 49.27, -123.10, "1 Example St, Vancouver",
                               [{"zoning_district": "RM-4", "cd_1_number": None}], [])
         self.assertNotIn("cd1_bylaw_number", res["site"])
+
+
+SH6 = {"id": "o", "tenure": "social_housing", "storeys": 6, "height_m": 19.8, "gfa_m2": 3000,
+       "units": {"studio": 10, "one_bed": 15, "two_bed": 10, "three_bed_plus": 5}}
+
+
+def lot(district, area=1200.0, frontage=30.0, **more):
+    return {**site(district, area), "frontage_m": frontage, "depth_m": area / frontage, **more}
+
+
+def status(ledger, rule_id):
+    return by_id(ledger, rule_id)["status"]
+
+
+class SchedulesFromThePdfs(unittest.TestCase):
+    """The twelve schedules Kai saved on 17 Nov 2026 (inbox/, October 2026 consolidations; R1-1 June 2026), each read
+    from its PDF: the district picks its own rules and no neighbour's, and the figures behave as the clauses say."""
+    OWN = {"RM-3": "cov.rm3", "RM-3A": "cov.rm3a", "RM-5": "cov.rm5", "RM-5A": "cov.rm5ac", "RM-5B": "cov.rm5b", "RM-5C": "cov.rm5ac",
+           "RM-5D": "cov.rm5d", "R1-1": "cov.r1_1", "C-2": "cov.c2", "C-2A": "cov.c2a", "C-2B": "cov.c2b", "C-2C": "cov.c2c",
+           "C-2C1": "cov.c2c1", "RR-1": "cov.rr1", "RR-2A": "cov.rr2a", "RR-2B": "cov.rr2b", "RR-3A": "cov.rr3a", "RR-3B": "cov.rr3bc",
+           "RR-3C": "cov.rr3bc"}
+
+    def test_each_district_takes_its_own_rules_read_from_its_pdf(self):
+        for d, prefix in self.OWN.items():
+            L = evaluate(site(d), SH6, AS_OF)
+            tested = {r["rule_id"] for r in L["results"] if r.get("check", "").startswith("district_") and r["status"] != "not_applicable"}
+            self.assertIn(f"{prefix}.outright_fsr", tested, d)
+            self.assertTrue(all(t.startswith(prefix + ".") or t in ("cov.rm5.outright_height", "cov.rm5.setbacks") for t in tested), (d, tested))
+            self.assertNotIn("coverage.district_schedule", open_ids(L), d)
+            for r in L["results"]:
+                if r["rule_id"] in tested:
+                    self.assertIs(r["source"]["verified"], True, r["rule_id"])
+                    self.assertTrue(r["source"]["read_from"].startswith("inbox/zoning-by-law-district-schedule-"), r["rule_id"])
+                    self.assertRegex(r["source"]["section"], r"s\.\d", r["rule_id"])
+        # C-2 never reads C-2A's or C-2B's, nor RR-3A RR-3B's
+        L = evaluate(site("C-2"), SH6, AS_OF)
+        self.assertEqual(status(L, "cov.c2a.outright_fsr"), "not_applicable")
+        self.assertEqual(status(L, "cov.c2b.outright_fsr"), "not_applicable")
+        self.assertEqual(status(evaluate(site("RR-3A"), SH6, AS_OF), "cov.rr3bc.outright_fsr"), "not_applicable")
+
+    def test_rm3_and_rm3a(self):
+        # RM-3: 1.00 plus formula increases not computed (uncertain, not fail); 36.6 m
+        L = evaluate(lot("RM-3"), SH6, AS_OF)
+        self.assertEqual(status(L, "cov.rm3.outright_fsr"), "uncertain")
+        self.assertIn("increases", by_id(L, "cov.rm3.outright_fsr")["finding"])
+        self.assertEqual(status(L, "cov.rm3.outright_height"), "pass")
+        # RM-3A: 3.00 for 100% social housing; 19.9 m as the Director's variance
+        L = evaluate(lot("RM-3A"), SH6, AS_OF)
+        self.assertEqual(status(L, "cov.rm3a.outright_fsr"), "pass")
+        self.assertEqual(status(L, "cov.rm3a.outright_height"), "conditional")
+
+    def test_rm5_family(self):
+        self.assertEqual(status(evaluate(lot("RM-5"), SH6, AS_OF), "cov.rm5.outright_fsr"), "fail")              # 2.50 over the Director's 1.50
+        self.assertEqual(status(evaluate(lot("RM-5B"), SH6, AS_OF), "cov.rm5b.outright_fsr"), "conditional")    # within 2.75 at discretion
+        two = dict(SH6, gfa_m2=2400)                                                                             # 2.00
+        self.assertEqual(status(evaluate(lot("RM-5A"), two, AS_OF), "cov.rm5ac.outright_fsr"), "conditional")
+        narrow = lot("RM-5A", 1200.0, 18.0)                                                                       # 18 m wide: at most 1.50
+        r = by_id(evaluate(narrow, two, AS_OF), "cov.rm5ac.outright_fsr")
+        self.assertEqual(r["status"], "fail")
+        self.assertEqual(status(evaluate(dict(narrow, corner_lot=True), two, AS_OF), "cov.rm5ac.outright_fsr"), "conditional")  # corner of 800 m²: 2.00
+        tall = dict(SH6, gfa_m2=8000, height_m=50.0, storeys=15)
+        L = evaluate(lot("RM-5D"), tall, AS_OF)                                                                   # 6.67 under 7.00, 50 m under 58.0
+        self.assertEqual((status(L, "cov.rm5d.outright_fsr"), status(L, "cov.rm5d.outright_height")), ("pass", "pass"))
+        self.assertEqual(status(evaluate(lot("RM-5D"), dict(tall, tenure="secured_market_rental"), AS_OF), "cov.rm5d.outright_fsr"), "fail")
+
+    def test_r1_1_multiplex(self):
+        eight = {"id": "o", "tenure": "social_housing", "storeys": 3, "height_m": 10.5, "gfa_m2": 600, "units": {"one_bed": 4, "two_bed": 4}}
+        L = evaluate(lot("R1-1", 650.0, 16.0), eight, AS_OF)
+        self.assertEqual((status(L, "cov.r1_1.outright_fsr"), status(L, "cov.r1_1.outright_height")), ("pass", "pass"))
+        strata = evaluate(lot("R1-1", 650.0, 16.0), dict(eight, tenure="other"), AS_OF)
+        self.assertEqual(status(strata, "cov.r1_1.outright_fsr"), "fail")                                       # 8 over the 6 for other tenures
+        self.assertIn("s.3.1.1.3", by_id(strata, "cov.r1_1.outright_fsr")["finding"])
+        self.assertEqual(status(evaluate(lot("R1-1", 650.0, 16.0), dict(eight, storeys=4), AS_OF), "cov.r1_1.outright_height"), "fail")
+
+    def test_c2_family_takes_the_rental_building_figures(self):
+        L = evaluate(lot("C-2"), SH6, AS_OF)
+        self.assertEqual(status(L, "cov.c2.outright_fsr"), "pass")
+        self.assertIn("every home secured as rental", by_id(L, "cov.c2.outright_fsr")["finding"])
+        self.assertEqual(status(L, "cov.c2.outright_height"), "pass")
+        strata = dict(SH6, tenure="other", gfa_m2=2400, height_m=13.0, storeys=4)                                # 2.00: over 0.75, within the Director's 2.50
+        self.assertEqual(status(evaluate(lot("C-2"), strata, AS_OF), "cov.c2.outright_fsr"), "conditional")
+        self.assertEqual(status(evaluate(lot("C-2B"), strata, AS_OF), "cov.c2b.outright_fsr"), "pass")           # 2.50 outright
+        big = dict(SH6, gfa_m2=6100)                                                                              # 3.65 on 1,672 m²
+        corner = lot("C-2C", 1672.0, 46.0, corner_lot=True)
+        self.assertEqual(status(evaluate(corner, big, AS_OF), "cov.c2c.outright_fsr"), "pass")                  # 3.70 on the corner
+        self.assertEqual(status(evaluate(dict(corner, corner_lot=False), big, AS_OF), "cov.c2c.outright_fsr"), "fail")
+        # C-2A: 23.0 m, 27.5 m in a transit-oriented area
+        tall = dict(SH6, height_m=26.0, storeys=8)
+        self.assertEqual(status(evaluate(lot("C-2A"), tall, AS_OF), "cov.c2a.outright_height"), "fail")
+        self.assertEqual(status(evaluate(lot("C-2A", in_transit_oriented_area=True), tall, AS_OF), "cov.c2a.outright_height"), "pass")
+
+    def test_rr_districts(self):
+        # rental only: another tenure fails whatever its size
+        r = by_id(evaluate(lot("RR-2A"), dict(SH6, tenure="other", gfa_m2=1000), AS_OF), "cov.rr2a.outright_fsr")
+        self.assertEqual(r["status"], "fail")
+        self.assertIn("residential rental tenure", r["finding"])
+        # RR-1: the largest form the site fits
+        four = dict(SH6, gfa_m2=1400, height_m=13.2, storeys=4, units={"one_bed": 6, "two_bed": 6})
+        L = evaluate(lot("RR-1", 1000.0, 32.0), four, AS_OF)                                                     # 920 m², 30.1 m: 1.45 and 13.7 m
+        self.assertEqual((status(L, "cov.rr1.outright_fsr"), status(L, "cov.rr1.outright_height")), ("pass", "pass"))
+        L = evaluate(lot("RR-1", 1000.0, 25.0), four, AS_OF)                                                     # 25 m: the 3-storey row, 1.20
+        self.assertEqual((status(L, "cov.rr1.outright_fsr"), status(L, "cov.rr1.outright_height")), ("fail", "fail"))
+        tiny = by_id(evaluate(lot("RR-1", 250.0, 9.0), dict(four, gfa_m2=200), AS_OF), "cov.rr1.outright_fsr")
+        self.assertEqual(tiny["status"], "uncertain")
+        self.assertIn("303 m²", tiny["finding"])
+        # RR-2B: 3.00 for social housing on a shallow site of 920 m²; a big corner of 920 to 1,469 m² stays at 2.40
+        sh = dict(SH6, gfa_m2=2900)
+        self.assertEqual(status(evaluate(lot("RR-2B", 1000.0, 32.0), sh, AS_OF), "cov.rr2b.outright_fsr"), "pass")       # 31.25 m deep
+        corner = lot("RR-2B", 1450.0, 41.0, corner_lot=True)                                                    # 35.4 m deep: not shallow
+        self.assertEqual(by_id(evaluate(corner, dict(sh, gfa_m2=3400), AS_OF), "cov.rr2b.outright_fsr")["values"]["max_fsr_outright"], 2.4)
+        self.assertEqual(status(evaluate(lot("RR-2B"), dict(SH6, height_m=26.0, storeys=8), AS_OF), "cov.rr2b.outright_height"), "pass")  # 27.5 m
+        # RR-3A: the Director's 2.50 only on a big corner; under 920 m² no figure applies
+        over = dict(SH6, gfa_m2=3600, height_m=15.0, storeys=4)                                                   # 2.40 on 1,500 m²
+        self.assertEqual(status(evaluate(lot("RR-3A", 1500.0, 41.0, corner_lot=True), over, AS_OF), "cov.rr3a.outright_fsr"), "pass")
+        more = dict(over, gfa_m2=3720)                                                                            # 2.48
+        self.assertEqual(status(evaluate(lot("RR-3A", 1500.0, 41.0, corner_lot=True), more, AS_OF), "cov.rr3a.outright_fsr"), "conditional")
+        self.assertEqual(status(evaluate(lot("RR-3A", 1500.0, 41.0), more, AS_OF), "cov.rr3a.outright_fsr"), "fail")
+        self.assertEqual(status(evaluate(lot("RR-3A", 800.0, 25.0), dict(over, gfa_m2=1500), AS_OF), "cov.rr3a.outright_fsr"), "uncertain")
+
+    def test_the_suggestion_cites_the_district(self):
+        s = lot("C-2", 1200.0, 30.0, has_water_and_sewer=True, in_transit_oriented_area=False, existing_trees_on_site=[])
+        S = suggest.suggest(s, [], AS_OF, "outright")
+        self.assertEqual(S["fields"]["gfa_m2"]["rule_id"], "cov.c2.outright_fsr")
+        self.assertEqual(S["fields"]["height_m"]["rule_id"], "cov.c2.outright_height")
+        self.assertEqual(S["option"]["gfa_m2"], 4200)                                                            # 3.50 × 1,200 for a rental building
+        self.assertEqual(S["option"]["storeys"], 6)
+        self.assertEqual(S["fields"]["setbacks_m.rear"]["rule_id"], "cov.c2.setbacks")
+        S = suggest.suggest(lot("RR-2B", 1000.0, 32.0, has_water_and_sewer=True, in_transit_oriented_area=False, existing_trees_on_site=[]), [], AS_OF, "outright")
+        self.assertEqual(S["fields"]["gfa_m2"]["rule_id"], "cov.rr2b.outright_fsr")
+        self.assertEqual(S["option"]["gfa_m2"], 3000)                                                            # 3.00 for social housing
 
 
 class NotInTheStack(unittest.TestCase):

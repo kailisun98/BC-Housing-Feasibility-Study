@@ -102,7 +102,8 @@ class OtherCandidates(unittest.TestCase):
         self.assertFalse(next(c for c in S["candidates"] if c["id"] == "outright")["available"])
 
     def test_small_lot_gets_the_ssmuh_minimum(self):
-        small = {"id": "small", "address": "a small lot", "zoning_district": "R1-1", "site_area_m2": 280, "frontage_m": 10, "depth_m": 28,
+        # an RS lot: SSMUH covers it and the stack has no RS schedule (since 17 Nov 2026 an R1-1 lot takes the R1-1 schedule)
+        small = {"id": "small", "address": "a small lot", "zoning_district": "RS-1", "site_area_m2": 280, "frontage_m": 10, "depth_m": 28,
                  "has_water_and_sewer": True, "in_transit_oriented_area": False, "frequent_bus_stop_within_400m": False, "existing_trees_on_site": []}
         S = suggest.suggest(small, [], AS_OF, "outright")
         self.assertEqual(S["fields"]["ssmuh_minimum_units"]["value"], 3)

@@ -248,6 +248,12 @@ redesigned from those flows, and a brand package. State now:
   the page as a background tab, where delayed CSS animations never leave their delay: finish them with
   `document.getAnimations().forEach(a => a.finish())` before a screenshot. The pane's `ffm-pages` server serves the
   `_site` folder named in its command line (a different scratchpad path than the session's own), so build there.
+- Scroll motion (17 Nov 2026, after an /impeccable exploration; DESIGN.md "Motion" has the timings): the gate's early
+  diamond travels back along the memo's row on a view timeline (`dia-travel`, `.marks` is a size container, the distance
+  in `cqw`) and rings when site.js adds `.landed`; the logic diagram's twelve nodes carry `--i` (their reading order, also
+  printed in the kind label) and arrive in that order; the who-reads-what memo cells carry `--r` and fill top to bottom;
+  `.nav::after` is a scroll-timeline progress line; `@view-transition { navigation: auto }` crossfades the site's pages
+  with `.nav` held still (app.html does not opt in). The hero foot's counter is now five section links (`aria-current`).
 
 ## Phase 1 of the workflows proposal (3 Nov 2026; `docs/proposal-workflows.md`)
 

@@ -138,34 +138,36 @@
       <p class="sub">There are twelve steps. One takes the inputs and five are ordinary code; one uses a language model, once, to turn a PDF into a clause and a date; three are checks that stop the run if they fail; and two belong to a person. If an input is marked "not sure", the rule that needs it stops there and the memo reports it as uncertain instead of passing it.</p>
     </div>
 
-    <div class="diagram logic reveal" role="img" aria-label="Twelve steps in three rows. Row one: inputs, look up the site, extract rules (a model, once, offline), verify the rule table (a person). Row two, right to left: test the option, is it cited and dated, draw the massing, does it match the rules. Row three: funding fit, write the memo from the ledger, do the numbers tie out and stamp the version, review and decide (a person).">
+    <div class="diagram logic reveal" role="img" aria-label="Twelve numbered steps in three rows. Row one, steps 1 to 4: inputs, look up the site, extract rules (a model, once, offline), verify the rule table (a person). Row two, right to left, steps 5 to 8: test the option, is it cited and dated, draw the massing, does it match the rules. Row three, steps 9 to 12: funding fit, write the memo from the ledger, do the numbers tie out and stamp the version, review and decide (a person).">
+      <!-- the steps are numbered in reading order (the second row reads right to left) and arrive in that order with
+           the arrow after each (site.css, "the twelve steps arrive in reading order"); --i is each one's place -->
       <div class="row four">
-        <div class="node"><span class="kind">data</span><b>Inputs</b><span>address, lot, option</span></div>
-        <div class="node"><span class="kind">script</span><b>Look up the site</b><span>district, SSMUH, TOA</span></div>
-        <div class="node signal"><span class="kind">model · once, offline</span><b>Extract rules</b><span>PDF to clause and date</span></div>
-        <div class="node person"><span class="kind">person</span><b>Verify the rule table</b><span>confirm; flag what is unsure</span></div>
+        <div class="node" style="--i: 1"><span class="kind">01 · data</span><b>Inputs</b><span>address, lot, option</span></div>
+        <div class="node" style="--i: 2"><span class="kind">02 · script</span><b>Look up the site</b><span>district, SSMUH, TOA</span></div>
+        <div class="node signal" style="--i: 3"><span class="kind">03 · model · once, offline</span><b>Extract rules</b><span>PDF to clause and date</span></div>
+        <div class="node person" style="--i: 4"><span class="kind">04 · person</span><b>Verify the rule table</b><span>confirm; flag what is unsure</span></div>
       </div>
-      <div class="down four"><i></i><i></i><i></i><i class="on"></i></div>
+      <div class="down four"><i></i><i></i><i></i><i class="on" style="--i: 4.5"></i></div>
       <div class="row four rtl">
-        <div class="node check"><span class="kind">check</span><b>Matches the rules?</b><span>area and height agree</span></div>
-        <div class="node"><span class="kind">script</span><b>Draw the massing</b><span>floor plates in the envelope</span></div>
-        <div class="node check"><span class="kind">check</span><b>Cited and dated?</b><span>a source and a date on all</span></div>
-        <div class="node"><span class="kind">script</span><b>Test the option</b><span>pass, fail, uncertain</span></div>
+        <div class="node check" style="--i: 8"><span class="kind">08 · check</span><b>Matches the rules?</b><span>area and height agree</span></div>
+        <div class="node" style="--i: 7"><span class="kind">07 · script</span><b>Draw the massing</b><span>floor plates in the envelope</span></div>
+        <div class="node check" style="--i: 6"><span class="kind">06 · check</span><b>Cited and dated?</b><span>a source and a date on all</span></div>
+        <div class="node" style="--i: 5"><span class="kind">05 · script</span><b>Test the option</b><span>pass, fail, uncertain</span></div>
       </div>
-      <div class="down four"><i class="on"></i><i></i><i></i><i></i></div>
+      <div class="down four"><i class="on" style="--i: 8.5"></i><i></i><i></i><i></i></div>
       <div class="row four">
-        <div class="node"><span class="kind">script</span><b>Funding fit</b><span>each program's criteria</span></div>
-        <div class="node"><span class="kind">script</span><b>Write the memo</b><span>from the ledger: two plain pages, then the clauses</span></div>
-        <div class="node check"><span class="kind">check</span><b>Numbers tie out?</b><span>stamp the revision</span></div>
-        <div class="node person"><span class="kind">person</span><b>Review and decide</b><span>the board decides</span></div>
+        <div class="node" style="--i: 9"><span class="kind">09 · script</span><b>Funding fit</b><span>each program's criteria</span></div>
+        <div class="node" style="--i: 10"><span class="kind">10 · script</span><b>Write the memo</b><span>from the ledger: two plain pages, then the clauses</span></div>
+        <div class="node check" style="--i: 11"><span class="kind">11 · check</span><b>Numbers tie out?</b><span>stamp the revision</span></div>
+        <div class="node person" style="--i: 12"><span class="kind">12 · person</span><b>Review and decide</b><span>the board decides</span></div>
       </div>
-      <div class="legend">
+      <div class="legend" style="--i: 13">
         <span><i></i>script: ordinary code, same result every time</span>
         <span><i class="signal"></i>model: reads text into data, once, checked by a person</span>
         <span><i class="check"></i>check: stops the run if it fails</span>
         <span><i class="person"></i>person</span>
       </div>
-      <p class="diagram-cap">If the massing fails the "matches the rules" check, it is redrawn. When a rule or program changes, the run starts again at the rule table and the memo gets a new revision listing what changed. Each step hands the next one a file: the rule table, the ledger, the massing, and the memo with its stamp.</p>
+      <p class="diagram-cap" style="--i: 13">If the massing fails the "matches the rules" check, it is redrawn. When a rule or program changes, the run starts again at the rule table and the memo gets a new revision listing what changed. Each step hands the next one a file: the rule table, the ledger, the massing, and the memo with its stamp.</p>
     </div>
   </div>
 </section>

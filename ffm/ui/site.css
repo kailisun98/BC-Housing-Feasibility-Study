@@ -76,6 +76,19 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .nav-links a:hover { color: var(--fg); background: rgba(255, 255, 255, .06); }
 .nav-links a[aria-current="page"] { color: var(--fg); background: rgba(255, 255, 255, .1); }
 .nav-cta { justify-self: end; }
+/* where the reader is on the page: a hairline of signal along the bar's foot grows with the scroll. No script; a
+   browser without scroll timelines shows no line, and on a phone the bar scrolls away with the page */
+@supports (animation-timeline: scroll()) {
+  .nav::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 2px; background: var(--signal); transform-origin: 0 50%; transform: scaleX(0); animation: read-progress linear both; animation-timeline: scroll(root); }
+  @media (max-width: 900px) { .nav::after { content: none; } }
+}
+@keyframes read-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+/* page to page: the next page crossfades in while the bar holds still (a browser without cross-document view
+   transitions loads the page as before; the tool's page does not opt in, so opening it is a plain load) */
+@view-transition { navigation: auto; }
+.nav { view-transition-name: site-nav; }
+::view-transition-old(root) { animation-duration: .2s; }
+::view-transition-new(root) { animation-duration: .28s; }
 @media (max-width: 900px) {
   /* a phone: the bar scrolls with the page; the lockup and the button share the first row, the links the second */
   .nav { position: static; grid-template-columns: 1fr auto; height: auto; padding-block: 14px 10px; row-gap: 10px; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 0; }
@@ -103,8 +116,14 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 /* the foot spans the hero it sits in (itself the page's column), not a column inside that column */
 .hero-foot.wrap { width: auto; margin-inline: 0; }
 .hero-foot { position: absolute; left: 0; right: 0; bottom: 24px; display: flex; justify-content: space-between; align-items: center; font: 500 12px/1 var(--sans); color: var(--fg-3); letter-spacing: .04em; }
-.hero-foot .counter { font-family: var(--mono); }
-.hero-foot .counter b { color: var(--fg); font-weight: 500; }
+/* the section index: five numbers, each a link to its section, the one in view lit (site.js) */
+.hero-foot .counter { display: flex; gap: 2px; font: 500 12px/1 var(--mono); letter-spacing: .04em; }
+.hero-foot .counter a { padding: 8px 6px; color: var(--fg-3); border-radius: 4px; transition: color var(--t-fast); }
+.hero-foot .counter a:hover { color: var(--fg); }
+.hero-foot .counter a[aria-current] { color: var(--fg); }
+@media (pointer: coarse) { .hero-foot .counter a { padding: 14px 9px; } }
+/* a section a link lands on clears the fixed bar */
+.sec[id] { scroll-margin-top: calc(var(--nav-h) + 12px); }
 @media (max-width: 980px) {
   .hero { grid-template-columns: 1fr; min-height: 0; padding-top: calc(var(--nav-h) + 72px); padding-bottom: 80px; }
   .hero-foot { display: none; }
@@ -578,10 +597,41 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .js .items.reveal > .item, .js .stats.reveal > li, .js .flows.reveal > .flow { opacity: 0; transform: translateY(8px); transition: opacity .4s var(--ease-out), transform .5s var(--ease-out); }
 .js .items.reveal.in > .item, .js .stats.reveal.in > li, .js .flows.reveal.in > .flow { opacity: 1; transform: none; }
 .js .reveal.in > :nth-child(2) { transition-delay: .05s; } .js .reveal.in > :nth-child(3) { transition-delay: .1s; } .js .reveal.in > :nth-child(n + 4) { transition-delay: .15s; }
-/* the first reliable answer, arriving early: the diamond rings once when the gate comes into view */
-.js .reveal.in .mark.early .dia { animation: ring .9s ease-out .35s 1 both; }
-@keyframes ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--signal) 55%, transparent); } 100% { box-shadow: 0 0 0 14px transparent; } }
-.js .reveal.in .mark.early .dia { box-shadow: 0 0 0 6px color-mix(in srgb, var(--signal) 22%, transparent); }
+/* the twelve steps arrive in reading order, each with the arrow after it (the arrows are the nodes' own pseudo-elements),
+   so the eye follows the snake: 80 ms a step, the two down-arrows between the rows, the legend and the note last.
+   Each step's place is its --i (how.html) */
+.js .logic.reveal .node, .js .logic.reveal .down > i.on, .js .logic.reveal .legend, .js .logic.reveal .diagram-cap { opacity: 0; transform: translateY(6px); transition: opacity .35s var(--ease-out), transform .45s var(--ease-out); }
+.js .logic.reveal.in .node, .js .logic.reveal.in .down > i.on, .js .logic.reveal.in .legend, .js .logic.reveal.in .diagram-cap { opacity: 1; transform: none; transition-delay: calc(var(--i, 0) * 80ms); }
+/* the memo's column fills: today's readers appear where they are, then the column lights and the memo collects the
+   five layers top to bottom (each memo cell's row is its --r, who.html) */
+.js .when.reveal .who { opacity: 0; transition: opacity .35s ease-out; }
+.js .when.reveal.in .who { opacity: 1; transition-delay: .1s; }
+.js .when.reveal.in .memo-col .who { transition-delay: calc(.5s + var(--r, 0) * 120ms); }
+@media (min-width: 901px) {
+  .js .when.reveal .memo-col { background: transparent; box-shadow: inset 1px 0 0 transparent, inset -1px 0 0 transparent; transition: background-color .5s ease-out, box-shadow .5s ease-out; }
+  .js .when.reveal.in .memo-col { background: color-mix(in srgb, var(--signal-deep) 18%, transparent); box-shadow: inset 1px 0 0 color-mix(in srgb, var(--signal) 50%, transparent), inset -1px 0 0 color-mix(in srgb, var(--signal) 50%, transparent); transition-delay: .3s; }
+}
+/* the first reliable answer moves earlier: in the memo's row the diamond travels back from the fifth stage to the second
+   as the row scrolls in, driven by the scroll itself (a view timeline on the row; the distance is three columns and
+   three gaps of the marks grid, so the grid is a container and the distance is in cqw), its note fading in as it lands;
+   then it rings once the row is well inside the window (site.js adds .landed). A browser without scroll timelines
+   plays the same travel on a clock when the gate arrives; under reduced motion the diamond stands where it lands. */
+.marks { container-type: inline-size; }
+.mark .dia { position: relative; }
+.mark.early .dia::before { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+@keyframes dia-travel { from { transform: translateX(calc(60cqw + 20.4px)) rotate(45deg); } to { transform: translateX(0) rotate(45deg); } }
+@keyframes ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--signal) 60%, transparent); } 100% { box-shadow: 0 0 0 16px transparent; } }
+@media (min-width: 901px) {
+  @supports (animation-timeline: view()) {
+    .js .mark.early .dia { animation: dia-travel linear both; animation-timeline: view(); animation-range: cover 0% cover 36%; }
+    .js .mark.early span { animation: iso-label linear both; animation-timeline: view(); animation-range: cover 28% cover 40%; }
+  }
+  @supports not (animation-timeline: view()) {
+    .js .reveal.in .mark.early .dia { animation: dia-travel .9s var(--ease-out) .2s both; }
+    .js .reveal.in .mark.early span { animation: iso-label .4s ease-out .9s both; }
+  }
+}
+.js .mark.early.landed .dia::before { animation: ring .9s ease-out 1 both; }
 
 @media (prefers-reduced-motion: reduce) {
   /* the drawing is shown built; only the labels fade in, so the hero still reads as arriving */
@@ -589,9 +639,10 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
   .hero-iso.play .iso-label, .hero-iso.play .iso-street-name, .hero-iso.play .iso-lot-name { animation-delay: .2s; animation-duration: .4s; }
   .hero-hw.play .hw-slab, .hero-hw.play .hw-shadow, .hero-hw.play .hw-sheet, .hero-who.play .who-sheet, .hero-who.play .who-line, .hero-who.play .who-tl, .hero-case.play .cs-bench-wash, .hero-case.play .cs-bench, .hero-case.play .cs-outright, .hero-case.play .cs-ground, .hero-case.play .cs-trees { animation: none; }
   .hero-hw.play .hw-arrow, .hero-hw.play .hw-label, .hero-who.play .who-name, .hero-case.play .cs-dim { animation-delay: .2s; animation-duration: .4s; }
-  .js .reveal, .js .items.reveal > .item, .js .stats.reveal > li, .js .flows.reveal > .flow { transform: none; transition-duration: .25s; transition-delay: 0s !important; }
-  .js .reveal.in .mark.early .dia { animation: none; }
+  .js .reveal, .js .items.reveal > .item, .js .stats.reveal > li, .js .flows.reveal > .flow, .js .logic.reveal .node, .js .logic.reveal .down > i.on, .js .logic.reveal .legend, .js .logic.reveal .diagram-cap, .js .when.reveal .who, .js .when.reveal .memo-col { transform: none; transition-duration: .25s; transition-delay: 0s !important; }
+  .js .mark.early .dia, .js .mark.early .dia::before, .js .mark.early span { animation: none; }
   .arrow { transition: none; }
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none; }
 }
 
 /* ------------------------------------------------------------------ print: light, the content only */

@@ -38,14 +38,27 @@
     window.addEventListener("beforeprint", () => items.forEach(el => el.classList.add("in")));
   } else items.forEach(el => el.classList.add("in"));
 
-  // the counter in the hero's foot follows the numbered section the reader is in
-  const counter = document.querySelector(".hero-foot .counter");
+  // the section index in the hero's foot (five links) marks the numbered section the reader is in
+  const index = document.querySelector(".hero-foot .counter");
   const secs = Array.from(document.querySelectorAll("main .sec[data-n]"));
-  if (counter && secs.length && "IntersectionObserver" in window) {
-    const total = String(secs.length).padStart(2, "0");
+  if (index && secs.length && "IntersectionObserver" in window) {
+    const links = Array.from(index.querySelectorAll("a[href^='#']"));
     const io = new IntersectionObserver(entries => {
-      for (const e of entries) if (e.isIntersecting) counter.innerHTML = `<b>${e.target.dataset.n}</b> / ${total}`;
+      for (const e of entries) if (e.isIntersecting) {
+        const here = "#" + e.target.id;
+        links.forEach(a => { if (a.getAttribute("href") === here) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current"); });
+      }
     }, { rootMargin: "-40% 0px -50% 0px" });
     secs.forEach(s => io.observe(s));
+  }
+
+  // the gate's early diamond rings once it has landed: when its row is well inside the window (the travel itself is
+  // scroll-driven in site.css, and ends a little before this line)
+  const early = document.querySelector(".mark.early");
+  if (early && !reduce && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(entries => {
+      for (const e of entries) if (e.isIntersecting) { early.classList.add("landed"); io.disconnect(); }
+    }, { rootMargin: "0px 0px -42% 0px" });
+    io.observe(early);
   }
 })();

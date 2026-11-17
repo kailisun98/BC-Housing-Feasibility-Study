@@ -57,7 +57,7 @@
   </div>
   <div class="hero-foot wrap">
     <span>The drawing is 998 E 19th Ave, Vancouver, as Council approved it</span>
-    <span class="counter"><b>01</b> / 05</span>
+    <nav class="counter" aria-label="Sections of this page"><a href="#gate" aria-current="true">01</a><a href="#found">02</a><a href="#how">03</a><a href="#who">04</a><a href="#numbers">05</a></nav>
   </div>
 </section>
 
@@ -80,7 +80,7 @@
           <div class="node"><b>Funding bid</b><span>BC Housing, CMHC</span></div>
           <div class="node"><b>Decision</b><span>fund or stop</span></div>
         </div>
-        <div class="marks five"><i></i><i></i><i></i><i></i><div class="mark late"><i class="dia"></i>first reliable answer: after $200,000 to $500,000</div></div>
+        <div class="marks five"><i></i><i></i><i></i><i></i><div class="mark late"><i class="dia"></i><span>first reliable answer: after $200,000 to $500,000</span></div></div>
       </div>
       <div class="gate-row">
         <p class="row-label">With the memo</p>
@@ -91,7 +91,9 @@
           <div class="node"><b>Pre&#8209;development</b><span>only if it fits</span></div>
           <div class="node"><b>Funding bid</b><span>the program it fits</span></div>
         </div>
-        <div class="marks five"><i></i><div class="mark early"><i class="dia"></i>first reliable answer: after a few hours, dated and cited</div></div>
+        <!-- the diamond travels back from the fifth stage to the second as the row scrolls in (site.css, "the first
+             reliable answer moves earlier"); site.js marks it landed, and it rings -->
+        <div class="marks five"><i></i><div class="mark early"><i class="dia"></i><span>first reliable answer: after a few hours, dated and cited</span></div></div>
       </div>
       <p class="diagram-cap">Cost figures from Future of Good and WC Studio, cited in the research behind the tool. The project keeps every step it has today; the memo adds a cheap, dated answer before the expensive one.</p>
     </div>
@@ -156,7 +158,7 @@
       <li class="item">
         <span class="n">01</span><span class="key">Site and option</span>
         <h3>Give it an address, then shape the option.</h3>
-        <p>The address finds the parcel, the zoning district and the lot in the City's open data, on a map to check. The tool asks only what the data could not tell, and "not sure" is a normal answer. Then it derives the option from the rules, funder-ready, outright or at the staff benchmark, with four figures to change in place and the unit mix yours to set; where the district has no schedule, a rough envelope from the lot and the code stands in.</p>
+        <p>The address finds the parcel, the district and the lot in the City's open data, and the tool asks only what the data could not tell; "not sure" is a normal answer. Then it derives the option from the rules, funder-ready, outright or at the staff benchmark, with four figures to change in place.</p>
       </li>
       <li class="item">
         <span class="n">02</span><span class="key">Rules</span>

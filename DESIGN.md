@@ -492,6 +492,19 @@ One authored moment and a handful of acknowledgements; everything eases out on `
 - **Arrivals (site):** a section fades in over 0.4s with no travel; the items of a list follow one another
   by 50ms, four deep at most, with 8px of rise. The gate's early diamond rings once (0.9s) when its section
   arrives. Reduced motion keeps the fades, drops the travel and the ring.
+- **The answer moves earlier (home, the gate; 17 Nov 2026):** the one scroll-driven moment. In the memo's row the
+  diamond travels back from the fifth stage to the second as the row scrolls in, on a view timeline (`cover 0%` to
+  `36%`, the distance three columns and three gaps of the marks grid in `cqw`), its note fading in as it lands; once
+  the row is 42% up the window it rings (site.js adds `.landed`). A browser without scroll timelines plays the same
+  travel on a clock (0.9s) when the gate arrives; reduced motion shows the diamond where it lands, no ring.
+- **Sequence as explanation (how, who; 17 Nov 2026):** the twelve logic steps are numbered 01 to 12 in their kind
+  labels and arrive in reading order, 80ms apart, each with the arrow after it, so the eye follows the snake; the
+  who-reads-what table shows today's readers first, then lights the memo's column and fills its five cells top to
+  bottom, 120ms apart. Reduced motion shows both at once.
+- **Orientation (site):** a 2px hairline of signal along the fixed bar's foot grows with the scroll (a scroll
+  timeline, no script; none on a phone, where the bar scrolls away). The home hero's foot carries the five section
+  numbers as links, the one in view lit. Page to page, a cross-document view transition crossfades the page (0.2s
+  out, 0.28s in) while the bar holds still; the tool's page does not opt in, so opening it is a plain load.
 - **Feedback (tool):** the mode switch's paper thumb slides under the chosen reader (220ms, measured in
   `placeModeThumb`); the Site and Option forms fold and unfold as a grid row, 0fr to 1fr (320ms), and leave
   the tab order folded; the rail's column eases (300ms); the three answers land as a list, 60ms apart, after

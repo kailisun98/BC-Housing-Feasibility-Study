@@ -9,16 +9,18 @@ import { memoRefs } from "./memo/memo.js";
 import { renderClaude } from "./claude.js";
 
 /* A rule's reference as the memo cites it (A1, C2): the memo's own when a run is on screen, else the same count the
-   engine makes, over every rule in force on the date (one that does not apply to the district still takes its place,
-   as "not applicable"), each layer in order of rule id (engine.run sorts the results so). */
+   engine makes over the rules that apply to this site's district or CD-1 (memoRefs, 20 Nov 2026: a rule written for
+   another district takes no number), each layer in order of rule id (engine.run sorts the results so). */
 let refsCache = { key: "", map: {} };
 
 export function refNow(id) {
   if (state.run && state.refOf && state.refOf[id]) return state.refOf[id];
-  const key = `${state.rules.length}|${state.rules.map(r => r.id).join(",").length}`;
+  const district = (state.site || {}).zoning_district, cd1 = (state.site || {}).cd1_bylaw_number;
+  const key = `${state.rules.length}|${state.rules.map(r => r.id).join(",").length}|${district || ""}|${cd1 || ""}`;
   if (refsCache.key !== key) {
     const order = { A: 0, B: 1, C: 2, D: 3, E: 4, F: 5 };
-    const rules = state.rules.slice().sort((a, b) => ((order[a.layer] ?? 9) - (order[b.layer] ?? 9)) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    const rules = state.rules.filter(r => appliesHere(r, district, cd1))
+      .sort((a, b) => ((order[a.layer] ?? 9) - (order[b.layer] ?? 9)) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     refsCache = { key, map: memoRefs(rules.map(r => ({ rule_id: r.id, layer: r.layer }))) };
   }
   return refsCache.map[id] || "";
@@ -85,7 +87,7 @@ export function refreshNeeds(formEl, schema, obj) {
   for (const g of schema) walk(g.fields);
   const [r0, r1] = counts.run, [u0, u1] = counts.rule;
   // the Ref column's key, once over the schedule (20 Nov 2026: "A25 A26", "C6" and "drawings" stood unexplained)
-  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i>Needed to run <b>${r0} of ${r1}</b></span><span>Read by a rule <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">· a blank comes back uncertain</span>` : ""}</span><span class="ref-key"><b>Ref</b> the rules that read the input, as the memo numbers them (A25 is layer A's rule 25), or what else it is for: drawings, title, note, file, money, open item. Click one for why.</span>`;
+  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i>Needed to run <b>${r0} of ${r1}</b></span><span>Read by a rule <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">· a blank comes back uncertain</span>` : ""}</span><span class="ref-key"><b>Ref</b> the rules that read the input, as the memo numbers them (A3 is the third rule of layer A that applies to this site), or what else it is for: drawings, title, note, file, money, open item. Click one for why.</span>`;
 }
 
 /* One row of a schedule, and the reason under it (folded). */

@@ -5,7 +5,7 @@ import { cap, fmtNum, h, setStatus, STATUS_WORD, todayISO, verdictStatus } from 
 import { state, STATIC } from "./core/state.js";
 import { optWord } from "./fields.js";
 import { rev } from "./runs.js";
-import { briefName, compareKind, dateWords, idBreak, optionName, refOf } from "./memo/memo.js";
+import { briefName, compareKind, dateWords, idBreak, memoRefs, optionName, takesRef } from "./memo/memo.js";
 import { fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, outrightWords, unverifiedRules } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
 import { sidesOf, tradeOff } from "./memo/side-by-side.js";
@@ -62,9 +62,12 @@ export function paperDocument(run) {
   const printed = dateWords(todayISO());
   const asOf = dateWords(L.run.as_of);
 
-  // references: the layer's letter and the rule's place in it, in the ledger's order
-  const refOf = {}, titleOf = {}, checkOf = {}, n = {};
-  for (const r of res) { n[r.layer] = (n[r.layer] || 0) + 1; refOf[r.rule_id] = `${r.layer}${n[r.layer]}`; titleOf[r.rule_id] = r.title; checkOf[r.rule_id] = r.check; }
+  // references: the layer's letter and the rule's place among the rules that apply here, as the screen counts them
+  const refOf = memoRefs(res), titleOf = {}, checkOf = {};
+  for (const r of res) { titleOf[r.rule_id] = r.title; checkOf[r.rule_id] = r.check; }
+  // the rules in the stack written for other districts (or not in force on the date): counted once, never listed
+  const elsewhere = res.filter(r => !takesRef(r));
+  const elsewhereLine = elsewhere.length ? `${elsewhere.length} more rule${elsewhere.length === 1 ? "" : "s"} in the stack ${elsewhere.length === 1 ? "is" : "are"} written for other districts or not in force on ${asOf}, and take no reference here.` : "";
   const ref = id => refOf[id] || id;
   const refTag = id => `<b class="ref">${h(ref(id))}</b>`;
   // an item with no rule of its own (the coverage notes, the plans) has no reference: a dash, never its id
@@ -79,7 +82,8 @@ export function paperDocument(run) {
     if (!srcNo.has(k)) { srcNo.set(k, sources.length + 1); sources.push({ ...s, cites: [] }); }
     return srcNo.get(k);
   };
-  for (const r of res) { const k = addSrc(r.source); if (k) sources[k - 1].cites.push(r.rule_id); }
+  // the sources of the rules that apply here; another district's schedule is not this memo's source
+  for (const r of res) { if (!takesRef(r)) continue; const k = addSrc(r.source); if (k) sources[k - 1].cites.push(r.rule_id); }
   for (const s of (site.sources || []).concat(opt.sources || [])) addSrc(s);
 
   const mark = s => `<span class="st st-${h(s || "na")}">${h(STATUS_WORD[s] || cap(s) || "—")}</span>`;
@@ -177,12 +181,13 @@ export function paperDocument(run) {
 
   // 4. every clause that applies, in reference order
   const applied = res.filter(r => r.status !== "not_applicable");
-  const na = res.filter(r => r.status === "not_applicable");
+  const na = res.filter(r => r.status === "not_applicable" && takesRef(r));
   const clauses = `<table class="clauses">
       <colgroup><col style="width:5%"><col style="width:24%"><col style="width:11%"><col style="width:19%"><col style="width:20%"><col></colgroup>
       <thead><tr><th>Ref</th><th>Clause and version</th><th>Status</th><th>Proposed</th><th>Permitted or required</th><th>The ask</th></tr></thead>
       <tbody>${applied.map(r => { const s = splitValues(r, L); return `<tr><td>${refTag(r.rule_id)}</td><td><b>${h(r.title)}</b><div class="mono muted">${idBreak(r.rule_id)} · v ${h(r.version_effective_from || "—")}</div></td><td>${mark(r.status)}</td>${s.info !== undefined ? `<td colspan="3">${h(s.info || "no figures")}</td>` : `<td>${h(s.proposed || "—")}</td><td>${h(s.permitted || "—")}</td><td>${s.ask ? h(s.ask) : `<span class="muted">—</span>`}</td>`}</tr>`; }).join("")}</tbody></table>
-    ${na.length ? `<p class="note">Not applicable here: ${na.map(r => `${refTag(r.rule_id)} ${h(r.title)}`).join("; ")}.</p>` : ""}`;
+    ${na.length ? `<p class="note">Not applicable here: ${na.map(r => `${refTag(r.rule_id)} ${h(r.title)}`).join("; ")}.</p>` : ""}
+    ${elsewhereLine ? `<p class="note">${h(elsewhereLine)}</p>` : ""}`;
 
   // 5. the massing, drawn from the same numbers
   let figures = "";
@@ -217,7 +222,7 @@ export function paperDocument(run) {
 
   // 6. the full ledger, layer by layer, each rule with its numbers and its source
   const layers = [];
-  for (const r of res) { let g = layers.find(x => x.layer === r.layer); if (!g) layers.push(g = { layer: r.layer, title: r.layer_title, rows: [] }); g.rows.push(r); }
+  for (const r of res) { if (!takesRef(r)) continue; let g = layers.find(x => x.layer === r.layer); if (!g) layers.push(g = { layer: r.layer, title: r.layer_title, rows: [] }); g.rows.push(r); }
   // a share prints as a percentage, as everywhere else in the memo (20 Nov 2026: "share below hils 0.3")
   const shareVal = (k, x) => {
     if (typeof x === "number" && /(^|_)shares?(_|$)/.test(k) && x >= 0 && x <= 1) return numberWords(k, x).split(": ").slice(1).join(": ");
@@ -230,7 +235,8 @@ export function paperDocument(run) {
       <table class="ledger">
         <colgroup><col style="width:5%"><col style="width:21%"><col style="width:14%"><col style="width:28%"><col style="width:18%"><col></colgroup>
         <thead><tr><th>Ref</th><th>Rule and version</th><th>Status</th><th>Finding</th><th>Numbers used</th><th>Source</th></tr></thead>
-        <tbody>${g.rows.map(r => { const k = srcNo.get(`${(r.source || {}).title || ""}|${(r.source || {}).url || ""}`); return `<tr><td>${refTag(r.rule_id)}</td><td><b>${h(r.title)}</b><div class="mono muted">${idBreak(r.rule_id)}</div><div class="muted">in force from ${h(r.version_effective_from || "—")}${r.version_effective_to ? ` to ${h(r.version_effective_to)}` : ""}</div></td><td>${mark(r.status)}</td><td>${h(r.finding || "")}${r.action ? `<div class="action">${h(r.action)}</div>` : ""}</td><td class="nums">${numbers(r.values)}</td><td>${k ? `<b class="ref">S${k}</b> ` : ""}${h((r.source && r.source.section) || "")}</td></tr>`; }).join("")}</tbody></table>`).join("");
+        <tbody>${g.rows.map(r => { const k = srcNo.get(`${(r.source || {}).title || ""}|${(r.source || {}).url || ""}`); return `<tr><td>${refTag(r.rule_id)}</td><td><b>${h(r.title)}</b><div class="mono muted">${idBreak(r.rule_id)}</div><div class="muted">in force from ${h(r.version_effective_from || "—")}${r.version_effective_to ? ` to ${h(r.version_effective_to)}` : ""}</div></td><td>${mark(r.status)}</td><td>${h(r.finding || "")}${r.action ? `<div class="action">${h(r.action)}</div>` : ""}</td><td class="nums">${numbers(r.values)}</td><td>${k ? `<b class="ref">S${k}</b> ` : ""}${h((r.source && r.source.section) || "")}</td></tr>`; }).join("")}</tbody></table>`).join("")
+    + (elsewhereLine ? `<p class="note">${h(elsewhereLine)}</p>` : "");
 
   // 7. the inputs the memo read
   const describe = x => {
@@ -254,8 +260,9 @@ export function paperDocument(run) {
   const files = Object.entries(st.rules_files || {}).map(([f, hsh]) => `<tr><td class="mono">${h(f)}</td><td class="mono">${h(hsh)}</td></tr>`).join("");
   // the versions the fingerprint is built from, in reference order
   const versions = (Array.isArray(st.rule_versions) ? st.rule_versions : [])
-    .slice().sort((a, b) => String(ref(a.rule_id)).localeCompare(String(ref(b.rule_id)), "en", { numeric: true }))
-    .map(v => `<tr><td>${refTag(v.rule_id)}</td><td class="mono">${idBreak(v.rule_id)}</td><td>${h(v.version_effective_from || "—")}${v.version_effective_to ? ` to ${h(v.version_effective_to)}` : ""}</td></tr>`).join("");
+    // the numbered rules first, in reference order; the stack's others (they still make the fingerprint) after, by id
+    .slice().sort((a, b) => (refOf[a.rule_id] ? 0 : 1) - (refOf[b.rule_id] ? 0 : 1) || String(ref(a.rule_id)).localeCompare(String(ref(b.rule_id)), "en", { numeric: true }))
+    .map(v => `<tr><td>${refCell(v.rule_id)}</td><td class="mono">${idBreak(v.rule_id)}</td><td>${h(v.version_effective_from || "—")}${v.version_effective_to ? ` to ${h(v.version_effective_to)}` : ""}</td></tr>`).join("");
   const verify = `<p>The memo is deterministic: the same inputs read under the same rules always give the same memo. To check it, run the engine on the same files and compare the fingerprint, which is a hash of the rule files and the rule versions in force on the as-of date.</p>
     <pre class="cmd">${h(cmd)}</pre>
     <table class="kv"><tbody>

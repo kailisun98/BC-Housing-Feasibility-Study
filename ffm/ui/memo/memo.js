@@ -236,11 +236,21 @@ function tierWords(t, n) {
   return n && sum !== n ? `${words} <span class="warn-text">· ${h(sum)} of ${h(n)} homes</span>` : words;
 }
 
-/* The paper memo's references, A1 to F7: the layer's letter and the rule's place in it, in the ledger's order. The
-   screen cites the same, so a planner's "re C5" means the same thing in both renderings. Pure. */
+/* Whether a ledger result takes a reference: every rule that applies to this site does, whatever its status; one
+   written for another district, or with no version in force on the date, is listed but not numbered (20 Nov 2026,
+   Kai: with 48 other districts' schedules in the stack, 998 E 19th Ave's rezoning policy had become A20). The engine
+   marks those results `elsewhere`; a ledger written before that says so in its finding. engine.takes_ref is the twin. */
+export const takesRef = r => !(r && (r.elsewhere || (r.status === "not_applicable" && /^(Written for |No version of this rule is in force)/.test(r.finding || ""))));
+
+/* The paper memo's references, A1 to F7: the layer's letter and the rule's place among the rules that apply here, in
+   the ledger's order. The screen cites the same, so a planner's "re C5" means the same thing in both renderings. Pure. */
 export function memoRefs(res) {
   const refOf = {}, n = {};
-  for (const r of res || []) { n[r.layer] = (n[r.layer] || 0) + 1; refOf[r.rule_id] = `${r.layer}${n[r.layer]}`; }
+  for (const r of res || []) {
+    if (!takesRef(r)) continue;
+    n[r.layer] = (n[r.layer] || 0) + 1;
+    refOf[r.rule_id] = `${r.layer}${n[r.layer]}`;
+  }
   return refOf;
 }
 

@@ -52,13 +52,16 @@ def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None
             "version_effective_from": version.effective_from.isoformat() if version else None,
             "version_effective_to": version.effective_to.isoformat() if (version and version.effective_to) else None,
         }
+        # a rule not in force on the date, or written for another district, is listed but takes no reference (A1…):
+        # `elsewhere` says which (takes_ref)
         if version is None:
-            results.append({**base, "status": NA, "finding": f"No version of this rule is in force on {on.isoformat()}.", "values": {}, "action": ""})
+            results.append({**base, "status": NA, "finding": f"No version of this rule is in force on {on.isoformat()}.", "values": {}, "action": "",
+                            "elsewhere": "date"})
             continue
         if not rule.applies_to_site(site):
             results.append({**base, "status": NA,
                             "finding": f"Written for {rule.written_for()}; this site is zoned {district or 'unknown'}.",
-                            "values": {"district": district}, "action": ""})
+                            "values": {"district": district}, "action": "", "elsewhere": "district"})
             continue
         fn = CHECKS.get(rule.check)
         if fn is None:
@@ -86,6 +89,30 @@ def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None
         "inputs": {"site": site, "option": option},
     }
     return ledger
+
+
+def takes_ref(r: dict) -> bool:
+    """Whether a ledger result takes a reference (A1 … F7): every rule that applies to the site does, whatever its
+    status; one written for another district, or with no version in force on the date, does not (20 Nov 2026, Kai:
+    with 48 other districts' schedules in the stack, 998 E 19th Ave's rezoning policy had become A20). A ledger written
+    before the `elsewhere` mark is read by its finding. The page's memo/memo.js takesRef is the twin."""
+    if r.get("elsewhere"):
+        return False
+    finding = r.get("finding") or ""
+    return not (r.get("status") == NA and (finding.startswith("Written for ") or finding.startswith("No version of this rule is in force")))
+
+
+def memo_refs(results: list[dict]) -> dict[str, str]:
+    """The memo's references: the layer's letter and the rule's place among the results that take one, in the ledger's
+    order (memo/memo.js memoRefs numbers them the same way on screen and on paper). Pure."""
+    out: dict[str, str] = {}
+    n: dict[str, int] = {}
+    for r in results:
+        if not takes_ref(r):
+            continue
+        n[r.get("layer")] = n.get(r.get("layer"), 0) + 1
+        out[r.get("rule_id")] = f"{r.get('layer')}{n[r.get('layer')]}"
+    return out
 
 
 def counts_outright(r: dict) -> bool:

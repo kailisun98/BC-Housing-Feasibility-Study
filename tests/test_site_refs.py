@@ -17,12 +17,7 @@ WORDS = {"Interim Rezoning Policy": "cov.irp.social_housing_rezoning", "Protecti
 # (20 Nov 2026: the exits pass in the regenerated R1, so the page no longer cites them as an open item)
 
 
-def memo_refs(results):
-    n, ref = {}, {}
-    for r in results:
-        n[r["layer"]] = n.get(r["layer"], 0) + 1
-        ref[r["rule_id"]] = f"{r['layer']}{n[r['layer']]}"
-    return ref
+from ffm.engine import memo_refs, takes_ref   # the tool's count: only the rules that apply to the site (20 Nov 2026)
 
 
 class CaseRefs(unittest.TestCase):
@@ -33,6 +28,22 @@ class CaseRefs(unittest.TestCase):
         for ref, words in cited:
             self.assertIn(words, WORDS, words)
             self.assertEqual(ref, refs[WORDS[words]], f"{words}: the page says {ref}, the R1 memo {refs[WORDS[words]]}")
+
+    def test_only_the_rules_that_apply_take_a_reference(self):
+        results = json.loads(R1.read_text(encoding="utf-8"))["results"]
+        refs = memo_refs(results)
+        elsewhere = [r for r in results if not takes_ref(r)]
+        self.assertGreater(len(elsewhere), 40)                       # the other districts' schedules
+        self.assertTrue(all(r["status"] == "not_applicable" for r in elsewhere))
+        self.assertFalse(any(r["rule_id"] in refs for r in elsewhere))
+        # each layer numbers from 1 with no gaps over the rules that apply
+        for layer in "ABCDEF":
+            nums = sorted(int(v[1:]) for v in refs.values() if v[0] == layer)
+            self.assertEqual(nums, list(range(1, len(nums) + 1)), layer)
+        # a result the engine marks, and one from a ledger written before the mark
+        self.assertFalse(takes_ref({"status": "pass", "elsewhere": "district"}))
+        self.assertFalse(takes_ref({"status": "not_applicable", "finding": "Written for RT-3 districts; this site is zoned RM-1."}))
+        self.assertTrue(takes_ref({"status": "not_applicable", "finding": "Not a CD-1 site."}))
 
     def test_no_rule_file_id_is_shown_to_the_reader(self):
         ids = re.findall(r'<span class="rid">([^<]+)</span>', CASE.read_text(encoding="utf-8"))

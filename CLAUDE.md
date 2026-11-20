@@ -838,7 +838,7 @@ an architect, a board/funder reader, a tester, the detector) wrote `.impeccable/
   it places more homes; the sheets carry scale bars, north arrows, street names, stairs, doors and an entry, measured
   text (`SheetsReadAsDrawings` checks no overlap); heights print half-up (88.45 stays 88.45).
 - **The committed runs were regenerated**: 998 now holds 84 rules (48 not applicable from the 17 Nov schedules), so its
-  refs moved (the IRP is A20, the trees C6; `tests/test_site_refs.py`); fingerprints 6e72488249c79837 (23 Oct) and
+  refs moved until they were counted over the rules that apply only (below); fingerprints 6e72488249c79837 (23 Oct) and
   6400258c88ac57c8 (27 Oct); homes placed 67 of 105 and exits pass (the solver already at HEAD). `375-glen-drive/
   first-run` was rerun with the rule files as at f3db4f1 (`git show f3db4f1:rules/…` into a scratch folder, `--rules`),
   keeping fingerprint 8a8459a0c650a9c2; with today's rules it would duplicate as-proposed. The site pages quote the new
@@ -851,6 +851,12 @@ an architect, a board/funder reader, a tester, the detector) wrote `.impeccable/
   (who resolves what), `memo/words.js` ("Words in this memo"), `figures/envelope.js` (answer 1's drawing); FIG 02 is
   Section A–A; dates read as words. **Site**: how.html gains the lanes (section 05) and drawn layer slabs; case.html the
   R1–R3 sections; claims sourced in the sentence; brand.html for designers. DESIGN.md records each.
+- **References count only the rules that apply** (Kai, 20 Nov 2026): a result written for another district or not
+  in force on the date takes no A1… number (`engine.takes_ref` / `memo_refs`, the page's `takesRef` / `memoRefs`;
+  the engine marks such results `elsewhere: "district" | "date"`, and older ledgers are read by their finding). The
+  schedule's pre-run count (`refNow`) numbers only the rules `appliesHere` keeps; the paper drops those rules from its
+  ledger and source list with one line counting them. On 998 R1: the policy A1, the RM-1 outright FSR and height A3
+  and A4, the trees C6 (the area-plan family rule in layer C still applies city-wide).
 
 ## Rules from the assignment brief (binding)
 

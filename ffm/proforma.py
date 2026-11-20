@@ -51,14 +51,10 @@ def next_step(pf: dict) -> str | None:
 
 
 def _refs(ledger: dict) -> dict[str, str]:
-    """The memo's references (A1 … F7): the layer's letter and the rule's place in it, in the ledger's order, as the
-    page's memoRefs (ffm/ui/memo/memo.js) numbers them, so a line note's "F3" is the row the reader finds."""
-    out: dict[str, str] = {}
-    n: dict[str, int] = {}
-    for r in ledger.get("results", []):
-        n[r.get("layer")] = n.get(r.get("layer"), 0) + 1
-        out[r.get("rule_id")] = f"{r.get('layer')}{n[r.get('layer')]}"
-    return out
+    """The memo's references (A1 … F7), as engine.memo_refs and the page's memoRefs (ffm/ui/memo/memo.js) number them,
+    so a line note's "F3" is the row the reader finds."""
+    from .engine import memo_refs   # imported here: the engine module is the larger one, and this keeps the import light
+    return memo_refs(ledger.get("results", []))
 
 
 def _layer(ledger: dict, layer: str) -> dict[str, dict]:

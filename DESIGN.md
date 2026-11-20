@@ -840,7 +840,9 @@ where Save as PDF gives the same pages. US Letter, 20 / 16 / 18 mm margins.
   source section); the inputs; the sources with their URLs printed; and how to reproduce the memo (the
   command, the fingerprint, the rule files' hashes, the rule versions in force).
 - **References:** every rule is named by its layer and place, A1 to E4, in every section, so any answer
-  can be followed to its clause and, through its S number, to its document.
+  can be followed to its clause and, through its S number, to its document. The place is counted over the rules that
+  apply to the site (20 Nov 2026): a rule written for another district, or not in force on the date, takes no number,
+  and the paper counts those in one line instead of listing them; screen, schedule and paper number alike.
 - **Type:** IBM Plex Sans 8.6pt, tables 7.6pt with 6.3pt uppercase keys, ids and numbers in Plex Mono;
   rule ids wrap at their dots and underscores. Statuses keep their mark and word, readable in grey.
 - **Running header and footer** from page 2: the address and the tool's name on the left, the revision

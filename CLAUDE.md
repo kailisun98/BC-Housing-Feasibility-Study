@@ -811,6 +811,47 @@ Phase 6, Claude in the loop (the model proposes, a person confirms, the engine d
   and for 27 Oct `83993057d297734a`. The local Revit result on the as-approved run still carries the old stamp
   `20e44f1445ecaff9`, so its section stays out of that memo until the pyRevit script is run again on the folder.
 
+## The six-reviewer critique and its fixes (20 Nov 2026)
+
+Kai asked for a re-critique with several opinions per part; six reviewers (a design director, a development manager,
+an architect, a board/funder reader, a tester, the detector) wrote `.impeccable/critique/2026-11-18T23-07-55Z__*`
+(tool 24/40, site 19/28), and Kai chose "everything found". Decisions Kai made: an option over the outright limits
+**fails the outright test, with rezoning named as required**; the money is **drawn as a stack**; 609 Heatley Ave
+**should fit** (below). What a later session must know:
+- **Corner lots** (`lookup.corner_yard_front`): where the address street runs along the lot's longer side and a cross
+  street along the shorter, the lookup sets `site.front_face` and `site.front_street` to the cross street. Kai's words:
+  the building's long side is along Heatley, but the side by the neighbour is a side yard, as it is from Keefer St. So
+  the yards are read from the short side (the 20 m RT-3 rear yard falls at the far end) while the address frontage
+  stays the named street's (the 39 frontage labels put six corner fronts on the longer, named street; making the
+  shorter side the frontage scored 30 of 39 against 35). 609 Heatley Ave: envelope 11.5 × 13.0 m, outright yes, FSR
+  0.60, 340 m², a walk-up of 4 homes (3 placed).
+- **Engine** (`checks.py`): exceeding the outright FSR, height or homes cap with a rezoning path is `fail` ("not allowed
+  outright; rezoning is required (…)"), never an open item (`engine.answered_by_rezoning`); the by-rezoning answer is
+  unchanged. The no-envelope yards finding leads with the consequence and a named task, clauses last. The funders answer
+  has `funded.words` ("Meets the criteria of …") and `funded.intake` [{rule_id, program, open, note, more, status}];
+  the CHF's cancelled 2025 call is `open: false`. `proforma`: a missing land price with a gap already over 15% before
+  land reads unlikely; line notes explain land at $0 (F3), the 15% screening line and the 1.10 coverage.
+  `suggest` returns `label` / `falls_short` (funder-ready under the fund's smallest split) and, with `fixed.units` and
+  no gfa, `floor_area_from_homes` (the floor area follows the homes, capped at the envelope, storeys on plates of at
+  most 500 m², a placeholder). `layout`: a building of at most 3 storeys on a plate of at most 150 m² is also tried as
+  a **walk-up** (one 2.6 × 5.5 m stair, no lift, `WALKUP_ASSUMPTIONS`, one exit marked a placeholder) and kept where
+  it places more homes; the sheets carry scale bars, north arrows, street names, stairs, doors and an entry, measured
+  text (`SheetsReadAsDrawings` checks no overlap); heights print half-up (88.45 stays 88.45).
+- **The committed runs were regenerated**: 998 now holds 84 rules (48 not applicable from the 17 Nov schedules), so its
+  refs moved (the IRP is A20, the trees C6; `tests/test_site_refs.py`); fingerprints 6e72488249c79837 (23 Oct) and
+  6400258c88ac57c8 (27 Oct); homes placed 67 of 105 and exits pass (the solver already at HEAD). `375-glen-drive/
+  first-run` was rerun with the rule files as at f3db4f1 (`git show f3db4f1:rules/…` into a scratch folder, `--rules`),
+  keeping fingerprint 8a8459a0c650a9c2; with today's rules it would duplicate as-proposed. The site pages quote the new
+  figures (seven open items on R1, 67 of 105).
+- **Tool**: the walkthrough's Run stop opens the committed R1 (no run folder); Back/Forward move between runs
+  (`followHistory`); drafts are removed only by Start fresh; stop 02 leads with Homes, refuses impossible figures and
+  draws a small section; the block editor opens on the memo's own plan, works by keyboard, and has "Suggest a grid
+  plan"; touch targets are 44px; the as-of date is labelled "Rules as of". **Memo**: the comparison follows the
+  answers (`.memo-compare`, folded for the reader); new modules `memo/stack.js` (capital stack), `memo/lanes.js`
+  (who resolves what), `memo/words.js` ("Words in this memo"), `figures/envelope.js` (answer 1's drawing); FIG 02 is
+  Section A–A; dates read as words. **Site**: how.html gains the lanes (section 05) and drawn layer slabs; case.html the
+  R1–R3 sections; claims sourced in the sentence; brand.html for designers. DESIGN.md records each.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

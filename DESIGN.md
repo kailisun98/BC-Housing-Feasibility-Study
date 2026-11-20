@@ -364,9 +364,16 @@ derived tokens too (the status marks are resolved where they are defined, so the
 night colours otherwise).
 
 **The Revision Rule.** When two readings of the rules are compared, what changed carries a delta
-with its letter (A) and the comparison's answer sits right under the title block, before the three
-answers. Two options read under the same rules are compared without it: their difference is in the
-numbers, not the rules. Nothing else uses the delta.
+with its letter (A). The comparison follows the four answers (20 Nov 2026: under the title block it put
+1,200 px of tables before answer 01, 3,000 px on a phone), in a fold that opens for the manager and the
+architect and stays shut for the reader. Two options read under the same rules are compared without the
+delta: their difference is in the numbers, not the rules. Nothing else uses the delta.
+
+**The Drawn Answer Rule (20 Nov 2026).** Where an answer turns on a relation a sentence cannot hold, it
+carries a drawing in the drawing language, on white paper, from the run's own files: answer 1 the
+envelope (allowed today against proposed), answer 3 the lanes (who settles what, in order), answer 4 the
+capital stack (cost against what pays for it). A drawing never replaces the words or the table beside
+it, and none is a chart for its own sake: no axis that isn't metres or dollars of this memo, no gauge.
 
 ## Typography
 
@@ -441,10 +448,17 @@ field and Look up, the saved sites and the demo case following on one quiet line
 puts the half-tone map beside its facts; the questions the open data could not answer are one schedule
 (question, a three-state or a select, who answers). 02 and 03 set keys beside their content as the
 title block does (For, The site allows, Start from, The building, Left to you); the building is **four
-figures under a 2px ink rule** (storeys, height, FSR over floor area, homes), each changed in place with
-its rule's ref, "rough", "placeholder" or "yours" beneath; every other figure waits behind "All 21
-figures". A blank page adds the memo's title block in dashed outline, labels only. A route row brought
-back after a run lays its card over the memo, with Back to R1 in the head.
+figures under a 2px ink rule** (homes first, since 20 Nov 2026, as a manager says "we need 40 homes";
+then storeys, height, FSR over floor area), each changed in place with
+its rule's ref, "rough", "placeholder" or "yours" beneath, and an impossible entry (storeys not whole or
+under 1, more than 6m or under 2.8m a floor) named under its figure; every other figure waits behind
+"All 21 figures". Beside them a small section on white paper (about 248 × 184px) draws the proposed mass
+filled over the allowed one dashed, redrawn as the figures change, so a wrong figure looks wrong. The
+suggestion is named by what it is ("Outright: 3 storeys, 4 homes") with a plain line where a candidate
+falls short of its name. Stop 01's questions each say what the answer changes and where to find it,
+under "Not sure is a fine answer". A blank page adds the memo's title block in dashed outline, labels
+only ("not run yet"). A route row brought back after a run lays its card over the memo, with Back to R1
+in the head.
 
 The home page is one 1280px column with a 20px gutter (16px on a phone); its top bar's contents
 line up with that column at any width, and its four anchors mark the section the reader is in. On a
@@ -606,7 +620,10 @@ here, including opening a past run, a comparison and reading the Revit result; t
 ### Title block
 The memo's header: an 18px title over a row of cells, each a Key over a 12.5px value, keys aligned
 to the top, separated by 1px lines, under a 2px Ink rule; the Revision cell carries R1, R2… in bold
-and the engine version. A comparison adds a cell: Revised from (the delta, the earlier memo's
+(the engine version moved to the Rules fingerprint card, 20 Nov 2026). Dates read as words, "23 Oct
+2026", in the title block, the answers, the status strip and the paper; ISO stays in mono, machine
+places. The mix has a cell of its own, and a long option name shows its short name over the full one,
+spanning the row past 90 characters. A comparison adds a cell: Revised from (the delta, the earlier memo's
 revision and its rules date) when the rules moved, Compared with (the other memo's revision, its
 option's name and date) when two options were read under the same rules.
 
@@ -625,9 +642,16 @@ foot of the memo, and in the Revit elements' Comments. The downloadable memo fil
 engine and still print the stamp.
 
 ### Side by side
-A comparison opens with it, directly under the title block.
+A comparison opens with it, after the four answers, inside the comparison's fold (the Revision Rule).
+The earlier revision stands on the left and this memo on the right, each under a short name ("R1 · As
+approved", "R2 · What-if (hypothetical)"); numbers are right-aligned under right-aligned keys, money in
+$M, and the last column is "Change" (right less left). It opens with **one section at one scale** on one
+ground: this memo's mass filled, the other's outlined, the outright limit and the benchmark band, the
+height difference dimensioned, and homes and trees in the caption. Funders read "Meets the criteria"
+(never "Yes", which read as funded), with a row for the money beside it, and the two capital stacks
+follow at one shared scale.
 - **Pickers:** the two run pickers ("Open a past run" and "Compare with…", above the memo otherwise)
-  move into a row laid on its A and B columns, their keys renamed "A · This run" and "B · Compared";
+  move into a row laid on its two columns, their keys renamed "This memo" and "Compared with";
   a hidden phrase keeps what each does in its accessible name. A picker that had focus keeps it as
   the memo is redrawn, wherever the picker lands. On a phone the two stack across the card. In print
   and when presenting the pickers hide and each option's name stands in their place.
@@ -671,6 +695,27 @@ verdict: one line under a tinted hairline, "Show the pro-forma · capital $54.1M
 the development manager's figures", reading "Fold the pro-forma" once open; ledger layer F follows it, and
 the choice is kept.
 
+The drawings in the answers (20 Nov 2026, after a six-reviewer critique; the Drawn Answer Rule):
+- **Answer 1, the envelope** (`figures/envelope.js`): two masses on one ground at one scale, about 172px
+  tall, the outright **limit** a dash-dot line apart from the outright **mass** (dashed), the benchmark a
+  band; under each, its words: "Allowed today, no vote needed" and "Needs rezoning: a Council decision after
+  a public hearing" (or "Within what is allowed today", "not yet confirmed", "not assessed", drawing only
+  what is known). The verdict reads "Not outright: rezoning required" when the option exceeds the outright
+  limits: those rules are Fail on the outright test, and the card keeps the by-rezoning answer's wash.
+- **Answer 2** says "Meets the criteria of …" and, where a targeted program's intake is closed, says so on
+  its own line ("the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open
+  now"), then "The criteria are not the money" with answer 4's verdict.
+- **Answer 3, the lanes** (`memo/lanes.js`): a lane per person who acts, three stages (site facts, design,
+  funders), each item a node with its ref and a few words, over the open-items table; the paper prints it.
+- **Answer 4, the capital stack** (`memo/stack.js`): HTML on white paper, two columns at one scale (what it
+  costs: hard, soft, contingency, land; what pays for it: grants, equity, debt) with the gap hatched "Not
+  yet found" and an amber line at 15% of the cost, "this tool's screening line, not a funder's rule"; small
+  parts get leaders, and under 400px of its own width the labels become a list. The sentences explain land
+  at $0, the 15% line and the 1.10 coverage with this memo's figures.
+- After the answers, **"Words in this memo"**, a fold of one-sentence definitions of only the terms the
+  memo uses (FSR, outright, by rezoning, plate, RGI, HILs, conditional, revision…), and **the unverified
+  line**: "N rules in this memo are not yet checked against their source", on page one of the paper too.
+
 ### Segmented control
 Plan | 3D on FIG 01 (the pattern for any two-or-three-way view switch): one 4px box with a Line border, 11.5px weight 500
 segments at 3px by 10px, the pressed segment filled Draw Ink with white text, the rest Draw Muted
@@ -689,7 +734,20 @@ sit at their heights and are pushed apart where two would overprint, a thin lead
 label to its line; its note under the ground line starts at the lot's edge. The axonometric leads its
 height labels off the masses on leader lines, turns under a sideways drag (vertical swipes still
 scroll a phone) and under the arrow keys; its frame is the largest extent the drawing can reach at any
-azimuth and any tilt, so a drag never rescales it. FIG 03 is the Revit sheet image.
+azimuth and any tilt, so a drag never rescales it. The Revit sheet image follows the engine's sheets.
+
+Since 20 Nov 2026: FIG 01 frames the lot plus 25m (the context faded a step, roads at full tone), dimensions
+the yards square to the lot lines and labels the plate, marks the cut A–A with lettered arrows, labels the
+scale bar 0 / half / full, and its caption says "North up" or "The street at the bottom" from the drawing
+itself. **FIG 02 is Section A–A through the lot**: the street named on the left, the lane or next road on
+the right, hatched ground, property lines, the setback envelope as red dashed verticals, the yards
+dimensioned under the ground, the proposed mass cut with level ticks and a height chain ("6 × 3.3 m",
+"+2.5"), the outright limit as a dash-dot line ("limit 10.7 m") apart from the outright mass ("outright 3
+storeys, 9.9 m"), the benchmark as a band and mapped neighbours at their heights. Captions are two or three
+lines with the key figures in ink; a lot with no plate says "no plate fits on the lot as fronted", never a
+zero. The engine's sheets (plans by program, stacking, elevations, code site plan) carry a two-half scale
+bar, the street named at its edge, a north arrow where the frame gives the bearing, stairs with treads
+(scissor stairs and lifts), exit doors and an entry arrow; their text is measured so nothing overprints.
 
 ### Who is reading
 The tool's top bar carries a three-way pill, Manager · Architect · Reader, after the lockup: the flows in
@@ -727,6 +785,15 @@ who-reads-what grid with the memo's column lit in signal; flows as numbered step
 screen each lands on in mono. Sections reveal on scroll (0.5s, off under reduced motion, and never
 left hidden past 1.5s).
 
+Added 20 Nov 2026: **lanes** (how.html section 05: people as rows, the project's stages as columns,
+numbered nodes, hand-offs drawn as lines; one numbered list on a phone); **revision sections** (case.html:
+R1, R2 and R3 cut through at one scale against the benchmark band and the outright line, a line each on
+what differs, their verdict pills in a fixed column); **connectors** (`[data-links]` with `data-to` on the
+nodes, drawn by site.js and redrawn on resize; CSS arrows on a narrow screen); the how hero's six layer slabs
+drawn in full, each tinted with its result. A section heading has more space above it than below (38 / 34px,
+24 / 14px on a phone), running prose holds to about 52ch, and pills on white paper always take the light
+status set. brand.html says it is for designers.
+
 ### Home page devices (the tool's former home page, kept for reference)
 HTML, never pictures of it, so everything reflows and keeps the page's type sizes. Only the memo row
 sits on paper; the rest sits on the page.
@@ -753,10 +820,11 @@ A spotlight cut from a dimmed page with a 2px blue ring, and a Panel card: a mod
 its 14px heading, 12.5px text, Back / Next buttons and a Key counter ("3 of 9 · Esc closes"). Tab
 stays inside the card, the arrows page through it except inside a field or the 3D view, and Esc
 returns focus to where it was. Its nine stops follow the route (rebuilt 16 Nov 2026): the mode switch,
-the three stops, 01, 02 (the demo case is loaded if no site is), 03 (it runs the real case), the four
+the three stops, 01, 02 (the demo case is loaded if no site is), 03 (it opens the committed R1, 20 Nov
+2026: running the rules there wrote a run folder and a new revision on every tour), the four
 answers, the memo's actions, the view switch, and the architect's and reader's layouts. A stop may set
 the page up for itself and wait for it; the layout and the view the reader started in come back when
-the walkthrough ends.
+the walkthrough ends, and `tour=` leaves the URL.
 
 ### The paper memo (PDF and Print)
 Download PDF and Print both lay the memo out for paper, for whoever reviews it, as one self-contained

@@ -359,6 +359,23 @@ def street_bearing(elements: list[dict], center_latlon: tuple[float, float], str
     return out
 
 
+def corner_yard_front(street: dict | None, metrics: dict | None) -> str | None:
+    """The street a corner lot's yards are read from, where it is not the address street: the cross street when its
+    side of the lot is the shorter one. Kai, 20 Nov 2026, on 609 Heatley Ave (37.2 m along Heatley Ave, 15.2 m along
+    Keefer St, RT-3): the building's long side is along Heatley, but the side by the neighbour is a side yard, since
+    from Keefer St it is one; so the 20 m rear yard falls at the end away from Keefer and a plate fits, where reading
+    the yards from Heatley left the 15.2 m depth under a 20 m rear yard. RT-3's own diagrams draw a corner site so: the
+    front on the narrow end, the flanking street along the long side, the lane at the rear. The address frontage stays
+    the named street's side (a person's frontage marks on 39 parcels put six corner lots' fronts on the longer, named
+    street; moving those to the shorter side scored 30 of 39 against 35), so only the yards move. Pure."""
+    if not street or not metrics or not street.get("cross_street"):
+        return None
+    front, depth = metrics.get("frontage_m"), metrics.get("depth_m")
+    if not front or not depth or depth >= front - 0.5:
+        return None
+    return street["cross_street"]["name"]
+
+
 def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_M) -> dict[str, Any]:
     """A proposed site file for the address, with every field's source, for a person to confirm. With `context`
     the streets, buildings and trees around the parcel come too, from the City's open data (a second or two),
@@ -450,7 +467,14 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         front_how = (f"the side along {street['name']}" + ("" if street["matched_by_name"] else ", the nearest road")
                      + f" (OpenStreetMap; its centre line {street['distance_m']} m from the lot's centre)") if street else metrics["frontage_from"]
         notes.append(f"Lot area {metrics['area_m2']:,.1f} m² from the parcel polygon" + (", a rectangle" if metrics["rectangular"] else ", not a rectangle: the frontage and depth are an equivalent rectangle with the same area") + f"; frontage taken as {front_how}.")
-        if street and street.get("cross_street"):
+        yard_front = corner_yard_front(street, metrics)
+        if yard_front:
+            x = street["cross_street"]
+            notes.append(f"A corner lot: the address faces {street['name']} along the lot's {metrics['frontage_m']} m side, and {x['name']} runs along "
+                         f"its {metrics['depth_m']} m end. The yards are read from {x['name']}, the shorter street side, as a corner site's are: "
+                         f"the lot is {metrics['frontage_m']} m deep from it, {street['name']} is the flanking street, and the side by the "
+                         f"neighbour is a side yard, not a rear yard. Confirm with the City which street is the front: it sets the yards, the envelope and the massing.")
+        elif street and street.get("cross_street"):
             x = street["cross_street"]
             notes.append(f"A corner lot: {x['name']} also runs beside it, {x['distance_m']} m from the centre. The frontage is taken on {street['name']} "
                          f"({metrics['frontage_m']} m); the front could instead be the {metrics['depth_m']} m side on {x['name']}. "
@@ -507,6 +531,10 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     }
     if cd1:
         site["cd1_bylaw_number"] = cd1
+    if metrics and corner_yard_front(street, metrics):
+        # the engine turns the lot to front_face; the page's "Which street is the front?" reads front_street
+        site["front_face"] = {"street": street["cross_street"]["name"]}
+        site["front_street"] = street["cross_street"]["name"]
     if site["context"] is None:
         del site["context"]
     # the surroundings, as python -m ffm context stores them, so the plan draws the real streets and buildings

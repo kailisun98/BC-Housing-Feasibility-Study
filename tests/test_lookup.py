@@ -78,9 +78,10 @@ class ParcelMetrics(unittest.TestCase):
         self.assertLess(lookup.parcel_metrics(parcel, g["bearing_deg"])["frontage_m"], 16)   # 15.2 m on Georgia
         self.assertIsNone(lookup.street_bearing([], (c["lat"], c["lon"]), "Heatley Ave"))
 
-    def test_a_corner_lot_is_flagged_not_decided(self):
-        # 609 Heatley Ave again, assembled with both streets in the context: the front stays on Heatley and the note
-        # names East Georgia Street as the other side to confirm
+    def test_a_corner_lots_yards_are_read_from_its_shorter_street_side(self):
+        # 609 Heatley Ave again, assembled with both streets in the context (20 Nov 2026, Kai: the building's long side is
+        # along Heatley, but the side by the neighbour is a side yard, as it is from the cross street): the address
+        # frontage stays the 37.2 m on Heatley, the yards are read from the 15.2 m side on the cross street
         parcel_ring = [[-123.08996199873619, 49.2792120018887], [-123.089976239477, 49.27887771187751],
                        [-123.08976691960697, 49.27887376388247], [-123.08975269125037, 49.27920808084372], [-123.08996199873619, 49.2792120018887]]
         c = lookup.parcel_metrics(parcel_ring)["center"]
@@ -90,10 +91,24 @@ class ParcelMetrics(unittest.TestCase):
                    "geometry": [{"lat": c["lat"] - 0.00025, "lon": c["lon"] - 0.001}, {"lat": c["lat"] - 0.00025, "lon": c["lon"] + 0.001}]}
         parcel = {"geom": {"geometry": {"coordinates": [parcel_ring]}}, "civic_number": "609", "streetname": "HEATLEY AV", "site_id": "x"}
         site = lookup.assemble("609 Heatley Ave", c["lat"], c["lon"], "609 HEATLEY AV (test)", [], [parcel], [heatley, georgia])["site"]
-        self.assertIn("A corner lot: East Georgia Street also runs beside it", site["notes"])
-        self.assertIn("Confirm which side is the front", site["notes"])
-        self.assertGreater(site["frontage_m"], site["depth_m"])             # still 37.2 m on Heatley
+        self.assertIn("The yards are read from East Georgia Street, the shorter street side", site["notes"])
+        self.assertIn("the side by the neighbour is a side yard", site["notes"])
+        self.assertIn("Confirm with the City which street is the front", site["notes"])
+        self.assertEqual(site["front_face"], {"street": "East Georgia Street"})
+        self.assertEqual(site["front_street"], "East Georgia Street")          # the page's "Which street is the front?"
+        self.assertGreater(site["frontage_m"], site["depth_m"])             # the address frontage: still 37.2 m on Heatley
         self.assertEqual(site["parcel"]["street"]["cross_street"]["name"], "East Georgia Street")
+
+    def test_the_corner_rule_moves_only_a_long_address_side(self):
+        cross = {"name": "Keefer St", "distance_m": 12.0, "bearing_deg": 0.0}
+        self.assertEqual(lookup.corner_yard_front({"name": "Heatley Ave", "cross_street": cross}, {"frontage_m": 37.2, "depth_m": 15.2}), "Keefer St")
+        # the address street is already the short side: its yards stand
+        self.assertIsNone(lookup.corner_yard_front({"name": "Heatley Ave", "cross_street": cross}, {"frontage_m": 15.2, "depth_m": 37.2}))
+        # near-square, within half a metre: no change
+        self.assertIsNone(lookup.corner_yard_front({"name": "Heatley Ave", "cross_street": cross}, {"frontage_m": 20.3, "depth_m": 20.0}))
+        # not a corner lot
+        self.assertIsNone(lookup.corner_yard_front({"name": "Heatley Ave"}, {"frontage_m": 37.2, "depth_m": 15.2}))
+        self.assertIsNone(lookup.corner_yard_front(None, None))
 
     def test_assemble_with_context_places_the_osm_block(self):
         parcels = [{"civic_number": "998", "streetname": "E 19TH AV", "geom": {"geometry": {"type": "Polygon", "coordinates": [PARCEL_998]}}}]

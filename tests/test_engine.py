@@ -30,12 +30,49 @@ class TypicalCase(unittest.TestCase):
         self.L = evaluate(SITE, OPTION, AS_OF)
 
     def test_fsr_and_height_exceed_outright_and_route_to_rezoning(self):
+        # over the outright maximum with a rezoning path: a fail on the outright test that says the rezoning is required
+        # (Kai, 20 Nov 2026); before, uncertain
         f = by_id(self.L, "cov.rm1.outright_fsr")
-        self.assertEqual(f["status"], "uncertain")
+        self.assertEqual(f["status"], "fail")
         self.assertAlmostEqual(f["values"]["fsr"], 2.953, places=3)
+        self.assertTrue(f["finding"].startswith("FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required (CD-1 under"), f["finding"])
+        self.assertTrue(f["action"].startswith("Manager and architect:"))
         h = by_id(self.L, "cov.rm1.outright_height")
-        self.assertEqual(h["status"], "uncertain")
-        self.assertEqual(self.L["summary"]["answers"]["allowed"]["outright"]["verdict"], "no")
+        self.assertEqual(h["status"], "fail")
+        self.assertIn("so it is not allowed outright; rezoning is required", h["finding"])
+        allowed = self.L["summary"]["answers"]["allowed"]
+        self.assertEqual(allowed["outright"]["verdict"], "no")
+        self.assertEqual(allowed["outright"]["fail"], ["cov.rm1.outright_fsr", "cov.rm1.outright_height"])
+        # the by-rezoning answer reads the policy rules only: unchanged
+        self.assertEqual(allowed["by_rezoning"]["verdict"], "yes, with conditions")
+        self.assertNotIn("cov.rm1.outright_fsr", allowed["by_rezoning"]["fail"])
+        # the rezoning answers the exceedance: not an open item
+        open_ids = [u["rule_id"] for u in self.L["summary"]["answers"]["unsure"]]
+        self.assertNotIn("cov.rm1.outright_fsr", open_ids)
+        self.assertNotIn("cov.rm1.outright_height", open_ids)
+
+    def test_without_a_path_the_exceedance_fails_and_is_an_open_item(self):
+        L = evaluate(SITE, {**OPTION, "rezoning_path": None}, AS_OF)
+        f = by_id(L, "cov.rm1.outright_fsr")
+        self.assertEqual(f["status"], "fail")
+        self.assertIn("no rezoning path is stated", f["finding"])
+        self.assertIn("cov.rm1.outright_fsr", [u["rule_id"] for u in L["summary"]["answers"]["unsure"]])
+
+    def test_a_height_not_entered_is_not_yet_confirmed_even_with_a_path(self):
+        # the old special case turned any uncertain outright check into "no" when a path was stated
+        L = evaluate(SITE, {**OPTION, "height_m": None, "gfa_m2": 5000.0}, AS_OF)          # FSR 1.78 over 1.20
+        self.assertEqual(by_id(L, "cov.rm1.outright_height")["status"], "uncertain")
+        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "no")    # the FSR still fails
+        L = evaluate(SITE, {**OPTION, "height_m": None, "gfa_m2": 1000.0}, AS_OF)
+        self.assertEqual(by_id(L, "cov.rm1.outright_fsr")["status"], "pass")
+        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "not yet confirmed")
+        self.assertIn("cov.rm1.outright_height", [u["rule_id"] for u in L["summary"]["answers"]["unsure"]])
+
+    def test_the_memo_leads_answer_1_with_the_outright_answer(self):
+        from ffm import memo
+        md = memo.markdown(self.L)
+        self.assertIn("**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required", md)
+        self.assertIn("**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): yes, with conditions.**", md)
 
     def test_family_units_pass_at_36_percent(self):
         r = by_id(self.L, "cov.family_units")
@@ -65,6 +102,46 @@ class TypicalCase(unittest.TestCase):
         self.assertEqual(by_id(self.L, "bch.chf.eligibility")["status"], "uncertain")
         self.assertEqual(by_id(self.L, "bc.bcbuilds.eligibility")["status"], "uncertain")
         self.assertEqual(self.L["summary"]["answers"]["funded"]["verdict"], "not yet confirmed")
+        self.assertEqual(self.L["summary"]["answers"]["funded"]["words"],
+                         "Whether it meets the criteria of BC Builds and the Community Housing Fund is not yet confirmed")
+
+
+class FundersCriteriaAndIntake(unittest.TestCase):
+    """The funder-ready what-if meets the fund's criteria while the fund's 2025 call is cancelled (20 Nov 2026): answer 2
+    says "meets the criteria", not "fits", and the closed intake beside it; the verdict key stays "yes"."""
+
+    def setUp(self):
+        self.L = evaluate(SITE, load_json(ROOT / "options" / "998-e-19th-ave-what-if-funder-ready.json"), AS_OF)
+        self.F = self.L["summary"]["answers"]["funded"]
+
+    def test_the_verdict_key_is_unchanged_and_the_words_say_criteria(self):
+        self.assertEqual(self.F["verdict"], "yes")
+        self.assertEqual(self.F["words"], "Meets the criteria of BC Builds and the Community Housing Fund")
+        chf = by_id(self.L, "bch.chf.eligibility")
+        self.assertTrue(chf["finding"].startswith("Community Housing Fund: meets the eligibility criteria"), chf["finding"])
+        self.assertNotIn("fits", chf["finding"])
+
+    def test_the_closed_intake_is_said_beside_the_verdict(self):
+        intake = {i["rule_id"]: i for i in self.F["intake"]}
+        chf = intake["bch.chf.eligibility"]
+        self.assertIs(chf["open"], False)
+        self.assertEqual(chf["note"], "the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now")
+        self.assertIn("Its 2025 call was cancelled in February 2026", by_id(self.L, "bch.chf.eligibility")["finding"])
+        from ffm import memo
+        self.assertIn("**Meets the criteria of BC Builds and the Community Housing Fund.** The Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now.",
+                      memo.markdown(self.L))
+
+    def test_intake_words(self):
+        from ffm.checks import program_intake
+        self.assertEqual(program_intake("continuous"), {"open": True, "note": "intake is continuous", "more": None, "status": "continuous"})
+        self.assertIs(program_intake("2026 intake closed 3 Mar 2026")["open"], False)
+        self.assertEqual(program_intake("2026 intake closed 3 Mar 2026")["note"], "its 2026 intake was closed in March 2026, so no intake is open now")
+        self.assertIsNone(program_intake(None))
+        # an open program with a continuous intake (CMHC's Affordable Housing Fund) is listed, not said beside the verdict
+        L = evaluate(SITE, {**OPTION, "target_programs": ["cmhc.ahf.readiness"]}, AS_OF)
+        F = L["summary"]["answers"]["funded"]
+        self.assertEqual(F["intake"][0]["note"], "the CMHC Affordable Housing Fund's intake is continuous")
+        self.assertEqual(F["words"], "No program the option targets has criteria the rules test")
 
     def test_every_result_has_a_source(self):
         for r in self.L["results"]:

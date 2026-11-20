@@ -41,6 +41,21 @@ LAYOUT_ASSUMPTIONS = {
     "min_home_depth_m": (4.0, "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"),
 }
 
+# A walk-up (20 Nov 2026, on 609 Heatley Ave: a 9.4 × 12 m plate of three storeys placed no homes, its 7 m core bay and
+# 1.8 m corridor leaving no strip a home fits in). A building of at most three storeys on a plate of at most 600 m², the
+# Part 9 limits in `bc.code_basis` (part9_max_storeys, part9_max_building_area_m2), is also laid out with one stair and
+# no elevator, every home opening off the stair's landing, and the arrangement that places more homes is kept.
+WALKUP_MAX_STOREYS = 3          # bc.code_basis: part9_max_storeys
+WALKUP_MAX_PLATE_M2 = 600.0     # bc.code_basis: part9_max_building_area_m2
+WALKUP_MAX_DEPTH_M = 16.0       # the homes run the plate's full depth; a deeper plate is the corridor plan's
+WALKUP_ASSUMPTIONS = {
+    "walkup_stair_m": ([2.6, 5.5], "a walk-up's one exit stair with its half landings, no elevator: about 2.6 m wide and 5.5 m long, on the street side of the plate"),
+    "walkup_landing_m": (1.2, "the floor landing behind the stair, which every home's door opens onto"),
+    "walkup_services_m2": (10.0, "garbage, recycling and meters in a walk-up, plus the bicycle spaces; no indoor amenity room in a building this small"),
+    "walkup_one_exit": (True, "one exit stair is taken to serve a floor of at most 150 m² with an occupant load of at most 60 (bcbc.exits, BCBC 3.4.2.1, "
+                              "a Part 3 clause); Part 9's own exit clauses (9.9.8) are not in the rules, so whether one exit serves the floor is a placeholder to confirm against the code"),
+}
+
 # Whether the floor areas are sprinklered: a Part 3 residential building over three storeys is sprinklered in
 # practice, so the egress check assumes it; `option.sprinklered: false` switches the unsprinklered limits on.
 SPRINKLERED_DEFAULT = True
@@ -227,6 +242,62 @@ def _point_geometry(option: dict, massing: dict) -> dict | None:
     return {"core": core, "ring": ring, "runs": runs, "ux": ux, "uy": uy, "core_m": [cw, cd]}
 
 
+def walkup_program(option: dict, prog: dict) -> dict:
+    """A walk-up's program: the blocks less the indoor amenity room, the services at `walkup_services_m2` plus the
+    bicycle spaces, and the walk-up's assumptions listed. Pure."""
+    serv_m2, _ = WALKUP_ASSUMPTIONS["walkup_services_m2"]
+    bike_each, _ = LAYOUT_ASSUMPTIONS["bicycle_m2_per_space"]
+    bikes = int(option.get("bicycle_spaces") or 0)
+    blocks_wu = []
+    for b in prog["blocks"]:
+        if b["key"] == "amenity":
+            continue
+        if b["key"] == "services":
+            b = dict(b, area_m2=round(serv_m2 + bikes * bike_each, 1), note=f"{serv_m2:.0f} m² services in a walk-up + {bikes} bicycle spaces × {bike_each} m²")
+        blocks_wu.append(b)
+    return dict(prog, blocks=blocks_wu, assumptions=prog["assumptions"] + [{"key": k, "value": v, "note": n} for k, (v, n) in WALKUP_ASSUMPTIONS.items()])
+
+
+def _walkup_geometries(option: dict, massing: dict, prog: dict, one_exit_m2: float = 150.0) -> list[dict]:
+    """A low building's plate laid out as a walk-up (20 Nov 2026): one stair on the street side (`walkup_stair_m`), its
+    landing behind it, and every home the plate's full depth with its door on the landing, so no corridor. Two
+    arrangements, the stair standing in the same place on every floor: `either_side`, the stair at the middle of the
+    frontage and one home each side of it; `one_end`, the stair at the left end and one home a floor beside it (a
+    narrow plate's larger homes). Behind the landing, the ground floor's services. The program drops the indoor amenity
+    room and takes `walkup_services_m2`, declared. Only at most WALKUP_MAX_STOREYS storeys on a plate of at most
+    WALKUP_MAX_PLATE_M2 and WALKUP_MAX_DEPTH_M deep, and no larger than the floor area one exit may serve
+    (`one_exit_m2`, bcbc.exits' two_exits_over_floor_area_m2): a larger floor needs two stairs, which is the corridor
+    plan's. Without a grid or cores the architect placed. Pure."""
+    pm, x0, y0, W, D, storeys, f2f = _plate(massing)
+    if (storeys > WALKUP_MAX_STOREYS or W * D > min(WALKUP_MAX_PLATE_M2, one_exit_m2) + 1e-6 or D > WALKUP_MAX_DEPTH_M + 1e-6
+            or grid_of(option) is not None or _cores_of(option, x0, y0, W, D)):
+        return []
+    (sw, sl), _ = WALKUP_ASSUMPTIONS["walkup_stair_m"]
+    land, _ = WALKUP_ASSUMPTIONS["walkup_landing_m"]
+    col = sl + land
+    units = [b for b in prog["blocks"] if b["key"] in UNIT_KEYS]
+    if not units or D < col + 0.5 or W < sw + 2.0:
+        return []
+    wprog = walkup_program(option, prog)
+    r2 = lambda v: round(v, 2)
+    out = []
+    for layout, cx in (("either_side", x0 + (W - sw) / 2), ("one_end", x0)):
+        stair = {"block": "core", "label": "Stair", "x": r2(cx), "y": r2(y0), "w": sw, "d": sl, "area_m2": round(sw * sl, 1), "stairs": "single"}
+        landing = {"block": "corridor", "label": "Landing", "x": r2(cx), "y": r2(y0 + sl), "w": sw, "d": land, "area_m2": round(sw * land, 1), "through": "core"}
+        run = lambda side, end, edge, d, at, depth, length, most=None: {"side": side, "end": end, "axis": "x", "edge": edge, "dir": d, "at": at, "depth": depth,
+                                                                         "len": length, "left": length, **({"max_units": most} if most else {})}
+        runs = []
+        if layout == "either_side":
+            runs += [run("front", "left", cx, -1, y0, D, cx - x0, 1), run("front", "right", cx + sw, 1, y0, D, x0 + W - cx - sw, 1)]
+        else:
+            runs.append(run("front", "right", cx + sw, 1, y0, D, W - sw, 1))
+        if D - col > 0.5:
+            runs.append(run("rear", "mid", cx, 1, y0 + col, D - col, sw))
+        out.append({"kind": "walkup", "layout": layout, "zones": [stair, landing], "runs": runs, "prog": wprog, "stair_m": [sw, sl],
+                    "homes_per_floor": 2 if layout == "either_side" else 1})
+    return out
+
+
 def _run_rect(r: dict, length: float) -> tuple[float, float, float, float]:
     """The rectangle the next `length` of a run takes, from where it is filled to, in its direction: along x a strip
     of the run's depth, along y (a point tower's sides) the same turned. Pure."""
@@ -245,11 +316,21 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
         return place_zones(site, option, ledger, massing, zones)
     prog = blocks(option, ledger)
     slab = _solve(site, option, ledger, massing, prog, None)
+    rank = lambda L: _STATUS_RANK.get((L.get("egress") or {}).get("status") or "pass", 0)
+    # a low building is also tried as a walk-up (`_walkup_geometries`); one is kept only where it places more homes, its
+    # exits no worse, or where the corridor plan places none
+    best = slab
+    ev = (_find(ledger["results"], rule_id=EGRESS_RULE) or {}).get("values") or {}
+    for wu in _walkup_geometries(option, massing, prog, float(ev.get("two_exits_over_floor_area_m2") or 150.0)):
+        walk = _solve(site, option, ledger, massing, wu["prog"], wu)
+        if walk["units_placed"] > best["units_placed"] and (rank(walk) <= rank(best) or best["units_placed"] == 0):
+            best = walk
+    if best is not slab:
+        return best
     pt = _point_geometry(option, massing)
     if pt is None:
         return slab
     point = _solve(site, option, ledger, massing, prog, pt)
-    rank = lambda L: _STATUS_RANK.get((L.get("egress") or {}).get("status") or "pass", 0)
     return point if point["units_placed"] >= slab["units_placed"] and rank(point) <= rank(slab) else slab
 
 
@@ -332,8 +413,23 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
         out.append(run("right", spans[-1][1], 1, max(0.0, x0 + W - spans[-1][1])))
         return out
 
+    walkup = bool(point) and point.get("kind") == "walkup"
+    if walkup:
+        warnings = [w for w in warnings if "double-loaded corridor" not in w]
+        warnings.append(f"A walk-up: one stair of {point['stair_m'][0]:g} × {point['stair_m'][1]:g} m on the street side and no elevator, every home the plate's full depth "
+                        + ("either side of the stair" if point["homes_per_floor"] == 2 else "beside the stair, one a floor")
+                        + ", its door on the landing; no indoor amenity room and services of "
+                        + f"{WALKUP_ASSUMPTIONS['walkup_services_m2'][0]:g} m² (placeholders for a building this small). Part 9 of the BC Building Code covers a residential "
+                        + f"building of at most {WALKUP_MAX_STOREYS} storeys and {WALKUP_MAX_PLATE_M2:,.0f} m² of building area (bc.code_basis); one exit is taken to serve a floor "
+                        + "of at most 150 m² with an occupant load of at most 60 (bcbc.exits, 3.4.2.1, a Part 3 figure). Part 9's own exit clauses (9.9.8) are not in the rules: "
+                        + "whether one stair serves these floors is a placeholder to confirm against the code.")
     floors: list[dict] = []
     for lv in range(storeys):
+        if walkup:
+            # the walk-up: the stair and its landing stand in the same place on every floor, the homes beside them
+            floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2),
+                           "zones": [dict(z) for z in point["zones"]], "runs": [dict(r) for r in point["runs"]], "spare_m2": 0.0})
+            continue
         if point:
             # the point tower: its core, the ring round it, and the four strips of homes round that
             zones = [dict(point["core"]), *(dict(z) for z in point["ring"])]
@@ -413,6 +509,9 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
             for r in runs:
                 if r["depth"] <= 0:
                     continue
+                # a walk-up's run holds the one home whose door is on the landing
+                if r.get("max_units") is not None and r.get("units", 0) >= r["max_units"]:
+                    continue
                 width = unit_width(b, r["depth"])   # a point tower's strips differ in depth, so per run
                 if r["left"] + 1e-9 < width:
                     continue
@@ -420,6 +519,7 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
                 fl["zones"].append({"block": key, "label": UNIT_LABEL[key], "x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "d": round(d, 2),
                                     "area_m2": round(width * r["depth"], 1), "side": r["side"], "unit": key, "accessible": flagged})
                 r["left"] -= width
+                r["units"] = r.get("units", 0) + 1
                 return True
         return False
 
@@ -454,7 +554,10 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
 
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2),
              "arrangement": "double" if double else "single"}
-    if point:
+    if walkup:
+        plate.update(arrangement="walkup", double_loaded=False, unit_depth_m=round(D, 2), walkup={"layout": point["layout"], "stair_m": point["stair_m"],
+                                                                                                 "homes_per_floor": point["homes_per_floor"]})
+    elif point:
         # the homes' depth in front of and behind the ring (`unit_depth_m`, as the editor's street strip reads it)
         # and beside it (`side_depth_m`)
         plate.update(arrangement="point", double_loaded=False, unit_depth_m=round(point["uy"], 2), side_depth_m=round(point["ux"], 2), core_m=point["core_m"])
@@ -782,6 +885,10 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
     what broke (a zone outside the plate, two zones overlapping, a unit smaller than its area, a floor without
     a corridor), and what the program still lacks. Same record as solve(), with `edited: true`."""
     prog = blocks(option, ledger)
+    # a walk-up kept through the block editor (its one stair) is read against the walk-up's program: no amenity room
+    raw_levels = zones_by_level.values() if isinstance(zones_by_level, dict) else zones_by_level
+    if any(isinstance(z, dict) and z.get("block") == "core" and z.get("stairs") == "single" for lv in raw_levels for z in (lv or [])):
+        prog = walkup_program(option, prog)
     pm, x0, y0, W, D, storeys, f2f = _plate(massing)
     corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
     double = D >= corr + 8.0
@@ -813,8 +920,10 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                 zone["accessible"] = bool(z.get("accessible"))
             if block == "corridor":
                 zone["through"] = "core"
-            if block == "core" and z.get("stairs") == "scissor":
-                zone["stairs"] = "scissor"   # the solver's scissor stair, kept through the block editor
+            if block == "core" and z.get("stairs") in ("scissor", "single"):
+                zone["stairs"] = z["stairs"]   # the solver's scissor stair, or a walk-up's one stair, kept through the block editor
+                if z["stairs"] == "single":
+                    zone["label"] = "Stair"
             zones.append(zone)
             # inside the plate?
             if x < x0 - 0.05 or y < y0 - 0.05 or x + w > x0 + W + 0.05 or y + d > y0 + D + 0.05:
@@ -864,6 +973,8 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
         c = ring[1]
         plate.update(arrangement="point", double_loaded=False, unit_depth_m=round(max(0.0, c["y"] - corr - y0), 2), side_depth_m=round(max(0.0, c["x"] - corr - x0), 2),
                      core_m=[c["w"], c["d"]])
+    elif any(z["block"] == "core" and z.get("stairs") == "single" for fl in floors for z in fl["zones"]):
+        plate.update(arrangement="walkup", double_loaded=False, unit_depth_m=round(D, 2))
     if grid_of(option):
         plate["grid"] = grid_of(option)
     return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
@@ -874,7 +985,7 @@ def zones_of(L: dict) -> dict[str, list[dict]]:
     out: dict[str, list[dict]] = {}
     for fl in L["floors"]:
         out[str(fl["level"])] = [{k: z[k] for k in ("block", "x", "y", "w", "d")} | ({"accessible": True} if z.get("accessible") else {}) | ({"label": z["label"]} if z["block"] == "other" else {})
-                                 | ({"stairs": "scissor"} if z.get("stairs") == "scissor" else {})
+                                 | ({"stairs": z["stairs"]} if z.get("stairs") in ("scissor", "single") else {})
                                  for z in fl["zones"] if z["block"] != "spare"]
     return out
 
@@ -910,6 +1021,14 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
         double = any(z.get("side") == "rear" for fl, z in zones)
         street_why = "the lane side has no room left beside the core" if double else "the plate is single-loaded"
         out.update(status="pass" if ok else "conditional", note="on the ground floor, lane side" if ok else (f"on the ground floor but facing the street: {street_why}" if zs and all(fl["level"] == 0 for fl, _ in zs) else "services could not all stay on the ground floor"))
+    elif key == "core" and any(z["block"] == "core" and z.get("stairs") == "single" for fl, z in zones):
+        st = next(z for fl, z in zones if z["block"] == "core" and z.get("stairs") == "single")
+        out.update(status="pass", note=f"a walk-up: one {st['w']:g} × {st['d']:g} m stair on the street side of every floor, no elevator, its landing behind it")
+    elif key == "units" and any(z["block"] == "core" and z.get("stairs") == "single" for fl, z in zones):
+        out.update(status="pass", note="every home opens off the stair's landing, the plate's full depth, with no corridor")
+        if shortfall:
+            out.update(status="conditional", note=out["note"] + "; " + ", ".join(f"{s.get('units', '')} {s['label'].lower()} ({s['area_m2']:,.0f} m²) did not fit".replace("  ", " ") for s in shortfall) + ": more storeys, a larger plate or a smaller program")
+        return out
     elif key == "core":
         n_cores = max((sum(1 for z in fl["zones"] if z["block"] == "core") for fl in floors), default=0)
         sc = next(((fl, z) for fl, z in zones if z["block"] == "core" and z.get("stairs") == "scissor"), None)
@@ -944,7 +1063,7 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
             by[fl["level"]] = by.get(fl["level"], 0) + 1
         where = lambda lv: "the ground floor" if lv == 0 else f"level {lv + 1}"
         lv = min(by)
-        note = (f"{len(acc)} accessible units on {where(lv)}, nearest the core" if len(by) == 1
+        note = (f"{len(acc)} accessible unit{'s' if len(acc) != 1 else ''} on {where(lv)}, nearest the core" if len(by) == 1
                 else f"{len(acc)} accessible units from {where(lv)} ({by[lv]} there) to {where(max(by))}, nearest the core")
         out.update(status="pass", note=note)
     return out
@@ -961,18 +1080,108 @@ def _svg_open(w: float, h: float, title: str) -> list[str]:
             f'<rect width="100%" height="100%" fill="{TONES["paper"]}"/>']
 
 
-def _legend(x: float, y: float, keys: list[str]) -> list[str]:
-    out = []
-    cx = x
+# Text is measured, not guessed, before it is placed (20 Nov 2026, an architect's review at 1600 px: labels printed over
+# each other, ran off the sheet and were cut mid-word). IBM Plex Sans averages about 0.55 em a character; 0.6 is taken,
+# so a measured label never runs longer than its box.
+EM_PER_CHAR = 0.6
+
+# Short names for the blocks where the full name does not fit its box, and the key that spells them out
+BLOCK_SHORT = {"three_bed_plus": "3B", "two_bed": "2B", "one_bed": "1B", "studio": "ST", "core": "C", "corridor": "CR", "services": "SV",
+               "amenity": "AM", "non_residential": "NR", "spare": "SP", "design_space": "DS", "commercial": "CM", "void": "V", "other": "OT"}
+
+
+def _metres(x: float) -> str:
+    """A height as the sheets print it: to the centimetre where the massing has one, rounded half up, trailing zeros
+    dropped to one decimal (88.45 stays 88.45, where "{:.1f}" printed 88.5 or, for 88.449999…, 88.4; 22.3 stays 22.3;
+    a floor at 9.15 m reads +9.15). Pure."""
+    from decimal import ROUND_HALF_UP, Decimal
+    d = Decimal(repr(round(float(x), 9))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    s = f"{d:.2f}"
+    return s[:-1] if s.endswith("0") else s
+
+
+def _tw(text: Any, size: float) -> float:
+    """A label's width in px at this font size, measured generously. Pure."""
+    return len(str(text)) * size * EM_PER_CHAR
+
+
+def _fit(options: list[str], room: float, size: float) -> str | None:
+    """The first of the labels that fits `room` px at this size, or None. Pure."""
+    return next((t for t in options if t and _tw(t, size) + 4 <= room), None)
+
+
+def _legend(x: float, y: float, keys: list[str], max_w: float = 10_000.0, short: bool = False) -> tuple[list[str], float]:
+    """The key: a swatch and the block's name (with its short name where the drawing uses one), wrapped to `max_w` px.
+    Returns the elements and the height it took. Pure."""
+    out: list[str] = []
+    cx, cy, row = x, y, 18
     for k in keys:
-        out.append(f'<rect x="{cx:.1f}" y="{y - 9:.1f}" width="12" height="12" fill="{TONES[k]}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
-        out.append(f'<text x="{cx + 16:.1f}" y="{y + 1:.1f}" fill="{TONES["muted"]}" font-size="11">{_esc(BLOCK_LABEL.get(k, k))}</text>')
-        cx += 16 + 7 * len(BLOCK_LABEL.get(k, k)) + 18
-    return out
+        word = BLOCK_LABEL.get(k, k) + (f" · {BLOCK_SHORT[k]}" if short and k in BLOCK_SHORT else "")
+        w = 16 + _tw(word, 11) + 14
+        if cx > x and cx + w > x + max_w:
+            cx, cy = x, cy + row
+        out.append(f'<rect x="{cx:.1f}" y="{cy - 9:.1f}" width="12" height="12" fill="{TONES[k]}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
+        out.append(f'<text x="{cx + 16:.1f}" y="{cy + 1:.1f}" fill="{TONES["muted"]}" font-size="11">{_esc(word)}</text>')
+        cx += w
+    return out, cy - y + row
 
 
-def _foot(lines: list[str], x: float, y: float) -> list[str]:
-    return [f'<text x="{x:.1f}" y="{y + i * 16:.1f}" fill="{TONES["ink"]}">{_esc(ln)}</text>' for i, ln in enumerate(lines)]
+def _foot(lines: list[str], x: float, y: float, max_w: float | None = None, size: float = 12) -> list[str]:
+    """The notes under a sheet, one line each, wrapped to `max_w` px where given so none runs off the sheet."""
+    if max_w:
+        per = max(30, int(max_w / (size * EM_PER_CHAR)))
+        lines = [ln2 for ln in lines for ln2 in (_wrap_words(ln, per) or [""])]
+    return [f'<text x="{x:.1f}" y="{y + i * 16:.1f}" font-size="{size:g}" fill="{TONES["ink"]}">{_esc(ln)}</text>' for i, ln in enumerate(lines)]
+
+
+def _foot_lines(lines: list[str], max_w: float, size: float = 12) -> int:
+    """How many lines `_foot` takes for these notes at this width. Pure."""
+    per = max(30, int(max_w / (size * EM_PER_CHAR)))
+    return sum(len(_wrap_words(ln, per) or [""]) for ln in lines)
+
+
+def _scale_bar(x: float, y: float, scale: float, max_px: float = 140.0) -> tuple[list[str], float]:
+    """A two-half scale bar from (x, y), the bar's top-left: the longest round length that fits `max_px` at `scale` px
+    a metre, its halves dark and light, labelled 0, the half and the whole in metres. Returns the elements and the
+    width it took, its end label included. Pure."""
+    L = next((v for v in (200, 100, 50, 20, 10, 5, 2, 1) if v * scale <= max_px), 1)
+    w = L * scale
+    half = f"{L / 2:g}"
+    out = [f'<rect x="{x:.1f}" y="{y:.1f}" width="{w / 2:.1f}" height="5" fill="{TONES["ink"]}"/>',
+           f'<rect x="{x + w / 2:.1f}" y="{y:.1f}" width="{w / 2:.1f}" height="5" fill="{TONES["paper"]}" stroke="{TONES["ink"]}" stroke-width="0.8"/>',
+           f'<text x="{x:.1f}" y="{y + 16:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["muted"]}">0</text>',
+           f'<text x="{x + w / 2:.1f}" y="{y + 16:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["muted"]}">{half}</text>',
+           f'<text x="{x + w:.1f}" y="{y + 16:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["muted"]}">{L:g} m</text>']
+    return out, w + _tw(f"{L:g} m", 9.5) / 2
+
+
+def _north(cx: float, cy: float, bearing: float, r: float = 11.0) -> list[str]:
+    """A north arrow at (cx, cy) on a sheet drawn with the street at the bottom: `bearing` is the bearing of the
+    drawing's x axis (along the frontage) clockwise from north, and its up is the y axis, 90° anticlockwise of it, so
+    north stands 90 - bearing degrees clockwise from up (as the page's northArrow, figures/common.js). The N stays
+    upright beyond the tip. Pure."""
+    rot = 90.0 - bearing
+    t = math.radians(rot)
+    d = r + 9
+    nx, ny = cx + d * math.sin(t), cy - d * math.cos(t) + 4
+    return [f'<g transform="rotate({rot:.1f} {cx:.1f} {cy:.1f})"><circle cx="{cx:.1f}" cy="{cy:.1f}" r="{r:.1f}" fill="{TONES["paper"]}" stroke="{TONES["muted"]}" stroke-width="0.8"/>'
+            f'<polygon points="{cx:.1f},{cy - r * 0.92:.1f} {cx + r * 0.42:.1f},{cy + r * 0.55:.1f} {cx:.1f},{cy + r * 0.2:.1f} {cx - r * 0.42:.1f},{cy + r * 0.55:.1f}" fill="{TONES["ink"]}"/></g>',
+            f'<text x="{nx:.1f}" y="{ny:.1f}" font-size="11" font-weight="600" text-anchor="middle" fill="{TONES["ink"]}">N</text>']
+
+
+def _spread(labels: list[tuple[float, str, str]], gap: float = 12.0, top: float = -1e9, bottom: float = 1e9) -> list[tuple[float, float, str, str]]:
+    """Labels at their heights (y, text, colour) pushed apart so no two are closer than `gap` px, kept between `top`
+    and `bottom`: returns (y wanted, y drawn, text, colour), in order down the sheet. Pure."""
+    ls = sorted(labels, key=lambda t: t[0])
+    ys = [max(top, y) for y, _, _ in ls]
+    for i in range(1, len(ys)):
+        ys[i] = max(ys[i], ys[i - 1] + gap)
+    over = ys[-1] - bottom if ys else 0
+    if over > 0:
+        ys = [y - over for y in ys]
+        for i in range(len(ys) - 2, -1, -1):
+            ys[i] = min(ys[i], ys[i + 1] - gap)
+    return [(ls[i][0], ys[i], ls[i][1], ls[i][2]) for i in range(len(ls))]
 
 
 def _stamp_line(L: dict) -> str:
@@ -986,14 +1195,22 @@ def svg_stacking(L: dict) -> str:
     floors = L["floors"]
     pad, bar_h, gap = 48, 26, 8
     bar_w = 520
+    mark_w = 64          # the level marks to the right of the bars
     n = len(floors)
+    f2f = float(L["plate"].get("floor_to_floor_m") or 0)
     lines = [f'{L["units_placed"]} of {L["units_total"]} units placed on {n} floors of {L["plate"]["width_m"]} × {L["plate"]["depth_m"]} m ({L["plate"]["width_m"] * L["plate"]["depth_m"]:,.0f} m² each)',
              *(f'Did not fit: {s["label"]}{" × " + str(s["units"]) if s.get("units") else ""}, {s["area_m2"]:,.0f} m²' for s in L["shortfall"]),
+             "A segment too short for its name carries its short name from the key, or none; the levels at the right are each floor's height above the ground floor.",
              _stamp_line(L)]
-    height = pad + 24 + n * (bar_h + gap) + 40 + 16 * len(lines) + 16
-    out = _svg_open(pad + 80 + bar_w + pad, height, "Stacking diagram")
-    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Stacking · top floor first, each bar one plate</text>')
+    width = pad + 80 + bar_w + mark_w + pad
     keys = ["non_residential", "amenity", "services", "core", "corridor", "three_bed_plus", "two_bed", "one_bed", "studio", "spare"]
+    legend, leg_h = _legend(pad, 0, keys, width - 2 * pad, short=True)
+    bars_bottom = pad + 24 + n * (bar_h + gap)
+    foot_y = bars_bottom + 18 + leg_h + 14
+    height = foot_y + 16 * _foot_lines(lines, width - 2 * pad) + 16
+    out = _svg_open(width, height, "Stacking diagram")
+    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Stacking · top floor first, each bar one plate</text>')
+    out.append(f'<text x="{pad + 80 + bar_w + 8}" y="{pad + 14}" font-size="9.5" fill="{TONES["muted"]}">level</text>')
     order = {k: i for i, k in enumerate(keys)}
     for i, fl in enumerate(reversed(floors)):
         y = pad + 24 + i * (bar_h + gap)
@@ -1005,39 +1222,182 @@ def svg_stacking(L: dict) -> str:
             agg[z["block"]] = agg.get(z["block"], 0) + z["area_m2"]
         for k in sorted(agg, key=lambda k: order.get(k, 99)):
             w = bar_w * agg[k] / total
-            out.append(f'<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{bar_h}" fill="{TONES[k]}" stroke="{TONES["paper"]}" stroke-width="1"/>')
-            if w > 34:
-                cnt = sum(1 for z in fl["zones"] if z["block"] == k and z.get("unit"))
-                out.append(f'<text x="{x + 4:.1f}" y="{y + bar_h / 2 + 4}" font-size="10" fill="{TONES["ink"]}">{_esc(BLOCK_LABEL.get(k, k))}{f" × {cnt}" if cnt else ""}</text>')
+            out.append(f'<rect x="{x:.1f}" y="{y}" width="{w:.1f}" height="{bar_h}" fill="{TONES.get(k, TONES["other"])}" stroke="{TONES["paper"]}" stroke-width="1"/>')
+            # the full name where it fits, else the key's short name, else nothing (20 Nov 2026: "Core (stair",
+            # "Two-bedroo" and "Non-resi" were cut mid-word)
+            cnt = sum(1 for z in fl["zones"] if z["block"] == k and z.get("unit"))
+            tail = f" × {cnt}" if cnt else ""
+            lab = _fit([BLOCK_LABEL.get(k, k) + tail, BLOCK_SHORT.get(k, "") + tail, BLOCK_SHORT.get(k, "")], w - 4, 10)
+            if lab:
+                out.append(f'<text x="{x + 4:.1f}" y="{y + bar_h / 2 + 4}" font-size="10" fill="{TONES["ink"]}">{_esc(lab)}</text>')
             x += w
-    out += _legend(pad + 80, pad + 24 + n * (bar_h + gap) + 18, keys)
-    out += _foot(lines, pad, pad + 24 + n * (bar_h + gap) + 48)
+        # the level mark: the floor's height above the ground floor
+        z = float(fl.get("z", fl["level"] * f2f) or 0)
+        out.append(f'<line x1="{pad + 80 + bar_w + 2}" y1="{y + bar_h}" x2="{pad + 80 + bar_w + 8}" y2="{y + bar_h}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
+        out.append(f'<text x="{pad + 80 + bar_w + 10}" y="{y + bar_h + 3:.1f}" font-size="9.5" fill="{TONES["muted"]}">+{_metres(z)} m</text>')
+    out += _shift(legend, 0, bars_bottom + 18)
+    out += _foot(lines, pad, foot_y, width - 2 * pad)
     out.append("</svg>")
     return "\n".join(out)
 
 
-def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float, title: str, eg: dict | None = None) -> None:
+def _shift(elements: list[str], dx: float, dy: float) -> list[str]:
+    """Elements drawn at an origin of (0, 0) moved to (dx, dy), as one group. Pure."""
+    return [f'<g transform="translate({dx:.1f} {dy:.1f})">'] + elements + ["</g>"]
+
+
+STATUS_TONE = {"pass": "#2f7d4a", "conditional": "#9a6b00", "fail": "#c81e1e", "uncertain": "#a3640c", "info": "#5f6672"}
+TREAD_M = 0.28        # a tread's going, for drawing the stairs only
+DOOR_M = 0.9          # a door leaf, for drawing only
+
+
+def _stair_boxes(z: dict, zones: list[dict]) -> list[dict]:
+    """The stairs drawn in a core zone, in plate metres: {x, y, w, d, kind, doors: [(x, y, face)]}, where `face` is the
+    side of the box the door is on ("x0", "x1", "y0", "y1"). The stairs stand in the part of the core the corridor does
+    not cross; a walk-up's one stair is the zone itself, its door on the landing; a scissor stair runs the core's width
+    along the corridor, doors at its two ends (a point tower's on the faces the ring corridor passes); a core a bay wide
+    holds a stair at each end, a narrower one a stair. Pure."""
+    stair_w, _ = LAYOUT_ASSUMPTIONS["stair_width_m"]
+    bay, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
+    x, y, w, d = z["x"], z["y"], z["w"], z["d"]
+    corrs = [c for c in zones if c["block"] == "corridor"]
+    # the corridor crossing the core along x: the stairs go in the core's longer part beside it
+    y0, y1 = y, y + d
+    for c in corrs:
+        if c["x"] < x + w - 0.05 and c["x"] + c["w"] > x + 0.05 and c["y"] < y1 - 0.05 and c["y"] + c["d"] > y0 + 0.05:
+            front, back = c["y"] - y0, y1 - (c["y"] + c["d"])
+            if back >= front:
+                y0 = c["y"] + c["d"]
+            else:
+                y1 = c["y"]
+    face_y = "y0" if any(abs(c["y"] + c["d"] - y0) < 0.1 and c["x"] < x + w and c["x"] + c["w"] > x for c in corrs) else "y1"
+    run = min(5.5, max(0.0, y1 - y0))
+    if run < 1.0:
+        return []
+    by = y0 if face_y == "y0" else y1 - run
+    if z.get("stairs") == "single":
+        land = next((c for c in corrs if abs(c["y"] - (y + d)) < 0.1 or abs(c["y"] + c["d"] - y) < 0.1), None)
+        face = "y1" if land is None or land["y"] >= y + d - 0.1 else "y0"
+        return [{"x": x, "y": y, "w": w, "d": d, "kind": "switchback", "doors": [(x + 0.15, y + d if face == "y1" else y, face)]}]
+    if z.get("stairs") == "scissor":
+        sd = min(2.8, max(0.0, y1 - y0))
+        ringed = _ringed(z, corrs)
+        sy = y + (d - sd) / 2 if ringed else (y0 if face_y == "y0" else y1 - sd)
+        doors = ([(x, sy + sd / 2 - DOOR_M / 2, "x0"), (x + w, sy + sd / 2 - DOOR_M / 2, "x1")] if ringed else
+                 [(x + 0.15, sy if face_y == "y0" else sy + sd, face_y), (x + w - 0.15 - DOOR_M, sy if face_y == "y0" else sy + sd, face_y)])
+        return [{"x": x, "y": sy, "w": w, "d": sd, "kind": "scissor", "doors": doors}]
+    fy = by if face_y == "y0" else by + run
+    if w + 1e-6 >= bay:
+        ld = min(2.2, run)
+        return [{"x": x, "y": by, "w": stair_w, "d": run, "kind": "switchback", "doors": [(x + 0.15, fy, face_y)]},
+                {"x": x + w - stair_w, "y": by, "w": stair_w, "d": run, "kind": "switchback", "doors": [(x + w - 0.15 - DOOR_M, fy, face_y)]},
+                {"x": x + w / 2 - 1.0, "y": by if face_y == "y0" else by + run - ld, "w": 2.0, "d": ld, "kind": "lift", "doors": []}]
+    sw = min(w, stair_w + 0.4)
+    return [{"x": x + (w - sw) / 2, "y": by, "w": sw, "d": run, "kind": "switchback", "doors": [(x + (w - sw) / 2 + 0.15, fy, face_y)]}]
+
+
+def _draw_stair(out: list[str], s: dict, P, scale: float) -> None:
+    """One stair in plan: its outline, the treads, the flights' divider (a switchback) or the crossing of two flights
+    (a scissor stair), and an exit door on the corridor or landing side with its swing. `P(x, y)` gives sheet px."""
+    x0, y0 = P(s["x"], s["y"] + s["d"])
+    w, d = s["w"] * scale, s["d"] * scale
+    out.append(f'<rect x="{x0:.1f}" y="{y0:.1f}" width="{w:.1f}" height="{d:.1f}" fill="{TONES["paper"]}" stroke="{TONES["ink"]}" stroke-width="0.9"/>')
+    if s["kind"] == "lift":    # the elevator shaft, crossed
+        out.append(f'<path d="M{x0:.1f} {y0:.1f}L{x0 + w:.1f} {y0 + d:.1f}M{x0:.1f} {y0 + d:.1f}L{x0 + w:.1f} {y0:.1f}" stroke="{TONES["muted"]}" stroke-width="0.6" fill="none"/>')
+        return
+    along_y = s["d"] >= s["w"]
+    length, across = (s["d"], s["w"]) if along_y else (s["w"], s["d"])
+    land = min(1.2, length / 4)
+    step = TREAD_M * scale
+    while step < 2.6:      # never denser than a line every 2.6 px
+        step *= 2
+    t = land * scale
+    lines = []
+    while t <= (length - land) * scale + 1e-6:
+        if along_y:
+            lines.append(f"M{x0:.1f} {y0 + t:.1f}h{w:.1f}")
+        else:
+            lines.append(f"M{x0 + t:.1f} {y0:.1f}v{d:.1f}")
+        t += step
+    if lines:
+        out.append(f'<path d="{"".join(lines)}" stroke="{TONES["muted"]}" stroke-width="0.5" fill="none"/>')
+    if s["kind"] == "scissor":
+        out.append(f'<path d="M{x0:.1f} {y0:.1f}L{x0 + w:.1f} {y0 + d:.1f}M{x0:.1f} {y0 + d:.1f}L{x0 + w:.1f} {y0:.1f}" stroke="{TONES["ink"]}" stroke-width="0.7" fill="none"/>')
+    elif along_y:
+        out.append(f'<line x1="{x0 + w / 2:.1f}" y1="{y0 + land * scale:.1f}" x2="{x0 + w / 2:.1f}" y2="{y0 + d - land * scale:.1f}" stroke="{TONES["ink"]}" stroke-width="0.8"/>')
+    else:
+        out.append(f'<line x1="{x0 + land * scale:.1f}" y1="{y0 + d / 2:.1f}" x2="{x0 + w - land * scale:.1f}" y2="{y0 + d / 2:.1f}" stroke="{TONES["ink"]}" stroke-width="0.8"/>')
+    r = min(DOOR_M, across * 0.45) * scale
+    for (hx, hy, face) in s["doors"]:
+        X, Y = P(hx, hy)
+        # the leaf swings into the stair; the arc drawn as points, so no sweep flag can turn it the wrong way
+        if face in ("y0", "y1"):
+            sy = -1 if face == "y0" else 1          # y0 is the box's street-side face, the lower edge on the sheet
+            pts = [(X + r * math.cos(a), Y + sy * r * math.sin(a)) for a in (i * math.pi / 12 for i in range(7))]
+            out.append(f'<line x1="{X:.1f}" y1="{Y:.1f}" x2="{X + r:.1f}" y2="{Y:.1f}" stroke="{TONES["paper"]}" stroke-width="1.6"/>')
+            out.append(f'<path d="M{X:.1f} {Y + sy * r:.1f}L{X:.1f} {Y:.1f}M' + "L".join(f"{a:.1f} {b:.1f}" for a, b in pts) + f'" stroke="{TONES["ink"]}" stroke-width="0.7" fill="none"/>')
+        else:
+            sx = 1 if face == "x0" else -1
+            pts = [(X + sx * r * math.sin(a), Y - r * math.cos(a)) for a in (i * math.pi / 12 for i in range(7))]
+            out.append(f'<line x1="{X:.1f}" y1="{Y:.1f}" x2="{X:.1f}" y2="{Y - r:.1f}" stroke="{TONES["paper"]}" stroke-width="1.6"/>')
+            out.append(f'<path d="M{X + sx * r:.1f} {Y:.1f}L{X:.1f} {Y:.1f}M' + "L".join(f"{a:.1f} {b:.1f}" for a, b in pts) + f'" stroke="{TONES["ink"]}" stroke-width="0.7" fill="none"/>')
+
+
+def _entry_x(L: dict, fl: dict) -> float:
+    """Where the ground floor is entered from the street, in plate metres along x: a walk-up's stair, else the amenity
+    on the street side (the entry it stands beside), else the core. Pure."""
+    zs = fl["zones"]
+    st = next((z for z in zs if z["block"] == "core" and z.get("stairs") == "single"), None)
+    if st:
+        return st["x"] + st["w"] / 2
+    am = next((z for z in zs if z["block"] == "amenity" and z.get("side") == "front"), None)
+    if am:
+        return am["x"] + am["w"] / 2
+    core = next((z for z in zs if z["block"] == "core" and z["w"] >= 3), None) or next((z for z in zs if z["block"] == "core"), None)
     p = L["plate"]
+    return core["x"] + core["w"] / 2 if core else p["x"] + p["width_m"] / 2
+
+
+def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float, title: str, eg: dict | None = None,
+          street: str | None = None, room: float | None = None) -> None:
+    p = L["plate"]
+    room = room or 10_000.0
     out.append(f'<text x="{ox:.1f}" y="{oy - (22 if eg else 8):.1f}" font-size="13" font-weight="600">{_esc(title)}</text>')
     if eg:
-        colour = {"pass": "#2f7d4a", "conditional": "#9a6b00", "fail": "#c81e1e", "uncertain": "#a3640c"}.get(eg["status"], TONES["muted"])
-        out.append(f'<text x="{ox:.1f}" y="{oy - 7:.1f}" font-size="10.5" fill="{colour}">Egress: {_esc(egress_line(eg))}</text>')
-    out.append(f'<rect x="{ox:.1f}" y="{oy:.1f}" width="{p["width_m"] * scale:.1f}" height="{p["depth_m"] * scale:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
+        colour = STATUS_TONE.get(eg["status"], TONES["muted"])
+        parts = egress_line(eg).split(" · ")
+        # the line as long as the sheet allows: the trailing figures go first, the status stays
+        words = next((" · ".join(parts[:k] + parts[-1:]) for k in range(len(parts) - 1, 0, -1) if _tw("Egress: " + " · ".join(parts[:k] + parts[-1:]), 10.5) <= room), parts[-1])
+        out.append(f'<text x="{ox:.1f}" y="{oy - 7:.1f}" font-size="10.5" fill="{colour}">Egress: {_esc(words)}</text>')
+    pw, pd = p["width_m"] * scale, p["depth_m"] * scale
+    out.append(f'<rect x="{ox:.1f}" y="{oy:.1f}" width="{pw:.1f}" height="{pd:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
     # the street is at the bottom of every plan in the set, as on FIG 01 (15 Nov 2026): the plate's y runs from the
     # street side, so a zone is drawn from the far edge down
+    P = lambda x, y: (ox + (x - p["x"]) * scale, oy + (p["depth_m"] - (y - p["y"])) * scale)
     for z in fl["zones"]:
-        x = ox + (z["x"] - p["x"]) * scale
-        y = oy + (p["depth_m"] - (z["y"] - p["y"]) - z["d"]) * scale
+        x, y = P(z["x"], z["y"] + z["d"])
         w, d = z["w"] * scale, z["d"] * scale
         dash = ' stroke-dasharray="3 2"' if z["block"] == "spare" else ""
-        out.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{d:.1f}" fill="{TONES[z["block"]]}" stroke="{TONES["muted"]}" stroke-width="0.8"{dash}/>')
+        out.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{w:.1f}" height="{d:.1f}" fill="{TONES.get(z["block"], TONES["other"])}" stroke="{TONES["muted"]}" stroke-width="0.8"{dash}/>')
+    # the stairs in the cores and their exit doors (20 Nov 2026: the plans showed no stair, door or entry)
+    for z in fl["zones"]:
+        if z["block"] == "core":
+            for s in _stair_boxes(z, fl["zones"]):
+                _draw_stair(out, s, P, scale)
+    labels: list[tuple[float, float, float, float]] = []     # the zone labels' boxes, so the travel figure keeps clear
+    for z in fl["zones"]:
+        x, y = P(z["x"], z["y"] + z["d"])
+        w, d = z["w"] * scale, z["d"] * scale
         if z.get("accessible"):
             out.append(f'<circle cx="{x + 7:.1f}" cy="{y + 7:.1f}" r="3.2" fill="{TONES["accessible"]}"/>')
-        if w > 26 and d > 14:
-            lab = {"three_bed_plus": "3b", "two_bed": "2b", "one_bed": "1b", "studio": "st", "corridor": "corridor", "core": "core", "services": "services", "amenity": "amenity", "non_residential": "non-res", "spare": "spare"}.get(z["block"], str(z.get("label") or "")[:12].lower())
-            if z.get("stairs") == "scissor" and w > 70:
-                lab = "core · scissor stair"
-            out.append(f'<text x="{x + w / 2:.1f}" y="{y + d / 2 + 3.5:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["ink"]}">{lab}</text>')
+        if d < 13 or z["block"] == "core":
+            continue
+        name = ("Landing" if z.get("label") == "Landing" else str(z.get("label") or "")) if z["block"] in ("corridor", "other") else BLOCK_LABEL.get(z["block"], z["block"])
+        lab = _fit([name, BLOCK_SHORT.get(z["block"], "")], w, 9.5)
+        if lab:
+            out.append(f'<text x="{x + w / 2:.1f}" y="{y + d / 2 + 3.5:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["ink"]}">{_esc(lab)}</text>')
+            tw = _tw(lab, 9.5)
+            labels.append((x + w / 2 - tw / 2, y + d / 2 - 5, x + w / 2 + tw / 2, y + d / 2 + 5))
     # the farthest travel path: the unit's door, across to the corridor's axis, along it to the exit
     fu = (eg or {}).get("farthest_unit")
     if fu:
@@ -1051,12 +1411,48 @@ def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float,
         out.append(f'<circle cx="{px(dx):.1f}" cy="{py(dy):.1f}" r="2.4" fill="{tone}"/>')
         out.append(f'<path d="M {px(ex) - 3:.1f} {py(ey) - 3:.1f} L {px(ex) + 3:.1f} {py(ey) + 3:.1f} M {px(ex) - 3:.1f} {py(ey) + 3:.1f} L {px(ex) + 3:.1f} {py(ey) - 3:.1f}" stroke="{tone}" stroke-width="1.4"/>')
         mx, my = (px(corner[0]) + px(ex)) / 2, (py(corner[1]) + py(ey)) / 2
-        out.append(f'<text x="{mx:.1f}" y="{my - 4:.1f}" font-size="10" text-anchor="middle" fill="{tone}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{eg["farthest_travel_m"]:.1f} m</text>')
-    # dimension strings
-    out.append(f'<line x1="{ox:.1f}" y1="{oy + p["depth_m"] * scale + 14:.1f}" x2="{ox + p["width_m"] * scale:.1f}" y2="{oy + p["depth_m"] * scale + 14:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
-    out.append(f'<text x="{ox + p["width_m"] * scale / 2:.1f}" y="{oy + p["depth_m"] * scale + 26:.1f}" font-size="10" text-anchor="middle" fill="{TONES["muted"]}">{p["width_m"]} m · street side</text>')
-    out.append(f'<line x1="{ox - 12:.1f}" y1="{oy:.1f}" x2="{ox - 12:.1f}" y2="{oy + p["depth_m"] * scale:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
-    out.append(f'<text x="{ox - 16:.1f}" y="{oy + p["depth_m"] * scale / 2:.1f}" font-size="10" text-anchor="middle" fill="{TONES["muted"]}" transform="rotate(-90 {ox - 16:.1f} {oy + p["depth_m"] * scale / 2:.1f})">{p["depth_m"]} m</text>')
+        fig = f'{eg["farthest_travel_m"]:.1f} m'
+        half = _tw(fig, 10) / 2
+        clear = lambda cx, cy: not any(a < cx + half and cx - half < c and b < cy + 2 and cy - 9 < e for a, b, c, e in labels)
+        # beside the path where a zone's name is not; above it, below it, then by the door
+        lx, ly = next(((cx, cy) for cx, cy in ((mx, my - 4), (mx, my + 13), (px(dx), py(dy) - 6), (px(dx), py(dy) + 13)) if clear(cx, cy)), (mx, my - 4))
+        out.append(f'<text x="{lx:.1f}" y="{ly:.1f}" font-size="10" text-anchor="middle" fill="{tone}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{fig}</text>')
+    bottom = oy + pd
+    # the entry, on the ground floor's street side
+    if fl["level"] == 0:
+        ex = P(_entry_x(L, fl), 0)[0]
+        out.append(f'<path d="M{ex:.1f} {bottom + 20:.1f}V{bottom + 3:.1f}M{ex - 4:.1f} {bottom + 9:.1f}L{ex:.1f} {bottom + 3:.1f}L{ex + 4:.1f} {bottom + 9:.1f}" stroke="{TONES["ink"]}" stroke-width="1.4" fill="none"/>')
+        out.append(f'<text x="{ex + 6:.1f}" y="{bottom + 19:.1f}" font-size="9.5" fill="{TONES["ink"]}">entry</text>')
+    # the width, dimensioned, and the street named at its edge
+    dy = bottom + 27
+    out.append(f'<path d="M{ox:.1f} {dy:.1f}H{ox + pw:.1f}M{ox:.1f} {dy - 4:.1f}V{dy + 4:.1f}M{ox + pw:.1f} {dy - 4:.1f}V{dy + 4:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8" fill="none"/>')
+    out.append(f'<text x="{ox + pw / 2:.1f}" y="{dy + 12:.1f}" font-size="10" text-anchor="middle" fill="{TONES["muted"]}">{p["width_m"]} m</text>')
+    st = f"{street} · street side" if street else "street side"
+    out.append(f'<text x="{ox + pw / 2:.1f}" y="{dy + 25:.1f}" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="{TONES["muted"]}">{_esc(st.upper())}</text>')
+    out.append(f'<line x1="{ox - 12:.1f}" y1="{oy:.1f}" x2="{ox - 12:.1f}" y2="{bottom:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
+    out.append(f'<text x="{ox - 16:.1f}" y="{oy + pd / 2:.1f}" font-size="10" text-anchor="middle" fill="{TONES["muted"]}" transform="rotate(-90 {ox - 16:.1f} {oy + pd / 2:.1f})">{p["depth_m"]} m</text>')
+
+
+def _homes_on(fl: dict) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for z in fl["zones"]:
+        if z.get("unit"):
+            out[z["unit"]] = out.get(z["unit"], 0) + 1
+    return out
+
+
+def _homes_words(counts: dict[str, int]) -> str:
+    return ", ".join(f"{n} {UNIT_LABEL[k].lower()}" for k, n in sorted(counts.items(), key=lambda kv: UNIT_KEYS.index(kv[0])))
+
+
+def _levels_words(levels: list[int]) -> str:
+    """Levels as a reader counts them, the ground floor as 1: "levels 2 to 5", "levels 2, 4 and 6", "level 3". Pure."""
+    ns = sorted(lv + 1 for lv in levels)
+    if len(ns) == 1:
+        return f"level {ns[0]}"
+    if ns == list(range(ns[0], ns[-1] + 1)):
+        return f"levels {ns[0]} to {ns[-1]}"
+    return "levels " + ", ".join(map(str, ns[:-1])) + f" and {ns[-1]}"
 
 
 def _typical_levels(L: dict) -> list[int]:
@@ -1073,8 +1469,33 @@ def _typical_levels(L: dict) -> list[int]:
     return levels
 
 
-def svg_plans(L: dict) -> str:
-    """Floor plans by program: the ground floor, a typical residential floor, the top floor where it differs."""
+def typical_floor(L: dict) -> dict | None:
+    """What the overview's typical floor stands for (20 Nov 2026): the levels above the ground floor with the same homes
+    as it (`levels`, 0-based), and those that differ, grouped by their homes (`differ`: [{levels, homes}]), the top
+    floor drawn on its own included. None for a building of one floor. Pure."""
+    floors = L["floors"]
+    drawn = _typical_levels(L)
+    if len(drawn) < 2:
+        return None
+    typ = drawn[1]
+    same = [fl["level"] for fl in floors[1:] if _homes_on(fl) == _homes_on(floors[typ])]
+    differ: list[dict] = []
+    for fl in floors[1:]:
+        if fl["level"] in same:
+            continue
+        h = _homes_on(fl)
+        g = next((g for g in differ if g["homes"] == h), None)
+        if g:
+            g["levels"].append(fl["level"])
+        else:
+            differ.append({"levels": [fl["level"]], "homes": h})
+    return {"level": typ, "levels": same, "differ": differ}
+
+
+def svg_plans(L: dict, bearing: float | None = None, street: str | None = None) -> str:
+    """Floor plans by program: the ground floor, a typical residential floor, the top floor where it differs; the
+    stairs, exit doors and the entry drawn, a scale bar, the street named at its edge, and a north arrow where the
+    bearing of the plate's x axis is known (`bearing`, clockwise from north)."""
     p = L["plate"]
     levels = _typical_levels(L)
     pad = 48
@@ -1084,46 +1505,76 @@ def svg_plans(L: dict) -> str:
     pw, pd = p["width_m"] * scale, p["depth_m"] * scale
     eg = L.get("egress")
     head = 14 if eg else 0
-    row = pd + 64 + head
-    width = pad + 30 + pw + pad
+    row = pd + 84 + head
+    width = max(pad + 30 + pw + pad, 640)
+    inner = width - 2 * pad
     point = p.get("arrangement") == "point"
+    walkup = p.get("arrangement") == "walkup"
     corr_m = LAYOUT_ASSUMPTIONS["corridor_width_m"][0]
-    lines = [(f'A point tower: homes {p["unit_depth_m"]} m deep in front and behind, {p.get("side_depth_m")} m beside, round a {corr_m} m corridor ringing the core;'
-              if point else f'Unit depth {p["unit_depth_m"]} m either side of a {corr_m} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;'),
+    typ = typical_floor(L)
+    arrangement = (f'A point tower: homes {p["unit_depth_m"]} m deep in front and behind, {p.get("side_depth_m")} m beside, round a {corr_m} m corridor ringing the core;' if point else
+                   (f'A walk-up: one stair of {(p.get("walkup") or {}).get("stair_m", [2.6, 5.5])[0]:g} × {(p.get("walkup") or {}).get("stair_m", [2.6, 5.5])[1]:g} m and no elevator, '
+                    f'every home {p["unit_depth_m"]} m deep with its door on the stair\'s landing;') if walkup else
+                   f'Unit depth {p["unit_depth_m"]} m either side of a {corr_m} m corridor; core bay {LAYOUT_ASSUMPTIONS["core_bay_m"][0]} m;')
+    lines = [arrangement,
              f'partitions +{int((LAYOUT_ASSUMPTIONS["partition_allowance"][0] - 1) * 100)}% over net areas (declared placeholders). The rules read back from the plates are listed with the figure.',
+             *([f'The typical floor stands for {_levels_words(typ["levels"])}'
+                + (("; other floors differ: " + "; ".join(f'{_levels_words(x["levels"])}, {_homes_words(x["homes"]) or "no homes"}' for x in typ["differ"])) if typ["differ"] else ", every floor above the ground the same")
+                + "."] if typ else []),
+             "Stairs drawn with their treads and exit doors; a switchback stair's flights either side of its divider, a scissor stair's two flights crossed; the arrow is the entry from the street.",
              *(['Each home is a block of its area: in a shallow strip it runs long along the facade, where a design would turn the corner.'] if point else []),
              *([f'Egress (BC Building Code 2024, Part 3; figures to be verified): dashed, the farthest unit door to its exit along the corridor;',
                 f'{"sprinklered (assumed, a placeholder)" if eg["sprinklered_is_placeholder"] and eg["sprinklered"] else ("sprinklered" if eg["sprinklered"] else "unsprinklered")}'
-                + ('.' if point else f'; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.'),
+                + ('.' if (point or walkup) else f'; a core {LAYOUT_ASSUMPTIONS["core_bay_m"][0]:g} m wide read as two {LAYOUT_ASSUMPTIONS["stair_width_m"][0]} m stairs at its ends.'),
                 *([("The scissor stair: two stairs interlocked in one shaft, its doors on the core's opposite faces, apart by the way round it; "
                     if point else "The scissor stair: two stairs interlocked in one shaft, its doors at the core's two ends; ")
                    + "a smoke-tight rated separation between them."]
-                  if eg.get("scissor_stair") else [])]
+                  if eg.get("scissor_stair") else []),
+                *(["One stair serves each floor as the Part 3 figure allows a floor of 150 m² or less; Part 9's own exit clauses are not in the rules, a placeholder to confirm."] if walkup else [])]
                if eg else []),
              _stamp_line(L)]
-    height = pad + 24 + len(levels) * row + 20 + 30 + 16 * len(lines) + 16
-    out = _svg_open(max(width, 640), height, "Floor plans by program")
+    keys = ["non_residential", "amenity", "services", "core", "corridor", "three_bed_plus", "two_bed", "one_bed", "studio", "spare"]
+    legend, leg_h = _legend(pad, 0, keys, inner, short=True)
+    ly = pad + 24 + len(levels) * row + 14
+    bar_y = ly + leg_h + 22
+    foot_y = bar_y + 44
+    height = foot_y + 16 * _foot_lines(lines, inner) + 16
+    out = _svg_open(width, height, "Floor plans by program")
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Plans by program · metres, street at the bottom</text>')
+    names = {0: "Ground floor"}
     for i, lv in enumerate(levels):
         fl = L["floors"][lv]
-        counts = {}
-        for z in fl["zones"]:
-            if z.get("unit"):
-                counts[z["unit"]] = counts.get(z["unit"], 0) + 1
-        title = fl["name"] + (": " + ", ".join(f'{n} {UNIT_LABEL[k].lower()}' for k, n in counts.items()) if counts else "") + (f' · {fl["spare_m2"]:,.0f} m² spare' if fl["spare_m2"] > 5 else "")
-        _plan(out, L, fl, pad + 30, pad + 24 + i * row + 14 + head, scale, title if len(title) < 80 else fl["name"],
-              eg["floors"][lv] if eg and lv < len(eg["floors"]) else None)
-    ly = pad + 24 + len(levels) * row + 14
-    out += _legend(pad, ly, ["non_residential", "amenity", "services", "core", "corridor", "three_bed_plus", "two_bed", "one_bed", "studio", "spare"])
-    out.append(f'<circle cx="{pad + 6}" cy="{ly + 18:.1f}" r="3.2" fill="{TONES["accessible"]}"/><text x="{pad + 16}" y="{ly + 22:.1f}" font-size="11" fill="{TONES["muted"]}">accessible unit</text>')
-    out += _foot(lines, pad, ly + 46)
+        homes = _homes_words(_homes_on(fl))
+        if lv == 0:
+            name = "Ground floor"
+        elif typ and lv == typ["level"]:
+            name = f"Typical floor ({_levels_words(typ['levels'])})" if len(typ["levels"]) > 1 else fl["name"]
+        elif lv == len(L["floors"]) - 1:
+            name = f"Top floor ({_levels_words([lv])})"
+        else:
+            name = fl["name"]
+        names[lv] = name
+        spare = f' · {fl["spare_m2"]:,.0f} m² spare' if fl["spare_m2"] > 5 else ""
+        title = _fit([f"{name}: {homes}{spare}" if homes else f"{name}{spare}", f"{name}: {homes}" if homes else name, name], inner - 30, 13) or name
+        _plan(out, L, fl, pad + 30, pad + 24 + i * row + 14 + head, scale, title,
+              eg["floors"][lv] if eg and lv < len(eg["floors"]) else None, street=street, room=inner - 30)
+    out += _shift(legend, 0, ly)
+    out.append(f'<circle cx="{pad + 6}" cy="{ly + leg_h + 2:.1f}" r="3.2" fill="{TONES["accessible"]}"/><text x="{pad + 16}" y="{ly + leg_h + 6:.1f}" font-size="11" fill="{TONES["muted"]}">accessible unit</text>')
+    bar, bw = _scale_bar(pad, bar_y, scale)
+    out += bar
+    if bearing is not None:
+        out += _north(pad + bw + 40, bar_y + 2, bearing)
+    out += _foot(lines, pad, foot_y, inner)
     out.append("</svg>")
     return "\n".join(out)
 
 
 def svg_elevations(L: dict, massing: dict) -> str:
     """Front and side elevations: storeys × floor to floor, a window per unit as the rhythm, the ground floor's
-    glazing where the non-residential space is, the outright height and the staff benchmark as lines."""
+    glazing where the non-residential space is, the outright height and the staff benchmark as lines; the floor levels
+    marked at the left and a scale bar under them. The labels at the right of each elevation are measured and pushed
+    apart, and the sheet is as wide as they are (20 Nov 2026: "22.3 m" printed over "benchmark 19.9–21.3", the side's
+    "benchmark 1…" ran off the sheet, and the notes were cut mid-word)."""
     p = L["plate"]
     f2f, n = p["floor_to_floor_m"], p["storeys"]
     H = f2f * n
@@ -1135,19 +1586,35 @@ def svg_elevations(L: dict, massing: dict) -> str:
     Hp = max(H, float((masses.get("proposed") or {}).get("height_m") or 0))
     hmax = max([Hp, out_h or 0] + ([bench["height_m"][1]] if bench.get("height_m") else []))
     pad = 48
+    marks = 40           # the floor level marks, left of the front elevation
     scale = max(3.0, min(380 / max(p["width_m"], 1.0), 220 / max(hmax, 1.0), 260 / max(p["depth_m"], 1.0)))
     fw, sw, eh = p["width_m"] * scale, p["depth_m"] * scale, hmax * scale
-    gap = 70
-    width = pad + fw + gap + sw + pad
-    lines = [f'{Hp:.1f} m high, as the section' + (f': {n} storeys × {f2f} m = {H:.1f} m to the top floor level (thin line), the {Hp - H:.1f} m above it parapet, roof or a taller ground floor' if Hp > H + 0.05 else f': {n} storeys × {f2f} m'),
-             (f'Outright maximum height {out_h} m, dashed grey' if out_h else "No outright height in the stack for this district"),
-             *( [f'Staff benchmark {bench["height_m"][0]} to {bench["height_m"][1]} m, amber'] if bench.get("height_m") else []),
-             f'Windows: one per unit on its side, {LAYOUT_ASSUMPTIONS["window_width_m"][0]} m wide, the unit module as the rhythm; a placeholder for the elevation study',
-             _stamp_line(L)]
-    height = pad + 24 + eh + 30 + 16 * len(lines) + 16
-    out = _svg_open(max(width, 720), height, "Preliminary elevations")
-    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Elevations · metres</text>')
     base = pad + 24 + eh
+
+    # the labels at the right of an elevation, at their heights
+    def right_labels() -> list[tuple[float, str, str]]:
+        ls = [(base - Hp * scale + 4, f"{_metres(Hp)} m", TONES["ink"])]
+        if out_h:
+            ls.append((base - out_h * scale + 4, f"outright {_metres(out_h)} m", TONES["outright"]))
+        if bench.get("height_m"):
+            ls.append((base - bench["height_m"][1] * scale + 4, f"benchmark {_metres(bench['height_m'][0])}–{_metres(bench['height_m'][1])} m", TONES["benchmark"]))
+        return ls
+
+    lab_w = max(_tw(t, 10) for _, t, _ in right_labels()) + 20
+    gap = lab_w + 36
+    width = max(pad + marks + fw + gap + sw + lab_w + pad, 720)
+    inner = width - 2 * pad
+    lines = [f'{_metres(Hp)} m high, as the section' + (f': {n} storeys × {f2f} m = {_metres(H)} m to the top floor level (thin line), the {_metres(Hp - H)} m above it parapet, roof or a taller ground floor' if Hp > H + 0.05 else f': {n} storeys × {f2f} m'),
+             (f'Outright maximum height {_metres(out_h)} m, dashed grey' if out_h else "No outright height in the stack for this district"),
+             *([f'Staff benchmark {_metres(bench["height_m"][0])} to {_metres(bench["height_m"][1])} m, amber'] if bench.get("height_m") else []),
+             f'Windows: one per unit on its side, {LAYOUT_ASSUMPTIONS["window_width_m"][0]} m wide, the unit module as the rhythm; a placeholder for the elevation study',
+             "Floor levels at the left, metres above the ground floor.",
+             _stamp_line(L)]
+    bar_y = base + 30
+    foot_y = bar_y + 40
+    height = foot_y + 16 * _foot_lines(lines, inner) + 16
+    out = _svg_open(width, height, "Preliminary elevations")
+    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Elevations · metres</text>')
     win_w, _ = LAYOUT_ASSUMPTIONS["window_width_m"]
     shop_h, win_h = max(0.0, f2f - 0.9) * scale, max(0.0, f2f - 1.8) * scale   # glazing below the floor above, never negative on a low storey
 
@@ -1180,17 +1647,33 @@ def svg_elevations(L: dict, massing: dict) -> str:
         if out_h:
             yo = base - out_h * scale
             out.append(f'<line x1="{ox - 10:.1f}" y1="{yo:.1f}" x2="{ox + length + 10:.1f}" y2="{yo:.1f}" stroke="{TONES["outright"]}" stroke-width="1" stroke-dasharray="5 3"/>')
-            out.append(f'<text x="{ox + length + 12:.1f}" y="{yo + 4:.1f}" font-size="10" fill="{TONES["outright"]}">outright {out_h} m</text>')
         if bench.get("height_m"):
             for hv in bench["height_m"]:
                 yb = base - hv * scale
                 out.append(f'<line x1="{ox - 10:.1f}" y1="{yb:.1f}" x2="{ox + length + 10:.1f}" y2="{yb:.1f}" stroke="{TONES["benchmark"]}" stroke-width="1" stroke-dasharray="4 3"/>')
-            out.append(f'<text x="{ox + length + 12:.1f}" y="{base - bench["height_m"][1] * scale + 4:.1f}" font-size="10" fill="{TONES["benchmark"]}">benchmark {bench["height_m"][0]}–{bench["height_m"][1]} m</text>')
-        out.append(f'<text x="{ox + length + 12:.1f}" y="{base - Hp * scale + 4:.1f}" font-size="10" fill="{TONES["ink"]}">{Hp:.1f} m</text>')
+        # the labels, pushed apart where their lines sit close, a leader to the line where one moved
+        lx = ox + length + 14
+        for want, got, text, tone in _spread(right_labels(), gap=12.0, top=pad + 22, bottom=base + 4):
+            if abs(got - want) > 0.5:
+                out.append(f'<line x1="{ox + length + 10:.1f}" y1="{want - 4:.1f}" x2="{lx - 2:.1f}" y2="{got - 4:.1f}" stroke="{tone}" stroke-width="0.6"/>')
+            out.append(f'<text x="{lx:.1f}" y="{got:.1f}" font-size="10" fill="{tone}">{_esc(text)}</text>')
 
-    elevation(pad, fw, "Front elevation · from the street", "x")
-    elevation(pad + fw + gap + 40, sw, "Side elevation · street at the left", "y")
-    out += _foot(lines, pad, base + 30)
+    fx = pad + marks
+    elevation(fx, fw, "Front elevation · from the street", "x")
+    elevation(fx + fw + gap, sw, "Side elevation · street at the left", "y")
+    # the floor levels, left of the front elevation: the ground at 0 and each floor above it
+    seen: list[float] = []
+    for fl in L["floors"]:
+        y = base - fl["z"] * scale
+        if seen and abs(seen[-1] - y) < 11:      # never closer than a line of type
+            continue
+        seen.append(y)
+        out.append(f'<line x1="{fx - 14:.1f}" y1="{y:.1f}" x2="{fx - 10:.1f}" y2="{y:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8"/>')
+        mark = "±0.0" if not fl["level"] else "+" + _metres(fl["z"])
+        out.append(f'<text x="{fx - 16:.1f}" y="{y + 3:.1f}" font-size="9" text-anchor="end" fill="{TONES["muted"]}">{mark}</text>')
+    bar, _ = _scale_bar(fx, bar_y, scale)
+    out += bar
+    out += _foot(lines, pad, foot_y, inner)
     out.append("</svg>")
     return "\n".join(out)
 
@@ -1206,7 +1689,7 @@ def svg_axon(L: dict) -> str:
     scale = max(3.0, min(360 / max(p["width_m"] + p["depth_m"] * cos, 1.0), 260 / max(p["storeys"] * p["floor_to_floor_m"] + p["depth_m"] * sin, 1.0)))
     pad = 48
     width = pad + (p["width_m"] + p["depth_m"] * cos) * scale + pad
-    height = pad + 24 + (p["storeys"] * p["floor_to_floor_m"] + p["depth_m"] * sin) * scale + 40 + 16 * 2 + 16
+    height = pad + 24 + (p["storeys"] * p["floor_to_floor_m"] + p["depth_m"] * sin) * scale + 40 + 16 * 3 + 16 + 30
     out = _svg_open(max(width, 640), height, "Axonometric of the stacked floors")
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Axonometric · the floors lifted apart, street at the front</text>')
     ox = pad
@@ -1224,7 +1707,12 @@ def svg_axon(L: dict) -> str:
         for zn in sorted(fl["zones"], key=lambda q: -(q["y"] + q["d"])):
             out.append(f'<polygon points="{pt(zn["x"], zn["y"], z)} {pt(zn["x"] + zn["w"], zn["y"], z)} {pt(zn["x"] + zn["w"], zn["y"] + zn["d"], z)} {pt(zn["x"], zn["y"] + zn["d"], z)}" fill="{TONES[zn["block"]]}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
         out.append(f'<text x="{ox + (p["width_m"] + p["depth_m"] * cos) * scale + 6:.1f}" y="{base - z * scale - 2:.1f}" font-size="10" fill="{TONES["muted"]}">{_esc(fl["name"])}</text>')
-    out += _foot([f'{p["storeys"]} floors of {p["width_m"]} × {p["depth_m"]} m, lifted one storey apart to show the program', _stamp_line(L)], pad, base + 28)
+    # an oblique keeps the frontage and the heights to scale, not the depth: the bar reads along the frontage
+    bar, bw = _scale_bar(pad, base + 18, scale)
+    out += bar
+    out.append(f'<text x="{pad + bw + 12:.1f}" y="{base + 27:.1f}" font-size="9.5" fill="{TONES["muted"]}">along the frontage and in height; the depth is drawn at half</text>')
+    out += _foot([f'{p["storeys"]} floors of {p["width_m"]} × {p["depth_m"]} m, lifted one storey apart to show the program', _stamp_line(L)], pad, base + 58,
+                 max(width, 640) - 2 * pad)
     out.append("</svg>")
     return "\n".join(out)
 
@@ -1241,10 +1729,27 @@ def _wrap_words(text: str, width: int) -> list[str]:
     return lines + ([cur] if cur else [])
 
 
-def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
-    """The code site plan: the lot, the yards with their dimensions, the setback envelope, the footprint, the
-    retained trees' protection barriers where the site records positions, and the table a plan checker reads:
-    FSR, coverage, height and yards against the schedule where the stack has one."""
+def _cuts(ring: list, at: float, axis: str) -> list[float]:
+    """Where the line x = at (axis "x") or y = at (axis "y") crosses a polygon's edges: the other coordinate of each
+    crossing, sorted. Pure."""
+    hits = []
+    n = len(ring)
+    for i in range(n):
+        (x1, y1), (x2, y2) = ring[i], ring[(i + 1) % n]
+        a1, a2, b1, b2 = (x1, x2, y1, y2) if axis == "x" else (y1, y2, x1, x2)
+        if (a1 - at) * (a2 - at) <= 0 and a1 != a2:
+            hits.append(b1 + (at - a1) / (a2 - a1) * (b2 - b1))
+    return sorted(hits)
+
+
+def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: float | None = None, street: str | None = None) -> str:
+    """The code site plan: the lot, the yards dimensioned on the lot (a polygon lot's too, measured across at the
+    envelope's middle), the setback envelope, the footprint, the retained trees' protection barriers where the site
+    records positions, a scale bar, the street named at its edge, a north arrow where the bearing is known, and the
+    table a plan checker reads: FSR, coverage, height and yards against the schedule where the stack has one. The
+    table's columns are measured from what they hold, and the plan takes the sheet's width (20 Nov 2026: cells printed
+    over the status column, a band of empty paper sat beside the plan, the side labels straddled the lot line, the
+    lot's caption ran off the sheet and a polygon lot's yards had no dimension)."""
     lot, env = massing["lot"], massing["envelope"]
     W, D = lot["frontage_m"], lot["depth_m"]
     sb = env["setbacks_m"]
@@ -1253,18 +1758,16 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     pad = 48
     bb = lot.get("bbox") or [0, 0, W, D]      # a polygon lot is drawn as itself, in its own extent
     polygon_lot = bool(lot.get("bbox"))
-    bw, bd = bb[2] - bb[0], bb[3] - bb[1]
-    scale = max(3.0, min(380 / bw, 300 / bd))
-    pw, pd = bw * scale, bd * scale
+    bw, bd = max(bb[2] - bb[0], 1.0), max(bb[3] - bb[1], 1.0)
     foot = pm["plate_width_m"] * pm["plate_depth_m"]
     rows = [("Site area", f'{lot["area_m2"]:,.1f} m²', "", "")]
     fsr = _find(results, check="district_outright_fsr")
     rows.append(("Floor space ratio", f'{pm["fsr"]:.2f} ({pm["gfa_m2"]:,.0f} m²)', f'{fsr["values"].get("max_fsr_outright")} outright' if fsr else "no schedule in the stack", fsr["status"] if fsr else "info"))
     hgt = _find(results, check="district_outright_height")
     rows.append(("Height", f'{pm["height_m"]} m, {pm["storeys"]} storeys', f'{hgt["values"].get("max_height_m_outright")} m outright' if hgt else "no schedule in the stack", hgt["status"] if hgt else "info"))
-    cov = _find(results, rule_id=None)
     cov_rule = next((r for r in results if r["rule_id"].endswith(".site_coverage") and r["status"] != "not_applicable"), None)
-    rows.append(("Site coverage", f'{foot / lot["area_m2"] * 100:.0f}% ({foot:,.0f} m²)', f'{cov_rule["values"].get("max_site_coverage", 0) * 100:.0f}% maximum' if cov_rule else "no schedule in the stack", ("pass" if foot / lot["area_m2"] <= cov_rule["values"].get("max_site_coverage", 1) else "conditional") if cov_rule else "info"))
+    area = float(lot["area_m2"] or 0) or 1.0
+    rows.append(("Site coverage", f'{foot / area * 100:.0f}% ({foot:,.0f} m²)', f'{cov_rule["values"].get("max_site_coverage", 0) * 100:.0f}% maximum' if cov_rule else "no schedule in the stack", ("pass" if foot / area <= cov_rule["values"].get("max_site_coverage", 1) else "conditional") if cov_rule else "info"))
     yards = _find(results, check="district_setbacks")
     for k in ("front", "rear", "side"):
         mn = (yards or {}).get("values", {}).get(f"min_{k}_yard_m") if yards else None
@@ -1273,84 +1776,132 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
     rows.append(("Trees", f'{trees.get("after", "?")} after development', f'Schedule C requires {trees.get("required", "?")}', "pass" if trees and (trees.get("shortfall") or 0) == 0 else "conditional") if trees else ("Trees", "no survey on file", "", "uncertain"))
     ans = ledger["summary"]["answers"]["allowed"]
     # the verdict and the path run long: they go under the table as lines of their own, not in its columns
-    # (17 Nov 2026: fixed columns at 110/250/330 px let "no schedule in the stack" print over its status and the
-    # path run off the drawing)
     allowed = [f'Allowed outright: {ans["outright"]["verdict"]}' + (f'; by rezoning: {ans["by_rezoning"]["verdict"]}' if ans.get("rezoning_path") else ""),
                f'Path: {ans["rezoning_path"]}' if ans.get("rezoning_path") else "No rezoning path stated"]
-    # columns sized to what they hold, at about 6.3 px a character of 11 px Plex Sans
-    cw = 6.3
-    widest = lambda i: max(len(r[i]) for r in rows) * cw
-    cols = (0, widest(0) + 16, widest(0) + widest(1) + 32, widest(0) + widest(1) + widest(2) + 48)
-    table_w = cols[3] + max(len(r[3]) for r in rows) * 6.0 + 4
-    allowed = [ln for a in allowed for ln in _wrap_words(a, max(40, int(table_w / cw)))]
+    # the columns, each as wide as its widest cell at its own size, and a gutter between
+    gut = 18
+    widest = [max(_tw(r[i], 11) for r in rows) for i in range(3)] + [max(_tw(r[3], 10.5) for r in rows)]
+    cols = (0, widest[0] + gut, widest[0] + widest[1] + 2 * gut, widest[0] + widest[1] + widest[2] + 3 * gut)
+    table_w = cols[3] + widest[3]
+    width = max(pad + table_w + pad, 680)
+    inner = width - 2 * pad
+    # the plan takes the sheet's width, at most 320 px tall
+    scale = max(3.0, min((inner - 60) / bw, 320 / bd))
+    pw, pd = bw * scale, bd * scale
+    ox = pad + 30 + max(0.0, (inner - 60 - pw) / 2)
+    oy = pad + 24
+    allowed = [ln for a in allowed for ln in _wrap_words(a, max(40, int(inner / (11 * EM_PER_CHAR))))]
+    # the caption under the lot, wrapped to the sheet
+    trees_barriers = {b.get("tree"): b.get("barrier_m") for b in (trees.get("retained_barriers") or [])}
+    ctx_trees = ((site.get("context") or {}).get("trees") or [])
+    placed_trees = [t for t in ctx_trees if t.get("x") is not None and t.get("y") is not None]
+    drawn = sum(1 for t in placed_trees if trees_barriers.get(t.get("id")))
+    lot_words = ((f'Lot polygon {lot.get("polygon_area_m2", lot["area_m2"]):,.0f} m² ({(lot.get("shape") or {}).get("class", "polygon").replace("_", " ")}); dashed red: the setback envelope, '
+                  f'dotted: the plate box {env["width_m"]} × {env["depth_m"]} m' if polygon_lot else f'Lot {W} × {D} m; dashed red: the setback envelope {env["width_m"]} × {env["depth_m"]} m')
+                 + '; blue: the footprint' + (f'; {drawn} protection barrier{"s" if drawn != 1 else ""} (By-law 9958, Schedule A)' if drawn else ('; the retained trees have no surveyed position, so no barriers are drawn' if trees_barriers else "")) + '.')
+    cap_lines = _wrap_words(lot_words, max(40, int(inner / (11 * EM_PER_CHAR))))
+    street_y = oy + pd + 30
+    bar_y = street_y + 16
+    cap_y = bar_y + 36
+    ty = round(cap_y + 16 * len(cap_lines) + 8, 1)
     table_h = 34 + 18 * len(rows) + 10 + 16 * len(allowed)
-    # the table stands under the plan: beside it the drawing grew to about 1,060 units wide and its 11 px type was set
-    # at 9 px in a 1024 px window and 4 px in the architect's two columns (17 Nov 2026)
-    body_h = pd + 44 + table_h
-    height = pad + 24 + body_h + 40
-    width = max(pad + 30 + pw + 30 + pad, pad + table_w + pad, 640)
+    foot_y = ty + table_h + 14
+    height = foot_y + 16 + 16
     out = _svg_open(width, height, "Code site plan")
     out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>')
-    ox, oy = pad + 30, pad + 24
     # the street at the bottom, as on FIG 01 and the plans (15 Nov 2026): y runs up the sheet
     T = lambda x, y: (ox + (x - bb[0]) * scale, oy + (bb[3] - y) * scale)
     pts = lambda ring: " ".join(f"{T(x, y)[0]:.1f},{T(x, y)[1]:.1f}" for x, y in ring)
-    out.append(f'<polygon points="{pts(lot["polygon"])}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
-    out.append(f'<polygon points="{pts(env["polygon"])}" fill="none" stroke="{TONES["envelope"]}" stroke-width="1.2" stroke-dasharray="6 4"/>')
+    lot_ring = lot.get("polygon") or [[0, 0], [W, 0], [W, D], [0, D]]
+    env_ring = env.get("polygon") or []
+    out.append(f'<polygon points="{pts(lot_ring)}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
+    if env_ring:
+        out.append(f'<polygon points="{pts(env_ring)}" fill="none" stroke="{TONES["envelope"]}" stroke-width="1.2" stroke-dasharray="6 4"/>')
     if polygon_lot and env.get("box"):
         bx = env["box"]
         out.append(f'<rect x="{T(bx["x"], bx["y"] + bx["d"])[0]:.1f}" y="{T(bx["x"], bx["y"] + bx["d"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
-    fp_x = min(x for x, _ in pm["footprint"]); fp_y = max(y for _, y in pm["footprint"])
-    fx, fy = T(fp_x, fp_y)
     # the footprint as the massing has it: a rectangle, turned where the architect turned the mass
     out.append(f'<polygon points="{pts(pm["footprint"])}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
-    out.append(f'<text x="{fx + 6:.1f}" y="{fy + 14:.1f}" font-size="10" fill="{TONES["ink"]}">{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys' + (f', turned {pm["angle_deg"]:g}°' if pm.get("angle_deg") else "") + '</text>')
-    # the yards, dimensioned on a rectangular lot (front at the bottom); on a polygon the envelope's own line shows the setbacks
-    dims = [] if polygon_lot else [
-            (ox + pw / 2, oy + pd - sb.get("front", 0) * scale, oy + pd, f'front {sb.get("front")} m', True),
-            (ox + pw / 2, oy, oy + sb.get("rear", 0) * scale, f'rear {sb.get("rear")} m', True),
-            (oy + pd / 2, ox, ox + sb.get("side", 0) * scale, f'side {sb.get("side")} m', False),
-            (oy + pd / 2, ox + pw - sb.get("side", 0) * scale, ox + pw, f'side {sb.get("side")} m', False)]
-    for a, b1, b2, lab, vert in dims:
-        if vert:
-            out.append(f'<line x1="{a:.1f}" y1="{b1:.1f}" x2="{a:.1f}" y2="{b2:.1f}" stroke="{TONES["envelope"]}" stroke-width="0.8"/>')
-            out.append(f'<text x="{a + 4:.1f}" y="{(b1 + b2) / 2 + 3:.1f}" font-size="9.5" fill="{TONES["envelope"]}">{_esc(lab)}</text>')
-        else:
-            out.append(f'<line x1="{b1:.1f}" y1="{a:.1f}" x2="{b2:.1f}" y2="{a:.1f}" stroke="{TONES["envelope"]}" stroke-width="0.8"/>')
-            out.append(f'<text x="{(b1 + b2) / 2:.1f}" y="{a - 4:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["envelope"]}">{_esc(lab)}</text>')
+    fp_x = min(x for x, _ in pm["footprint"]); fp_y = max(y for _, y in pm["footprint"])
+    fx, fy = T(fp_x, fp_y)
+    fp_words = f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys' + (f', turned {pm["angle_deg"]:g}°' if pm.get("angle_deg") else "")
+    fp_room = (max(x for x, _ in pm["footprint"]) - fp_x) * scale
+    if _tw(fp_words, 10) + 8 > fp_room:
+        fp_words = _fit([fp_words, f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m', f'{pm["storeys"]} st.'], fp_room - 4, 10) or ""
+    if fp_words:
+        out.append(f'<text x="{fx + 6:.1f}" y="{fy + 14:.1f}" font-size="10" fill="{TONES["ink"]}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{_esc(fp_words)}</text>')
+    # the yards, dimensioned on the lot: across the envelope's middle, from the lot line to the envelope line
+    if env_ring:
+        ex = [x for x, _ in env_ring]
+        ey = [y for _, y in env_ring]
+        mx, my = (min(ex) + max(ex)) / 2, (min(ey) + max(ey)) / 2
+        lot_v, env_v = _cuts(lot_ring, mx, "x"), _cuts(env_ring, mx, "x")
+        lot_h, env_h = _cuts(lot_ring, my, "y"), _cuts(env_ring, my, "y")
+        dims = []
+        if lot_v and env_v:
+            dims.append(("front", (mx, lot_v[0]), (mx, env_v[0])))
+            dims.append(("rear", (mx, env_v[-1]), (mx, lot_v[-1])))
+        if lot_h and env_h:
+            dims.append(("side", (lot_h[0], my), (env_h[0], my)))
+            dims.append(("side", (env_h[-1], my), (lot_h[-1], my)))
+        side_w = _tw(f"side {sb.get('side')} m", 9.5)
+        env_px = (max(ex) - min(ex)) * scale
+        # the side labels: inside the envelope where both fit, else outside the lot where the sheet has room, else one
+        # above the other; never across the lot line
+        side_mode = "inside" if 2 * side_w + 16 <= env_px else ("outside" if min(ox - pad, width - pad - (ox + pw)) >= side_w + 6 else "stagger")
+        for k, a, b in dims:
+            (x1, y1), (x2, y2) = T(*a), T(*b)
+            if abs(x1 - x2) + abs(y1 - y2) < 2:
+                continue
+            tone = TONES["envelope"]
+            out.append(f'<path d="M{x1:.1f} {y1:.1f}L{x2:.1f} {y2:.1f}" stroke="{tone}" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>')
+            lab = f"{k} {sb.get(k)} m"
+            if k in ("front", "rear"):
+                # beside the line, inside the lot
+                out.append(f'<text x="{x1 + 4:.1f}" y="{(y1 + y2) / 2 + 3.5:.1f}" font-size="9.5" fill="{tone}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{_esc(lab)}</text>')
+                continue
+            left = min(x1, x2) < ox + pw / 2
+            if side_mode == "outside":
+                tx, anchor, ty_ = (min(x1, x2) - 4, "end", y1 + 3.5) if left else (max(x1, x2) + 4, "start", y1 + 3.5)
+            else:
+                tx, anchor = (max(x1, x2) + 4, "start") if left else (min(x1, x2) - 4, "end")
+                ty_ = y1 - 4 if (left or side_mode == "inside") else y1 + 12
+            out.append(f'<text x="{tx:.1f}" y="{ty_:.1f}" font-size="9.5" text-anchor="{anchor}" fill="{tone}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{_esc(lab)}</text>')
+        out.insert(2, f'<defs><marker id="tick" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M3 0V6" stroke="{TONES["envelope"]}" stroke-width="1.2"/></marker></defs>')
     # trees with a position and a barrier
-    ctx_trees = ((site.get("context") or {}).get("trees") or [])
-    barriers = {b.get("tree"): b.get("barrier_m") for b in (trees.get("retained_barriers") or [])}
-    drawn = 0
-    for t in ctx_trees:
-        if t.get("x") is None or t.get("y") is None:
-            continue
-        r = barriers.get(t.get("id"))
+    for t in placed_trees:
+        r = trees_barriers.get(t.get("id"))
         cx, cy = T(float(t["x"]), float(t["y"]))
         out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{max(3, 1.5 * scale / 2):.1f}" fill="{TONES["tree"]}" stroke="{TONES["tree_line"]}" stroke-width="0.8"/>')
         if r:
             out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{float(r) * scale:.1f}" fill="none" stroke="{TONES["tree_line"]}" stroke-width="0.8" stroke-dasharray="3 2"/>')
-            drawn += 1
-    lot_words = (f'lot polygon {lot.get("polygon_area_m2", lot["area_m2"]):,.0f} m² ({(lot.get("shape") or {}).get("class", "polygon").replace("_", " ")}) · dashed red: setback envelope, dotted: plate box {env["width_m"]} × {env["depth_m"]} m'
-                 if polygon_lot else f'lot {W} × {D} m · dashed red: setback envelope {env["width_m"]} × {env["depth_m"]} m')
-    out.append(f'<text x="{ox}" y="{oy + pd + 16:.1f}" font-size="11" fill="{TONES["muted"]}">{lot_words} · blue: footprint' + (f' · {drawn} protection barrier{"s" if drawn != 1 else ""} (By-law 9958, Schedule A)' if drawn else (' · retained trees have no surveyed position: barriers not drawn' if barriers else "")) + '</text>')
+    # the street, named at its edge
+    st = f"{street} · street side" if street else "street side"
+    out.append(f'<line x1="{ox:.1f}" y1="{oy + pd + 12:.1f}" x2="{ox + pw:.1f}" y2="{oy + pd + 12:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8" stroke-dasharray="1 3"/>')
+    out.append(f'<text x="{ox + pw / 2:.1f}" y="{street_y:.1f}" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="{TONES["muted"]}">{_esc(st.upper())}</text>')
+    bar, bwid = _scale_bar(pad, bar_y, scale)
+    out += bar
+    if bearing is not None:
+        out += _north(pad + bwid + 40, bar_y + 2, bearing)
+    for i, ln in enumerate(cap_lines):
+        out.append(f'<text x="{pad}" y="{cap_y + i * 16:.1f}" font-size="11" fill="{TONES["muted"]}">{_esc(ln)}</text>')
     # the table
-    tx, ty = pad, oy + pd + 36
-    out.append(f'<text x="{tx}" y="{ty + 12}" font-size="12" font-weight="600">What the plan checker reads</text>')
-    for i, (k, v, lim, st) in enumerate(rows):
+    tx = pad
+    out.append(f'<text x="{tx}" y="{ty + 12:.1f}" font-size="12" font-weight="600">What the plan checker reads</text>')
+    for i, (k, v, lim, stt) in enumerate(rows):
         y = ty + 34 + i * 18
-        out.append(f'<line x1="{tx}" y1="{y + 5}" x2="{tx + table_w:.1f}" y2="{y + 5}" stroke="{TONES["rule"]}" stroke-width="0.8"/>')
-        out.append(f'<text x="{tx + cols[0]:.1f}" y="{y}" font-size="11" fill="{TONES["muted"]}">{_esc(k)}</text>')
-        out.append(f'<text x="{tx + cols[1]:.1f}" y="{y}" font-size="11">{_esc(v)}</text>')
-        out.append(f'<text x="{tx + cols[2]:.1f}" y="{y}" font-size="11" fill="{TONES["muted"]}">{_esc(lim)}</text>')
-        if st:
-            colour = {"pass": "#2f7d4a", "conditional": "#9a6b00", "fail": "#c81e1e", "uncertain": "#a3640c", "info": "#5f6672"}.get(st, "#5f6672")
-            out.append(f'<text x="{tx + cols[3]:.1f}" y="{y}" font-size="10.5" font-weight="600" fill="{colour}">{_esc(st)}</text>')
+        out.append(f'<line x1="{tx}" y1="{y + 5:.1f}" x2="{tx + table_w:.1f}" y2="{y + 5:.1f}" stroke="{TONES["rule"]}" stroke-width="0.8"/>')
+        out.append(f'<text x="{tx + cols[0]:.1f}" y="{y:.1f}" font-size="11" fill="{TONES["muted"]}">{_esc(k)}</text>')
+        out.append(f'<text x="{tx + cols[1]:.1f}" y="{y:.1f}" font-size="11">{_esc(v)}</text>')
+        if lim:
+            out.append(f'<text x="{tx + cols[2]:.1f}" y="{y:.1f}" font-size="11" fill="{TONES["muted"]}">{_esc(lim)}</text>')
+        if stt:
+            out.append(f'<text x="{tx + cols[3]:.1f}" y="{y:.1f}" font-size="10.5" font-weight="600" fill="{STATUS_TONE.get(stt, "#5f6672")}">{_esc(stt)}</text>')
     ay = ty + 34 + len(rows) * 18 + 14
     for i, ln in enumerate(allowed):
         weight = "" if i else ' font-weight="600"'
-        out.append(f'<text x="{tx}" y="{ay + i * 16}" font-size="11"{weight}>{_esc(ln)}</text>')
-    out += _foot([_stamp_line(L)], pad, oy + body_h + 24)
+        out.append(f'<text x="{tx}" y="{ay + i * 16:.1f}" font-size="11"{weight}>{_esc(ln)}</text>')
+    out += _foot([_stamp_line(L)], pad, foot_y, inner)
     out.append("</svg>")
     return "\n".join(out)
 
@@ -1358,8 +1909,26 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict) -> str:
 SHEETS = ("stacking", "plans", "elevations", "axon", "site-plan")
 
 
+def lot_bearing(site: dict, massing: dict) -> float | None:
+    """The bearing of the lot frame's x axis (along the frontage), clockwise from north, where the site's context frame
+    gives it (`osm.frame.x_axis_bearing_deg`); a lot turned to another front (`lot.orientation`, θ anticlockwise) adds
+    θ, as the page's siteContext does. None without a frame. Pure."""
+    b = (((site or {}).get("osm") or {}).get("frame") or {}).get("x_axis_bearing_deg")
+    if not isinstance(b, (int, float)) or isinstance(b, bool):
+        return None
+    turn = float((((massing or {}).get("lot") or {}).get("orientation") or {}).get("rotate_deg") or 0)
+    return (float(b) + turn) % 360
+
+
 def sheets(L: dict, site: dict, massing: dict, ledger: dict) -> dict[str, str]:
-    return {"stacking": svg_stacking(L), "plans": svg_plans(L), "elevations": svg_elevations(L, massing), "axon": svg_axon(L), "site-plan": svg_site_plan(L, site, massing, ledger)}
+    from .checks import front_street
+    bearing = lot_bearing(site, massing)
+    street = front_street(site or {})
+    # the plans are drawn in the plate's own frame: a mass turned anticlockwise by angle_deg turns its x axis with it
+    angle = float(next((m.get("angle_deg") or 0 for m in massing.get("masses") or [] if m.get("name") == "proposed"), 0) or 0)
+    plate_bearing = None if bearing is None else (bearing - angle) % 360
+    return {"stacking": svg_stacking(L), "plans": svg_plans(L, plate_bearing, street), "elevations": svg_elevations(L, massing), "axon": svg_axon(L),
+            "site-plan": svg_site_plan(L, site, massing, ledger, bearing, street)}
 
 
 def write(L: dict, site: dict, massing: dict, ledger: dict, out_dir: Path) -> dict[str, Path]:
@@ -1378,8 +1947,12 @@ def markdown(L: dict) -> list[str]:
     M: list[str] = []
     M.append("## Layouts derived from the option")
     p = L["plate"]
+    wu = p.get("walkup") or {}
     shape = (f"a point tower, the homes round a corridor ringing the core, {p['unit_depth_m']} m deep in front and behind and {p.get('side_depth_m')} m beside"
              if p.get("arrangement") == "point" else
+             (f"a walk-up, one stair and no elevator, every home the plate's full depth ({p['unit_depth_m']} m) with its door on the stair's landing, "
+              + ("one each side of the stair" if wu.get("homes_per_floor") == 2 else "one a floor beside the stair"))
+             if p.get("arrangement") == "walkup" else
              f"{'a double-loaded corridor' if p['double_loaded'] else 'a single-loaded plate, the depth is the limit'}, units {p['unit_depth_m']} m deep")
     M.append(f"{p['storeys']} floors of {p['width_m']} × {p['depth_m']} m ({p['width_m'] * p['depth_m']:,.0f} m² each); {shape}; {L['units_placed']} of {L['units_total']} units placed.")
     if p.get("grid"):

@@ -16,6 +16,7 @@ It is deterministic: no randomness, no model, no clock other than the as-of date
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -63,7 +64,11 @@ def evaluate(site: dict, option: dict, on: date, rules: list[Rule] | None = None
         if fn is None:
             results.append({**base, "status": UNSURE, "finding": f"No check named '{rule.check}' is implemented.", "values": {}, "action": "Developer: implement the check."})
             continue
-        out = fn(site, option, version.params)
+        params = version.params
+        if rule.check == "district_setbacks" and (version.source or {}).get("section"):
+            # the yards' finding names its clauses last, read off the source's section (checks.yard_clause)
+            params = {**params, "_section": version.source["section"]}
+        out = fn(site, option, params)
         results.append({**base, **out})
 
     results.sort(key=lambda r: (LAYER_ORDER.index(r["layer"]) if r["layer"] in LAYER_ORDER else 99, r["rule_id"]))
@@ -89,6 +94,13 @@ def counts_outright(r: dict) -> bool:
     return check.startswith("district_outright") or (check == "district_setbacks" and bool((r.get("values") or {}).get("no_envelope")))
 
 
+def answered_by_rezoning(r: dict, option: dict) -> bool:
+    """An outright limit the option exceeds while it states a rezoning path: a fail on the outright test whose finding
+    says the rezoning is required. Answer 1 carries it; it is not an open item and not a blocker of the by-rezoning
+    answer."""
+    return bool(option.get("rezoning_path")) and r.get("status") == FAIL and (r.get("check") or "").startswith("district_outright")
+
+
 def summarise(results: list[dict], option: dict, site: dict | None = None) -> dict[str, Any]:
     counts = {s: 0 for s in STATUS_ORDER}
     for r in results:
@@ -110,10 +122,10 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     # the other front, the lane and the variance.
     outright_rules = [r for r in results if r["layer"] == "A" and counts_outright(r)]
     policy_rules = [r for r in results if r["layer"] in ("A", "B", "C") and r not in outright_rules]
+    # An option over the district's outright maximum fails the outright test, rezoning path or not (20 Nov 2026, Kai:
+    # "Mention rezoning is required but fail on outright test"); the check says the rezoning is required. Before, it read
+    # uncertain and a special case here turned the verdict to "no", which also turned a missing height into "no".
     outright = _verdict(outright_rules)
-    if outright["uncertain"] and option.get("rezoning_path"):
-        # 'uncertain' from an outright check means 'exceeds, needs rezoning': say no outright.
-        outright["verdict"] = "no"
     # No schedule in the stack for the district is not a pass: nothing was tested (15 Nov 2026, after two architects
     # read "Allowed outright" on a DD, an R1-1 and a Burnaby site). The verdict says so, and answer 3 carries it.
     tested = [r for r in outright_rules if r["status"] != "not_applicable"]
@@ -194,16 +206,78 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     targets = set(option.get("target_programs") or [])
     e = [r for r in results if r["layer"] == "E" and (not targets or r["rule_id"] in targets)]
     funded = _verdict(e)
+    funded.update(funders_words(funded, e))
 
     # Question 3: what is still unsure, and who resolves it?
-    # Outright-schedule exceedances are already answered by the rezoning path, so they do not
-    # reappear as open items when a path is stated.
+    # An outright limit the option exceeds is answered by the rezoning path (answer 1 says the rezoning is required), so
+    # that fail is not an open item when a path is stated; an outright check that could not be read (a height not
+    # entered) still is.
     unsure = extra_open + [
         {"rule_id": r["rule_id"], "title": r["title"], "status": r["status"], "finding": r["finding"], "action": r["action"]}
-        for r in results if r["status"] in (UNSURE, COND, FAIL)
-        and not (option.get("rezoning_path") and r.get("check", "").startswith("district_outright"))
+        for r in results if r["status"] in (UNSURE, COND, FAIL) and not answered_by_rezoning(r, option)
     ]
     return {"counts": counts, "answers": {"allowed": allowed, "funded": funded, "unsure": unsure}}
+
+
+def program_name(r: dict) -> str:
+    """A funding rule's program as a sentence names it: "the Community Housing Fund", "BC Builds", "the CMHC Affordable
+    Housing Fund" (the rule title before its colon, less "BC Housing" and a parenthesis)."""
+    name = str(r.get("title") or r.get("rule_id") or "").split(":")[0]
+    name = re.sub(r"\s*\(.*?\)\s*", " ", name).strip()
+    name = re.sub(r"^BC Housing\s+", "", name)
+    return f"the {name}" if name.lower().endswith(("fund", "program", "programme", "initiative")) else name
+
+
+def _possessive(name: str) -> str:
+    return name + ("'" if name.endswith("s") else "'s")
+
+
+def _and(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1]
+
+
+def funders_words(funded: dict, e: list[dict]) -> dict[str, Any]:
+    """Answer 2 in words, and whether each program it targets is taking proposals (20 Nov 2026: the funder-ready
+    what-if read "fits the funders: yes" while the Community Housing Fund's 2025 call had been cancelled).
+
+    `words`: the verdict as criteria met or not ("Meets the criteria of the Community Housing Fund and BC Builds"), no
+    full stop; the key `verdict` (yes / yes, with conditions / not yet confirmed / no) is unchanged.
+    `intake`: one entry per targeted program whose rule records its intake, [{rule_id, program, open (true, false or
+    null), note ("the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now"),
+    more (what the record adds, or null), status (the record as written)}]. A closed intake is said beside the
+    verdict; it does not change it."""
+    from .checks import program_intake
+    tested = [r for r in e if r["status"] in (PASS, COND, UNSURE, FAIL)]
+    names = {r["rule_id"]: program_name(r) for r in e}
+    of = lambda st: [names[r["rule_id"]] for r in tested if r["status"] in st]
+    v = funded["verdict"]
+    if not tested:
+        words = "No program the option targets has criteria the rules test" if e else "The option targets no program in the rules"
+    elif v == "no":
+        words = f"Does not meet the criteria of {_and(of((FAIL,)))}"
+    elif v == "not yet confirmed":
+        words = f"Whether it meets the criteria of {_and(of((UNSURE,)))} is not yet confirmed"
+    elif v == "yes, with conditions":
+        words = f"Meets the criteria of {_and(of((PASS, COND)))}, with conditions"
+    else:
+        words = f"Meets the criteria of {_and(of((PASS,)))}"
+    intake = []
+    for r in e:
+        vals = r.get("values") or {}
+        x = vals.get("intake")
+        rec = x if isinstance(x, dict) else program_intake(x if isinstance(x, str) else vals.get("status"))
+        if not rec:
+            continue
+        name = names[r["rule_id"]]
+        note = rec["note"]
+        if note.startswith("its "):
+            note = f"{_possessive(name)} {note[4:]}"
+        elif note.startswith("intake"):
+            note = f"{_possessive(name)} {note}"
+        else:
+            note = f"{name}: {note}"
+        intake.append({"rule_id": r["rule_id"], "program": name, "open": rec["open"], "note": note, "more": rec.get("more"), "status": rec["status"]})
+    return {"words": words, "intake": intake}
 
 
 def _verdict(rs: list[dict]) -> dict[str, Any]:

@@ -216,10 +216,14 @@ def district_outright_fsr(site, option, p) -> Result:
     # a schedule's cap on the number of homes (R1-1 s.3.1.1.3: 8 when all are rental, else 6)
     units = _units_total(option)
     cap_units = (p.get("max_dwelling_units_rental") if tenure in RENTAL_TENURES else None) or p.get("max_dwelling_units")
+    path = option.get("rezoning_path")
     if cap_units and units > cap_units:
         vals["max_dwelling_units"] = cap_units
-        return _r(FAIL if not option.get("rezoning_path") else UNSURE,
-                  f"{units} homes exceed the schedule's {cap_units} for this form ({p.get('dwelling_units_clause') or 'the schedule'}); a larger building needs another district or a rezoning.",
+        said_cap = f"{units} homes exceed the schedule's {cap_units} for this form ({p.get('dwelling_units_clause') or 'the schedule'})"
+        if path:
+            return _r(FAIL, f"{said_cap}, so it is not allowed outright; rezoning is required ({path}).",
+                      vals, action=f"Manager and architect: take the rezoning ({path}) and confirm with City staff the number of homes they will support.")
+        return _r(FAIL, f"{said_cap}; a larger building needs another district or a rezoning.",
                   vals, action="Reduce the homes to the schedule's cap or state a rezoning path.")
     # compared at two decimals, the precision a schedule and a referral report state an FSR to (Kai, 17 Nov 2026):
     # 14,729 m² on CD-1 (819)'s 2,134.4 m² is 6.9008, which the report gives as 6.90 against a maximum of 6.90
@@ -237,12 +241,15 @@ def district_outright_fsr(site, option, p) -> Result:
         vals["max_fsr_discretionary"] = lim["discretionary"]
         return _r(COND, f"{subject} exceeds {said}; the Director of Planning may increase it to at most {lim['discretionary']} ({lim['discretionary_clause']}), a discretionary approval, not assumed.",
                   vals, action=f"Architect: make the case for the increase under {lim['discretionary_clause']} with the development permit application.")
-    if lim["increases"] and not option.get("rezoning_path"):
+    if lim["increases"] and not path:
         return _r(UNSURE, f"{subject} exceeds the base of {mx}; the schedule's increases ({lim['increases']}) may reach it, and they are not computed here.",
                   vals, action="Architect: work out the schedule's increases for this site's coverage, area and parking, and enter the result as the option's floor area.")
-    if option.get("rezoning_path"):
-        return _r(UNSURE, f"{subject} exceeds {said}; it can proceed only by rezoning ({option['rezoning_path']}), where density is negotiated.",
-                  vals, action="Architect and manager: confirm the rezoning path and the density staff will support.")
+    # over the outright maximum with a rezoning path stated: the outright test fails, and the finding says the rezoning
+    # is required (Kai, 20 Nov 2026: "Mention rezoning is required but fail on outright test"; it read uncertain before).
+    # The by-rezoning answer reads the policy rules, not this one, so it does not change.
+    if path:
+        return _r(FAIL, f"{subject} exceeds {said}, so it is not allowed outright; rezoning is required ({path}), where density is negotiated.",
+                  vals, action=f"Manager and architect: take the rezoning ({path}) and confirm with City staff the density they will support.")
     return _r(FAIL, f"{subject} exceeds {said} and no rezoning path is stated.", vals,
               action="Reduce the floor area or state a rezoning path.")
 
@@ -274,9 +281,10 @@ def district_outright_height(site, option, p) -> Result:
         return _r(COND, f"{what} {verb} the outright maximum of {limit_words}; " + ("for 100% social housing " if lim["discretionary_social"] else "")
                   + f"the Director of Planning may vary it to at most {var} m ({clause}), a discretionary approval, not assumed.",
                   vals, action=f"Architect: ask for the height variance under {clause} with the development permit application.")
-    if option.get("rezoning_path"):
-        return _r(UNSURE, f"{what} {verb} the outright maximum of {limit_words}; it can proceed only by rezoning ({option['rezoning_path']}), where height is negotiated.",
-                  vals, action="Architect: confirm the height staff will support under the policy.")
+    path = option.get("rezoning_path")
+    if path:
+        return _r(FAIL, f"{what} {verb} the outright maximum of {limit_words}, so it is not allowed outright; rezoning is required ({path}), where height is negotiated.",
+                  vals, action=f"Architect: confirm with City staff the height they will support under the rezoning ({path}).")
     return _r(FAIL, f"{what} {verb} the outright maximum of {limit_words} and no rezoning path is stated.", vals,
               action="Reduce the height or state a rezoning path.")
 
@@ -587,15 +595,26 @@ def chf_fit(site, option, p) -> Result:
                  "provisional_grant_per_unit_cad": p["provisional_grant_per_unit_cad_2025_26"],
                  "indicative_grant_cad": (p["provisional_grant_per_unit_cad_2025_26"] * total) if total else None})
     head = "Community Housing Fund: "
-    notes.append(f"program status: {p['status']}")
+    # whether the fund is taking proposals, said beside the verdict (20 Nov 2026: the what-if read "fits the funders:
+    # yes" while the 2025 call had been cancelled); a closed intake is a sentence of its own, not a note at the end
+    intake = program_intake(p.get("status"))
+    if intake:
+        vals["intake"] = intake
+    if intake and intake["open"] is False:
+        closed = " " + intake["note"][:1].upper() + intake["note"][1:] + (f"; {intake['more']}" if intake.get("more") else "") + "."
+    else:
+        closed = ""
+        notes.append(f"program status: {p['status']}")
     if fails:
-        return _r(FAIL, head + "does not fit: " + "; ".join(fails) + ".", vals, action="Manager: resolve the failing criteria or target another program.")
+        return _r(FAIL, head + "does not meet the criteria: " + "; ".join(fails) + "." + closed, vals,
+                  action="Manager: resolve the failing criteria or target another program.")
     if unknown:
         said = "; ".join(notes)   # one sentence, capitalised once ("; Construction must…" was each note's capital)
-        return _r(UNSURE, head + "fit cannot be confirmed without the " + "; ".join(unknown) + ". " + (said[:1].upper() + said[1:] + "." if said else ""),
+        return _r(UNSURE, head + "whether it meets the criteria cannot be confirmed without the " + "; ".join(unknown) + ". "
+                  + (said[:1].upper() + said[1:] + "." if said else "") + closed,
                   vals, action="Manager: supply the missing figures; the indicative grant at 2025-26 rates would be "
                   + (f"${vals['indicative_grant_cad']:,.0f} for {total} units." if total else "set by unit count."))
-    return _r(PASS, head + "fits the eligibility criteria: " + "; ".join(notes) + ".", vals)
+    return _r(PASS, head + "meets the eligibility criteria: " + "; ".join(notes) + "." + closed, vals)
 
 
 def bc_builds_fit(site, option, p) -> Result:
@@ -622,16 +641,51 @@ def bc_builds_fit(site, option, p) -> Result:
     notes.append(f"ground must break within {lo} to {hi} months of the conditional land contribution letter")
     vals = {"fails": fails, "unknown": unknown, "notes": notes, "tenant_income_limits_cad": p["tenant_income_limits_cad"], "submission": p["submission"]}
     if fails:
-        return _r(FAIL, "BC Builds: does not fit: " + "; ".join(fails) + ".", vals, action="Manager: resolve the failing criteria.")
+        return _r(FAIL, "BC Builds: does not meet the criteria: " + "; ".join(fails) + ".", vals, action="Manager: resolve the failing criteria.")
     if unknown:
         # the notes are one sentence, capitalised once (17 Nov 2026: each was, so it read "…under the 30% cap; Ground
         # must break…"), and the action asks for what is actually missing, not always the below-market share
         said = "; ".join(notes)
         asks = (["say whether a developer or builder partner is in place"] if any("partner" in u for u in unknown) else []) \
             + (["state the below-market share and discount"] if any("below market" in u for u in unknown) else [])
-        return _r(UNSURE, "BC Builds: fit cannot be confirmed without the " + "; ".join(unknown) + ". " + (said[:1].upper() + said[1:] + "." if said else ""),
+        return _r(UNSURE, "BC Builds: whether it meets the criteria cannot be confirmed without the " + "; ".join(unknown) + ". " + (said[:1].upper() + said[1:] + "." if said else ""),
                   vals, action=f"Manager: {' and '.join(asks) or 'supply what is missing'}; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices.")
-    return _r(PASS, "BC Builds: fits the published criteria: " + "; ".join(notes) + ".", vals)
+    return _r(PASS, "BC Builds: meets the published criteria: " + "; ".join(notes) + ".", vals)
+
+
+_MONTHS = {m[:3].lower(): m for m in ("January", "February", "March", "April", "May", "June", "July", "August", "September",
+                                      "October", "November", "December")}
+
+
+def program_intake(status: Any) -> dict[str, Any] | None:
+    """A funding program's intake as its rule records it, in words: the CHF's `status` ("2025 call (RFP …) cancelled
+    Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"), CMHC's `intake`
+    ("continuous"). Returns {open (True, False or None where the words do not say), note (a clause starting "its …" or
+    "intake …"), more (what the record adds after its first semicolon), status (the record as written)}, or None where
+    the rule records nothing. Pure; `engine.summarise` puts the program's name in place of "its"."""
+    if not status or not isinstance(status, str):
+        return None
+    s = status.strip()
+    head, _, more = s.partition(";")
+    low = s.lower()
+    closed = re.search(r"\b(cancell?ed|closed|paused|suspended|withdrawn)\b", low)
+    if closed or re.search(r"\bnot (open|accepting)\b", low):
+        m = re.search(r"\b(\d{4})(?:[-/]\d{2,4})?\s+(call|intake|rfp)\b.*?\b(cancell?ed|closed|paused|suspended|withdrawn)\s+(?:in\s+|on\s+)?(\d{1,2}\s+)?([A-Za-z]{3,9})\.?\s+(\d{4})", head, re.I)
+        if m:
+            month = _MONTHS.get(m.group(5)[:3].lower(), m.group(5))
+            verb = "cancelled" if m.group(3).lower().startswith("cancel") else m.group(3).lower()
+            note = f"its {m.group(1)} {m.group(2).lower()} was {verb} in {month} {m.group(6)}, so no intake is open now"
+        else:
+            note = f"no intake is open now ({head.strip()})"
+        more = more.strip()
+        if more.lower().startswith("program page"):
+            more = "the " + more
+        return {"open": False, "note": note, "more": more or None, "status": s}
+    if re.search(r"\b(continuous|ongoing|rolling)\b", low):
+        return {"open": True, "note": f"intake is {re.search(r'continuous|ongoing|rolling', low).group(0)}", "more": None, "status": s}
+    if re.search(r"\bopen\b", low):
+        return {"open": True, "note": f"intake: {s}", "more": None, "status": s}
+    return {"open": None, "note": f"intake: {s}", "more": None, "status": s}
 
 
 def param_words(k: str, v: Any) -> str:
@@ -736,25 +790,60 @@ def _m(x: float) -> str:
     return f"{x:.1f}"
 
 
+def front_street(site: Site) -> str | None:
+    """The street the lot is fronted on as the site records it (`front_face {street}`, else the site's or the context's
+    street, else the first of a corner lot's two), or None: a front named by side or edge, or no street recorded."""
+    ff = site.get("front_face")
+    if ff:
+        return ff.get("street") if isinstance(ff, dict) else None
+    streets = corner_streets(site)
+    return (site.get("front_street") or ((site.get("context") or {}).get("street") or {}).get("name")
+            or ((site.get("parcel") or {}).get("street") or {}).get("name") or (streets[0] if streets else None)
+            or ((site.get("osm") or {}).get("frame") or {}).get("front_street"))
+
+
+def yard_clause(p: Params, which: str) -> str | None:
+    """The clause a schedule's yard is in: the rule's `<which>_yard_clause` where it names one, else read off the rule
+    source's section ("s.3.1.2.7 and 3.1.2.17 (rear yard 20.0 m, …" gives s.3.1.2.7; the engine hands the section to
+    district_setbacks as `_section`). None where neither says."""
+    if p.get(f"{which}_yard_clause"):
+        return str(p[f"{which}_yard_clause"])
+    m = re.search(rf"(s\.\d+(?:\.\d+)+(?:\([a-z]\))?)[^;()]*?\({which} yard", str(p.get("_section") or ""))
+    return m.group(1) if m else None
+
+
 def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
     """The yards the option keeps (at least the schedule's) leave no plate on the lot as fronted. Uncertain, never a
-    fail: the other street as the front of a corner lot, a lane behind, or the Director's variance may leave one, and the
-    finding gives each one's numbers (decided with Kai, 17 Nov 2026, on 609 Heatley Ave)."""
-    district = site.get("zoning_district") or "the district"
+    fail: the other street as the front of a corner lot, a lane behind, or the Director's variance may leave one (decided
+    with Kai, 17 Nov 2026, on 609 Heatley Ave).
+
+    The finding reads in three parts (20 Nov 2026, a reviewer: "a clause essay"): the plain consequence first ("On
+    Heatley Ave as the front, the RT-3 yards leave no room to build: the rear yard is 20.0 m on a lot 15.2 m deep."),
+    then the way out with its numbers ("With Keefer St as the front, a plate of about 12.2 × 13.5 m (165 m²) fits."), then
+    the task with the person named, the clause numbers last ("Manager: ask the City which street is the front (s.3.1.2.7
+    rear yard; s.3.1.2.17 a lane behind; s.3.1.2.21 the Director's variance for affordable housing).")."""
+    district = site.get("zoning_district") or "the district's"
     w_left, d_left = W - 2 * eff["side"], D - eff["front"] - eff["rear"]
-    which = []
+    front = front_street(site)
+    # the consequence, in plain words
+    why = []
     if d_left <= 0:
-        which.append(f"a front yard of {eff['front']:g} m and a rear yard of {eff['rear']:g} m on a lot {D:g} m deep"
-                     + (f" (the {lane['rear_yard_m']:g} m rear yard less {lane['to_centre_line_m']:g} m to the lane's centre line, {lane['clause']})" if lane else ""))
+        rear = f"{eff['rear']:.1f} m" + (f" ({lane['rear_yard_m']:.1f} m less {lane['to_centre_line_m']:g} m to the lane's centre line)" if lane else "")
+        if eff["front"] <= 0 or eff["rear"] >= D - 1e-9:
+            why.append(f"the rear yard is {rear} on a lot {D:.1f} m deep")
+        else:
+            why.append(f"a front yard of {eff['front']:.1f} m and a rear yard of {rear} take more than the lot's {D:.1f} m depth")
     if w_left <= 0:
-        which.append(f"two side yards of {eff['side']:g} m on a lot {W:g} m wide")
-    finding = f"The {district} yards leave no envelope on this lot as fronted: {' and '.join(which)}."
-    if short:
-        finding += f" The option's own setbacks sit inside them ({'; '.join(short)})."
-    ways: list[str] = []
-    asks: list[str] = []
+        why.append(f"two side yards of {eff['side']:.1f} m take the whole of a lot {W:.1f} m wide")
+    lead = (f"On {front} as the front" if front else "As the lot is fronted") + f", the {district} yards leave no room to build: " + " and ".join(why) + "."
+    ways: list[str] = []          # the way out, with its numbers
+    tasks: list[str] = []         # the short task the finding names
+    asks: list[str] = []          # the action, in full
+    lane_said = bool(lane)
     vals.update({"no_envelope": True, "lot_as_fronted_m": {"frontage": round(W, 2), "depth": round(D, 2)},
                  "envelope_m": {"width": round(max(0.0, w_left), 2), "depth": round(max(0.0, d_left), 2)}})
+    if front:
+        vals["front_street"] = front
     # the other street as the front: the lot turned a quarter, the same yards (a front yard the schedule fixes, else the
     # most it can ask)
     other = other_front(site)
@@ -765,46 +854,70 @@ def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
         alt = {"street": other, "frontage_m": round(D, 2), "depth_m": round(W, 2), "front_yard_m": f_alt,
                "envelope_m": {"width": round(max(0.0, w2), 2), "depth": round(max(0.0, d2), 2)}}
         if w2 > 0 and d2 > 0:
-            words = (f"With {other} as the front the lot is about {D:.1f} m wide and {W:.1f} m deep, and the same yards"
-                     + (f" (a front yard of up to {f_alt:g} m)" if mins["front"] is None and p.get("max_front_yard_m") is not None else "")
-                     + f" leave about {_m(w2)} × {_m(d2)} m ({w2 * d2:,.0f} m²)")
+            words = f"With {other} as the front, a plate of about {_m(w2)} × {_m(d2)} m ({w2 * d2:,.0f} m²) fits"
+            if mins["front"] is None and p.get("max_front_yard_m") is not None:
+                words += f" behind a front yard of up to {f_alt:g} m"
             if p.get("rear_yard_lane_reduction"):
                 d3 = d2 + LANE_TO_CENTRE_LINE_M
                 alt["envelope_with_lane_m"] = {"width": round(w2, 2), "depth": round(d3, 2)}
-                words += f"; {_m(w2)} × {_m(d3)} m ({w2 * d3:,.0f} m²) if a lane runs behind it ({p['rear_yard_lane_reduction']}, {LANE_TO_CENTRE_LINE_M:g} m to a standard lane's centre line)"
+                words += f", or {_m(w2)} × {_m(d3)} m ({w2 * d3:,.0f} m²) if a lane runs behind it"
+                lane_said = True
             ways.append(words + ".")
-            asks.append(f"choose the front of the corner lot at 01 (the schedule does not say which street a corner site fronts; confirm it with the City), and if {other} is the front, say whether a lane runs behind it")
+            tasks.append("ask the City which street is the front")
+            asks.append(f"ask the City which street is the front of the corner lot (the schedule does not say) and choose it at 01; {other} as the front leaves a plate"
+                        + (f", so if it is the front, say whether a lane runs behind it" if p.get("rear_yard_lane_reduction") else ""))
         else:
-            ways.append(f"With {other} as the front the same yards leave no envelope either ({_m(max(0.0, w2))} × {_m(max(0.0, d2))} m).")
+            ways.append(f"With {other} as the front the yards leave no room either ({_m(max(0.0, w2))} × {_m(max(0.0, d2))} m).")
         vals["other_front"] = alt
     # a lane behind the lot as fronted, where the site has not said and it would leave a plate
     ctx = site.get("context") or {}
     if p.get("rear_yard_lane_reduction") and not lane and ctx.get("lane_behind") is None and mins["rear"] is not None:
         d_lane = D - eff["front"] - (float(mins["rear"]) - LANE_TO_CENTRE_LINE_M)   # the schedule's rear yard, reduced
         if d_lane > 0 and w_left > 0:
-            ways.append(f"If a lane runs behind the lot, {p['rear_yard_lane_reduction']} takes {LANE_TO_CENTRE_LINE_M:g} m off the rear yard and leaves about {_m(w_left)} × {_m(d_lane)} m.")
+            ways.append(f"If a lane runs behind the lot, a plate of about {_m(w_left)} × {_m(d_lane)} m fits.")
+            tasks.append("say whether a lane runs behind the lot")
             asks.append("say whether a lane runs behind the lot")
-    # the Director of Planning's variance for affordable housing, stated as a question for the City, never assumed
+            lane_said = True
+    # the Director of Planning's variance for affordable housing, a question for the City, never assumed
     var = p.get("affordable_variance")
+    clause = None
     if var:
         clause = var.get("clause") if isinstance(var, dict) else str(var)
         needs = var.get("needs") if isinstance(var, dict) else ""
-        words = f"Or ask the Director of Planning to vary the yards under {clause}" + (f" ({needs})" if needs else "")
-        if option.get("tenure") == "social_housing":
-            words += "; this option is social housing, which can meet that"
+        words = ("Or the" if ways else "The") + " Director of Planning may vary the yards for affordable housing" + (
+            " (this option is social housing, which can qualify)" if option.get("tenure") == "social_housing" else "")
         from .massing import PLATE_MIN_DEPTH_M
         room = D - eff["front"]
         if d_left <= 0 < room and w_left > 0:
             depth = min(PLATE_MIN_DEPTH_M, room)
             rear_max = room - depth
-            words += f". On this front a rear yard of at most {rear_max:.1f} m (against {mins['rear']:g} m) leaves a plate {depth:.1f} m deep"
+            words += f": a rear yard of at most {rear_max:.1f} m (against {mins['rear']:g} m) leaves a plate {depth:.1f} m deep on this front"
             vals["variance"] = {"clause": clause, "rear_yard_for_plate_m": round(rear_max, 2), "plate_depth_m": round(depth, 2)}
         else:
             vals["variance"] = {"clause": clause}
-        ways.append(words + "; the variance is the City's to grant, not assumed here.")
+        if needs:
+            vals["variance"]["needs"] = needs
+        ways.append(words + "; that is the City's to grant, not assumed here.")
+        tasks.append("ask the Director of Planning about a variance")
         asks.append(f"or ask the Director of Planning about a variance under {clause}")
-    finding += (" " + " ".join(ways)) if ways else " The yards must change before a building fits."
-    action = ("Manager or architect: " + "; ".join(asks) + ".") if asks else "Architect: the yards must change before a building fits; state the relaxation to ask for."
+    # the clause numbers, last
+    clauses = []
+    if d_left <= 0 and yard_clause(p, "rear"):
+        clauses.append(f"{yard_clause(p, 'rear')} rear yard")
+    if w_left <= 0 and yard_clause(p, "side"):
+        clauses.append(f"{yard_clause(p, 'side')} side yards")
+    if lane_said and p.get("rear_yard_lane_reduction"):
+        clauses.append(f"{p['rear_yard_lane_reduction']} a lane behind")
+    if clause:
+        clauses.append(f"{clause} the Director's variance for affordable housing")
+    cited = f" ({'; '.join(clauses)})" if clauses else ""
+    own = f" The option's own setbacks are under the schedule's minimums too ({'; '.join(short)})." if short else ""
+    if tasks:
+        task = f" Manager: {tasks[0]}{cited}."
+    else:
+        task = f" Architect: the yards must change before a building fits; state the relaxation to ask for{cited}."
+    finding = lead + (" " + " ".join(ways) if ways else "") + own + task
+    action = ("Manager: " + "; ".join(asks) + ".") if asks else "Architect: the yards must change before a building fits; state the relaxation to ask for."
     return _r(UNSURE, finding, vals, action=action)
 
 

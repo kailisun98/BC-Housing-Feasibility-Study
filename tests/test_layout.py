@@ -105,6 +105,159 @@ class Stacking(unittest.TestCase):
         self.assertIn("facing the street", md)
 
 
+def text_boxes(svg: str):
+    """Every unrotated text's box at 0.55 em a character (Plex Sans), and the sheet's size."""
+    import re
+    root = ET.fromstring(svg)
+    W, H = float(root.get("width")), float(root.get("height"))
+    out = []
+
+    def walk(el, dx, dy, rot):
+        tr = el.get("transform") or ""
+        m = re.search(r"translate\(([-\d.]+)[ ,]+([-\d.]+)\)", tr)
+        if m:
+            dx, dy = dx + float(m.group(1)), dy + float(m.group(2))
+        rot = rot or "rotate" in tr
+        if el.tag.endswith("text") and not rot:
+            t, size = "".join(el.itertext()), float(el.get("font-size") or 12)
+            x, y, w = float(el.get("x")) + dx, float(el.get("y")) + dy, len("".join(el.itertext())) * size * 0.55
+            a = el.get("text-anchor") or "start"
+            x0 = x - (w / 2 if a == "middle" else w if a == "end" else 0)
+            out.append((x0, y - size * 0.75, x0 + w, y + size * 0.22, t))
+        for c in el:
+            walk(c, dx, dy, rot)
+    walk(root, 0, 0, False)
+    return W, H, out
+
+
+class SheetsReadAsDrawings(unittest.TestCase):
+    """20 Nov 2026, an architect's review at 1600 px: no north arrow or scale bar, labels printed over each other and
+    ran off the sheets, stacking labels cut mid-word, no stair, door or entry on the plans, the yards undimensioned on
+    a polygon lot. Every text is measured: none runs past the sheet and none prints over another."""
+
+    def sheets_for(self, site, option, on):
+        L = evaluate(site, option, on)
+        m = massing.build(site, option, L)
+        return layout.sheets(layout.solve(site, option, L, m), site, m, L)
+
+    def cases(self):
+        glen = load_json(ROOT / "sites" / "375-glen-drive.json")
+        expo = load_json(ROOT / "sites" / "1010-expo-blvd.json")
+        return {"998": self.sheets_for(SITE, OPTION, AS_OF),
+                "998-approved": self.sheets_for(SITE, load_json(ROOT / "options" / "998-e-19th-ave-as-approved.json"), date(2026, 10, 23)),
+                "glen": self.sheets_for(glen, load_json(ROOT / "options" / "375-glen-drive-as-proposed.json"), date(2026, 11, 17)),
+                "expo": self.sheets_for(expo, load_json(ROOT / "options" / "1010-expo-blvd-as-permitted.json"), date(2026, 10, 23))}
+
+    def test_no_text_runs_off_a_sheet_or_over_another(self):
+        for case, S in self.cases().items():
+            for name, svg in S.items():
+                W, H, boxes = text_boxes(svg)
+                for b in boxes:
+                    self.assertTrue(b[0] >= -0.5 and b[2] <= W + 0.5 and b[1] >= -0.5 and b[3] <= H + 0.5, f"{case} {name}: {b[4]!r} runs off the {W:.0f} × {H:.0f} sheet")
+                for i, a in enumerate(boxes):
+                    for b in boxes[i + 1:]:
+                        self.assertFalse(a[0] < b[2] - 1 and b[0] < a[2] - 1 and a[1] < b[3] - 1 and b[1] < a[3] - 1, f"{case} {name}: {a[4]!r} over {b[4]!r}")
+
+    def test_scale_bars_north_arrows_streets_and_level_marks(self):
+        S = self.cases()["998-approved"]
+        for name in ("plans", "site-plan", "elevations", "axon"):
+            self.assertIn(">0</text>", S[name], name)                       # a two-half scale bar from 0
+        for name in ("plans", "site-plan"):
+            self.assertIn(">N</text>", S[name], name)                       # the context frame gives the bearing
+            self.assertIn("E 19TH AVE · STREET SIDE", S[name], name)
+        self.assertIn(">+3.3</text>", S["elevations"])                       # floor levels marked
+        self.assertIn("+3.3 m</text>", S["stacking"])
+        self.assertIn(">entry</text>", S["plans"])
+        self.assertIn("stroke-width=\"0.5\" fill=\"none\"", S["plans"])    # the stairs' treads
+        self.assertIn("The typical floor stands for", S["plans"])
+
+    def test_the_elevations_labels_keep_apart_and_heights_keep_their_centimetres(self):
+        S = self.cases()["998-approved"]
+        W, H, boxes = text_boxes(S["elevations"])
+        tall = [b for b in boxes if b[4] == "22.3 m"]
+        bench = [b for b in boxes if b[4].startswith("benchmark")]
+        self.assertEqual(len(tall), 2)
+        for a, b in zip(tall, bench):
+            self.assertGreaterEqual(abs(a[1] - b[1]), 11)                    # was printed one over the other
+        self.assertEqual(layout._metres(88.45), "88.45")
+        self.assertEqual(layout._metres(9.149999999), "9.15")
+        self.assertEqual(layout._metres(36.6), "36.6")
+        self.assertIn("88.45 m", self.cases()["expo"]["elevations"])
+
+    def test_the_stacking_never_cuts_a_name(self):
+        for case, S in self.cases().items():
+            for full in ("Core (stair", "Two-bedroo", "Non-resi", "Corridc"):
+                self.assertNotIn(f">{full}<", S["stacking"], case)
+
+    def test_a_polygon_lots_yards_are_dimensioned_inside_the_lot(self):
+        S = self.cases()["glen"]
+        self.assertIn("front ", S["site-plan"])
+        self.assertIn("rear ", S["site-plan"])
+        self.assertIn('marker-end="url(#tick)"', S["site-plan"])
+
+
+class WalkUp(unittest.TestCase):
+    """20 Nov 2026, 609 Heatley Ave fronted on Keefer St: three storeys on a 9.44 × 12 m plate. The corridor plan's 7 m
+    core bay and 1.8 m corridor left no strip a home fits in; a low building on a plate one exit may serve is also laid
+    out as a walk-up, one stair and no elevator, every home off its landing, and the Part 9 basis is said."""
+
+    MINS = {"studio": 33, "one_bed": 49, "two_bed": 67, "three_bed_plus": 86}
+
+    def solve(self, w, d, storeys, units):
+        ring = [[0.0, 0.0], [w, 0.0], [w, d], [0.0, d]]
+        m = {"origin": "", "warnings": [], "masses": [{"name": "proposed", "footprint": ring, "plate_width_m": w, "plate_depth_m": d, "storeys": storeys,
+                                                      "floor_to_floor_m": 3.3, "plate_area_m2": w * d, "gfa_m2": w * d * storeys}]}
+        ledger = {"results": [{"rule_id": "bch.design_guidelines.unit_areas", "check": "unit_area_flags", "status": "info", "values": {"min_net_area_m2": self.MINS}}],
+                  "run": {"as_of": "", "stamp": {"stamp": ""}}}
+        return layout.solve({}, {"units": units}, ledger, m), m, ledger
+
+    def test_a_small_low_plate_is_a_walk_up_off_one_stair(self):
+        lay, m, ledger = self.solve(9.44, 12.0, 3, {"studio": 1, "one_bed": 0, "two_bed": 2, "three_bed_plus": 0})
+        self.assertEqual(lay["plate"]["arrangement"], "walkup")
+        self.assertEqual(lay["units_placed"], 3)                       # before: the corridor plan placed none of them
+        for fl in lay["floors"]:
+            stairs = [z for z in fl["zones"] if z["block"] == "core"]
+            self.assertEqual(len(stairs), 1)
+            self.assertEqual((stairs[0]["w"], stairs[0]["d"], stairs[0].get("stairs")), (2.6, 5.5, "single"))
+            self.assertEqual(stairs[0]["x"], lay["floors"][0]["zones"][0]["x"])    # the stair stands in the same place on every floor
+            self.assertTrue(any(z["block"] == "corridor" and z["label"] == "Landing" for z in fl["zones"]))
+            for z in fl["zones"]:
+                if z.get("unit"):
+                    self.assertEqual(z["d"], 12.0)                     # every home the plate's full depth, its door on the landing
+        self.assertNotIn("amenity", {b["key"] for b in lay["program"]})   # no indoor amenity room in a building this small
+        self.assertTrue(any("Part 9" in w and "placeholder" in w for w in lay["warnings"]), lay["warnings"])
+        self.assertIn("walkup_one_exit", {a["key"] for a in lay["assumptions"]})
+        self.assertEqual(next(c for c in lay["adjacencies"] if c["id"] == "core_centre")["status"], "pass")
+
+    def test_the_exits_read_one_stair_against_a_small_floor(self):
+        lay, m, ledger = self.solve(9.44, 12.0, 3, {"studio": 1, "one_bed": 0, "two_bed": 2, "three_bed_plus": 0})
+        L = evaluate(ShallowLot.SITE, {"id": "o", "units": {"studio": 1, "two_bed": 2}, "storeys": 3, "height_m": 9.9, "gfa_m2": 340, "tenure": "social_housing"}, AS_OF)
+        eg = layout.egress(lay["floors"], lay["plate"], {"blocks": []}, next(r for r in L["results"] if r["rule_id"] == "bcbc.exits")["values"], True)
+        self.assertEqual(eg["status"], "pass")
+        self.assertTrue(all(f["exits"] == 1 and f["exits_required"] == 1 for f in eg["floors"]))
+
+    def test_a_floor_two_exits_must_serve_keeps_the_corridor_plan(self):
+        lay, *_ = self.solve(31.2, 10.4, 3, {"studio": 2, "one_bed": 3, "two_bed": 3, "three_bed_plus": 1})   # 324 m², over 150
+        self.assertNotEqual(lay["plate"]["arrangement"], "walkup")
+        lay, *_ = self.solve(9.44, 12.0, 4, {"studio": 1, "one_bed": 0, "two_bed": 2, "three_bed_plus": 0})   # four storeys: Part 3
+        self.assertNotEqual(lay["plate"]["arrangement"], "walkup")
+
+    def test_the_sheets_draw_the_walk_up(self):
+        lay, m, ledger = self.solve(9.44, 12.0, 3, {"studio": 1, "one_bed": 0, "two_bed": 2, "three_bed_plus": 0})
+        lay["outright"] = {}
+        site = {"id": "s", "site_area_m2": 566.7}
+        led = {"results": ledger["results"], "summary": {"answers": {"allowed": {"outright": {"verdict": "yes"}, "by_rezoning": {"verdict": "yes"}, "rezoning_path": None}}}}
+        m["lot"] = {"frontage_m": 15.2, "depth_m": 37.2, "area_m2": 566.7, "polygon": [[0, 0], [15.2, 0], [15.2, 37.2], [0, 37.2]]}
+        m["envelope"] = {"setbacks_m": {"front": 3.7, "rear": 20.0, "side": 1.5}, "polygon": [[1.5, 3.7], [13.7, 3.7], [13.7, 17.2], [1.5, 17.2]], "width_m": 12.2, "depth_m": 13.5}
+        m["masses"][0].update(fsr=0.6, height_m=9.9)
+        S = layout.sheets(lay, site, m, led)
+        for text in S.values():
+            ET.fromstring(text)
+        self.assertIn("walk-up", S["plans"])
+        md = "\n".join(layout.markdown(lay))
+        self.assertIn("a walk-up", md)
+
+
 class ShallowLot(unittest.TestCase):
     SITE = {"id": "609-heatley-ave", "address": "609 Heatley Ave", "zoning_district": "RT-3", "site_area_m2": 566.7, "frontage_m": 37.2, "depth_m": 15.2,
             "has_water_and_sewer": True, "existing_trees_on_site": [], "osm": {"frame": {"snapped_m": {"cross_street": {"name": "Keefer St", "side": "right"}}}}}

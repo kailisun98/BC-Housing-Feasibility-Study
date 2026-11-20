@@ -93,7 +93,11 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
                 L.append(f"- *{STATUS_WORD[r['status']]}* — {r['title']}: {r['finding']}")
         L.append("")
     L.append("## 2. Does it fit the funders?")
-    L.append(f"**{ans['funded']['verdict'].capitalize()}.**")
+    # the criteria in words, and a closed intake beside them (20 Nov 2026: "Yes." over a fund whose call was cancelled);
+    # a ledger written before `words` existed falls back to the verdict key
+    fd = ans["funded"]
+    closed = [i["note"] for i in fd.get("intake") or [] if i.get("open") is False]
+    L.append(f"**{fd.get('words') or fd['verdict'].capitalize()}.**" + "".join(f" {c[:1].upper() + c[1:]}." for c in closed))
     for r in res:
         if r["layer"] == "E" and r["rule_id"] in (opt.get("target_programs") or [r["rule_id"]]):
             L.append(f"- *{STATUS_WORD[r['status']]}* — {r['title']}: {r['finding']}")

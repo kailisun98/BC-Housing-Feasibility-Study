@@ -24,6 +24,8 @@ from typing import Any
 UNIT_KEYS = ("studio", "one_bed", "two_bed", "three_bed_plus")
 TIER_KEYS = ("market", "rgi", "deep_subsidy")
 GAP_UNLIKELY_SHARE = 0.15   # a gap above this share of the capital cost reads "unlikely"; below it, "unsure"
+# how the memo says what the 15% is (20 Nov 2026, a reviewer read it as a funder's threshold)
+SCREEN_LINE = f"the {GAP_UNLIKELY_SHARE * 100:.0f}% line (this tool's screening line, not a funder's rule)"
 
 # How the memo words each verdict (17 Nov 2026, Kai: "Unlikely" read as "will not be funded"; a gap past the screen's
 # line is the development manager's cue to look for more sources). The key in proforma.json stays "unlikely", so the
@@ -46,6 +48,17 @@ def next_step(pf: dict) -> str | None:
     if v.get("word") == "unsure" and homes and gap is not None and gap > 0 and cap.get("total") is not None and cap.get("land") is not None:
         return CLOSE_GAP
     return None
+
+
+def _refs(ledger: dict) -> dict[str, str]:
+    """The memo's references (A1 … F7): the layer's letter and the rule's place in it, in the ledger's order, as the
+    page's memoRefs (ffm/ui/memo/memo.js) numbers them, so a line note's "F3" is the row the reader finds."""
+    out: dict[str, str] = {}
+    n: dict[str, int] = {}
+    for r in ledger.get("results", []):
+        n[r.get("layer")] = n.get(r.get("layer"), 0) + 1
+        out[r.get("rule_id")] = f"{r.get('layer')}{n[r.get('layer')]}"
+    return out
 
 
 def _layer(ledger: dict, layer: str) -> dict[str, dict]:
@@ -147,19 +160,23 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     land_cost = fin.get("land_cost_cad")
     owner_type = str(site.get("owner_type") or "").lower().replace(" ", "_")
     nominal_types = [str(t).lower() for t in (land.get("nominal_lease_owner_types") or [])]
+    ref = _refs(ledger)
     if land_cost is not None:
         land_cost = float(land_cost)
         line("land", "Land", land_cost, "$", None, "entered in the option's finance block", False)
     elif owner_type and any(owner_type == t or owner_type.startswith(t) for t in nominal_types):
         land_cost = float(land.get("nominal_value_cad") or 0)
-        line("land", "Land", land_cost, "$", "f.land", f"nominal: the owner is a {owner_type.replace('_', ' ')} and the tenure plan is a long lease or a transfer", False)
+        # why the land is $0, in words (20 Nov 2026: a reviewer read "$0" as a missing figure)
+        line("land", "Land", land_cost, "$", "f.land",
+             f"nominal: the owner is a {owner_type.replace('_', ' ')}, and this screen carries the land of a church, a society or a government "
+             f"at ${land_cost:,.0f} on a long lease or a transfer ({ref.get('f.land', 'f.land')})", False)
     else:
         land_cost = None
         line("land", "Land", None, "$", "f.land", "not settled: enter the assessed value or the agreed price in the option's finance block", False)
         unsure.append("land cost (the owner is not a church, a society or a government, and no price is entered)")
 
     capital = round(hard + soft_cost + contingency + (land_cost or 0)) if hard else None
-    line("capital", "Capital cost", capital, "$", None, "hard + soft + contingency + land", False)
+    line("capital", "Capital cost", capital, "$", None, "hard + soft + contingency + land" + ("; no land price yet, so this is the cost before land" if land_cost is None else ""), False)
 
     # ---------------- operating
     rents, ops = P("f.rents"), P("f.operating")
@@ -235,13 +252,18 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     k = mortgage_constant(rate, years)
     debt = round(max(0.0, noi) / dcr / k) if noi is not None and k else None
     service = round(debt * k) if debt else None
-    line("debt", "Supportable debt", debt, "$", "f.mortgage", f"NOI over a {dcr:.2f} coverage ratio, at {rate}% over {years} years (annual service ${service:,.0f})" if debt is not None else "no net operating income to carry debt", False)
+    # the debt in plain words (20 Nov 2026): what the coverage ratio and the amortization mean, not only their figures
+    line("debt", "Supportable debt", debt, "$", "f.mortgage",
+         (f"the largest loan the net operating income carries: the lender wants net income {dcr:.2f} times the loan payment "
+          f"(the debt coverage ratio), at {rate}% repaid over {years} years (the amortization), ${service or 0:,.0f} a year in payments")
+         if debt is not None else "no net operating income to carry debt", False)
     funding = round(sum(g["value"] for g in grants) + equity + (debt or 0)) if capital is not None else None
     line("funding", "Funding", funding, "$", None, "grants + equity + supportable debt", False)
 
     gap = round(capital - funding) if capital is not None and funding is not None else None
     gap_share = round(gap / capital, 3) if gap is not None and capital else None
-    line("gap", "Gap", gap, "$", None, "capital cost less funding; a negative gap is headroom", False)
+    line("gap", "Gap", gap, "$", None, f"capital cost less funding; a negative gap is headroom, and a gap above {SCREEN_LINE} "
+         "of the capital cost reads Needs more sources", False)
 
     # ---------------- the verdict
     if capital is None:
@@ -254,18 +276,24 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         word = "unsure"
         why.append(f"the option has no homes entered, so there is no rent, debt or grant to set against the ${capital:,.0f} capital cost")
         unsure.insert(0, "the unit mix (homes by type: studio, one-, two- and three-bedroom)")
+    elif land_cost is None and gap_share is not None and gap_share > GAP_UNLIKELY_SHARE:
+        # a land price can only add to the cost: a gap already past the line before it is past the line (20 Nov 2026:
+        # it read "unsure: the land cost is not settled" with a 49% gap)
+        word = "unlikely"
+        why.append(f"the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the cost before any land price, more than {SCREEN_LINE}; a land price would only widen it")
     elif land_cost is None:
         word = "unsure"
-        why.append("the land cost is not settled")
+        why.append("the land cost is not settled" + (f": before any land price the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the cost" if gap and gap > 0 and gap_share is not None
+                                                    else f": before any land price the funding covers the cost with ${-gap:,.0f} to spare" if gap is not None else ""))
     elif gap <= 0:
         word = "likely"
         why.append(f"the funding stack covers the capital cost with ${-gap:,.0f} to spare")
     elif gap_share is not None and gap_share > GAP_UNLIKELY_SHARE:
         word = "unlikely"
-        why.append(f"the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the capital cost, more than the {GAP_UNLIKELY_SHARE * 100:.0f}% a feasibility screen can call close")
+        why.append(f"the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the capital cost, more than {SCREEN_LINE}")
     else:
         word = "unsure"
-        why.append(f"the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the capital cost: close enough to turn on the placeholders")
+        why.append(f"the gap is ${gap:,.0f}, {gap_share * 100:.0f}% of the capital cost, inside {SCREEN_LINE}: close enough to turn on the placeholders")
     if gfa and gfa_from == "the massing":
         why.append(f"the floor area, {gfa:,.0f} m², is the massing's (plate × storeys), not a figure in the option")
     placeholders = [l["label"] for l in lines if l["placeholder"]]
@@ -356,7 +384,8 @@ def markdown(pf: dict) -> list[str]:
         L.append("")
     L.append(f"- Capital cost **{_money(c['total'])}**: hard {_money(c['hard'])} (escalated ×{c['escalation']}), soft {_money(c['soft'])}, contingency {_money(c['contingency'])}, land {_money(c['land'])}.")
     L.append(f"- Net operating income **{_money(o['noi'])} a year**: rent {_money(o['gross'])} less vacancy {_money(o['vacancy'])}, operating cost {_money(o['operating_cost'])} and reserve {_money(o['reserve'])}.")
-    L.append(f"- Funding **{_money(f['total'])}**: grants {_money(sum(x['value'] for x in f['grants']))}, equity {_money(f['equity'])}, supportable debt {_money(f['debt']['supportable'])} at {f['debt']['rate_pct']}% over {f['debt']['amortization_years']} years, {f['debt']['dcr']:.2f} coverage.")
+    L.append(f"- Funding **{_money(f['total'])}**: grants {_money(sum(x['value'] for x in f['grants']))}, equity {_money(f['equity'])}, supportable debt {_money(f['debt']['supportable'])} "
+             f"at {f['debt']['rate_pct']}% repaid over {f['debt']['amortization_years']} years, the loan the lender sizes so net income is {f['debt']['dcr']:.2f} times the payment.")
     L.append(f"- Gap **{_money(g['value'])}**" + (f" ({g['share_of_capital'] * 100:.0f}% of the capital cost)" if g.get("share_of_capital") is not None else "") + ".")
     if v["unsure"]:
         L.append("- Left to a person: " + "; ".join(v["unsure"]) + ".")

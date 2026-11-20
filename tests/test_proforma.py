@@ -90,11 +90,40 @@ class RealCase(unittest.TestCase):
 
 class Verdicts(unittest.TestCase):
     def test_a_private_site_without_a_price_is_unsure_on_land(self):
+        # a gap inside the line before any land price: the land decides it
+        site = dict(SITE, owner_type="private", owner="a numbered company")
+        opt = dict(OPTION, finance={"equity_cad": 18_000_000})
+        pf = proforma.build(site, opt, evaluate(site, opt, AS_OF))
+        self.assertIsNone(pf["capital"]["land"])
+        self.assertLessEqual(pf["gap"]["share_of_capital"], proforma.GAP_UNLIKELY_SHARE)
+        self.assertEqual(pf["verdict"]["word"], "unsure")
+        self.assertTrue(pf["verdict"]["why"][0].startswith("the land cost is not settled: before any land price the gap is $"), pf["verdict"]["why"][0])
+        self.assertTrue(any("land" in u for u in pf["verdict"]["unsure"]))
+
+    def test_a_gap_past_the_line_before_any_land_price_needs_more_sources(self):
+        # 20 Nov 2026: a 44% gap read "unsure: the land cost is not settled"; a land price can only widen it
         site = dict(SITE, owner_type="private", owner="a numbered company")
         pf = proforma.build(site, OPTION, evaluate(site, OPTION, AS_OF))
         self.assertIsNone(pf["capital"]["land"])
-        self.assertEqual(pf["verdict"]["word"], "unsure")
-        self.assertTrue(any("land" in u for u in pf["verdict"]["unsure"]))
+        self.assertGreater(pf["gap"]["share_of_capital"], proforma.GAP_UNLIKELY_SHARE)
+        self.assertEqual(pf["verdict"]["word"], "unlikely")
+        why = pf["verdict"]["why"][0]
+        self.assertRegex(why, r"^the gap is \$[\d,]+, \d+% of the cost before any land price, more than the 15% line \(this tool's screening line, not a funder's rule\)")
+        self.assertTrue(any("land" in u for u in pf["verdict"]["unsure"]))       # still left to a person
+        self.assertEqual(proforma.next_step(pf), proforma.MORE_SOURCES)
+        self.assertIn("**Needs more sources.**", "\n".join(proforma.markdown(pf)))
+        cap = next(ln for ln in pf["lines"] if ln["key"] == "capital")
+        self.assertIn("before land", cap["note"])
+
+    def test_the_line_notes_say_what_they_mean(self):
+        L = evaluate(SITE, OPTION, AS_OF)
+        lines = {ln["key"]: ln for ln in proforma.build(SITE, OPTION, L)["lines"]}
+        land_ref = proforma._refs(L)["f.land"]
+        self.assertEqual(land_ref[0], "F")
+        self.assertEqual(lines["land"]["note"], f"nominal: the owner is a church, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer ({land_ref})")
+        self.assertIn("this tool's screening line, not a funder's rule", lines["gap"]["note"])
+        self.assertIn("the lender wants net income 1.10 times the loan payment", lines["debt"]["note"])
+        self.assertIn("repaid over 40 years (the amortization)", lines["debt"]["note"])
 
     def test_a_price_in_the_finance_block_settles_the_land(self):
         site = dict(SITE, owner_type="private")

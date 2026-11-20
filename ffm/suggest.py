@@ -316,32 +316,66 @@ def _largest_remainder(total: int, shares: dict[str, float]) -> dict[str, int]:
     return out
 
 
-def homes_placed(counts: dict[str, int], plate_w: float, plate_d: float, storeys: int, mins: dict[str, float]) -> int:
-    """How many of these homes the plans place on `storeys` plates of plate_w × plate_d m: the layout's own solver
-    (ffm/layout.py) on a bare massing, the ground floor's amenity and services first, as a run lays them. Pure."""
+# How many storeys the floor area the manager's homes need takes, where the envelope allows more: a plate of about this
+# much (a double-loaded slab some 20 m deep and 25 m long), or the setback envelope's plate box where that is smaller.
+# A placeholder, declared with the suggestion's notes; the manager's own storeys stand over it.
+TARGET_PLATE_M2 = 500.0
+
+
+def floor_area_for_homes(units: dict[str, int], mins: dict[str, float], allowance: float, efficiency: float) -> dict[str, Any]:
+    """The floor area a set of homes needs, the inverse of `unit_mix`: each home at the BC Housing minimum plus the
+    design allowance, over the net efficiency, plus the ground floor's amenity and services as the layout lays them
+    (layout.blocks: 1.5 m² of amenity a home, at least 40 m², and 40 m² of services). Returns {gfa_m2, net_m2,
+    residential_m2, amenity_m2, services_m2, how}. Pure."""
+    from .layout import LAYOUT_ASSUMPTIONS    # layout imports this module's ASSUMPTIONS, so it is imported here
+    n = sum(int(v or 0) for v in units.values())
+    net = sum(int(units.get(k) or 0) * float(mins[k]) * allowance for k in MIX_KEYS if k in mins)
+    res = net / efficiency if efficiency else net
+    per, _ = LAYOUT_ASSUMPTIONS["amenity_m2_per_unit"]
+    amenity = max(40.0, per * n) if n else 0.0
+    services, _ = LAYOUT_ASSUMPTIONS["services_base_m2"]
+    total = round(res + amenity + services)
+    how = (f"{net:,.0f} m² net at the BC Housing minimums + {int(round((allowance - 1) * 100))}%, over a net efficiency of {efficiency * 100:.0f}%, "
+           f"is {res:,.0f} m², plus {amenity:,.0f} m² of amenity and {services:,.0f} m² of services")
+    return {"gfa_m2": float(total), "net_m2": round(net, 1), "residential_m2": round(res, 1), "amenity_m2": amenity, "services_m2": services, "how": how}
+
+
+def plans_for(counts: dict[str, int], plate_w: float, plate_d: float, storeys: int, mins: dict[str, float]) -> dict | None:
+    """The layout's own solver (ffm/layout.py) on a bare massing of `storeys` plates of plate_w × plate_d m, the ground
+    floor's amenity and services first, as a run lays them; a low building tried as a walk-up too. None where there is
+    nothing to lay out. Pure."""
     from . import layout   # layout reads this module's ASSUMPTIONS, so it is imported here, not at the top
     n = sum(int(v or 0) for v in counts.values())
     if not (plate_w > 0 and plate_d > 0 and storeys and n):
-        return n
+        return None
     ring = [[0.0, 0.0], [plate_w, 0.0], [plate_w, plate_d], [0.0, plate_d]]
     m = {"origin": "", "warnings": [], "masses": [{"name": "proposed", "footprint": ring, "plate_width_m": plate_w, "plate_depth_m": plate_d,
                                                   "storeys": int(storeys), "floor_to_floor_m": ASSUMPTIONS["floor_to_floor_m"][0],
                                                   "plate_area_m2": plate_w * plate_d, "gfa_m2": plate_w * plate_d * storeys}]}
     ledger = {"results": [{"rule_id": "bch.design_guidelines.unit_areas", "check": "unit_area_flags", "status": "info",
                            "values": {"min_net_area_m2": dict(mins)}}], "run": {"as_of": "", "stamp": {"stamp": ""}}}
-    return int(layout.solve({}, {"units": dict(counts)}, ledger, m)["units_placed"])
+    return layout.solve({}, {"units": dict(counts)}, ledger, m)
+
+
+def homes_placed(counts: dict[str, int], plate_w: float, plate_d: float, storeys: int, mins: dict[str, float]) -> int:
+    """How many of these homes the plans place (`plans_for`); all of them where there is no plate to test. Pure."""
+    L = plans_for(counts, plate_w, plate_d, storeys, mins)
+    return sum(int(v or 0) for v in counts.values()) if L is None else int(L["units_placed"])
 
 
 def fit_to_plans(net_area_m2: float, mins: dict[str, float], family: dict | None, allowance: float, shares: dict[str, float],
-                 plate_w: float, plate_d: float, storeys: int) -> tuple[dict[str, int], float, int]:
+                 plate_w: float, plate_d: float, storeys: int) -> tuple[dict[str, int], float, int, int]:
     """The homes `unit_mix` gives, cut to the most the plans place on the plate (17 Nov 2026: the floor area held 170
     homes at the minimums while the plans placed 114, and the money and the funders counted all 170). Returns the
-    counts, the average area and how many the floor area alone held. A search on the net area keeps the mix and the
-    family-unit minimums whole. Pure."""
+    counts, the average area, how many the floor area alone held, and how many of the counts the plans place. A search
+    on the net area keeps the mix and the family-unit minimums whole. Where no count places whole (20 Nov 2026, 609
+    Heatley Ave: the three-bedroom home the family minimum asks fits no floor of a 9.4 × 12 m walk-up, so every count
+    fell to zero), the floor area's count is kept and the placed number says how many of it the plans hold. Pure."""
     counts, avg = unit_mix(net_area_m2, mins, family, allowance, shares)
     alone = sum(counts.values())
-    if not alone or homes_placed(counts, plate_w, plate_d, storeys, mins) >= alone:
-        return counts, avg, alone
+    placed = homes_placed(counts, plate_w, plate_d, storeys, mins) if alone else 0
+    if not alone or placed >= alone:
+        return counts, avg, alone, alone
     lo, hi, best = 0.0, net_area_m2, None
     for _ in range(14):
         mid = (lo + hi) / 2
@@ -352,8 +386,8 @@ def fit_to_plans(net_area_m2: float, mins: dict[str, float], family: dict | None
         else:
             hi = mid
     if best is None:
-        best = unit_mix(0.0, mins, family, allowance, shares)
-    return best[0], best[1], alone
+        return counts, avg, alone, placed
+    return best[0], best[1], alone, sum(best[0].values())
 
 
 def toa_tier(site: dict, rules: list[Rule], on: date, district: str) -> dict | None:
@@ -573,6 +607,43 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     gfa = fixed.get("gfa_m2", gfa)
     storeys = fixed.get("storeys", storeys)
     height = fixed.get("height_m", height)
+    # the manager's homes with no floor area of theirs: the floor area follows the homes, capped by the envelope, and the
+    # storeys follow the floor area (20 Nov 2026: 20 homes kept the envelope's 8,432 m²)
+    from_homes = None
+    p_areas_early = _params(rules, on, "bch.design_guidelines.unit_areas", district)
+    if fixed.get("units") and not fixed.get("gfa_m2") and p_areas_early and sum(fixed["units"].values()):
+        from_homes = floor_area_for_homes(fixed["units"], p_areas_early["min_net_area_m2"], allowance, eff)
+        cap = env.get("gfa_m2")
+        basis = (fields.get("gfa_m2") or {}).get("basis")
+        allows = {"rule": "the outright FSR", "benchmark": "the staff benchmark", "toa": "the transit-oriented minimum",
+                  "envelope": "the rough envelope (the plate the setbacks leave)"}.get(basis, "the envelope")
+        need = from_homes["gfa_m2"]
+        nh = sum(fixed["units"].values())
+        capped = cap is not None and need > cap + 0.5
+        gfa = float(cap) if capped else need
+        from_homes.update({"capped": capped, "cap_m2": cap, "cap_from": allows if cap is not None else None,
+                           "words": (f"{nh} homes need about {need:,.0f} m²; {allows} allows {cap:,.0f} m²" if capped else
+                                     f"{nh} homes need about {need:,.0f} m²" + (f", within the {cap:,.0f} m² {allows} allows" if cap is not None else ", and no envelope in the rules caps it"))})
+        if not fixed.get("storeys"):
+            env_storeys = int(storeys or 1)
+            box = float((rough or {}).get("plate_m2") or 0)
+            per = min(box, TARGET_PLATE_M2) if box else TARGET_PLATE_M2
+            storeys = max(1, min(env_storeys, int(math.ceil(gfa / per - 1e-9))))
+            if not fixed.get("height_m"):
+                height = round(storeys * f2f, 1)
+            from_homes["storeys"] = storeys
+            from_homes["words"] += (f"; on {storeys} storey{'s' if storeys != 1 else ''}, a plate of about {gfa / storeys:,.0f} m²"
+                                    + (f" (the envelope allows {env_storeys})" if storeys < env_storeys else ""))
+            if storeys < env_storeys:
+                st_field = fields.get("storeys") or {}
+                fields["storeys"] = {**st_field, "value": storeys,
+                                     "note": f"the storeys the floor area your homes need takes, on a plate of at most about {per:,.0f} m² (a placeholder); "
+                                             f"the envelope allows {env_storeys}: " + str(st_field.get("note") or "")}
+                fields["height_m"] = {**(fields.get("height_m") or {}), "value": height, "note": f"{storeys} storeys × {f2f} m"}
+        fields["gfa_m2"] = {"value": round(gfa), "rule_id": (fields.get("gfa_m2") or {}).get("rule_id") if capped else "bch.design_guidelines.unit_areas",
+                            "basis": basis if capped else "rule", "note": from_homes["words"] + f" ({from_homes['how']})"}
+        if capped:
+            unsure.append({"key": "gfa_m2", "why": from_homes["words"], "who": "Manager: fewer homes, smaller ones, or a path to more floor area (a rezoning)"})
 
     # the building
     option: dict[str, Any] = {
@@ -630,10 +701,22 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
             from .massing import plate_dims   # massing builds on the checks this module imports
             bw, bd = float(rough["plate_w_m"]), float(rough["plate_d_m"])
             pw, pd = plate_dims(min(gfa / storeys, bw * bd), bw, bd, int(storeys))
-            counts, avg, alone = fit_to_plans(gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares, pw, pd, int(storeys))
-            if alone > sum(counts.values()):
-                fit_words = (f"; the floor area alone holds {alone} at these sizes, the plans place {sum(counts.values())} on {int(storeys)} floors "
-                             f"of {pw:.1f} × {pd:.1f} m, so {sum(counts.values())} it is")
+            counts, avg, alone, placed = fit_to_plans(gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares, pw, pd, int(storeys))
+            kept = sum(counts.values())
+            if placed < kept:
+                # no count places whole: the floor area's count stands and the plan is the architect's (20 Nov 2026)
+                plans = plans_for(counts, pw, pd, int(storeys), p_areas["min_net_area_m2"]) or {}
+                short = [s for s in plans.get("shortfall") or [] if s.get("units")]
+                short_words = ", ".join(f"{s['units']} {s['label'].lower()} ({s['area_m2'] / s['units']:,.0f} m² each)" for s in short)
+                how = {"walkup": "beside one stair (a walk-up)", "point": "round a point tower's core"}.get((plans.get("plate") or {}).get("arrangement"), "along a corridor")
+                fit_words = (f"; the plans place {placed} of these {kept} on {int(storeys)} floors of {pw:.1f} × {pd:.1f} m {how}, and no smaller count places whole, "
+                             f"so the floor area's {kept} are kept and the plan is the architect's")
+                unsure.append({"key": "plan", "why": f"the floor area holds {kept} homes at these sizes, but the plans place {placed} on {int(storeys)} floors of {pw:.1f} × {pd:.1f} m {how}"
+                                                    + (f": {short_words} did not fit" if short_words else "") + f"; the {kept} homes are kept",
+                               "who": "Architect: lay out the plan in Edit blocks (a larger home across two floors, a wider plate) or change the mix"})
+            elif alone > kept:
+                fit_words = (f"; the floor area alone holds {alone} at these sizes, the plans place {kept} on {int(storeys)} floors "
+                             f"of {pw:.1f} × {pd:.1f} m, so {kept} it is")
         option["units"] = counts
         n = sum(counts.values())
         # how many homes the family-unit minimums moved up from the shares
@@ -734,7 +817,9 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     # with the other street as the front, a lane behind and the Director's variance as the ways out, in the words the
     # memo's open item uses. The front is offered, never switched: a person chooses it at 01.
     if sb_rule:
-        yards = district_setbacks(site, option, p_sb)
+        sb_version = (_rule(rules, sb_rule).version_on(on) if _rule(rules, sb_rule) else None)
+        section = ((sb_version.source if sb_version else None) or {}).get("section")
+        yards = district_setbacks(site, option, {**p_sb, "_section": section} if section else p_sb)
         if (yards.get("values") or {}).get("no_envelope"):
             unsure.append({"key": "yards", "why": yards["finding"].rstrip("."), "who": yards["action"].rstrip(".")})
 
@@ -762,11 +847,38 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         "presets": {k: {"shares": dict(v["shares"]), "note": v["note"]} for k, v in MIX_PRESETS.items()},
         "unit_areas_m2": dict((p_areas or {}).get("min_net_area_m2") or {}), "allowance": allowance,
     }
+    label, falls_short = says_what_it_is(candidate, option, fields, p_chf, n)
     return {
         "candidate": candidate, "candidate_note": candidate_note, "candidates": cands, "option": option, "fields": fields,
         "unsure": unsure, "assumptions": assumptions, "envelope": rough, "mix": mix,
+        "label": label, "falls_short": falls_short, "floor_area_from_homes": from_homes,
         "as_of": on.isoformat(), "stamp": stamp(rules, on, rules_dir),
     }
+
+
+# What the envelope a suggestion stands on is called, by the basis its storeys came from
+ENVELOPE_WORDS = {"benchmark": "Benchmark", "rule": "Outright", "toa": "Transit-oriented minimum", "envelope": "Rough envelope"}
+
+
+def says_what_it_is(candidate: str, option: dict, fields: dict, p_chf: dict | None, n: int) -> tuple[str | None, str | None]:
+    """Where a candidate cannot deliver what its name promises (20 Nov 2026), a plain label for what was built and a
+    sentence on what it falls short of; (None, None) where it delivers. Funder-ready promises the fund's mix: below the
+    smallest count that can split 30 / 50 / 20 within the tolerance (`checks.smallest_split`), or with no homes at all,
+    it falls short, and the label names the envelope it stands on instead ("Outright: 3 storeys, 4 homes"). Pure."""
+    if candidate != "funder-ready" or not p_chf:
+        return None, None
+    from .checks import smallest_split
+    least = smallest_split(p_chf["mix"], p_chf["mix_tolerance"])
+    if n >= least:
+        return None, None
+    basis = (fields.get("storeys") or {}).get("basis")
+    word = ENVELOPE_WORDS.get(basis) or ("Provincial minimum" if fields.get("ssmuh_minimum_units") else "Rough envelope")
+    storeys = option.get("storeys")
+    label = f"{word}: " + (f"{storeys} storeys, " if storeys else "") + (f"{n} home{'s' if n != 1 else ''}" if n else "no homes derived")
+    mix = " / ".join(f"{int(round(s * 100))}" for s in p_chf["mix"].values())
+    falls_short = (f"Funder-ready needs at least {least} homes for the {mix} mix; this lot's envelope gives {n}" if n
+                   else f"Funder-ready needs at least {least} homes for the {mix} mix; no homes were derived from this lot's envelope")
+    return label, falls_short
 
 
 def read_site(site: dict, on: date, rules: list[Rule] | None = None, rules_dir: Path = RULES_DIR) -> dict[str, Any]:

@@ -7,7 +7,7 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from ffm import massing, suggest
+from ffm import layout, massing, suggest
 from ffm.engine import evaluate, load_json
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -231,13 +231,17 @@ class YardsLeaveNoEnvelope(unittest.TestCase):
         self.assertIsNone(S["envelope"]["plate_m2"])
         self.assertIn("leave no envelope on a lot 37.2 m wide and 15.2 m deep", S["envelope"]["gfa_from"])
         y = next(u for u in S["unsure"] if u["key"] == "yards")
-        self.assertIn("The RT-3 yards leave no envelope", y["why"])
-        self.assertIn("With Keefer St as the front", y["why"])
-        self.assertIn("12.2 × 13.5 m (165 m²)", y["why"])                     # 37.2 - 3.7 - 20.0 deep, 15.2 - 2 x 1.5 wide
-        self.assertIn("12.2 × 16.6 m (202 m²) if a lane runs behind it (s.3.1.2.17", y["why"])
-        self.assertIn("s.3.1.2.21", y["why"])
+        # the plain consequence first, the way out with its numbers, then the task with the clause numbers last
+        # (20 Nov 2026: the finding read as a clause essay)
+        self.assertTrue(y["why"].startswith("On Heatley Ave as the front, the RT-3 yards leave no room to build: the rear yard is 20.0 m on a lot 15.2 m deep. "
+                                            "With Keefer St as the front, a plate of about 12.2 × 13.5 m (165 m²) fits"), y["why"])   # 37.2 - 3.7 - 20.0 deep, 15.2 - 2 x 1.5 wide
+        self.assertIn("12.2 × 16.6 m (202 m²) if a lane runs behind it", y["why"])
         self.assertIn("not assumed", y["why"])
-        self.assertIn("choose the front of the corner lot at 01", y["who"])
+        self.assertTrue(y["why"].endswith("Manager: ask the City which street is the front (s.3.1.2.7 rear yard; s.3.1.2.17 a lane behind; "
+                                          "s.3.1.2.21 the Director's variance for affordable housing)"), y["why"])
+        self.assertIn("which street is the front of the corner lot", y["who"])
+        self.assertIn("choose it at 01", y["who"])
+        self.assertIn("s.3.1.2.21", y["who"])
 
     def test_the_outright_answer_is_not_yet_confirmed_and_the_open_item_names_the_ways_out(self):
         site = self.site()
@@ -256,8 +260,22 @@ class YardsLeaveNoEnvelope(unittest.TestCase):
         self.assertNotIn("why", out)                                            # assessed, not "not assessed"
         item = next(u for u in L["summary"]["answers"]["unsure"] if u["rule_id"] == "cov.rt3.setbacks")
         self.assertIn("Keefer St", item["action"])
+        self.assertTrue(item["action"].startswith("Manager: "))
+        self.assertEqual(r["values"]["front_street"], "Heatley Ave")
+        self.assertTrue(r["finding"].endswith("(s.3.1.2.7 rear yard; s.3.1.2.17 a lane behind; s.3.1.2.21 the Director's variance for affordable housing)."))
         from ffm import memo
         self.assertIn("**Outright, under RT-3: not yet confirmed.**", memo.markdown(L))
+
+    def test_a_lot_on_one_street_says_so_without_another_front(self):
+        site = self.site(parcel={"street": {"name": "Heatley Ave"}}, osm={})
+        o = suggest.suggest(site, ["bch.chf.eligibility"], self.ON)["option"]
+        r = next(x for x in evaluate(site, o, self.ON)["results"] if x["rule_id"] == "cov.rt3.setbacks")
+        self.assertNotIn("other_front", r["values"])
+        self.assertTrue(r["finding"].startswith("On Heatley Ave as the front, the RT-3 yards leave no room to build"), r["finding"])
+        self.assertNotIn("If a lane runs behind", r["finding"])     # 15.2 - 3.7 - (20.0 - 3.05) still leaves nothing
+        self.assertNotIn("With ", r["finding"])
+        self.assertIn("The Director of Planning may vary the yards", r["finding"])
+        self.assertTrue(r["finding"].endswith("Manager: ask the Director of Planning about a variance (s.3.1.2.7 rear yard; s.3.1.2.21 the Director's variance for affordable housing)."), r["finding"])
 
     def test_a_lane_behind_takes_the_centre_line_off_the_rear_yard(self):
         site = self.site(front_face={"street": "Keefer St"}, boundary_m=self.RING, osm={"roads": self.ROADS}, lane_behind=True)
@@ -298,6 +316,77 @@ class YardsLeaveNoEnvelope(unittest.TestCase):
         self.assertAlmostEqual(abs(o["orientation"]["rotate_deg"]), 90, delta=1)
         self.assertAlmostEqual(o["frontage_m"], 15.2, delta=0.1)
         self.assertAlmostEqual(o["depth_m"], 37.0, delta=0.3)
+
+
+class SmallWalkUp(unittest.TestCase):
+    """20 Nov 2026: 609 Heatley Ave fronted on Keefer St (15.2 m along it, 37.2 m deep), RT-3's 0.60 on 566.7 m² over
+    three storeys: the plans placed no homes and the suggestion derived none. The walk-up places them, the homes the
+    floor area holds are kept where no smaller count places whole, and funder-ready says what it falls short of."""
+
+    ON = date(2026, 11, 17)
+    SITE = {"id": "609-heatley-ave", "zoning_district": "RT-3", "site_area_m2": 566.7, "frontage_m": 15.2, "depth_m": 37.2,
+            "has_water_and_sewer": True, "existing_trees_on_site": [], "context": {"street": {"name": "Keefer St"}}}
+
+    def test_the_homes_are_not_cut_to_zero_and_the_plan_is_left_to_the_architect(self):
+        S = suggest.suggest(self.SITE, ["bch.chf.eligibility"], self.ON, "funder-ready")
+        n = sum(S["option"]["units"].values())
+        self.assertGreater(n, 0)
+        self.assertEqual(S["option"]["storeys"], 3)
+        plan = next((u for u in S["unsure"] if u["key"] == "plan"), None)
+        if plan:                                                     # the family minimum's three-bedroom home fits no floor
+            self.assertIn("did not fit", plan["why"])
+            self.assertTrue(plan["who"].startswith("Architect:"))
+        L = evaluate(self.SITE, S["option"], self.ON)
+        lay = layout.solve(self.SITE, S["option"], L, massing.build(self.SITE, S["option"], L))
+        self.assertEqual(lay["plate"]["arrangement"], "walkup")
+        self.assertGreater(lay["units_placed"], 0)
+
+    def test_funder_ready_below_the_funds_mix_says_what_it_is(self):
+        S = suggest.suggest(self.SITE, ["bch.chf.eligibility"], self.ON, "funder-ready")
+        n = sum(S["option"]["units"].values())
+        self.assertLess(n, 10)
+        self.assertEqual(S["label"], f"Outright: 3 storeys, {n} homes")
+        self.assertEqual(S["falls_short"], f"Funder-ready needs at least 10 homes for the 30 / 50 / 20 mix; this lot's envelope gives {n}")
+
+    def test_a_candidate_that_delivers_carries_no_label(self):
+        S = suggest.suggest(SITE, PROGRAMS, AS_OF, "funder-ready")
+        self.assertIsNone(S["label"])
+        self.assertIsNone(S["falls_short"])
+        self.assertIsNone(suggest.suggest(self.SITE, ["bch.chf.eligibility"], self.ON, "outright")["falls_short"])   # outright promises no mix
+
+
+class FloorAreaFromHomes(unittest.TestCase):
+    """20 Nov 2026: the manager types homes at stop 02 (`fixed.units`, no floor area); the floor area follows the homes,
+    capped by the envelope, and the storeys follow the floor area. A floor area the manager gives still leads."""
+
+    TWENTY = {"studio": 4, "one_bed": 8, "two_bed": 6, "three_bed_plus": 2}
+
+    def test_the_floor_area_follows_the_homes(self):
+        S = suggest.suggest(SITE, PROGRAMS, AS_OF, "funder-ready", fixed={"units": self.TWENTY})
+        o, fh = S["option"], S["floor_area_from_homes"]
+        net = (4 * 33 + 8 * 49 + 6 * 67 + 2 * 86) * 1.10
+        self.assertAlmostEqual(fh["gfa_m2"], round(net / 0.78 + 40 + 40), delta=1)      # amenity at least 40 m², services 40 m²
+        self.assertFalse(fh["capped"])
+        self.assertEqual(o["gfa_m2"], fh["gfa_m2"])                                       # was the envelope's 8,432 m²
+        self.assertEqual(o["units"], self.TWENTY)
+        self.assertEqual(o["storeys"], 4)                                                 # about 1,630 m² on plates of at most 500 m²
+        self.assertAlmostEqual(o["height_m"], 4 * 3.3, places=1)
+        self.assertIn("20 homes need about 1,628 m²", S["fields"]["gfa_m2"]["note"])
+
+    def test_the_envelope_caps_it_and_says_so(self):
+        site = SmallWalkUp.SITE
+        S = suggest.suggest(site, ["bch.chf.eligibility"], SmallWalkUp.ON, "outright", fixed={"units": self.TWENTY})
+        fh = S["floor_area_from_homes"]
+        self.assertTrue(fh["capped"])
+        self.assertEqual(S["option"]["gfa_m2"], 340.0)                                    # RT-3's 0.60 on 566.7 m²
+        self.assertTrue(fh["words"].startswith("20 homes need about 1,628 m²; the outright FSR allows 340 m²"), fh["words"])
+        self.assertIn("gfa_m2", {u["key"] for u in S["unsure"]})
+
+    def test_a_floor_area_given_still_leads(self):
+        S = suggest.suggest(SITE, PROGRAMS, AS_OF, "funder-ready", fixed={"units": self.TWENTY, "gfa_m2": 5000})
+        self.assertEqual(S["option"]["gfa_m2"], 5000)
+        self.assertIsNone(S["floor_area_from_homes"])
+        self.assertIsNone(suggest.suggest(SITE, PROGRAMS, AS_OF, "funder-ready")["floor_area_from_homes"])
 
 
 class ReadSite(unittest.TestCase):

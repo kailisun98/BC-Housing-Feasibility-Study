@@ -49,8 +49,9 @@ class FsrComparedAtTwoDecimals(unittest.TestCase):
 
     def test_a_hundredth_over_is_still_over(self):
         r = self.fsr(14750.0)                                           # 6.9106, stated as 6.91
-        self.assertEqual(r["status"], "uncertain")
+        self.assertEqual(r["status"], "fail")                           # outright; the rezoning is required (20 Nov 2026)
         self.assertIn("FSR 6.91 exceeds", r["finding"])
+        self.assertIn("rezoning is required (CD-1)", r["finding"])
 
 
 if __name__ == "__main__":

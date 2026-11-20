@@ -308,7 +308,7 @@
       "version_effective_from": "2024-06-26",
       "version_effective_to": null,
       "status": "info",
-      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 59 vehicle and 308 bicycle spaces, which are set by the Parking By-law at the development permit stage.",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 59 vehicle and 308 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage.",
       "values": {
         "parking_spaces": 59,
         "bicycle_spaces": 308
@@ -818,7 +818,7 @@
       "version_effective_from": "2025-03-10",
       "version_effective_to": null,
       "status": "info",
-      "finding": "two exits over floor area m2: 150; two exits over occupant load: 60; separation min m: 9; separation share of diagonal: 0.5; travel limit sprinklered m: 45; travel limit unsprinklered m: 30; dead end max m: 6; occupant load persons per sleeping room: 2.",
+      "finding": "two exits over floor area: 150 m²; two exits over occupant load: 60; separation minimum: 9 m; separation share of diagonal: 50%; travel limit sprinklered: 45 m; travel limit unsprinklered: 30 m; dead end maximum: 6 m; occupant load persons per sleeping room: 2.",
       "values": {
         "two_exits_over_floor_area_m2": 150,
         "two_exits_over_occupant_load": 60,
@@ -880,7 +880,7 @@
       "version_effective_from": "2024-02-13",
       "version_effective_to": null,
       "status": "uncertain",
-      "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter.",
+      "finding": "BC Builds: whether it meets the criteria cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
       "values": {
         "fails": [],
         "unknown": [
@@ -915,7 +915,7 @@
       "version_effective_from": "2025-05-30",
       "version_effective_to": null,
       "status": "fail",
-      "finding": "Community Housing Fund: does not fit: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20.",
+      "finding": "Community Housing Fund: does not meet the criteria: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
       "values": {
         "required_mix": {
           "market": 0.3,
@@ -936,11 +936,16 @@
         ],
         "notes": [
           "site control (council resolution) meets the readiness bar",
-          "construction must be able to start within 18 months of award",
-          "program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+          "construction must be able to start within 18 months of award"
         ],
         "provisional_grant_per_unit_cad": 171211,
-        "indicative_grant_cad": 27907393
+        "indicative_grant_cad": 27907393,
+        "intake": {
+          "open": false,
+          "note": "its 2025 call was cancelled in February 2026, so no intake is open now",
+          "more": "the program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+          "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+        }
       },
       "action": "Manager: resolve the failing criteria or target another program."
     },
@@ -959,7 +964,7 @@
       "version_effective_from": "2025-01-01",
       "version_effective_to": null,
       "status": "info",
-      "finding": "max loan cad: 250000; eligible costs: due diligence, feasibility and design.",
+      "finding": "maximum loan: $250,000; eligible costs: due diligence, feasibility and design.",
       "values": {
         "max_loan_cad": 250000,
         "eligible_costs": "due diligence, feasibility and design"
@@ -981,7 +986,7 @@
       "version_effective_from": "2024-03-13",
       "version_effective_to": null,
       "status": "info",
-      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding.",
+      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist.",
       "values": {
         "construction_start_months_after_approval": 6,
         "intake": "continuous",
@@ -1232,7 +1237,18 @@
           "bch.chf.eligibility"
         ],
         "conditional": [],
-        "uncertain": []
+        "uncertain": [],
+        "words": "Does not meet the criteria of the Community Housing Fund",
+        "intake": [
+          {
+            "rule_id": "bch.chf.eligibility",
+            "program": "the Community Housing Fund",
+            "open": false,
+            "note": "the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now",
+            "more": "the program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+            "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+          }
+        ]
       },
       "unsure": [
         {
@@ -1267,14 +1283,14 @@
           "rule_id": "bc.bcbuilds.eligibility",
           "title": "BC Builds: eligibility and below-market requirement",
           "status": "uncertain",
-          "finding": "BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; Ground must break within 12 to 18 months of the conditional land contribution letter.",
+          "finding": "BC Builds: whether it meets the criteria cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
           "action": "Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices."
         },
         {
           "rule_id": "bch.chf.eligibility",
           "title": "BC Housing Community Housing Fund: eligibility and unit mix",
           "status": "fail",
-          "finding": "Community Housing Fund: does not fit: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20.",
+          "finding": "Community Housing Fund: does not meet the criteria: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
           "action": "Manager: resolve the failing criteria or target another program."
         }
       ]

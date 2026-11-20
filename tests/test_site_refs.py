@@ -13,7 +13,8 @@ CASE = ROOT / "ffm" / "ui" / "case.html"
 R1 = ROOT / "outputs" / "998-e-19th-ave" / "as-approved" / "ledger.json"
 # the words the page uses for a rule, and the rule
 WORDS = {"Interim Rezoning Policy": "cov.irp.social_housing_rezoning", "Protection of Trees By-law": "cov.trees.replacement",
-         "BC Builds": "bc.bcbuilds.eligibility", "Community Housing Fund": "bch.chf.eligibility", "BC Building Code, exits": "bcbc.exits"}
+         "BC Builds": "bc.bcbuilds.eligibility", "Community Housing Fund": "bch.chf.eligibility"}
+# (20 Nov 2026: the exits pass in the regenerated R1, so the page no longer cites them as an open item)
 
 
 def memo_refs(results):

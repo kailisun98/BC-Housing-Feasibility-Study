@@ -52,22 +52,28 @@ const FIELDS = [
     info: "With the frontage, the rectangle the massing is drawn in; the street is along the frontage, the lane behind the depth." },
   { on: "site", key: "in_former_community_vision_area", group: "Policy areas", label: "In a former Community Vision area", type: TRI, need: "rule",
     reads: ["rezoning_policy_social_housing"],
-    ask: { stop: 1, q: "Inside a former Community Vision area?", who: "you, from Map 1 of the Interim Rezoning Policy" },
+    ask: { stop: 1, q: "Inside a former Community Vision area?", who: "you, from Map 1 of the Interim Rezoning Policy",
+      why: "Decides whether the social housing rezoning policy, and its staff benchmark, applies.",
+      where: ["Map 1 of the policy", "https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf"] },
     info: "Map 1 of the Interim Rezoning Policy for Social Housing (1 Nov 2023, amended 31 Mar 2026). Inside the map, 100% social housing can rezone to CD-1 against a staff benchmark (here about 19.9 to 21.3 m and FSR 3.0). Outside it, the Affordable Housing Policies (1989) or an area plan apply and this rule reads 'not applicable'." },
   { on: "site", key: "in_transit_oriented_area", group: "Policy areas", label: "In a transit-oriented area", type: TRI, need: "rule",
     reads: ["toa_status", "ssmuh_minimum_units"],
-    ask: { stop: 1, q: "Inside a transit-oriented area?", who: "you, from the City's TOA map" },
+    ask: { stop: 1, q: "Inside a transit-oriented area?", who: "you, from the City's TOA map",
+      why: "Inside one, the Province sets a minimum height and density by tier.",
+      where: ["the City's June 2024 release on the areas", "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx"] },
     info: "Bill 47 (2023): inside a provincially designated transit-oriented area the City may not refuse the minimum height and density for the tier. Vancouver designated 29 such areas in June 2024, around SkyTrain stations and bus exchanges. Check the City's TOA map; 'Not sure' comes back as uncertain." },
   { on: "site", key: "toa_tier", group: "Policy areas", label: "Transit-oriented area tier", type: "select", need: "rule", reads: ["toa_status"],
     // short enough for the architect's schedule (17 Nov 2026: "Tier 4 · bus exchange, within 200 m" was cut in it)
     options: [["", "Not sure"], ["1", "1 · SkyTrain, 200 m"], ["2", "2 · SkyTrain, 400 m"], ["3", "3 · SkyTrain, 800 m"],
       ["4", "4 · bus exchange, 200 m"], ["5", "5 · bus exchange, 400 m"]],
-    ask: { stop: 1, q: "Which tier?", who: "you, from the same map", when: site => site.in_transit_oriented_area === true },
+    ask: { stop: 1, q: "Which tier?", who: "you, from the same map", when: site => site.in_transit_oriented_area === true,
+      why: "Sets the minimum: 20, 12 or 8 storeys, by the distance to the station or exchange." },
     info: "Distance bands: around a SkyTrain station Tier 1 within 200 m, minimum allowable 20 storeys; Tier 2 200 to 400 m, 12 storeys; Tier 3 400 to 800 m, 8 storeys. Around a bus exchange (the Kootenay Loop, say) Tier 4 within 200 m, 12 storeys; Tier 5 200 to 400 m, 8 storeys. The tier comes from the City's TOA map, which the tool does not read." },
   { on: "site", key: "frequent_bus_stop_within_400m", group: "Policy areas", label: "Frequent bus stop within 400 m", type: TRI, need: "", ref: "note",
     info: "Recorded for the record: no rule in the stack reads it yet. It will matter when frequent-transit policies are coded." },
   { on: "site", key: "has_water_and_sewer", group: "Policy areas", label: "Water and sewer service", type: TRI, need: "rule", reads: ["ssmuh_minimum_units"],
-    ask: { stop: 1, q: "Water and sewer service?", who: "you" },
+    ask: { stop: 1, q: "Water and sewer service?", who: "you",
+      why: "The small-scale multiplex minimums apply only on a serviced lot.", where: ["the site survey or the City's records"] },
     info: "The Small-Scale Multi-Unit Housing minimums (Bill 44) apply only where the lot has water and sewer service; 'No' switches that rule off." },
   { on: "site", key: "existing_trees_on_site", group: "Trees", label: "Existing trees on site", type: "trees", need: "rule", reads: ["tree_replacement"],
     info: "Protection of Trees By-law 9958. The survey must cover every tree of 20 cm DBH or more on the site, within 2 m of the boundary and on the adjoining street. Schedule A sets the protection barrier by trunk diameter (40 cm: 2.4 m, which the massing must leave clear); Schedule C sets how many trees the site must have after development, by area; each missing tree is $1,000 cash in lieu. No survey on file: the rule says so and returns uncertain." },
@@ -77,24 +83,31 @@ const FIELDS = [
     info: "Printed in the memo's inputs." },
   // the architect's schedule offers the manager's choices (17 Nov 2026: it was free text showing "municipality")
   { on: "site", key: "owner_type", group: "Owner", label: "Owner type", type: "select", options: OWNER_TYPES, need: "", reads: ["dcl_cac"],
-    ask: { stop: 1, q: "Who owns the land?", who: "you", kind: "select", options: OWNER_TYPES },
+    ask: { stop: 1, q: "Who owns the land?", who: "you", kind: "select", options: OWNER_TYPES,
+      why: "A church, society or government owner lets the money count the land at a nominal value.",
+      where: ["the land title, or BC Assessment", "https://www.bcassessment.ca/"] },
     info: "A note for the memo: church, society, municipality, private. The DCL exemption for church use is read from the referral report, not from this field. The pro-forma carries the land at a nominal value where the owner is a church, a society or a government on a long lease." },
   { on: "site", key: "keep_existing_buildings", group: "Owner", label: "The buildings on the lot stay", type: TRI, need: "rule", ref: "open item",
-    ask: { stop: 1, q: "Do the buildings on the lot stay?", who: "you, then the architect" },
+    ask: { stop: 1, q: "Do the buildings on the lot stay?", who: "you, then the architect",
+      why: "The drawings assume a clear lot; a building that stays changes the massing." },
     info: "The massing is drawn on a clear lot. Yes means a building stays and the architect must draw the kept footprint; No means the lot is cleared; Not sure becomes an open item with the manager's name." },
   { on: "site", key: "land_tenure_plan", group: "Owner", label: "Land tenure plan", type: "text", need: "rule", reads: ["chf_fit"],
     help: "Write “to confirm” if it is not settled; the funders' checks read that honestly.",
-    ask: { stop: 1, q: "How will the land be held?", who: "you", placeholder: "e.g. a 60-year nominal lease" },
+    ask: { stop: 1, q: "How will the land be held?", who: "you", placeholder: "e.g. owned, or a 60-year nominal lease",
+      examples: ["owned by the society", "a 60-year lease at a nominal rent", "a 99-year lease at a nominal rent", "to confirm"],
+      why: "The Community Housing Fund needs ownership, or a lease of 60 years or more at a nominal rent.", where: ["the owner's agreement"] },
     info: "Who will hold the land. The Community Housing Fund needs a lease of at least 60 years at nominal value, or ownership. Write 'to confirm' while it is unsettled: the check then returns uncertain instead of guessing. The option's own tenure plan overrides this one." },
   { on: "site", key: "notes", group: "Owner", label: "Notes", type: "textarea", need: "", ref: "note",
     info: "Placeholders, assumptions and what still needs checking. The memo prints them." },
   // the front of a corner lot: asked at stop 1 only where the lookup found two streets; not a schedule row
   { on: "site", key: "front_street", label: "Which street is the front", type: "select", need: "rule", ref: "drawings",
-    ask: { stop: 1, q: "Which street is the front?", who: "you, or the architect confirms it", when: site => cornerStreets(site).length > 0 },
+    ask: { stop: 1, q: "Which street is the front?", who: "you, or the architect confirms it", when: site => cornerStreets(site).length > 0,
+      why: "Sets which yards are front, side and rear, and so the envelope.", where: ["the survey, or the address the City lists"] },
     info: "The front street sets the yards, the envelope and the massing; choosing the other street turns the lot to it (the site's front_face)." },
   // a lane behind the lot as fronted: RT-3 takes the distance to the lane's centre line off the rear yard (s.3.1.2.17)
   { on: "site", key: "context.lane_behind", group: "Lot", label: "A lane behind the lot", type: TRI, need: "rule", reads: ["district_setbacks"],
-    ask: { stop: 1, q: "A lane behind the lot, opposite the front?", who: "you, or the architect from the survey" },
+    ask: { stop: 1, q: "A lane behind the lot, opposite the front?", who: "you, or the architect from the survey",
+      why: "A lane behind can shorten the rear yard (RT-3 takes off the distance to its centre line).", where: ["the map above, or the survey"] },
     info: "Where the rear of the lot (the side opposite the front) runs along a lane. RT-3 reduces the 20.0 m rear yard by the distance from the rear property line to the lane's ultimate centre line (s.3.1.2.17), taken as 3.05 m, half a standard 6.1 m lane, unless the site gives its own figure (context.lane_to_centre_line_m). The open data the lookup reads carry no lanes, so a person says. Not sure leaves the full rear yard." },
 
   // ---- the option
@@ -267,8 +280,11 @@ export const GUIDE_FIELDS = FIELDS.filter(f => f.figure).sort((a, b) => a.figure
 export const FINANCE_FIELDS = FIELDS.filter(f => f.money).map(f => [f.key, f.label]);
 
 /* What the rules leave to a person, asked in the flow: the site's at stop 1, the option's at stop 2. */
+/* (20 Nov 2026) `why`: what the answer changes, in a few words; `where`: [where to find it, its public URL if any];
+   `examples`: suggestions a text answer offers (a datalist), for a question that takes a phrase. */
 export const ANSWERS = Object.fromEntries(FIELDS.filter(f => f.ask).map(f => [f.key, {
   on: f.on, stop: f.ask.stop, who: f.ask.who, when: f.ask.when || null, label: f.ask.q, placeholder: f.ask.placeholder || "",
+  why: f.ask.why || "", where: f.ask.where || null, examples: f.ask.examples || null,
   kind: f.ask.kind || (f.type === TRI ? "tri" : f.type === "select" ? "select" : "text"), options: f.ask.options || f.options || [] }]));
 
 const NEED_WORD = { run: "needed to run", rule: "read by a rule; blank means uncertain", figure: "drawings only" };

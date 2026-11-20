@@ -6,11 +6,37 @@ import { state, STATIC } from "../core/state.js";
 import { optWord } from "../fields.js";
 import { syncStaleBand } from "../files.js";
 import { byRev, openRun, rev } from "../runs.js";
-import { answerAllowed, answerFunders, answerMoney, answerUnsure, wireMoneyFold } from "./answers.js";
+import { answerAllowed, answerFunders, answerMoney, answerUnsure, unverifiedLine, wireMoneyFold } from "./answers.js";
 import { renderClauses, UNIT_WORD, withPlans } from "./clauses.js";
 import { renderLedger, wireLedger } from "./ledger.js";
-import { renderSideBySide } from "./side-by-side.js";
+import { compareFoldLine, renderSideBySide, wireSideBySide } from "./side-by-side.js";
 import { renderChanges } from "./changes.js";
+import { wordsHtml } from "./words.js";
+
+/* A date as a reader writes it, "23 Oct 2026", in the title block, the answers and the paper (20 Nov 2026: ISO dates
+   read as machine text); a time, where there is one and it is asked for, follows: "18 Nov 2026, 14:03". The machine's
+   own places (shell lines, the fingerprint card's file list) keep ISO. Pure. */
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export function dateWords(iso, withTime = false) {
+  const m = /^(\d{4})-(\d\d)-(\d\d)(?:[T ](\d\d):(\d\d))?/.exec(String(iso || ""));
+  if (!m) return String(iso || "");
+  return `${Number(m[3])} ${MONTHS[Number(m[2]) - 1]} ${m[1]}${withTime && m[4] ? `, ${m[4]}:${m[5]}` : ""}`;
+}
+
+/* An option's name as a short title (20 Nov 2026: the Option cell ran six lines in 160 px; Side by side named "R1 · As
+   approved"): the part before the colon, the site's own address taken off its front, a bracket kept to its first
+   phrase, and a long name cut at its first comma or bracket. Pure. */
+export function briefName(name, site = null) {
+  let s = String(name || "").trim();
+  const colon = s.indexOf(":");
+  if (colon >= 6) s = s.slice(0, colon).trim();
+  const addr = String((site && site.address) || "").split(",")[0].trim();
+  if (addr && s.toLowerCase().startsWith(`${addr.toLowerCase()},`)) s = s.slice(addr.length + 1).trim().replace(/^./, c => c.toUpperCase());
+  s = s.replace(/\s*\(([^(),;]+)[,;][^()]*\)/g, " ($1)");
+  if (s.length > 34 && s.includes(",")) s = s.split(",")[0].trim();
+  if (s.length > 40 && s.includes(" (")) s = s.split(" (")[0].trim();
+  return s;
+}
 import { renderFigures, wireFigures } from "../figures/cards.js";
 import { foot, renderStage } from "../route-stage.js";
 import { applyModeToMemo } from "../modes.js";
@@ -30,7 +56,7 @@ export function renderQuiet() {
       <div class="memo-meta">
         <div><b>Option</b><span>${h(opt.name || opt.id || "—")}</span></div>
         <div><b>Proponent</b><span>${h(opt.proponent || "—")}</span></div>
-        <div><b>Rules as of</b><span>${h($("#as-of").value || todayISO())}</span></div>
+        <div><b>Rules as of</b><span>${h(dateWords($("#as-of").value || todayISO()))}</span></div>
       </div>
       <p class="quiet">Run the rules evaluates this site and option against the ${n || "dated"} rules in force on that date, ${STATIC ? "in your browser, with nothing uploaded, and keeps the memo in this tab" : "writes the memo to <code>outputs/</code>"}, and reads it here: four answers first, then the massing and the full ledger.</p>
     </div>
@@ -84,33 +110,42 @@ export function renderMemo(run) {
   const B = d && run.compareLedger ? run.compareLedger : null;
   const prevRev = state.compareRun ? rev(state.compareRun) : "an earlier memo";
   const cmpCell = !d ? "" : kind === "rules"
-    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(prevRev)} <span class="cont">(rules as of ${h(d.previous_as_of)})</span></span></div>`
-    : `<div><b>Compared with</b><span><b class="rev-no">${h(prevRev)}</b> ${B ? h(optionName(B)) : "a run"} <span class="cont">(as of ${h(d.previous_as_of)})</span></span></div>`;
+    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(prevRev)} <span class="cont">(rules as of ${h(dateWords(d.previous_as_of))})</span></span></div>`
+    : `<div class="cmp-cell"><b>Compared with</b><span><b class="rev-no">${h(prevRev)}</b> ${B ? h(briefName(optionName(B), site)) : "a run"} <span class="cont">(as of ${h(dateWords(d.previous_as_of))})</span></span></div>`;
+  // the option's short name in the cell, its whole name beneath in a quieter line (20 Nov 2026: 375 Glen Drive's name
+  // ran six lines in a 160 px cell); the engine's version leaves the reading path for the fingerprint card
+  const fullName = String(opt.name || opt.id || "");
+  const shortOpt = briefName(fullName, site);
   parts.push(`<div class="card memo-head">
     <h1>${h(site.address || site.id)}</h1>
     <div class="memo-meta">
-      <div><b>Option</b><span>${h(opt.name || opt.id)}</span></div>
+      <div class="opt-cell${fullName.length > 90 ? " long" : ""}"><b>Option</b><span>${h(shortOpt)}${shortOpt !== fullName ? `<span class="opt-full">${h(fullName)}</span>` : ""}</span></div>
       <div><b>Proponent</b><span>${opt.proponent ? h(opt.proponent) : "<i>not named</i>"}${opt.proponent_type ? ` <span class="cont">· ${h(optWord("option", "proponent_type", opt.proponent_type))}</span>` : ""}</span></div>
-      <div><b>Rules as of</b><span>${h(L.run.as_of)}</span></div>
-      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b> <span class="cont">· engine ${h(L.run.engine_version)}</span></span></div>
+      <div><b>Rules as of</b><span>${h(dateWords(L.run.as_of))}</span></div>
+      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b></span></div>
       ${cmpCell}
     </div>
     ${optionFiguresHtml(site, opt, run)}
     <div class="memo-actions" id="memo-actions"></div>
-    <p class="quiet">Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo. A feasibility screen, not legal, planning or funding advice; every number links to the document it came from.</p>
+    <p class="quiet memo-disclaimer">A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from.</p>
   </div>`);
   // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
   const note = (run.issues || []).filter(i => i.to === state.mode).slice(-1)[0];
-  if (note) parts.push(`<div class="card issue-note"><b>From ${note.name ? `${h(note.name)} (the ${h(note.by)})` : `the ${h(note.by)}`}, ${h(String(note.issued_at || "").replace("T", " ").slice(0, 16))}:</b> ${note.note ? h(note.note) : "<i>no note</i>"}</div>`);
+  if (note) parts.push(`<div class="card issue-note"><b>From ${note.name ? `${h(note.name)} (the ${h(note.by)})` : `the ${h(note.by)}`}, ${h(dateWords(note.issued_at, true))}:</b> ${note.note ? h(note.note) : "<i>no note</i>"}</div>`);
 
-  // 2. a comparison comes straight after the title block: the two runs side by side, their pickers heading the A
-  // and B columns, then What changed; 3. the three answers; 4. the massing figures beside them at >=1600 px, under
-  // them otherwise; 5. the full ledger; 6. inputs, sources, version stamp. Only a change in the rules carries the
-  // delta into the clauses and the ledger (the Revision Rule); two options differ in their numbers, not their rules.
-  if (B) parts.push(renderSideBySide(run));
-  if (d) parts.push(renderChanges(d, L, run));
-  const changed = new Set(kind === "rules" ? (d.changes || []).map(c => c.rule_id) : []);
+  // 2. the four answers come first in every layout (20 Nov 2026: a manager read ~1,200 px of comparison tables before
+  // answer 01, and on a phone the first answer moved from 1,236 px to 4,279 px), with the words they use and the rules
+  // not yet checked; 3. the comparison: the two runs side by side, their pickers heading the columns, then What
+  // changed, folded to one line for the reader; 4. the massing figures beside the answers at >=1600 px, under them
+  // otherwise; 5. the clauses; 6. the full ledger, inputs, sources, version stamp. Only a change in the rules carries
+  // the delta into the clauses and the ledger (the Revision Rule); two options differ in their numbers, not their rules.
   state.refOf = memoRefs(res);   // the paper's A1, C4 references, the same on screen (15 Nov 2026)
+  const compareParts = [B ? renderSideBySide(run) : "", d ? renderChanges(d, L, run) : ""].filter(Boolean).join("\n");
+  const compare = !compareParts ? "" : `<details class="compare-fold"${state.mode === "reader" ? "" : " open"}>
+      <summary>${compareFoldLine(run)}</summary>
+      ${compareParts}
+    </details>`;
+  const changed = new Set(kind === "rules" ? (d.changes || []).map(c => c.rule_id) : []);
   const rest = [];
   // the ledger reads the exits as the plans found them, as the clauses and answer 3 do (17 Nov 2026: Pass in the
   // clauses, Info in the ledger)
@@ -119,9 +154,13 @@ export function renderMemo(run) {
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));
   // the clauses stand on their own so the reader's order can be the paper's: answers, comparison, clauses, massing, ledger
+  // the manager's note on the plans says there is nothing for them to do yet (20 Nov 2026); the reader does not see it
+  // (app.css). The note's words are FIG 03's (figures/cards.js); this only adds the clause where they stand.
+  const figures = renderFigures(run).replace(/(issues this run back to you)(;)/, "$1 (nothing to do yet)$2");
   parts.push(`<div class="memo-body">
-    <div class="answers">${answerAllowed(L)}${answerFunders(L)}${answerUnsure(L, run)}${answerMoney(run)}</div>
-    ${renderFigures(run)}
+    <div class="answers">${answerAllowed(L, run)}${answerFunders(L, run)}${answerUnsure(L, run)}${answerMoney(run)}${unverifiedLine(L)}${wordsHtml(run)}</div>
+    ${compare ? `<div class="memo-compare">${compare}</div>` : ""}
+    ${figures}
     <div class="memo-clauses">${renderClauses(res, L, changed, run)}</div>
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
@@ -139,6 +178,7 @@ export function renderMemo(run) {
   memoEl.classList.add("landed");
   placeRunTools(true);
   if (focused && document.activeElement !== focused) focused.focus({ preventScroll: !!focused.closest("#side-by-side") });
+  wireSideBySide(run);
   wireFigures(run);
   wireLedger();
   applyModeToMemo();
@@ -164,10 +204,14 @@ function optionFiguresHtml(site, opt, run) {
   // while answer 3 said 114 fit, and nothing near the 170 said so)
   const lay = run && run.layout;
   const placed = lay && lay.units_total && lay.units_placed != null && lay.units_placed < lay.units_total ? lay.units_placed : null;
+  // the homes' count in its cell and the mix on a line of its own across two cells' width (20 Nov 2026: "105 · 30
+  // studio, 37 1-bed, 26 2-bed, 12 3-bed+ · 69 fit the plate (answer 3)" wrapped to four lines beside one-line cells)
+  const mix = Object.entries(units).filter(([, v]) => v).map(([k, v]) => `<span class="nw">${v} ${UNIT_WORD[k] || k}</span>`).join(", ");
   return `<div class="memo-figures">
     ${cell("Storeys", opt.storeys != null ? h(opt.storeys) : "<i>not given</i>", opt.height_m != null ? `· ${h(opt.height_m)}&nbsp;m` : "")}
     ${cell("Floor area", opt.gfa_m2 != null ? `${h(fmtNum(opt.gfa_m2))}&nbsp;m²` : "<i>not given</i>", fsr ? `· FSR&nbsp;${h(fsr)}` : "")}
-    ${cell("Homes", n ? h(n) : "<i>not given</i>", n ? `· ${Object.entries(units).filter(([, v]) => v).map(([k, v]) => `<span class="nw">${v} ${UNIT_WORD[k] || k}</span>`).join(", ")}${placed != null ? ` <span class="warn-text">· ${h(placed)} fit the plate (answer 3)</span>` : ""}` : "")}
+    ${cell("Homes", n ? h(n) : "<i>not given</i>", placed != null ? `<span class="warn-text">·&nbsp;<span class="nw">${h(placed)} fit</span> the plate (answer 3)</span>` : "")}
+    ${mix ? `<div class="mix-cell"><b>Mix</b><span>${mix}</span></div>` : ""}
     ${cell("Rent tiers", tiers ? tierWords(tiers, n) : "<i>not split</i>", "")}
     ${cell("Tenure", h(optWord("option", "tenure", opt.tenure) || "not set"), opt.housing_agreement_years ? `· <span class="nw">${h(opt.housing_agreement_years)}‑year agreement</span>` : "")}
     ${plateCell(cell, pm)}
@@ -228,7 +272,7 @@ function setPrintFooter(run) {
 /* The two run pickers. With two runs compared they head the Side by side card's A and B columns, so the choice
    sits above what it changes; otherwise, and whenever the memo is about to be replaced, they sit above the memo.
    In the card their keys name the column; a hidden phrase keeps what each one does in its accessible name. */
-const RUN_TOOLS = [["open", "#tool-open", "A · This run", " (open a past run)"], ["compare", "#tool-compare", "B · Compared", " (choose the run to compare with)"]];
+const RUN_TOOLS = [["open", "#tool-open", "This memo", " (open a past run)"], ["compare", "#tool-compare", "Compared with", " (choose the run to compare with)"]];
 
 export function placeRunTools(intoMemo) {
   placeActions(intoMemo);
@@ -308,7 +352,7 @@ function renderStamp(run, runId) {
   const files = Object.entries(st.rules_files || {}).map(([f, hsh]) => `<li><code>${h(f)}</code> <span class="hash">${h(hsh.slice(0, 16))}…</span></li>`).join("");
   return `<section class="card section stampbox">
     <h2>Rules fingerprint</h2>
-    <p>This memo, ${h(rev(runId))} on this site, read the rule files below and the versions in force on ${h(run.as_of)}. Together they are fingerprinted, so the same inputs under the same fingerprint always give the same memo; change one number in one rule and the fingerprint changes. A site's memos are numbered as revisions, R1, R2 and so on, in the order they were written.</p>
+    <p>This memo, ${h(rev(runId))} on this site, read the rule files below and the versions in force on ${h(dateWords(run.as_of))}, with engine ${h(run.engine_version || "")}. Together they are fingerprinted, so the same inputs under the same fingerprint always give the same memo; change one number in one rule and the fingerprint changes. A site's memos are numbered as revisions, R1, R2 and so on, in the order they were written.</p>
     <p class="hash">Fingerprint ${h(st.stamp)} · rules hash (SHA-256 over all rule files) ${h(st.rules_hash)}</p>
     <ul>${files}</ul>
   </section>`;

@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-10-23",
-      "rules_hash": "4ea4d9682e172983c8a931edbd4bff345f834f1ec1ea3c1c43ef59c10fa099d2",
+      "rules_hash": "280b574d21bda783a480a372f034f9efbef4e7ac704b1c2c1dd79c010850ff8c",
       "rules_files": {
         "a_zoning_district.json": "bc89fd02e4bd0a63bd28788c71a42b80e692ba1949ef6d4f69c874579e4615e5",
-        "b_provincial.json": "0fede33e5d62b1bd85ea63435ef0012ef3c0772df8c0192d1e74b8a29f807cb8",
+        "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
         "d_design_standards.json": "666cc2f2cc4405706d3b103715cdf6bef2812ac674e4eaa29ff088d00f2b0b85",
         "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb",
         "f_assumptions.json": "942a6dbab04d93fca08a7cb84f3af5ce4d95eb22ba165262176185aac691ae26"
       },
-      "stamp": "8edfb9e62179aa68",
+      "stamp": "6e72488249c79837",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -1091,7 +1091,7 @@
       "version_effective_from": "2024-06-26",
       "version_effective_to": null,
       "status": "info",
-      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 30 vehicle and 220 bicycle spaces, which are set by the Parking By-law at the development permit stage.",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 30 vehicle and 220 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage.",
       "values": {
         "parking_spaces": 30,
         "bicycle_spaces": 220
@@ -2266,7 +2266,7 @@
       "version_effective_from": "2025-03-10",
       "version_effective_to": null,
       "status": "info",
-      "finding": "two exits over floor area m2: 150; two exits over occupant load: 60; separation min m: 9; separation share of diagonal: 0.5; travel limit sprinklered m: 45; travel limit unsprinklered m: 30; dead end max m: 6; occupant load persons per sleeping room: 2.",
+      "finding": "two exits over floor area: 150 m²; two exits over occupant load: 60; separation minimum: 9 m; separation share of diagonal: 50%; travel limit sprinklered: 45 m; travel limit unsprinklered: 30 m; dead end maximum: 6 m; occupant load persons per sleeping room: 2.",
       "values": {
         "two_exits_over_floor_area_m2": 150,
         "two_exits_over_occupant_load": 60,
@@ -2329,7 +2329,7 @@
       "version_effective_from": "2024-02-13",
       "version_effective_to": null,
       "status": "pass",
-      "finding": "BC Builds: fits the published criteria: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
+      "finding": "BC Builds: meets the published criteria: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
       "values": {
         "fails": [],
         "unknown": [],
@@ -2362,7 +2362,7 @@
       "version_effective_from": "2025-05-30",
       "version_effective_to": null,
       "status": "uncertain",
-      "finding": "Community Housing Fund: fit cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; Site control (finalized) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).",
+      "finding": "Community Housing Fund: whether it meets the criteria cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
       "values": {
         "required_mix": {
           "market": 0.3,
@@ -2382,11 +2382,16 @@
         "notes": [
           "unit mix matches 30/50/20 within tolerance",
           "site control (finalized) meets the readiness bar",
-          "construction must be able to start within 18 months of award",
-          "program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+          "construction must be able to start within 18 months of award"
         ],
         "provisional_grant_per_unit_cad": 171211,
-        "indicative_grant_cad": 20545320
+        "indicative_grant_cad": 20545320,
+        "intake": {
+          "open": false,
+          "note": "its 2025 call was cancelled in February 2026, so no intake is open now",
+          "more": "the program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+          "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+        }
       },
       "action": "Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $20,545,320 for 120 units."
     },
@@ -2405,7 +2410,7 @@
       "version_effective_from": "2025-01-01",
       "version_effective_to": null,
       "status": "info",
-      "finding": "max loan cad: 250000; eligible costs: due diligence, feasibility and design.",
+      "finding": "maximum loan: $250,000; eligible costs: due diligence, feasibility and design.",
       "values": {
         "max_loan_cad": 250000,
         "eligible_costs": "due diligence, feasibility and design"
@@ -2427,7 +2432,7 @@
       "version_effective_from": "2024-03-13",
       "version_effective_to": null,
       "status": "info",
-      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note: Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding.",
+      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist.",
       "values": {
         "construction_start_months_after_approval": 6,
         "intake": "continuous",
@@ -2676,6 +2681,17 @@
         "conditional": [],
         "uncertain": [
           "bch.chf.eligibility"
+        ],
+        "words": "Whether it meets the criteria of the Community Housing Fund is not yet confirmed",
+        "intake": [
+          {
+            "rule_id": "bch.chf.eligibility",
+            "program": "the Community Housing Fund",
+            "open": false,
+            "note": "the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now",
+            "more": "the program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+            "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
+          }
         ]
       },
       "unsure": [
@@ -2704,7 +2720,7 @@
           "rule_id": "bch.chf.eligibility",
           "title": "BC Housing Community Housing Fund: eligibility and unit mix",
           "status": "uncertain",
-          "finding": "Community Housing Fund: fit cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; Site control (finalized) meets the readiness bar; Construction must be able to start within 18 months of award; Program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026).",
+          "finding": "Community Housing Fund: whether it meets the criteria cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
           "action": "Manager: supply the missing figures; the indicative grant at 2025-26 rates would be $20,545,320 for 120 units."
         }
       ]

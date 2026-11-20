@@ -54,8 +54,8 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .btn-small { min-height: 38px; padding: 0 16px; font-size: 13px; }
 /* a phone: a long button wraps inside the page rather than run past its edge */
 @media (max-width: 560px) { .btn { white-space: normal; text-align: center; line-height: 1.3; padding-block: 11px; } }
-/* a touch screen: the bar's links and every pill are 44px tall */
-@media (pointer: coarse) { .nav .nav-links a { padding: 16px 14px; } .btn-small { min-height: 44px; } }
+/* a touch screen: every link a finger aims at is 44 px tall (20 Nov 2026: the bar's links measured 30 px on a phone, where
+   the narrow layout's padding won, and the footer's 20 px). Placed after the phone rules below, so it wins there too */
 .text-link { display: inline-flex; align-items: center; min-height: 46px; font-weight: 500; color: var(--fg); border-bottom: 1px solid transparent; }
 .text-link:hover { color: var(--signal); }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; }
@@ -94,22 +94,35 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
   .nav { position: static; grid-template-columns: 1fr auto; height: auto; padding-block: 14px 10px; row-gap: 10px; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; border-bottom: 0; }
   .lockup em { display: none; }
   /* the links wrap onto a second row rather than scroll out of sight (17 Nov 2026: "The case" was cut to "The c") */
-  .nav-links { grid-column: 1 / -1; justify-self: stretch; flex-wrap: wrap; max-width: 100%; border-radius: 22px; }
+  .nav-links { grid-column: 1 / -1; grid-row: 2; justify-self: stretch; flex-wrap: wrap; max-width: 100%; border-radius: 22px; }
+  .nav-cta { grid-column: 2; grid-row: 1; }
   .nav-links a { padding: 8px 12px; white-space: nowrap; }
   .nav-cta { min-height: 38px; padding: 0 14px; font-size: 13px; }
+}
+@media (pointer: coarse) {
+  .nav .nav-links a, .foot .foot-links a, .item a.more, .flow .flow-head .text-link, .jump a, .hero-foot .counter a { display: inline-flex; align-items: center; min-height: 44px; }
+  .nav .nav-links a { padding-block: 0; }
+  .nav .lockup { min-height: 44px; }
+  .btn-small, .nav-cta { min-height: 44px; }
+  .foot .foot-links { gap: 0 18px; }
 }
 
 /* ------------------------------------------------------------------ the hero */
 .hero { position: relative; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 40px; padding-top: calc(var(--nav-h) + 40px); padding-bottom: 72px; }
 .hero-text { display: flex; flex-direction: column; gap: 28px; max-width: 680px; }
-.hero h1 { font-size: clamp(40px, 5.4vw, 74px); line-height: 1.02; letter-spacing: -.03em; }
+/* the four questions, one line each at 1366 (20 Nov 2026: at 74 px they broke into a stair of six lines, "Does it fit /
+   the funders?"): the longest, "Does the money work?", runs 9.44 times the type size, so 4.6vw keeps it inside the
+   column from 981 px up and 34 px keeps it on one line on a 390 px phone */
+.hero h1 { font-size: clamp(34px, 4.6vw, 66px); line-height: 1.04; letter-spacing: -.03em; }
 .hero h1 .dim { color: var(--fg-3); }
-/* each question its own block, so each balances on its own lines: "Does it fit / the funders?", not "Does it fit the /
-   funders?" (17 Nov 2026; one block of eight lines is past what balancing takes on) */
+/* each question its own block, so a narrow window wraps each on its own, balanced */
 .hero h1 .q { display: block; }
 .hero .lede { font-size: clamp(16px, 1.4vw, 18px); line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
-.hero-note { font-size: 12.5px; color: var(--fg-3); }
+.hero-note { font-size: 12.5px; color: var(--fg-3); max-width: 50ch; }
 .hero-art { position: relative; min-width: 0; }
+/* the words under the drawing: what its two labels mean */
+.hero-cap { position: relative; margin-top: 14px; font-size: 13px; line-height: 1.5; color: var(--fg-2); max-width: 56ch; }
+.hero-cap b { color: var(--fg); font-weight: 600; }
 /* the glow stays inside the window: at -8% it reached 5 to 32 px past the edge, overflow the body only hid (17 Nov 2026) */
 .hero-art::before { content: ""; position: absolute; inset: -10% -2%; background: radial-gradient(closest-side, color-mix(in srgb, var(--signal-deep) 22%, transparent), transparent 70%); pointer-events: none; }
 .hero-iso { position: relative; width: 100%; height: auto; display: block; }
@@ -142,14 +155,15 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .iso-proposed polygon { stroke: var(--signal); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .iso-floors line { stroke: var(--signal); stroke-opacity: .55; stroke-width: 1; vector-effect: non-scaling-stroke; }
 .iso-label line { stroke: var(--fg-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+/* the drawing is 640 units in a column about 605 px wide at 1366, so 12 units is the least that reads at 11 px */
 .iso-label text { font: 500 12.5px var(--sans); fill: var(--fg); }
-.iso-label .l2 { font-size: 11.5px; font-weight: 400; fill: var(--fg-2); }
-.iso-street-name, .iso-lot-name { font: 500 11px var(--sans); fill: var(--fg-3); letter-spacing: .04em; }
-.iso-street-name { text-transform: uppercase; letter-spacing: .14em; font-size: 11px; }
+.iso-label .l2 { font-size: 12px; font-weight: 400; fill: var(--fg-2); }
+.iso-street-name, .iso-lot-name { font: 500 12px var(--sans); fill: var(--fg-3); letter-spacing: .04em; }
+.iso-street-name { text-transform: uppercase; letter-spacing: .14em; }
 /* a phone draws the 640-unit drawing at about half size, so its 12 px labels came out near 7 px (17 Nov 2026): there
    the two names stay, at a size that reads, and the figures and the street and lot captions go */
 @media (max-width: 560px) {
-  .iso-label text { font-size: 22px; }
+  .iso-label text { font-size: 24px; }
   .iso-label .l2, .iso-street-name, .iso-lot-name { display: none; }
 }
 
@@ -163,16 +177,36 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .hero.page.two .hero-text { max-width: 680px; }
 @media (max-width: 980px) { .hero.page.two { grid-template-columns: 1fr; gap: 48px; } }
 
-/* how it works: the option over the six exploded layers, the memo beside them. The slabs and the sheet are the
-   page's own greys and paper; the mass reuses the home page's iso-proposed tones */
-.hw-slab .top { fill: rgba(255, 255, 255, .06); stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.hw-slab .side { fill: rgba(255, 255, 255, .025); stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.hw-slab[data-k="5"] .top { fill: rgba(255, 255, 255, .09); }
+/* how it works: the option over the six exploded layers, the memo beside them. Each slab is tinted by what its layer
+   found on the approved case (R1), with that result beside it as a chip: the colour never without its word. The slabs
+   are drawn out in full: a <use> clone takes no styles from selectors outside it, so the shared shape had drawn black
+   on black (20 Nov 2026). The mass reuses the home page's iso-proposed tones */
+.hw-slab { --st: var(--st-na); }
+.hw-slab[data-st="fail"] { --st: var(--st-fail); } .hw-slab[data-st="conditional"] { --st: var(--st-conditional); }
+.hw-slab[data-st="uncertain"] { --st: var(--st-uncertain); } .hw-slab[data-st="info"] { --st: var(--st-info); }
+.hw-slab .top { fill: color-mix(in srgb, var(--st) 16%, var(--bg-2)); stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.hw-slab .side { fill: color-mix(in srgb, var(--st) 9%, var(--bg)); stroke: var(--line-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.hw-slab .edge { fill: none; stroke: var(--st); stroke-opacity: .9; stroke-width: 1.4; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .hw-shadow { fill: none; stroke: var(--signal); stroke-opacity: .7; stroke-width: 1; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
 .hw-label line { stroke: var(--fg-3); stroke-width: 1; vector-effect: non-scaling-stroke; }
-.hw-label text { font: 400 12px var(--sans); fill: var(--fg-2); }
-.hw-label .lk { font: 500 12px var(--mono); fill: var(--fg); }
-.hw-arrow line, .hw-arrow path { stroke: var(--fg-3); stroke-width: 1.2; fill: none; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.hw-label text { font: 400 12.5px var(--sans); fill: var(--fg-2); }
+.hw-label .lk { font: 600 12.5px var(--mono); fill: var(--fg); }
+.hw-label .nm { fill: var(--fg); }
+/* the chip: the brand's status pill drawn in SVG, a wash, a round mark, the word */
+.hw-chip rect { fill: var(--st-na-wash); }
+.hw-chip circle { fill: var(--st-na); }
+.hw-chip .gl { font: 700 10px var(--sans); fill: #fff; }
+.hw-chip .cw { font: 500 12px var(--sans); fill: var(--st-na-text); }
+.hw-chip.fail rect { fill: var(--st-fail-wash); } .hw-chip.fail circle { fill: var(--st-fail); } .hw-chip.fail .cw { fill: var(--st-fail-text); }
+.hw-chip.conditional rect { fill: var(--st-conditional-wash); } .hw-chip.conditional circle { fill: var(--st-conditional); } .hw-chip.conditional .gl { fill: #1f2933; } .hw-chip.conditional .cw { fill: var(--st-conditional-text); }
+.hw-chip.uncertain rect { fill: var(--st-uncertain-wash); stroke: var(--st-uncertain); stroke-width: 1; stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; } .hw-chip.uncertain circle { fill: var(--st-uncertain); } .hw-chip.uncertain .gl { fill: #14181d; } .hw-chip.uncertain .cw { fill: var(--st-uncertain-text); }
+.hw-chip.info rect { fill: var(--st-info-wash); } .hw-chip.info circle { fill: var(--st-info); } .hw-chip.info .gl { font-family: var(--mono); } .hw-chip.info .cw { fill: var(--st-info-text); }
+/* the six results as text, for a phone only */
+.hw-legend { display: none; position: relative; list-style: none; margin: 14px 0 0; padding: 0; gap: 8px; font-size: 14px; color: var(--fg-2); }
+.hw-legend li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.hw-legend b { font-family: var(--mono); color: var(--fg); }
+.hw-legend .pill { margin-left: auto; }
+@media (max-width: 560px) { .hw-legend { display: grid; } }
 .hw-sheet, .who-sheet { filter: drop-shadow(0 18px 28px rgba(0, 0, 0, .5)); }
 .hw-sheet .pg, .who-sheet .pg { fill: var(--paper); }
 .hw-mark, .who-mark { fill: var(--paper-ink); }
@@ -190,8 +224,9 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .hw-sheet .hw-p { display: none; }
 
 /* who it's for: the memo three times, one sheet a reader; the names above, the timeline the mark is drawn from below */
+/* 12 units is the least that reads at 11 px in the 605 px column at 1366 (20 Nov 2026: 11 and 10 drew at 10.4 and 9.5) */
 .who-name .n1 { font: 500 12.5px var(--sans); fill: var(--fg); }
-.who-name .n2 { font: 400 11px var(--sans); fill: var(--fg-2); }
+.who-name .n2 { font: 400 12px var(--sans); fill: var(--fg-2); }
 .who-name .short { display: none; }
 .who-sheet .t1 { font: 600 9.5px var(--sans); fill: var(--paper-ink); }
 .who-sheet .t2 { font-size: 7.5px; }
@@ -219,12 +254,20 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .who-tl .axis { stroke: var(--line-2); stroke-width: 1.5; }
 .who-tl .tick { fill: var(--fg-3); }
 .who-tl .dia { fill: var(--signal); }
-.who-tl .st { font: 600 10px var(--sans); letter-spacing: .12em; text-transform: uppercase; fill: var(--fg-3); }
+.who-tl .st { font: 600 12px var(--sans); letter-spacing: .07em; text-transform: uppercase; fill: var(--fg-3); }
 .who-tl .st.on { fill: var(--fg); }
-.who-tl .st2 { font: 400 10.5px var(--sans); fill: var(--fg-2); }
+.who-tl .st2 { font: 400 12px var(--sans); fill: var(--fg-2); }
 
-/* the case: the street elevation at one scale, the memo's figures as dimensions */
+/* the case: the street elevation at one scale, the memo's figures as dimensions. The drawing is cropped to the lot and
+   its labels, so 13 units read at 11 px or more at 1366 (20 Nov 2026: they were 10 px) */
 .hero-case .iso-proposed .face-front { fill-opacity: .5; }
+.hero-case .iso-label text { font-size: 14px; }
+.hero-case .iso-label .l2 { font-size: 13px; }
+.hero-case .iso-lot-name { font-size: 13px; }
+@media (max-width: 560px) {
+  .hero-case .iso-label text { font-size: 26px; }
+  .hero-case .cs-h text { font-size: 24px; }
+}
 .cs-bench-wash { fill: var(--amber); fill-opacity: .14; }
 .cs-bench line { stroke: var(--amber); stroke-width: 1; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
 .cs-outright { stroke: var(--st-fail); stroke-width: 1; stroke-dasharray: 5 4; vector-effect: non-scaling-stroke; }
@@ -239,13 +282,18 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 @media (max-width: 560px) {
   /* a phone draws the three at about half size: the layer letters, the readers' short names, the sheet's four short
      verdicts and the case's two headline figures stay, sized to read; every smaller caption goes */
-  .hw-label .nm, .hw-s, .who-s, .who-name .long, .cs-left, .cs-trees-note { display: none; }
-  .hw-label .lk { font-size: 20px; }
-  .hw-sheet .hw-p { display: block; font-size: 19px; }
-  .hw-sheet .t3 { font-size: 20px; }
-  .who-name .short { display: inline; } .who-name .n1 { font-size: 20px; }
-  .who-tl .st.on { font-size: 16px; }
-  .who-sheet .row .v { font-size: 13px; }
+  .hw-label .nm, .hw-chip, .hw-s, .who-s, .who-name .long, .cs-left, .cs-trees-note { display: none; }
+  .hw-label .lk { font-size: 22px; }
+  /* the sheet's short verdicts, its name and its site, at 22 units: 11 px and more on a 375 px phone (20 Nov 2026: the
+     verdicts' own 11 px rule had won, and drew them at 6 px) */
+  .hw-sheet .row .v.hw-p { display: block; font-size: 22px; }
+  .hw-sheet .t1 { font-size: 22px; }
+  .hw-sheet .t3 { font-size: 22px; }
+  .who-name .short { display: inline; } .who-name .n1 { font-size: 22px; }
+  .who-tl .st.on { font-size: 22px; }
+  /* the sheets are 87 px wide on a phone, too narrow for words at 11 px: they stay as pictures of the page, their
+     coloured rows and drawings, and the names above and the stage below carry the words */
+  .who-sheet text { display: none; }
 }
 /* where the nav scrolls with the page there is no fixed bar to clear: this comes after the rule above so it wins
    (17 Nov 2026: the earlier override lost to it and left a 144 px band under the nav on the inner pages) */
@@ -253,19 +301,34 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 
 /* ------------------------------------------------------------------ brand page devices */
 .mark-show { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
-.tile { display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 180px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--fg); padding: 24px; }
+/* the lockups need room for the stacked one's subtitle: two to a row (20 Nov 2026: four across clipped it) */
+.mark-show.wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 760px) { .mark-show.wide { grid-template-columns: 1fr; } }
+/* a tile on the night is a step lighter than the page and keeps a visible edge, so the mark on it reads as a mark on a
+   tile, not a dark square (20 Nov 2026) */
+.tile { display: flex; align-items: center; justify-content: center; gap: 14px; min-height: 200px; border-radius: 14px; border: 1px solid #3a4552; background: #1d242d; color: var(--fg); padding: 24px; }
 .tile.paper-tile { background: var(--paper); color: var(--paper-ink); border-color: transparent; }
 .tile.signal-tile { background: var(--signal-deep); color: #fff; border-color: transparent; }
-.tile .fr-mark.big { width: 96px; height: 96px; }
-.tile .sizes { display: flex; align-items: center; gap: 22px; }
-.tile .sizes .fr-mark:nth-child(1) { width: 64px; height: 64px; } .tile .sizes .fr-mark:nth-child(2) { width: 32px; height: 32px; } .tile .sizes .fr-mark:nth-child(3) { width: 16px; height: 16px; }
+/* the mark's drawing fills the middle half of its box, so a 160 px box shows a 130 px mark */
+.tile .fr-mark.big { width: 160px; height: 160px; margin-block: -40px; }
+.tile .sizes { display: flex; align-items: center; gap: 14px; }
+.tile .sizes .fr-mark:nth-child(1) { width: 64px; height: 64px; } .tile .sizes .fr-mark:nth-child(2) { width: 32px; height: 32px; } .tile .sizes .fr-mark:nth-child(3) { width: 24px; height: 24px; } .tile .sizes .fr-mark:nth-child(4) { width: 16px; height: 16px; }
 .tile img { max-width: 100%; height: auto; display: block; }
-.tile-cap { margin-top: 10px; font-size: 12.5px; color: var(--fg-3); }
+/* the icon tile is ink, so it sits on paper here, where its own edge shows */
+.tile.icon-tile { background: var(--paper); border-color: transparent; }
+.tile.icon-tile img { width: 128px; height: 128px; }
+.tile .lockup { white-space: nowrap; }
+.tile-cap { margin-top: 10px; font-size: 12.5px; color: var(--fg-3); max-width: 50ch; }
 /* eight colours, four to a row, so none is left alone on a row of its own (17 Nov 2026: Amber was) */
 .swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; list-style: none; margin: 0; padding: 0; }
 @media (max-width: 900px) { .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .sw { border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
-.sw i { display: block; height: 84px; }
+.sw i { display: block; height: 84px; border-bottom: 1px solid var(--line); }
+/* a dark swatch names its use inside itself, in the page's grey */
+.sw i.sw-use { display: flex; align-items: flex-end; padding: 10px 12px; font-style: normal; font-size: 12px; color: #aab3bf; }
+.sw i.sw-use span { line-height: 1.3; }
+.hero-note a.inline, a.inline { color: var(--fg-2); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--signal) 60%, transparent); text-underline-offset: 3px; }
+.hero-note a.inline:hover, a.inline:hover { color: var(--signal); }
 .sw div { padding: 10px 12px; font-size: 12.5px; background: var(--bg-2); }
 .sw b { display: block; font-weight: 600; font-size: 13px; }
 .sw code { color: var(--fg-3); font-size: 11.5px; }
@@ -276,13 +339,13 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .ts .k { font: 500 11px/1.5 var(--mono); color: var(--fg-3); letter-spacing: .04em; }
 .ts .display { font-size: clamp(36px, 4.6vw, 60px); font-weight: 300; line-height: 1.02; letter-spacing: -.03em; }
 .ts .heading { font-size: 26px; font-weight: 400; letter-spacing: -.015em; }
-.ts .body { font-size: 15px; max-width: 60ch; color: var(--fg-2); }
+.ts .body { font-size: 15px; max-width: 52ch; color: var(--fg-2); }
 .ts .control { font-size: 14px; font-weight: 500; }
 .ts .keyline { font: 600 11px/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--fg-2); }
 .ts .mach { font: 400 12px/1.6 var(--mono); color: var(--fg-2); }
 @media (max-width: 640px) { .ts { grid-template-columns: 1fr; gap: 6px; } }
 .dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; }
-.dos ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 14px; color: var(--fg-2); }
+.dos ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; font-size: 14px; color: var(--fg-2); max-width: 54ch; }
 .dos li { padding-left: 22px; position: relative; }
 .dos li::before { position: absolute; left: 0; top: 0; font-weight: 600; }
 .dos .do li::before { content: "✓"; color: var(--st-pass); }
@@ -293,15 +356,22 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 
 /* ------------------------------------------------------------------ sections */
 .sec { padding-block: clamp(72px, 10vw, 128px); border-top: 1px solid var(--line); }
-/* the heading sits under its key, whatever the length of the line beside it (17 Nov 2026: aligned to the end, a taller
-   sub pushed the heading 81 to 283 px away from its key) */
-.sec-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 28px 64px; align-items: start; margin-bottom: clamp(36px, 5vw, 64px); }
-.sec-head .eyebrow { grid-column: 1 / -1; }
-.sec-head h2 { font-size: clamp(30px, 4.2vw, 54px); line-height: 1.05; text-wrap: balance; max-width: 18ch; }
-.sec-head .sub { font-size: 16px; line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
-.sec-head .sub + .sub { margin-top: 10px; }
+/* a heading belongs to what it introduces: more room above it than below (20 Nov 2026: 28 px above, 51 to 134 below, so
+   each read as the foot of the block before it). The heading and the line beside it share a bottom edge, and what they
+   introduce follows that edge closer than the key stands above the heading */
+/* The key stays with its heading too: the line beside them spans both rows, and a taller line opens the room above the
+   key rather than between the key and the heading */
+.sec-head { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: 1fr auto; column-gap: 64px; row-gap: 0; margin-bottom: clamp(26px, 2.6vw, 34px); }
+.sec-head .eyebrow { grid-column: 1; grid-row: 1; align-self: end; margin-bottom: 38px; }
+.sec-head h2 { grid-column: 1; grid-row: 2; align-self: end; font-size: clamp(30px, 4.2vw, 54px); line-height: 1.05; text-wrap: balance; max-width: 18ch; }
+.sec-head .sub { grid-column: 2; grid-row: 1 / span 2; align-self: end; font-size: 16px; line-height: 1.55; color: var(--fg-2); max-width: 46ch; }
 .sec-foot { margin-top: clamp(28px, 4vw, 44px); display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; }
-@media (max-width: 900px) { .sec-head { grid-template-columns: 1fr; gap: 18px; } }
+@media (max-width: 900px) {
+  .sec-head { grid-template-columns: 1fr; grid-template-rows: none; margin-bottom: 26px; }
+  .sec-head .eyebrow, .sec-head h2, .sec-head .sub { grid-column: 1; grid-row: auto; }
+  .sec-head .eyebrow { margin-bottom: 24px; }
+  .sec-head .sub { margin-top: 14px; }
+}
 
 /* a quieter segment: a raised slab across the window */
 .sec.slab { background: var(--bg-2); }
@@ -313,7 +383,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .item { display: flex; flex-direction: column; gap: 10px; padding-top: 18px; border-top: 1px solid var(--line-2); }
 .item .n { font: 500 12px/1 var(--mono); color: var(--fg-3); letter-spacing: .08em; }
 .item .key { font: 600 11px/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--signal); }
-.item h3 { font-size: clamp(20px, 2vw, 26px); line-height: 1.2; font-weight: 400; letter-spacing: -.015em; }
+.item h3 { margin-top: 6px; font-size: clamp(20px, 2vw, 26px); line-height: 1.2; font-weight: 400; letter-spacing: -.015em; }
 .item p { color: var(--fg-2); font-size: 14.5px; max-width: 36ch; }
 .item .pill { align-self: flex-start; }
 .item a.more { color: var(--fg); font-weight: 500; font-size: 13.5px; margin-top: 4px; }
@@ -327,7 +397,10 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .stats .v { font-size: clamp(40px, 5vw, 64px); line-height: 1; font-weight: 300; letter-spacing: -.03em; }
 .stats .v small { font-size: max(14px, .45em); color: var(--fg-3); margin-left: 6px; letter-spacing: 0; }
 .stats .l { margin-top: 10px; font-size: 13.5px; color: var(--fg-2); max-width: 24ch; }
+.stats.three { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 40px; }
+.stats.three .l { max-width: 30ch; }
 @media (max-width: 760px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .stats.three { grid-template-columns: 1fr; } }
 
 /* ------------------------------------------------------------------ paper: the memo shows on white, whatever the desk */
 .paper { background: var(--paper); color: var(--paper-ink); border-radius: 14px; padding: clamp(18px, 2.4vw, 28px) clamp(18px, 2.6vw, 30px); box-shadow: 0 40px 90px rgba(0, 0, 0, .55), 0 1px 0 rgba(255, 255, 255, .5) inset; }
@@ -355,11 +428,24 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .answer[data-verdict] .q { color: var(--wash-ink); }
 .answer .v { font-size: 18px; line-height: 1.3; font-weight: 600; letter-spacing: -.01em; }
 .answer .v em { font-style: normal; color: var(--wash-ink); }
-.answer .f { font-size: 13px; color: var(--paper-muted); line-height: 1.45; }
+/* running prose holds the 52ch measure, about 68 characters (20 Nov 2026: the answers ran 82 to 96 a line) */
+.answer .f { font-size: 13px; color: var(--paper-muted); line-height: 1.45; max-width: 52ch; }
 .answer[data-verdict] .f { color: var(--wash-ink); }
 .answer .f b { color: var(--paper-ink); }
+/* a status pill on paper takes the light set whatever the desk (20 Nov 2026: on the night page the paper's pills were the
+   dark washes); the marks are the brand's light status colours */
+.paper .pill { background: var(--lt-na-wash); color: var(--lt-na-text); }
+.paper .pill::before { background: #8a93a0; }
+.paper .pill-pass { background: var(--lt-pass-wash); color: var(--lt-pass-text); } .paper .pill-pass::before { background: #2f7d4a; }
+.paper .pill-conditional { background: var(--lt-conditional-wash); color: var(--lt-conditional-text); } .paper .pill-conditional::before { background: #d9a520; }
+.paper .pill-fail { background: var(--lt-fail-wash); color: var(--lt-fail-text); } .paper .pill-fail::before { background: #c81e1e; }
+.paper .pill-uncertain { background: var(--lt-uncertain-wash); color: var(--lt-uncertain-text); border-color: #c77d14; } .paper .pill-uncertain::before { background: #c77d14; }
+.paper .pill-info { background: var(--lt-info-wash); color: var(--lt-info-text); } .paper .pill-info::before { background: #2a6fb8; }
 /* open items on paper: a table with a Who column */
-.ptable { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 16px; }
+.ptable-note { margin-top: 18px; max-width: 52ch; font-size: 13px; line-height: 1.45; color: var(--paper-muted); }
+/* the table holds its two text columns near the 68-character measure: fixed columns on a sheet no wider than 960 px */
+.ptable { width: 100%; max-width: 960px; table-layout: fixed; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+.ptable th:nth-child(1) { width: 44%; } .ptable th:nth-child(2) { width: 124px; }
 .ptable th { text-align: left; font: 600 11px/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--paper-muted); padding: 6px 10px 6px 0; border-bottom: 1px solid var(--paper-line); }
 .ptable td { padding: 9px 10px 9px 0; border-bottom: 1px solid var(--paper-line); vertical-align: top; line-height: 1.45; }
 .ptable tr:last-child td { border-bottom: 0; }
@@ -383,7 +469,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .memo-row .key { display: block; padding-bottom: 6px; border-bottom: 1px solid var(--paper-line); margin-bottom: 8px; }
 .memo-row code { display: block; font-size: 11px; color: var(--paper-muted); margin-top: 4px; }
 .memo-row .ask { color: var(--lt-conditional-text); font-weight: 500; }
-.memo-who { margin-top: 16px; padding: 10px 14px; border-radius: 6px; background: var(--lt-conditional-wash); font-size: 13px; color: var(--lt-conditional-text); }
+.memo-who { margin-top: 16px; padding: 10px 14px; border-radius: 6px; background: var(--lt-conditional-wash); font-size: 13px; color: var(--lt-conditional-text); max-width: 56ch; }
 .memo-who b { color: var(--paper-ink); }
 @media (max-width: 900px) { .answers { grid-template-columns: 1fr; } .memo-row { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) {
@@ -397,15 +483,17 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 /* ------------------------------------------------------------------ diagrams: nodes and arrows drawn in HTML */
 .diagram { position: relative; }
 .diagram-title { font-size: clamp(18px, 2vw, 22px); font-weight: 400; letter-spacing: -.01em; margin-bottom: 20px; max-width: 46ch; text-wrap: balance; }
-.diagram-cap { margin-top: 18px; font-size: 13px; color: var(--fg-3); max-width: 70ch; line-height: 1.5; }
+.diagram-cap { margin-top: 18px; font-size: 13px; color: var(--fg-3); max-width: 54ch; line-height: 1.5; }
 .node { position: relative; display: flex; flex-direction: column; gap: 3px; padding: 14px 16px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--bg-2); min-width: 0; }
 .node b { font-weight: 600; font-size: 14.5px; line-height: 1.3; }
 .node span { font-size: 12.5px; color: var(--fg-2); line-height: 1.4; }
 .node .kind { font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 4px; }
 .node.signal { border-color: var(--signal); background: color-mix(in srgb, var(--signal-deep) 22%, var(--bg-2)); }
 .node.signal .kind { color: var(--signal); }
-.node.check { background: var(--bg-3); border-color: var(--bg-3); }
-.node.person { border-style: dashed; background: transparent; }
+/* a check is a filled node: a grey that reads on the night and on the raised slab alike (20 Nov 2026: #1f262f on the
+   slab's #161b22 was barely a step) */
+.node.check { background: #28313c; border-color: #3a4552; }
+.node.person { border-style: dashed; border-color: var(--fg-3); background: transparent; }
 .node.band { background: rgba(255, 255, 255, .06); border-color: transparent; padding: 9px 14px; }
 .node.band b { font-weight: 500; font-size: 13.5px; }
 .node.band .lk { display: inline-flex; width: 20px; height: 20px; border-radius: 50%; align-items: center; justify-content: center; background: var(--fg); color: var(--bg); font: 600 11px/1 var(--sans); margin-right: 8px; vertical-align: middle; }
@@ -419,10 +507,6 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .row > .node:not(:last-child)::after, .row > .node:not(:last-child)::before { content: ""; position: absolute; top: 50%; left: 100%; pointer-events: none; }
 .row > .node:not(:last-child)::after { width: 34px; height: 1px; background: var(--line-2); }
 .row > .node:not(:last-child)::before { width: 7px; height: 7px; margin-left: 26px; margin-top: -4px; border-right: 1px solid var(--fg-2); border-bottom: 1px solid var(--fg-2); transform: rotate(-45deg); }
-.row.rtl > .node:not(:first-child)::after, .row.rtl > .node:not(:first-child)::before { content: ""; position: absolute; top: 50%; right: 100%; left: auto; }
-.row.rtl > .node::after, .row.rtl > .node::before { content: none; }
-.row.rtl > .node:not(:first-child)::after { width: 34px; height: 1px; background: var(--line-2); }
-.row.rtl > .node:not(:first-child)::before { width: 7px; height: 7px; margin-right: 26px; margin-top: -4px; border-left: 1px solid var(--fg-2); border-top: 1px solid var(--fg-2); transform: rotate(-45deg); }
 /* a vertical arrow between two rows, under a given column */
 .down { display: grid; gap: 34px; height: 34px; }
 .down.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -433,7 +517,10 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 /* the marker row under a track: a diamond with a note */
 .marks { display: grid; gap: 34px; margin-top: 14px; }
 .marks.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.mark { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 12.5px; color: var(--fg-2); }
+/* the note under a diamond holds inside its own column, centred under its node (20 Nov 2026: the Decision note ran to the
+   page's edge and wrapped there) */
+.mark { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; font-size: 12.5px; line-height: 1.45; color: var(--fg-2); min-width: 0; }
+.mark span { max-width: 24ch; text-wrap: balance; }
 .mark .dia { width: 14px; height: 14px; transform: rotate(45deg); border-radius: 2px; background: var(--fg-3); }
 .mark.late .dia { background: var(--st-fail); }
 .mark.early .dia { background: var(--signal); box-shadow: 0 0 0 6px color-mix(in srgb, var(--signal) 22%, transparent); }
@@ -442,19 +529,28 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .gate-row .row-label { font: 600 11px/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--fg-3); margin-bottom: 14px; }
 .gate-row .node.signal b { color: var(--fg); }
 /* a loop note: dashed, returning */
-.loop { display: flex; align-items: center; gap: 12px; margin-top: 18px; font-size: 12.5px; color: var(--fg-2); }
+.loop { display: flex; align-items: center; gap: 12px; margin-top: 18px; font-size: 12.5px; color: var(--fg-2); max-width: 64ch; }
 .loop::before { content: ""; flex: 0 0 56px; height: 1px; border-top: 1px dashed var(--fg-3); }
 .loop .ret { font-family: var(--mono); color: var(--fg-3); }
-/* legend */
-.legend { display: flex; flex-wrap: wrap; gap: 10px 22px; margin-top: 22px; font-size: 12.5px; color: var(--fg-2); }
-.legend span { display: inline-flex; align-items: center; gap: 8px; }
-.legend i { display: inline-block; width: 26px; height: 16px; border-radius: 5px; border: 1px solid var(--line-2); background: var(--bg-2); }
-.legend i.signal { border-color: var(--signal); background: color-mix(in srgb, var(--signal-deep) 22%, var(--bg-2)); }
-.legend i.check { background: var(--bg-3); border-color: var(--bg-3); }
-.legend i.person { border-style: dashed; background: transparent; }
+/* legend: each swatch is the node it names, drawn at full strength (20 Nov 2026: the chips' 18% edges vanished) */
+.legend { display: flex; flex-wrap: wrap; gap: 12px 26px; margin-top: 24px; font-size: 13px; color: var(--fg-2); }
+.legend span { display: inline-flex; align-items: center; gap: 9px; }
+.legend span b { color: var(--fg); font-weight: 600; }
+.legend i { flex: 0 0 auto; display: inline-block; width: 28px; height: 18px; border-radius: 5px; border: 1px solid var(--fg-3); background: var(--bg-2); }
+.legend i.signal { border-color: var(--signal); background: color-mix(in srgb, var(--signal-deep) 30%, var(--bg-2)); }
+.legend i.check { background: #28313c; border-color: #4a5664; }
+.legend i.person { border-style: dashed; border-color: var(--fg-2); background: transparent; }
 .legend i.amber { width: 16px; height: 16px; border-radius: 50%; background: var(--amber); border: 0; }
-/* three columns: in, inside, out */
+/* connectors drawn by site.js between nodes that name a target (data-to): an SVG under the nodes, redrawn when the
+   diagram's box changes. Without script, or stacked on a narrow window, the diagram's own CSS arrows stand */
+svg.links { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; z-index: 0; }
+svg.links path { fill: none; stroke: var(--fg-3); stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
+svg.links path.head { stroke: var(--fg-2); }
+[data-links] { position: relative; }
+[data-links] > * { position: relative; z-index: 1; }
+/* three columns: in, inside, out; the gaps are wide enough for the leaders to fan */
 .io { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr); gap: 48px; align-items: start; }
+.io.linked { column-gap: clamp(56px, 7vw, 104px); }
 .io .col { display: flex; flex-direction: column; gap: 10px; }
 /* the inputs and the outputs centre on the tool between them, so the arrow out of the middle of "Inside" lands on the
    middle of what comes out (17 Nov 2026: it pointed into the gap under "Version ledger") */
@@ -466,22 +562,28 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .io .col.in .node, .io .col.mid .inside { position: relative; }
 .io .col.in .node::after, .io .col.mid .inside::after { width: 48px; height: 1px; background: var(--line-2); }
 .io .col.in .node::before, .io .col.mid .inside::before { width: 7px; height: 7px; margin-left: 40px; margin-top: -4px; border-right: 1px solid var(--fg-2); border-bottom: 1px solid var(--fg-2); transform: rotate(-45deg); }
+/* with the leaders drawn, the short stubs go */
+.io.linked .col.in .node::after, .io.linked .col.in .node::before, .io.linked .col.mid .inside::after, .io.linked .col.mid .inside::before { content: none; }
 @media (max-width: 900px) {
-  .io { grid-template-columns: 1fr; gap: 28px; }
+  .io, .io.linked { grid-template-columns: 1fr; gap: 28px; }
+  .io svg.links { display: none; }
   .io .col.in .node::after, .io .col.in .node::before, .io .col.mid .inside::after, .io .col.mid .inside::before { content: none; }
+  /* stacked: one arrow down into the tool and one out of it */
+  .io .col.mid, .io .col.out { position: relative; }
+  .io .col.mid::before, .io .col.out::before { content: ""; position: absolute; left: 50%; top: -24px; height: 18px; width: 1px; background: var(--fg-3); }
+  .io .col.mid::after, .io .col.out::after { content: ""; position: absolute; left: 50%; top: -12px; width: 7px; height: 7px; margin-left: -3.5px; border-right: 1px solid var(--fg-2); border-bottom: 1px solid var(--fg-2); transform: rotate(45deg); }
 }
-/* the logic grid: four across, three rows, snaking */
-.logic { display: grid; gap: 34px; }
+/* the logic: three rows of four, each read left to right in number order, like lines of text (20 Nov 2026: the middle
+   row read right to left, 08 07 06 05, and its arrowheads drew as diamonds) */
+.logic { display: grid; gap: 30px; }
 .logic .row { margin: 0; }
 @media (max-width: 900px) {
   .row.five, .row.four, .row.three, .down.five, .down.four, .marks.five { grid-template-columns: 1fr 1fr; }
-  .row > .node::after, .row > .node::before, .row.rtl > .node::after, .row.rtl > .node::before { content: none !important; }
+  .row > .node::after, .row > .node::before { content: none !important; }
   .down { display: none; }
-  .row.rtl { direction: rtl; } .row.rtl > * { direction: ltr; }
 }
 @media (max-width: 560px) {
   .row.five, .row.four, .row.three, .marks.five { grid-template-columns: 1fr; gap: 14px; }
-  .row.rtl { direction: ltr; }
   /* stacked, the marker row keeps only its diamond; the empty cells would be blank rows */
   .marks > i { display: none; }
   .marks .mark { flex-direction: row; text-align: left; }
@@ -525,9 +627,11 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .flows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
 .flow { display: flex; flex-direction: column; gap: 0; }
 .flow .flow-head { padding-bottom: 16px; border-bottom: 1px solid var(--line-2); margin-bottom: 8px; }
-.flow .flow-head h3 { font-size: 22px; font-weight: 400; letter-spacing: -.015em; }
+.flow[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }
+.flow .flow-head h3 { margin-top: 8px; font-size: 22px; font-weight: 400; letter-spacing: -.015em; }
 .flow .flow-head p { color: var(--fg-2); font-size: 13.5px; margin-top: 6px; }
 .flow .flow-head .text-link { min-height: 0; margin-top: 10px; font-size: 13.5px; color: var(--signal); }
+@media (pointer: coarse) { .flow .flow-head .text-link { min-height: 44px; margin-top: 2px; } }
 .flow ol { list-style: none; margin: 0; padding: 0; }
 .flow li { position: relative; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; padding: 12px 0; }
 .flow li::before { content: ""; position: absolute; left: 13px; top: 0; bottom: 0; width: 1px; background: var(--line); }
@@ -547,6 +651,99 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .steps-strip span.on i { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 .steps-strip .ln { flex: 1 1 24px; height: 1px; background: var(--line-2); min-width: 16px; }
 
+/* ------------------------------------------------------------------ who settles what, in order (how, 05)
+   Lanes, one per person who acts, as rows; the stages a project passes through as columns; each open item of the
+   approved case's memo a numbered node in the lane of the person who settles it, in the order they come up. The
+   hand-offs are drawn by site.js (data-to). On a phone the lanes fold into one numbered list, each node naming its
+   person and its stage */
+.lanes { display: grid; grid-template-columns: 136px repeat(5, minmax(0, 1fr)); column-gap: 24px; row-gap: 0; }
+.lanes .ph { grid-row: 1; padding: 0 0 12px; font: 600 11px/1.4 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--fg-2); align-self: end; }
+.lanes .band { grid-column: 1 / -1; border-top: 1px solid var(--line-2); position: static; }
+.lanes .band.alt { background: rgba(255, 255, 255, .03); }
+.lanes .band.last { border-bottom: 1px solid var(--line-2); }
+.lanes .lane-name { grid-column: 1; align-self: center; padding: 18px 0; font-size: 14px; font-weight: 600; line-height: 1.3; color: var(--fg); }
+.lanes .lane-name span { display: block; font-size: 12.5px; font-weight: 400; color: var(--fg-2); }
+.lanes .cell { display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 14px 0; min-width: 0; }
+.lanes .node { padding: 10px 12px; background: var(--bg-2); }
+.lanes .node b { font-size: 13.5px; }
+.lanes .node span:not(.kind) { font-size: 12.5px; }
+.lanes .node .kind { margin-bottom: 2px; color: var(--fg-2); }
+.lanes .node.signal .kind { color: var(--signal); }
+.lanes-cap { margin-top: 20px; }
+@media (max-width: 900px) {
+  /* one list in the order the items come up, down a line, each node naming who and when */
+  .lanes { display: block; position: relative; padding-left: 26px; }
+  .lanes::before { content: ""; position: absolute; left: 6px; top: 8px; bottom: 8px; width: 1px; background: var(--line-2); }
+  .lanes .ph, .lanes .band, .lanes .lane-name, .lanes svg.links { display: none; }
+  .lanes .cell { padding: 0; gap: 12px; margin-bottom: 12px; }
+  .lanes .node::before { content: attr(data-who); display: block; margin-bottom: 4px; font: 600 11px/1.4 var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--signal); }
+  .lanes .node::after { content: ""; position: absolute; left: -24px; top: 16px; width: 9px; height: 9px; border-radius: 50%; background: var(--fg-3); }
+}
+
+/* ------------------------------------------------------------------ the words a sheet uses, in plain language (home) */
+.words { margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line-2); }
+.words dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 28px; margin: 12px 0 0; }
+.words dl > div { min-width: 0; }
+.words dt { font-size: 13.5px; font-weight: 600; color: var(--fg); }
+.words dd { margin: 3px 0 0; font-size: 13px; line-height: 1.45; color: var(--fg-2); }
+.words-head { font: 600 11px/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--fg-2); }
+
+/* ------------------------------------------------------------------ a jump for the reader in a hurry (who) */
+.jump { font-size: 15px; color: var(--fg-2); max-width: 50ch; }
+.jump a { color: var(--fg); font-weight: 500; text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--signal) 70%, transparent); text-underline-offset: 4px; }
+.jump a:hover { color: var(--signal); }
+
+/* ------------------------------------------------------------------ what a tool cannot know yet (how) */
+.unknowns { margin-top: clamp(32px, 4vw, 48px); padding: 20px 22px; border: 1px dashed var(--fg-3); border-radius: 12px; max-width: 760px; }
+.unknowns h3 { font-size: 20px; font-weight: 400; letter-spacing: -.01em; margin-bottom: 10px; }
+.unknowns ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; line-height: 1.5; color: var(--fg-2); max-width: 54ch; }
+.unknowns li::marker { color: var(--amber); }
+
+/* ------------------------------------------------------------------ three revisions as sections, at one scale (case)
+   Each revision's building cut through its depth, drawn from its massing.json at 6.2 px to the metre on a phone's
+   4.2 (20 Nov 2026), against the outright limit and the staff benchmark; under each, the revision's one difference */
+.revs { --k: 6.2px; margin: 0 0 clamp(32px, 4vw, 48px); }
+.revs-plot { position: relative; display: grid; grid-template-columns: 168px repeat(3, minmax(0, 1fr)); align-items: end; height: calc(27 * var(--k)); border-bottom: 1.5px solid var(--fg-2); }
+.revs-plot .rs { position: relative; grid-row: 1; justify-self: center; width: calc(var(--w) * var(--k)); height: calc(var(--h) * var(--k)); border: 1px solid var(--signal); border-bottom: 0;
+  background: repeating-linear-gradient(to top, transparent 0 calc(3.3 * var(--k) - 1px), color-mix(in srgb, var(--signal) 55%, transparent) calc(3.3 * var(--k) - 1px) calc(3.3 * var(--k))) bottom / 100% calc(var(--n) * 3.3 * var(--k)) no-repeat,
+    color-mix(in srgb, var(--signal-deep) 45%, transparent); }
+.revs-plot .r1, .revs-cap .r1 { grid-column: 2; } .revs-plot .r2, .revs-cap .r2 { grid-column: 3; } .revs-plot .r3, .revs-cap .r3 { grid-column: 4; }
+/* each section's height heads its column, on one line across all three, clear of the benchmark band */
+.revs-plot .rs b { position: absolute; left: 50%; bottom: calc(100% + (24.6 - var(--h)) * var(--k)); transform: translateX(-50%); font: 500 13px/1 var(--sans); color: var(--fg); white-space: nowrap; }
+.revs-plot .rs b small { font-size: 13px; font-weight: 400; color: var(--fg-2); }
+.revs-plot .rs b i { font: 500 12px var(--mono); font-style: normal; color: var(--signal); margin-right: 4px; }
+@media (max-width: 640px) { .revs-plot .rs b small { display: none; } }
+.revs-plot .rl { position: absolute; left: 0; right: 0; pointer-events: none; }
+.revs-plot .rl-bench { bottom: calc(19.9 * var(--k)); height: calc(1.4 * var(--k)); background: color-mix(in srgb, var(--amber) 16%, transparent); border-top: 1px dashed var(--amber); border-bottom: 1px dashed var(--amber); }
+.revs-plot .rl-out { bottom: calc(10.7 * var(--k)); border-top: 1px dashed var(--st-fail); }
+/* each line's name sits just under it, in the left column */
+.revs-plot .rl span { position: absolute; left: 0; top: calc(100% + 5px); font-size: 13px; line-height: 1.3; color: var(--fg-2); }
+.revs-plot .rl-out span { top: 5px; }
+.revs-plot .rl span b { display: block; font-weight: 500; color: var(--fg); }
+/* the three revisions under their sections: the same three verdicts as a fixed column in each, so they line up */
+.revs-cap { display: grid; grid-template-columns: 168px repeat(3, minmax(0, 1fr)); gap: 0 28px; margin-top: 16px; }
+.revs-cap .item { grid-row: 1; border-top: 0; padding-top: 0; }
+.revs-cap .item p.diff { color: var(--fg); font-size: 15px; line-height: 1.45; }
+.verdicts { display: grid; justify-items: start; gap: 6px; }
+.verdicts .pill { white-space: normal; }
+@media (max-width: 900px) {
+  .revs { --k: 4.4px; }
+  .revs-plot, .revs-cap { grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: 16px; }
+  .revs-plot .r1, .revs-cap .r1 { grid-column: 1; } .revs-plot .r2, .revs-cap .r2 { grid-column: 2; } .revs-plot .r3, .revs-cap .r3 { grid-column: 3; }
+  .revs-plot .rl span { display: none; }
+  .revs-key { display: flex !important; }
+}
+@media (max-width: 640px) {
+  /* a phone: the three sections stay side by side; the revisions follow one under another */
+  .revs { --k: 3.6px; }
+  .revs-cap { grid-template-columns: 1fr; row-gap: 24px; }
+  .revs-cap .r1, .revs-cap .r2, .revs-cap .r3 { grid-column: 1; grid-row: auto; border-top: 1px solid var(--line-2); padding-top: 14px; }
+}
+.revs-key { display: none; flex-wrap: wrap; gap: 8px 20px; margin-top: 12px; font-size: 13px; color: var(--fg-2); }
+.revs-key span { display: inline-flex; align-items: center; gap: 8px; }
+.revs-key i { display: inline-block; width: 22px; height: 0; border-top: 1px dashed var(--st-fail); }
+.revs-key i.bench { height: 6px; border: 1px dashed var(--amber); border-left: 0; border-right: 0; background: color-mix(in srgb, var(--amber) 16%, transparent); }
+
 /* ------------------------------------------------------------------ the close and the footer */
 .close { text-align: left; }
 .close h2 { font-size: clamp(34px, 5.4vw, 72px); line-height: 1.02; max-width: 16ch; text-wrap: balance; }
@@ -555,7 +752,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .foot a { color: var(--fg-2); }
 .foot a:hover { color: var(--fg); }
 .foot .foot-links { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-.foot p { max-width: 80ch; }
+.foot p { max-width: 50ch; }
 @media (max-width: 760px) { .foot { grid-template-columns: 1fr; } }
 
 /* ------------------------------------------------------------------ motion
@@ -581,7 +778,6 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .hero-hw.play .hw-slab { animation: iso-lift .5s var(--ease-out) both; }
 .hero-hw.play .hw-slab[data-k="1"] { animation-delay: .08s; } .hero-hw.play .hw-slab[data-k="2"] { animation-delay: .16s; } .hero-hw.play .hw-slab[data-k="3"] { animation-delay: .24s; } .hero-hw.play .hw-slab[data-k="4"] { animation-delay: .32s; } .hero-hw.play .hw-slab[data-k="5"] { animation-delay: .4s; }
 .hero-hw.play .hw-shadow { animation: iso-label .4s ease-out .7s both; }
-.hero-hw.play .hw-arrow { animation: iso-label .3s ease-out 1.25s both; }
 .hero-hw.play .hw-sheet { animation: iso-lift .5s var(--ease-out) 1.15s both; }
 .hero-hw.play .hw-label { animation: iso-label .3s ease-out 1.35s both; }
 .hero-who.play .who-sheet { animation: iso-lift .55s var(--ease-out) both; }
@@ -638,7 +834,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
   .hero-iso.play .iso-street, .hero-iso.play .iso-lot, .hero-iso.play .iso-env, .hero-iso.play .iso-outright, .hero-iso.play .iso-outright-edges, .hero-iso.play .iso-proposed, .hero-iso.play .iso-floors { animation: none; }
   .hero-iso.play .iso-label, .hero-iso.play .iso-street-name, .hero-iso.play .iso-lot-name { animation-delay: .2s; animation-duration: .4s; }
   .hero-hw.play .hw-slab, .hero-hw.play .hw-shadow, .hero-hw.play .hw-sheet, .hero-who.play .who-sheet, .hero-who.play .who-line, .hero-who.play .who-tl, .hero-case.play .cs-bench-wash, .hero-case.play .cs-bench, .hero-case.play .cs-outright, .hero-case.play .cs-ground, .hero-case.play .cs-trees { animation: none; }
-  .hero-hw.play .hw-arrow, .hero-hw.play .hw-label, .hero-who.play .who-name, .hero-case.play .cs-dim { animation-delay: .2s; animation-duration: .4s; }
+  .hero-hw.play .hw-label, .hero-who.play .who-name, .hero-case.play .cs-dim { animation-delay: .2s; animation-duration: .4s; }
   .js .reveal, .js .items.reveal > .item, .js .stats.reveal > li, .js .flows.reveal > .flow, .js .logic.reveal .node, .js .logic.reveal .down > i.on, .js .logic.reveal .legend, .js .logic.reveal .diagram-cap, .js .when.reveal .who, .js .when.reveal .memo-col { transform: none; transition-duration: .25s; transition-delay: 0s !important; }
   .js .mark.early .dia, .js .mark.early .dia::before, .js .mark.early span { animation: none; }
   .arrow { transition: none; }

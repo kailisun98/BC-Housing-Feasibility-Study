@@ -24,10 +24,12 @@ import {
   selectOption, selectSite
 } from "./files.js";
 import { byRev, openRun, rev, runRules, syncRunButton } from "./runs.js";
-import { placeRunTools, renderMemo } from "./memo/memo.js";
+import { dateWords, placeRunTools, renderMemo } from "./memo/memo.js";
 import { money } from "./memo/answers.js";
 import { tok } from "./figures/common.js";
-import { DERIVES, guideLookup, guideReadSite, guideSuggest, guideUseSite, useSuggestion } from "./guide.js";
+import {
+  DERIVES, fallsShort, guideLookup, guideReadSite, guideSuggest, guideUseSite, suggestionName, suggestionWord, useSuggestion
+} from "./guide.js";
 import { showInputs } from "./modes.js";
 
 /* A parcel's shape in a manager's words, without the classifier's figures. */
@@ -193,7 +195,7 @@ function optionLine(o) {
   if (!o) return "";
   const homes = Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
   const bits = [o.storeys != null ? `${o.storeys} storeys` : "", homes ? `${homes} homes` : "",
-    guide.suggestion && !state.optionId ? cap(guide.suggestion.candidate) : (o.name ? String(o.name).split(/[;,]/)[0] : "")];
+    guide.suggestion && !state.optionId ? suggestionWord(guide.suggestion) : (o.name ? String(o.name).split(/[;,:]/)[0] : "")];
   return bits.filter(Boolean).join(" · ") || "an option";
 }
 
@@ -206,7 +208,7 @@ export function renderRoute() {
   const cur = stageShown() ? (guide.step || 1) : 0;
   const done = { 1: p.site, 2: p.option, 3: p.run };
   const open = { 1: true, 2: p.site, 3: p.site && p.option };
-  const sum = { 1: p.site ? siteLine(state.site) : "", 2: p.option ? optionLine(state.option) : "", 3: p.run ? `${rev(state.run.run_id)} · rules as of ${state.run.as_of}` : "" };
+  const sum = { 1: p.site ? siteLine(state.site) : "", 2: p.option ? optionLine(state.option) : "", 3: p.run ? `${rev(state.run.run_id)} · rules as of ${dateWords(state.run.as_of)}` : "" };
   const rows = GUIDE_STOPS.map(s => {
     const here = cur === s.n;
     return `<li><button type="button" class="route-row${here ? " current" : ""}${done[s.n] ? " done" : ""}" data-stop="${s.n}"${here ? ' aria-current="step"' : ""}${open[s.n] ? "" : " disabled"}>
@@ -224,7 +226,7 @@ export function renderRoute() {
 }
 
 /* A route row: its card on the stage, over the memo if one is on screen (Back returns to it). */
-function goStop(n) {
+function goStop(n, say = true) {
   const p = progress();
   if ((n === 2 && !p.site) || (n === 3 && !(p.site && p.option))) return;
   if (state.mode !== "manager") return;
@@ -234,7 +236,22 @@ function goStop(n) {
   if (guide.over) showInputs(true, false);
   renderGuide();
   focusStage();
+  // every stop says where the reader is and what it asks (20 Nov 2026: on the saved-site path the status line still
+  // read "…is the site" at 02 and 03); a derivation that starts at 02 writes over this with its own
+  if (say) setStatus(stopWords(n), "info");
   if (n === 2) enterOption();
+}
+
+/* The status line on arriving at a stop. */
+function stopWords(n) {
+  const where = state.site ? String(state.site.address || state.site.id || "the site").split(",")[0] : "";
+  const back = state.run && guide.over ? ` Back to ${rev(state.run.run_id)} returns to the memo.` : "";
+  if (n === 1) return (where ? `01 The site: ${where}. Answer what the open data could not tell, or leave it not sure, then continue to the option.` : "Start with the site: look up an address, or choose a saved site.") + back;
+  if (n === 2) {
+    const named = state.optionId && state.option ? (state.option.name || state.optionId) : "";
+    return `02 The option for ${where || "the site"}. ${named ? `The saved one is on the card ("${named}"); choose a candidate to derive another, or click a figure to change it.` : "The rules derive a candidate; click a figure to make it yours."} Continue to the run when it reads right.${back}`;
+  }
+  return `03 Run: enter the money only you know, or leave it blank, then Run the rules.${back}`;
 }
 
 export function backToMemo() {
@@ -304,11 +321,15 @@ const stageCard = (n, q, body, foot) => `<section class="card stage-card" id="st
 
 export const foot = (quiet, main) => `<div class="foot-quiet">${quiet || ""}</div><div class="foot-main">${main || ""}</div>`;
 
+/* The draft the blank stage offered, read once when it was drawn: Resume takes this one, not whatever the storage
+   holds at the click (20 Nov 2026: by then the blank page's own saveDraft had removed it, and Resume threw). */
+let stageDraft = null;
+
 function stageHtml() {
   const site = state.site;
   const n = guide.step || 1;
   const blank = !site && !guide.lookup;
-  const draft = blank ? readDraft() : null;
+  const draft = stageDraft = blank ? readDraft() : null;
   const head = `<header class="stage-head">
       <div class="stage-title">
         <h1>${site ? h(site.address || site.id) : "A site, a funder, an option, a memo"}</h1>
@@ -321,12 +342,13 @@ function stageHtml() {
   return head + card + (blank && n === 1 ? ghostHtml() : "");
 }
 
-/* What the memo will be, drawn as its title block in outline: labels only, no figures it has not made. */
+/* What the memo will be, drawn as its title block in outline: labels only, no figures it has not made (20 Nov 2026: a
+   grey bar for the title and "R1" under Revision read as a memo half loaded; it says it has not been run). */
 function ghostHtml() {
   return `<figure class="ghost">
       <div class="ghost-sheet" aria-hidden="true">
-        <div class="ghost-h"></div>
-        <div class="memo-meta"><div><b>Option</b><span></span></div><div><b>Proponent</b><span></span></div><div><b>Rules as of</b><span></span></div><div><b>Revision</b><span>R1</span></div></div>
+        <p class="ghost-h">The memo · not run yet</p>
+        <div class="memo-meta"><div><b>Option</b><span></span></div><div><b>Proponent</b><span></span></div><div><b>Rules as of</b><span></span></div><div><b>Revision</b><span></span></div></div>
         <ol class="ghost-answers"><li><b>01</b> Is it allowed?</li><li><b>02</b> Does it fit the funders?</li><li><b>03</b> What is still unsure, and who resolves it?</li><li><b>04</b> Does the money work?</li></ol>
       </div>
       <figcaption>After the run, the memo takes this pane: four answers, the open items with who resolves each, the drawings, and a PDF for the board.</figcaption>
@@ -354,12 +376,16 @@ function cardSite() {
   }
   const busy = !!guide.busy.lookup;
   const saved = state.sites.map(s => `<option value="${h(s.id)}">${h(s.address || s.id)} · ${h(s.zoning_district || "?")}</option>`).join("");
+  // a failed lookup is said under the field as well as in the status line, which a phone has scrolled away (20 Nov
+  // 2026); the field takes no autofill, since the browser's offer is the reader's own home address
+  const err = !busy && guide.lookupError;
   const body = `
     <div class="addr-row">
       <label class="sr-only" for="guide-address">Address</label>
-      <input type="text" id="guide-address" value="${h(guide.address)}" placeholder="e.g. 609 Heatley Ave" autocomplete="street-address">
+      <input type="text" id="guide-address" value="${h(guide.address)}" placeholder="e.g. 609 Heatley Ave" autocomplete="off" spellcheck="false"${err ? ' aria-invalid="true" aria-describedby="guide-address-err"' : ""}>
       <button class="btn btn-primary" type="button" id="guide-lookup"${busy ? " disabled" : ""}>${busy ? "Looking up…" : "Look up"}</button>
     </div>
+    ${err ? `<p class="field-err" id="guide-address-err" role="alert">${h(err)}</p>` : ""}
     <p class="help">${busy ? "The City's address list, then the district and the parcel; the streets, buildings and trees around it take a few seconds more." : "The City's address list gives the point; its open data the zoning district and the parcel."}</p>
     <div class="addr-alt">
       ${saved ? `<label class="addr-saved"><span class="cont">or a saved site</span><select id="guide-saved-site"><option value="">choose…</option>${saved}</select></label>` : ""}
@@ -445,15 +471,26 @@ function askControl(key, labelId) {
     if (cur != null && cur !== "" && !options.some(([v]) => String(v) === String(cur))) options = [...options, [String(cur), String(cur)]];
     return `<select data-answer="${h(key)}" aria-labelledby="${labelId}">${options.map(([val, lab]) => `<option value="${h(val)}"${String(cur ?? "") === String(val) ? " selected" : ""}>${h(lab)}</option>`).join("")}</select>`;
   }
-  return `<input type="text" data-answer="${h(key)}" aria-labelledby="${labelId}" value="${h(cur || "")}" placeholder="${h(a.placeholder || "")}">`;
+  // a question that takes a phrase offers examples to pick from, and any words of the manager's own (20 Nov 2026)
+  const list = a.examples ? `ask-ex-${key.replace(/\W/g, "-")}` : "";
+  return `<input type="text" data-answer="${h(key)}" aria-labelledby="${labelId}" value="${h(cur || "")}" placeholder="${h(a.placeholder || "")}"${list ? ` list="${list}"` : ""} autocomplete="off">${list ? `<datalist id="${list}">${a.examples.map(x => `<option value="${h(x)}"></option>`).join("")}</datalist>` : ""}`;
 }
 
-/* The questions a stop asks, as a schedule: the question, the answer, who answers it. */
+/* The questions a stop asks, as a schedule: the question, the answer, who answers it. Under each question, what the
+   answer changes and where to find it (20 Nov 2026: the manager was asked "Inside a former Community Vision area?"
+   with no word on why it mattered or where to look); over the table, that Not sure is a fine answer. */
 function askTable(stop) {
   const keys = Object.keys(ANSWERS).filter(k => ANSWERS[k].stop === stop && (!ANSWERS[k].when || ANSWERS[k].when(state.site || {})));
   if (!keys.length) return "";
-  const rows = keys.map(k => `<tr><th scope="row" id="ask-${h(k)}">${h(ANSWERS[k].label)}</th><td>${askControl(k, `ask-${k}`)}</td><td class="ask-who">${h(ANSWERS[k].who || "")}</td></tr>`).join("");
-  return `<table class="ask-table"><thead><tr><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">Who answers</th></tr></thead><tbody>${rows}</tbody></table>`;
+  const whyOf = a => {
+    if (!a.why && !a.where) return "";
+    const [text, url] = a.where || [];
+    const where = text ? ` <span class="ask-where">Find it in ${url ? `<a href="${h(url)}" target="_blank" rel="noopener">${h(text)}</a>` : h(text)}.</span>` : "";
+    return `<span class="ask-why">${h(a.why || "")}${where}</span>`;
+  };
+  const rows = keys.map(k => `<tr><th scope="row"><span id="ask-${h(k)}">${h(ANSWERS[k].label)}</span>${whyOf(ANSWERS[k])}</th><td>${askControl(k, `ask-${k}`)}</td><td class="ask-who">${h(ANSWERS[k].who || "")}</td></tr>`).join("");
+  const lead = stop === 1 ? `<p class="ask-lead">Not sure is a fine answer: the memo carries it as an open item, with the person on the right named to settle it.</p>` : "";
+  return `${lead}<table class="ask-table"><thead><tr><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">Who answers</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function takeAnswer(key, raw) {
@@ -462,6 +499,9 @@ function takeAnswer(key, raw) {
   const v = a.kind === "tri" ? (raw === "yes" ? true : raw === "no" ? false : null) : (raw === "" ? null : raw);
   const word = v ? ansWord(key, v) : "";
   const said = `${a.label.replace(/\?$/, "")}: ${v === true ? "yes" : v === false ? "no" : v ? word.charAt(0).toLowerCase() + word.slice(1) : "not sure"}`;
+  // an answer after a run leaves the memo on screen out of date: the status line says so with the answer (20 Nov 2026)
+  const fresh = !!(state.run && !state.runStale);
+  const stale = () => (fresh && state.runStale ? ` ${rev(state.run.run_id)}'s memo is out of date now: Run again, in the top bar, reads the rules with this answer.` : "");
   if (a.on === "site") {
     if (!state.site) return;
     if (key === "front_street") {
@@ -481,12 +521,12 @@ function takeAnswer(key, raw) {
       site.front_street = v;
       if (v && streets.includes(v) && v !== streets[0]) site.front_face = { street: v };
       else if (site.front_face && site.front_face.street) delete site.front_face;
-      setStatus(v ? `The front is ${v}${site.front_face ? ": the lot is turned to it" : ""}. The yards, the envelope and the massing follow it.` : "Which street is the front stays not sure: the memo keeps the named street and asks the architect to confirm.", "info");
     } else {
       setPath(state.site, key, key === "toa_tier" && v != null ? Number(v) : v);
-      setStatus(`${said}.`, "info");
     }
     onSiteChange(key);
+    if (key === "front_street") setStatus((v ? `The front is ${v}${state.site.front_face ? ": the lot is turned to it" : ""}. The yards, the envelope and the massing follow it.` : "Which street is the front stays not sure: the memo keeps the named street and asks the architect to confirm.") + stale(), fresh ? "busy" : "info");
+    else setStatus(`${said}.${stale()}`, fresh ? "busy" : "info");
     renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
     // what the site allows, and so the suggestion, may move with the answer: both are read again at 02
     guide.readStale = true;
@@ -501,7 +541,7 @@ function takeAnswer(key, raw) {
     setPath(state.option, key, v);
     onOptionChange(key);
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
-    setStatus(`${said}.`, "info");
+    setStatus(`${said}.${stale()}`, fresh ? "busy" : "info");
   }
 }
 
@@ -585,19 +625,51 @@ export function continueWords() {
 
 /* What the four figures cannot make, in a few words each: storeys taller than the height, a floor larger than the
    plate the setbacks leave. Empty when the building can stand. Pure. */
+/* The most and the least a floor can take, floor to floor: under 2.8 m no storey fits, over 6 m it is no storey of
+   housing (a lobby or a hall runs to about 6 m). */
+const MIN_F2F = 2.8, MAX_F2F = 6;
+
 function figureProblems(o, S) {
   const out = [];
+  // storeys are whole and at least one (20 Nov 2026: 0 storeys skipped the floor-to-floor test and went on to the run)
+  const st = o.storeys == null || o.storeys === "" ? null : Number(o.storeys);
+  if (st != null && !(Number.isInteger(st) && st >= 1))
+    out.push(`the storeys (${fmtNum(st)} is not a whole number of floors, 1 or more)`);
   // impossible, not merely tight: no floor to floor of 2.8 m or more makes the storeys in the height (a height a
   // little under storeys × 3.3 m is a lower floor to floor, which the note above the block offers)
-  const MIN_F2F = 2.8;
-  if (o.storeys && o.height_m != null && Number(o.height_m) / o.storeys < MIN_F2F)
-    out.push(`the height or the storeys (${fmtNum(o.storeys)} storeys in ${fmtNum(o.height_m)} m is ${fmtNum(Math.round(Number(o.height_m) / o.storeys * 100) / 100)} m a floor, under the ${MIN_F2F} m any floor needs)`);
+  if (st >= 1 && o.height_m != null && Number(o.height_m) / st < MIN_F2F)
+    out.push(`the height or the storeys (${fmtNum(st)} storeys in ${fmtNum(o.height_m)} m is ${fmtNum(Math.round(Number(o.height_m) / st * 100) / 100)} m a floor, under the ${MIN_F2F} m any floor needs)`);
+  // and not absurdly tall: more than 6 m a floor is not storeys of homes (20 Nov 2026: 300 m on 6 storeys went through)
+  if (st >= 1 && o.height_m != null && Number(o.height_m) / st > MAX_F2F)
+    out.push(`the height or the storeys (${fmtNum(st)} storeys in ${fmtNum(o.height_m)} m is ${fmtNum(Math.round(Number(o.height_m) / st * 10) / 10)} m a floor, over the ${MAX_F2F} m a floor of homes takes)`);
   const E0 = S && S.envelope;
   const lot = Number((state.site || {}).site_area_m2) || 0;
   const box = E0 && E0.plate_w_m && E0.plate_d_m ? E0.plate_w_m * E0.plate_d_m : (lot || null);
-  if (o.gfa_m2 && o.storeys && box && o.gfa_m2 / o.storeys > box * 1.01)
-    out.push(`the floor area or the storeys (${fmtNum(Math.round(o.gfa_m2 / o.storeys))} m² a floor, more than the ${fmtNum(Math.round(box))} m² the setbacks leave)`);
+  if (o.gfa_m2 && st >= 1 && box && o.gfa_m2 / st > box * 1.01)
+    out.push(`the floor area or the storeys (${fmtNum(Math.round(o.gfa_m2 / st))} m² a floor, more than the ${fmtNum(Math.round(box))} m² the setbacks leave)`);
   return out;
+}
+
+/* A figure typed at 02 that no building can have, in the words said beside it; null when it can stand on its own
+   (whether it fits the other figures is figureProblems'). `bad`: the field held something that is not a number
+   ("-5e"), which an <input type=number> reports as blank. Pure. */
+export function figureError(key, raw, bad = false) {
+  const what = { storeys: "Storeys", height_m: "Height", gfa_m2: "Floor area", fsr: "FSR", homes: "Homes" }[key] || "This figure";
+  const eg = { storeys: "6", height_m: "19.8", gfa_m2: "5,400", fsr: "2.5", homes: "60" }[key] || "a number";
+  if (bad) return `${what}: not a number. Enter one such as ${eg}, or leave it blank.`;
+  const s = String(raw ?? "").trim().replace(/,/g, "");
+  if (s === "") return null;
+  const v = Number(s);
+  if (!Number.isFinite(v)) return `${what}: not a number. Enter one such as ${eg}, or leave it blank.`;
+  if (key === "storeys" && !(Number.isInteger(v) && v >= 1)) return "Storeys: a whole number of floors, 1 or more.";
+  if (key === "storeys" && v > 80) return "Storeys: more than 80 is no building this tool can read.";
+  if (key === "homes" && !(Number.isInteger(v) && v >= 1)) return "Homes: a whole number, 1 or more.";
+  if (key === "homes" && v > 2000) return "Homes: more than 2,000 on one site is no building this tool can read.";
+  if (key === "height_m" && !(v > 0)) return "Height: more than 0 m.";
+  if (key === "height_m" && v > 6 * 80) return `Height: ${fmtNum(v)} m is taller than any building here; enter metres, such as ${eg}.`;
+  if (key === "gfa_m2" && !(v > 0)) return "Floor area: more than 0 m².";
+  if (key === "fsr" && !(v > 0)) return "Not a floor space ratio: enter a number such as 2.5.";
+  return null;
 }
 
 /* The building in four figures, each changed in place; the rest of the suggestion behind one fold. */
@@ -615,22 +687,28 @@ function figureBlock(o, S) {
   const homes = Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
   const lot = Number(site.site_area_m2) || 0;
   const fsr = o.gfa_m2 && lot ? (o.gfa_m2 / lot).toFixed(2) : null;
-  const cell = (key, k, shown, sub, editable = true) => {
+  // a figure refused is said beside it, and its button points at the words (20 Nov 2026: "-5e" reverted in silence)
+  const err = guide.figError || null;
+  const cell = (key, k, shown, sub, editable = true, extra = "") => {
     const editing = guide.editFig === key;
+    const bad = err && err.key === key;
     // the FSR cell takes an FSR and writes the floor area from it (17 Nov 2026: it opened a floor-area field under
     // the word FSR, so 6.01 typed there became 6.01 m²)
-    const raw = key === "fsr" ? fsr : getPath(o, key);
+    const raw = key === "fsr" ? fsr : key === "homes" ? (homes || "") : getPath(o, key);
+    const whole = key === "storeys" || key === "homes";
     const val = editing
-      ? `<input type="number" class="fig4-input" data-fig-input="${h(key)}" value="${h(raw ?? "")}" step="${key === "storeys" ? 1 : "any"}" aria-label="${h(k)}, my figure">`
-      : (editable ? `<button type="button" class="fig4-v" data-fig="${h(key)}" aria-label="${h(k)}: ${h(shown)}. Change it">${h(shown)}</button>` : `<span class="fig4-v">${h(shown)}</span>`);
-    return `<div class="fig4-cell"><span class="fig4-k">${h(k)}</span>${val}<span class="fig4-sub">${sub || ""}${tag(key === "fsr" ? "gfa_m2" : key)}</span></div>`;
+      ? `<input type="number" class="fig4-input" data-fig-input="${h(key)}" value="${h(raw ?? "")}" step="${whole ? 1 : "any"}" min="${whole ? 1 : 0}" inputmode="${whole ? "numeric" : "decimal"}" aria-label="${h(k)}, my figure"${bad ? ` aria-invalid="true" aria-describedby="fig-err-${h(key)}"` : ""}>`
+      : (editable ? `<button type="button" class="fig4-v" data-fig="${h(key)}" aria-label="${h(k)}: ${h(shown)}. Change it"${bad ? ` aria-describedby="fig-err-${h(key)}"` : ""}>${h(shown)}</button>` : `<span class="fig4-v">${h(shown)}</span>`);
+    return `<div class="fig4-cell${bad ? " has-err" : ""}"><span class="fig4-k">${h(k)}</span>${val}<span class="fig4-sub">${sub || ""}${tag(key === "fsr" ? "gfa_m2" : key === "homes" ? "units.one_bed" : key)}${extra}</span>${bad ? `<span class="fig4-err" id="fig-err-${h(key)}" role="alert">${h(err.msg)}</span>` : ""}</div>`;
   };
   // the storeys at the option's floor-to-floor need a height; a stated height below that is said here, before the run
   // (17 Nov 2026: 4 storeys at 9.9 m made a memo "within 10.7 m" while the elevations drew 13.2 m)
   const f2f = Number(o.floor_to_floor_m) || 3.0;
   const needs = o.storeys != null ? Math.round(o.storeys * f2f * 10) / 10 : null;
   const short = needs != null && o.height_m != null && Number(o.height_m) < needs - 0.5;
-  const heightSub = short ? `<span class="warn-text">needs about ${h(fmtNum(needs))}&nbsp;m</span> ` : "";
+  const perStorey = o.storeys >= 1 && o.height_m != null ? Number(o.height_m) / o.storeys : null;
+  const heightSub = short ? `<span class="warn-text">needs about ${h(fmtNum(needs))}&nbsp;m</span> `
+    : (perStorey > MAX_F2F ? `<span class="warn-text">${h(fmtNum(Math.round(perStorey * 10) / 10))}&nbsp;m a floor</span> ` : "");
   // what the drawings will do about it, and the one figure that changes it, in a line under the four
   // the fix offered is one a building can take: a floor to floor of 2.8 m or more, else a taller height or fewer
   // storeys (17 Nov 2026: 19 storeys in 19.8 m advised a 1.04 m floor to floor)
@@ -650,18 +728,91 @@ function figureBlock(o, S) {
     ? `<p class="help warn-text fig4-note">${h(fmtNum(o.gfa_m2))}&nbsp;m² on ${h(o.storeys)} floors is ${h(fmtNum(Math.round(perFloor)))}&nbsp;m² a floor, more than the ${h(fmtNum(Math.round(boxArea)))}&nbsp;m² ${E0 && E0.plate_w_m ? `the setbacks leave (${h(E0.plate_w_m)} × ${h(E0.plate_d_m)}&nbsp;m)` : "of the lot"}: plan ${h(Math.ceil(o.gfa_m2 / boxArea))} storeys or more, or less floor area.</p>` : "";
   const floorCell = lot ? cell("fsr", "FSR", fsr || "—", o.gfa_m2 != null ? `${h(fmtNum(o.gfa_m2))}&nbsp;m² ` : "")
     : cell("gfa_m2", "Floor area", o.gfa_m2 != null ? `${fmtNum(o.gfa_m2)} m²` : "—", "");
+  // Homes first (20 Nov 2026: a manager often starts from a number of homes). With a suggestion it is a figure like
+  // the others: a count typed here is split by the mix and derived again (fixed units); the mix opens under it
+  const tiers = o.rent_tiers_units ? `${h(o.rent_tiers_units.market || 0)} / ${h(o.rent_tiers_units.rgi || 0)} / ${h(o.rent_tiers_units.deep_subsidy || 0)} tiers ` : "";
+  const mixBtn = S && S.mix ? ` <button type="button" class="linkish fig4-mix" id="guide-homes" aria-expanded="${!!guide.mixOpen}" aria-controls="guide-mix">the mix</button>` : "";
+  const homesCell = cell("homes", "Homes", homes ? String(homes) : "—", tiers, !!(S && S.mix), mixBtn);
   const block = `<div class="fig4">
+      ${homesCell}
       ${cell("storeys", "Storeys", o.storeys != null ? String(o.storeys) : "—", "")}
       ${cell("height_m", "Height", o.height_m != null ? `${fmtNum(o.height_m)} m` : "—", heightSub)}
       ${floorCell}
-      <div class="fig4-cell"><span class="fig4-k">Homes</span>${S && S.mix ? `<button type="button" class="fig4-v" id="guide-homes" aria-expanded="${!!guide.mixOpen}" aria-controls="guide-mix" aria-label="Homes: ${homes || "none"}. Change the mix">${homes || "—"}</button>` : `<span class="fig4-v">${homes || "—"}</span>`}<span class="fig4-sub">${o.rent_tiers_units ? `${h(o.rent_tiers_units.market || 0)} / ${h(o.rent_tiers_units.rgi || 0)} / ${h(o.rent_tiers_units.deep_subsidy || 0)} tiers` : ""}</span></div>
     </div>`;
-  if (!S) return block + heightLine + floorLine + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
+  // the homes the manager typed, against the floor area that carries them: said in figures, so a building that does
+  // not follow the count is seen at once
+  const ownHomes = S && UNIT_KEYS.some(u => guide.mine[`units.${u}`] !== undefined && String(guide.mine[`units.${u}`]).trim() !== "");
+  const homesLine = ownHomes && homes && o.gfa_m2 ? `<p class="help fig4-note">Your ${h(homes)} homes in ${h(fmtNum(o.gfa_m2))}&nbsp;m² of floor area: about ${h(fmtNum(Math.round(o.gfa_m2 / homes)))}&nbsp;m² a home, corridors and cores included. Change FSR or the storeys to size the building to them.</p>` : "";
+  const sketch = sectionSketch(o, S);
+  const wrap = inner => `<div class="fig4-wrap"><div class="fig4-main">${inner}</div>${sketch}</div>`;
+  if (!S) return wrap(block + heightLine + floorLine) + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
+  // what the suggestion is, in the engine's words where it gives them, and what it falls short of (20 Nov 2026: a
+  // 4-home outright-sized option read "Suggested, funder-ready")
+  const short2 = fallsShort(S);
+  const what = `<p class="fig4-what"><span class="fig4-k">Suggested</span> <b>${h(suggestionName(S))}</b>${short2.length ? `<span class="fig4-short"><span class="cont">It falls short:</span> ${h(short2.join("; "))}.</span>` : ""}</p>`;
   // the rough envelope from the lot and the code, offered as the manager's own three figures
   const E = S.envelope;
   const envDiffers = E && E.storeys != null && ["storeys", "height_m", "gfa_m2"].some(k => guide.mine[k] !== undefined || (S.fields[k] || {}).value !== E[k]);
   const envLine = E && E.storeys != null ? `<p class="help env-line"><span class="cont">Rough allowed, from the lot and the code:</span> <b>${h(E.storeys)} storeys · ${h(E.height_m)} m · ${h(fmtNum(E.gfa_m2))} m²</b><span class="cont">${E.plate_w_m != null ? ` (${h(E.storeys)} floors inside a ${h(E.plate_w_m)} × ${h(E.plate_d_m)} m plate box)` : ""}. Not a permission.</span>${envDiffers ? ` <button class="btn btn-quiet btn-small" type="button" id="guide-use-envelope">Use the rough envelope</button>` : ""}</p>` : "";
-  return block + heightLine + floorLine + envLine + (guide.mixOpen ? mixPanel(S) : "") + allFigures(S);
+  return what + wrap(block + heightLine + floorLine + homesLine) + envLine + (guide.mixOpen ? mixPanel(S) : "") + allFigures(S);
+}
+
+const UNIT_KEYS = ["studio", "one_bed", "two_bed", "three_bed_plus"];
+
+/* A small section through the lot beside the four figures (20 Nov 2026, Kai: drawings where they help): the ground,
+   the lot's front and rear, the allowed mass as a heavy dashed outline and the proposed one filled, each at its own
+   height, the proposed one with its floors. Drawn at true proportion and fitted to the box, so an impossible figure
+   looks it (0 storeys draws no floors; 300 m on 6 storeys a tower of 50 m floors over a lot gone narrow). Drawn on
+   white paper in the drawing tokens (app.css, .sec4); labels at 11.5 px. Pure. */
+function sectionSketch(o, S) {
+  const site = state.site || {};
+  const E = (S && S.envelope) || null;
+  const sb = o.setbacks_m || (S && S.option && S.option.setbacks_m) || {};
+  const front = Math.max(0, Number(sb.front) || 0), rear = Math.max(0, Number(sb.rear) || 0);
+  const turned = !!(site.front_face && site.front_face.street);
+  const siteD = Number(turned ? site.frontage_m : site.depth_m) || 0, siteW = Number(turned ? site.depth_m : site.frontage_m) || 0;
+  const st = o.storeys == null || o.storeys === "" ? null : Number(o.storeys);
+  // the plate's depth: the plate box the setbacks leave; where they leave none (RT-3's rear yard on a shallow lot), the
+  // floor the figures ask for laid across the frontage, from the front yard, overhanging the rear line as it does
+  let plateD = E && E.plate_d_m ? Number(E.plate_d_m) : (siteD > front + rear ? siteD - front - rear : 0);
+  if (!(plateD > 0) && o.gfa_m2 && st >= 1 && siteW) plateD = o.gfa_m2 / st / siteW;
+  const D = siteD > 0 ? siteD : front + plateD + rear;
+  if (!(D > 0) || !(plateD > 0)) return "";
+  const f2f = Number(o.floor_to_floor_m) || 3;
+  const Hp = o.height_m != null && o.height_m !== "" ? Number(o.height_m) : (st >= 1 ? st * f2f : null);
+  const Ha = E && E.height_m != null ? Number(E.height_m) : null;
+  if (!(Hp > 0) && !(Ha > 0)) return "";
+  // the proposed plate's depth follows its floor against the plate box (a floor larger than the box overhangs it)
+  const plateA = E && E.plate_w_m && E.plate_d_m ? E.plate_w_m * E.plate_d_m : null;
+  const perFloor = o.gfa_m2 && st >= 1 ? o.gfa_m2 / st : null;
+  const dP = plateD * (plateA && perFloor ? Math.min(3, Math.max(0.2, Math.sqrt(perFloor / plateA))) : 1);
+  const W = 248, Hh = 184, padL = 22, padR = 104, top = 16, bottom = 24;
+  const zmax = Math.max(Hp || 0, Ha || 0, 9) * 1.04;
+  const s = Math.min((W - padL - padR) / Math.max(D, front + dP), (Hh - top - bottom) / zmax);
+  const g = Hh - bottom, X = x => padL + x * s, Z = z => g - z * s, f = n => n.toFixed(1);
+  let svg = `<line class="sec4-ground" x1="4" y1="${f(g)}" x2="${f(X(D) + 12)}" y2="${f(g)}"/>`;
+  svg += `<line class="sec4-lot" x1="${f(X(0))}" y1="${f(g - 5)}" x2="${f(X(0))}" y2="${f(g + 5)}"/><line class="sec4-lot" x1="${f(X(D))}" y1="${f(g - 5)}" x2="${f(X(D))}" y2="${f(g + 5)}"/>`;
+  if (Hp > 0) {
+    svg += `<rect class="sec4-prop" x="${f(X(front))}" y="${f(Z(Hp))}" width="${f(dP * s)}" height="${f(Hp * s)}"/>`;
+    if (st >= 1 && Number.isInteger(st) && st <= 80) for (let k = 1; k < st; k++) svg += `<line class="sec4-floor" x1="${f(X(front))}" y1="${f(Z(k * Hp / st))}" x2="${f(X(front) + dP * s)}" y2="${f(Z(k * Hp / st))}"/>`;
+  }
+  if (Ha > 0) svg += `<rect class="sec4-allow" x="${f(X(front))}" y="${f(Z(Ha))}" width="${f(plateD * s)}" height="${f(Ha * s)}"/>`;
+  // the two heights beside the lot, pushed apart where they would overprint
+  const lx = W - padR + 8;
+  const allowWord = !E ? "" : E.basis === "schedule" ? "outright" : E.basis === "toa" ? "TOA minimum" : E.basis === "benchmark" ? "benchmark" : "rough";
+  const tags = [];
+  if (Hp > 0) tags.push({ y: Z(Hp) + 4, cls: "sec4-t-prop", text: `${fmtNum(Math.round(Hp * 10) / 10)} m`, sub: st != null ? `${fmtNum(st)} storey${st === 1 ? "" : "s"}` : "storeys not given" });
+  if (Ha > 0) tags.push({ y: Z(Ha) + 4, cls: "sec4-t-allow", text: `${fmtNum(Ha)} m`, sub: allowWord });
+  tags.sort((a, b) => a.y - b.y);
+  for (let k = 1; k < tags.length; k++) tags[k].y = Math.max(tags[k].y, tags[k - 1].y + 30);
+  for (const t of tags) { t.y = Math.min(t.y, g - 16); }
+  for (let k = tags.length - 2; k >= 0; k--) tags[k].y = Math.min(tags[k].y, tags[k + 1].y - 30);
+  for (const t of tags) svg += `<text class="${t.cls}" x="${lx}" y="${f(Math.max(12, t.y))}">${h(t.text)}<tspan class="sec4-t-sub" x="${lx}" dy="14">${h(t.sub)}</tspan></text>`;
+  // the street under its end of the ground; the rear under the lot's far line, or past it where the lot is drawn narrow
+  const wideLot = X(D) - 4 >= 80;
+  svg += `<text class="sec4-t-sub" x="4" y="${f(g + 17)}">street</text><text class="sec4-t-sub" x="${f(wideLot ? X(D) : X(D) + 6)}" y="${f(g + 17)}"${wideLot ? ' text-anchor="end"' : ""}>rear</text>`;
+  const label = `Section through the lot: proposed ${Hp > 0 ? `${fmtNum(Math.round(Hp * 10) / 10)} metres` : "no height"}${st != null ? `, ${fmtNum(st)} storeys` : ""}${Ha > 0 ? `; allowed (${allowWord}) ${fmtNum(Ha)} metres` : ""}`;
+  return `<figure class="fig4-sketch"><svg class="sec4" viewBox="0 0 ${W} ${Hh}" width="${W}" height="${Hh}" role="img" aria-label="${h(label)}">${svg}</svg><figcaption>Section, schematic: proposed filled${Ha > 0 ? `, ${allowWord} dashed` : ""}</figcaption></figure>`;
 }
 
 function mixPanel(S) {
@@ -739,18 +890,25 @@ function cardRun() {
   // the owner in the words the question offered ("the City", not "a municipality"; 17 Nov 2026)
   const owner = site.owner_type ? ansWord("owner_type", site.owner_type) : "";
   const ownerIs = /^(the|a|an) /i.test(owner) ? owner.charAt(0).toLowerCase() + owner.slice(1) : `${/^[aeiou]/i.test(owner) ? "an" : "a"} ${owner.toLowerCase()}`;
-  const fields = FINANCE_FIELDS.map(([k, label]) => `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? (nominal ? "blank: nominal" : "blank: unsure") : "blank: none"}"></label>`).join("");
+  // each figure says what a blank means and what the tool counts itself (20 Nov 2026: three bare dollar fields)
+  const finHelp = { "finance.land_cost_cad": "Leave it blank if the church or society is giving the land: it counts at a nominal value.",
+    "finance.equity_cad": "Cash the society brings. Blank means none.",
+    "finance.other_grants_cad": "Beyond the Community Housing Fund's grant, which the tool counts itself when the fund is targeted." };
+  const fields = FINANCE_FIELDS.map(([k, label]) => { const hid = `fin-help-${k.split(".")[1]}`; return `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? (nominal ? "blank: nominal" : "blank: unsure") : "blank: none"}" aria-describedby="${hid}"><span class="help" id="${hid}">${h(finHelp[k] || "")}</span></label>`; }).join("");
   const money = `<details class="fold money-fold"${nominal && !Object.values(fin).some(v => v != null) ? "" : " open"}><summary>Land, equity and other grants <span class="cont">${nominal ? `· the land counts at a nominal value: the owner is ${h(ownerIs)}` : "· only you know these"}</span></summary>
       <div class="fin-rows">${fields}</div>
-      <p class="help">${nominal ? "A blank land figure carries the land at a nominal value on a long lease." : (site.owner_type ? "Enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Name the owner at 01, or enter a land price here.")} The Community Housing Fund's provisional grant is counted on its own when the fund is targeted.</p>
+      <p class="help">${nominal ? "A blank land figure carries the land at a nominal value on a long lease." : (site.owner_type ? "Enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Name the owner at 01, or enter a land price here.")}</p>
     </details>`;
+  // what the suggestion falls short of travels with it to the run (20 Nov 2026)
+  const short3 = guide.suggestion && guide.suggestionUsed && !state.optionId ? fallsShort(guide.suggestion) : [];
   const dl = `<dl class="stage-dl">
-      <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p></dd></div>
+      <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p>${short3.length ? `<p class="dd-line fig4-short"><span class="cont">It falls short:</span> ${h(short3.join("; "))}.</p>` : ""}</dd></div>
       <div><dt>Money in</dt><dd>${money}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
       <div><dt>Rules as of</dt><dd><p class="dd-line"><code>${h($("#as-of").value || todayISO())}</code> <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
     </dl>`;
   const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-back-2">Back to the option</button>`;
-  const main = `<span class="help kbd-help">Ctrl+Enter</span><button type="button" class="btn btn-primary" id="guide-run"${busy ? " disabled" : ""}>${busy ? "Running…" : "Run the rules"}</button>`;
+  // the shortcut is labelled as one (20 Nov 2026: a bare "Ctrl+Enter" beside the button read as stray text)
+  const main = `<span class="kbd-help" id="run-kbd">Shortcut <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span><button type="button" class="btn btn-primary" id="guide-run" aria-keyshortcuts="Control+Enter" aria-describedby="run-kbd"${busy ? " disabled" : ""}>${busy ? "Running…" : "Run the rules"}</button>`;
   return stageCard(3, "Money in, then run", dl, foot(quiet, main));
 }
 
@@ -759,7 +917,7 @@ function cardRun() {
 function wireStage(el) {
   const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
   on("#stage-back", backToMemo);
-  on("#stage-resume", () => resumeDraft(readDraft()).catch(e => toast(e.message, true)));
+  on("#stage-resume", () => resumeDraft(stageDraft || readDraft()).catch(e => toast(e.message, true)));
   on("#stage-discard", () => { discardDraft(); renderStage(); });
   on("#stage-demo", () => loadDemo().catch(e => toast(e.message, true)));
   $$("[data-open-run]", el).forEach(b => b.addEventListener("click", () => openRun(b.dataset.openRun).catch(e => toast(e.message, true))));
@@ -813,8 +971,13 @@ function wireStage(el) {
     const commit = keep => {
       if (done) return; done = true;
       const key = fi.dataset.figInput, raw = fi.value.trim();
+      // an entry no building can have is refused and said beside the figure (20 Nov 2026: 0 storeys and 300 m went
+      // through, and "-5e", which the field reports as blank, reverted in silence)
+      const msg = keep ? figureError(key, raw, !!(fi.validity && fi.validity.badInput)) : null;
       guide.editFig = null;
-      if (keep) setFigure(key, raw);
+      guide.figError = msg ? { key, msg } : null;
+      if (msg) setStatus(`${msg} The figure stays as it was.`, "error");
+      else if (keep) setFigure(key, raw);
       renderGuide();
       const b = $(`[data-fig="${key}"]`); if (b) b.focus();
     };
@@ -864,6 +1027,18 @@ function wireStage(el) {
     if (inp) {
       inp.addEventListener("input", () => { guide.mine[key] = inp.value; guide.suggestionUsed = false; });
       inp.addEventListener("change", () => {
+        // the three figures the building stands on are checked here as at the four-figure block (20 Nov 2026)
+        const msg = ["storeys", "height_m", "gfa_m2"].includes(key) ? figureError(key, inp.value, !!(inp.validity && inp.validity.badInput)) : null;
+        let note = $(".sg-err", row);
+        if (msg) {
+          if (!note) { note = document.createElement("span"); note.className = "sg-note sg-err"; note.id = `sg-err-${key.replace(/\W/g, "-")}`; note.setAttribute("role", "alert"); row.appendChild(note); }
+          note.textContent = msg;
+          inp.setAttribute("aria-invalid", "true"); inp.setAttribute("aria-describedby", note.id);
+          setStatus(`${msg} Continue waits until it is a figure a building can have.`, "error");
+          return;
+        }
+        if (note) note.remove();
+        inp.removeAttribute("aria-invalid"); inp.removeAttribute("aria-describedby");
         if (DERIVES(key)) { guideSuggest({ said: `${rowLabel(key)}: ${inp.value.trim() === "" ? "blank" : inp.value.trim()}, yours.` }); return; }
         applyAfterRun(); renderGuide();
       });
@@ -897,6 +1072,26 @@ function applyAfterRun() {
 function setFigure(key, raw) {
   const asked = key;
   let said = null;
+  if (key === "homes") {
+    // a count of homes: split in the proportions the suggestion's own homes have (which already clear the family-unit
+    // minimums), else by the mix, and derived again with those counts fixed (suggest's `fixed.units`)
+    const S = guide.suggestion;
+    if (!S || state.optionId) return;
+    if (raw === "") {
+      UNIT_KEYS.forEach(u => delete guide.mine[`units.${u}`]);
+      guide.suggestionUsed = false;
+      guideSuggest({ said: "Homes: the derived count again.", focus: '[data-fig="homes"]' });
+      return;
+    }
+    const n = Math.round(Number(raw));
+    const now = (S.option && S.option.units) || {}, total = UNIT_KEYS.reduce((t, u) => t + (Number(now[u]) || 0), 0);
+    const shares = total ? Object.fromEntries(UNIT_KEYS.map(u => [u, (Number(now[u]) || 0) / total])) : (guide.mixShares || (S.mix && S.mix.shares) || { studio: 0.2, one_bed: 0.4, two_bed: 0.32, three_bed_plus: 0.08 });
+    const split = splitByShares(n, shares);
+    UNIT_KEYS.forEach(u => { guide.mine[`units.${u}`] = String(split[u]); });
+    guide.suggestionUsed = false;
+    guideSuggest({ said: `Homes: ${fmtNum(n)}, yours (${split.studio} studios, ${split.one_bed} one-bed, ${split.two_bed} two-bed, ${split.three_bed_plus} three-bed+).`, focus: '[data-fig="homes"]', ownHomes: true });
+    return;
+  }
   if (key === "fsr") {
     const lot = Number((state.site || {}).site_area_m2) || 0;
     const f = raw === "" ? null : Number(raw);
@@ -927,6 +1122,16 @@ function setFigure(key, raw) {
   renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
 }
 
+/* A whole count split by shares, the largest remainders taking the leftover homes (the engine's own way of splitting a
+   mix, suggest._largest_remainder). Pure. */
+function splitByShares(n, shares) {
+  const raw = UNIT_KEYS.map(u => [u, n * (Number(shares[u]) || 0)]);
+  const out = Object.fromEntries(raw.map(([u, v]) => [u, Math.floor(v)]));
+  let left = n - Object.values(out).reduce((t, v) => t + v, 0);
+  for (const [u] of raw.slice().sort((a, b) => (b[1] - Math.floor(b[1])) - (a[1] - Math.floor(a[1])))) { if (left <= 0) break; out[u] += 1; left -= 1; }
+  return out;
+}
+
 async function useSavedSite(id) {
   if (!id) return;
   if ((state.siteDirty || state.optionDirty) && state.site && !confirm("Switch the site? Unsaved edits to the site and option will be lost.")) { renderGuide(); return; }
@@ -955,7 +1160,8 @@ async function useSavedOption(id) {
 }
 
 function continueToRun() {
-  if (guide.suggestion && !state.optionId && !guide.suggestionUsed) { if (!useSuggestion()) return; }
+  let used = false;
+  if (guide.suggestion && !state.optionId && !guide.suggestionUsed) { if (!useSuggestion()) return; used = true; }
   if (!progress().option) { toast("Choose where to start first: a candidate or a saved option.", true); return; }
-  goStop(3);
+  goStop(3, !used);   // the suggestion just used has said what it set, and what is blank
 }

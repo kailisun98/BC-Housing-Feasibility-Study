@@ -23,7 +23,8 @@
     <a href="who.html">Who it's for</a>
     <a href="case.html">The case</a>
   </nav>
-  <a class="btn btn-paper btn-small nav-cta" href="app.html?mode=manager">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+  <a class="btn btn-paper btn-small nav-cta" href="app.html?mode=manager" title="The tool asks for an address and a building option, then writes the memo. To see the real case first, take the walkthrough." aria-describedby="cta-d">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+  <span id="cta-d" hidden>The tool asks for an address and a building option, then writes the memo. To see the real case first, take the walkthrough.</span>
 </header>
 
 <main id="main">
@@ -33,6 +34,7 @@
     <p class="eyebrow">Who it's for</p>
     <h1 id="hero-h">One memo,<br><span class="dim">three kinds of reader.</span></h1>
     <p class="lede">Housing societies, co-ops, churches and First Nations build homes that rent below market, and they have no development profit to absorb a wrong guess. The people working on one of their sites each read different documents at different times. The memo gives them one document they all read.</p>
+    <p class="jump">On a board, or reading for a funder or the City? <a href="#flow-3">Start with Flow 3</a>, two pages and a decision.</p>
   </div>
   <div class="hero-art">
     <!-- the same memo three times, as each reader holds it, fanned from the diamond on the brand mark's five-stage
@@ -44,9 +46,9 @@
         <!-- the mark, copied from brand/mark.svg, so the drawing fetches nothing while it builds -->
         <g id="who-mark-shape"><rect x="3" y="15.25" width="26" height="1.5" rx=".75"/><rect x="4.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="16.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="22.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="28.25" y="12.5" width="1.5" height="7" rx=".75"/><path d="M11 9.4 17.6 16 11 22.6 4.4 16Z"/></g>
       </defs>
-      <g class="who-name"><text class="n1" x="40" y="30"><tspan class="long">The development manager</tspan><tspan class="short">Manager</tspan></text><text class="n2 who-s" x="40" y="46">runs it and reads the four answers</text></g>
-      <g class="who-name"><text class="n1" x="235" y="30"><tspan class="long">The architect</tspan><tspan class="short">Architect</tspan></text><text class="n2 who-s" x="235" y="46">places the mass and draws the plans</text></g>
-      <g class="who-name"><text class="n1" x="430" y="30"><tspan class="long">Board, planner, funder</tspan><tspan class="short">Board</tspan></text><text class="n2 who-s" x="430" y="46">reads it cold and decides</text></g>
+      <g class="who-name"><text class="n1" x="40" y="30"><tspan class="long">The development manager</tspan><tspan class="short">Manager</tspan></text><text class="n2 who-s" x="40" y="46">runs it, reads four answers</text></g>
+      <g class="who-name"><text class="n1" x="235" y="30"><tspan class="long">The architect</tspan><tspan class="short">Architect</tspan></text><text class="n2 who-s" x="235" y="46">places the mass, draws plans</text></g>
+      <g class="who-name"><text class="n1" x="430" y="30"><tspan class="long">Board, planner, funder</tspan><tspan class="short">Board</tspan></text><text class="n2 who-s" x="430" y="46">reads it cold, decides</text></g>
 
       <!-- each sheet's translate sits on an inner group: the outer one is animated with a CSS transform, which would
            replace a transform attribute on the same element -->
@@ -58,7 +60,7 @@
         <text class="t3 who-s" x="12" y="39">As approved · 6 storeys · 105 homes</text>
         <g class="row fail"><rect x="12" y="52" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="65">1 · Is it allowed?</text><text class="v" x="20" y="80">By rezoning: yes</text></g>
         <g class="row uncertain"><rect x="12" y="94" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="107">2 · Does it fit the funders?</text><text class="v" x="20" y="122">Not yet confirmed</text></g>
-        <g class="row conditional"><rect x="12" y="136" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="149">3 · What is still unsure?</text><text class="v" x="20" y="164">Eight open items</text></g>
+        <g class="row conditional"><rect x="12" y="136" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="149">3 · What is still unsure?</text><text class="v" x="20" y="164">Seven open items</text></g>
         <g class="row conditional"><rect x="12" y="178" width="146" height="36" rx="4"/><text class="q who-s" x="20" y="191">4 · Does the money work?</text><text class="v" x="20" y="206">Needs more sources</text></g>
       </g></g>
 
@@ -97,7 +99,7 @@
         <g class="bars"><rect x="12" y="52" width="134" height="3.5" rx="1.75"/><rect x="12" y="60" width="146" height="3.5" rx="1.75"/><rect x="12" y="68" width="120" height="3.5" rx="1.75"/><rect x="12" y="76" width="146" height="3.5" rx="1.75"/><rect x="12" y="84" width="92" height="3.5" rx="1.75"/></g>
         <text class="q who-s" x="12" y="108">Open items · 8, each with a person</text>
         <g class="item"><circle cx="18" cy="125" r="4"/><text class="i1 who-s" x="28" y="124">3 more trees, or $3,000 in lieu</text><text class="i2 who-s" x="28" y="135">the architect</text></g>
-        <g class="item"><circle cx="18" cy="149" r="4"/><text class="i1 who-s" x="28" y="148">The plate holds 69 of the 105 homes</text><text class="i2 who-s" x="28" y="159">the architect</text></g>
+        <g class="item"><circle cx="18" cy="149" r="4"/><text class="i1 who-s" x="28" y="148">The plate holds 67 of the 105 homes</text><text class="i2 who-s" x="28" y="159">the architect</text></g>
         <g class="item"><circle cx="18" cy="173" r="4"/><text class="i1 who-s" x="28" y="172">Units below market, the rent tiers</text><text class="i2 who-s" x="28" y="183">the development manager</text></g>
         <g class="item"><circle cx="18" cy="197" r="4"/><text class="i1 who-s" x="28" y="196">Land tenure</text><text class="i2 who-s" x="28" y="207">the development manager</text></g>
       </g></g>
@@ -172,7 +174,7 @@
       <div data-stage="Funding bid"><p class="who"><b>The development manager</b>when a call opens</p></div>
       <div></div>
     </div>
-    <p class="diagram-cap reveal">Pre&#8209;development costs $200,000 to $500,000 per project, and today that is where the answer arrives. The memo moves it one stage earlier, where a wrong answer costs a few hours of work.</p>
+    <p class="diagram-cap reveal">Pre&#8209;development costs $200,000 to $500,000 a project, by Future of Good's and WC Studio's figures, and today that is where the answer arrives. The memo moves it one stage earlier, where a wrong answer costs the few hours it took to gather the inputs.</p>
   </div>
 </section>
 
@@ -182,33 +184,33 @@
     <div class="sec-head reveal">
       <p class="eyebrow"><span class="n">02</span>What each reader does</p>
       <h2 id="flows-h">Each reader takes a different path through the same tool.</h2>
-      <p class="sub">A switch in the tool's top bar (Manager, Architect, Reader) changes the layout for each one. The manager walks a route of three stops, one card at a time; the architect gets the site and option schedules, the drawings and the ledger open with the Revit export at hand; the reader sees the memo alone, as on paper. The filled step in each path is the one that reader came for.</p>
+      <p class="sub">A switch in the tool's top bar, Manager, Architect or Reader, lays the page out for each of them; the reader sees the memo alone, as on paper. The filled step in each path is the one that reader came for.</p>
     </div>
 
     <div class="flows reveal">
       <div class="flow">
         <div class="flow-head"><p class="eyebrow">Flow 1</p><h3>The development manager</h3><p>Starts from a site and leaves with a memo, before any money goes to design.</p><a class="text-link" href="app.html?mode=manager">Open the tool as the manager <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a></div>
         <ol>
-          <li><span class="sn">1</span><div class="st"><b>Types an address.</b> The tool finds it in the City's open data, takes the zoning district and the parcel from the City's records, and draws the parcel on a map to check before it is used.<span class="scr">01 The site · Look up · Is this the parcel?</span></div></li>
-          <li><span class="sn">2</span><div class="st"><b>Answers what the data could not tell, once.</b> The policy areas, water and sewer, the owner, whether the buildings stay, which street of a corner lot is the front. "Not sure" is an answer, and the memo reports that rule as uncertain.<span class="scr">01 The site · the schedule of questions</span></div></li>
-          <li class="key"><span class="sn">3</span><div class="st"><b>Shapes the option from the rules, or from their own figures.</b> The programs as toggles, what the site allows, then a candidate: funder-ready, outright or the staff benchmark, with four figures to change in place and every other figure behind "All 21 figures", each with its rule beside it. The unit mix is a preset or their own shares; where the district has no schedule a rough envelope stands in.<span class="scr">02 The option · Outright | Benchmark | Funder-ready</span></div></li>
-          <li><span class="sn">4</span><div class="st"><b>Enters the money and runs the rules.</b> Land, equity and other grants, then four answers in under a second, the option's figures under the title block, and the drawings. The views are Summary, Detailed and 3D preview.<span class="scr">03 Run · Summary | Detailed | 3D</span></div></li>
-          <li><span class="sn">5</span><div class="st"><b>Works the open items.</b> Each names the person who resolves it and what to do.<span class="scr">answer 3 · open items table</span></div></li>
-          <li><span class="sn">6</span><div class="st"><b>Issues it to the architect, and the PDF to the board.</b> The form opens where the button is, with their name and a note; the architect sees the revision in their top bar and issues it back with the plans drawn.<span class="scr">Issue to the architect · Download PDF</span></div></li>
+          <li><span class="sn">1</span><div class="st"><b>Types an address.</b> The tool finds the parcel and its zoning in the City's open data and shows it on a map to confirm.<span class="scr">01 The site</span></div></li>
+          <li><span class="sn">2</span><div class="st"><b>Answers what the data could not tell,</b> once. "Not sure" is an answer, and the memo reports that rule as uncertain.<span class="scr">01 The site · questions</span></div></li>
+          <li class="key"><span class="sn">3</span><div class="st"><b>Shapes the option,</b> from the rules (funder-ready, outright or the staff benchmark) or from their own figures, each figure with its rule beside it.<span class="scr">02 The option</span></div></li>
+          <li><span class="sn">4</span><div class="st"><b>Enters the money and runs the rules.</b> Land, equity and other grants; four answers and the drawings come back in under a second.<span class="scr">03 Run</span></div></li>
+          <li><span class="sn">5</span><div class="st"><b>Works the open items.</b> Each names who resolves it and what to do.<span class="scr">answer 3</span></div></li>
+          <li><span class="sn">6</span><div class="st"><b>Issues it to the architect,</b> with a note, and takes the PDF to the board.<span class="scr">Issue · Download PDF</span></div></li>
         </ol>
       </div>
       <div class="flow">
         <div class="flow-head"><p class="eyebrow">Flow 2</p><h3>The architect</h3><p>Starts from the manager's run and leaves with the plans drawn, a comparison and a massing.</p><a class="text-link" href="app.html?mode=architect&amp;run=998-e-19th-ave/what-if-funder-ready&amp;compare=998-e-19th-ave/as-approved">Open the tool as the architect <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a></div>
         <ol>
-          <li><span class="sn">1</span><div class="st"><b>Opens the run the manager issued,</b> from the chip in the top bar, with the manager's note under the title; or a past run from the picker.<span class="scr">issued to you by the manager · Open a past run</span></div></li>
-          <li><span class="sn">2</span><div class="st"><b>Reads the schedules.</b> The site and the option as Item, Value and Ref: the Ref names the rules that read each input, as the memo numbers them. Save as… keeps a copy so the run can be repeated.<span class="scr">Site schedule · Option schedule</span></div></li>
-          <li class="key"><span class="sn">3</span><div class="st"><b>Places the mass and draws the plans.</b> On FIG 01 they choose the front face and set the mass inside the plate box. On FIG 03 the block editor lays out each floor on a grid, with a tracker of the program left to place, their own programs, and the exits read on every floor: how many, how far apart, the travel distance, the dead end.<span class="scr">FIG 01 · Place the mass · FIG 03 · Edit blocks</span></div></li>
-          <li><span class="sn">4</span><div class="st"><b>Runs again and compares.</b> The new memo is the site's next revision, R2; the comparison opens with one sentence on the trade-off, then the answers, the building and the money for each, then only the rules that came out differently.<span class="scr">Run the rules · Compare with… · Side by side</span></div></li>
-          <li><span class="sn">5</span><div class="st"><b>Reads the ledger:</b> every rule, layer by layer, with the numbers it used and its source; a figure entered without its document says so.<span class="scr">Full ledger · A to F</span></div></li>
-          <li><span class="sn">6</span><div class="st"><b>Issues the run back to the manager,</b> whose memo then shows the plans; and takes the massing to Revit with two shell commands, the sheet coming back into the memo.<span class="scr">Issue to the manager · Export to Revit</span></div></li>
+          <li><span class="sn">1</span><div class="st"><b>Opens the run the manager issued,</b> with the manager's note under its title.<span class="scr">issued to you</span></div></li>
+          <li><span class="sn">2</span><div class="st"><b>Reads the schedules:</b> every input of the site and the option, with the rules that read it.<span class="scr">Site and Option schedules</span></div></li>
+          <li class="key"><span class="sn">3</span><div class="st"><b>Places the mass and draws the plans:</b> the front, the mass inside the plate box, then each floor block by block, the exits checked on every floor.<span class="scr">FIG 01 · FIG 03 Edit blocks</span></div></li>
+          <li><span class="sn">4</span><div class="st"><b>Runs again and compares.</b> The new memo is the next revision, R2, set beside R1: the trade-off in one sentence, then only the rules that came out differently.<span class="scr">Compare with…</span></div></li>
+          <li><span class="sn">5</span><div class="st"><b>Reads the ledger:</b> every rule, layer by layer, with its numbers and its source.<span class="scr">Full ledger</span></div></li>
+          <li><span class="sn">6</span><div class="st"><b>Issues the run back</b> and takes the massing to Revit.<span class="scr">Issue · Export to Revit</span></div></li>
         </ol>
       </div>
-      <div class="flow">
+      <div class="flow" id="flow-3">
         <div class="flow-head"><p class="eyebrow">Flow 3</p><h3>The board, the planner, the funder</h3><p>Starts from the PDF and ends with a decision, without a briefing.</p><a class="text-link" href="app.html?mode=reader&amp;run=998-e-19th-ave/as-approved">Open the memo as a reader <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a></div>
         <ol>
           <li><span class="sn">1</span><div class="st"><b>Reads page one without a briefing:</b> the address, option, revision and rules date, then the four answers with the rules that decide them.<span class="scr">PDF · page 1</span></div></li>

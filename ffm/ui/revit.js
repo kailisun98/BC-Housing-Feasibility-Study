@@ -16,11 +16,28 @@ function psLines(run) {
   ].join("\n");
 }
 
+/* What Revit receives from this run, in one line, as revit/ffm_massing_pyrevit.py builds it: the masses
+   (stage_masses, with a floor plate per storey of the proposed one), the lot and setback lines, a level and a block
+   per zone from layout.json where it sits beside massing.json (corridors and spare left out), three views and sheet
+   FFM-01 with the answers and the open items (20 Nov 2026: the panel never said). */
+function revitGets(run) {
+  const m = run.massing || {}, L = run.layout || null;
+  const masses = (m.masses || []).map(x => x.name).filter(Boolean);
+  const prop = (m.masses || []).find(x => x.name === "proposed");
+  const massWords = masses.length === 2 ? "the two masses, proposed and outright" : masses.length === 1 ? `one mass, ${masses[0]}` : "the masses";
+  const plates = prop && prop.storeys > 1 ? `, ${prop.storeys - 1} floor plate${prop.storeys - 1 === 1 ? "" : "s"} in the proposed one` : "";
+  const floors = L && Array.isArray(L.floors) ? L.floors : [];
+  const blocks = floors.reduce((t, fl) => t + (fl.zones || []).filter(z => z.block !== "spare" && z.block !== "corridor").length, 0);
+  const layout = floors.length ? `, ${floors.length} level${floors.length === 1 ? "" : "s"} with ${blocks} floor blocks from layout.json (corridors left out)` : "";
+  return `Revit gets ${massWords}${plates}, the lot line and the setback envelope${layout}, a 3D view, a plan and a section, and sheet FFM-01 with the answers, the open items and the figures, exported as PDF and PNG.`;
+}
+
 export function renderExportPanel(run) {
   const f = run.files || {};
   const panel = $("#export-panel");
   panel.innerHTML = `
     <h3>Export to Revit</h3>
+    <p class="export-gets">${h(revitGets(run))}</p>
     <div class="block">
       <span class="eyebrow">This run's massing.json</span>
       <div class="codeline"><code class="path" id="exp-path">${h(f.massing_json || (STATIC ? "Download massing.json from the action bar above and save it next to this run's ledger.json on the machine that has Revit." : "This run has no massing.json."))}</code><button class="btn btn-quiet btn-small" type="button" data-copy="exp-path">Copy</button></div>

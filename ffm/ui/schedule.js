@@ -84,7 +84,8 @@ export function refreshNeeds(formEl, schema, obj) {
   };
   for (const g of schema) walk(g.fields);
   const [r0, r1] = counts.run, [u0, u1] = counts.rule;
-  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i>Needed to run <b>${r0} of ${r1}</b></span><span>Read by a rule <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">· a blank comes back uncertain</span>` : ""}</span>`;
+  // the Ref column's key, once over the schedule (20 Nov 2026: "A25 A26", "C6" and "drawings" stood unexplained)
+  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i>Needed to run <b>${r0} of ${r1}</b></span><span>Read by a rule <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">· a blank comes back uncertain</span>` : ""}</span><span class="ref-key"><b>Ref</b> the rules that read the input, as the memo numbers them (A25 is layer A's rule 25), or what else it is for: drawings, title, note, file, money, open item. Click one for why.</span>`;
 }
 
 /* One row of a schedule, and the reason under it (folded). */
@@ -97,7 +98,9 @@ function scheduleRow(f, obj, onChange, on) {
     return [el];
   }
   const id = `f-${on}-${f.key.replace(/\W/g, "-")}`;
-  const wide = ["programs", "trees", "textarea"].includes(f.type);
+  // a value in words takes the row's width under its label (20 Nov 2026: in a 120 px cell the address read "998 E 19th
+  // Ave, Vancc" and the owner "Vancouver First Churcl"); short codes (a district, a CD-1 number) keep the cell
+  const wide = ["programs", "trees", "textarea"].includes(f.type) || (f.type === "text" && wordsField(f));
   const asSpan = [TRI, "programs", "trees"].includes(f.type);
   const row = document.createElement("div");
   row.className = `sch-row${wide ? " wide" : ""}${f.need === "run" ? " needed" : ""}`;
@@ -122,6 +125,9 @@ function scheduleRow(f, obj, onChange, on) {
   $(".sch-ref", row).appendChild(btn);
   return [row, note];
 }
+
+/* A text input that holds words (an address, an owner, a tenure plan), not a short code (a district, a CD-1 number). */
+const wordsField = f => !["zoning_district", "cd1_bylaw_number", "cd1_sub_area"].includes(f.key);
 
 /* A help line short enough to stand in the empty field as its placeholder. */
 const shortHelp = f => !!(f.help && f.help.length <= 28);
@@ -231,6 +237,17 @@ function controlFor(f, obj, onChange, id) {
       el.appendChild(add);
     };
     draw();
+    return el;
+  }
+  // a value in words wraps in its field rather than run out of it (20 Nov 2026: "long-term lease or transfer to a
+  // non-profit society (to confirm)" ran past a 390 px field): one line that grows, Enter adds no line break
+  if (f.type === "text" && wordsField(f)) {
+    el.innerHTML = `<textarea id="${id}" class="sch-words" rows="1" spellcheck="false"${shortHelp(f) ? ` placeholder="${h(f.help)}"` : ""}>${h(value ?? "")}</textarea>`;
+    const ta = $("textarea", el);
+    const fit = () => { ta.style.height = "auto"; ta.style.height = `${ta.scrollHeight + 2}px`; };
+    ta.addEventListener("keydown", e => { if (e.key === "Enter") e.preventDefault(); });
+    ta.addEventListener("input", e => { const v = e.target.value.replace(/\s*\n\s*/g, " "); setPath(obj, f.key, v === "" ? null : v); onChange(f.key); fit(); });
+    requestAnimationFrame(fit);
     return el;
   }
   // text, slug, number. A blank number is read as "not sure", and the empty field says so.

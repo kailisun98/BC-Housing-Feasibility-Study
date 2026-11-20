@@ -23,8 +23,12 @@
     <a href="who.html">Who it's for</a>
     <a href="case.html">The case</a>
   </nav>
-  <a class="btn btn-paper btn-small nav-cta" href="app.html?mode=manager">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+  <a class="btn btn-paper btn-small nav-cta" href="app.html?mode=manager" title="The tool asks for an address and a building option, then writes the memo. To see the real case first, take the walkthrough." aria-describedby="cta-d">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+  <span id="cta-d" hidden>The tool asks for an address and a building option, then writes the memo. To see the real case first, take the walkthrough.</span>
 </header>
+
+<!-- the mark, copied from brand/mark.svg, so the specimens below draw without fetching it -->
+<svg width="0" height="0" style="position: absolute" aria-hidden="true" focusable="false"><symbol id="mark-i" viewBox="0 0 32 32"><rect x="3" y="15.25" width="26" height="1.5" rx=".75"/><rect x="4.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="16.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="22.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="28.25" y="12.5" width="1.5" height="7" rx=".75"/><path d="M11 9.4 17.6 16 11 22.6 4.4 16Z"/></symbol></svg>
 
 <main id="main">
 
@@ -32,7 +36,8 @@
   <div class="hero-text">
     <p class="eyebrow">Brand</p>
     <h1 id="hero-h">First Read,<br><span class="dim">the identity.</span></h1>
-    <p class="lede">One type family, two surfaces, one signal colour. Ink chrome around white paper, so the memo is always the brightest thing on the screen. Everything a page, a sheet or a slide needs to read as First Read.</p>
+    <p class="lede">This page is for designers: anyone making a page, a sheet or a slide that should read as First Read. One type family, two surfaces, one signal colour; ink chrome around white paper, so the memo is always the brightest thing on the screen.</p>
+    <p class="hero-note">Here to understand the tool rather than to design for it? <a class="inline" href="how.html">How it works</a> is the place to start.</p>
   </div>
 </section>
 
@@ -46,24 +51,24 @@
     </div>
     <div class="mark-show reveal">
       <div>
-        <div class="tile"><svg class="fr-mark big" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg></div>
+        <div class="tile"><svg class="fr-mark big" aria-hidden="true"><use href="#mark-i"/></svg></div>
         <p class="tile-cap">On the night, in the page's text colour</p>
       </div>
       <div>
-        <div class="tile paper-tile"><svg class="fr-mark big" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg></div>
+        <div class="tile paper-tile"><svg class="fr-mark big" aria-hidden="true"><use href="#mark-i"/></svg></div>
         <p class="tile-cap">On paper, in ink</p>
       </div>
       <div>
-        <div class="tile signal-tile"><svg class="fr-mark big" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg></div>
+        <div class="tile signal-tile"><svg class="fr-mark big" aria-hidden="true"><use href="#mark-i"/></svg></div>
         <p class="tile-cap">On the signal, in white</p>
       </div>
       <div>
-        <div class="tile"><div class="sizes"><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg></div></div>
-        <p class="tile-cap">64, 32 and 16 px: the mark holds at a favicon's size</p>
+        <div class="tile"><div class="sizes"><svg class="fr-mark" aria-hidden="true"><use href="#mark-i"/></svg><svg class="fr-mark" aria-hidden="true"><use href="#mark-i"/></svg><svg class="fr-mark" aria-hidden="true"><use href="#mark-i"/></svg><svg class="fr-mark" aria-hidden="true"><use href="#mark-i"/></svg></div></div>
+        <p class="tile-cap">64, 32, 24 and 16 px: the mark holds at a favicon's size</p>
       </div>
       <div>
-        <div class="tile"><img src="brand/mark-tile.svg" width="96" height="96" alt="The mark in white on a rounded ink tile, the diamond in signal blue"></div>
-        <p class="tile-cap">The tile: app icon and favicon, the diamond in signal</p>
+        <div class="tile icon-tile"><img src="brand/mark-tile.svg" width="128" height="128" alt="The mark in white on a rounded ink tile, the diamond in signal blue"></div>
+        <p class="tile-cap">The tile: app icon and favicon, the diamond in signal; shown on paper so its edge shows</p>
       </div>
     </div>
     <div class="sec-foot reveal dl">
@@ -85,7 +90,7 @@
       <h2 id="lockups-h">The name is set in the same face as everything else.</h2>
       <p class="sub">IBM Plex Sans 600 at the mark's height, tracked slightly tight. Clear space around a lockup is the mark's own width; the mark is never smaller than 16 px, the lockup never narrower than 120 px.</p>
     </div>
-    <div class="mark-show reveal">
+    <div class="mark-show wide reveal">
       <div>
         <div class="tile"><img src="brand/lockup.svg" width="285" height="48" alt="First Read horizontal lockup: the mark then the wordmark" style="filter: invert(1)"></div>
         <p class="tile-cap">Horizontal lockup, in the page's ink</p>
@@ -95,11 +100,11 @@
         <p class="tile-cap">Horizontal lockup on paper</p>
       </div>
       <div>
-        <div class="tile paper-tile"><img src="brand/lockup-stacked.svg" width="240" height="132" alt="First Read stacked lockup with the subtitle, a funding-fit memo for BC non-profit housing"></div>
+        <div class="tile paper-tile"><img src="brand/lockup-stacked.svg" width="300" height="110" alt="First Read stacked lockup with the subtitle, a funding-fit memo for BC non-profit housing"></div>
         <p class="tile-cap">Stacked, with the subtitle: a cover, a title block, a slide</p>
       </div>
       <div>
-        <div class="tile"><span class="lockup" style="font-size: 22px"><svg class="fr-mark" style="width: 30px; height: 30px" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg>First Read <em>a funding-fit memo</em></span></div>
+        <div class="tile"><span class="lockup" style="font-size: 22px"><svg class="fr-mark" style="width: 30px; height: 30px" aria-hidden="true"><use href="#mark-i"/></svg>First Read <em>a funding-fit memo</em></span></div>
         <p class="tile-cap">In HTML: the mark as an inline SVG and the name as text, so it scales and takes the ink around it</p>
       </div>
     </div>
@@ -115,11 +120,13 @@
       <p class="sub">Colour is meaning. The signal blue is the proposed mass in every drawing, so it is also the link, the focus ring and the one loud button. White text sits only on the deep signal (5.2:1); the light signal draws lines, links on the night and the mass. Amber is never a highlight: it means not yet settled. A status colour never appears without its word.</p>
     </div>
     <ul class="swatches reveal">
-      <li class="sw"><i style="background:#14181d"></i><div><b>Ink</b><code>#14181D</code></div></li>
+      <!-- Ink and Night are a step apart, so each swatch shows its use: the bar on top of both surfaces, the ground under
+           this page (20 Nov 2026: side by side they read as one colour) -->
+      <li class="sw"><i class="sw-use" style="background:#14181d"><span>the top bar · type on paper</span></i><div><b>Ink</b><code>#14181D</code><span class="sw-note">the bar over both surfaces; the memo's type on paper</span></div></li>
       <li class="sw"><i style="background:#2c3e50"></i><div><b>Slate</b><code>#2C3E50</code><span class="sw-note">the tool's working ink</span></div></li>
-      <li class="sw"><i style="background:#ffffff"></i><div><b>Paper</b><code>#FFFFFF</code></div></li>
+      <li class="sw"><i style="background:#ffffff"></i><div><b>Paper</b><code>#FFFFFF</code><span class="sw-note">the memo, the drawings, the site's primary button</span></div></li>
       <li class="sw"><i style="background:#f5f6f8"></i><div><b>Page</b><code>#F5F6F8</code><span class="sw-note">the tool's desk</span></div></li>
-      <li class="sw"><i style="background:#0e1116; border-bottom: 1px solid #333"></i><div><b>Night</b><code>#0E1116</code><span class="sw-note">the site's desk</span></div></li>
+      <li class="sw"><i class="sw-use" style="background:#0e1116"><span>this page's ground</span></i><div><b>Night</b><code>#0E1116</code><span class="sw-note">the site's desk, the ground under this page</span></div></li>
       <li class="sw"><i style="background:#3c8cdc"></i><div><b>Signal</b><code>#3C8CDC</code><span class="sw-note">#6FB1F2 at night · lines, the mass</span></div></li>
       <li class="sw"><i style="background:#2a6fb8"></i><div><b>Signal, deep</b><code>#2A6FB8</code><span class="sw-note">fills under white text, links on paper</span></div></li>
       <li class="sw"><i style="background:#c77d14"></i><div><b>Amber</b><code>#C77D14</code><span class="sw-note">#E0A03A at night</span></div></li>

@@ -38,17 +38,49 @@ export function fitLabels(box, build) {
   return fs;
 }
 
-/* A scale bar in the drawing's corner: a round length near a fifth of the frame, in two halves. */
+/* A scale bar in the drawing's corner: a round length near a third of the frame, in two halves, each half labelled
+   (20 Nov 2026: "0 … 50 m" left the reader to halve it; now 0 / 25 / 50 m). */
 export function scaleBar(x, y, frameW, fs) {
-  const L = [5, 10, 20, 25, 50, 100].find(v => v >= frameW / 6) || 100;
-  const hgt = fs * 0.4;
+  const L = [10, 20, 30, 50, 100, 200].find(v => v >= frameW / 4) || 200;
+  const hgt = fs * 0.4, ty = (y - hgt - fs * 0.35).toFixed(2);
   return `<g class="scalebar">
     <rect x="${(x - fs * 0.4).toFixed(2)}" y="${(y - fs * 1.5).toFixed(2)}" width="${(L + fs * 3.6).toFixed(2)}" height="${(fs * 2.1).toFixed(2)}" fill="${FIG.paper}" fill-opacity="0.85"/>
     <rect x="${x.toFixed(2)}" y="${(y - hgt).toFixed(2)}" width="${(L / 2).toFixed(2)}" height="${hgt.toFixed(2)}" fill="${FIG.lot}"/>
     <rect x="${(x + L / 2).toFixed(2)}" y="${(y - hgt).toFixed(2)}" width="${(L / 2).toFixed(2)}" height="${hgt.toFixed(2)}" fill="${FIG.paper}" stroke="${FIG.lot}" stroke-width="0.8" ${NS}/>
-    <text x="${x.toFixed(2)}" y="${(y - hgt - fs * 0.35).toFixed(2)}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">0</text>
-    <text x="${(x + L).toFixed(2)}" y="${(y - hgt - fs * 0.35).toFixed(2)}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">${L} m</text>
+    <text x="${x.toFixed(2)}" y="${ty}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">0</text>
+    <text x="${(x + L / 2).toFixed(2)}" y="${ty}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">${L / 2}</text>
+    <text x="${(x + L).toFixed(2)}" y="${ty}" font-size="${fs.toFixed(2)}" fill="${FIG.lot}" text-anchor="middle">${L} m</text>
   </g>`;
+}
+
+/* Where a vertical line x = c crosses a ring, as the sorted y values (each edge counted once). Pure. */
+export function crossingsAtX(ring, c) {
+  const out = [];
+  for (let i = 0; i < (ring || []).length; i++) {
+    const [x1, y1] = ring[i], [x2, y2] = ring[(i + 1) % ring.length];
+    if ((x1 <= c && x2 > c) || (x2 <= c && x1 > c)) out.push(y1 + (c - x1) / (x2 - x1) * (y2 - y1));
+  }
+  return out.sort((a, b) => a - b);
+}
+
+/* Section A–A: the line x = c (in the lot frame, across the depth) that FIG 02 cuts and FIG 01 marks, through the
+   proposed mass, a little past its middle so the plate's own label in plan stays clear of it (20 Nov 2026). Pure. */
+export function sectionCut(m) {
+  const mass = (m.masses || []).find(x => x.name === "proposed") || (m.masses || [])[0];
+  const xs = ((mass && mass.footprint) || []).map(p => Number(p[0])).filter(Number.isFinite);
+  if (xs.length) return Math.min(...xs) + 0.72 * (Math.max(...xs) - Math.min(...xs));
+  const b = m.envelope && m.envelope.box;
+  return b ? b.x + 0.72 * b.w : (m.lot.frontage_m || 0) / 2;
+}
+
+/* The outright height limit: the massing's own field, else the figure the outright mass's label carries ("Outright:
+   FSR 1.2, 10.7 m"), which is the limit, not the mass (the mass stands at its whole storeys, 9.9 m). Pure. */
+export function outrightLimit(m) {
+  const v = Number(m && m.outright_height_limit_m);
+  if (v > 0) return v;
+  const o = ((m && m.masses) || []).find(x => x.name === "outright");
+  const hit = o && String(o.label || "").match(/([\d.]+)\s*m\s*$/);
+  return hit ? Number(hit[1]) : null;
 }
 
 /* North up (17 Nov 2026, Kai: "plan needs to show north as up always"). The lot frame has the street along x, so a
@@ -76,9 +108,10 @@ export function upright(s, a) {
   });
 }
 
-/* A north arrow, only where the site's OpenStreetMap frame says which way the lot faces; the plan is drawn with the
-   street at the bottom, so north is wherever the frame puts it. x_axis_bearing_deg is the bearing of the lot's x axis
-   (along the frontage); the plan's up is the y axis, 90 degrees anticlockwise of it. */
+/* A north arrow, only where the site's OpenStreetMap frame says which way the lot faces. Drawn in the lot frame (the
+   street at the bottom) north is wherever the frame puts it: x_axis_bearing_deg is the bearing of the lot's x axis
+   (along the frontage) and the drawing's up is the y axis, 90 degrees anticlockwise of it. FIG 01 turns its plan north
+   up and passes 90, so its arrow points up the page. */
 export function northArrow(cx, cy, bearing, fs) {
   const rot = 90 - bearing;          // north, measured clockwise from the drawing's up
   const r = fs * 1.15, t = rot * Math.PI / 180, d = r + fs * 0.8;
@@ -149,7 +182,7 @@ export function siteContext(site, m) {
   const streetTreeList = [];
   for (let i = 0; i < streetTrees; i++) streetTreeList.push({ x: W * (i + 0.5) / streetTrees, y: -3, crown: 2.5 });
   const labels = ground.map(g => ({ text: g.label, at: g.at, angle: g.rotate ? 90 : 0 }));
-  const base = { W, D, street, lane, cross, neighbours, streetTrees: streetTreeList, trees, schematic, ground, labels, buildings: [], osmTrees: [], xmin, xmax, ymin, ymax, osm: null };
+  const base = { W, D, street, lane, cross, neighbours, streetTrees: streetTreeList, trees, schematic, ground, labels, buildings: [], osmTrees: [], roads: [], xmin, xmax, ymin, ymax, osm: null };
   return site && site.osm ? osmContext(site, m, base) : base;
 }
 
@@ -208,10 +241,13 @@ function osmContext(site, m, base) {
       }
     }
   }
-  const buildings = (o.buildings || []).map(b => ({ polygon: b.polygon, height: b.height_m || 7, name: b.name }));
+  // `known` says the height was mapped (the 3D view stands an unmapped one at 7 m; the section draws only mapped ones)
+  const buildings = (o.buildings || []).map(b => ({ polygon: b.polygon, height: b.height_m || 7, known: b.height_m > 0, name: b.name }));
   const osmTrees = (o.trees || []).map(t => ({ x: t.x, y: t.y, crown: t.crown_m || 3 }));
+  // the roads as lines, for the plan's labels (set where they fall in its frame) and the section's streets and lanes
+  const roads = (o.roads || []).filter(rd => (rd.points || []).length > 1).map(rd => ({ name: rd.name || null, kind: rd.highway || "", width: rd.width_m || 8, points: rd.points, front: !!front && rd.name === front }));
   return Object.assign({}, base, {
-    ground, labels, buildings, osmTrees, streetTrees: [],
+    ground, labels, buildings, osmTrees, streetTrees: [], roads,
     xmin: W / 2 - r, xmax: W / 2 + r, ymin: D / 2 - r, ymax: D / 2 + r, frameRadius: r * 0.75,
     osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: front || (o.frame && o.frame.front_street),
            // the turned lot's x axis: new = R(θ)·old with θ counter-clockwise (boundary.oriented_ring), so the new x axis

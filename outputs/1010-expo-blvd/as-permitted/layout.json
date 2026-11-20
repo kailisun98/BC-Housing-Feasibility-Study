@@ -2,7 +2,7 @@
   "site_id": "1010-expo-blvd",
   "option_id": "1010-expo-blvd-as-permitted",
   "as_of": "2026-10-23",
-  "stamp": "8edfb9e62179aa68",
+  "stamp": "6e72488249c79837",
   "units": "m",
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
@@ -13,8 +13,14 @@
     "depth_m": 25.41,
     "storeys": 29,
     "floor_to_floor_m": 3.05,
-    "double_loaded": true,
-    "unit_depth_m": 11.8
+    "double_loaded": false,
+    "unit_depth_m": 7.41,
+    "arrangement": "point",
+    "side_depth_m": 10.45,
+    "core_m": [
+      7.0,
+      7.0
+    ]
   },
   "program": [
     {
@@ -54,14 +60,14 @@
       "block": "services",
       "rule": "on the ground floor, away from the street",
       "status": "conditional",
-      "note": "on the ground floor but facing the street: the plate is single-loaded"
+      "note": "on the ground floor but facing the street: the lane side has no room left beside the core"
     },
     {
       "id": "core_centre",
       "block": "core",
       "rule": "at the centre of every floor, the corridor through it",
       "status": "pass",
-      "note": "one core bay at the centre of every floor, the corridor through it"
+      "note": "one 7 × 7 m core at the centre of every floor holding a scissor stair, the corridor round it and the homes round that"
     },
     {
       "id": "units_both_sides",
@@ -115,17 +121,15 @@
         "name": "Ground floor",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -134,17 +138,15 @@
         "name": "Level 2",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -153,17 +155,15 @@
         "name": "Level 3",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -172,17 +172,15 @@
         "name": "Level 4",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -191,17 +189,15 @@
         "name": "Level 5",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -210,17 +206,15 @@
         "name": "Level 6",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -229,17 +223,15 @@
         "name": "Level 7",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -248,17 +240,15 @@
         "name": "Level 8",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -267,17 +257,15 @@
         "name": "Level 9",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -286,17 +274,15 @@
         "name": "Level 10",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -305,17 +291,15 @@
         "name": "Level 11",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -324,17 +308,15 @@
         "name": "Level 12",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -343,17 +325,15 @@
         "name": "Level 13",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -362,17 +342,15 @@
         "name": "Level 14",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -381,17 +359,15 @@
         "name": "Level 15",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -400,17 +376,15 @@
         "name": "Level 16",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -419,17 +393,15 @@
         "name": "Level 17",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -438,17 +410,15 @@
         "name": "Level 18",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -457,17 +427,15 @@
         "name": "Level 19",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -476,17 +444,15 @@
         "name": "Level 20",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -495,17 +461,15 @@
         "name": "Level 21",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -514,17 +478,15 @@
         "name": "Level 22",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -533,17 +495,15 @@
         "name": "Level 23",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -552,17 +512,15 @@
         "name": "Level 24",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -571,17 +529,15 @@
         "name": "Level 25",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -590,17 +546,15 @@
         "name": "Level 26",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -609,17 +563,15 @@
         "name": "Level 27",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -628,17 +580,15 @@
         "name": "Level 28",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       },
@@ -647,23 +597,22 @@
         "name": "Level 29",
         "exits": 2,
         "exits_required": 2,
-        "separation_m": 4.8,
+        "separation_m": 14.0,
         "separation_min_m": 9.0,
         "farthest_travel_m": null,
         "travel_limit_m": 45.0,
         "farthest_unit": null,
-        "dead_end_m": 12.25,
+        "dead_end_m": 1.8,
         "dead_end_limit_m": 6.0,
-        "status": "fail",
+        "status": "pass",
         "notes": [
-          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 25.4 m deep, so stairs at its front and rear ends could be 23.2 m apart: an arrangement for the architect to draw",
-          "the corridor runs 12.2 m past the last exit, over the 6 m a dead end may be (3.3.1.9)",
           "no units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured"
         ]
       }
     ],
-    "status": "fail",
-    "summary": "Egress (sprinklered, BCBC 2024 Part 3): fail; 29 floors: 29 fail; exits 4.8 m apart against 9 m on 29 floors; dead-end corridors up to 12.2 m against 6."
+    "status": "pass",
+    "scissor_stair": true,
+    "summary": "Egress (sprinklered, BCBC 2024 Part 3): pass; 29 floors: 29 pass; the core's two exits are a scissor stair, its doors on the core's opposite faces, 14.0 m apart as smoke would go round the core (3.4.2.3.(3)); the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings."
   },
   "floors": [
     {
@@ -675,39 +624,60 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
           "block": "services",
           "label": "Services, bicycles",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
-        },
-        {
-          "block": "services",
-          "label": "Services, bicycles",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
@@ -715,23 +685,33 @@
           "label": "Services, bicycles",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "services",
           "label": "Services, bicycles",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.04,
-          "d": 11.8,
-          "area_m2": 142.2,
-          "side": "front"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.48,
+          "area_m2": 109.5,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 0.0
+      "spare_m2": 110.8
     },
     {
       "level": 1,
@@ -742,19 +722,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -762,43 +773,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 2,
@@ -809,19 +820,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -829,43 +871,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 3,
@@ -876,19 +918,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -896,43 +969,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 4,
@@ -943,19 +1016,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -963,43 +1067,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 5,
@@ -1010,19 +1114,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1030,43 +1165,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 6,
@@ -1077,19 +1212,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1097,43 +1263,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 7,
@@ -1144,19 +1310,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1164,43 +1361,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 8,
@@ -1211,19 +1408,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1231,43 +1459,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 9,
@@ -1278,19 +1506,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1298,43 +1557,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 10,
@@ -1345,19 +1604,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1365,43 +1655,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 11,
@@ -1412,19 +1702,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1432,43 +1753,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 12,
@@ -1479,19 +1800,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1499,43 +1851,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 13,
@@ -1546,19 +1898,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1566,43 +1949,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 14,
@@ -1613,19 +1996,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1633,43 +2047,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 15,
@@ -1680,19 +2094,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1700,43 +2145,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 16,
@@ -1747,19 +2192,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1767,43 +2243,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 17,
@@ -1814,19 +2290,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1834,43 +2341,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 18,
@@ -1881,19 +2388,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1901,43 +2439,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 19,
@@ -1948,19 +2486,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -1968,43 +2537,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 20,
@@ -2015,19 +2584,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2035,43 +2635,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 21,
@@ -2082,19 +2682,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2102,43 +2733,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 22,
@@ -2149,19 +2780,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2169,43 +2831,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 23,
@@ -2216,19 +2878,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2236,43 +2929,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 24,
@@ -2283,19 +2976,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2303,43 +3027,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 25,
@@ -2350,19 +3074,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2370,43 +3125,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 26,
@@ -2417,19 +3172,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2437,43 +3223,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 27,
@@ -2484,19 +3270,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2504,43 +3321,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     },
     {
       "level": 28,
@@ -2551,19 +3368,50 @@
           "block": "core",
           "label": "Core (stairs, elevator)",
           "x": 20.54,
-          "y": 2.45,
+          "y": 11.66,
           "w": 7.0,
-          "d": 25.41,
-          "area_m2": 177.9
+          "d": 7.0,
+          "area_m2": 49.0,
+          "stairs": "scissor"
         },
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 8.29,
-          "y": 14.25,
-          "w": 31.5,
+          "x": 18.74,
+          "y": 9.86,
+          "w": 10.6,
           "d": 1.8,
-          "area_m2": 56.7,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 18.65,
+          "w": 10.6,
+          "d": 1.8,
+          "area_m2": 19.1,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 18.74,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
+          "through": "core"
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 27.54,
+          "y": 11.66,
+          "w": 1.8,
+          "d": 7.0,
+          "area_m2": 12.6,
           "through": "core"
         },
         {
@@ -2571,43 +3419,43 @@
           "label": "Spare",
           "x": 8.29,
           "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "front"
-        },
-        {
-          "block": "spare",
-          "label": "Spare",
-          "x": 27.54,
-          "y": 2.45,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
           "x": 8.29,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
+          "y": 20.45,
+          "w": 31.5,
+          "d": 7.41,
+          "area_m2": 233.3,
           "side": "rear"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 27.54,
-          "y": 16.05,
-          "w": 12.25,
-          "d": 11.8,
-          "area_m2": 144.6,
-          "side": "rear"
+          "x": 8.29,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "left"
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 29.34,
+          "y": 9.86,
+          "w": 10.45,
+          "d": 10.6,
+          "area_m2": 110.8,
+          "side": "right"
         }
       ],
-      "spare_m2": 578.4
+      "spare_m2": 688.1
     }
   ],
   "shortfall": [],
@@ -2634,8 +3482,8 @@
   },
   "totals": {
     "plates_m2": 23212.0,
-    "used_m2": 7379.4,
-    "spare_m2": 15832.6,
+    "used_m2": 3835.7,
+    "spare_m2": 19376.3,
     "gfa_m2": 23215.0
   },
   "assumptions": [
@@ -2683,6 +3531,11 @@
       "key": "stair_width_m",
       "value": 2.2,
       "note": "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"
+    },
+    {
+      "key": "min_home_depth_m",
+      "value": 4.0,
+      "note": "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"
     }
   ],
   "warnings": [

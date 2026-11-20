@@ -12,7 +12,7 @@
       "to": "pass",
       "from_version": "2025-05-30",
       "to_version": "2025-05-30",
-      "finding": "Community Housing Fund: fits the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award; program status: 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)."
+      "finding": "Community Housing Fund: meets the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026)."
     },
     {
       "rule_id": "cov.cd1_819.outright_fsr",

@@ -4,7 +4,7 @@
   "site_id": "998-e-19th-ave",
   "option_id": "998-e-19th-ave-as-approved",
   "as_of": "2026-10-27",
-  "stamp": "8a8459a0c650a9c2",
+  "stamp": "6400258c88ac57c8",
   "lot": {
     "polygon": [
       [
@@ -164,5 +164,6 @@
   },
   "warnings": [
     "Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
-  ]
+  ],
+  "outright_height_limit_m": 10.7
 }

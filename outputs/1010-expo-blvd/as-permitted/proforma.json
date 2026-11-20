@@ -112,7 +112,7 @@
       "value": 0.0,
       "unit": "$",
       "rule_id": "f.land",
-      "note": "nominal: the owner is a municipality and the tenure plan is a long lease or a transfer",
+      "note": "nominal: the owner is a municipality, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer (F3)",
       "placeholder": false
     },
     {
@@ -220,10 +220,10 @@
       "value": 151374523,
       "unit": "$",
       "rule_id": null,
-      "note": "capital cost less funding; a negative gap is headroom",
+      "note": "capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources",
       "placeholder": false
     }
   ],
   "as_of": "2026-10-23",
-  "stamp": "8edfb9e62179aa68"
+  "stamp": "6e72488249c79837"
 }

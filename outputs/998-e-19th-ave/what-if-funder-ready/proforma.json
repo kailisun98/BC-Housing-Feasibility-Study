@@ -64,7 +64,7 @@
   "verdict": {
     "word": "unlikely",
     "why": [
-      "the gap is $20,228,128, 44% of the capital cost, more than the 15% a feasibility screen can call close",
+      "the gap is $20,228,128, 44% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
       "placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve"
     ],
     "unsure": []
@@ -121,7 +121,7 @@
       "value": 0.0,
       "unit": "$",
       "rule_id": "f.land",
-      "note": "nominal: the owner is a church and the tenure plan is a long lease or a transfer",
+      "note": "nominal: the owner is a church, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer (F3)",
       "placeholder": false
     },
     {
@@ -220,7 +220,7 @@
       "value": 10349140,
       "unit": "$",
       "rule_id": "f.mortgage",
-      "note": "NOI over a 1.10 coverage ratio, at 6.19% over 40 years (annual service $699,828)",
+      "note": "the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $699,828 a year in payments",
       "placeholder": false
     },
     {
@@ -238,10 +238,10 @@
       "value": 20228128,
       "unit": "$",
       "rule_id": null,
-      "note": "capital cost less funding; a negative gap is headroom",
+      "note": "capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources",
       "placeholder": false
     }
   ],
   "as_of": "2026-10-23",
-  "stamp": "f04c09783591820f"
+  "stamp": "6e72488249c79837"
 }

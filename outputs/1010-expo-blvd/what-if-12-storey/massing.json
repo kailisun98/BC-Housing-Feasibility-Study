@@ -4,7 +4,7 @@
   "site_id": "1010-expo-blvd",
   "option_id": "1010-expo-blvd-what-if-12-storey",
   "as_of": "2026-10-23",
-  "stamp": "8edfb9e62179aa68",
+  "stamp": "6e72488249c79837",
   "lot": {
     "polygon": [
       [
@@ -628,7 +628,7 @@
     "rule_id": "cov.trees.replacement"
   },
   "warnings": [
-    "The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.",
-    "Option height 36.6 m exceeds 12 x 3.05 m = 36.6 m; the extra 0.0 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
-  ]
+    "The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site."
+  ],
+  "outright_height_limit_m": 91.0
 }

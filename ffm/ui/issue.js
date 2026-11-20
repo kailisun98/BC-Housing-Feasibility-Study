@@ -47,7 +47,9 @@ function issueFormHtml(scope) {
 
 function wireIssueForm(form, onClose) {
   form.addEventListener("submit", e => { e.preventDefault(); sendIssue(form).then(ok => { if (ok && onClose) onClose(); }); });
-  const c = $("[data-issue-cancel]", form); if (c) c.addEventListener("click", () => onClose && onClose());
+  const c = $("[data-issue-cancel]", form); if (c) c.addEventListener("click", () => onClose && onClose(true));
+  // Esc closes it, as Not now does, and the keyboard goes back to the button that opened it (20 Nov 2026)
+  form.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); if (onClose) onClose(true); } });
   const first = $("input[name=name]", form);
   if (first) (first.value ? $("textarea", form) : first).focus({ preventScroll: true });
 }
@@ -62,10 +64,12 @@ export function openIssuePanel() {
   wireIssueForm($("form", panel), closeIssuePanel);
 }
 
-export function closeIssuePanel() {
+export function closeIssuePanel(focusBack = false) {
   const panel = $("#issue-panel");
+  const had = !panel.hidden;
   panel.hidden = true; panel.innerHTML = "";
   $("#issue-btn").setAttribute("aria-expanded", "false");
+  if (focusBack === true && had) $("#issue-btn").focus();
 }
 
 /* Records the issue on the run; true when it went. The page does not scroll: the sender stays where they pressed. */

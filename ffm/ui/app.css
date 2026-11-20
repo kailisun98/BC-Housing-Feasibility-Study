@@ -138,6 +138,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .strip .tour-link { margin-left: auto; padding-left: 12px; color: var(--blue); font-weight: 500; text-decoration: none; white-space: nowrap; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; }
 .strip .tour-link:hover { text-decoration: underline; }
 .strip .tour-link.unseen::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
+/* (20 Nov 2026) the link takes the info wash's deepened blue, 4.5:1 or more on every wash the strip wears (the signal
+   blue was 4.44:1 on the ok wash); on a touch screen it is a 44 px target */
+.strip .tour-link { color: var(--s-info-text); }
+@media (pointer: coarse) { .strip .tour-link { min-height: 44px; padding-inline: 12px 4px; } }
 
 .strip { display: flex; align-items: center; gap: 10px; padding: 6px 16px; font-size: 12.5px; border-bottom: 1px solid var(--line); background: var(--status-info); min-width: 0; min-height: var(--strip-h); transition: background-color .25s ease-out; }
 .strip .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex: 0 0 9px; transition: background-color .25s ease-out; }
@@ -146,6 +150,16 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .strip.error { background: var(--status-error); } .strip.error .dot { background: var(--red); }
 .strip.busy { background: var(--status-busy); }
 .strip.busy .dot { border: 2px solid var(--amber); border-top-color: transparent; background: transparent; width: 10px; height: 10px; animation: ui-spin .9s linear infinite; }
+/* (20 Nov 2026) at night the strip is a tint of its status over the panel, not a solid band of the wash (the ok wash
+   read as a heavy green bar across the page); the dot carries the status colour, the words keep the ink */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .strip.ok { background: color-mix(in srgb, var(--ok) 10%, var(--panel)); }
+  :root:not([data-theme="light"]) .strip.busy { background: color-mix(in srgb, var(--amber) 10%, var(--panel)); }
+  :root:not([data-theme="light"]) .strip.error { background: color-mix(in srgb, var(--red) 12%, var(--panel)); }
+}
+:root[data-theme="dark"] .strip.ok { background: color-mix(in srgb, var(--ok) 10%, var(--panel)); }
+:root[data-theme="dark"] .strip.busy { background: color-mix(in srgb, var(--amber) 10%, var(--panel)); }
+:root[data-theme="dark"] .strip.error { background: color-mix(in srgb, var(--red) 12%, var(--panel)); }
 
 
 /* ------------------------------------------------------------------ layout: the step rail and the stage */
@@ -238,6 +252,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .checks input { margin-top: 3px; }
 .trees { display: flex; flex-direction: column; gap: 4px; }
 .tree-row { display: grid; grid-template-columns: 40px 1fr 64px 84px 24px; gap: 4px; align-items: center; }
+/* (20 Nov 2026) the diameter column holds its "not sure" whole (it read "not su") */
+.tree-row { grid-template-columns: 40px minmax(0, 1fr) 76px 80px 24px; }
 .tree-row input, .tree-row select { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12px; }
 .tree-row .x { border: 0; border-radius: 4px; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; min-height: 24px; padding: 0; }
 .tree-row .x:hover { color: var(--red); background: color-mix(in srgb, var(--red) 10%, transparent); box-shadow: none; }
@@ -355,7 +371,8 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* the board reads the plans only once the architect has issued them back (17 Nov 2026: the reader saw plans the
    manager was told were still the architect's to check) */
 [data-mode="reader"] .memo:not([data-issued-manager="1"]) .layout-sheet { display: none; }
-[data-mode="reader"] .memo:not([data-issued-manager="1"]) .layout-wait { display: block; }
+/* (20 Nov 2026) the note that the plans are the architect's to issue is the manager's; the reader is not waiting on it */
+[data-mode="reader"] .memo .layout-wait { display: none; }
 /* the inline Save as… field under a card, and the band over a memo whose inputs changed */
 .save-inline { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 10px; width: 100%; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); }
 .save-inline .field { flex: 1 1 180px; margin: 0; }
@@ -470,13 +487,15 @@ table.plain td.status { white-space: nowrap; }
 /* ------------------------------------------------------------------ figures: drawings on white paper, beside the answers when wide */
 /* the clauses have their own area, after the figures and before the ledger, in the DOM's order (17 Nov 2026: the grid
    named no area for them, so they fell to an implicit row under Sources and the stamp) */
-.memo-body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; gap: 12px; }
+/* (20 Nov 2026) the comparison follows the four answers in every layout ("compare"), no longer above them */
+.memo-body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "compare" "figures" "clauses" "rest"; gap: 12px; }
 .memo-body > .answers { grid-area: answers; }
+.memo-body > .memo-compare { grid-area: compare; min-width: 0; }
 .memo-body > .figures { grid-area: figures; }
 .memo-body > .memo-clauses { grid-area: clauses; min-width: 0; }
 .memo-body > .memo-rest { grid-area: rest; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 /* wide: the figures beside the answers, then the clauses, the ledger and the rest across the full width */
-@media (min-width: 1600px) { .memo-body { grid-template-columns: minmax(0, 1fr) 460px; grid-template-areas: "answers figures" "clauses clauses" "rest rest"; align-items: start; } }
+@media (min-width: 1600px) { .memo-body { grid-template-columns: minmax(0, 1fr) 460px; grid-template-areas: "answers figures" "compare compare" "clauses clauses" "rest rest"; align-items: start; } }
 .figures { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 /* a drawing's card is white paper in both themes, and the words on it take the paper's own ink (17 Nov 2026: at night
    the sheet titles, notes and the exits fold stayed night ink on white, 1.2:1) */
@@ -495,6 +514,8 @@ table.plain td.status { white-space: nowrap; }
 .fig-outright { background: color-mix(in srgb, var(--c-lane) 45%, var(--c-paper)); border: 1.5px dashed var(--c-street) !important; }
 .fig-bench { background: none; border: 0 !important; border-top: 2px dashed var(--c-bench) !important; height: 0 !important; }
 .fig-env { background: none; border: 1px dashed var(--c-env) !important; }
+/* the outright height limit in FIG 02, a dash-dot line of its own apart from the outright mass (20 Nov 2026) */
+.fig-limit { border: 0 !important; height: 1.5px !important; background: repeating-linear-gradient(90deg, var(--c-drawink) 0 7px, transparent 7px 9px, var(--c-drawink) 9px 10.5px, transparent 10.5px 12.5px); }
 .fig-tree { background: var(--c-tree); opacity: .55; border-radius: 50%; width: 10px !important; height: 10px !important; }
 .fig-context { background: var(--c-half-road); border-color: var(--c-half-line) !important; }
 .fig-building { background: var(--c-half-building); border-color: var(--c-half-line) !important; }
@@ -609,6 +630,31 @@ table.plain td.status { white-space: nowrap; }
 .ed-canvas .ed-zone:focus-visible > rect:first-child { stroke-width: 2.6; }
 .ed-canvas .ed-handle { display: none; }
 .ed-canvas .ed-zone.sel .ed-handle { display: block; }
+/* (20 Nov 2026) the selected block's ring and handles stand over every block (editors/blocks.js, selOverlay): a 2 px
+   signal ring on a white halo, clear on any block's tone; a block reached by Tab is selected, so the ring is the focus
+   ring too, and the keyboard's focus adds an outline where the browser draws one on SVG */
+.ed-canvas .ed-selover .ed-handle { display: block; }
+.ed-canvas .ed-ring-halo { stroke: var(--c-paper); stroke-width: 4; }
+.ed-canvas .ed-ring { stroke: var(--c-envelope-line); stroke-width: 2; }
+.ed-canvas .ed-zone.clash.sel ~ .ed-selover .ed-ring { stroke: var(--c-env); }
+.ed-canvas .ed-zone:focus-visible { outline: 2px solid var(--c-envelope-line); outline-offset: 3px; }
+/* the editor is white paper (it sits in the plans' figure): the status words, marks and washes take their light
+   values there in both themes (the White Paper Rule; at night "placed" was #6FCB8D on white, 1.98:1) */
+.sheet-editor {
+  --amber: var(--b-amber); --ok: #2f7d4a; --red: #c81e1e; --blue: var(--b-signal-deep);
+  --s-pass: #2f7d4a; --s-pass-text: var(--lt-pass-text); --s-pass-wash: var(--lt-pass-wash);
+  --s-conditional: #d9a520; --s-conditional-text: var(--lt-conditional-text); --s-conditional-wash: var(--lt-conditional-wash);
+  --s-fail: #c81e1e; --s-fail-text: var(--lt-fail-text); --s-fail-wash: var(--lt-fail-wash);
+  --s-uncertain: #c77d14; --s-uncertain-text: var(--lt-uncertain-text); --s-uncertain-wash: var(--lt-uncertain-wash);
+  --s-na: #8a93a0; --s-na-text: var(--lt-na-text); --s-na-wash: var(--lt-na-wash);
+  --s-info: #2a6fb8; --s-info-text: var(--lt-info-text); --s-info-wash: var(--lt-info-wash);
+  --st-pass: #2f7d4a; --st-pass-text: var(--lt-pass-text); --st-pass-wash: var(--lt-pass-wash);
+  --st-conditional: #d9a520; --st-conditional-text: var(--lt-conditional-text); --st-conditional-wash: var(--lt-conditional-wash);
+  --st-fail: #c81e1e; --st-fail-text: var(--lt-fail-text); --st-fail-wash: var(--lt-fail-wash);
+  --st-uncertain: #c77d14; --st-uncertain-text: var(--lt-uncertain-text); --st-uncertain-wash: var(--lt-uncertain-wash);
+  --st-na: #8a93a0; --st-na-text: var(--lt-na-text); --st-na-wash: var(--lt-na-wash);
+  --st-info: #2a6fb8; --st-info-text: var(--lt-info-text); --st-info-wash: var(--lt-info-wash);
+}
 .ed-canvas .ed-handle-w, .ed-canvas .ed-handle-l { cursor: ew-resize; }
 .ed-canvas .ed-handle-d { cursor: ns-resize; }
 .ed-status { display: flex; flex-direction: column; gap: 4px; font-size: 12px; }
@@ -625,6 +671,20 @@ table.plain td.status { white-space: nowrap; }
 .fig-hint { font-size: 11px; color: var(--c-drawmuted); margin-top: 6px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .figure { border-color: var(--line); } }
 :root[data-theme="dark"] .figure { border-color: var(--line); }
+/* the envelope drawing in answer 1 (20 Nov 2026, figures/envelope.js): white paper on the answer's wash, the section
+   in pixels down and percent across, the words under each mass in two columns; under 520 px the benchmark's label
+   drops its words */
+.env-fig { margin: 12px 0 4px; border: 1px solid var(--c-rule); border-radius: 4px; container-type: inline-size; max-width: 720px; }
+.env-fig svg { display: block; width: 100%; }
+.env-fig .env-short { display: none; }
+@container (max-width: 520px) { .env-fig .env-long { display: none; } .env-fig .env-short { display: inline; } }
+.env-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; margin-top: 8px; font-size: 12px; line-height: 1.4; color: var(--c-drawmuted); }
+.env-col { padding-left: 4%; min-width: 0; }
+.env-head { color: var(--c-drawink); }
+.env-head b { font-weight: 600; }
+.env-head i { display: inline-block; width: 14px; height: 8px; margin-right: 6px; vertical-align: middle; border: 1px solid transparent; }
+.env-num { color: var(--c-drawink); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.env-sub { margin-top: 2px; }
 
 /* what changed: a revision sheet under the title block, the comparison's answer before anything else */
 .changes h2 .rev { width: 18px; height: 16px; }
@@ -664,6 +724,8 @@ table.plain td.status { white-space: nowrap; }
 .more-formats[open] > summary { background: var(--field); }
 .more-formats > .action-bar { padding-top: 6px; }
 .export-panel { margin-top: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
+/* (20 Nov 2026) what Revit receives, in one line under the panel's heading */
+.export-panel .export-gets { margin: -6px 0 0; font-size: 12.5px; max-width: 80ch; }
 .export-panel h3 { font-size: 14px; }
 .export-panel .block { display: flex; flex-direction: column; gap: 4px; }
 .export-panel .block .eyebrow { margin: 0; }
@@ -786,6 +848,10 @@ table.plain td.status { white-space: nowrap; }
 .keybox .key-input { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font: 12.5px var(--mono); }
 .keybox code { font: 11px var(--mono); }
 .keybox-note { margin: 2px 0 6px; }
+/* (20 Nov 2026) the key's note goes under its button, the full width of the box, so nothing in a narrow column can
+   squeeze it under a field */
+.keybox .form-actions { flex-wrap: wrap; align-items: flex-start; }
+.keybox .form-actions .help { flex: 1 1 100%; min-width: 0; }
 .sched-form { display: grid; grid-template-columns: 1fr; gap: 6px; margin-bottom: 8px; }
 .sched-form .field .label { font-size: 11px; }
 .sched-form input[type="text"], .sched-form input[type="url"] { width: 100%; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 4px 6px; font-size: 12.5px; }
@@ -898,7 +964,7 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="architect"] #export-actions #dl-massing { order: -1; }
 /* the architect reads the four answers, then the drawings at full width, two sheets to a row, the plans (and the
    block editor on them) across the whole width; the ledger follows */
-[data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; }
+[data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "compare" "figures" "clauses" "rest"; }
 @media (min-width: 1100px) {
   [data-mode="architect"] .figure.sheet .sheet-body svg { max-height: none; }
 }
@@ -910,7 +976,9 @@ table.plain td.status { white-space: nowrap; }
   [data-mode="architect"] .figure.sheet[data-sheet="plans"] { column-span: all; }
 }
 @media (min-width: 1600px) {
-  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "figures" "clauses" "rest"; }
+  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "compare" "figures" "clauses" "rest"; }
+  /* the unverified line and the words fold run across both columns, under the four answers (20 Nov 2026) */
+  [data-mode="architect"] .memo-body > .answers > .unverified-line, [data-mode="architect"] .memo-body > .answers > .words { column-span: all; }
   /* two columns that fill: a grid left a card-sized hole under a short answer (16 Nov 2026), so the answers flow
      down one column and into the next instead */
   [data-mode="architect"] .memo-body > .answers { display: block; columns: 2; column-gap: 12px; }
@@ -931,8 +999,7 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .memo > .memo-head { order: 0; }
 [data-mode="reader"] .memo > .issue-note, [data-mode="reader"] .memo > .stale-band { order: 1; }
 [data-mode="reader"] .memo .answers { order: 2; }
-[data-mode="reader"] .memo > #side-by-side { order: 3; }
-[data-mode="reader"] .memo > #changes { order: 4; }
+[data-mode="reader"] .memo .memo-compare { order: 3; }
 [data-mode="reader"] .memo .memo-clauses { order: 5; }
 [data-mode="reader"] .memo .figures { order: 6; }
 [data-mode="reader"] .memo .memo-rest { order: 7; }
@@ -1015,7 +1082,8 @@ table.plain td.status { white-space: nowrap; }
 /* the memo in outline: what the run will make, labels only */
 .ghost { margin: 0; }
 .ghost-sheet { border: 1px dashed color-mix(in srgb, var(--ink) 22%, var(--line)); border-radius: var(--r-panel); padding: 16px 18px 14px; background: color-mix(in srgb, var(--panel) 55%, transparent); }
-.ghost-h { height: 12px; width: 44%; border-radius: 3px; background: var(--group); margin: 2px 0 14px; }
+/* (20 Nov 2026) the head says the memo is not run yet, in words, where a grey bar stood for a title still to come */
+.ghost-h { margin: 0 0 12px; font-size: 12.5px; font-weight: 500; color: var(--muted); }
 .ghost .memo-meta { background: transparent; opacity: .8; margin-bottom: 12px; }
 .ghost .memo-meta span { min-height: 17px; }
 .ghost-answers { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 18px; font-size: 12.5px; color: var(--muted); }
@@ -1031,6 +1099,13 @@ table.plain td.status { white-space: nowrap; }
 .ask-table .tri button { padding: 4px 10px; min-height: 28px; }
 .ask-table select, .ask-table input[type="text"] { width: 100%; max-width: 280px; border: 1px solid var(--line); background: var(--field); border-radius: 4px; padding: 5px 8px; font-size: 12.5px; }
 .ask-table input[type="text"]::placeholder { color: var(--muted); font-style: italic; }
+/* (20 Nov 2026) under each question, what the answer changes and where to find it; over the table, that Not sure is
+   a fine answer; under the address, why a lookup failed */
+.ask-table tbody th .ask-why { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--muted); line-height: 1.4; max-width: 52ch; }
+.ask-table .ask-why a { color: var(--blue); }
+.ask-lead { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 70ch; }
+.field-err { margin: -6px 0 0; font-size: 12.5px; font-weight: 500; color: var(--s-fail-text); }
+.addr-row input[aria-invalid="true"] { border-color: var(--s-fail); }
 /* 02 and 03: keys beside their content, the way the memo's title block sets them */
 .stage-dl { margin: 0; display: grid; }
 .stage-dl > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line); }
@@ -1064,6 +1139,31 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
 .fig4-tag { font: 600 11px/1.3 var(--mono); color: var(--muted); }
 .fig4-tag.rough, .fig4-tag.ph { color: var(--s-uncertain-text); }
 .fig4-tag.yours { color: var(--ink); font-family: var(--sans); }
+/* (20 Nov 2026) a figure refused is said under it; what the suggestion is, over the four; the mix under Homes */
+.fig4-err { font-size: 12px; font-weight: 500; color: var(--s-fail-text); line-height: 1.35; }
+.fig4-cell.has-err .fig4-v { border-bottom-color: var(--s-fail); }
+.fig4-what { margin: 0 0 8px; font-size: 13px; display: flex; flex-wrap: wrap; gap: 2px 8px; align-items: baseline; }
+.fig4-short { flex-basis: 100%; font-size: 12.5px; }
+.fig4-mix { font-size: 12px; }
+/* the four figures and, beside them, a small section of the lot on white paper (wraps under them when narrow) */
+.fig4-wrap { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 18px; }
+.fig4-main { flex: 1 1 400px; min-width: 0; }
+.fig4-sketch { flex: 0 0 auto; margin: 0; padding: 6px 8px 6px; background: var(--c-paper); border: 1px solid var(--line); border-radius: 4px; color-scheme: light; }
+.fig4-sketch svg { display: block; max-width: 100%; height: auto; }
+.fig4-sketch figcaption { font-size: 11px; color: var(--c-drawmuted); margin-top: 2px; max-width: 248px; }
+.sec4 text { font: 11.5px var(--sans); fill: var(--c-drawink); }
+.sec4 .sec4-t-prop { fill: var(--c-envelope-line); font-weight: 600; }
+.sec4 .sec4-t-allow { fill: var(--c-drawink); font-weight: 600; }
+.sec4 .sec4-t-sub, .sec4 tspan.sec4-t-sub { fill: var(--c-drawmuted); font-weight: 400; }
+.sec4 .sec4-ground { stroke: var(--c-drawink); stroke-width: 1.2; }
+.sec4 .sec4-lot { stroke: var(--c-drawink); stroke-width: 1; }
+.sec4 .sec4-prop { fill: color-mix(in srgb, var(--c-envelope) 45%, var(--c-paper)); stroke: var(--c-envelope-line); stroke-width: 1.2; }
+.sec4 .sec4-floor { stroke: var(--c-envelope-line); stroke-width: .6; stroke-opacity: .6; }
+.sec4 .sec4-allow { fill: none; stroke: var(--c-street); stroke-width: 2; stroke-dasharray: 6 3; }
+.sg-err { color: var(--s-fail-text); font-weight: 500; }
+/* the run's shortcut, labelled as one */
+.kbd-help kbd { font: 500 11px var(--mono); padding: 1px 5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; background: var(--field); color: var(--ink); }
+.kbd-help { font-family: var(--sans); font-size: 11.5px; }
 .env-line { margin: 0; font-size: 12.5px; }
 .env-line .btn { margin-left: 6px; }
 .all-figures .sg-rows { border-top: 1px solid var(--line); }
@@ -1159,6 +1259,39 @@ button.fig4-v:hover { border-bottom-color: color-mix(in srgb, var(--ink) 45%, tr
   .sch-val .tri button, .ask-table .tri button, .chip { min-height: 44px; }
   .route-row, .route-memo { min-height: 44px; }
   .fig4-v { min-height: 44px; }
+}
+/* (20 Nov 2026) a value in words takes the row under its label and wraps there (schedule.js, sch-words): one line
+   that grows with what is typed; on a phone a tree row puts its species on a line of its own */
+.sch-val textarea.sch-words { min-height: 0; resize: none; overflow: hidden; line-height: 1.35; field-sizing: content; }
+@media (pointer: coarse) { .sch-val textarea.sch-words { min-height: 44px; } }
+/* (20 Nov 2026) the editor's actions wrap on a narrow column instead of running the page sideways (485 px at 375) */
+.sheet-editor .form-actions { flex-wrap: wrap; }
+@media (max-width: 480px) {
+  .trees .tree-head { display: none; }
+  .tree-row:not(.tree-head) { grid-template-columns: 48px minmax(0, 1fr) minmax(0, 1fr) 44px; }
+  .tree-row:not(.tree-head) > :nth-child(2) { grid-column: 2 / 5; }
+  .tree-row:not(.tree-head) > :nth-child(3) { grid-column: 2; }
+  .tree-row:not(.tree-head) > :nth-child(4) { grid-column: 3; }
+  .tree-row:not(.tree-head) > :nth-child(5) { grid-column: 4; }
+}
+/* (20 Nov 2026) the Ref column's key, its own line in the schedule's head */
+.schedule .need-legend .ref-key { flex-basis: 100%; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.schedule .need-legend .ref-key b { font: 600 11px/1 var(--mono); color: var(--ink); background: var(--group); border-radius: 3px; padding: 2px 5px; margin-right: 4px; }
+/* (20 Nov 2026) every control at least 44 px on a coarse pointer (at 375 px the architect's page had 121 under it):
+   the schedule's fields, the Ref chips, the three-state segments, the mass anchor, the skip link, the editor's bar */
+@media (pointer: coarse) {
+  .sch-val input[type="text"], .sch-val input[type="number"], .sch-val select, .sch-val textarea, .ask-table select, .ask-table input[type="text"],
+  .ed-bar input, .ed-bar select, .ed-selbar select, .ed-newprog input, .mass-row input, .mass-row select, .bnd-edges input, .fin-rows input, .mix-row input, .mix-row select,
+  .issue-panel input, .issue-panel select, .addr-saved select, .file-pick select, .save-inline input, .fig4-input, .keybox .key-input, .sg-input, .tree-row input, .tree-row select { min-height: 44px; }
+  .ref-btn { min-height: 44px; min-width: 44px; }
+  .tri button, .sch-val .tri button, .ask-table .tri button { min-width: 44px; min-height: 44px; }
+  .mass-anchor { grid-template-columns: repeat(3, 44px); grid-auto-rows: 44px; gap: 3px; }
+  .skip { min-height: 44px; display: inline-flex; align-items: center; }
+  .linkish, .fig4-mix { min-height: 44px; display: inline-flex; align-items: center; }
+  .ed-prog { min-height: 44px; }
+  .ed-acc, .chip, .checks label { min-height: 44px; }
+  .tree-row { grid-template-columns: 40px minmax(0, 1fr) 76px 80px 44px; }
+  .claude-fold > summary, .ed-newprog summary, .fold > summary { min-height: 44px; display: flex; align-items: center; }
 }
 
 /* the top bar's Run for the manager: quiet, Run again, live only once the memo is out of date */
@@ -1290,3 +1423,165 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
    characters a line at 1366 px) */
 .memo-body .answer p:not(.verdict), .memo-body .answer li, .memo-body .answer .finding { max-width: 82ch; }
 .memo-body .answer .also-uncertain { margin-top: 10px; font-size: 12px; }
+
+/* ------------------------------------------------------------------ (20 Nov 2026) the memo after the six-reviewer
+   critique: the answers first, the money and the open items drawn, the words a board reader asked about */
+/* the title block: the option's short name, its whole name under it; the mix on a line of its own, two cells wide */
+.memo-meta > .opt-cell { flex: 2 1 240px; }
+.memo-meta > .opt-cell.long { flex-basis: 100%; grid-column: 1 / -1; border-right: 0; margin-right: 0; border-bottom: 1px solid var(--line); }
+.memo-meta .opt-full { display: block; font-size: 12px; line-height: 1.4; color: var(--muted); margin-top: 2px; max-width: 72ch; }
+.memo-meta > .cmp-cell { flex: 1.6 1 200px; }
+.memo-figures > .mix-cell { display: flex; flex-direction: column; gap: 1px; flex: 2 1 230px; }
+.memo-head .memo-disclaimer { max-width: 72ch; }
+/* the "More formats" list takes no room and no clicks while folded (a closed list still had boxes the occlusion check
+   found under the next card) */
+.more-formats:not([open]) > :not(summary) { display: none; }
+/* answer 1: the outright rules, then the rezoning's, each under a line that names it; mark and reference in one cell */
+.answer .ans-sub { margin: 12px 0 6px; color: var(--ink); font-size: 12.5px; font-weight: 500; }
+.answer .ans-sub:first-of-type { margin-top: 4px; }
+.rule-list .fl-marks { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.rule-list .fl-marks .ref { margin-right: 0; }
+@media (max-width: 560px) { .rule-list li { grid-template-columns: minmax(0, 1fr); gap: 3px; } }
+.answer .intake-note .lead { font-weight: 500; }
+.answer .money-link { margin: 12px 0 0; }
+/* the rules not yet read from their document, in one line under the four answers */
+.unverified-line { margin: 0; padding: 0 2px; font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 82ch; }
+.unverified-line .unverified { margin: 0 6px 0 0; }
+/* a fold's line: a chevron drawn in CSS, turned when open */
+.words > summary, .compare-fold > summary { cursor: pointer; list-style: none; display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.words > summary::-webkit-details-marker, .compare-fold > summary::-webkit-details-marker { display: none; }
+.words > summary::before, .compare-fold > summary::before { content: ""; flex: 0 0 auto; width: 6px; height: 6px; margin: 0 8px 1px 1px; border: solid var(--muted); border-width: 0 1.5px 1.5px 0; transform: rotate(-45deg); transition: transform var(--t-fast); align-self: center; }
+.words[open] > summary::before, .compare-fold[open] > summary::before { transform: rotate(45deg); }
+@media (prefers-reduced-motion: reduce) { .words > summary::before, .compare-fold > summary::before { transition: none; } }
+/* words in this memo: folded after the four answers, one sentence a term */
+.words { padding: 10px 14px; }
+.words > summary { font-size: 13px; color: var(--ink); }
+.words .words-act { font-weight: 600; }
+.words .cont { color: var(--muted); }
+.words-list { margin: 10px 0 2px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px 28px; }
+.words-list > div { display: grid; gap: 1px; align-content: start; }
+.words-list dt { font-weight: 600; font-size: 12.5px; color: var(--ink); }
+.words-list dd { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--muted); max-width: 72ch; }
+[data-mode="reader"] .words-list dt, [data-mode="reader"] .words-list dd { font-size: 13.5px; }
+/* the comparison, after the answers: one line that folds it (the reader's layout starts it folded) */
+.compare-fold > summary { padding: 9px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-panel); box-shadow: var(--shadow); font-size: 13px; color: var(--ink); }
+.compare-fold > summary .cf-act { font-weight: 600; }
+.compare-fold > summary .cont { color: var(--muted); }
+.compare-fold .cf-open { display: none; }
+.compare-fold[open] .cf-closed { display: none; }
+.compare-fold[open] .cf-open { display: inline; }
+.compare-fold[open] > summary { margin-bottom: 12px; }
+.compare-fold > .card + .card { margin-top: 12px; }
+.memo-pane[data-view="3d"] .memo-compare { display: none; }
+/* the money drawn: the capital stack (memo/stack.js) beside the four figures, on white paper in both themes, in the
+   drawing's own tones; its words are HTML at the drawing label size */
+.money-draw { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px 20px; align-items: start; margin: 0 0 12px; }
+.money-draw > .pf-four { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+@media (max-width: 980px) { .money-draw { grid-template-columns: minmax(0, 1fr); } }
+.answer .money-words { font-size: 12.5px; line-height: 1.5; color: var(--muted); max-width: 72ch; }
+.money-stack { margin: 0; }
+.money-stack .ms-paper { background: var(--c-paper); border: 1px solid var(--c-rule); border-radius: 6px; padding: 12px 10px 8px; color: var(--c-drawink); overflow-x: clip; }
+.money-stack figcaption { margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--muted); max-width: 72ch; }
+.ms-row { display: flex; flex-wrap: wrap; gap: 18px 28px; }
+.ms-one { flex: 1 1 340px; min-width: 0; container-type: inline-size; }
+.ms-name { margin: 0 0 8px; font: 600 11.5px/1.3 var(--sans); color: var(--c-drawink); }
+.ms-draw, .ms-keys { display: grid; grid-template-columns: minmax(0, 1fr) var(--ms-col, 96px) var(--ms-col, 96px) minmax(0, 1.35fr); column-gap: 6px; position: relative; }
+.ms-col { position: relative; align-self: end; grid-row: 1; }
+.ms-cost { grid-column: 2; } .ms-pay { grid-column: 3; }
+.ms-seg { position: absolute; left: 0; right: 0; box-sizing: border-box; border: 1px solid var(--c-street); display: flex; align-items: center; overflow: hidden; }
+.ms-seg + .ms-seg { border-bottom-width: 0; }
+.ms-cost .s-hard { background: color-mix(in srgb, var(--c-lane) 62%, var(--c-paper)); }
+.ms-cost .s-soft { background: color-mix(in srgb, var(--c-lane) 40%, var(--c-paper)); }
+.ms-cost .s-contingency { background: color-mix(in srgb, var(--c-lane) 24%, var(--c-paper)); }
+.ms-cost .s-land { background: color-mix(in srgb, var(--c-lane) 12%, var(--c-paper)); }
+.ms-pay .ms-seg { border-color: var(--c-envelope-line); }
+.ms-pay .s-debt { background: color-mix(in srgb, var(--c-envelope) 16%, var(--c-paper)); }
+.ms-pay .s-equity { background: color-mix(in srgb, var(--c-envelope) 26%, var(--c-paper)); }
+.ms-pay .s-other { background: color-mix(in srgb, var(--c-envelope) 36%, var(--c-paper)); }
+.ms-pay .s-grant { background: color-mix(in srgb, var(--c-envelope) 50%, var(--c-paper)); }
+/* the gap: hatched in the drawing's muted ink, "not yet found" on a paper label so it reads over the hatch */
+.ms-pay .s-gap { background: var(--c-paper) repeating-linear-gradient(135deg, var(--c-drawmuted) 0 1px, transparent 1px 7px); border: 1px solid var(--c-drawink); }
+/* a label inside a part masks the amber line where the two cross: it stands over the line on the part's own fill */
+.ms-in { position: relative; z-index: 1; padding: 0 8px; background: inherit; font: 400 11.5px/15px var(--sans); color: var(--c-drawink); }
+.ms-in b, .ms-out b { font-weight: 600; }
+.s-gap .ms-in { background: var(--c-paper); padding: 2px 6px; margin-left: 5px; }
+/* the screen's line: 15% of the cost below the top, amber dashes across both columns */
+.ms-screen { position: absolute; grid-column: 2 / 4; grid-row: 1; left: -6px; right: -6px; height: 0; border-top: 1.5px dashed var(--c-bench); pointer-events: none; }
+.ms-lab { position: relative; grid-row: 1; min-width: 0; }
+.ms-lab-cost { grid-column: 1; } .ms-lab-pay { grid-column: 4; }
+.ms-leaders { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ms-lead { fill: none; stroke: var(--c-drawmuted); stroke-width: 1; }
+.ms-lead-bench { fill: none; stroke: var(--c-bench); stroke-width: 1; }
+.ms-out { position: absolute; font: 400 11.5px/15px var(--sans); color: var(--c-drawink); white-space: nowrap; }
+.ms-lab-pay .ms-out { left: 22%; } .ms-lab-cost .ms-out { right: 21%; text-align: right; }
+.ms-out.ms-bench, .ms-list .ms-bench { color: var(--c-bench-text); }
+.ms-keys { margin-top: 6px; font: 600 11px/1.35 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--c-drawmuted); }
+.ms-keys > span:nth-child(2) { grid-column: 2; } .ms-keys > span:nth-child(3) { grid-column: 3; white-space: nowrap; }
+.ms-keys b { font: 600 12.5px/1.35 var(--sans); letter-spacing: 0; text-transform: none; color: var(--c-drawink); }
+.ms-muted { color: var(--c-drawmuted); text-transform: none; letter-spacing: 0; font-weight: 400; }
+/* too narrow for labels beside the columns (a phone): the columns take the width and the small parts follow as a list */
+.ms-list { display: none; list-style: none; margin: 8px 0 0; padding: 6px 0 0; border-top: 1px solid var(--c-rule); font: 400 11.5px/1.5 var(--sans); color: var(--c-drawink); }
+@container (max-width: 400px) {
+  .ms-draw, .ms-keys { grid-template-columns: 0 minmax(0, 1fr) minmax(0, 1fr) 0; }
+  .ms-lab { display: none; }
+  .ms-list { display: block; }
+}
+/* who resolves what: a lane per person, the work's stages left to right, then the table */
+.lanes { display: grid; grid-template-columns: 136px repeat(var(--stages, 3), minmax(0, 1fr)); margin: 4px 0 14px; font-size: 12px; }
+.lanes-head, .lane { display: contents; }
+.lanes-head > span { position: relative; padding: 0 8px 6px; border-bottom: 1px solid var(--ink); }
+.lanes-stage { font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+/* the order of the work: an arrowhead at the end of the rule under the stages */
+.lanes-head > span:last-child::after { content: ""; position: absolute; right: -1px; bottom: -4px; border-style: solid; border-width: 3.5px 0 3.5px 6px; border-color: transparent transparent transparent var(--ink); }
+.lane-who { padding: 8px 8px 8px 0; font-weight: 600; font-size: 12.5px; color: var(--ink); border-bottom: 1px solid var(--line); }
+.lane-cell { list-style: none; margin: 0; padding: 6px 8px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; border-bottom: 1px solid var(--line); border-left: 1px dashed var(--line); }
+.lane-node { padding: 4px 7px; border: 1px solid color-mix(in srgb, var(--ink) 30%, var(--line)); border-radius: 4px; background: var(--panel); line-height: 1.35; font-size: 12px; color: var(--ink); }
+.lane-node .ref { margin-right: 5px; }
+.node-stage { display: none; }
+.node-also { display: block; font-size: 11.5px; color: var(--muted); }
+@media (max-width: 640px) {
+  /* a phone: each person's items in a column, each naming its stage */
+  .lanes { grid-template-columns: minmax(0, 1fr); }
+  .lanes-head { display: none; }
+  .lane-who { padding: 10px 0 4px; border-bottom: 0; border-top: 1px solid var(--line); }
+  .lane-cell { padding: 0 0 4px; border: 0; }
+  .lane-cell:empty { display: none; }
+  .node-stage { display: block; font: 600 11px/1.3 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+}
+/* Side by side: one section with both buildings, the money's verdict beside the funders' criteria, numbers right-aligned
+   under right-aligned headers in fixed columns, the two stacks at one scale */
+.side-overlay { margin: 4px 0 12px; }
+.side-overlay .fig-section { background: var(--c-paper); border: 1px solid var(--c-rule); border-radius: 6px; padding: 8px; }
+.side-overlay svg { display: block; width: 100%; height: auto; max-height: 320px; }
+.side-overlay figcaption { margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--muted); max-width: 80ch; }
+.side .side-cellnote { margin-top: 3px; font-size: 11.5px; white-space: normal; max-width: 40ch; }
+.side .side-head td { white-space: normal; }
+.side .side-money col.c-label { width: 34%; } .side .side-money col.c-num { width: 22%; }
+.side table.side-money th.num, .side table.side-money td.num { text-align: right; padding-left: 8px; padding-right: 0; font-variant-numeric: tabular-nums; }
+.side table.side-money td.num { white-space: nowrap; }
+.side .side-money .th-name { display: block; margin-top: 1px; font-size: 11px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--muted); }
+.side .side-stacks { margin: 14px 0 4px; }
+@media (max-width: 760px) { .side .side-money col.c-label { width: 31%; } .side .side-money col.c-num { width: 23%; } .side table.side-money td.num { white-space: normal; } }
+/* clauses: the findings first, the notes that only inform folded under them; a cell across three columns keeps a measure */
+.clauses .info-fold { margin: 10px 0 0; }
+.clauses .info-fold > summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.clauses .info-fold table.plain { margin-top: 6px; }
+.clauses td.info-span .info-text, .clauses td.info-span .info-ask { display: block; max-width: 72ch; }
+/* a long cell in a wide table keeps the reading measure inside its column */
+.memo td .measure { display: block; max-width: 72ch; }
+.compare-fold > summary .cont { max-width: 90ch; }
+/* every fold's line is a 44 px target under a finger (20 Nov 2026: 17 to 32 px at 375 px with a coarse pointer) */
+@media (pointer: coarse) {
+  .memo details > summary, .words > summary, .compare-fold > summary { min-height: 44px; box-sizing: border-box; padding-block: 11px; }
+  .words > summary, .compare-fold > summary { align-items: center; }
+  .ledger details.layer > summary { min-height: 44px; }
+}
+/* long lines in the memo's own sections keep a reading measure (20 Nov 2026: up to ~179 characters a line) */
+.memo .section > p, .memo .section li, .memo .stamps { max-width: 72ch; }
+@media print {
+  /* the folds print open: the comparison, the words and the notes are part of the memo on paper */
+  .compare-fold::details-content, .words::details-content, .clauses .info-fold::details-content { content-visibility: visible; display: contents; }
+  .compare-fold > summary { display: none; }
+  .clauses .info-fold:not([open]) > table { display: table; }
+  .words:not([open]) > dl { display: grid; }
+}

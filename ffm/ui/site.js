@@ -52,6 +52,59 @@
     secs.forEach(s => io.observe(s));
   }
 
+  // connectors: in a diagram marked [data-links], every node with data-to="id id…" gets a line to each node it names,
+  // drawn in an SVG under the nodes from their boxes as laid out, and drawn again whenever the diagram's box changes
+  // (a wider window, a font arriving). A target to the right is reached from the source's right side to its left, a
+  // target below from bottom to top. Nothing here is a rule; the lines only show who hands what to whom.
+  const NS = "http://www.w3.org/2000/svg";
+  const draw = root => {
+    let svg = root.querySelector(":scope > svg.links");
+    if (!svg) { svg = document.createElementNS(NS, "svg"); svg.setAttribute("class", "links"); svg.setAttribute("aria-hidden", "true"); svg.setAttribute("focusable", "false"); root.prepend(svg); }
+    if (getComputedStyle(svg).display === "none") return;
+    const o = root.getBoundingClientRect();
+    svg.setAttribute("width", o.width); svg.setAttribute("height", o.height);
+    let lines = "", heads = "";
+    const f = n => n.toFixed(1);
+    const head = (x, y, dx, dy) => {      // a chevron at (x, y) pointing along (dx, dy)
+      const l = Math.hypot(dx, dy) || 1, ux = dx / l, uy = dy / l, s = 6.5;
+      const ax = x - ux * s - uy * s * .62, ay = y - uy * s + ux * s * .62, bx = x - ux * s + uy * s * .62, by = y - uy * s - ux * s * .62;
+      return `M${f(ax)} ${f(ay)}L${f(x)} ${f(y)}L${f(bx)} ${f(by)}`;
+    };
+    root.querySelectorAll("[data-to]").forEach(a => {
+      const ra = a.getBoundingClientRect();
+      for (const id of a.dataset.to.split(/\s+/)) {
+        const b = id && document.getElementById(id);
+        if (!b) continue;
+        const rb = b.getBoundingClientRect();
+        if (rb.left >= ra.right - 1) {
+          // across: right side to left side, a curve with level ends; a fan where several share an end
+          const x1 = ra.right - o.left, y1 = ra.top + ra.height / 2 - o.top, x2 = rb.left - o.left - 1, y2 = rb.top + rb.height / 2 - o.top;
+          const c = Math.max(18, (x2 - x1) * .5);
+          lines += `M${f(x1)} ${f(y1)}C${f(x1 + c)} ${f(y1)} ${f(x2 - c)} ${f(y2)} ${f(x2)} ${f(y2)}`;
+          heads += head(x2, y2, 1, 0);
+        } else if (rb.top >= ra.bottom - 1) {
+          // down: bottom to top, at the middle of the stretch the two share
+          const lo = Math.max(ra.left, rb.left), hi = Math.min(ra.right, rb.right);
+          const x = (hi > lo ? (lo + hi) / 2 : rb.left + rb.width / 2) - o.left;
+          const y1 = ra.bottom - o.top, y2 = rb.top - o.top - 1;
+          lines += `M${f(x)} ${f(y1)}L${f(x)} ${f(y2)}`;
+          heads += head(x, y2, 0, 1);
+        }
+      }
+    });
+    svg.innerHTML = `<path d="${lines}"/><path class="head" d="${heads}"/>`;
+  };
+  const linked = Array.from(document.querySelectorAll("[data-links]"));
+  if (linked.length) {
+    linked.forEach(root => root.classList.add("linked"));
+    const redraw = () => linked.forEach(draw);
+    redraw();
+    if ("ResizeObserver" in window) { const ro = new ResizeObserver(redraw); linked.forEach(r => ro.observe(r)); }
+    else window.addEventListener("resize", redraw);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
+    window.addEventListener("load", redraw);
+  }
+
   // the gate's early diamond rings once it has landed: when its row is well inside the window (the travel itself is
   // scroll-driven in site.css, and ends a little before this line)
   const early = document.querySelector(".mark.early");

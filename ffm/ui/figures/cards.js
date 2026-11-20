@@ -9,7 +9,7 @@ import { refreshSummary } from "../schedule.js";
 import { markStale } from "../files.js";
 import { refOf } from "../memo/memo.js";
 import { egressLine } from "../memo/answers.js";
-import { fitLabels, siteContext } from "./common.js";
+import { fitLabels, outrightLimit, siteContext } from "./common.js";
 import { boundaryTools, figPlan } from "./plan.js";
 import { figSection } from "./section.js";
 import { fig3d, VIEW3D } from "./fig3d.js";
@@ -76,7 +76,7 @@ function massTools(m) {
         ${corners ? corners.map((c, i) => `<option value="edge:${i}"${ffVal === `edge:${i}` ? " selected" : ""}>lot edge ${i} (${h(Math.round(Math.hypot(corners[(i + 1) % corners.length][0] - c[0], corners[(i + 1) % corners.length][1] - c[1]) * 10) / 10)} m)</option>`).join("") : ""}
       </select></label>
       <button type="button" class="btn btn-small btn-primary" id="mass-apply"${mass.busy ? " disabled" : ""}>${mass.busy ? "Rebuilding…" : "Place it"}</button>
-      <span class="help">Inside the plate box, ${h(box.w ?? m.envelope.width_m)} × ${h(box.d ?? m.envelope.depth_m)} m; a shift past it is held back and said so. The front sets the yards and turns the lot; the sheets follow. Run the rules to make the memo from it.</span>
+      <span class="help">${(box.w ?? m.envelope.width_m) > 0 && (box.d ?? m.envelope.depth_m) > 0 ? `Inside the plate box, ${h(box.w ?? m.envelope.width_m)} × ${h(box.d ?? m.envelope.depth_m)} m; a shift past it is held back and said so.` : "No plate fits on the lot as fronted: the yards leave nothing to place the mass in."} The front sets the yards and turns the lot; the sheets follow. Run the rules to make the memo from it.</span>
     </div>
   </details>`;
 }
@@ -135,7 +135,7 @@ export function wireFigures(run) {
     const body = $(".fig-body", fig);
     if (body) VIEW3D.fs = fitLabels(body, fs => (VIEW3D.mode === "3d" ? fig3d(m, ctx, VIEW3D.az, VIEW3D.el, fs) : figPlan(m, ctx, fs)));
     const sec = $("#fig-02");
-    if (sec) fitLabels(sec, fs => figSection(m, fs));
+    if (sec) fitLabels(sec, fs => figSection(m, fs, ctx));
     wireOrbit();
     if (bnd.open) loaded.boundary.wireBoundaryCanvas(fig, redraw);   // open means its module is in
   };
@@ -208,45 +208,90 @@ export function wireFigures(run) {
   }
 }
 
+/* One mass in words. Where no plate fits it says so instead of "plate 0 m² × 3 = 0 m² (FSR 0.00)" (20 Nov 2026). */
 export function massLine(x) {
+  if (!(x.plate_area_m2 > 0)) return `<b>${h(x.label)}</b>: no plate fits on the lot as fronted.`;
   return `<b>${h(x.label)}</b>: plate ${fmtNum(x.plate_area_m2)} m² × ${x.storeys} = ${fmtNum(x.gfa_m2)} m² (FSR ${Number(x.fsr).toFixed(2)}), ${h(x.height_m)} m high.`;
+}
+
+/* FIG 01's caption and FIG 02's, two or three short lines each with the figures that matter in ink (20 Nov 2026: four
+   to six grey lines with the numbers buried, and two near-identical notes about the lot's area on 375 Glen Drive). */
+const yd = v => (Number(v) || 0).toFixed(1);
+const yardWords = sb => sb.front === sb.rear && sb.rear === sb.side ? `yards of ${yd(sb.front)} m all round` : `yards front ${yd(sb.front)}, rear ${yd(sb.rear)}, sides ${yd(sb.side)} m`;
+
+function planCaption(m, ctx) {
+  const sb = m.envelope.setbacks_m || {}, lot = m.lot;
+  const plate = m.envelope.width_m > 0 && m.envelope.depth_m > 0;
+  const room = plate ? `<b>${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m</b> ${lot.bbox ? "of plate box, dotted" : "to build on, dashed red"}` : "<b>no plate on the lot as fronted</b>";
+  const first = lot.bbox
+    ? `<b>Lot ${fmtNum(Math.round(lot.polygon_area_m2 || lot.area_m2))} m²</b>, ${lot.source === "drawn" ? "drawn in the tool" : "the City's parcel"} (${h(String((lot.shape || {}).class || "polygon").replace(/_/g, " "))}, ${h(cornerCount(lot))} corners; equivalent rectangle ${h(lot.frontage_m)} × ${h(lot.depth_m)} m); ${yardWords(sb)} leave ${room}.`
+    : `<b>Lot ${h(lot.frontage_m)} × ${h(lot.depth_m)} m, ${fmtNum(lot.area_m2)} m²</b>; ${yardWords(sb)} leave ${room}.`;
+  const up = ctx.osm && ctx.osm.bearing != null ? "North up" : "The street at the bottom";
+  let context;
+  if (ctx.osm) {
+    const om = ctx.osm.omitted || [];
+    context = `Context: ${h(ctx.osm.attribution)}, fetched ${h(ctx.osm.fetched)}${om.length ? `; ${om.length === 1 ? "the building now on the lot" : `the ${om.length} buildings now on the lot`} left out` : ""}.`;
+  } else {
+    const around = [ctx.street.name + " in front"];
+    if (ctx.lane) around.push("a lane behind");
+    for (const x of ctx.cross) around.push(`${x.name} to the ${x.side}`);
+    context = `Context schematic: ${h(around.join(", "))}.${state.mode === "architect" ? ` <code>python -m ffm context --site sites/${h(m.site_id)}.json</code> draws it from OpenStreetMap.` : ""}`;
+  }
+  const kept = ctx.trees.filter(t => t.retained).length, gone = ctx.trees.length - kept, tr = m.trees;
+  const trees = ctx.trees.length || tr
+    ? ` Trees: ${ctx.trees.length ? `${kept} kept, ${gone} to remove (×)${ctx.schematic ? ", placed schematically" : ""}` : ""}${tr ? `${ctx.trees.length ? "; " : ""}Schedule C asks <b>${h(tr.required)}</b>, the plan leaves <b>${h(tr.after)}</b>` : ""}.`
+    : "";
+  return `${first} ${up}; A–A is the section, FIG 02. ${context}${trees}`;
+}
+
+/* The lot's area against the recorded site area, said once, under the plan (it was a warning under the section as
+   well, twice over on 375 Glen Drive). */
+const LOT_AREA_WARNING = /not a clean rectangle|lot polygon measures/i;
+function lotAreaNote(m) {
+  const lot = m.lot, rec = Number(lot.area_m2), poly = Number(lot.polygon_area_m2);
+  if (lot.bbox && poly && rec && Math.abs(poly - rec) / rec > 0.05) {
+    const noun = lot.source === "drawn" ? "lot as drawn" : "City's parcel";
+    return `The ${noun} measures ${fmtNum(Math.round(poly))} m² against the ${fmtNum(rec)} m² recorded: the plan draws the ${lot.source === "drawn" ? "drawn lot" : "parcel"}, the FSR reads the recorded area. Which is the development site is a question for a person.`;
+  }
+  const w = (m.warnings || []).find(x => LOT_AREA_WARNING.test(x));
+  return w ? String(w).replace(/(\d) x (\d)/g, "$1 × $2") : "";
+}
+
+function sectionCaption(m) {
+  const pm = m.masses.find(x => x.name === "proposed"), om = m.masses.find(x => x.name === "outright");
+  const lim = outrightLimit(m), b = m.policy_benchmark;
+  const hm = v => { const r = Math.round(Number(v) * 100) / 100; return Math.abs(r * 10 - Math.round(r * 10)) < 1e-6 ? r.toFixed(1) : r.toFixed(2); };
+  const parts = [];
+  if (pm) parts.push(pm.plate_area_m2 > 0
+    ? `<b>Proposed: ${h(pm.storeys)} storeys, ${hm(pm.height_m)} m</b>, plate ${fmtNum(pm.plate_area_m2)} m² × ${h(pm.storeys)} = ${fmtNum(pm.gfa_m2)} m², FSR ${Number(pm.fsr).toFixed(2)}.`
+    : `<b>Proposed: ${h(pm.storeys)} storeys, ${hm(pm.height_m)} m</b>; no plate fits on the lot as fronted.`);
+  if (om) parts.push(`<b>Outright: ${h(om.storeys)} storeys, ${hm(om.height_m)} m</b>${lim ? (Math.abs(lim - om.height_m) > 0.05 ? `, whole storeys under the ${hm(lim)} m limit` : `, at the ${hm(lim)} m limit`) : ""}, FSR ${h(om.fsr)}${om.plate_area_m2 > 0 ? "" : "; no plate fits"}.`);
+  if (b && b.height_m) parts.push(`Staff benchmark ${hm(b.height_m[0])} to ${hm(b.height_m[1])} m, about FSR ${h(b.fsr)} (<code>${h(b.rule_id)}</code>).`);
+  return parts.join(" ");
 }
 
 export function renderFigures(run) {
   const m = run.massing;
   const out = [];
   if (m) {
-    const sb = m.envelope.setbacks_m || {};
     const ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
-    let contextNote;
-    if (ctx.osm) {
-      const c = ctx.osm.counts, om = ctx.osm.omitted;
-      contextNote = `Context in half tone from OpenStreetMap (${h(ctx.osm.attribution)}; fetched ${h(ctx.osm.fetched)}, ${h(ctx.osm.radius)} m around the address): ${c.roads ?? 0} roads, ${c.buildings ?? 0} buildings and ${c.trees ?? 0} mapped trees, with ${h(ctx.osm.frontStreet || "the nearest road")} taken as the front street.${om.length ? ` ${om.length === 1 ? "The building now on the lot is" : `${om.length} buildings now on the lot are`} left out${om[0] && om[0].name ? ` (${h(om.map(b => b.name).filter(Boolean).join(", "))})` : ""}.` : ""}`;
-    } else {
-      const around = [ctx.street.name + " in front"];
-      if (ctx.lane) around.push("a lane behind");
-      for (const x of ctx.cross) around.push(`${x.name} to the ${x.side}`);
-      if (ctx.neighbours.length) around.push(ctx.neighbours.length === 2 ? "neighbouring parcels either side" : "a neighbouring parcel");
-      if (ctx.streetTrees.length) around.push(`${ctx.streetTrees.length} street trees`);
-      contextNote = `Context in half tone, schematic: ${h(around.join(", "))}. Run <code>python -m ffm context --site sites/${h(m.site_id)}.json</code> to draw it from OpenStreetMap instead.`;
-    }
-    const retained = ctx.trees.filter(t => t.retained).length, removed = ctx.trees.length - retained;
-    const treeNote = ctx.trees.length ? ` On site, ${retained} tree${retained === 1 ? "" : "s"} retained and ${removed} to be removed (×)${ctx.schematic ? ", placed schematically because the survey is not on file" : ""}.` : "";
+    const lotNote = lotAreaNote(m);
     out.push(`<figure class="card figure">
       <div id="fig-01">${figOne(m, ctx)}</div>
-      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-building"></i>building</span><span><i class="fig-context"></i>road</span></div>
-      <figcaption>${m.lot.bbox
-        ? `Lot ${m.lot.source === "drawn" ? "as drawn in the tool" : "from the City's parcel polygon"}: ${h(String((m.lot.shape || {}).class || "polygon").replace(/_/g, " "))}, ${h(cornerCount(m.lot))} corners, ${fmtNum(Math.round(m.lot.polygon_area_m2 || m.lot.area_m2))} m² (recorded site area ${fmtNum(m.lot.area_m2)} m²; equivalent rectangle ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m). The setback envelope follows the lot lines (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m) and the masses stand in the plate box, the largest rectangle inside it, ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m, dotted.`
-        : `Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${fmtNum(m.lot.area_m2)} m². Setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m (front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m). Both masses fill the envelope's width from the front setback back, so the outright mass is drawn dashed over the proposed one, here and in the section.`} ${contextNote}${treeNote}${ctx.osm && ctx.osm.bearing != null ? " The north arrow follows the OpenStreetMap frame; the plan is drawn with the street at the bottom." : ""}</figcaption>
+      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright, dashed over it</span><span><i class="fig-env"></i>setback envelope</span><span><i class="fig-tree"></i>tree</span><span><i class="fig-building"></i>building</span><span><i class="fig-context"></i>road</span></div>
+      <figcaption>${planCaption(m, ctx)}</figcaption>
+      ${lotNote ? `<p class="note">${h(lotNote)}</p>` : ""}
     </figure>`);
     const bench = m.policy_benchmark;
-    const trees = m.trees;
+    // the engine's notes the section bears on; the lot's area is said under the plan, and a height that adds nothing
+    // over its storeys ("the extra 0.0 m") is no note
+    const notes = (m.warnings || []).filter(w => !LOT_AREA_WARNING.test(w) && !/extra 0\.0 m/.test(w));
     out.push(`<figure class="card figure">
-      <div class="eyebrow">FIG 02 · Section across the frontage</div>
-      <div class="fig-section" id="fig-02">${figSection(m)}</div>
-      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span>${bench && bench.height_m ? `<span><i class="fig-bench"></i>staff benchmark</span>` : ""}</div>
-      <figcaption>${m.masses.map(massLine).join(" ")}${bench && bench.height_m ? ` Staff benchmark under <code>${h(bench.rule_id)}</code>: ${h(bench.height_m[0])} to ${h(bench.height_m[1])} m, about FSR ${h(bench.fsr)}.` : ""}${trees ? ` Trees: Schedule C requires ${h(trees.required)}, the plan leaves ${h(trees.after)} (shortfall ${h(trees.shortfall)}).` : ""}</figcaption>
-      ${(m.warnings || []).map(w => `<p class="note">${h(String(w).replace(/(\d) x (\d)/g, "$1 × $2"))}</p>`).join("")}
+      <div class="eyebrow">FIG 02 · Section A–A through the lot</div>
+      <div class="fig-section" id="fig-02">${figSection(m, null, ctx)}</div>
+      <div class="legend"><span><i class="fig-proposed"></i>proposed</span><span><i class="fig-outright"></i>outright</span>${outrightLimit(m) ? `<span><i class="fig-limit"></i>outright limit</span>` : ""}${bench && bench.height_m ? `<span><i class="fig-bench"></i>staff benchmark</span>` : ""}<span><i class="fig-env"></i>setback envelope</span></div>
+      <figcaption>${sectionCaption(m)}</figcaption>
+      ${notes.map(w => `<p class="note">${h(String(w).replace(/(\d) x (\d)/g, "$1 × $2"))}</p>`).join("")}
     </figure>`);
   } else if (run.massing_note) {
     out.push(`<div class="card figure"><div class="eyebrow">Massing</div><p class="note">${h(run.massing_note)}</p></div>`);
@@ -286,7 +331,7 @@ function renderSheets(run, n0) {
     </div>
     <div class="sheet-body" data-view="axon" hidden>${S.axon || ""}</div>
     <div class="sheet-editor" id="sheet-editor" hidden></div>
-    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.arrangement === "point" ? `a point tower, the homes round a corridor ringing the core, ${h(L.plate.unit_depth_m)} m deep in front and behind and ${h(L.plate.side_depth_m)} m beside` : `${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep`}. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
+    <figcaption><b>${h(L.units_placed)} of ${h(L.units_total)} units</b> on ${h(L.floors.length)} floors of ${h(L.plate.width_m)} × ${h(L.plate.depth_m)} m; ${L.plate.arrangement === "point" ? `a point tower, the homes round a corridor ringing the core, ${h(L.plate.unit_depth_m)} m deep in front and behind and ${h(L.plate.side_depth_m)} m beside` : L.plate.arrangement === "walkup" ? `a walk-up: one stair on the street side and no elevator, every home the plate's full depth (one exit taken for a small floor, a placeholder until the code's own clauses are in the rules)` : `${L.plate.double_loaded ? "a double-loaded corridor" : "single-loaded, the depth is the limit"}, units ${h(L.plate.unit_depth_m)} m deep`}. Program: ${h(prog)}.${h(short)}${L.edited ? " Placed by hand in the block editor and re-checked by the engine; the option carries the placement, so a run reproduces it." : ""}</figcaption>
     <ul class="finding-list sheet-rules">${broken}${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
     ${egressHtml(L.egress)}
   </figure>`);
@@ -422,10 +467,10 @@ export function renderPreview3D() {
   const [prop, outr] = [m.masses.find(x => x.name === "proposed"), m.masses.find(x => x.name === "outright")];
   box.innerHTML = `
     <figure class="figure p3-plan"><div class="fig-head"><span class="eyebrow">Site plan · dimensions in metres</span></div><div class="fig-body"></div><figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${h(fmtNum(m.lot.area_m2))} m²; setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m. ${prop ? massLine(prop) : ""}</figcaption></figure>
-    <figure class="figure p3-section"><div class="fig-head"><span class="eyebrow">Section · through the depth</span></div><div class="fig-section"></div><figcaption>${outr ? massLine(outr) : ""}</figcaption></figure>
+    <figure class="figure p3-section"><div class="fig-head"><span class="eyebrow">Section A–A · through the lot</span></div><div class="fig-section"></div><figcaption>${outr ? massLine(outr) : ""}</figcaption></figure>
     <figure class="figure p3-axon"><div class="fig-head"><span class="eyebrow">Axonometric · drag to turn</span></div><div class="fig-body fig3d"></div><figcaption>The proposed mass over the outright envelope, from the same numbers as the plan and the section.</figcaption></figure>`;
   fitLabels($(".p3-plan .fig-body", box), fs => figPlan(m, ctx, fs));
-  fitLabels($(".p3-section .fig-section", box), fs => figSection(m, fs));
+  fitLabels($(".p3-section .fig-section", box), fs => figSection(m, fs, ctx));
   const fs3 = fitLabels($(".p3-axon .fig-body", box), fs => fig3d(m, ctx, 35, 28, fs));
   // a light orbit for the preview's axon: a drag turns it, as in the memo
   const svg = $(".p3-axon svg", box);

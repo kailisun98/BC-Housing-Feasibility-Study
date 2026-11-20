@@ -30,10 +30,10 @@
     </div>
   </div>
   <div class="topbar-controls">
-    <label class="asof">
-      <span class="eyebrow">Rules as of</span>
-      <input type="date" id="as-of" aria-describedby="as-of-help">
-      <span id="as-of-help" class="sr-only">The next run reads the rules in force on this date.</span>
+    <label class="asof" title="The memo reads the rules in force on this date: the memo on screen was made on it, and the next run reads it">
+      <span class="eyebrow asof-key">Rules as of</span>
+      <input type="date" id="as-of" aria-describedby="as-of-help" title="The memo reads the rules in force on this date">
+      <span id="as-of-help" class="sr-only">The memo reads the rules in force on this date; the next run reads them as of it.</span>
     </label>
     <button id="run-btn" class="btn btn-primary" type="button" title="Run the rules (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Run the rules</button>
     <span id="engine-chip" class="engine-chip" hidden></span>

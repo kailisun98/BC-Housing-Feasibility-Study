@@ -7,43 +7,111 @@ import { refOf, refTagOf } from "./memo.js";
 import { withPlans } from "./clauses.js";
 import { ruleTitle } from "../route-stage.js";
 import { districtOf } from "../fields.js";
+import { millionsOf, SCREEN_SHARE, stackFigure, stackOf } from "./stack.js";
+import { fewWords, lanesHtml, todoOf, whoOf } from "./lanes.js";
+import { envelopeFigure } from "../figures/envelope.js";
 
-export function answerAllowed(L) {
+/* The outright answer as a reader says it (20 Nov 2026): where the option is over the district's own FSR or height,
+   the engine reads that as fail, "not allowed outright; rezoning is required" (it read uncertain before), and the
+   memo says "Not outright: rezoning required." The card's wash still comes from the operative answer, by rezoning
+   where a path is stated, so the outright excess does not turn a conditional rezoning red. Pure. */
+export const isOutrightLimit = r => String((r && r.check) || "").startsWith("district_outright");
+export function outrightWords(o, outLines = []) {
+  if (o.verdict === "no") {
+    const against = outLines.filter(r => ["fail", "uncertain"].includes(r.status));
+    return against.length && against.every(isOutrightLimit) ? "Not outright: rezoning required." : "Not outright.";
+  }
+  return VERDICT_OUTRIGHT[o.verdict] || `${cap(o.verdict)}.`;
+}
+
+/* A rule in an answer's list: its status as a word with its mark, its reference, then the finding (lead in ink, the
+   rest muted). The mark and the reference share the first cell, so a finding that wraps never runs under them. */
+const ruleItem = (r, text) => `<li><span class="fl-marks">${pill(r.status)}${refTagOf(r.rule_id).trim()}</span><span>${text}</span></li>`;
+
+export function answerAllowed(L, run = null) {
   const res = L.results, ans = L.summary.answers, site = L.inputs.site;
   const o = ans.allowed.outright, bz = ans.allowed.by_rezoning, path = ans.allowed.rezoning_path;
   // the district's FSR and height, and its yards where they leave no envelope (as engine.counts_outright)
-  const outLines = res.filter(r => ((r.check || "").startsWith("district_outright") || (r.check === "district_setbacks" && (r.values || {}).no_envelope)) && r.status !== "not_applicable");
-  const policy = res.filter(r => ["A", "B", "C"].includes(r.layer) && ["fail", "conditional", "uncertain"].includes(r.status) && !(r.check || "").startsWith("district_outright"));
-  let verdict = `${h(VERDICT_OUTRIGHT[o.verdict] || cap(o.verdict) + ".")}`;
+  const outLines = res.filter(r => (isOutrightLimit(r) || (r.check === "district_setbacks" && (r.values || {}).no_envelope)) && r.status !== "not_applicable");
+  const policy = res.filter(r => ["A", "B", "C"].includes(r.layer) && ["fail", "conditional", "uncertain"].includes(r.status) && !isOutrightLimit(r));
+  // the operative words wear the status colour: by rezoning where a path is stated, else the outright answer
+  let verdict = path ? h(outrightWords(o, outLines)) : `<em>${h(outrightWords(o, outLines))}</em>`;
   if (path) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
-  let body = `<p class="path">Outright under ${h(districtOf(site) || "the district")}${path ? ` · rezoning path: ${h(path)}` : " · no rezoning path stated"}</p>`;
+  const district = districtOf(site) || "the district";
+  let body = "";
   // nothing was tested: say why, in the words answer 3 repeats with the person who settles it
   if (o.why) body += `<p class="finding"><b>Not assessed:</b> ${h(o.why)}. The storeys, height and floor area in this memo are the option's own figures, not permitted ones; answer 3 names who reads the schedule.</p>`;
   // each finding cites the rule it came from (A1, its title), so a CD-1 site shows its own by-law's rules (17 Nov 2026)
-  body += outLines.map(r => `<p class="finding">${refTagOf(r.rule_id)}${leadCont(r.finding)} <span class="cont">(${h(r.title)})</span></p>`).join("");
-  if (path && policy.length) {
-    body += `<ul class="finding-list">${policy.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span></span></li>`).join("")}</ul>`;
-  }
+  if (outLines.length) {
+    body += `<p class="path ans-sub">Outright under ${h(district)}</p>
+      <ul class="finding-list rule-list">${outLines.map(r => ruleItem(r, `${leadCont(r.finding)} <span class="cont">(${h(r.title)})</span>`)).join("")}</ul>`;
+  } else if (!o.why) body += `<p class="path ans-sub">Outright under ${h(district)}</p>`;
+  if (path) {
+    body += `<p class="path ans-sub">By rezoning: ${h(path)}</p>`;
+    if (policy.length) body += `<ul class="finding-list rule-list">${policy.map(r => ruleItem(r, `<span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span>`)).join("")}</ul>`;
+  } else body += `<p class="path ans-sub">No rezoning path stated</p>`;
   const status = verdictStatus(path ? bz.verdict : o.verdict);   // the operative answer: by rezoning when a path is stated
+  // the figures worker's drawing of outright against proposed (figures/envelope.js, envelopeFigure(run)) goes here
+  const drawing = run ? envelopeFigure(run) : "";
   return `<section class="card answer" data-verdict="${h(status)}">
     <h2><span class="badge">1</span> Is it allowed?</h2>
     <p class="verdict">${verdict}</p>
+    ${drawing}
     ${body}
   </section>`;
 }
 
-export function answerFunders(L) {
+/* The funders' answer in words that do not read as money (20 Nov 2026: "Fits the funders: Yes" stood beside a $20.2M
+   gap and a cancelled call): the programs' published criteria are met, or not; whether the money closes is answer 4.
+   The verdict sentence takes the engine's own words (summary.answers.funded.words, engine.funders_words: "Meets the
+   criteria of the Community Housing Fund and BC Builds"); a pill or a mark takes the short form. */
+export const FUNDED_WORD = { yes: "Meets the criteria", "yes, with conditions": "Meets the criteria, with conditions", no: "Does not meet the criteria", "not yet confirmed": "Criteria not yet confirmed", "not assessed": "Criteria not assessed" };
+export function fundedWord(f, long = false) {
+  const own = long && f && typeof f.words === "string" && f.words ? f.words : null;
+  return own ? cap(own) : FUNDED_WORD[f && f.verdict] || cap((f && f.verdict) || "");
+}
+/* Whether the programs targeted are taking proposals (summary.answers.funded.intake, engine.funders_words: one entry per
+   program whose rule records it, {program, open, note}): a closed or unknown intake is said beside the verdict, in the
+   engine's words; an open one says nothing more. */
+export function intakeNote(f) {
+  const list = f && Array.isArray(f.intake) ? f.intake : [];
+  return list.filter(x => x && x.open !== true && x.note).map(x => `${cap(String(x.note).replace(/\.$/, ""))}.`).join(" ");
+}
+
+/* The money's verdict in a short phrase, for the funders' answer and the comparison: "Needs more sources: a $20.2M gap,
+   44% of the cost". */
+export function moneyPhrase(pf) {
+  if (!pf || !pf.available) return "";
+  const g = pf.gap || {};
+  return `${moneyWord(pf.verdict || {})}${g.value != null ? `: ${g.value > 0 ? `a ${millionsOf(g.value)} gap${g.share_of_capital != null ? `, ${Math.round(g.share_of_capital * 100)}% of the cost` : ""}` : g.value < 0 ? `${millionsOf(-g.value)} of headroom` : "no gap"}` : ""}`;
+}
+
+export function answerFunders(L, run = null) {
   const res = L.results, ans = L.summary.answers, opt = L.inputs.option;
   const targets = new Set(opt.target_programs || []);
   const rows = res.filter(r => r.layer === "E" && (!targets.size || targets.has(r.rule_id)));
   const others = res.filter(r => r.layer === "E" && targets.size && !targets.has(r.rule_id));
-  let body = `<ul class="finding-list">${rows.map(r => `<li>${pill(r.status)}<span><span class="title">${h(r.title)}:</span> <span class="cont">${h(withoutRepeat(r.title, r.finding))}</span></span></li>`).join("")}</ul>`;
+  let body = `<ul class="finding-list rule-list">${rows.map(r => ruleItem(r, `<span class="title">${h(r.title)}:</span> <span class="cont">${h(withoutRepeat(r.title, r.finding))}</span>`)).join("")}</ul>`;
+  const intake = intakeNote(ans.funded);
+  if (intake) body = `<p class="finding intake-note">${leadCont(intake)}</p>` + body;
+  // the criteria are not the money: say where the money stands, beside them
+  const pf = run && run.proforma && run.proforma.available ? run.proforma : null;
+  if (pf) body += `<p class="finding money-link"><span class="lead">The criteria are not the money.</span> <span class="cont">Answer 4: ${h(moneyPhrase(pf))}.</span></p>`;
   if (others.length) body += `<p class="path" style="margin-top:12px">Not targeted, listed in the ledger: ${others.map(r => h(r.title)).join("; ")}.</p>`;
   return `<section class="card answer" data-verdict="${h(verdictStatus(ans.funded.verdict))}">
     <h2><span class="badge">2</span> Does it fit the funders?</h2>
-    <p class="verdict"><em>${h(cap(ans.funded.verdict))}.</em></p>
+    <p class="verdict"><em>${h(fundedWord(ans.funded, true))}.</em></p>
     ${body}
   </section>`;
+}
+
+/* The rules in this memo whose figures were not read from their document (source.verified false), counted over the
+   rules that apply here; one line near the answers says so (20 Nov 2026). Pure. */
+export const unverifiedRules = L => ((L && L.results) || []).filter(r => r.status !== "not_applicable" && r.source && r.source.verified === false);
+export function unverifiedLine(L) {
+  const u = unverifiedRules(L);
+  if (!u.length) return "";
+  return `<p class="unverified-line"><span class="unverified">unverified</span> ${u.length === 1 ? "1 rule in this memo is" : `${u.length} rules in this memo are`} not yet checked against ${u.length === 1 ? "its" : "their"} source (marked UNVERIFIED): ${h(u.map(r => `${refOf(r.rule_id) ? `${refOf(r.rule_id)} ` : ""}${fewWords(r.title)}`).join("; "))}.</p>`;
 }
 
 /* What the drawings found that the rules did not: homes that did not fit the plate, and hand-placed blocks that
@@ -91,12 +159,14 @@ export function answerUnsure(L, run) {
   const n = items.length;
   const verdict = n ? `${n === 1 ? "One open item" : `${["", "", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"][n] || n} open items`}. Each names who resolves it.` : "Nothing outstanding.";
   // the longest name first, so "Manager and owner" is not read as "Manager"; an action with no name is the
-  // manager's, who carries the memo (17 Nov 2026: a "—" under Who beside "Each names who resolves it")
-  const WHO = /^(Manager and owner|Manager and architect|Manager|Architect|Owner|Planner|Both)\b:?\s*/i;
-  const who = u => { const m = WHO.exec(u.action || ""); return m ? cap(m[1]) : "Manager"; };
-  const todo = u => cap((u.action || "").replace(WHO, "")) || "—";
-  const table = n ? `<table class="plain open-items"><thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
-    ${items.map(u => `<tr><td data-k="Ref">${refOf(u.rule_id) ? `<b class="ref" title="${h(u.title)}">${h(refOf(u.rule_id))}</b>` : "—"}</td><td data-k="Item">${h(u.title)}</td><td class="status" data-k="Status">${pill(u.status)}</td><td class="who" data-k="Who">${h(who(u))}</td><td class="todo" data-k="What to do">${h(todo(u))}</td></tr>`).join("")}
+  // manager's, who carries the memo (17 Nov 2026: a "—" under Who beside "Each names who resolves it"); lanes.js
+  // reads the same names for the drawing above the table
+  const who = whoOf;
+  const todo = u => todoOf(u) || "—";
+  // who resolves what, drawn: a lane per person, the site's facts, then the design, then the funders (20 Nov 2026)
+  const lanes = n ? lanesHtml(items, refOf) : "";
+  const table = n ? `${lanes}<table class="plain open-items"><thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who</th><th>What to do</th></tr></thead><tbody>
+    ${items.map(u => `<tr><td data-k="Ref">${refOf(u.rule_id) ? `<b class="ref" title="${h(u.title)}">${h(refOf(u.rule_id))}</b>` : "—"}</td><td data-k="Item">${h(u.title)}</td><td class="status" data-k="Status">${pill(u.status)}</td><td class="who" data-k="Who">${h(who(u))}</td><td class="todo" data-k="What to do"><span class="measure">${h(todo(u))}</span></td></tr>`).join("")}
   </tbody></table>` : "";
   // the clauses also marked uncertain that are not open items here, named, so the two counts reconcile (17 Nov 2026:
   // "Four open items" over a clause table counting 6 Uncertain); the outright limits are answered by the rezoning
@@ -145,6 +215,35 @@ export function rememberArchitectMoney(open) { try { localStorage.setItem(MONEY_
 /* A figure in millions for the folded line: $54.1M. */
 const millions = x => (x == null ? "not given" : `${x < 0 ? "−" : ""}$${(Math.abs(x) / 1e6).toFixed(1)}M`);
 
+/* The stack's caption: what the drawing is, in a sentence. */
+export function moneyCaption(pf) {
+  const g = pf.gap || {};
+  return `What it costs against what pays for it, drawn to one scale. ${g.value > 0 ? `The hatched part is the gap, ${h(millionsOf(g.value))} not yet found; ` : ""}the amber line is 15% of the cost below the top.`;
+}
+
+/* Land at $0, the 15% line and the 1.10 coverage, each in a plain sentence with this memo's figures (20 Nov 2026: a
+   board reader listed all three as words they did not understand). */
+export function moneyWords(pf, run = null, tag = "p") {
+  const c = pf.capital || {}, f = pf.funding || {}, d = f.debt || {}, o = pf.operating || {}, g = pf.gap || {};
+  const line = key => (pf.lines || []).find(l => l.key === key) || {};
+  const ref = id => (id && refOf(id) ? ` (${refOf(id)})` : "");
+  const out = [];
+  const land = line("land");
+  if (c.land === 0) {
+    const why = String(land.note || "").replace(/^\$?0?\s*,?\s*nominal\s*[:,;]?\s*/i, "").trim();
+    out.push(`Land is carried at $0${ref(land.rule_id)}: ${why ? `${why.replace(/\.$/, "")}, so` : "the owner leases or transfers it at a nominal value, so"} it adds nothing to the cost.`);
+  } else if (c.land == null) out.push("Land is not priced: no figure was entered and the owner is not one that leases at a nominal value, so the cost leaves it out until it is entered.");
+  if (c.total) {
+    const share = g.share_of_capital != null ? Math.round(g.share_of_capital * 100) : null;
+    out.push(`The amber line is this tool's screening line, 15% of the cost (${millionsOf(c.total * SCREEN_SHARE)} here) below the top: a gap that stays above it is one the screen calls close${g.value > 0 && share != null ? `; this gap is ${share}%, ${share > 15 ? "past it, so the project needs more sources before design money is spent" : "inside it"}` : g.value != null && g.value <= 0 ? "; there is no gap" : ""}. It is the screen's own line, not a funder's rule.`);
+  }
+  if (d.supportable != null && d.dcr != null) {
+    out.push(`Debt is what the rent can carry: a lender asks that the rent left after running costs cover the yearly mortgage payment ${Number(d.dcr).toFixed(2)} times (CMHC's coverage ratio), so ${money(o.noi)} a year carries ${money(d.supportable)} at ${d.rate_pct}% over ${d.amortization_years} years${ref((line("debt") || {}).rule_id)}.`);
+  }
+  if (!out.length) return "";
+  return tag === "p" ? `<p class="path money-words">${h(out.join(" "))}</p>` : out.join(" ");
+}
+
 export function answerMoney(run) {
   const pf = run.proforma;
   if (!pf) return "";
@@ -164,15 +263,19 @@ export function answerMoney(run) {
     const s = ln.rule_id ? srcOf(ln.rule_id) : null;
     // the rule by its reference, the source as a short link (its full title in the link's title): the ledger carries the rest
     const from = ln.rule_id ? `${refTagOf(ln.rule_id)}<code title="${h(ruleTitle(ln.rule_id))}">${h(ln.rule_id)}</code>${s ? `<div class="cont">${s.url ? `<a href="${h(s.url)}" target="_blank" rel="noopener" title="${h(s.title || s.url)}">${h(shortSource(s))}</a>` : h(shortSource(s))}</div>` : ""}` : `<span class="cont">the option's own figures</span>`;
-    return `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${from}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont">${h(ln.note || "")}</td></tr>`;
+    return `<tr><td>${h(ln.label)}</td><td class="num">${h(shown(ln))}</td><td>${from}${ln.placeholder ? ' <span class="ph-tag">placeholder</span>' : ""}</td><td class="cont"><span class="measure">${h(ln.note || "")}</span></td></tr>`;
   }).join("");
+  // the stack drawn beside the four figures, then the three things a board reader asked about, in plain words
+  const stack = stackFigure([stackOf(pf)], { H: 220, lh: 15 }, moneyCaption(pf));
   const body = `${next ? `<p class="finding money-next"><span class="cont">For the development manager:</span> ${leadCont(next)}</p>` : ""}
+    <div class="money-draw">${stack}
     <dl class="pf-four">
       <div><dt>Capital cost</dt><dd><b>${h(money(c.total))}</b><span class="cont">hard ${h(money(c.hard))} (escalated ×${h(c.escalation)}), soft ${h(money(c.soft))}, contingency ${h(money(c.contingency))}, land ${h(money(c.land))}</span></dd></div>
       <div><dt>Net operating income</dt><dd><b>${h(money(o.noi))} a year</b><span class="cont">rent ${h(money(o.gross))} less vacancy, operating cost and reserve</span></dd></div>
       <div><dt>Funding</dt><dd><b>${h(money(f.total))}</b><span class="cont">grants ${h(money(grants))}, equity ${h(money(f.equity))}, debt ${h(money(f.debt.supportable))} at ${h(f.debt.rate_pct)}% over ${h(f.debt.amortization_years)} years, ${h(Number(f.debt.dcr).toFixed(2))} coverage${pf.inputs && pf.inputs.units_total ? `; ${h(pf.inputs.units_total)} homes as entered${run.layout && run.layout.units_placed != null && run.layout.units_placed < pf.inputs.units_total ? ` (${h(run.layout.units_placed)} fit the plate: answer 3)` : ""}` : ""}</span></dd></div>
       <div><dt>Gap</dt><dd><b>${h(money(g.value))}</b><span class="cont">${g.share_of_capital != null ? `${h(Math.round(g.share_of_capital * 100))}% of the capital cost; a negative gap is headroom` : ""}</span></dd></div>
-    </dl>
+    </dl></div>
+    ${moneyWords(pf, run)}
     ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
     ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
     <details class="pf-lines"><summary>Every line, where it came from, and its source <span class="cont">(${(pf.lines || []).length} lines)</span></summary>

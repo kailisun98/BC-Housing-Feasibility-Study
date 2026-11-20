@@ -8,6 +8,9 @@ import { FIG, HALF, halo, NS, SVG_OPEN } from "./common.js";
    view survives a re-render. No library: the boxes are projected and painted far to near. */
 export const VIEW3D = { mode: "plan", az: 35, el: 28 };
 
+/* a height as the section and the captions print it: one decimal, or two where the massing has them (88.45) */
+const heightWords = v => { const r = Math.round(Number(v) * 100) / 100; return Math.abs(r * 10 - Math.round(r * 10)) < 1e-6 ? r.toFixed(1) : r.toFixed(2); };
+
 export function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
@@ -83,16 +86,46 @@ export function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   for (const i of items) if (i.d === -1e9) i.d = prop ? prop.d + 1e-6 : 0;
   items.sort((u, v) => v.d - u.d);
   body += items.map(i => i.s).join("");
-  // the street names last, over the buildings around, with a paper halo, so none is hidden behind a block
-  for (const l of ctx.labels) {
-    const c = proj(l.at);
-    body += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${l.strong ? FIG.grey : HALF.text}"${l.strong ? ` font-weight="600"` : ""} ${halo(fs)}>${h(l.text)}</text>`;
+  // the street names, each at the point of its road nearest the lot (outside it), so they stay in the frame as the
+  // view turns; drawn last, over the buildings around, with a paper halo, so none is hidden behind a block
+  const bbN = m.lot.bbox || [0, 0, W, D];
+  let names = (ctx.labels || []).map(l => ({ at: l.at, text: l.text, strong: l.strong }));
+  if (ctx.roads && ctx.roads.length) {
+    const best = new Map();
+    for (const rd of ctx.roads) {
+      if (!rd.name || /^(footway|cycleway|path|steps|pedestrian|track|bridleway)$/.test(rd.kind)) continue;
+      const pts = rd.points;
+      for (let i = 0; i + 1 < pts.length; i++) {
+        const [xa, ya] = pts[i], [xb, yb] = pts[i + 1], L = Math.hypot(xb - xa, yb - ya), n = Math.max(1, Math.ceil(L / 2));
+        for (let j = 0; j <= n; j++) {
+          const x = xa + (xb - xa) * j / n, y = ya + (yb - ya) * j / n;
+          if (x > bbN[0] - 4 && x < bbN[2] + 4 && y > bbN[1] - 4 && y < bbN[3] + 4) continue;
+          const d = Math.hypot(x - cx, y - cy), was = best.get(rd.name);
+          if (!was || d < was.d) best.set(rd.name, { d, at: [x, y], text: rd.name, strong: rd.front });
+        }
+      }
+    }
+    names = [...best.values()];
   }
   const b = m.policy_benchmark;
   if (b && b.height_m && masses.proposed) {
     for (const z of b.height_m) body += poly(masses.proposed.footprint.map(([x, y]) => [x, y, z]), `fill="none" stroke="${FIG.bench}" stroke-width="1" stroke-dasharray="4 3"`);
   }
-  // labels: the heights, led off the near top corner of each mass so they sit beside the building, not on its faces
+  // a steady frame: the largest extent the drawing can reach at any azimuth and any tilt the orbit allows (8° to
+  // 80°), so neither turning nor tilting ever rescales it; a drag reads as one object turning in a fixed window
+  // the frame reaches the lot and about 30 m round it, as the plan frames it (20 Nov 2026: the whole 120 m of mapped
+  // context, so the lot was a thumbnail in it); the context past it runs to the card's edge
+  const corners = [[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]];
+  const bbL = m.lot.bbox || [0, 0, W, D];
+  const lotR = Math.max(...[[bbL[0], bbL[1]], [bbL[2], bbL[1]], [bbL[2], bbL[3]], [bbL[0], bbL[3]]].map(([x, y]) => Math.hypot(x - cx, y - cy))) + 30;
+  const R = Math.min(ctx.frameRadius || Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy))), lotR);
+  const zmax = Math.max(...m.masses.map(x => (x.base_z || 0) + x.height_m), 1);
+  const tilts = [8, 20, 35, 50, 65, 80].map(t => t * Math.PI / 180);
+  const top = Math.max(...tilts.map(t => zmax * Math.cos(t) + R * Math.sin(t))), bottom = R * Math.sin(tilts[tilts.length - 1]);
+  const pad = fs * 1.5;
+  const x0 = -R - pad - fs * 3, x1 = R + pad + fs * 3, y0 = -top - pad - fs, y1 = bottom + pad;
+  // labels: the heights, led off the near top corner of each mass so they sit beside the building, not on its faces,
+  // on the side the corner is on unless the frame leaves the words no room there (a phone, 20 Nov 2026)
   const labels = [];
   const nearest = ring => ring.map(([x, y]) => [x, y]).sort((u, v) => proj(u).d - proj(v).d)[0];
   // every corner of every mass on the picture plane, so the labels can stand clear of all of them
@@ -103,23 +136,26 @@ export function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   for (const [name, colour, weight] of [["proposed", FIG.proposedStroke, 600], ["outright", FIG.lot, 400]]) {
     const x = masses[name]; if (!x) continue;
     const c = nearest(x.footprint); const t = proj([c[0], c[1], (x.base_z || 0) + x.height_m]);
-    const side = t.x < 0 ? -1 : 1;                       // out on the side the near corner is on
-    const lx = side < 0 ? minX - fs * 0.9 : maxX + fs * 0.9;
+    const room = { "-1": minX - fs * 0.9 - x0, "1": x1 - (maxX + fs * 0.9) };
+    // the full words where a side has room for them, else the height and the name only
+    const long = `${name} ${x.storeys} storeys, ${heightWords(x.height_m)} m`;
+    const words = Math.max(room[-1], room[1]) >= long.length * fs * 0.56 ? long : `${heightWords(x.height_m)} m ${name}`, len = words.length * fs * 0.56;
+    let side = t.x < 0 ? -1 : 1;                         // out on the side the near corner is on
+    if (room[side] < len && room[-side] >= len) side = -side;
+    let lx = side < 0 ? minX - fs * 0.9 : maxX + fs * 0.9;
+    if (room[side] < len) lx = side < 0 ? x0 + len : x1 - len;   // neither side has room: held inside the frame
     let ly = t.y + fs * 0.35;
     if (lastY != null && Math.abs(ly - lastY) < fs * 1.4) ly = lastY + fs * 1.4;
     lastY = ly;
     labels.push(`<line x1="${t.x.toFixed(2)}" y1="${t.y.toFixed(2)}" x2="${(lx - side * fs * 0.3).toFixed(2)}" y2="${(ly - fs * 0.35).toFixed(2)}" stroke="${colour}" stroke-width="0.8" ${NS}/>`
       + `<circle cx="${t.x.toFixed(2)}" cy="${t.y.toFixed(2)}" r="${(fs * 0.18).toFixed(2)}" fill="${colour}"/>`
-      + `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" font-size="${fs.toFixed(2)}" font-weight="${weight}" fill="${colour}" text-anchor="${side < 0 ? "end" : "start"}" ${halo(fs)}>${h(x.height_m)} m · ${name}</text>`);
+      + `<text x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" font-size="${fs.toFixed(2)}" font-weight="${weight}" fill="${colour}" text-anchor="${side < 0 ? "end" : "start"}" ${halo(fs)}>${h(words)}</text>`);
   }
-  // a steady frame: the largest extent the drawing can reach at any azimuth and any tilt the orbit allows (8° to
-  // 80°), so neither turning nor tilting ever rescales it; a drag reads as one object turning in a fixed window
-  const corners = [[ctx.xmin, ctx.ymin], [ctx.xmax, ctx.ymin], [ctx.xmax, ctx.ymax], [ctx.xmin, ctx.ymax]];
-  const R = ctx.frameRadius || Math.max(...corners.map(([x, y]) => Math.hypot(x - cx, y - cy)));
-  const zmax = Math.max(...m.masses.map(x => (x.base_z || 0) + x.height_m), 1);
-  const tilts = [8, 20, 35, 50, 65, 80].map(t => t * Math.PI / 180);
-  const top = Math.max(...tilts.map(t => zmax * Math.cos(t) + R * Math.sin(t))), bottom = R * Math.sin(tilts[tilts.length - 1]);
-  const pad = fs * 1.5;
-  const x0 = -R - pad - fs * 3, x1 = R + pad + fs * 3, y0 = -top - pad - fs, y1 = bottom + pad;
-  return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, its surroundings in half tone, the setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${labels.join("")}</svg>`;
+  let streets = "";
+  for (const l of names) {
+    const c = proj(l.at), half = String(l.text).length * fs * 0.25;
+    if (c.x - half < x0 || c.x + half > x1 || c.y < y0 + fs || c.y > y1 - fs * 0.5) continue;   // only the names the frame holds whole
+    streets += `<text x="${c.x.toFixed(2)}" y="${(c.y + fs * 0.35).toFixed(2)}" font-size="${(fs * 0.9).toFixed(2)}" text-anchor="middle" fill="${l.strong ? FIG.grey : HALF.text}"${l.strong ? ` font-weight="600"` : ""} ${halo(fs)}>${h(l.text)}</text>`;
+  }
+  return `<svg ${SVG_OPEN} viewBox="${x0.toFixed(2)} ${y0.toFixed(2)} ${(x1 - x0).toFixed(2)} ${(y1 - y0).toFixed(2)}" tabindex="0" aria-label="Axonometric of the lot, its surroundings in half tone, the setback envelope and the two masses; drag or use the arrow keys to turn it">${body}${streets}${labels.join("")}</svg>`;
 }

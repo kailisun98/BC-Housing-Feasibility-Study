@@ -1,5 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 110" width="200" height="110">
-  <!-- First Read, the stacked lockup with the subtitle: for a title slide, a PDF's cover, a sheet's title block. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 110" width="300" height="110">
+  <!-- First Read, the stacked lockup with the subtitle: for a title slide, a PDF's cover, a sheet's title block.
+       300 wide so the whole subtitle fits in the fallback sans an <img> draws it in (20 Nov 2026: at 200 it was cut at
+       "non-prof"). -->
   <g fill="currentColor" transform="translate(0 0) scale(1.25)">
     <rect x="3" y="15.25" width="26" height="1.5" rx=".75"/>
     <rect x="4.25" y="12.5" width="1.5" height="7" rx=".75"/>

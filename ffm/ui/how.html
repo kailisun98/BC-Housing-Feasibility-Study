@@ -23,7 +23,8 @@
     <a href="who.html">Who it's for</a>
     <a href="case.html">The case</a>
   </nav>
-  <a class="btn btn-paper btn-small nav-cta" href="app.html?mode=manager">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+  <a class="btn btn-paper btn-small nav-cta" href="app.html?mode=manager" title="The tool asks for an address and a building option, then writes the memo. To see the real case first, take the walkthrough." aria-describedby="cta-d">Open the tool <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
+  <span id="cta-d" hidden>The tool asks for an address and a building option, then writes the memo. To see the real case first, take the walkthrough.</span>
 </header>
 
 <main id="main">
@@ -36,32 +37,32 @@
   </div>
   <div class="hero-art">
     <!-- the option over the rule stack: the same 30° projection as the home page's massing, the stack's six layers
-         exploded so each can be named; the memo sheet beside it carries the four answers of the committed R1 -->
+         exploded so each can be named, each tinted by what its layer found on R1 and labelled with that result (from
+         outputs/998-e-19th-ave/as-approved/ledger.json); the memo sheet beside it carries R1's four answers. Drawn by
+         a scratch generator; every slab is written out, no <use>, so the page's styles reach it -->
     <svg class="hero-iso hero-hw" viewBox="0 0 640 372" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="hw-t hw-d">
       <title id="hw-t">The option over the rule stack, and the memo</title>
-      <desc id="hw-d">A six-storey option in blue hovers over six exploded layers, A to F: the zoning district, the Province, City policy, design standards, funders and assumptions. Beside them is the memo for 998 E 19th Ave, revision 1, with its four answers: by rezoning yes, funders not yet confirmed, eight open items, the money needing more sources.</desc>
+      <desc id="hw-d">A six-storey option in blue hovers over six exploded layers of rules, each with what it found on the approved case: A, the zoning district, fail, a rezoning is required; B, the Province, not applicable; C, City policy, conditional, three trees short; D, design standards, three flags for information; E, the funders, uncertain, figures missing; F, the cost assumptions, seven for information. Beside them is the memo for 998 E 19th Ave, revision 1, with its four answers: not outright, by rezoning yes; funders not yet confirmed; eight open items; the money needs more sources.</desc>
       <defs>
-        <g id="hw-slab-shape"><polygon class="top" points="235,215 364.9,290 281.8,338 151.9,263"/><polygon class="side" points="364.9,290 281.8,338 281.8,347 364.9,299"/><polygon class="side" points="151.9,263 281.8,338 281.8,347 151.9,272"/></g>
         <!-- the mark, copied from brand/mark.svg, so the drawing fetches nothing while it builds -->
         <g id="hw-mark-shape"><rect x="3" y="15.25" width="26" height="1.5" rx=".75"/><rect x="4.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="16.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="22.25" y="12.5" width="1.5" height="7" rx=".75"/><rect x="28.25" y="12.5" width="1.5" height="7" rx=".75"/><path d="M11 9.4 17.6 16 11 22.6 4.4 16Z"/></g>
       </defs>
-      <g class="hw-slab" data-k="0"><use href="#hw-slab-shape"/></g>
-      <g class="hw-slab" data-k="1"><use href="#hw-slab-shape" y="-30"/></g>
-      <g class="hw-slab" data-k="2"><use href="#hw-slab-shape" y="-60"/></g>
-      <g class="hw-slab" data-k="3"><use href="#hw-slab-shape" y="-90"/></g>
-      <g class="hw-slab" data-k="4"><use href="#hw-slab-shape" y="-120"/></g>
-      <g class="hw-slab" data-k="5"><use href="#hw-slab-shape" y="-150"/></g>
-      <g class="hw-label"><line x1="151.9" y1="113" x2="134" y2="113"/><text x="128" y="117" text-anchor="end"><tspan class="lk">A</tspan><tspan class="nm" dx="6">Zoning district</tspan></text></g>
-      <g class="hw-label"><line x1="151.9" y1="143" x2="134" y2="143"/><text x="128" y="147" text-anchor="end"><tspan class="lk">B</tspan><tspan class="nm" dx="6">Province</tspan></text></g>
-      <g class="hw-label"><line x1="151.9" y1="173" x2="134" y2="173"/><text x="128" y="177" text-anchor="end"><tspan class="lk">C</tspan><tspan class="nm" dx="6">City policy</tspan></text></g>
-      <g class="hw-label"><line x1="151.9" y1="203" x2="134" y2="203"/><text x="128" y="207" text-anchor="end"><tspan class="lk">D</tspan><tspan class="nm" dx="6">Design standards</tspan></text></g>
-      <g class="hw-label"><line x1="151.9" y1="233" x2="134" y2="233"/><text x="128" y="237" text-anchor="end"><tspan class="lk">E</tspan><tspan class="nm" dx="6">Funders</tspan></text></g>
-      <g class="hw-label"><line x1="151.9" y1="263" x2="134" y2="263"/><text x="128" y="267" text-anchor="end"><tspan class="lk">F</tspan><tspan class="nm" dx="6">Assumptions</tspan></text></g>
-      <polygon class="hw-shadow" points="247.1,98 307.7,133 269.6,155 209,120"/>
-      <g class="iso-proposed"><polygon class="face-top" points="247.1,24 307.7,59 269.6,81 209,46"/><polygon class="face-front" points="209,46 269.6,81 269.6,129 209,94"/><polygon class="face-left" points="307.7,59 269.6,81 269.6,129 307.7,107"/></g>
-      <g class="iso-floors"><line x1="209" y1="86" x2="269.6" y2="121"/><line x1="269.6" y1="121" x2="307.7" y2="99"/><line x1="209" y1="78" x2="269.6" y2="113"/><line x1="269.6" y1="113" x2="307.7" y2="91"/><line x1="209" y1="70" x2="269.6" y2="105"/><line x1="269.6" y1="105" x2="307.7" y2="83"/><line x1="209" y1="62" x2="269.6" y2="97"/><line x1="269.6" y1="97" x2="307.7" y2="75"/><line x1="209" y1="54" x2="269.6" y2="89"/><line x1="269.6" y1="89" x2="307.7" y2="67"/></g>
-      <g class="iso-label"><line x1="209" y1="46" x2="178" y2="30"/><text x="172" y="27" text-anchor="end"><tspan class="l1">The option</tspan><tspan class="l2" x="172" dy="14">6 storeys · 22.3 m · FSR 2.95</tspan></text></g>
-      <g class="hw-arrow"><line x1="378" y1="196" x2="414" y2="196"/><path d="M408 190 414 196 408 202"/></g>
+      <g class="hw-slab" data-k="0" data-st="info"><polygon class="top" points="90,244 200.9,308 129.8,349 19,285"/><polygon class="side" points="200.9,308 129.8,349 129.8,358 200.9,317"/><polygon class="side" points="19,285 129.8,349 129.8,358 19,294"/><polyline class="edge" points="19,285 129.8,349 200.9,308"/></g>
+      <g class="hw-slab" data-k="1" data-st="uncertain"><polygon class="top" points="90,208 200.9,272 129.8,313 19,249"/><polygon class="side" points="200.9,272 129.8,313 129.8,322 200.9,281"/><polygon class="side" points="19,249 129.8,313 129.8,322 19,258"/><polyline class="edge" points="19,249 129.8,313 200.9,272"/></g>
+      <g class="hw-slab" data-k="2" data-st="info"><polygon class="top" points="90,172 200.9,236 129.8,277 19,213"/><polygon class="side" points="200.9,236 129.8,277 129.8,286 200.9,245"/><polygon class="side" points="19,213 129.8,277 129.8,286 19,222"/><polyline class="edge" points="19,213 129.8,277 200.9,236"/></g>
+      <g class="hw-slab" data-k="3" data-st="conditional"><polygon class="top" points="90,136 200.9,200 129.8,241 19,177"/><polygon class="side" points="200.9,200 129.8,241 129.8,250 200.9,209"/><polygon class="side" points="19,177 129.8,241 129.8,250 19,186"/><polyline class="edge" points="19,177 129.8,241 200.9,200"/></g>
+      <g class="hw-slab" data-k="4" data-st="na"><polygon class="top" points="90,100 200.9,164 129.8,205 19,141"/><polygon class="side" points="200.9,164 129.8,205 129.8,214 200.9,173"/><polygon class="side" points="19,141 129.8,205 129.8,214 19,150"/><polyline class="edge" points="19,141 129.8,205 200.9,164"/></g>
+      <g class="hw-slab" data-k="5" data-st="fail"><polygon class="top" points="90,64 200.9,128 129.8,169 19,105"/><polygon class="side" points="200.9,128 129.8,169 129.8,178 200.9,137"/><polygon class="side" points="19,105 129.8,169 129.8,178 19,114"/><polyline class="edge" points="19,105 129.8,169 200.9,128"/></g>
+      <polygon class="hw-shadow" points="99.5,90.5 155,122.5 120.3,142.5 64.9,110.5"/>
+      <g class="iso-proposed"><polygon class="face-top" points="99.5,16.5 155,48.5 120.3,68.5 64.9,36.5"/><polygon class="face-front" points="64.9,36.5 120.3,68.5 120.3,116.5 64.9,84.5"/><polygon class="face-left" points="155,48.5 120.3,68.5 120.3,116.5 155,96.5"/></g>
+      <g class="iso-floors"><line x1="64.9" y1="76.5" x2="120.3" y2="108.5"/><line x1="120.3" y1="108.5" x2="155" y2="88.5"/><line x1="64.9" y1="68.5" x2="120.3" y2="100.5"/><line x1="120.3" y1="100.5" x2="155" y2="80.5"/><line x1="64.9" y1="60.5" x2="120.3" y2="92.5"/><line x1="120.3" y1="92.5" x2="155" y2="72.5"/><line x1="64.9" y1="52.5" x2="120.3" y2="84.5"/><line x1="120.3" y1="84.5" x2="155" y2="64.5"/><line x1="64.9" y1="44.5" x2="120.3" y2="76.5"/><line x1="120.3" y1="76.5" x2="155" y2="56.5"/></g>
+      <g class="hw-label"><line x1="204.9" y1="308" x2="220.9" y2="308"/><text x="226.9" y="312.5"><tspan class="lk">F</tspan><tspan class="nm" dx="7">Assumptions</tspan></text><g class="hw-chip info"><rect x="226.9" y="316" width="167.3" height="18" rx="9"/><circle cx="237.4" cy="325" r="6.5"/><text class="gl" x="237.4" y="328.2" text-anchor="middle">i</text><text class="cw" x="249.9" y="329">Info: seven assumptions</text></g></g>
+      <g class="hw-label"><line x1="204.9" y1="272" x2="220.9" y2="272"/><text x="226.9" y="276.5"><tspan class="lk">E</tspan><tspan class="nm" dx="7">Funders</tspan></text><g class="hw-chip uncertain"><rect x="226.9" y="280" width="175.8" height="18" rx="9"/><circle cx="237.4" cy="289" r="6.5"/><text class="gl" x="237.4" y="292.2" text-anchor="middle">?</text><text class="cw" x="249.9" y="293">Uncertain: figures missing</text></g></g>
+      <g class="hw-label"><line x1="204.9" y1="236" x2="220.9" y2="236"/><text x="226.9" y="240.5"><tspan class="lk">D</tspan><tspan class="nm" dx="7">Design standards</tspan></text><g class="hw-chip info"><rect x="226.9" y="244" width="120.7" height="18" rx="9"/><circle cx="237.4" cy="253" r="6.5"/><text class="gl" x="237.4" y="256.2" text-anchor="middle">i</text><text class="cw" x="249.9" y="257">Info: three flags</text></g></g>
+      <g class="hw-label"><line x1="204.9" y1="200" x2="220.9" y2="200"/><text x="226.9" y="204.5"><tspan class="lk">C</tspan><tspan class="nm" dx="7">City policy</tspan></text><g class="hw-chip conditional"><rect x="226.9" y="208" width="172.1" height="18" rx="9"/><circle cx="237.4" cy="217" r="6.5"/><text class="gl" x="237.4" y="220.2" text-anchor="middle">!</text><text class="cw" x="249.9" y="221">Conditional: 3 trees short</text></g></g>
+      <g class="hw-label"><line x1="204.9" y1="164" x2="220.9" y2="164"/><text x="226.9" y="168.5"><tspan class="lk">B</tspan><tspan class="nm" dx="7">Province</tspan></text><g class="hw-chip na"><rect x="226.9" y="172" width="112.8" height="18" rx="9"/><circle cx="237.4" cy="181" r="6.5"/><text class="gl" x="237.4" y="184.2" text-anchor="middle">–</text><text class="cw" x="249.9" y="185">Not applicable</text></g></g>
+      <g class="hw-label"><line x1="204.9" y1="128" x2="220.9" y2="128"/><text x="226.9" y="132.5"><tspan class="lk">A</tspan><tspan class="nm" dx="7">Zoning district</tspan></text><g class="hw-chip fail"><rect x="226.9" y="136" width="155.8" height="18" rx="9"/><circle cx="237.4" cy="145" r="6.5"/><text class="gl" x="237.4" y="148.2" text-anchor="middle">✗</text><text class="cw" x="249.9" y="149">Fail: rezoning required</text></g></g>
+      <g class="iso-label"><line x1="158" y1="48.5" x2="220.9" y2="42.5"/><text x="226.9" y="39.5"><tspan class="l1">The option</tspan><tspan class="l2" x="226.9" dy="15">6 storeys · 22.3 m · FSR 2.95</tspan></text></g>
       <g class="hw-sheet">
         <rect class="pg" x="424" y="56" width="196" height="280" rx="6"/>
         <use class="hw-mark" href="#hw-mark-shape" transform="translate(438 69) scale(.375)"/>
@@ -72,10 +73,19 @@
         <text class="t4 hw-s" x="438" y="123">As approved · 6 storeys · 105 homes</text>
         <g class="row fail"><rect x="438" y="140" width="168" height="42" rx="5"/><text class="q hw-s" x="448" y="156">1 · Is it allowed?</text><text class="v hw-s" x="448" y="172">Not outright. Rezoning: yes.</text><text class="v hw-p" x="448" y="168">Not outright</text></g>
         <g class="row uncertain"><rect x="438" y="188" width="168" height="42" rx="5"/><text class="q hw-s" x="448" y="204">2 · Does it fit the funders?</text><text class="v hw-s" x="448" y="220">Not yet confirmed.</text><text class="v hw-p" x="448" y="216">Not confirmed</text></g>
-        <g class="row conditional"><rect x="438" y="236" width="168" height="42" rx="5"/><text class="q hw-s" x="448" y="252">3 · What is still unsure?</text><text class="v hw-s" x="448" y="268">Eight open items.</text><text class="v hw-p" x="448" y="264">8 open items</text></g>
+        <g class="row conditional"><rect x="438" y="236" width="168" height="42" rx="5"/><text class="q hw-s" x="448" y="252">3 · What is still unsure?</text><text class="v hw-s" x="448" y="268">Seven open items.</text><text class="v hw-p" x="448" y="264">7 open items</text></g>
         <g class="row conditional"><rect x="438" y="284" width="168" height="42" rx="5"/><text class="q hw-s" x="448" y="300">4 · Does the money work?</text><text class="v hw-s" x="448" y="316">Needs more sources.</text><text class="v hw-p" x="448" y="312">More sources</text></g>
       </g>
     </svg>
+    <!-- on a phone the drawing's chips are too small to read, so the six results follow it as text (site.css) -->
+    <ul class="hw-legend" aria-hidden="true">
+      <li><b>A</b> Zoning district <span class="pill pill-fail">Fail: rezoning required</span></li>
+      <li><b>B</b> Province <span class="pill pill-not_applicable">Not applicable</span></li>
+      <li><b>C</b> City policy <span class="pill pill-conditional">Conditional: 3 trees short</span></li>
+      <li><b>D</b> Design standards <span class="pill pill-info">Info: three flags</span></li>
+      <li><b>E</b> Funders <span class="pill pill-uncertain">Uncertain: figures missing</span></li>
+      <li><b>F</b> Assumptions <span class="pill pill-info">Info: seven assumptions</span></li>
+    </ul>
   </div>
 </section>
 
@@ -88,19 +98,20 @@
       <p class="sub">Each rule is stored as a structured clause with its source, its section and the date it took effect. Once it is in, the tool reuses it for every address, and someone reads the source again only when the rule changes.</p>
     </div>
 
-    <div class="diagram reveal" role="img" aria-label="Five inputs flow into the tool, which holds six layers of rules and four steps: the rules engine, the massing, the pro&#8209;forma and the memo writer. Six outputs come out: a cited rule table, a massing, a funding-fit matrix, a feasibility pro&#8209;forma, the memo with its two-page summary, and a version ledger. A rule or program change reruns the tool with a new stamp.">
-      <div class="io">
+    <div class="diagram reveal" role="img" aria-label="Five inputs, each with a line into the tool, which holds six layers of rules and four steps: the rules engine, the massing, the pro&#8209;forma and the memo writer. Lines fan out from the tool to six outputs: a cited rule table, a massing, a funding-fit answer, a pro&#8209;forma with every line cited, the memo with its two-page summary, and a version ledger. A rule or program change reruns the tool with a new revision.">
+      <!-- the leaders into the tool and out to the outputs are drawn by site.js from data-to (site.css "connectors") -->
+      <div class="io" data-links>
         <div class="col in">
           <p class="col-title">What goes in</p>
-          <div class="node"><b>Address</b></div>
-          <div class="node"><b>Lot area and frontage</b></div>
-          <div class="node"><b>Option</b><span>storeys, floor area, units, tenure</span></div>
-          <div class="node"><b>Target programs</b></div>
-          <div class="node"><b>Tree survey</b><span>optional</span></div>
+          <div class="node" data-to="io-tool"><b>Address</b></div>
+          <div class="node" data-to="io-tool"><b>Lot area and frontage</b></div>
+          <div class="node" data-to="io-tool"><b>Option</b><span>storeys, floor area, units, tenure</span></div>
+          <div class="node" data-to="io-tool"><b>Target programs</b></div>
+          <div class="node" data-to="io-tool"><b>Tree survey</b><span>optional</span></div>
         </div>
         <div class="col mid">
           <p class="col-title">Inside</p>
-          <div class="inside">
+          <div class="inside" id="io-tool" data-to="io-o1 io-o2 io-o3 io-o4 io-o5 io-o6">
             <div class="node band"><b><span class="lk">A</span>Zoning district</b><span>R1-1, RT, RM, RR, C-2; a CD-1 by its own by-law</span></div>
             <div class="node band"><b><span class="lk">B</span>Provincial overrides</b><span>SSMUH, transit-oriented areas</span></div>
             <div class="node band"><b><span class="lk">C</span>City policy</b><span>family mix, rents, trees, levies</span></div>
@@ -116,12 +127,12 @@
         </div>
         <div class="col out">
           <p class="col-title">What comes out</p>
-          <div class="node"><b>Rule table, cited</b></div>
-          <div class="node"><b>Massing</b></div>
-          <div class="node"><b>Funding-fit answer</b></div>
-          <div class="node"><b>Pro&#8209;forma, every line cited</b></div>
-          <div class="node"><b>Memo, two-page summary first</b></div>
-          <div class="node"><b>Version ledger</b></div>
+          <div class="node" id="io-o1"><b>Rule table, cited</b></div>
+          <div class="node" id="io-o2"><b>Massing</b></div>
+          <div class="node" id="io-o3"><b>Funding-fit answer</b></div>
+          <div class="node" id="io-o4"><b>Pro&#8209;forma, every line cited</b></div>
+          <div class="node" id="io-o5"><b>Memo, two-page summary first</b></div>
+          <div class="node" id="io-o6"><b>Version ledger</b></div>
         </div>
       </div>
       <p class="loop"><span class="ret">↺</span> When a rule or program changes, run it again: the memo gets a new revision and lists what moved.</p>
@@ -138,23 +149,21 @@
       <p class="sub">There are twelve steps. One takes the inputs and five are ordinary code; one uses a language model, once, to turn a PDF into a clause and a date; three are checks that stop the run if they fail; and two belong to a person. If an input is marked "not sure", the rule that needs it stops there and the memo reports it as uncertain instead of passing it.</p>
     </div>
 
-    <div class="diagram logic reveal" role="img" aria-label="Twelve numbered steps in three rows. Row one, steps 1 to 4: inputs, look up the site, extract rules (a model, once, offline), verify the rule table (a person). Row two, right to left, steps 5 to 8: test the option, is it cited and dated, draw the massing, does it match the rules. Row three, steps 9 to 12: funding fit, write the memo from the ledger, do the numbers tie out and stamp the version, review and decide (a person).">
-      <!-- the steps are numbered in reading order (the second row reads right to left) and arrive in that order with
-           the arrow after each (site.css, "the twelve steps arrive in reading order"); --i is each one's place -->
+    <div class="diagram logic reveal" role="img" aria-label="Twelve numbered steps in three rows of four, each row read left to right. Steps 1 to 4: inputs, look up the site, extract rules (a model, once, offline), verify the rule table (a person). Steps 5 to 8: test the option, is it cited and dated, draw the massing, does it match the rules. Steps 9 to 12: funding fit, write the memo from the ledger, do the numbers tie out and stamp the revision, review and decide (a person).">
+      <!-- three rows of four, each read left to right in number order like lines of text; the steps arrive in that order
+           with the arrow after each (site.css, "the twelve steps arrive in reading order"); --i is each one's place -->
       <div class="row four">
         <div class="node" style="--i: 1"><span class="kind">01 · data</span><b>Inputs</b><span>address, lot, option</span></div>
         <div class="node" style="--i: 2"><span class="kind">02 · script</span><b>Look up the site</b><span>district, SSMUH, TOA</span></div>
         <div class="node signal" style="--i: 3"><span class="kind">03 · model · once, offline</span><b>Extract rules</b><span>PDF to clause and date</span></div>
         <div class="node person" style="--i: 4"><span class="kind">04 · person</span><b>Verify the rule table</b><span>confirm; flag what is unsure</span></div>
       </div>
-      <div class="down four"><i></i><i></i><i></i><i class="on" style="--i: 4.5"></i></div>
-      <div class="row four rtl">
-        <div class="node check" style="--i: 8"><span class="kind">08 · check</span><b>Matches the rules?</b><span>area and height agree</span></div>
-        <div class="node" style="--i: 7"><span class="kind">07 · script</span><b>Draw the massing</b><span>floor plates in the envelope</span></div>
-        <div class="node check" style="--i: 6"><span class="kind">06 · check</span><b>Cited and dated?</b><span>a source and a date on all</span></div>
+      <div class="row four">
         <div class="node" style="--i: 5"><span class="kind">05 · script</span><b>Test the option</b><span>pass, fail, uncertain</span></div>
+        <div class="node check" style="--i: 6"><span class="kind">06 · check</span><b>Cited and dated?</b><span>a source and a date on all</span></div>
+        <div class="node" style="--i: 7"><span class="kind">07 · script</span><b>Draw the massing</b><span>floor plates in the envelope</span></div>
+        <div class="node check" style="--i: 8"><span class="kind">08 · check</span><b>Matches the rules?</b><span>area and height agree</span></div>
       </div>
-      <div class="down four"><i class="on" style="--i: 8.5"></i><i></i><i></i><i></i></div>
       <div class="row four">
         <div class="node" style="--i: 9"><span class="kind">09 · script</span><b>Funding fit</b><span>each program's criteria</span></div>
         <div class="node" style="--i: 10"><span class="kind">10 · script</span><b>Write the memo</b><span>from the ledger: two plain pages, then the clauses</span></div>
@@ -162,10 +171,10 @@
         <div class="node person" style="--i: 12"><span class="kind">12 · person</span><b>Review and decide</b><span>the board decides</span></div>
       </div>
       <div class="legend" style="--i: 13">
-        <span><i></i>script: ordinary code, same result every time</span>
-        <span><i class="signal"></i>model: reads text into data, once, checked by a person</span>
-        <span><i class="check"></i>check: stops the run if it fails</span>
-        <span><i class="person"></i>person</span>
+        <span><i></i><b>script</b> ordinary code, the same result every time</span>
+        <span><i class="signal"></i><b>model</b> Claude reads a PDF once; a person confirms what it found; the engine decides</span>
+        <span><i class="check"></i><b>check</b> stops the run if it fails</span>
+        <span><i class="person"></i><b>person</b> a judgement the tool leaves to someone named</span>
       </div>
       <p class="diagram-cap" style="--i: 13">If the massing fails the "matches the rules" check, it is redrawn. When a rule or program changes, the run starts again at the rule table and the memo gets a new revision listing what changed. Each step hands the next one a file: the rule table, the ledger, the massing, and the memo with its stamp.</p>
     </div>
@@ -181,7 +190,7 @@
       <p class="sub">Each layer comes from a different body and changes on its own schedule. Where two layers conflict on geometry, the stricter one governs, and where the Province sets a minimum, it overrides a lower local limit.</p>
     </div>
     <ol class="items four reveal">
-      <li class="item"><span class="n">A · 62 rules</span><span class="key">Zoning district</span><h3>The shape a building may take.</h3><p>Height, yards, floor space ratio and parking, from Vancouver's Zoning and Development By-law. Twenty-one districts are read from the City's own PDFs (RM-3, RM-3A, RM-4, the RM-5 family, RT-3, R1-1, the C-2 family and the RR rental districts); RM-1's figures come from the 998 E 19th Ave referral report, and most of the RT family was entered from recollection, so both say "unverified" in the memo until a person reads the schedule. A CD-1 site, zoned by its own by-law, matches the rules keyed to its by-law number: CD-1 (324) read from the by-law, CD-1 (819) from a referral report's draft and marked unverified.</p></li>
+      <li class="item"><span class="n">A · 62 rules</span><span class="key">Zoning district</span><h3>The shape a building may take.</h3><p>Height, yards, floor space ratio and parking, from Vancouver's Zoning and Development By-law. Twenty-one districts are read from the City's own PDFs: RM-3, RM-3A, RM-4, the RM-5 family, RT-3, R1-1, the C-2 family and the RR rental districts. A CD-1 site, zoned by its own by-law, matches the rules keyed to its by-law number.</p></li>
       <li class="item"><span class="n">B · 2 rules</span><span class="key">Province</span><h3>Minimums a city cannot go below.</h3><p>The least number of homes allowed on a small lot, set by its size and its distance to a bus stop, and minimum heights near transit stations. Bills 44 and 47, in force since 2024.</p></li>
       <li class="item"><span class="n">C · 6 rules</span><span class="key">City policy</span><h3>What attaches to a rezoning.</h3><p>Family-sized units, the definition of social housing, below-market rents, the tree by-law and development charges, and the Downtown Eastside Plan's own family target where a site is in that area. The family-unit rule changed on 27 Oct 2026.</p></li>
       <li class="item"><span class="n">D · 3 rules</span><span class="key">Design standards</span><h3>What shapes the option itself.</h3><p>BC Housing's minimum unit areas, the building code basis under the 2025 Vancouver Building By-law, and the code's exit clauses: how many exits a floor needs, how far apart, how far a unit's door is from one, and how long a corridor may run past the last. The exits are read on every floor of the plans; the rest are flagged for the architect.</p></li>
@@ -189,6 +198,18 @@
       <li class="item"><span class="n">F · 7 assumptions</span><span class="key">Assumptions</span><h3>What the pro&#8209;forma counts with.</h3><p>An early-stage (Class D) construction cost, the Statistics Canada price index, the Bank of Canada rate, CMHC rents and CMHC's coverage ratio. Each is dated and cited, one command refreshes them, and any placeholder is labelled as one.</p></li>
       <li class="item"><span class="n">By design</span><span class="key">Left to a person</span><h3>Four things stay uncertain.</h3><p>Which transit-oriented tier a parcel falls in, what a CD-1 rezoning is negotiated to, whether council waives the charges, and the land price on a private site. The memo names each one and hands it to a person.</p></li>
     </ol>
+    <!-- the seven are the rules whose newest version says source.verified false in rules/*.json on 20 Nov 2026:
+         cov.rt.outright_fsr, cov.rt.outright_height, cov.cd1_819.outright_fsr, cov.cd1_819.outright_height,
+         bc.toa.minimum_density, cov.dtes.family_units, bcbc.exits -->
+    <div class="unknowns reveal">
+      <h3>What it does not know yet</h3>
+      <ul>
+        <li>Seven of the 84 rules are entered but not yet checked against their documents: the RT districts other than RT-3, typed from recollection; CD-1 (819), read from a referral report's draft; the building code's exit clauses; the transit-oriented tiers 4 and 5; and the Downtown Eastside family target. A district schedule like that becomes an open item in the memo of any site it is used on.</li>
+        <li>RM-1's figures, the approved case's own district, come from the City's referral report rather than the district schedule.</li>
+        <li>A district with no schedule in the rules reads "not assessed", never "yes".</li>
+        <li>In the costs, the soft costs, the contingency and the operating figures are placeholders until a project gives its own, and the construction cost is a figure for two- to four-unit buildings.</li>
+      </ul>
+    </div>
   </div>
 </section>
 
@@ -196,9 +217,9 @@
 <section class="sec slab" id="steps" data-n="04" aria-labelledby="steps-h">
   <div class="wrap">
     <div class="sec-head reveal">
-      <p class="eyebrow"><span class="n">04</span>In the tool</p>
-      <h2 id="steps-h">The tool is one page: a route of three stops, one card at a time, then the memo.</h2>
-      <p class="sub">The route sits on the left and shows each stop's decision once it is made. The stage beside it holds one card, the stop's input above what it found. After the run the route folds and the memo takes the page, with Download PDF in its title block.</p>
+      <p class="eyebrow"><span class="n">04</span>What you receive</p>
+      <h2 id="steps-h">Three stops in the tool, then a memo to keep.</h2>
+      <p class="sub">You give the tool a site, shape an option and run it. What comes back is a dated memo with four answers, the open items with a name on each, the drawings and a PDF to hand round.</p>
     </div>
     <div class="steps-strip reveal" aria-hidden="true">
       <span class="on"><i>1</i> The site</span><span class="ln"></span>
@@ -207,15 +228,74 @@
       <span><i>4</i> The memo</span>
     </div>
     <ol class="items four reveal" style="margin-top: 36px">
-      <li class="item"><span class="n">01</span><span class="key">The site</span><h3>An address, a parcel to check.</h3><p>The City's open data gives the district, the parcel and the lot, drawn on a map to confirm. Then the questions the data could not answer, asked once: the policy areas, what stays on the lot, the owner, which street is the front. "Not sure" is a normal answer.</p></li>
-      <li class="item"><span class="n">02</span><span class="key">The option</span><h3>Derived from the rules, or yours.</h3><p>The programs as toggles and what the site allows, then a candidate: funder-ready, outright, or the staff benchmark. Four figures to change in place, every other figure behind "All 21 figures" with its rule beside it. No schedule for the district: a rough envelope from the lot and the code stands in. The unit mix is a preset or your own shares.</p></li>
-      <li class="item"><span class="n">03</span><span class="key">Run</span><h3>The money in, then the rules.</h3><p>Land, equity and other grants are the three figures only you know; the rest is dated and cited. A run takes under a second: four answers, the drawings and every rule with its numbers and source. Two runs go side by side.</p></li>
-      <li class="item"><span class="n">04</span><span class="key">The memo</span><h3>A PDF for the board, a handoff to the architect, a massing for Revit.</h3><p>Download PDF lays the memo out for a reviewer. Issue hands the revision to the architect with your name and a note; they place the mass, draw the plans and issue it back. A pyRevit script builds the masses on an annotated Revit sheet.</p></li>
+      <li class="item"><span class="n">01</span><span class="key">The memo</span><h3>One dated revision, R1, R2, R3.</h3><p>Its title block names the site, the option and the date of the rules it read. Two plain pages come first; every clause, with its numbers and its source, follows.</p></li>
+      <li class="item"><span class="n">02</span><span class="key">Four answers</span><h3>Allowed, funded, unsure, money.</h3><p>Is it allowed, outright and by rezoning; does it fit the funders; what is still unsure; does the money work. Each answer names the rules that decide it.</p></li>
+      <li class="item"><span class="n">03</span><span class="key">Open items</span><h3>A name on every one.</h3><p>Each open item says who settles it and what to do next. The approved case has eight; the diagram below puts them in order, person by person.</p></li>
+      <li class="item"><span class="n">04</span><span class="key">Drawings and a PDF</span><h3>The massing, the plans, the paper.</h3><p>The massing the rules allow in plan, section and 3D, the floor plans with their exits checked, and a Revit sheet from the same numbers. Download PDF lays it all out for a board.</p></li>
     </ol>
     <div class="sec-foot reveal">
       <a class="btn btn-paper" href="app.html?tour=1">Run the real case with a walkthrough <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M6 4h6v6"/></svg></a>
       <a class="text-link" href="who.html">Who does what, step by step <svg class="arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
     </div>
+  </div>
+</section>
+
+<!-- ------------------------------------------------------------ 05 after the memo: who settles what, in order -->
+<section class="sec" id="after" data-n="05" aria-labelledby="after-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <p class="eyebrow"><span class="n">05</span>After the memo</p>
+      <h2 id="after-h">Who settles each open item, and in what order.</h2>
+      <p class="sub">The approved case's memo, R1, leaves seven open items, each with a person. Here they are in the order a project meets them, from the figures a manager can give before the board votes to the tree count set at the permit.</p>
+    </div>
+
+    <!-- the open items and their actions from outputs/998-e-19th-ave/as-approved/ledger.json (summary.answers.unsure,
+         as memo.md answer 3 prints them) and layout.json (the plate; its exits pass); the fund's status from
+         rules/e_funding_programs.json; the owner's tenure plan from the site's inputs. Lanes as rows, stages as
+         columns, the hand-offs drawn by site.js from data-to; a phone reads it as one numbered list -->
+    <div class="lanes reveal" data-links role="group" aria-label="Who settles each of the approved case's open items, in order">
+      <p class="ph" style="grid-column: 2">Before the board votes</p>
+      <p class="ph" style="grid-column: 3">Before the plans are fixed</p>
+      <p class="ph" style="grid-column: 4">The rezoning</p>
+      <p class="ph" style="grid-column: 5">Funding</p>
+      <p class="ph" style="grid-column: 6">The permit</p>
+
+      <div class="band" style="grid-row: 2"></div>
+      <div class="band alt" style="grid-row: 3"></div>
+      <div class="band" style="grid-row: 4"></div>
+      <div class="band alt" style="grid-row: 5"></div>
+      <div class="band last" style="grid-row: 6"></div>
+      <p class="lane-name" style="grid-row: 2">Development manager<span>the non-profit</span></p>
+      <p class="lane-name" style="grid-row: 3">The owner<span>the church</span></p>
+      <p class="lane-name" style="grid-row: 4">The funder<span>BC Builds, BC Housing</span></p>
+      <p class="lane-name" style="grid-row: 5">The architect</p>
+      <p class="lane-name" style="grid-row: 6">The City<span>staff, then Council</span></p>
+
+      <div class="cell" style="grid-row: 2; grid-column: 2">
+        <div class="node" id="ln-1" data-to="ln-8" data-who="Development manager · before the board votes"><span class="kind">01</span><b>The funders' figures</b><span>The homes at least 20% below market, the rent-tier split, the accessible homes (5% at least).</span></div>
+      </div>
+      <div class="cell" style="grid-row: 3; grid-column: 2">
+        <div class="node" id="ln-2" data-to="ln-8" data-who="The owner · before the board votes"><span class="kind">02</span><b>The land tenure</b><span>A lease of 60 years or more at a nominal rent, or ownership; the plan's lease or transfer is still to confirm.</span></div>
+      </div>
+      <div class="cell" style="grid-row: 5; grid-column: 3">
+        <div class="node" id="ln-3" data-who="The architect · before the plans are fixed"><span class="kind">03</span><b>The yards and the heritage register</b><span>RM-1's yard clauses, and the register for a church site.</span></div>
+        <div class="node" id="ln-4" data-to="ln-6" data-who="The architect · before the plans are fixed"><span class="kind">04</span><b>The homes the plate holds</b><span>67 of the 105 fit on six floors of 69.6 × 19.9 m: more storeys, a larger plate or a smaller program.</span></div>
+        <div class="node" id="ln-5" data-who="The architect · before the plans are fixed"><span class="kind">05</span><b>Three more trees</b><span>Room for 3 more, or $3,000 cash in lieu.</span></div>
+      </div>
+      <div class="cell" style="grid-row: 5; grid-column: 4">
+        <div class="node" id="ln-6" data-to="ln-7" data-who="The architect, with the manager · the rezoning"><span class="kind">06 · with the manager</span><b>The height case</b><span>22.3 m against a staff benchmark of 19.9 to 21.3 m: shadow and daylight studies.</span></div>
+      </div>
+      <div class="cell" style="grid-row: 6; grid-column: 4">
+        <div class="node" id="ln-7" data-to="ln-9" data-who="The City · the rezoning"><span class="kind">07</span><b>Staff, then Council</b><span>Staff test it against the RM-4 benchmark; Council decides after a public hearing.</span></div>
+      </div>
+      <div class="cell" style="grid-row: 4; grid-column: 5">
+        <div class="node" id="ln-8" data-who="The funder · funding"><span class="kind">08</span><b>BC Builds and the Community Housing Fund</b><span>A current Property Opportunity Notice; the fund's next call, its 2025 call cancelled in Feb 2026.</span></div>
+      </div>
+      <div class="cell" style="grid-row: 6; grid-column: 6">
+        <div class="node" id="ln-9" data-who="The City · the permit"><span class="kind">09</span><b>The final tree count</b><span>Set at the development permit.</span></div>
+      </div>
+    </div>
+    <p class="diagram-cap lanes-cap reveal">Each node is one of R1's open items or the step it leads to. The order is the usual one, not a rule: the funders' figures and the land tenure cost nothing to settle, so they come first, and only a rezoning Council approves reaches a permit.</p>
   </div>
 </section>
 

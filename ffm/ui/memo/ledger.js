@@ -1,7 +1,31 @@
 /* The full ledger, layer by layer (A zoning to F assumptions), each finding with its rule and source. */
 
-import { $, $$, fmtValues, h, pill, REV, STATUS_WORD, unverifiedTag } from "../core/util.js";
+import { $, $$, fmtNum, h, keyWords, paramWords, pill, REV, STATUS_WORD, unverifiedTag } from "../core/util.js";
 import { refTagOf } from "./memo.js";
+
+/* A figure the rules call a share prints as a percentage wherever the key says share, as the rest of the memo prints
+   it (20 Nov 2026: "share below hils: 0.3" in Numbers used beside "30%" in the clauses). Pure. */
+export const isShare = (k, x) => typeof x === "number" && /(^|_)shares?(_|$)/.test(String(k)) && x >= 0 && x <= 1;
+export const pctWords = x => `${fmtNum(Math.round(x * 1000) / 10)}%`;
+export function numberWords(k, x) {
+  if (isShare(k, x)) return `${keyWords(k)}: ${pctWords(x)}`;
+  return paramWords(k, x);
+}
+/* Every figure a result carries that is a number, a word or a yes/no, in words; a share as a percentage, and a small
+   object of shares (the CHF's mix) as its parts. */
+export function valuesWords(v) {
+  const bits = [];
+  for (const [k, x] of Object.entries(v || {})) {
+    if (x === null || x === undefined) continue;
+    if (typeof x === "object" && !Array.isArray(x) && /share|mix/.test(k) && Object.values(x).every(y => typeof y === "number" && y >= 0 && y <= 1)) {
+      bits.push(`${keyWords(k)}: ${Object.entries(x).map(([a, y]) => `${a.replace(/_/g, " ").replace(/\brgi\b/, "RGI")} ${pctWords(y)}`).join(", ")}`);
+      continue;
+    }
+    if (typeof x === "object") continue;
+    bits.push(numberWords(k, x));
+  }
+  return bits.join("; ");
+}
 
 /* The ledger opens one layer at a time, or all at once; printing opens every layer and closes them again after. */
 export function wireLedger() {
@@ -38,7 +62,7 @@ export function renderLedger(res, changed = new Set()) {
       <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · <span class="nw">v ${h(r.version_effective_from || "—")}</span></code></td>
       <td class="status">${pill(r.status)}</td>
       <td>${h(r.finding)}</td>
-      <td class="nums">${h(fmtValues(r.values))}</td>
+      <td class="nums">${h(valuesWords(r.values))}</td>
       <td class="src">${sourceCell(r.source)}</td>
     </tr>`;
   const blocks = layers.map(L => {

@@ -110,17 +110,23 @@ export function openEditor() {
   editor.angle = Number(ms && ms.angle_deg) || 0;
   editor.massing = run.massing || null;
   try { editor.context = localStorage.getItem("ffm.ed.context") !== "0"; } catch (e) { editor.context = true; }
+  // the editor opens on the plan the memo drew (the run's own floors, as layout.zones_of gives them), never on another
+  // (20 Nov 2026: it opened on a fresh suggestion, 64 of 105 homes placed and the exits passing, beside a memo whose plan
+  // placed 69 and failed the exits on every floor: two plans for one option). A grid plan is a separate action.
   editor.zones = JSON.parse(JSON.stringify(fromOption || zonesFromLayout(run.layout)));
   editor.result = run.layout;
+  editor.sel = null;
   const fig = $('.figure.sheet[data-sheet="plans"]');
   $$(".sheet-body", fig).forEach(x => { x.hidden = true; });
   $("#edit-blocks").setAttribute("aria-expanded", "true");
   $("#edit-blocks").textContent = "Close the editor";
   $("#sheet-editor").hidden = false;
   renderEditor();
-  if (fromOption) setStatus("Block editor: your placement, as the option carries it. Drag a block from the program onto the plate, or drag one on the plate to move it; the engine checks every move.", "info");
-  else suggestPlan(true);   // a first plan on the grid, to adjust
-  if (fromOption) checkPlacement();   // a run read from disk may predate what the editor reads (the FSR room)
+  const L = run.layout, left = (L.units_total || 0) - (L.units_placed || 0);
+  setStatus(fromOption
+    ? "Block editor: your placement, as the option carries it. Drag a block from the program onto the plate, or move one on the plate (or Tab to it and use the arrows); the engine checks every move."
+    : `Block editor: the memo's own plan, ${L.units_placed ?? "?"} of ${L.units_total ?? "?"} homes placed${left > 0 ? `, ${left} left to place` : ""}. Move a block (drag it, or Tab to it and use the arrows), or Suggest a grid plan for a different plan laid out afresh on the grid.`, "info");
+  checkPlacement();   // a run read from disk may predate what the editor reads (the FSR room)
 }
 
 export function closeEditor() {
@@ -199,7 +205,8 @@ function viewOf(p, m, width) {
   v.s = (width - 2 * M) / Math.max(1, v.x1 - v.x0);
   v.X = x => M + (x - v.x0) * v.s;
   v.Y = y => M + (v.y1 - y) * v.s;
-  v.H = (v.y1 - v.y0) * v.s + 2 * M + 2;
+  // without the site behind it, room under the plate for the grid's distances and the caption (20 Nov 2026)
+  v.H = (v.y1 - v.y0) * v.s + 2 * M + 2 + (v.ctx ? 0 : 18);
   return v;
 }
 
@@ -225,23 +232,34 @@ function contextSvg(m, v) {
   return `<g class="ed-context" pointer-events="none">${s}</g>`;
 }
 
-/* one block: its rectangle, the accessible mark, its name and width, and the three handles (shown when selected) */
+/* one block: its rectangle, the accessible mark, its name and width (at the 11 px floor, where they fit) */
 function zoneInner(z, r) {
   const f = v => v.toFixed(1);
-  const two = r.w > 34 && r.d > 30 && z.block !== "corridor";
+  const two = r.w > 40 && r.d > 36 && z.block !== "corridor";
   return `<rect x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.d)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "void" ? ` stroke-dasharray="5 3"` : ""}/>
     ${z.accessible ? `<circle cx="${f(r.x + 7)}" cy="${f(r.y + 7)}" r="3.2" fill="#245f9c"/>` : ""}
-    ${r.w > 22 && r.d > 11 ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + (two ? -1 : 3.5))}" font-size="9.5" font-weight="500" text-anchor="middle" fill="#1f2933">${h(zoneShort(z))}</text>` : ""}
-    ${two ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + 10)}" font-size="8.5" text-anchor="middle" fill="#5f6672">${h(z.w)} m</text>` : ""}
+    ${r.w > 26 && r.d > 14 ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + (two ? -1.5 : 4))}" font-size="11" font-weight="500" text-anchor="middle" fill="#1f2933">${h(zoneShort(z))}</text>` : ""}
+    ${two ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + 12)}" font-size="11" text-anchor="middle" fill="#5f6672">${h(z.w)} m</text>` : ""}`;
+}
+
+/* The selected block's ring and its three handles, drawn over every block (20 Nov 2026: the selected block was moved to
+   the end of the drawing to stand on top, which moved it in the tab order too, so Tab from it left the plan; the
+   blocks now keep their order and the ring stands over them). */
+function selOverlay(i, z, V) {
+  const r = rectOf(z, V), f = v => v.toFixed(1);
+  return `<g class="ed-selover" data-i="${i}">
+    <rect class="ed-ring-halo" x="${f(r.x - 2)}" y="${f(r.y - 2)}" width="${f(r.w + 4)}" height="${f(r.d + 4)}" fill="none" pointer-events="none"/>
+    <rect class="ed-ring" x="${f(r.x - 2)}" y="${f(r.y - 2)}" width="${f(r.w + 4)}" height="${f(r.d + 4)}" fill="none" pointer-events="none"/>
     <rect class="ed-handle ed-handle-w" x="${f(r.x + r.w - 4)}" y="${f(r.y + r.d / 2 - 7)}" width="8" height="14" rx="2" fill="#245f9c"/>
     <rect class="ed-handle ed-handle-l" x="${f(r.x - 4)}" y="${f(r.y + r.d / 2 - 7)}" width="8" height="14" rx="2" fill="#245f9c"/>
-    <rect class="ed-handle ed-handle-d" x="${f(r.x + r.w / 2 - 7)}" y="${f(r.y - 4)}" width="14" height="8" rx="2" fill="#245f9c"/>`;
+    <rect class="ed-handle ed-handle-d" x="${f(r.x + r.w / 2 - 7)}" y="${f(r.y - 4)}" width="14" height="8" rx="2" fill="#245f9c"/>
+  </g>`;
 }
 
 /* the line above the plate: what is selected and what can be done with it */
 function selBarHtml(L, zs) {
   const sel = editor.sel != null ? zs[editor.sel] : null;
-  if (!sel) return `<span class="help">Drag a block from the program onto the plate. On the plate: drag to move, pull an edge to resize, Delete removes, Ctrl+Z undoes.</span>`;
+  if (!sel) return `<span class="help">Drag a block from the program onto the plate (or press Enter on its row). On the plate: drag to move, pull an edge to resize; or Tab to a block and the arrows move it, Delete removes it, Ctrl+Z undoes.</span>`;
   const prog = (L.program || []).find(b => b.key === sel.block);
   const gross = prog && prog.gross_m2_each, least = (prog && prog.min_gross_m2_each) || gross, a = sel.w * sel.d;
   const over = !gross ? "" : (a > gross * 1.15 ? ` <span class="warn-text">· ${fmtNum(Math.round(a - gross))} m² over the ${fmtNum(Math.round(gross))} m² the program carries</span>` : (a + 0.5 < least ? ` <span class="warn-text">· ${fmtNum(Math.round(least - a))} m² under its ${fmtNum(Math.round(least))} m² minimum</span>` : ""));
@@ -281,7 +299,8 @@ function programHtml(L, tr, zs, B) {
   const nCore = zs.filter(z => z.block === "core").length;
   const withCorr = L.floors.filter(fl => (editor.zones[String(fl.level)] || []).some(z => z.block === "corridor")).length;
   const hereCorr = zs.some(z => z.block === "corridor");
-  const structure = row("core", "Core", ZONE_TONE.core, "stairs, elevator · the same on every floor", nCore ? `${nCore} on every floor` : "<b>none</b>", nCore ? "done" : "short", null, `Core: ${nCore} on every floor. Enter adds one.`)
+  // the count is of blocks, each standing on every floor (20 Nov 2026: "3 on every floor" beside what read as one core)
+  const structure = row("core", "Core", ZONE_TONE.core, "stairs, elevator · the same on every floor", nCore ? `${nCore} block${nCore === 1 ? "" : "s"}` : "<b>none</b>", nCore ? "done" : "short", null, `Core: ${nCore} block${nCore === 1 ? "" : "s"}, each the same on every floor. Enter adds one.`)
     + row("corridor", "Corridor", ZONE_TONE.corridor, `${withCorr} of ${L.floors.length} floors have one`, hereCorr ? "on this floor" : "<b>none here</b>", hereCorr ? "done" : "short", null, `Corridor: ${hereCorr ? "on this floor" : "none on this floor"}. Enter adds one.`);
   // the architect's own blocks: placed area only, nothing asked for
   const areaOf = kind => Math.round(Object.values(editor.zones).flat().filter(z => z.block === kind).reduce((t, z) => t + z.w * z.d, 0));
@@ -331,17 +350,17 @@ function renderEditor() {
   const px0 = V.X(p.x), py0 = V.Y(p.y + p.depth_m), pw = p.width_m * scale, pd = p.depth_m * scale;   // the plate on the canvas
   const env = editor.massing && editor.massing.envelope, maxW = env ? ((env.box && env.box.w) || env.width_m) : p.width_m, maxD = env ? ((env.box && env.box.d) || env.depth_m) : p.depth_m;
   const bad = clashes(zs);
-  const order = zs.map((z, i) => i).filter(i => i !== editor.sel).concat(editor.sel != null ? [editor.sel] : []);   // the selected block on top
-  const svgZones = order.map(i => {
-    const z = zs[i];
-    return `<g class="ed-zone${i === editor.sel ? " sel" : ""}${bad.has(i) ? " clash" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(blockName(z))}, ${z.w} by ${z.d} m, at ${z.x}, ${z.y} m${bad.has(i) ? ", overlapping another block" : ""}">${zoneInner(z, rectOf(z, V))}</g>`;
-  }).join("");
-  // the grid: a line at every bay, a fainter one at every module, the bays' distances along the top
+  // the blocks in their own order, which is the tab order; the selected one's ring and handles stand over them all
+  const svgZones = zs.map((z, i) => `<g class="ed-zone${i === editor.sel ? " sel" : ""}${bad.has(i) ? " clash" : ""}" data-i="${i}" tabindex="0" role="button" aria-label="${h(blockName(z))}, ${z.w} by ${z.d} m, at ${z.x}, ${z.y} m${bad.has(i) ? ", overlapping another block" : ""}. Arrows move it, Delete removes it">${zoneInner(z, rectOf(z, V))}</g>`).join("")
+    + (editor.sel != null && zs[editor.sel] ? selOverlay(editor.sel, zs[editor.sel], V) : "");
+  // the grid: a line at every bay, a fainter one at every module, the bays' distances along the street side, centred
+  // 12 px off the plate's edge so they read clear of the wall whichever way the plan is turned (20 Nov 2026: on a plan
+  // turned north up they sat on the wall line, and the depth handle covered the middle one)
   let grid = "", ticks = "";
   for (let k = 0; k * m <= p.width_m + 1e-6; k++) {
     const x = (px0 + k * m * scale).toFixed(1), bay = k % editor.divide === 0;
     grid += `<line x1="${x}" y1="${py0.toFixed(1)}" x2="${x}" y2="${(py0 + pd).toFixed(1)}" stroke="${bay ? "#aab4c0" : "#cfd6de"}" stroke-width="${bay ? 0.8 : 0.5}"${bay ? "" : ` stroke-dasharray="2 3"`}/>`;
-    if (bay && editor.bay * scale >= 22) ticks += `<text x="${x}" y="${(py0 - 6).toFixed(1)}" font-size="8.5" text-anchor="middle" fill="#5f6672">${r2(k * m)}</text>`;
+    if (bay && editor.bay * scale >= 26) ticks += `<text x="${x}" y="${(py0 + pd + 12 + 3.9).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672">${r2(k * m)}</text>`;
   }
   const bandY = v => V.Y(v).toFixed(1);
   const bandLines = [B.corr, B.rear].filter(v => v != null && v < p.y + p.depth_m - 0.05).map(v => `<line x1="${px0.toFixed(1)}" y1="${bandY(v)}" x2="${(px0 + pw).toFixed(1)}" y2="${bandY(v)}" stroke="#aab4c0" stroke-width="0.6" stroke-dasharray="5 4"/>`).join("");
@@ -394,14 +413,14 @@ function renderEditor() {
       <span class="ed-tools">
         <span class="help ed-busy" id="ed-busy"${editor.busy ? "" : " hidden"}>Checking…</span>
         <button type="button" class="btn btn-small btn-quiet" id="ed-undo"${(editor.history || []).length ? "" : " disabled"} title="Undo the last change (Ctrl+Z)">Undo</button>
-        <button type="button" class="btn btn-small" id="ed-suggest" title="Lay the whole program out on this grid, round the cores where they stand; Undo brings back what was there">Suggest a plan</button>
+        <button type="button" class="btn btn-small" id="ed-suggest" title="A different plan from the memo's: the engine lays the whole program out afresh on this grid, round the cores where they stand; Undo brings back what was there">Suggest a grid plan</button>
       </span>
     </div>
     <div class="ed-main">
       ${programHtml(L, tr, zs, B)}
       <div class="ed-stage">
         <div class="ed-selbar" id="ed-selbar">${selBarHtml(L, zs)}</div>
-        <svg class="ed-canvas" viewBox="0 0 ${frame.W.toFixed(1)} ${frame.H.toFixed(1)}" width="${width}" height="${(frame.H * width / frame.W).toFixed(0)}" role="application" aria-label="Block editor, ${h(L.floors[editor.level].name)}${turn ? ", north up" : ""}">
+        <svg class="ed-canvas" viewBox="0 0 ${frame.W.toFixed(1)} ${frame.H.toFixed(1)}" width="${width}" height="${(frame.H * width / frame.W).toFixed(0)}" role="application" tabindex="-1" aria-label="Block editor, ${h(L.floors[editor.level].name)}${turn ? ", north up" : ""}. Tab to a block; the arrows move it, Delete removes it, Ctrl+Z undoes">
           <rect x="0" y="0" width="100%" height="100%" fill="${V.ctx && site && site.osm ? HALF.parcel : "#ffffff"}"/>
           ${frame.open}${U(`
           <defs><pattern id="ed-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"/><line x1="0" y1="0" x2="0" y2="6" stroke="#aab4c0" stroke-width="1.4"/></pattern></defs>
@@ -413,7 +432,7 @@ function renderEditor() {
           <rect class="ed-plate-handle ed-plate-w" x="${(px0 + pw + 3).toFixed(1)}" y="${(py0 + pd / 2 - 11).toFixed(1)}" width="8" height="22" rx="2" fill="#1f2933"><title>Drag to widen or narrow the plate</title></rect>
           <rect class="ed-plate-handle ed-plate-d" x="${(px0 + pw / 2 - 11).toFixed(1)}" y="${(py0 - 11).toFixed(1)}" width="22" height="8" rx="2" fill="#1f2933"><title>Drag to deepen or shallow the plate</title></rect>
           <g id="ed-ghost" pointer-events="none"></g>`)}</g></g>
-          <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="10" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${turn ? "north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
+          <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${turn ? "north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
           ${turn || (site && site.osm && site.osm.bearing != null) ? northArrow(frame.W - 24, 26, 90, 10) : ""}
         </svg>
         <div class="ed-status">
@@ -435,8 +454,14 @@ function renderEditor() {
     $(".ed-newprog", box).open = true; $("#ed-prog-label", box).value = typed.label; $("#ed-prog-area", box).value = typed.area;
     if (typed.focus === "ed-prog-label" || typed.focus === "ed-prog-area") $(`#${typed.focus}`, box).focus({ preventScroll: true });
   }
-  wireEditor(box, { L, p, B, zs, scale, width, H, V, maxW, maxD, U: UM });
-  if (hadFocus && editor.sel != null) { const g = $(`.ed-zone[data-i="${editor.sel}"]`, box); if (g) g.focus({ preventScroll: true }); }
+  wireEditor(box, { L, p, B, zs, scale, width, H, V, maxW, maxD, U: UM, rot: turn - ang });
+  // the keyboard stays on the plan through a redraw: on the selected block, else on the plan itself, so Ctrl+Z and Tab
+  // still work (20 Nov 2026: after Delete the redraw left the focus on the page's body and Ctrl+Z did nothing)
+  if (hadFocus || editor.keepFocus) {
+    editor.keepFocus = false;
+    const g = editor.sel != null ? $(`.ed-zone[data-i="${editor.sel}"]`, box) : null;
+    (g || $(".ed-canvas", box)).focus({ preventScroll: true });
+  }
 }
 
 /* ---------------------------------------------------------------- new blocks and where they land */
@@ -539,12 +564,17 @@ function wireSel(box, ctx) {
   if (acc) acc.addEventListener("change", () => { snapshot(); if (acc.checked) sel.accessible = true; else delete sel.accessible; commit(false); });
 }
 
+/* Delete: the block goes, and the next one (or the plan) takes the selection and the keyboard, so Delete and Ctrl+Z
+   go on working from the keys. */
 function removeSel(zs) {
   if (editor.sel == null || !zs[editor.sel]) return;
   snapshot();
-  const core = zs[editor.sel].block === "core";
-  zs.splice(editor.sel, 1); editor.sel = null;
+  const i = editor.sel, gone = zs[i], core = gone.block === "core";
+  zs.splice(i, 1);
+  editor.sel = zs.length ? Math.min(i, zs.length - 1) : null;
+  editor.keepFocus = true;
   commit(core);
+  setStatus(`${blockName(gone)} removed${editor.sel != null ? `; ${blockName(zs[editor.sel]).toLowerCase()} is selected` : ""}. Ctrl+Z brings it back.`, "info");
 }
 
 function wireEditor(box, ctx) {
@@ -707,10 +737,17 @@ function wireEditor(box, ctx) {
   const near = (v, stops, tol) => { let best = null; for (const s of stops) if (Math.abs(s - v) <= tol && (best == null || Math.abs(s - v) < Math.abs(best - v))) best = s; return best; };
   const wallX = (v, i) => near(v, xEdges(i), 0.4) ?? gx(v);
   const edgeY = (v, i) => near(v, yEdges(i), 1.2) ?? Math.round(v * 2) / 2;
-  const select = i => {
+  // the ring and handles over the selected block, drawn again where it is
+  const overlay = i => {
+    const old = $(".ed-selover", svg); if (old) old.remove();
+    if (i != null && zs[i]) ghost.insertAdjacentHTML("beforebegin", U(selOverlay(i, zs[i], V)));
+  };
+  // a block is selected by a press, by Tab landing on it, or by Enter; the drawing order (and so the tab order) stays
+  const select = (i, focus = true) => {
     editor.sel = i;
     $$(".ed-zone", svg).forEach(g => g.classList.toggle("sel", Number(g.dataset.i) === i));
-    if (i != null) { const g = $(`.ed-zone[data-i="${i}"]`, svg); if (g) { ghost.parentNode.insertBefore(g, ghost); g.focus({ preventScroll: true }); } }
+    overlay(i);
+    if (i != null && focus) { const g = $(`.ed-zone[data-i="${i}"]`, svg); if (g && document.activeElement !== g) g.focus({ preventScroll: true }); }
     $("#ed-selbar", box).innerHTML = selBarHtml(L, zs);
     wireSel(box, ctx);
   };
@@ -721,8 +758,10 @@ function wireEditor(box, ctx) {
       g.classList.toggle("clash", bad.has(j));
       if (j === i) g.innerHTML = U(zoneInner(zs[j], rectOf(zs[j], V)));
     });
+    if (i === editor.sel) overlay(i);
     $("#ed-selbar", box).innerHTML = selBarHtml(L, zs);
   };
+  $$(".ed-zone", svg).forEach(g => g.addEventListener("focus", () => { const i = Number(g.dataset.i); if (editor.sel !== i) select(i, false); }));
   let drag = null;
   svg.addEventListener("pointerdown", e => {
     if (e.button) return;
@@ -730,7 +769,7 @@ function wireEditor(box, ctx) {
       drag = { plate: e.target.classList.contains("ed-plate-w") ? "w" : "d", x0: e.clientX, y0: e.clientY, p0: loc(e), w: p.width_m, d: p.depth_m, moved: false };
       svg.setPointerCapture(e.pointerId); e.preventDefault(); return;
     }
-    const g = e.target.closest(".ed-zone");
+    const g = e.target.closest(".ed-zone, .ed-selover");   // a block, or the selected one's handles over it
     if (!g) { if (editor.sel != null) select(null); return; }
     const i = Number(g.dataset.i);
     const mode = e.target.classList.contains("ed-handle-w") ? "w" : e.target.classList.contains("ed-handle-l") ? "l" : e.target.classList.contains("ed-handle-d") ? "d" : "move";
@@ -797,20 +836,42 @@ function wireEditor(box, ctx) {
   svg.addEventListener("pointerup", end);
   svg.addEventListener("pointercancel", end);
 
-  // keyboard: the arrows move the selected block a module along the plate and 0.5 m across it (shift: a bay,
-  // 2 m); Delete removes it; Ctrl+Z undoes
+  // keyboard: Tab lands on a block and selects it (Enter or Space does too); the arrows move the selected block a
+  // module along the plate and 0.5 m across it (shift: a bay, 2 m); Delete removes it; Esc lets it go; Ctrl+Z undoes
+  // from anywhere in the editor but a field (20 Nov 2026: nothing worked from the keys until a pointer had pressed)
+  if (!box.dataset.undoKeys) {
+    box.dataset.undoKeys = "1";
+    box.addEventListener("keydown", e => {
+      if (!(e.ctrlKey || e.metaKey) || e.shiftKey || String(e.key).toLowerCase() !== "z") return;
+      if (e.target.closest && e.target.closest("input, select, textarea")) return;   // a field keeps its own undo
+      e.preventDefault();
+      editor.keepFocus = !!(e.target.closest && e.target.closest(".ed-canvas"));
+      undo();
+    });
+  }
   svg.addEventListener("keydown", e => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") { e.preventDefault(); undo(); return; }
+    const k = e.key, g = e.target.closest && e.target.closest(".ed-zone");
+    if ((k === "Enter" || k === " ") && g) {
+      e.preventDefault();
+      const i = Number(g.dataset.i);
+      select(i, false);
+      setStatus(`${blockName(zs[i])} selected, ${zs[i].w} × ${zs[i].d} m: the arrows move it a module (Shift: a bay), Delete removes it, Ctrl+Z undoes.`, "info");
+      return;
+    }
+    if (k === "Escape" && editor.sel != null) { e.preventDefault(); select(null); svg.focus({ preventScroll: true }); return; }
     if (editor.sel == null || !zs[editor.sel]) return;
-    const z = zs[editor.sel], k = e.key;
+    const z = zs[editor.sel];
     if (k === "Delete" || k === "Backspace") { e.preventDefault(); removeSel(zs); return; }
     const sx = e.shiftKey ? editor.bay : m, sy = e.shiftKey ? 2 : 0.5;
-    if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(k)) return;
+    const arrow = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[k];
+    if (!arrow) return;
     e.preventDefault(); snapshot();
-    if (k === "ArrowLeft") z.x = r2(Math.max(p.x, gx(z.x - sx)));
-    else if (k === "ArrowRight") z.x = r2(Math.min(p.x + p.width_m - z.w, gx(z.x + sx)));
-    else if (k === "ArrowUp") z.y = r2(Math.min(p.y + p.depth_m - z.d, z.y + sy));   // up on screen is away from the street
-    else z.y = r2(Math.max(p.y, z.y - sy));
+    // the arrow as the plan is seen: turned back through the plan's turn (north up) and the mass's, into the plate's
+    // own frame, where y runs away from the street (20 Nov 2026: on a plan turned 180° Up moved the block down)
+    const t = -(ctx.rot || 0) * Math.PI / 180;
+    const lx = arrow[0] * Math.cos(t) - arrow[1] * Math.sin(t), ly = -(arrow[0] * Math.sin(t) + arrow[1] * Math.cos(t));
+    if (Math.abs(lx) >= Math.abs(ly)) z.x = r2(lx < 0 ? Math.max(p.x, gx(z.x - sx)) : Math.min(p.x + p.width_m - z.w, gx(z.x + sx)));
+    else z.y = r2(ly > 0 ? Math.min(p.y + p.depth_m - z.d, z.y + sy) : Math.max(p.y, z.y - sy));
     commit(z.block === "core");
   });
 }
@@ -969,7 +1030,7 @@ async function suggestPlan(first, noSnapshot) {
     if (kept) scheduleCheck();   // the engine counts again what the cut-outs displaced
     updateSheets(res);
     const L = res.layout, left = L.units_total - L.units_placed;
-    setStatus(`${first ? "A suggested plan to start from" : "Suggested plan"}, on a ${editor.bay} m bay${cores.length ? ` round your core${cores.length === 1 ? "" : "s"}` : ""}: ${L.units_placed} of ${L.units_total} units placed${left > 0 ? `; ${left} did not fit and stay in the program as left to place` : ""}. Drag to adjust${first ? "" : "; Undo brings back what was there"}.`, left > 0 ? "busy" : "ok");
+    setStatus(`A grid plan, not the memo's: laid out afresh on a ${editor.bay} m bay${cores.length ? ` round your core${cores.length === 1 ? "" : "s"}` : ""}, ${L.units_placed} of ${L.units_total} units placed${left > 0 ? `; ${left} did not fit and stay in the program as left to place` : ""}. Drag to adjust; Undo brings back the plan that was there; Apply makes it the option's.`, left > 0 ? "busy" : "ok");
   } catch (e) {
     toast(`The engine could not suggest a plan: ${e.message}`, true);
   } finally {

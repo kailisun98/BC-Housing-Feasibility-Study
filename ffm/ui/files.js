@@ -222,6 +222,10 @@ export function markStale(what) {
   if (!state.run || state.runStale) { if (state.run) syncStaleBand(); return; }
   state.runStale = what || "the inputs";
   syncStaleBand();
+  // the status line says so once, at the change that left the memo out of date (20 Nov 2026: a three-state answer
+  // after a run changed nothing on screen but the band); a caller with more to say writes after this
+  const r = rev(state.run.run_id), w = state.runStale;
+  setStatus(`${w.charAt(0).toUpperCase() + w.slice(1)} changed after ${r}: the memo on screen is ${r}'s until the rules run again (${state.mode === "manager" ? "Run again, in the top bar" : "Run the rules"}).`, "busy");
 }
 
 export function syncStaleBand() {
@@ -252,7 +256,10 @@ export function saveDraft() {
   clearTimeout(draftTimer);
   draftTimer = setTimeout(() => {
     try {
-      if (state.mode !== "manager" || (!state.site && !guide.lookup)) { sessionStorage.removeItem(DRAFT_KEY); return; }
+      // nothing to keep yet: the draft already in the tab stays, so the blank stage's "Resume where you were" still has
+      // it to resume (20 Nov 2026: the blank page's first render removed it ~400 ms after a reload, and Resume threw on
+      // null). Start fresh (discardDraft) is what removes it.
+      if (state.mode !== "manager" || (!state.site && !guide.lookup)) return;
       const d = { version: 3, saved_at: new Date().toISOString(), as_of: $("#as-of").value, siteId: state.siteId, site: state.siteId ? null : state.site, siteDirty: state.siteDirty,
         optionId: state.optionId, option: state.optionId ? null : state.option, optionDirty: state.optionDirty,
         guide: { step: guide.step, address: guide.address, way: guide.way, programs: guide.programs, candidate: guide.candidate, mine: guide.mine, answers: guide.answers,
@@ -267,6 +274,12 @@ export function readDraft() {
 }
 
 export async function resumeDraft(d) {
+  if (!d) {
+    // the tab's storage was cleared under the offer (another tab, the browser): say so and offer the blank stage again
+    setStatus("There is nothing left to resume in this tab: start with the site.", "info");
+    renderGuide();
+    return;
+  }
   if (d.as_of) $("#as-of").value = d.as_of;
   if (d.siteId && state.sites.some(s => s.id === d.siteId)) { $("#site-select").value = d.siteId; await selectSite(d.siteId); }
   else if (d.site) {

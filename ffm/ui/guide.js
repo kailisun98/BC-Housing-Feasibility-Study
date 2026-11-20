@@ -16,7 +16,10 @@ import { setStep } from "./modes.js";
 
 export async function guideLookup() {
   const q = (guide.address || "").trim();
-  if (q.length < 4) { toast("Type an address first.", true); const a = $("#guide-address"); if (a) a.focus(); return; }
+  // a problem with the lookup is said under the field too (route-stage.js reads guide.lookupError), where a phone
+  // reader is looking, not only in the status line at the top (20 Nov 2026)
+  if (q.length < 4) { guide.lookupError = "Type an address first: a number and a street, such as 609 Heatley Ave."; toast(guide.lookupError, true); renderGuide(); const a = $("#guide-address"); if (a) a.focus(); return; }
+  guide.lookupError = null;
   guide.busy.lookup = true; renderGuide();
   setStatus(`Looking up ${q}: the point, the district, the parcel, and the streets, buildings and trees around it…`, "busy");
   try {
@@ -25,6 +28,7 @@ export async function guideLookup() {
     setStatus(`Found ${s.address}: ${s.zoning_district || "district not found"}, ${s.site_area_m2 ? `${fmtNum(s.site_area_m2)} m²` : "no parcel"}. Check the parcel on the map, then use it.`, "ok");
   } catch (e) {
     guide.lookup = null;
+    guide.lookupError = `The lookup failed: ${String(e.message || "no answer").replace(/[.\s]*$/, ".")} Or choose a saved site below.`;
     toast(`Lookup failed: ${e.message}`, true);
   } finally {
     guide.busy.lookup = false; renderGuide();
@@ -120,6 +124,28 @@ function fixedFigures() {
   return Object.keys(out).length ? out : null;
 }
 
+/* What the suggestion is, in a few words: the engine's own label for what it built where the response carries one
+   (`label`), else the candidate's title (20 Nov 2026: the status line printed the candidate asked for, so a 4-home
+   option sized to the outright envelope read "funder-ready"). */
+export function suggestionName(S) {
+  if (!S) return "";
+  const own = S.label || S.suggestion_label || (S.summary && S.summary.label);
+  if (own) return String(own);
+  const c = (S.candidates || []).find(x => x.id === S.candidate);
+  return c ? c.title : cap(String(S.candidate || "suggested"));
+}
+
+/* The suggestion in one word for the route's line ("Outright" from "Outright: 3 storeys, 4 homes"). */
+export const suggestionWord = S => String(suggestionName(S)).split(":")[0];
+
+/* What the suggestion falls short of, as plain lines: the engine's `falls_short` (a list of sentences or of records
+   with a why), empty without one. */
+export function fallsShort(S) {
+  const fs = S && (S.falls_short ?? S.fallsShort);
+  const list = Array.isArray(fs) ? fs : (fs ? [fs] : []);
+  return list.map(x => (typeof x === "string" ? x : (x && (x.why || x.text || x.note || x.what || x.finding)) || "")).map(x => String(x).trim().replace(/\.$/, "")).filter(Boolean);
+}
+
 /* The figures that other figures follow: a change to one re-derives the option. */
 export const DERIVES = k => ["storeys", "height_m", "gfa_m2"].includes(k) || k.startsWith("units.");
 
@@ -145,8 +171,11 @@ export async function guideSuggest(opts = {}) {
     const rough = ["storeys", "height_m", "gfa_m2"].some(k => (guide.suggestion.fields[k] || {}).basis === "envelope");
     const swapped = guide.suggestion.candidate_note && asked !== guide.candidate;
     const homes = Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0);
-    if (opts.said) setStatus(`${opts.said} ${homes ? `${homes} homes follow from the figures, the rent tiers and accessible units with them.` : "No homes follow yet: enter a floor area."} ${continueWords()}`, "info");
-    else setStatus(`Suggested, ${guide.candidate}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${Object.values(o.units || {}).reduce((t, v) => t + (v || 0), 0) || "no"} homes.${toa ? " Raised to the transit-oriented tier's minimum, by rezoning under the City's TOA policy." : ""}${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ?" The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}`, cv || swapped ? "info" : "ok");
+    const short = fallsShort(guide.suggestion);
+    if (opts.said) setStatus(`${opts.said} ${opts.ownHomes ? `The rent tiers and the accessible units follow them; the floor area is ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "not given"}.` : (homes ? `${homes} homes follow from the figures, the rent tiers and accessible units with them.` : "No homes follow yet: enter a floor area.")} ${continueWords()}`, "info");
+    // what was built, in the engine's words where it gives them (20 Nov 2026: a 4-home option sized to the outright
+    // envelope read "Suggested, funder-ready"), and what it falls short of
+    else setStatus(`${guide.suggestion.label ? `Suggested, ${guide.suggestion.label}${o.gfa_m2 ? ` in ${fmtNum(o.gfa_m2)} m²` : ""}.` : `Suggested, ${suggestionName(guide.suggestion).toLowerCase()}: ${o.storeys ?? "?"} storeys, ${o.gfa_m2 ? `${fmtNum(o.gfa_m2)} m²` : "no floor area"}, ${homes || "no"} homes.`}${toa ? " Raised to the transit-oriented tier's minimum, by rezoning under the City's TOA policy." : ""}${rough ? " The envelope is rough, from the lot and the code, not a permitted figure." : ""}${cv ?" The benchmark needs the Community Vision answer at 01; until then this is the outright envelope." : ""}${swapped ? ` ${guide.suggestion.candidate_note}` : ""}${short.length ? ` It falls short: ${short.join("; ")}.` : ""}`, cv || swapped || short.length ? "info" : "ok");
     // after a run, a new derivation (another candidate, a mix, the programs) is a change to the memo's option
     if (state.run) useSuggestion({ live: true });
   } catch (e) {
@@ -202,7 +231,9 @@ function useSuggestionNow({ live = false } = {}) {
   // the name is a name: the candidate and how much of it is the manager's; the figures typed are listed in the notes
   // (17 Nov 2026: the name ran "…; rezoning path, storeys, height (m), floor area (m²), studios… entered by the
   // manager" across ten lines of the title block and cut off every run picker)
-  const base = `${cap(guide.candidate)} option`;
+  // named for what it is: the engine's label where it gives one ("4 homes sized to the outright envelope"), else the
+  // candidate (20 Nov 2026)
+  const base = S.label || S.suggestion_label ? cap(suggestionName(S)) : `${cap(guide.candidate)} option`;
   if (blank.length) opt.name = `${base}, ${blank.join(", ").toLowerCase()} not given`;
   else if (chosen) opt.name = `${base} with ${chosen === 1 ? "one figure" : `${chosen} figures`} of the manager's`;
   state.optionId = null;
@@ -220,7 +251,7 @@ function useSuggestionNow({ live = false } = {}) {
     setStatus(`The option changed after ${rev(state.run.run_id)}: the memo on screen is ${rev(state.run.run_id)}'s until the rules run again.${blank.length ? ` ${blank.join(", ")} ${blank.length === 1 ? "is" : "are"} blank.` : ""}`, "busy");
     return true;
   }
-  if (blank.length) setStatus(`The ${guide.candidate} option is set${chosen ? ` with ${chosen} of your own figures` : ""}, but ${blank.join(", ").toLowerCase()} ${blank.length === 1 ? "is" : "are"} blank: the run will answer allowed and funders, say the money is unsure and draw the plate the setbacks leave. Enter ${blank.length === 1 ? "it" : "them"} at 02 for all four answers, or run as it stands.`, "busy");
-  else setStatus(`The ${guide.candidate} option is set${chosen ? `, with ${chosen} of your own figures` : ""}. Enter the money only you know, then run the rules.`, "ok");
+  if (blank.length) setStatus(`The option is set (${suggestionName(S)}${chosen ? `, with ${chosen} of your own figures` : ""}), but ${blank.join(", ").toLowerCase()} ${blank.length === 1 ? "is" : "are"} blank: the run will answer allowed and funders, say the money is unsure and draw the plate the setbacks leave. Enter ${blank.length === 1 ? "it" : "them"} at 02 for all four answers, or run as it stands.`, "busy");
+  else setStatus(`03 Run: the option is set (${suggestionName(S)}${chosen ? `, with ${chosen} of your own figures` : ""}). Enter the money only you know, or leave it blank, then run the rules.`, "ok");
   return true;
 }

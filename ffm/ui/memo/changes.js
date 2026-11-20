@@ -5,7 +5,7 @@ import { $, h, pill, REV } from "../core/util.js";
 import { state } from "../core/state.js";
 import { api } from "../core/api.js";
 import { rev } from "../runs.js";
-import { compareKind, idBreak, optionName } from "./memo.js";
+import { compareKind, dateWords, idBreak, optionName } from "./memo.js";
 
 /* The engine's words for a change (engine.diff), as a reader would say them. Between two options read under the same
    rules a reworded finding is the option's numbers changing, not the rule. */
@@ -41,7 +41,7 @@ export function compareSummary(run) {
   const d = run.diff;
   if (!d) return "";
   return compareKind(d) === "rules"
-    ? `${rev(run.run_id)}, rules as of ${d.current_as_of}, against ${state.compareRun ? rev(state.compareRun) : "an earlier memo"}, rules as of ${d.previous_as_of}: ${changesPhrase(d)}`
+    ? `${rev(run.run_id)}, rules as of ${dateWords(d.current_as_of)}, against ${state.compareRun ? rev(state.compareRun) : "an earlier memo"}, rules as of ${dateWords(d.previous_as_of)}: ${changesPhrase(d)}`
     : `${rev(run.run_id)} against ${state.compareRun ? `${rev(state.compareRun)}, ` : ""}${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a run as of ${d.previous_as_of}`}: ${changesPhrase(d)}`;
 }
 
@@ -90,14 +90,17 @@ export function renderChanges(d, L, run) {
   const kind = compareKind(d), rules = kind === "rules";
   const titles = Object.fromEntries(((L && L.results) || []).map(r => [r.rule_id, r.title]));
   const changes = d.changes || [];
+  // the status reads from the run compared to this one, each named by its revision (20 Nov 2026: "B → A")
+  const fromRev = state.compareRun ? rev(state.compareRun) : "earlier", toRev = rev(run && run.run_id);
+  const statusHead = rules ? "Status" : `Status, ${fromRev} → ${toRev}`;
   const row = c => {
     const ver = c.from_version && c.to_version && c.from_version !== c.to_version;
     const status = c.from && c.to ? (c.from === c.to ? `${pill(c.to)} <span class="cont">unchanged</span>` : `${pill(c.from)} → ${pill(c.to)}`) : (c.to ? pill(c.to) : c.from ? pill(c.from) : "—");
     return `<tr>
       <td data-label="Rule"><span class="rule-title">${h(titles[c.rule_id] || c.rule_id)}</span><code class="rule-id">${idBreak(c.rule_id)}</code><div class="cont">${h(changeWord(c, kind))}</div></td>
       ${rules ? `<td class="ver" data-label="Version in force">${ver ? `<span class="was">${h(c.from_version)}</span> → ${h(c.to_version)}` : h(c.to_version || c.from_version || "—")}</td>` : ""}
-      <td class="trans" data-label="${rules ? "Status" : "Status, B → A"}">${status}</td>
-      <td data-label="Now reads">${h(c.finding)}</td>
+      <td class="trans" data-label="${h(statusHead)}">${status}</td>
+      <td data-label="Now reads"><span class="measure">${h(c.finding)}</span></td>
     </tr>`;
   };
   // the rules that apply to neither run fold into one row at the foot, as the ledger folds its own
@@ -108,14 +111,16 @@ export function renderChanges(d, L, run) {
   const rows = shown.map(row).join("") + naRow;
   const sameVerdict = shown.length && shown.every(c => c.from === c.to && c.from_version && c.from_version !== c.to_version);
   const cause = d.cause || (d.rules_changed ? "the rule files themselves changed" : "the rule files are the same; the difference comes from the as-of date or the inputs");
+  // dates as a reader writes them; the cause sentence's own dates too (attachCause writes them ISO)
+  const cause2 = cause.replace(/\d{4}-\d\d-\d\d/g, x => dateWords(x));
   const lead = rules
-    ? `<b>${h(state.compareRun ? rev(state.compareRun) : "The earlier memo")}</b> → <b>${h(rev(run && run.run_id))}</b> · ${h(cause)}.`
-    : `<b>${h(state.compareRun ? rev(state.compareRun) : "B")}</b> → <b>${h(rev(run && run.run_id))}</b> · same rules, as of ${h(d.current_as_of)}; ${h(cause.replace(/^same rule files(, same site and option)?; /, ""))}.`;
+    ? `<b>${h(state.compareRun ? rev(state.compareRun) : "The earlier memo")}</b> → <b>${h(toRev)}</b> · ${h(cause2)}.`
+    : `<b>${h(state.compareRun ? rev(state.compareRun) : "The other run")}</b> → <b>${h(toRev)}</b> · same rules, as of ${h(dateWords(d.current_as_of))}; ${h(cause2.replace(/^same rule files(, same site and option)?; /, ""))}.`;
   return `<section class="card section changes" id="changes">
-    <h2>${rules ? `${REV} What changed: rules as of ${h(d.current_as_of)} against ${h(d.previous_as_of)}` : "What changed between the two options"}</h2>
+    <h2>${rules ? `${REV} What changed: rules as of ${h(dateWords(d.current_as_of))} against ${h(dateWords(d.previous_as_of))}` : "What changed between the two options"}</h2>
     <p class="stamps">${lead}</p>
     ${changes.length ? `${sameVerdict ? `<p class="same">Same verdict${shown.length === 1 ? "" : "s"}, new version${shown.length === 1 ? "" : "s"}: the memo names the version it used.</p>` : ""}${!shown.length ? `<p>No rule that applies to either run changed version or status.</p>` : ""}
-    <table class="plain"><thead><tr><th>Rule</th>${rules ? "<th>Version in force</th><th>Status</th>" : "<th>Status, B → A</th>"}<th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
+    <table class="plain"><thead><tr><th>Rule</th>${rules ? "<th>Version in force</th><th>Status</th>" : `<th>${h(statusHead)}</th>`}<th>Now reads</th></tr></thead><tbody>${rows}</tbody></table>`
     : `<p>No rule changed version or status between the two runs.</p>`}
   </section>`;
 }

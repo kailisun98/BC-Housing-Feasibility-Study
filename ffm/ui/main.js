@@ -10,7 +10,7 @@ import { checkForNewerBuild, loadEngine } from "./core/engine.js";
 import { OPTION_FIELDS } from "./fields.js";
 import { renderForm, setRailTab, syncCards } from "./schedule.js";
 import { loadSites, onOptionChange, saveAs, saveNow, selectOption, selectSite } from "./files.js";
-import { applyCompare, fillRunSelects, loadRuns, openRun, rev, runRules } from "./runs.js";
+import { applyCompare, fillRunSelects, followHistory, loadRuns, openRun, rev, runRules } from "./runs.js";
 import { renderNoMemo, renderQuiet } from "./memo/memo.js";
 import { closeExportPanel, renderExportPanel } from "./revit.js";
 import { offerTour, startTour } from "./tour.js";
@@ -155,6 +155,8 @@ async function init() {
   startIssuePolling();
   if (STATIC) loadEngine().catch(() => { /* the chip says why; past runs still open */ });
   await followLink();
+  // Back and Forward open the run and the comparison each entry names (runs.js pushes one per run or comparison)
+  window.addEventListener("popstate", () => { followHistory(); });
 }
 
 // ?tour=1 starts the walkthrough; ?run=<site>/<folder>&compare=<site>/<folder> opens a past run and compares it

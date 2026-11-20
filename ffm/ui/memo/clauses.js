@@ -1,16 +1,22 @@
 /* "Clauses applied": proposed, permitted or required, and the ask, one row per clause the run read. */
 
-import { fmtNum, h, paramWords, pill, REV, STATUS_WORD, unverifiedTag } from "../core/util.js";
+import { fmtNum, h, pill, REV, STATUS_WORD, unverifiedTag } from "../core/util.js";
 import { optWord } from "../fields.js";
 import { idBreak, refTagOf } from "./memo.js";
+import { numberWords } from "./ledger.js";
 
 const pct = x => (typeof x === "number" ? `${(100 * x).toFixed(x * 100 % 1 ? 1 : 0)}%` : "—");
+const paramWords = numberWords;   // a share as a percentage, as the ledger prints it (20 Nov 2026)
 
 // non-breaking hyphens: a count reads "70 1‑bed", never "70 1-" at a line's end and "bed" on the next (17 Nov 2026)
 export const UNIT_WORD = { studio: "studio", one_bed: "1‑bed", two_bed: "2‑bed", three_bed_plus: "3‑bed+" };
 
 /* Every figure a check carries that is a number, a word or a yes/no, in words. */
 const flatWords = v => Object.entries(v || {}).filter(([, x]) => x !== null && x !== undefined && typeof x !== "object").map(([k, x]) => paramWords(k, x));
+
+/* The ask where the option is over the district's own limit: not allowed outright, a rezoning required (20 Nov 2026: the
+   engine reads this as fail now); where a rezoning path is stated, answer 1 reads the option by it. */
+const outrightAsk = (what, path) => `${what} above the outright limit: not allowed outright; a rezoning is required${path ? ` (${path}), which answer 1 reads` : ""}.`;
 
 const num = x => (x === null || x === undefined ? "—" : fmtNum(x));
 
@@ -31,14 +37,15 @@ function exitsWords(v) {
 export function splitValues(r, L) {
   const v = r.values || {}, opt = (L.inputs && L.inputs.option) || {};
   const ask = r.action || "";
-  const path = L.summary && L.summary.answers && L.summary.answers.rezoning_path;
+  // the path is the allowed answer's (it was read from answers.rezoning_path, which the summary never had)
+  const path = (L.summary && L.summary.answers && (L.summary.answers.allowed || {}).rezoning_path) || opt.rezoning_path || "";
   switch (r.check) {
     case "district_outright_fsr":
       return { proposed: `FSR ${num(v.fsr && Number(v.fsr).toFixed(2))} (${num(v.gfa_m2)} m² on ${num(v.site_area_m2)} m²)`, permitted: `FSR ${num(v.max_fsr_outright)} outright`,
-               ask: v.fsr > v.max_fsr_outright ? `Density above the outright limit: ${path ? `relaxation by rezoning (${path})` : "a rezoning"}.` : "" };
+               ask: v.fsr > v.max_fsr_outright ? outrightAsk("Density", path) : (r.status !== "pass" ? ask : "") };
     case "district_outright_height":
       return { proposed: `${num(v.height_m)} m, ${num(v.storeys)} storeys`, permitted: `${num(v.max_height_m_outright)} m outright`,
-               ask: v.height_m > v.max_height_m_outright ? `Height above the outright limit: ${path ? `relaxation by rezoning (${path})` : "a rezoning"}.` : "" };
+               ask: v.height_m > v.max_height_m_outright ? outrightAsk("Height", path) : (r.status !== "pass" ? ask : "") };
     case "rezoning_policy_social_housing": {
       const b = v.benchmark_height_m || [];
       // where the policy is not yet known to apply, the check carries no figures: the option's own, and the condition
@@ -147,25 +154,37 @@ export function renderClauses(res, L, changed = new Set(), run = null) {
   const applied = res.filter(r => r.status !== "not_applicable");
   const na = res.filter(r => r.status === "not_applicable");
   const order = { fail: 0, conditional: 1, uncertain: 2, pass: 3, info: 4 };
-  const rows = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer)).map(r => {
+  const row = r => {
     const s = splitValues(r, L);
+    // a cell that runs across three columns keeps a reading measure (20 Nov 2026: lines of up to ~179 characters)
     return `<tr class="st-${h(r.status)}">
       <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}${unverifiedTag(r.source)}</span><code class="rule-id">${idBreak(r.rule_id)} · <span class="nw">v ${h(r.version_effective_from || "—")}</span></code>${secHtml(r.source && r.source.section)}</td>
       <td class="status">${pill(r.status)}</td>
-      ${s.info !== undefined ? `<td class="nums info-span" colspan="3">${h(s.info || "no figures")}${r.status !== "info" && r.action ? `<span class="ask info-ask">${h(r.action)}</span>` : ""}</td>` : `<td class="nums">${h(s.proposed || "—")}</td>
+      ${s.info !== undefined ? `<td class="nums info-span" colspan="3"><span class="info-text">${h(s.info || "no figures")}</span>${r.status !== "info" && r.action ? `<span class="ask info-ask">${h(r.action)}</span>` : ""}</td>` : `<td class="nums">${h(s.proposed || "—")}</td>
       <td class="nums">${h(s.permitted || "—")}</td>
       <td class="ask">${s.ask ? h(s.ask) : `<span class="cont">—</span>`}</td>`}
     </tr>`;
-  }).join("");
+  };
+  const sorted = applied.slice().sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9) || a.layer.localeCompare(b.layer));
+  // the findings first; the rules that only inform (the cost assumptions, the loan terms, the code basis) fold under
+  // the table into one line (20 Nov 2026: thirteen Info rows ran between the findings and the next section). A changed
+  // rule stays in view.
+  const notes = sorted.filter(r => r.status === "info" && !changed.has(r.rule_id));
+  const rows = sorted.filter(r => !notes.includes(r)).map(row).join("");
   const counts = {};
   for (const r of applied) counts[r.status] = (counts[r.status] || 0) + 1;
   const countPills = ["fail", "conditional", "uncertain", "pass", "info"].filter(s => counts[s]).map(s => `<span class="pill pill-${s}">${counts[s]} ${h(STATUS_WORD[s])}</span>`).join("");
+  const colgroup = `<colgroup><col class="c-rule"><col class="c-status"><col class="c-prop"><col class="c-perm"><col class="c-ask"></colgroup>`;
+  const layersOf = rs => [...new Set(rs.map(r => r.layer))];
+  const notesWhat = layersOf(notes).includes("F") ? "the cost assumptions and other information" : "information the rules carry";
   return `<section class="card section clauses">
     <h2>Clauses applied · ${applied.length} of ${res.length} rules</h2>
     <p class="intro">Every clause that applies to this site and option, worst first. <b>Proposed</b> is what the option puts forward and the simulation used; <b>permitted or required</b> is the clause's own limit; <b>the ask</b> is the relaxation, negotiation or missing figure that stands between them.</p>
     <div class="counts">${countPills}</div>
-    <table class="plain"><colgroup><col class="c-rule"><col class="c-status"><col class="c-prop"><col class="c-perm"><col class="c-ask"></colgroup>
-      <thead><tr><th>Clause</th><th>Status</th><th>Proposed (simulated)</th><th>Permitted or required</th><th>The ask</th></tr></thead><tbody>${rows}</tbody></table>
+    ${rows ? `<table class="plain">${colgroup}
+      <thead><tr><th>Clause</th><th>Status</th><th>Proposed (simulated)</th><th>Permitted or required</th><th>The ask</th></tr></thead><tbody>${rows}</tbody></table>` : ""}
+    ${notes.length ? `<details class="fold info-fold"><summary>${notes.length} note${notes.length === 1 ? "" : "s"}: ${notesWhat}</summary>
+      <table class="plain">${colgroup}<tbody>${notes.map(row).join("")}</tbody></table></details>` : ""}
     ${na.length ? `<details class="fold na"><summary>Not applicable here: ${na.length} rule${na.length === 1 ? "" : "s"}, for other districts, policies or programs</summary><ul class="na-list">${na.map(r => `<li>${h(r.title)} <code class="rule-id">${idBreak(r.rule_id)}</code></li>`).join("")}</ul></details>` : ""}
   </section>`;
 }

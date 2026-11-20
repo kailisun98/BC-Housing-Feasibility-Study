@@ -13,8 +13,8 @@
 - *Uncertain* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 12 trees on a 2,134 m² site; no tree survey is on file.
 
 ## 2. Does it fit the funders?
-**No.**
-- *Fail* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: does not fit: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20.
+**Does not meet the criteria of the Community Housing Fund.** The Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now.
+- *Fail* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: does not meet the criteria: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).
 
 ## 3. What is still unsure, and who resolves it?
 | Item | Status | Who / what |
@@ -26,13 +26,13 @@
 | BC Housing Community Housing Fund: eligibility and unit mix | Fail | Manager: resolve the failing criteria or target another program. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $45,563,403, 47% of the capital cost, more than the 15% a feasibility screen can call close. Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $45,563,403, 47% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Rent-geared-to-income, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.
 
 - Capital cost **$96,218,453**: hard $71,272,928 (escalated ×1.0311), soft $17,818,232, contingency $7,127,293, land $0.
 - Net operating income **$1,692,063 a year**: rent $2,958,840 less vacancy $109,477, operating cost $1,059,500 and reserve $97,800.
-- Funding **$50,655,050**: grants $27,907,393, equity $0, supportable debt $22,747,657 at 6.19% over 40 years, 1.10 coverage.
+- Funding **$50,655,050**: grants $27,907,393, equity $0, supportable debt $22,747,657 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
 - Gap **$45,563,403** (47% of the capital cost).
 
 | Line | Figure | From | Note |
@@ -42,7 +42,7 @@
 | Hard cost | $71,272,928 | `f.hard_cost_base` | 14,729 m² × $4,693 × 1.0311 |
 | Soft costs | $17,818,232 | `f.soft_costs` (placeholder) | 25% of hard cost |
 | Contingency | $7,127,293 | `f.soft_costs` (placeholder) | 10% of hard cost |
-| Land | $0 | `f.land` | nominal: the owner is a municipality and the tenure plan is a long lease or a transfer |
+| Land | $0 | `f.land` | nominal: the owner is a municipality, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer (F3) |
 | Capital cost | $96,218,453 | the option | hard + soft + contingency + land |
 | Market rent | $2,188,214 a year | `f.rents` | CMHC October 2025, 89 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
 | Rent-geared-to-income | $548,626 a year | `f.rents` (placeholder) | 30% of a household income taken at 50% of the fund's income limit (placeholder) |
@@ -53,9 +53,9 @@
 | Net operating income | $1,692,063 a year | the option | gross rent less vacancy, operating cost and reserve |
 | Community Housing Fund grant | $27,907,393 | `bch.chf.eligibility` | $171,211 per unit × 163; indicative, the fund is between calls |
 | Equity | $0 | the option | none entered |
-| Supportable debt | $22,747,657 | `f.mortgage` | NOI over a 1.10 coverage ratio, at 6.19% over 40 years (annual service $1,538,239) |
+| Supportable debt | $22,747,657 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $1,538,239 a year in payments |
 | Funding | $50,655,050 | the option | grants + equity + supportable debt |
-| Gap | $45,563,403 | the option | capital cost less funding; a negative gap is headroom |
+| Gap | $45,563,403 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
 
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
@@ -133,11 +133,7 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `4227307d
 
 | Rule | Change | From | To | Now reads |
 |---|---|---|---|---|
-| bc.bcbuilds.eligibility | finding changed | uncertain | uncertain | BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. |
 | bc.toa.minimum_density | changed | not_applicable (v 2024-06-30) | not_applicable (v 2026-11-17) | The site is outside the transit-oriented areas; no provincial minimum height applies. |
-| bcbc.exits | finding changed | info | info | two exits over floor area: 150 m²; two exits over occupant load: 60; separation minimum: 9 m; separation share of diagonal: 50%; travel limit sprinklered: 45 m; travel limit unsprinklered: 30 m; dead end maximum: 6 m; occupant load persons per sleeping room: 2. |
-| bch.pdf.predevelopment_loan | finding changed | info | info | maximum loan: $250,000; eligible costs: due diligence, feasibility and design. |
-| cmhc.ahf.readiness | finding changed | info | info | construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist. |
 | cov.c2.outright_fsr | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
 | cov.c2.outright_height | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
 | cov.c2.setbacks | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
@@ -159,7 +155,6 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `4227307d
 | cov.cd1_819.outright_height | added | — | pass | Height 51.0 m is within the outright maximum of 51.0 m. |
 | cov.dtes.family_units | added | — | pass | 40 of 138 units (29.0%) have two or more bedrooms, against a 25.0% minimum; the 25 supportive homes are left out of the count, as the plan allows (40 of all 163 is 24.5%). |
 | cov.family_units | changed | fail | not_applicable | The site is inside the Downtown Eastside Plan area, whose own family-unit target applies in place of the city-wide one. |
-| cov.parking_minimums | finding changed | info | info | No minimum off-street parking applies citywide since June 2024; the option provides 59 vehicle and 308 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage. |
 | cov.r1_1.outright_fsr | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
 | cov.r1_1.outright_height | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
 | cov.r1_1.setbacks | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
@@ -294,8 +289,8 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `4227307d
 
 | Rule | Status | Finding | Numbers used | Source |
 |---|---|---|---|---|
-| BC Builds: eligibility and below-market requirement (`bc.bcbuilds.eligibility`, v 2024-02-13) | Uncertain | BC Builds: fit cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. | submission = Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template | [BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024, Applicant requirements; grants; timelines](https://www.bcbuildshomes.ca/developers-operators) |
-| BC Housing Community Housing Fund: eligibility and unit mix (`bch.chf.eligibility`, v 2025-05-30) | Fail | Community Housing Fund: does not fit: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. | status = 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026); provisional grant per unit cad = 171211; indicative grant cad = 27907393 | [BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page, Eligibility; unit mix 30/50/20; minimum requirements; rated criteria](https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf) |
+| BC Builds: eligibility and below-market requirement (`bc.bcbuilds.eligibility`, v 2024-02-13) | Uncertain | BC Builds: whether it meets the criteria cannot be confirmed without the share of units at least 20% below market. Non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. | submission = Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template | [BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024, Applicant requirements; grants; timelines](https://www.bcbuildshomes.ca/developers-operators) |
+| BC Housing Community Housing Fund: eligibility and unit mix (`bch.chf.eligibility`, v 2025-05-30) | Fail | Community Housing Fund: does not meet the criteria: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026). | status = 2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026); provisional grant per unit cad = 171211; indicative grant cad = 27907393 | [BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page, Eligibility; unit mix 30/50/20; minimum requirements; rated criteria](https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf) |
 | BC Housing Project Development Fund (pre-development loans) (`bch.pdf.predevelopment_loan`, v 2025-01-01) | Info | maximum loan: $250,000; eligible costs: due diligence, feasibility and design. | max loan cad = 250000; eligible costs = due diligence, feasibility and design | [UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000), Provincial response](https://www.ubcm.ca/node/111136) |
 | CMHC Affordable Housing Fund: readiness and submission mechanics (`cmhc.ahf.readiness`, v 2024-03-13) | Info | construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist. | construction start months after approval = 6; intake = continuous; submission = online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist; criteria note = Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding | [CMHC, Affordable Housing Fund applicant guide, Minimum submission requirements; readiness](https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx) |
 

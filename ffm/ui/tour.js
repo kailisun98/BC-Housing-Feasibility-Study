@@ -3,7 +3,7 @@
 import { $, $$, h, reducedMotion, toast } from "./core/util.js";
 import { guide, state } from "./core/state.js";
 import { loadDemo } from "./files.js";
-import { runRules } from "./runs.js";
+import { openRun } from "./runs.js";
 import { backToMemo, enterOption, progress, renderGuide } from "./route-stage.js";
 import { useSuggestion } from "./guide.js";
 import { setMode, setView, showInputs } from "./modes.js";
@@ -22,7 +22,7 @@ const TOUR = [
     text: "The programs in view, what the site allows before any option, and where to start: Funder-ready, Outright, Benchmark or a saved option, derived from the rules. The building is four figures; click one to make it yours. Every other figure, with the rule it rests on, is behind one fold." },
   { target: "#stage-card", fallback: "#memo", title: "03 Money in, then run", action: "run",
     before: async () => { if (!progress().site) await loadDemo(); if (!progress().option && guide.suggestion) useSuggestion(); if (progress().option) { guide.step = 3; guide.over = !!state.run; renderGuide(); } },
-    text: "Land, equity and other grants are the three figures only the manager knows; everything else the money counts with is a dated, cited assumption. Then one button. The walkthrough runs it for you now." },
+    text: "Land, equity and other grants are the three figures only the manager knows; everything else the money counts with is a dated, cited assumption. Then one button runs the rules. Here the walkthrough opens the demo case's own memo instead, as Council approved it, so it writes no new revision." },
   { target: ".answers", fallback: "#memo", title: "The four answers", before: () => { if (guide.over) backToMemo(); },
     text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Does the money work? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item. The route has folded so the memo has the width." },
   { target: "#memo-actions", fallback: "#step-export", title: "Download PDF, and issue",
@@ -77,6 +77,11 @@ function endTour() {
   if (tour.modeBefore && tour.modeBefore !== state.mode) setMode(tour.modeBefore, false, false);
   tour.modeBefore = tour.viewBefore = null;
   try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* private window: fine */ }
+  // the link that started it no longer names it, so a reload does not start it again (20 Nov 2026)
+  try {
+    const q = new URLSearchParams(location.search);
+    if (q.has("tour")) { q.delete("tour"); const s = q.toString().replace(/%2F/g, "/"); history.replaceState(history.state, "", `${location.pathname}${s ? `?${s}` : ""}`); }
+  } catch (e) { /* no history to change */ }
   // focus goes back where it was before the walkthrough
   const back = tour.returnTo;
   tour.returnTo = null;
@@ -100,14 +105,18 @@ function tourKeys(e) {
   else if (e.key === "ArrowLeft") { e.preventDefault(); showTourStep(tour.i - 1); }
 }
 
+/* The run the walkthrough shows: the demo case's committed memo, opened, never made (20 Nov 2026: every walkthrough ran
+   the rules, so each wrote an outputs folder and a new revision, R4, R5…). */
+const TOUR_RUN = "998-e-19th-ave/as-approved";
+
 async function tourNext() {
   const step = TOUR[tour.i];
   if (step.action === "run" && !state.run) {
     const btn = $(".tour-next", tour.card);
-    if (btn) { btn.disabled = true; btn.textContent = "Running…"; }
-    await runRules();
+    if (btn) { btn.disabled = true; btn.textContent = "Opening the memo…"; }
+    try { await openRun(TOUR_RUN); } catch (e) { toast(`Could not open the demo's memo: ${e.message}`, true); }
     if (!tour.active) return;
-    if (!state.run) { showTourStep(tour.i); return; }   // the run failed; the toast says why
+    if (!state.run) { showTourStep(tour.i); return; }   // it could not open; the status line says why
   }
   showTourStep(tour.i + 1);
 }
@@ -125,7 +134,7 @@ async function showTourStep(i) {
   const aim = tourTarget(step);
   if (aim && aim.closest(".inputs-body") && $(".panes").classList.contains("no-inputs")) showInputs(true, false);
   const last = i === TOUR.length - 1;
-  const primary = step.action === "run" && !state.run ? "Run and continue" : (last ? "Done" : "Next");
+  const primary = step.action === "run" && !state.run ? "Open the memo and continue" : (last ? "Done" : "Next");
   tour.card.innerHTML = `
     <button class="tour-close" type="button" aria-label="Close the walkthrough">×</button>
     <h3 id="tour-title">${h(step.title)}</h3>

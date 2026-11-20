@@ -135,6 +135,12 @@ export function setMode(mode, remember = true, announce = true) {
   issueButtonLabel();
   closeIssuePanel();
   if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }
+  // a link that names the layout names the one on screen, so Back and a reload come back to it (20 Nov 2026: Back
+  // restores each entry's layout, and an entry still saying ?mode=manager would have undone the switch)
+  try {
+    const q = new URLSearchParams(location.search);
+    if (q.has("mode") && q.get("mode") !== mode) { q.set("mode", mode); history.replaceState(history.state, "", `${location.pathname}?${q.toString().replace(/%2F/g, "/")}`); }
+  } catch (e) { /* a page without history (a file): the link keeps its own */ }
   if (announce) { setStatus(`Laid out for ${MODES[mode].who}: ${MODES[mode].line}`, "info"); pollIssues(); }
 }
 

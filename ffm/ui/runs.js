@@ -10,13 +10,13 @@ import { refreshSummary, renderForm, syncCards } from "./schedule.js";
 import {
   blankOption, blankSite, loadOptions, onOptionChange, onSiteChange, selectOption, selectSite, tidyOption
 } from "./files.js";
-import { renderMemo } from "./memo/memo.js";
+import { dateWords, renderMemo } from "./memo/memo.js";
 import { attachCause, compareSummary, setCompareNote } from "./memo/changes.js";
 import { renderPreview3D } from "./figures/cards.js";
 import { closeExportPanel } from "./revit.js";
-import { progress, renderGuide, renderRoute, renderStage, stageShown } from "./route-stage.js";
+import { backToMemo, progress, renderGuide, renderRoute, renderStage, stageShown } from "./route-stage.js";
 import { closeIssuePanel } from "./issue.js";
-import { setStep, showInputs } from "./modes.js";
+import { setMode, setStep, showInputs } from "./modes.js";
 
 /* The top bar's Run. The architect's is the one loud button. The manager runs from the card at 03, so theirs waits
    until there is a memo, then reads Run again, quiet, live only once an edit has left the memo out of date. */
@@ -106,7 +106,11 @@ export async function runRules() {
     if (state.mode === "manager") showInputs(false, false);
     renderRoute();
     const ms = Math.round(performance.now() - t0);
-    toast(`Ran the rules as of ${run.as_of}: ${rev(run.run_id)}, in ${ms} ms${run.diff ? ` · ${compareSummary(run)}` : ""}. Download PDF is under the title.`);
+    toast(`Ran the rules as of ${dateWords(run.as_of)}: ${rev(run.run_id)}, in ${ms} ms${run.diff ? ` · ${compareSummary(run)}` : ""}. Download PDF is under the title.`);
+    // the keyboard goes to the memo's heading, where the answers start (20 Nov 2026: it stayed on a Run button the
+    // memo had just replaced, so it fell to the page's top)
+    const head = $("#memo .memo-head h1");
+    if (head) { head.tabIndex = -1; head.focus({ preventScroll: true }); }
     // where the answers are: beside the rail on a wide window, below it on a narrow one, where the memo is what to scroll to
     const stacked = matchMedia("(max-width: 1100px)").matches;
     (stacked ? $("#memo") : $("#step-run")).scrollIntoView({ behavior: scrollBehavior(), block: "start" });
@@ -163,15 +167,54 @@ function runLabel(r) {
   return `${rev(r.run_id)} · ${ranOn ? `run ${ranOn}${ranAt} · rules as of ${r.as_of}` : `rules as of ${r.as_of}`} · ${named ? `${r.folder} · ` : ""}${option}${r.revit ? " · Revit" : ""}`;
 }
 
-/* The address bar names the run on screen (and the run compared), so a memo can be sent as a link. */
+/* The address bar names the run on screen (and the run compared), so a memo can be sent as a link. Another run or
+   another comparison is a new entry in the browser's history, so Back returns to the memo before it (20 Nov 2026:
+   every change replaced the entry, and Back left the tool); anything smaller, and a step Back itself takes, replaces. */
+let restoring = false;
+
 function syncUrl() {
   if (STATIC && !state.run) return;
   const q = new URLSearchParams(location.search);
+  const was = new URLSearchParams(location.search);
   if (state.run && !state.run.in_browser) q.set("run", state.run.run_id); else q.delete("run");
   if (state.run && state.compareRun) q.set("compare", state.compareRun); else q.delete("compare");
   q.set("mode", state.mode);
+  q.delete("tour");   // the walkthrough is a one-time link: an entry made while it runs does not start it again
   const url = `${location.pathname}?${q.toString().replace(/%2F/g, "/")}`;   // run ids read as site/folder, as the site's own links write them
-  if (url !== location.pathname + location.search) history.replaceState(null, "", url);
+  if (url === location.pathname + location.search) return;
+  const moved = (was.get("run") || "") !== (q.get("run") || "") || (was.get("compare") || "") !== (q.get("compare") || "");
+  if (moved && !restoring) history.pushState({ ffm: 1 }, "", url);
+  else history.replaceState(history.state, "", url);
+}
+
+/* Back and Forward: the page opens what the address bar now names, the run and the comparison (and the layout the
+   entry was made in), without making a new entry. An entry with no run brings the manager's stops back over the memo. */
+export async function followHistory() {
+  const q = new URLSearchParams(location.search);
+  const run = q.get("run"), cmp = q.get("compare") || null, mode = q.get("mode");
+  restoring = true;
+  try {
+    if (mode && mode !== state.mode && ["manager", "architect", "reader"].includes(mode)) setMode(mode, false, false);
+    if (run && (!state.run || state.run.run_id !== run)) {
+      state.compareRun = cmp && cmp !== run ? cmp : null;
+      await openRun(run);
+    } else if (run && (state.compareRun || null) !== cmp) {
+      state.compareRun = cmp;
+      fillRunSelects();
+      await applyCompare();
+    } else if (run && guide.over) {
+      backToMemo();
+    } else if (!run && state.run && state.mode === "manager") {
+      // the page before the first run: the stop the manager was on comes back over the memo, which stays a click away
+      guide.over = true;
+      showInputs(true, false);
+      renderGuide();
+    }
+  } catch (e) {
+    toast(`Could not open ${run || "that page"}: ${e.message}`, true);
+  } finally {
+    restoring = false;
+  }
 }
 
 export function fillRunSelects() {
@@ -218,7 +261,7 @@ export async function openRun(runId) {
   closeExportPanel();
   // the folder is the architect's to know; the manager and the reader are told the revision and its date
   const where = state.mode === "architect" ? ` · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}` : "";
-  setStatus(`Opened ${rev(run.run_id)}, the memo as of ${run.as_of}${where}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
+  setStatus(`Opened ${rev(run.run_id)}, the memo as of ${dateWords(run.as_of)}${where}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
 }
 
 /* The run a stored comparison (diff.json) was made against. The diff names only that run's date and rules stamp,

@@ -1,0 +1,195 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "2001-stainsbury-ave",
+  "option_id": "2001-stainsbury-ave-as-approved",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        41.33,
+        0.0
+      ],
+      [
+        46.06,
+        2.27
+      ],
+      [
+        83.16,
+        54.67
+      ],
+      [
+        58.68,
+        72.24
+      ],
+      [
+        8.5,
+        21.72
+      ],
+      [
+        0.0,
+        13.17
+      ],
+      [
+        1.2,
+        2.27
+      ]
+    ],
+    "frontage_m": 83.16,
+    "depth_m": 72.24,
+    "area_m2": 2966.7,
+    "street_side": "y = 0",
+    "front_face": {
+      "street": "Victoria Drive"
+    },
+    "orientation": {
+      "rotate_deg": 54.690958,
+      "tx": 28.048,
+      "ty": -23.078
+    },
+    "front_edge": 5,
+    "corners": [
+      [
+        41.33,
+        0.0
+      ],
+      [
+        46.06,
+        2.27
+      ],
+      [
+        83.16,
+        54.67
+      ],
+      [
+        58.68,
+        72.24
+      ],
+      [
+        0.0,
+        13.17
+      ],
+      [
+        1.2,
+        2.27
+      ]
+    ],
+    "bbox": [
+      0.0,
+      0.0,
+      83.16,
+      72.24
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 2942.7,
+    "shape": {
+      "class": "irregular",
+      "note": "Irregular: 6 corners, 77% of its 94.9 x 40.4 m bounding rectangle, 2,943 m2.",
+      "rectangularity": 0.768,
+      "vertices": 6,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in); turned so lot edge 5 is the front (front_face {'street': 'Victoria Drive'})"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        40.59,
+        3.75
+      ],
+      [
+        44.89,
+        5.81
+      ],
+      [
+        77.26,
+        51.52
+      ],
+      [
+        59.33,
+        64.39
+      ],
+      [
+        3.56,
+        8.24
+      ],
+      [
+        3.83,
+        5.83
+      ]
+    ],
+    "width_m": 22.0,
+    "depth_m": 21.5,
+    "area_m2": 1938.0,
+    "setbacks_m": {
+      "front": 3.7,
+      "rear": 6.0,
+      "side": 3.0
+    },
+    "box": {
+      "x": 22.56,
+      "y": 5.75,
+      "w": 22.0,
+      "d": 21.5,
+      "area_m2": 473.0
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 7 storeys, FSR 3.46",
+      "footprint": [
+        [
+          22.56,
+          5.75
+        ],
+        [
+          44.56,
+          5.75
+        ],
+        [
+          44.56,
+          27.25
+        ],
+        [
+          22.56,
+          27.25
+        ]
+      ],
+      "plate_width_m": 22.0,
+      "plate_depth_m": 21.5,
+      "at_street_corner": "right",
+      "base_z": 0.0,
+      "height_m": 23.83,
+      "storeys": 7,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 473.0,
+      "gfa_m2": 3311.0,
+      "fsr": 1.116,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m",
+        "site.front_face"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 25,
+    "after": 0,
+    "shortfall": 25,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "Proposed plate of 1,465 m² exceeds the plate box of 473 m² (the largest rectangle inside the 1,938 m² envelope); the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.",
+    "Option height 23.83 m exceeds 7 x 3.3 m = 23.1 m; the extra 0.7 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
+  ],
+  "outright_height_limit_m": null
+}

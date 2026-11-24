@@ -160,15 +160,13 @@ class Unverified(unittest.TestCase):
                         self.assertTrue(v.source["url"].startswith("https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-"), r.id)
 
     def test_rt4_run_raises_one_unverified_item(self):
-        L = evaluate(site("RT-4"), OPTION, AS_OF)
-        items = [u for u in L["summary"]["answers"]["unsure"] if u["rule_id"] == "coverage.schedule_unverified"]
-        self.assertEqual(len(items), 1)
-        self.assertEqual(items[0]["title"], "District schedule figures entered unverified (RT-4)")
-        self.assertIn("cov.rt.outright_fsr", items[0]["finding"])
-        self.assertIn("cov.rt.outright_height", items[0]["finding"])
-        self.assertIn("entered from recollection of the RT-4 schedule", items[0]["finding"])
-        self.assertEqual(items[0]["status"], "uncertain")
-        self.assertTrue(items[0]["action"].startswith("Architect: open the RT-4 schedule"))
+        # 24 Nov 2026: the RT schedules were read from their PDFs, and the family rule typed from memory is gone (RT-6
+        # and the N variants it was left covering are not districts on the City's map). No RT site is unverified now,
+        # and a district that does not exist has no schedule.
+        self.assertNotIn("coverage.schedule_unverified", open_ids(evaluate(site("RT-4"), OPTION, AS_OF)))
+        L = evaluate(site("RT-6"), OPTION, AS_OF)
+        self.assertNotIn("coverage.schedule_unverified", open_ids(L))
+        self.assertIn("coverage.district_schedule", open_ids(L))
 
     def test_rm1_and_the_schedules_read_from_pdfs_have_none(self):
         self.assertNotIn("coverage.schedule_unverified", open_ids(evaluate(site("RM-1", 2810.7), OPTION, AS_OF)))
@@ -374,14 +372,20 @@ class SchedulesFromThePdfs(unittest.TestCase):
         self.assertEqual(status(evaluate(lot("R1-1", 650.0, 16.0), dict(eight, storeys=4), AS_OF), "cov.r1_1.outright_height"), "fail")
 
     def test_c2_family_takes_the_rental_building_figures(self):
+        # the rental figure asks for 0.35 FSR of non-dwelling use at the street (s.3.1.1.1): 420 m² on 1,200 m²
+        SH6 = dict(globals()["SH6"], non_residential_gfa_m2=420)
         L = evaluate(lot("C-2"), SH6, AS_OF)
         self.assertEqual(status(L, "cov.c2.outright_fsr"), "pass")
+        # without it the base figure stands, and the finding says what the higher one needs (23 Nov 2026)
+        bare = by_id(evaluate(lot("C-2A"), dict(globals()["SH6"], gfa_m2=3600), AS_OF), "cov.c2a.outright_fsr")           # 3.00, over the base 2.5
+        self.assertNotEqual(bare["status"], "pass")
+        self.assertIn("0.35 FSR of non-dwelling use at the street, 420 m² on this lot; this option has 0 m²", bare["finding"])
         self.assertIn("every home secured as rental", by_id(L, "cov.c2.outright_fsr")["finding"])
         self.assertEqual(status(L, "cov.c2.outright_height"), "pass")
         strata = dict(SH6, tenure="other", gfa_m2=2400, height_m=13.0, storeys=4)                                # 2.00: over 0.75, within the Director's 2.50
         self.assertEqual(status(evaluate(lot("C-2"), strata, AS_OF), "cov.c2.outright_fsr"), "conditional")
         self.assertEqual(status(evaluate(lot("C-2B"), strata, AS_OF), "cov.c2b.outright_fsr"), "pass")           # 2.50 outright
-        big = dict(SH6, gfa_m2=6100)                                                                              # 3.65 on 1,672 m²
+        big = dict(SH6, gfa_m2=6100, non_residential_gfa_m2=590)                                                                              # 3.65 on 1,672 m²
         corner = lot("C-2C", 1672.0, 46.0, corner_lot=True)
         self.assertEqual(status(evaluate(corner, big, AS_OF), "cov.c2c.outright_fsr"), "pass")                  # 3.70 on the corner
         self.assertEqual(status(evaluate(dict(corner, corner_lot=False), big, AS_OF), "cov.c2c.outright_fsr"), "fail")
@@ -440,7 +444,8 @@ class NotInTheStack(unittest.TestCase):
         item = open_item(L, "coverage.district_schedule")
         self.assertEqual(item["title"], "No I-2 schedule in the rules")
         self.assertEqual(item["status"], "uncertain")
-        self.assertTrue(item["action"].startswith("Architect: save the I-2 schedule into inbox/"))
+        self.assertTrue(item["action"].startswith("Architect: read the I-2 schedule for its FSR, height and yards, and whether housing is a permitted use"))
+        self.assertNotIn("inbox/", item["action"])
         self.assertTrue(all(r["status"] == "not_applicable" for r in L["results"] if r.get("check", "").startswith("district_")))
 
 

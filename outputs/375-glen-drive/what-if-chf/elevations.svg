@@ -4,9 +4,8 @@
 <text x="88.0" y="62.0" font-size="12" font-weight="600">Front elevation · from the street</text>
 <line x1="78.0" y1="292.0" x2="264.1" y2="292.0" stroke="#1f2933" stroke-width="1.5"/>
 <rect x="88.0" y="94.6" width="166.1" height="197.4" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-<rect x="90.0" y="281.0" width="79.7" height="9.3" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="203.4" y="282.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="239.3" y="282.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="102.7" y="281.0" width="79.7" height="9.3" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="216.1" y="282.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="278.8" x2="254.1" y2="278.8" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="110.7" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="162.5" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -88,6 +87,7 @@
 <rect x="134.5" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="154.4" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="174.3" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="194.2" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="78.0" y1="72.0" x2="264.1" y2="72.0" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
 <text x="268.1" y="76.0" font-size="10" fill="#8e8e8e">outright 51.0 m</text>
 <text x="268.1" y="98.6" font-size="10" fill="#1f2933">45.75 m</text>

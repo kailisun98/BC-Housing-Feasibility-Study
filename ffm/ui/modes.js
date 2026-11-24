@@ -4,6 +4,7 @@
 import { $, $$, setStatus } from "./core/util.js";
 import { editor, guide, state } from "./core/state.js";
 import { syncCards } from "./schedule.js";
+import { renderClaude } from "./claude.js";
 import { renderMemo, renderQuiet } from "./memo/memo.js";
 import { renderPreview3D } from "./figures/cards.js";
 import { closeExportPanel } from "./revit.js";
@@ -130,6 +131,7 @@ export function setMode(mode, remember = true, announce = true) {
   // the memo is laid out for its reader (the note addressed to them, the architect's mass tools), so it is drawn again
   if (state.run && state.run.ledger) renderMemo(state.run); else applyModeToMemo();
   syncCards();
+  renderClaude();      // the schedule form sits on the manager's site card for a CD-1 lot, under the architect's district row otherwise
   renderGuide();
   if (!state.run) renderQuiet();   // the manager's stage, the reader's empty page, or the quiet cards for the architect
   issueButtonLabel();

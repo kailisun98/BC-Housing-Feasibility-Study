@@ -1,6 +1,6 @@
 {
-  "previous_stamp": "6e72488249c79837",
-  "current_stamp": "6e72488249c79837",
+  "previous_stamp": "31193259023b85e0",
+  "current_stamp": "31193259023b85e0",
   "previous_as_of": "2026-10-23",
   "current_as_of": "2026-10-23",
   "rules_changed": false,
@@ -10,9 +10,9 @@
       "change": "changed",
       "from": "uncertain",
       "to": "pass",
-      "from_version": "2024-02-13",
-      "to_version": "2024-02-13",
-      "finding": "BC Builds: meets the published criteria: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter."
+      "from_version": "2026-01-01",
+      "to_version": "2026-01-01",
+      "finding": "BC Builds: passes the published items this screen checks: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. BC Builds works opportunity by opportunity; middle-income rents and the team's capacity are not assessed here."
     },
     {
       "rule_id": "bc.code_basis",
@@ -26,7 +26,7 @@
       "change": "finding_changed",
       "from": "uncertain",
       "to": "uncertain",
-      "finding": "Community Housing Fund: whether it meets the criteria cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026)."
+      "finding": "Community Housing Fund: whether it meets the criteria cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026)."
     },
     {
       "rule_id": "bch.design_guidelines.unit_areas",
@@ -34,6 +34,13 @@
       "from": "info",
       "to": "info",
       "finding": "BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 80 m² gross per unit, so net areas should be checked at the plan stage."
+    },
+    {
+      "rule_id": "bch.ihf.program",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "Would be a program for this housing if it is Indigenous-led, or partnered with an Indigenous housing provider or Nation (not said on the option): affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve). It funds building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them). A project enters by BC Housing's request for proposals. No intake is open now (closed: no call is posted on the program page (read 23 Nov 2026)). Its homes are all rent geared to income; this option has 36 market-rent homes, which it would not carry. Its criteria are not tested here."
     },
     {
       "rule_id": "cov.cd1_324.floor_area",

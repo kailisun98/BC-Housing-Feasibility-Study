@@ -28,8 +28,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from .checks import (LANE_TO_CENTRE_LINE_M, _schedule_c_required, district_setbacks, fsr_limit, height_limit, lot_as_fronted,
-                     yard_minimums)
+from .checks import (LANE_TO_CENTRE_LINE_M, _schedule_c_required, corner_streets, district_setbacks, fsr_limit, height_limit, lot_as_fronted,
+                     other_front, yard_minimums)
 from .engine import evaluate
 from .rules_loader import RULES_DIR, Rule, district_of, load_rules, stamp
 
@@ -134,9 +134,10 @@ def _plate(site: dict, sb: dict[str, float]) -> dict[str, Any] | None:
         ring = boundary.oriented_ring(site) or boundary.lot_ring(site)
         if ring:
             env_poly = boundary.inset(ring["ring"], sb)
-            box = boundary.largest_rect(env_poly, PLATE_GRID_M) if env_poly else None
+            box = boundary.turned_rect(env_poly, PLATE_GRID_M) if env_poly else None      # as massing.build finds it for a suggestion
             if box and box.get("area_m2"):
-                return {"w": round(box["w"], 1), "d": round(box["d"], 1), "area": round(box["area_m2"], 1), "how": "the largest rectangle inside the lot polygon less the setbacks"}
+                return {"w": round(box["w"], 1), "d": round(box["d"], 1), "area": round(box["area_m2"], 1),
+                        "how": "the largest rectangle inside the lot polygon less the setbacks" + (", turned to the lot's longest side" if box.get("angle_deg") else "")}
     except Exception:
         pass
     W, D = lot_as_fronted(site)
@@ -169,7 +170,7 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
         tier_storeys = (p_toa.get("tiers_storeys") or {}).get(str(tier).strip())
     fsr_cap = None
     rule_ids: list[str] = []
-    if r_fsr and r_h:
+    if r_fsr and r_h and _social_height(site, r_h[1])[0] is not None:
         id_fsr, p_fsr = r_fsr
         id_h, p_h = r_h
         max_h, h_word = _social_height(site, p_h)     # the suggestion is 100% social housing (RM-4: the Director's variance)
@@ -253,8 +254,14 @@ def setbacks_for(site: dict) -> dict[str, float]:
     base, _ = ASSUMPTIONS["setbacks_m"]
     W, D = lot_as_fronted(site)     # the lot as fronted: turned where site.front_face names another face
     if not W or not D:
-        return dict(base)
-    return {"front": round(min(base["front"], D * 0.12), 1), "rear": round(min(base["rear"], D * 0.20), 1), "side": round(min(base["side"], W * 0.08), 1)}
+        out = dict(base)
+    else:
+        out = {"front": round(min(base["front"], D * 0.12), 1), "rear": round(min(base["rear"], D * 0.20), 1), "side": round(min(base["side"], W * 0.08), 1)}
+    # a street built to its lot lines (23 Nov 2026: the Downtown Eastside, a commercial street): where the site says so,
+    # no front or side yard is assumed; the rear placeholder stays, for the lane. Still a placeholder, said as one.
+    if site.get("builds_to_lot_lines") is True:
+        out["front"], out["side"] = 0.0, 0.0
+    return out
 
 
 def _rule(rules: list[Rule], rule_id: str) -> Rule | None:
@@ -284,11 +291,25 @@ def _district_rule(rules: list[Rule], on: date, check: str, district: str) -> tu
 SOCIAL_PROBE = {"tenure": "social_housing"}     # every suggestion is 100% social housing
 
 
+def street_floor_m2(site: dict, p_fsr: dict | None) -> int:
+    """The non-dwelling floor area at the street a schedule's rental FSR asks for (C-2 s.3.1.1.1: 0.35 FSR), in whole
+    m² on this lot; 0 where the schedule asks for none. The suggestion puts it on the ground floor so that it earns the
+    figure it takes (23 Nov 2026: an all-residential suggestion took 3.5)."""
+    need = (p_fsr or {}).get("rental_min_non_dwelling_fsr")
+    area = float((p_fsr or {}).get("fsr_site_area_m2") or site.get("site_area_m2") or 0)
+    return int(math.ceil(need * area - 1e-9)) if need and area else 0
+
+
+def _probe(site: dict, p_fsr: dict | None) -> dict:
+    nonres = street_floor_m2(site, p_fsr)
+    return {**SOCIAL_PROBE, "non_residential_gfa_m2": nonres} if nonres else SOCIAL_PROBE
+
+
 def _social_fsr(site: dict, p_fsr: dict) -> tuple[float | None, str, float | None]:
     """The FSR a 100% social housing suggestion takes from a schedule (checks.fsr_limit: the schedule's social housing
     or rental figure, the site's row of a table, a CD-1 sub-area's fixed floor area), the words for it, and the floor
     area in m² where the by-law fixes one. None where no figure applies to the site (a sub-area not recorded)."""
-    lim = fsr_limit(site, SOCIAL_PROBE, p_fsr)
+    lim = fsr_limit(site, _probe(site, p_fsr), p_fsr)
     if lim["max"] is None:
         return None, lim["short"] or "no figure applies to this site", None
     if lim["floor_area_cap"] is not None:
@@ -304,6 +325,11 @@ def _social_height(site: dict, p_h: dict) -> tuple[float, str]:
     if lim["discretionary"] and lim["discretionary_social"]:
         return float(lim["discretionary"]), (f"the {lim['discretionary']} m the Director of Planning may allow for 100% social housing ({lim['discretionary_clause']}; "
                                              f"{lim['max']} m outright), a variance to ask for, not a right")
+    if lim["max"] is None:      # a plan that gives this site no outright maximum (a sub-area not recorded, or none printed)
+        if lim["discretionary"]:
+            return float(lim["discretionary"]), (f"the {lim['discretionary']} m the Director of Planning may allow{lim['words']} ({lim['discretionary_clause']}); "
+                                                 "the plan states no outright maximum there, so this is a discretion to ask for, not a right")
+        return None, "no height applies until the site's sub-area is recorded"
     return float(lim["max"]), f"the outright maximum of {lim['max']} m{lim['words']}"
 
 
@@ -450,9 +476,13 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
             unsure.append({"key": "in_former_community_vision_area", "why": "whether the site is inside a former Community Vision area (Map 1 of the policy) decides whether the benchmark applies", "who": "Architect: check Map 1 for this address"})
         # fall through to outright
     max_fsr, fsr_word, floor_cap = _social_fsr(site, p_fsr) if p_fsr else (None, "", None)
+    if p_fsr and p_fsr.get("housing_not_permitted"):      # an industrial schedule (M-1): the use comes before any envelope
+        unsure.append({"key": "use", "why": p_fsr["housing_not_permitted"], "who": "Manager: ask a City planner whether housing is permitted here at all, before any design work"})
+    if p_h and max_fsr is not None and _social_height(site, p_h)[0] is None:
+        max_fsr = None
     if p_fsr and p_h and max_fsr is None:
         # the schedule's figure needs a fact the site does not carry yet (a CD-1 sub-area): said, and the rough envelope stands in
-        unsure.append({"key": "cd1_sub_area" if p_fsr.get("sub_area_residential_floor_area_m2") else "gfa_m2", "why": f"{id_fsr}: {fsr_word}",
+        unsure.append({"key": "cd1_sub_area" if p_fsr.get("sub_area_residential_floor_area_m2") else "odp_sub_area" if p_fsr.get("by_sub_area") else "gfa_m2", "why": f"{id_fsr}: {fsr_word}",
                        "who": "Architect: find the site on the by-law's map and record it"})
     if p_fsr and p_h and max_fsr is not None:
         # every suggestion is 100% social housing: where the schedule gives social housing its own FSR and lets the
@@ -473,6 +503,9 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
             gfa = round(rough["gfa_m2"], 0)
             plate_words = f"; at {storeys} storeys the plate the yards leave holds {gfa:,.0f} m², which governs"
         out.update({"storeys": storeys, "height_m": round(min(storeys * f2f, max_h), 1), "fsr": round(gfa / area, 2) if (floor_cap is not None and area) else max_fsr, "gfa_m2": gfa})
+        if street_floor_m2(site, p_fsr) and max_fsr > float(p_fsr.get("max_fsr") or 0):
+            out["non_residential_gfa_m2"] = street_floor_m2(site, p_fsr)
+            out["non_residential_rule"] = id_fsr
         fields["storeys"] = {"value": storeys, "rule_id": id_h, "basis": "rule", "note": f"the most storeys of {f2f} m under {h_word}" + (f", at most {cap_storeys} storeys" if cap_storeys else "")
                              + (f", capped at the wood-frame standard of {wood_max}" if storeys == wood_max and max_h > wood_max * f2f else "")}
         fields["height_m"] = {"value": out["height_m"], "rule_id": id_h, "basis": "rule", "note": f"{storeys} storeys × {f2f} m, under {h_word}"}
@@ -528,18 +561,19 @@ def _envelope(site: dict, candidate: str, rules: list[Rule], on: date, fields: d
     unsure.append({"key": "gfa_m2", "why": (f"the rule stack holds nothing from {district}'s by-law: a CD-1 site's limits are whatever its by-law and rezoning set" if district.upper().startswith("CD-1")
                                              else f"the rule stack has no {district or 'district'} schedule")
                    + ("; the rough envelope figures (the plate the setbacks leave times the storeys) stand in until the schedule is read" if rough.get("storeys") else ""),
-                   "who": "Architect: read the district schedule and enter the storeys, height and floor area it permits (or read it with Claude at stop 3)" + ("" if rough.get("storeys") else ". Left blank, the memo says the envelope was not assessed and draws no building")})
+                   "who": "Architect: read the district schedule and enter the storeys, height and floor area it permits (the architect's Site schedule can read it with Claude)" + ("" if rough.get("storeys") else ". Left blank, the memo says the envelope was not assessed and draws no building")})
     fields["rezoning_path"] = {"value": None, "rule_id": None, "note": "not derived: enter the path the site takes"}
     return out
 
 
 def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "funder-ready",
             rules: list[Rule] | None = None, rules_dir: Path = RULES_DIR, mix_shares: dict | None = None,
-            fixed: dict | None = None) -> dict[str, Any]:
+            fixed: dict | None = None, _compare_fronts: bool = True) -> dict[str, Any]:
     """`fixed`: the manager's own storeys, height, floor area and unit counts. The suggestion's own figures stay in
     `fields` (what the rules derive); the option takes the manager's, and everything downstream (the homes from the
     floor area, the funders' tiers, the accessible count, the below-market share) follows them."""
     mine = check_mix(mix_shares)
+    fixed_given = fixed
     fixed = check_fixed(fixed)
     rules = rules if rules is not None else load_rules(rules_dir)
     programs = list(programs or [])
@@ -599,6 +633,17 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
 
     rough = envelope_for(site, rules, on, sb, sb_rule)
     env = _envelope(site, candidate, rules, on, fields, unsure, rough)
+    # the candidates that would give this same building (23 Nov 2026: three choices that were one building, with
+    # nothing to say so): each other available candidate's envelope is derived, and the note names the ones that match
+    same = []
+    for c in cands:
+        if c.get("available") and c["id"] != candidate:
+            e2 = _envelope(site, c["id"], rules, on, {}, [], rough)
+            c["same_building"] = (e2.get("storeys"), e2.get("height_m"), e2.get("gfa_m2")) == (env.get("storeys"), env.get("height_m"), env.get("gfa_m2"))
+            if c["same_building"]:
+                same.append(str(c.get("title") or c["id"]))
+    same_note = (f"{' and '.join(same)} would give this same building here (the same storeys, height and floor area); between them only the rent tiers and the funders' answers change"
+                 if same else None)
     gfa = env.get("gfa_m2")
     storeys = env.get("storeys")
     height = env.get("height_m")
@@ -645,6 +690,22 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         if capped:
             unsure.append({"key": "gfa_m2", "why": from_homes["words"], "who": "Manager: fewer homes, smaller ones, or a path to more floor area (a rezoning)"})
 
+    # the non-dwelling floor area the schedule's figure asks for at the street comes off the homes' floor area
+    nonres = int(env.get("non_residential_gfa_m2") or 0)
+    # only where the floor area is the schedule's own outright figure: a transit-area rezoning or the manager's own
+    # floor area is not that clause's building
+    if not gfa or nonres >= gfa or fixed.get("gfa_m2") or (fields.get("gfa_m2") or {}).get("basis") != "rule":
+        nonres = 0
+    res_gfa = (gfa - nonres) if gfa else gfa
+
+    # more storeys on the same floor area make every floor smaller, and a slimmer plate places fewer homes: said, so a
+    # manager who raises the storeys is not left to wonder why the homes fell (23 Nov 2026, the page's own walk)
+    own_st, rule_st = fixed.get("storeys"), env.get("storeys")
+    if own_st and rule_st and gfa and not fixed.get("gfa_m2") and int(own_st) > int(rule_st):
+        unsure.append({"key": "storeys", "why": f"{int(own_st)} storeys on the same {gfa:,.0f} m² of floor area make each floor about {gfa / int(own_st):,.0f} m², where {int(rule_st)} storeys made it "
+                                                f"{gfa / int(rule_st):,.0f} m²: a slimmer floor holds fewer homes, so the homes can fall as the storeys rise",
+                       "who": "Manager: raise the floor area with the storeys (the FSR figure), or keep the storeys the rules gave"})
+
     # the building
     option: dict[str, Any] = {
         "id": f"{site.get('id') or 'site'}-suggested-{candidate}",
@@ -655,7 +716,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         "tenure": "social_housing",
         "rezoning_path": fields.get("rezoning_path", {}).get("value"),
         "storeys": storeys, "height_m": height, "gfa_m2": gfa,
-        "residential_gfa_m2": gfa, "non_residential_gfa_m2": 0 if gfa else None,
+        "residential_gfa_m2": (gfa - nonres) if gfa else gfa, "non_residential_gfa_m2": nonres if gfa else None,
         "units": {"studio": None, "one_bed": None, "two_bed": None, "three_bed_plus": None},
         "rent_tiers_units": None, "share_below_hils": None, "max_rent_share_of_income": None,
         "owner_type_at_completion": "non_profit_society", "housing_agreement_years": None,
@@ -686,14 +747,19 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
                 + ("" if lane["given"] else ", a standard lane assumed") + ")" if k == "rear" and lane else "")}
         else:
             fields[f"setbacks_m.{k}"] = {"value": sb[k], "rule_id": None, "note": "placeholder, not read from the district schedule" + ("; scaled to this lot" if sb[k] < ASSUMPTIONS["setbacks_m"][0][k] else "")}
-    fields["non_residential_gfa_m2"] = {"value": option["non_residential_gfa_m2"], "rule_id": "bc.bcbuilds.eligibility", "note": "none suggested; BC Builds caps it at 30% of the floor area"}
-    fields["residential_gfa_m2"] = {"value": gfa, "rule_id": None, "note": "all of the floor area, with no non-residential space"}
+    if nonres:
+        fields["non_residential_gfa_m2"] = {"value": nonres, "rule_id": env.get("non_residential_rule"),
+                                            "note": f"the non-dwelling floor area at the street the schedule's rental FSR asks for ({nonres / float(site.get('site_area_m2') or 1):.2f} FSR); shops or services, yours to program"}
+        fields["residential_gfa_m2"] = {"value": res_gfa, "rule_id": None, "note": f"the floor area less the {nonres:,.0f} m² of non-dwelling space at the street"}
+    else:
+        fields["non_residential_gfa_m2"] = {"value": option["non_residential_gfa_m2"], "rule_id": "bc.bcbuilds.eligibility", "note": "none suggested; BC Builds caps it at 30% of the floor area"}
+        fields["residential_gfa_m2"] = {"value": gfa, "rule_id": None, "note": "all of the floor area, with no non-residential space"}
 
     # units, from layers C and D
     p_fam = _params(rules, on, "cov.family_units", district)
     p_areas = _params(rules, on, "bch.design_guidelines.unit_areas", district)
     if gfa and p_areas:
-        counts, avg = unit_mix(gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares)
+        counts, avg = unit_mix(res_gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares)
         # the homes are the ones the plans place on the plate the massing draws, not only what the floor area holds;
         # counts the manager typed are theirs, and the memo says what does not fit
         fit_words = ""
@@ -701,7 +767,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
             from .massing import plate_dims   # massing builds on the checks this module imports
             bw, bd = float(rough["plate_w_m"]), float(rough["plate_d_m"])
             pw, pd = plate_dims(min(gfa / storeys, bw * bd), bw, bd, int(storeys))
-            counts, avg, alone, placed = fit_to_plans(gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares, pw, pd, int(storeys))
+            counts, avg, alone, placed = fit_to_plans(res_gfa * eff, p_areas["min_net_area_m2"], p_fam, allowance, shares, pw, pd, int(storeys))
             kept = sum(counts.values())
             if placed < kept:
                 # no count places whole: the floor area's count stands and the plan is the architect's (20 Nov 2026)
@@ -779,7 +845,8 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
             if short:
                 unsure.append({"key": "unit_count_for_the_mix", "why": f"{n} homes cannot split {' / '.join(f'{int(s * 100)}' for s in p_chf['mix'].values())} within the fund's tolerance; the nearest split is "
                                + " / ".join(str(tiers[k]) for k in p_chf["mix"]) + f", which the fund's check will call short",
-                               "who": f"Manager: plan at least {least} homes, or ask BC Housing whether a smaller count can be read as meeting the mix"})
+                               "who": (f"Manager: plan at least {least} homes, or ask BC Housing whether a smaller count can be read as meeting the mix" if n < least else
+                                       f"Manager: plan a number of homes that splits the mix in whole homes ({least} is the smallest; {n} does not), or ask BC Housing how it reads a split this close")})
             acc = int(math.ceil(p_chf["min_accessible_unit_share"] * n))
             option["accessible_units"] = acc
             fields["accessible_units"] = {"value": acc, "rule_id": "bch.chf.eligibility", "note": f"the fund's {p_chf['min_accessible_unit_share'] * 100:.0f}% minimum of {n} units, rounded up"}
@@ -833,6 +900,28 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
                        "who": "Architect: save the site's CD-1 by-law into inbox/ to have its rules entered" if district.upper() != "CD-1"
                               else "Manager: find the address again (the lookup records the CD-1 number) or enter it on the site"})
 
+    # A corner lot read from its other street (23 Nov 2026: Vienna House, 2001 Stainsbury Ave, held 27 homes fronting
+    # Victoria Drive, the lookup's choice, and 95 fronting Stainsbury). The same suggestion is derived with the other
+    # street as the front; where the homes differ by 15% or more, both counts are said and the choice goes to a person.
+    fronts = None
+    alt = other_front(site) if _compare_fronts else None
+    if alt and n:
+        streets = corner_streets(site)
+        cur = next((s for s in streets if s != alt), None)
+        other_site = {k: v for k, v in site.items() if k != "front_face"}
+        other_site["front_street"] = alt
+        if streets and alt != streets[0]:
+            other_site["front_face"] = {"street": alt}
+        try:
+            o2 = suggest(other_site, programs, on, candidate, rules=rules, mix_shares=mix_shares, fixed=fixed_given, _compare_fronts=False)["option"]
+            n2 = sum(int(v or 0) for v in (o2.get("units") or {}).values())
+            fronts = [{"street": cur, "homes": n, "gfa_m2": option.get("gfa_m2"), "current": True}, {"street": alt, "homes": n2, "gfa_m2": o2.get("gfa_m2"), "current": False}]
+            if n2 and abs(n2 - n) / max(n, n2) >= 0.15:
+                unsure.append({"key": "front_street", "why": f"which street is the front decides the plate: fronting {cur} this suggestion holds {n} homes, fronting {alt} it holds {n2}",
+                               "who": "Architect: confirm the front from the survey or the address the City lists; Manager: choose it at 01 (Which street is the front?)"})
+        except (ValueError, KeyError, TypeError):
+            fronts = None      # the other front cannot be drawn from the streets on file: nothing to compare
+
     fields["target_programs"] = {"value": programs, "rule_id": None, "note": "the programs chosen"}
     fields["id"] = {"value": option["id"], "rule_id": None, "note": "named after the site and the candidate"}
     fields["name"] = {"value": option["name"], "rule_id": None, "note": ""}
@@ -851,7 +940,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     return {
         "candidate": candidate, "candidate_note": candidate_note, "candidates": cands, "option": option, "fields": fields,
         "unsure": unsure, "assumptions": assumptions, "envelope": rough, "mix": mix,
-        "label": label, "falls_short": falls_short, "floor_area_from_homes": from_homes,
+        "label": label, "falls_short": falls_short, "floor_area_from_homes": from_homes, "fronts": fronts, "same_building_note": same_note,
         "as_of": on.isoformat(), "stamp": stamp(rules, on, rules_dir),
     }
 

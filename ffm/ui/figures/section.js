@@ -123,9 +123,17 @@ export function figSection(m, fsIn = null, ctx = null) {
   if (env) for (const e of env) s += line(X(e), Yz(0), X(e), Yz(zTop + fs * 0.6), `stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
   // the proposed mass, cut: its floors, then the outright mass over it as a heavy dashed outline, as in plan
   if (p && pS) {
-    const [a, z] = pS, H = p.height_m, f = p.floor_to_floor_m || 3;
-    s += `<rect x="${f2(X(a))}" y="${f2(Yz(H))}" width="${f2(z - a)}" height="${f2(H)}" fill="${FIG.proposedFill}" fill-opacity="0.45" stroke="${FIG.proposedStroke}" stroke-width="1.4" ${NS}/>`;
-    for (let k = 1; k <= p.storeys && k * f < H - 0.05; k++) s += line(X(a), Yz(k * f), X(z), Yz(k * f), `stroke="${FIG.proposedStroke}" stroke-width="0.6" stroke-opacity="0.6"`);
+    const H = p.height_m, f = p.floor_to_floor_m || 3;
+    // a stepped mass (massing's `tiers`) is cut tier by tier, each at its own depth; else the one box
+    const parts = (p.tiers && p.tiers.length > 1 ? p.tiers : [{ footprint: p.footprint, base_z: 0, height_m: H }]).map(t => {
+      const c = crossingsAtX(t.footprint, xc);
+      return c.length >= 2 ? { a: c[0], z: c[c.length - 1], z0: t.base_z, z1: t.base_z + t.height_m } : null;
+    }).filter(Boolean);
+    if (!parts.length) parts.push({ a: pS[0], z: pS[1], z0: 0, z1: H });
+    for (const t of parts) {
+      s += `<rect x="${f2(X(t.a))}" y="${f2(Yz(t.z1))}" width="${f2(t.z - t.a)}" height="${f2(t.z1 - t.z0)}" fill="${FIG.proposedFill}" fill-opacity="0.45" stroke="${FIG.proposedStroke}" stroke-width="1.4" ${NS}/>`;
+      for (let k = 1; k <= p.storeys && k * f < H - 0.05; k++) if (k * f > t.z0 + 0.05 && k * f < t.z1 - 0.05) s += line(X(t.a), Yz(k * f), X(t.z), Yz(k * f), `stroke="${FIG.proposedStroke}" stroke-width="0.6" stroke-opacity="0.6"`);
+    }
   }
   if (o && oS) s += `<rect x="${f2(X(oS[0]))}" y="${f2(Yz(o.height_m))}" width="${f2(oS[1] - oS[0])}" height="${f2(o.height_m)}" fill="${FIG.outrightFill}" fill-opacity="${pS ? 0.3 : 0.9}" stroke="${FIG.outrightStroke}" stroke-width="2" stroke-dasharray="6 3" ${NS}/>`;
   // the outright limit: a line of its own over the lot, out to its label

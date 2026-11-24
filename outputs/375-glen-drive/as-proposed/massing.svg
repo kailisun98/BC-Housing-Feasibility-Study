@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="770" height="452" viewBox="0 0 770 452" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
 <rect width="100%" height="100%" fill="#ffffff"/>
-<text x="48" y="44" font-size="14" font-weight="600">Plan · 375-glen-drive · 60.25 × 36.99 m, 2,134 m²</text>
-<polygon points="128.7,72.0 355.2,72.0 352.5,260.6 48.0,260.6" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
-<polygon points="138.7,87.3 339.7,87.3 337.4,245.3 71.2,245.3" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
-<polygon points="140.0,87.3 336.3,87.3 336.3,209.2 140.0,209.2" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
-<polygon points="140.0,87.3 336.3,87.3 336.3,217.3 140.0,217.3" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
-<text x="48" y="276.5764705882353" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope, plate box 38.5 × 30.5 m</text>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 375-glen-drive · the lot polygon, 60.2 × 37.0 m across, 2,134 m² recorded</text>
+<polygon points="128.7,260.6 355.2,260.6 352.5,72.0 48.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="138.7,245.3 339.7,245.3 337.4,87.3 71.2,87.3" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="140.0,245.3 336.3,245.3 336.3,123.4 140.0,123.4" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
+<polygon points="140.0,245.3 336.3,245.3 336.3,115.3 140.0,115.3" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="276.5764705882353" fill="#5f6672">street side at the bottom · dashed = setback envelope, plate box 38.5 × 30.5 m</text>
 <text x="415.156862745098" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
 <line x1="415.156862745098" y1="332.0" x2="722.313725490196" y2="332.0" stroke="#1f2933" stroke-width="1.5"/>
 <rect x="507.2" y="83.2" width="196.3" height="248.8" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5"/>

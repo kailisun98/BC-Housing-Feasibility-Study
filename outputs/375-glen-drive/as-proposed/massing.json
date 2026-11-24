@@ -4,7 +4,7 @@
   "site_id": "375-glen-drive",
   "option_id": "375-glen-drive-as-proposed",
   "as_of": "2026-11-17",
-  "stamp": "4227307d738e56fe",
+  "stamp": "5cfd6a34b23f68ab",
   "lot": {
     "polygon": [
       [
@@ -106,7 +106,8 @@
       "y": 3.0,
       "w": 38.5,
       "d": 30.5,
-      "area_m2": 1174.2
+      "area_m2": 1174.2,
+      "angle_deg": 0.0
     },
     "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
   },

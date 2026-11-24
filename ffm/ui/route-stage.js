@@ -15,9 +15,10 @@ import {
 import { guide, state } from "./core/state.js";
 import { loadScript } from "./core/engine.js";
 import {
-  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, isShare, OPTION_FIELDS,
+  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, isShare, OPERATING_FIELDS, OPTION_FIELDS,
   optWord, shareFromScreen, shareToScreen, SITE_FIELDS
 } from "./fields.js";
+import { renderClaude } from "./claude.js";
 import { optionSummary, refNow, renderForm } from "./schedule.js";
 import {
   discardDraft, loadDemo, markStale, onOptionChange, onSiteChange, readDraft, resumeDraft, saveDraft, saveNow,
@@ -294,6 +295,7 @@ export function renderStage() {
   const memo = $("#memo");
   if (!memo) return;
   const keep = $("#stage-map", memo);
+  const keepCd1 = $("#stage-cd1-slot", memo);
   const focusKey = focusKeyOf(document.activeElement, memo);
   placeRunTools(false);
   const pane = $(".memo-pane");
@@ -310,6 +312,10 @@ export function renderStage() {
     if (keep && keep._map && keep.dataset.sig === slot.dataset.sig) { slot.replaceWith(keep); setTimeout(() => keep._map.invalidateSize(), 0); }
     else mountStageMap(state.site || (guide.lookup && guide.lookup.site), slot);
   }
+  // the CD-1 form is kept across a re-render of the card (a chosen PDF would be lost with it), drawn when it is new
+  const cd1 = $("#stage-cd1-slot", memo);
+  if (cd1 && keepCd1 && keepCd1.innerHTML && keepCd1.dataset.sig === cd1.dataset.sig) cd1.replaceWith(keepCd1);
+  else if (cd1) renderClaude();
   if (focusKey) { const again = $(focusKey, memo); if (again) again.focus({ preventScroll: true }); }
 }
 
@@ -363,7 +369,7 @@ function cardSite() {
   if (chosen) {
     const runs = byRev((state.runs || []).filter(r => r.run_id.startsWith((state.siteId || site.id || "") + "/")));
     const memos = runs.length ? `<p class="stage-memos"><span class="cont">This site has ${runs.length} memo${runs.length === 1 ? "" : "s"}:</span> ${runs.map(r => `<button type="button" class="linkish" data-open-run="${h(r.run_id)}">${h(rev(r.run_id))}</button>`).join(" ")}</p>` : "";
-    const body = `${siteFacts(site)}${memos}${askTable(1)}${saveSiteInline()}`;
+    const body = `${siteFacts(site)}${cd1Slot(site)}${memos}${askTable(1)}${saveSiteInline()}`;
     const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-change-site">Change the site</button>${!state.siteId || state.siteDirty ? `<button type="button" class="btn btn-quiet btn-small" id="guide-keep-site" aria-expanded="${!!guide.saveOpen}" aria-controls="stage-save">Keep as a site file…</button>` : ""}`;
     return stageCard(1, "What the open data could not tell", body, foot(quiet, `<button type="button" class="btn btn-primary" id="guide-next-1">Continue to the option →</button>`));
   }
@@ -404,11 +410,22 @@ function previewFacts(found) {
         <div><dt>Found</dt><dd><b>${h(found.address)}</b><span class="cont"> · from the ${info.geocoded_as && String(info.geocoded_as).includes("property address") ? "City's address list" : "address as geocoded"}</span></dd></div>
         <div><dt>District</dt><dd>${found.zoning_district ? `<b>${h(districtOf(found))}</b>${districtWords(found)}` : "<i>not found</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${found.site_area_m2 ? `<b>${h(fmtNum(found.site_area_m2))} m²</b> · ${h(found.frontage_m)} × ${h(found.depth_m)} m` : "<i>no parcel polygon at the point</i>"}${p.shape && p.shape.class !== "rectangle" ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : ""}</dd></div>
-        ${info.civic_mismatch ? `<div><dt>Check</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street. This is the nearest parcel: use it only if it is the site.</dd></div>` : ""}
+        ${info.civic_mismatch ? `<div><dt>Check</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street. This is the parcel found nearest the address: use it only if it is the site.${info.nearest_on_street ? ` The City's nearest number on that street is ${h(info.nearest_on_street)}: look that up instead if it is the lot.` : ""}</dd></div>` : ""}
         ${info.outside_vancouver ? `<div><dt>Check</dt><dd class="warn-text">${h(found.municipality)} is outside the City of Vancouver: the rules here cannot read its zoning.</dd></div>` : ""}
       </dl>
     </div>
     <p class="help">If the outline is wrong, look up another address.</p>`;
+}
+
+/* A CD-1 lot whose by-law the rules do not hold: a place on the site card where the person can give a key and the
+   by-law's PDF and have the tool read it (24 Nov 2026). claude.js draws the form into it and keeps it there; the
+   signature lets a re-render of the card keep a chosen file. */
+function cd1Slot(site) {
+  const d = districtOf(site || {}).toUpperCase();
+  if (!/^CD-1/.test(d)) return "";
+  const known = scheduleFor(d, site.cd1_bylaw_number);
+  if (known && !(guide.ruleProposal && String(guide.ruleProposal.district || "").toUpperCase() === d)) return "";
+  return `<div id="stage-cd1-slot" data-sig="${h(d)}|${known ? 1 : 0}"></div>`;
 }
 
 /* The chosen site: the map beside its facts. */
@@ -575,7 +592,8 @@ function stageOptionNow() {
 function cardOption() {
   const site = state.site || {};
   const S = guide.suggestion;
-  const progs = state.rules.filter(r => r.layer === "E");
+  // the programs whose criteria the rules test; the ones only listed (program_match) are named in answer 2, not chosen here
+  const progs = state.rules.filter(r => r.layer === "E" && r.check !== "program_match");
   const chosen = new Set(guide.programs || (state.option && state.option.target_programs) || defaultPrograms());
   const R = guide.reading;
   const o = stageOptionNow();
@@ -590,13 +608,13 @@ function cardOption() {
         <div class="chips" role="group" aria-label="The programs in view">${progs.map(r => `<label class="chip"><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
         <details class="fold"><summary>Their published terms</summary>${stagePrograms([...chosen])}</details>
       </dd></div>
-      <div><dt>The site allows</dt><dd>${reading}</dd></div>
+      <div><dt>What the rules ask here</dt><dd>${reading}</dd></div>
       <div><dt>Start from</dt><dd>
         <div class="start-row">
           <div class="seg cands" role="group" aria-label="Start from">${cands.map(c => `<button class="segbtn" type="button" data-cand="${h(c.id)}" aria-pressed="${!fromSaved && guide.candidate === c.id}"${c.available === false ? ` disabled title="${h(c.why)}"` : ` title="${h(c.what)}"`}>${h(c.title)}</button>`).join("")}</div>
           ${savedOpts.length ? `<label class="addr-saved"><span class="cont">or a saved option</span><select id="guide-saved-option"><option value="">choose…</option>${savedOpts.map(x => `<option value="${h(x.id)}"${fromSaved && state.optionId === x.id ? " selected" : ""}>${h(x.name || x.id)}</option>`).join("")}</select></label>` : ""}
         </div>
-        ${candWhy ? `<ul class="help cand-why">${candWhy}</ul>` : ""}${S && S.candidate_note && !fromSaved ? `<p class="help warn-text">${h(S.candidate_note)}</p>` : ""}
+        ${candWhy ? `<ul class="help cand-why">${candWhy}</ul>` : ""}${S && S.candidate_note && !fromSaved ? `<p class="help warn-text">${h(S.candidate_note)}</p>` : ""}${S && S.same_building_note && !fromSaved ? `<p class="help">${h(S.same_building_note)}.</p>` : ""}
       </dd></div>
       <div><dt>The building</dt><dd>${guide.busy.suggest ? `<p class="help">Deriving the ${h(guide.candidate)} option from the rules…</p>` : (o ? figureBlock(o, fromSaved ? null : S) : `<p class="help">Choose where to start.</p>`)}</dd></div>
       <div><dt>Left to you</dt><dd>${askTable(2)}${leftToPerson(S, fromSaved)}</dd></div>
@@ -893,17 +911,37 @@ function cardRun() {
   // each figure says what a blank means and what the tool counts itself (20 Nov 2026: three bare dollar fields)
   const finHelp = { "finance.land_cost_cad": "Leave it blank if the church or society is giving the land: it counts at a nominal value.",
     "finance.equity_cad": "Cash the society brings. Blank means none.",
+    "finance.hard_cost_per_m2_cad": "A cost consultant's figure. Blank: the tool's wood-frame base.",
+    "finance.non_residential_cost_per_m2_cad": "Community space or shops. Blank: priced like the homes.",
+    "finance.non_residential_income_cad_year": "Rent or a contribution. Blank: none.",
+    "finance.non_residential_funding_cad": "A capital campaign or a partner. Blank: none.",
     "finance.other_grants_cad": "Beyond the Community Housing Fund's grant, which the tool counts itself when the fund is targeted." };
   const fields = FINANCE_FIELDS.map(([k, label]) => { const hid = `fin-help-${k.split(".")[1]}`; return `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? (nominal ? "blank: nominal" : "blank: unsure") : "blank: none"}" aria-describedby="${hid}"><span class="help" id="${hid}">${h(finHelp[k] || "")}</span></label>`; }).join("");
   const money = `<details class="fold money-fold"${nominal && !Object.values(fin).some(v => v != null) ? "" : " open"}><summary>Land, equity and other grants <span class="cont">${nominal ? `· the land counts at a nominal value: the owner is ${h(ownerIs)}` : "· only you know these"}</span></summary>
       <div class="fin-rows">${fields}</div>
       <p class="help">${nominal ? "A blank land figure carries the land at a nominal value on a long lease." : (site.owner_type ? "Enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Name the owner at 01, or enter a land price here.")}</p>
     </details>`;
+  // what it takes to run: the operator's own figures, each over a placeholder; staffing and a subsidy are never assumed
+  // (23 Nov 2026). The same inputs as the money above: a blank is a normal answer and says what the tool uses instead.
+  const opsIn = o.operations || {};
+  const supported = ["supportive", "transitional", "shelter"].includes(String(o.housing_type || ""));
+  const opsHelp = { "operations.rent_market_monthly_cad": "Blank: the CMHC survey's average.",
+    "operations.rent_rgi_monthly_cad": "Blank: a placeholder, 30% of half the fund's income limit.",
+    "operations.rent_deep_monthly_cad": "Blank: the $500 shelter rate. 0 for a shelter.",
+    "operations.operating_cost_per_unit_year_cad": "Blank: the placeholder in the assumptions.",
+    "operations.support_staffing_cad_year": supported ? "Never assumed. Blank leaves the money answer unsure." : "Blank: none.",
+    "operations.operating_subsidy_cad_year": "What the operator has or is seeking. Blank: none." };
+  const opsFields = OPERATING_FIELDS.map(([k, label]) => { const sub = k.split(".")[1], hid = `ops-help-${sub}`; return `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" min="0" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(opsIn[sub] ?? "")}" placeholder="blank" aria-describedby="${hid}"><span class="help" id="${hid}">${h(opsHelp[k] || "")}</span></label>`; }).join("");
+  const opsFold = `<details class="fold money-fold"${supported || Object.values(opsIn).some(v => v != null && v !== "") ? " open" : ""}><summary>What it takes to run <span class="cont">· ${supported ? "support staffing and who pays for it decide this kind of housing" : "the operator's rents and running costs, if you have them"}</span></summary>
+      <div class="fin-rows">${opsFields}</div>
+      <p class="field ops-confirm"><label><input type="checkbox" id="ops-confirmed"${opsIn.subsidy_confirmed === true ? " checked" : ""}> The operating subsidy is confirmed, with an agreement in hand</label></p>
+      <p class="help">The memo prints an operating table from these and the subsidy needed a home a month. A subsidy not yet confirmed is shown as sought.</p>
+    </details>`;
   // what the suggestion falls short of travels with it to the run (20 Nov 2026)
   const short3 = guide.suggestion && guide.suggestionUsed && !state.optionId ? fallsShort(guide.suggestion) : [];
   const dl = `<dl class="stage-dl">
       <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p>${short3.length ? `<p class="dd-line fig4-short"><span class="cont">It falls short:</span> ${h(short3.join("; "))}.</p>` : ""}</dd></div>
-      <div><dt>Money in</dt><dd>${money}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
+      <div><dt>Money in</dt><dd>${money}${opsFold}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
       <div><dt>Rules as of</dt><dd><p class="dd-line"><code>${h($("#as-of").value || todayISO())}</code> <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
     </dl>`;
   const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-back-2">Back to the option</button>`;
@@ -1058,6 +1096,17 @@ function wireStage(el) {
     markStale("the money in");
     saveDraft();
   }));
+  const conf = $("#ops-confirmed", el);
+  if (conf) conf.addEventListener("change", () => {
+    if (!state.option) return;
+    state.option.operations = state.option.operations || {};
+    state.option.operations.subsidy_confirmed = conf.checked ? true : null;
+    state.optionDirty = true;
+    $("#option-dirty").hidden = false;
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    markStale("the money in");
+    saveDraft();
+  });
   on("#guide-run", () => runRules());
 }
 

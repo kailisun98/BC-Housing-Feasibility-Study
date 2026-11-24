@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="487" height="439" viewBox="0 0 487 439" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 1280-seymour-st · 22.9 × 36.6 m, 837 m²</text>
+<polygon points="213.7,72.0 212.7,335.2 48.0,335.2 49.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="34.4,86.7 199.7,86.7 199.7,351.1 34.4,351.1" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="51.4,86.7 199.7,86.7 199.7,238.4 51.4,238.4" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="351.17777777777775" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope 22.9 × 36.6 m</text>
+<text x="273.6777777777778" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
+<line x1="273.6777777777778" y1="335.17777777777775" x2="439.0666666666667" y2="335.17777777777775" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="260.0" y="75.2" width="165.4" height="260.0" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="260.0" y1="309.2" x2="425.4" y2="309.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="283.2" x2="425.4" y2="283.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="257.2" x2="425.4" y2="257.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="231.2" x2="425.4" y2="231.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="205.2" x2="425.4" y2="205.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="179.2" x2="425.4" y2="179.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="153.2" x2="425.4" y2="153.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="127.2" x2="425.4" y2="127.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="260.0" y1="101.2" x2="425.4" y2="101.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="266.0" y="69.2" fill="#2a6fb8" font-weight="600">Proposed: 10 storeys, FSR 5.15 · 36.0 m</text>
+<text x="48" y="375.17777777777775" fill="#1f2933">Proposed: 10 storeys, FSR 5.15: plate 431 m² × 10 = 4,312 m² (FSR 5.15), 36.0 m high</text>
+<text x="48" y="391.17777777777775" fill="#1f2933">Trees: Schedule C requires 6, plan leaves 0 (shortfall 6); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
+<text x="48" y="407.17777777777775" fill="#1f2933">Rules as of 2026-11-23 · drawn from the rules, not a survey</text>
+</svg>

@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="996" height="399" viewBox="0 0 996 399" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
 <rect width="100%" height="100%" fill="#ffffff"/>
-<text x="48" y="44" font-size="14" font-weight="600">Plan · 998-e-19th-ave · 75.6 × 37.2 m, 2,811 m²</text>
-<polygon points="48.0,72.0 468.0,72.0 468.0,278.7 48.0,278.7" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
-<polygon points="64.7,92.6 451.3,92.6 451.3,245.3 64.7,245.3" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
-<polygon points="64.7,92.6 451.3,92.6 451.3,182.3 64.7,182.3" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
-<polygon points="64.7,92.6 451.3,92.6 451.3,203.0 64.7,203.0" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
-<text x="48" y="294.66666666666674" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope 69.6 × 27.5 m</text>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 998-e-19th-ave · 75.6 × 37.2 m, 2,811 m² recorded</text>
+<polygon points="48.0,278.7 468.0,278.7 468.0,72.0 48.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="64.7,258.1 451.3,258.1 451.3,105.3 64.7,105.3" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="64.7,258.1 451.3,258.1 451.3,168.4 64.7,168.4" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
+<polygon points="64.7,258.1 451.3,258.1 451.3,147.7 64.7,147.7" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="294.66666666666674" fill="#5f6672">street side at the bottom · dashed = setback envelope 69.6 × 27.5 m</text>
 <text x="528.0" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
 <line x1="528.0" y1="278.66666666666674" x2="948.0" y2="278.66666666666674" stroke="#1f2933" stroke-width="1.5"/>
 <rect x="544.7" y="223.7" width="386.7" height="55.0" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5"/>

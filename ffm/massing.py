@@ -96,10 +96,25 @@ def _given_angle(spec) -> float:
     return 180.0 if a == -180.0 else a + 0.0
 
 
-def _turn(ring: list[list[float]], angle_deg: float) -> list[list[float]]:
-    """A ring turned counter-clockwise about the middle of its bounding box (for a rectangle, its centre)."""
+def _given_steps(spec, storeys: int) -> list[dict]:
+    """The step-backs the option states (`massing.steps`): each from a level above the ground (`from_level`, counted
+    from 0) with the metres taken off the front, rear, left and right of the plate from there up. Bad entries dropped."""
+    out: list[dict] = []
+    for s in (spec.get("steps") if isinstance(spec, dict) else None) or []:
+        try:
+            lv = int(s.get("from_level"))
+            sides = {k: max(0.0, float(s.get(k) or 0)) for k in ("front", "rear", "left", "right")}
+        except (TypeError, ValueError, AttributeError):
+            continue
+        if 1 <= lv < storeys and any(sides.values()):
+            out.append({"from_level": lv, **sides})
+    return sorted(out, key=lambda s: s["from_level"])
+
+
+def _turn(ring: list[list[float]], angle_deg: float, centre: tuple[float, float] | None = None) -> list[list[float]]:
+    """A ring turned counter-clockwise about `centre`, or the middle of its bounding box (a rectangle's centre)."""
     xs, ys = [p[0] for p in ring], [p[1] for p in ring]
-    cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    cx, cy = centre if centre else ((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2)
     t = math.radians(angle_deg)
     c, s = math.cos(t), math.sin(t)
     return [[round(cx + (x - cx) * c - (y - cy) * s, 2), round(cy + (x - cx) * s + (y - cy) * c, 2)] for x, y in ring]
@@ -114,6 +129,29 @@ def _given_plate(spec) -> tuple[float, float] | None:
     except (TypeError, ValueError):
         return None
     return (w, d) if w > 0 and d > 0 else None
+
+
+def _wing(wb: dict, box: dict, need_m2: float) -> dict | None:
+    """The wing the plate takes inside the wing box `wb` for `need_m2` more floor area: all of it where the area needs
+    it; otherwise as far out from the plate box as the area asks, never shallower than a strip of homes with its
+    corridor, and then only as long as it needs, starting where it meets the box. None where even that is too much to
+    be worth a wing (less floor area than `boundary.WING_MIN_AREA_M2`)."""
+    side = boundary.WING_MIN_SIDE_M
+    across = wb["w"] if wb["joins"] in ("left", "right") else wb["d"]      # out from the box
+    along = wb["d"] if wb["joins"] in ("left", "right") else wb["w"]       # along the wall they share
+    if need_m2 < boundary.WING_MIN_AREA_M2:      # too little floor area to be worth a second core and its stairs
+        return None
+    a, l = across, along
+    if need_m2 < across * along:
+        a = min(across, max(side, need_m2 / along))
+        l = min(along, max(side, need_m2 / a))
+    lo_w, lo_b = (wb["y"], box["y"]) if wb["joins"] in ("left", "right") else (wb["x"], box["x"])
+    start = max(lo_w, lo_b) if max(lo_w, lo_b) + l <= lo_w + along + 1e-6 else lo_w + along - l
+    if wb["joins"] in ("left", "right"):
+        x = wb["x"] if wb["joins"] == "right" else wb["x"] + wb["w"] - a
+        return {"x": x, "y": start, "w": a, "d": l, "joins": wb["joins"]}
+    y = wb["y"] if wb["joins"] == "rear" else wb["y"] + wb["d"] - a
+    return {"x": start, "y": y, "w": l, "d": a, "joins": wb["joins"]}
 
 
 def place(spec: dict, plate_m2: float, w: float, d: float, box: dict, default_anchor: str,
@@ -195,14 +233,39 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         if area and abs(poly_area - area) / area > 0.05:
             warnings.append(f"The lot polygon measures {poly_area:,.0f} m² against a recorded site area of {area:,.0f} m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.")
         env_poly = boundary.inset(ring["ring"], sb)
-        box = boundary.largest_rect(env_poly, PLATE_GRID_M) if env_poly else None
+        # the plate box: square to the frontage, or to the lot's longest edge where that holds at least a tenth more
+        # (boundary.turned_rect); where the architect placed the mass (option.massing) the box stays square to the front
+        if env_poly:
+            box = boundary.turned_rect(env_poly, PLATE_GRID_M) if option.get("massing") is None else boundary.largest_rect(env_poly, PLATE_GRID_M)
         if not box:
             warnings.append("The setbacks leave no envelope inside the lot polygon that a rectangular plate fits; the equivalent rectangle is used for the envelope.")
+    turn = float((box or {}).get("angle_deg") or 0.0)
+    # a second rectangle beside the plate box, where the envelope has room for one and the box stands square to the
+    # frontage (boundary.wing_rect): the proposed plate takes it when its floor area does not fit the box alone
+    wing_box = boundary.wing_rect(env_poly, box, PLATE_GRID_M) if (ring and box and not turn and option.get("massing") is None and env_poly) else None
+
+    def lot_rect(x: float, y: float, w: float, d: float) -> list[list[float]]:
+        """A rectangle of the plate box's frame as the lot frame keeps it: as it is where the box is square to the
+        frontage; where the box is turned, the rectangle of the same size about the same centre, which `_turn`
+        then turns about that centre to where it stands."""
+        if not turn:
+            return _rect(x, y, w, d)
+        cx, cy = boundary.rotate_pt((x + w / 2, y + d / 2), turn)
+        return _rect(cx - w / 2, cy - d / 2, w, d)
+
     if box:
         env_w, env_d = box["w"], box["d"]
         env_area = boundary.area(env_poly)
+        shown = dict(box)
+        if turn:
+            r0 = lot_rect(box["x"], box["y"], box["w"], box["d"])
+            # `ring` is the box where it stands, turned; x, y, w, d are the same rectangle before the turn about its centre
+            shown = {"x": r0[0][0], "y": r0[0][1], "w": box["w"], "d": box["d"], "area_m2": box["area_m2"], "angle_deg": turn, "ring": _turn(r0, turn)}
+            warnings.append(f"The plate box is turned {abs(turn):g}° to run along the lot's longest side: square to the frontage the largest rectangle inside the setbacks is much smaller. "
+                            "The plans are drawn in the plate's own frame; the site plan shows it turned.")
         env = {"polygon": env_poly, "width_m": round(env_w, 2), "depth_m": round(env_d, 2), "area_m2": round(env_area, 1), "setbacks_m": sb,
-               "box": box, "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"}
+               "box": shown, "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+                                     + (", turned to the lot's longest side" if turn else "")}
         plate_cap = box["area_m2"]
     else:
         env_w = W - 2 * float(sb.get("side", 0))
@@ -237,7 +300,7 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     def footprint(plate_m2: float, n_storeys: int = 1) -> tuple[list[list[float]], float, float]:
         w, d = plate_dims(plate_m2, env_w, env_d, n_storeys)
         x0 = box["x"] + (env_w - w if at_right else 0.0)
-        return _rect(x0, box["y"], w, d), w, d
+        return lot_rect(x0, box["y"], w, d), w, d
 
     # Proposed mass: the option's GFA at its storey count. With no storey count the plate is drawn one storey high as
     # a placeholder, and the label and a warning say so (15 Nov 2026: a reviewer read it as a building someone chose).
@@ -247,9 +310,16 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         warnings.append("The option gives no storey count: the proposed mass is drawn one storey high on the plate the setbacks leave, as a placeholder, not a building anyone chose.")
     gfa = float(option.get("gfa_m2") or 0)
     plate = gfa / storeys if gfa else plate_cap
+    wing = None
     if plate > plate_cap:
         where = f"the plate box of {plate_cap:,.0f} m² (the largest rectangle inside the {env_area:,.0f} m² envelope)" if ring and env.get("box") else f"the setback envelope of {env_area:,.0f} m²"
-        warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}; the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.")
+        wing = _wing(wing_box, box, plate - plate_cap) if wing_box else None
+        if wing:
+            got = plate_cap + wing["w"] * wing["d"]
+            warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}, so the plate takes a wing of {wing['w']:.1f} × {wing['d']:.1f} m on the box's {wing['joins']} side, inside the same setbacks: "
+                            f"{got:,.0f} m² a floor in two parts" + ("." if got + 1 >= plate else f"; {plate - got:,.0f} m² a floor still does not fit and must go into more storeys or smaller setbacks."))
+        else:
+            warnings.append(f"Proposed plate of {plate:,.0f} m² exceeds {where}; the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line.")
         plate = plate_cap
     p_ring, p_w, depth = footprint(plate, storeys)
     # the plate's own dimensions, where the architect set them in the block editor (`option.massing.width_m`,
@@ -260,16 +330,20 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         if gw < given[0] - 0.01 or gd < given[1] - 0.01:
             warnings.append(f"The plate of {given[0]:g} × {given[1]:g} m set on the option does not fit the {env_w:.1f} × {env_d:.1f} m the setbacks leave; it is drawn {gw:.1f} × {gd:.1f} m.")
         p_w, depth, plate = gw, gd, gw * gd
-        p_ring = _rect(box["x"] + (env_w - p_w if at_right else 0.0), box["y"], p_w, depth)
+        p_ring = lot_rect(box["x"] + (env_w - p_w if at_right else 0.0), box["y"], p_w, depth)
     placement = None
     if option.get("massing") is not None:
         p_ring, p_w, depth, placement = place(option["massing"], plate, p_w, depth, box, "front-right" if at_right else "front-left", warnings)
-    h = storeys * f2f
+    from .layout import ground_extra      # a ground floor taller than the floors above (option.ground_floor_height_m)
+    g_extra = ground_extra(option, f2f)
+    h = storeys * f2f + g_extra
     parapet = option.get("height_m")
     # a height within 5 cm of storeys × floor to floor is that height, rounded (17 Nov 2026: 61.6 m against 19 × 3.24
     # = 61.56 m warned of "the extra 0.0 m")
     if parapet and parapet > h + 0.05:
-        warnings.append(f"Option height {parapet} m exceeds {storeys} x {f2f} m = {h:.1f} m; the extra {parapet - h:.1f} m is parapet, roof structure or taller ground floor, and the mass uses the stated height.")
+        warnings.append((f"Option height {parapet} m exceeds {storeys} storeys with a {f2f + g_extra:g} m ground floor = {h:.1f} m; the extra {parapet - h:.1f} m is parapet or roof structure, and the mass uses the stated height."
+                         if g_extra else
+                         f"Option height {parapet} m exceeds {storeys} x {f2f} m = {h:.1f} m; the extra {parapet - h:.1f} m is parapet, roof structure or taller ground floor, and the mass uses the stated height."))
         h = float(parapet)
     elif parapet and parapet > h:
         h = float(parapet)   # the stated height, drawn as stated
@@ -284,11 +358,23 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
     })
     if placement:
         masses[-1]["placement"] = placement
+    # the plate in two parts: the box and its wing. The footprint is their outline, the plate's width and depth the
+    # rectangle round both (`plate_origin` its front-left corner), and the layout reads `parts` to lay each out.
+    if wing:
+        main = {"x": round(p_ring[0][0], 2), "y": round(p_ring[0][1], 2), "w": round(p_w, 2), "d": round(depth, 2)}
+        part = {"x": round(wing["x"], 2), "y": round(wing["y"], 2), "w": round(wing["w"], 2), "d": round(wing["d"], 2), "joins": wing["joins"]}
+        bx0, by0 = min(main["x"], part["x"]), min(main["y"], part["y"])
+        bx1, by1 = max(main["x"] + main["w"], part["x"] + part["w"]), max(main["y"] + main["d"], part["y"] + part["d"])
+        total = plate + part["w"] * part["d"]
+        masses[-1].update({"parts": [main, part], "footprint": boundary.rects_outline([main, part]), "plate_origin": [round(bx0, 2), round(by0, 2)],
+                           "plate_width_m": round(bx1 - bx0, 2), "plate_depth_m": round(by1 - by0, 2),
+                           "plate_area_m2": round(total, 1), "gfa_m2": round(total * storeys, 1), "fsr": round(total * storeys / area, 3)})
+        masses[-1]["derived_from"].append("the setback envelope (a wing beside the plate box)")
     # the mass turned on the lot (`option.massing.angle_deg`, counter-clockwise in the lot frame, about the plate's
     # centre): `footprint` is the turned outline, which the plan, the 3D view and the Revit masses draw; the plate
     # itself, and every block laid out on it, stays in its own frame, whose front-left corner is `plate_origin`.
     # Nothing is moved back: a corner past the setback envelope is said in a warning.
-    angle = _given_angle(option.get("massing"))
+    angle = _given_angle(option.get("massing")) or turn      # the architect's turn, else the plate box's own
     if angle:
         turned = _turn(p_ring, angle)
         masses[-1].update({"angle_deg": angle, "plate_origin": [round(p_ring[0][0], 2), round(p_ring[0][1], 2)], "footprint": turned})
@@ -297,6 +383,36 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         out = sum(1 for x, y in turned if not boundary.point_in((x, y), env_ring))
         if out:
             warnings.append(f"Turned {angle:g}°, the mass has {out} corner{'s' if out != 1 else ''} past the setback envelope: turn it less, move it, or make the plate smaller.")
+
+    # the mass stepped back above a level (`option.massing.steps`: [{from_level, front, rear, left, right}], metres in
+    # from each side of the plate): `tiers` are the boxes the 3D view stacks, each with its own outline; the plan's
+    # footprint and the plate stay the base, and the floor area the steps take off is the layout's to count (its
+    # cut-outs), so `gfa_m2` here is still the plate times the storeys.
+    steps = _given_steps(option.get("massing"), storeys)
+    if steps:
+        bx, by = float(p_ring[0][0]), float(p_ring[0][1])
+        centre = (bx + p_w / 2, by + depth / 2)
+        tiers: list[dict] = []
+        for lv in range(storeys):
+            ins = tuple(max([float(s[k]) for s in steps if s["from_level"] <= lv] or [0.0]) for k in ("front", "rear", "left", "right"))
+            if tiers and tiers[-1]["_ins"] == ins:
+                tiers[-1]["storeys"] += 1
+                continue
+            tw, td = p_w - ins[2] - ins[3], depth - ins[0] - ins[1]
+            if tw <= 0.5 or td <= 0.5:
+                warnings.append(f"The step-back from level {lv + 1} leaves no floor ({max(tw, 0):.1f} × {max(td, 0):.1f} m): the mass stops under it.")
+                break
+            ring = _rect(bx + ins[2], by + ins[0], tw, td)
+            tiers.append({"_ins": ins, "from_level": lv, "storeys": 1, "base_z": round(lv * f2f, 2), "width_m": round(tw, 2), "depth_m": round(td, 2),
+                          "inset_m": {"front": ins[0], "rear": ins[1], "left": ins[2], "right": ins[3]},
+                          "footprint": _turn(ring, angle, centre) if angle else ring})
+        for i, t in enumerate(tiers):
+            del t["_ins"]
+            top = tiers[i + 1]["base_z"] if i + 1 < len(tiers) else max(h, t["base_z"] + t["storeys"] * f2f)
+            t["height_m"] = round(top - t["base_z"], 2)
+        if len(tiers) > 1:
+            masses[-1]["tiers"] = tiers
+            masses[-1]["derived_from"].append("option.massing.steps")
 
     # Outright mass: what the schedule allows with no rezoning.
     max_fsr, max_h, used = _outright_params(results)
@@ -315,6 +431,8 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
             "plate_area_m2": round(o_plate, 1), "gfa_m2": round(o_plate * o_storeys, 1), "fsr": round(o_plate * o_storeys / area, 3),
             "derived_from": used + ["option.setbacks_m", "option.floor_to_floor_m"] + (["site.front_face"] if oriented else []),
         })
+        if turn:
+            masses[-1].update({"angle_deg": turn, "plate_origin": [round(o_ring[0][0], 2), round(o_ring[0][1], 2)], "footprint": _turn(o_ring, turn)})
 
     # Policy benchmark, if a rezoning policy fired.
     bench = None
@@ -380,20 +498,22 @@ def svg(m: dict[str, Any]) -> str:
     sx, sy = pad + plan_w + gap, pad + 24 + max(plan_h, sec_h)  # section baseline
 
     def P(pts, fill, stroke, dash="", op=1.0):
-        d = " ".join(f"{ox + (x - bb[0]) * scale:.1f},{oy + (y - bb[1]) * scale:.1f}" for x, y in pts)
+        # the street at the bottom, as on every other sheet (23 Nov 2026: this drawing alone had it at the top, so the
+        # lot read mirrored against the site plan)
+        d = " ".join(f"{ox + (x - bb[0]) * scale:.1f},{oy + (bb[3] - y) * scale:.1f}" for x, y in pts)
         return f'<polygon points="{d}" fill="{fill}" stroke="{stroke}" stroke-width="1.5" stroke-dasharray="{dash}" fill-opacity="{op}"/>'
 
     C = DRAWING_COLOURS
     out = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{width:.0f}" height="{height:.0f}" viewBox="0 0 {width:.0f} {height:.0f}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="{C["ink"]}">',
            f'<rect width="100%" height="100%" fill="{C["paper"]}"/>',
-           f'<text x="{ox}" y="{pad - 4}" font-size="14" font-weight="600">Plan · {m["site_id"]} · {m["lot"]["frontage_m"]} × {m["lot"]["depth_m"]} m, {m["lot"]["area_m2"]:,.0f} m²</text>',
+           f'<text x="{ox}" y="{pad - 4}" font-size="14" font-weight="600">Plan · {m["site_id"]} · {"the lot polygon, " + format(bw, ".1f") + " × " + format(bd, ".1f") + " m across" if m["lot"].get("bbox") else str(m["lot"]["frontage_m"]) + " × " + str(m["lot"]["depth_m"]) + " m"}, {m["lot"]["area_m2"]:,.0f} m² recorded</text>',
            P(m["lot"]["polygon"], C["lot"], C["ink"]),
            P(m["envelope"]["polygon"], "none", C["envelope"], dash="6 4")]
     if "outright" in masses:
         out.append(P(masses["outright"]["footprint"], C["outright"], C["outright_line"], op=0.9))
     if "proposed" in masses:
         out.append(P(masses["proposed"]["footprint"], C["proposed"], C["proposed_line"], op=0.5))
-    out.append(f'<text x="{ox}" y="{oy + plan_h + 16}" fill="{C["muted"]}">street (y = 0 is the top edge) · dashed = setback envelope{", plate box" if m["envelope"].get("box") and m["lot"].get("bbox") else ""} {m["envelope"]["width_m"]} × {m["envelope"]["depth_m"]} m</text>')
+    out.append(f'<text x="{ox}" y="{oy + plan_h + 16}" fill="{C["muted"]}">street side at the bottom · dashed = setback envelope{", plate box" if m["envelope"].get("box") and m["lot"].get("bbox") else ""} {m["envelope"]["width_m"]} × {m["envelope"]["depth_m"]} m</text>')
 
     # Section
     out.append(f'<text x="{sx}" y="{pad - 4}" font-size="14" font-weight="600">Section across the frontage · heights in m</text>')

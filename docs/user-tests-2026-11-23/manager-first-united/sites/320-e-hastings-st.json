@@ -1,0 +1,3714 @@
+{
+  "id": "320-e-hastings-st",
+  "address": "320 E Hastings St (the City's parcel is addressed 438 Gore Ave), Vancouver, BC",
+  "municipality": "City of Vancouver",
+  "zoning_district": "DEOD",
+  "site_area_m2": 1362.3,
+  "frontage_m": 36.1,
+  "depth_m": 37.7,
+  "in_former_community_vision_area": false,
+  "in_transit_oriented_area": null,
+  "toa_tier": null,
+  "frequent_bus_stop_within_400m": true,
+  "has_water_and_sewer": true,
+  "owner_type": "non_profit_society",
+  "owner": "First United Church Community Ministry Society",
+  "land_tenure_plan": "Land contributed by First United (public record: the Province's release of 6 Nov 2023 counts 'land costs' in First United's share). How the housing floors are held by or leased to the operator is not public.",
+  "existing_trees_on_site": [],
+  "street_trees": {
+    "count": null,
+    "street": "Gore Ave"
+  },
+  "context": {
+    "street": {
+      "name": "Gore Ave"
+    }
+  },
+  "notes": "USER TEST INPUT (simulated manager, 23 Nov 2026). Added by hand to the lookup's file: area_plan downtown_eastside (my reading: the site is in the Downtown Eastside Oppenheimer District, inside the Downtown Eastside Plan area); not a former Community Vision area (my assumption); transit-oriented area left 'not sure'; frequent bus stop yes (my assumption: Hastings St); owner and owner type (public record: https://news.gov.bc.ca/releases/2023HOUS0151-001731); front on E Hastings St (the project's address). Site area 1,362.3 m2 is the lookup's; the architect's design rationale quoted in search results gives 1,362 m2. --- The lookup's own note: You typed 320; the City's address list has no such number on this street, and the nearest parcel is 438 Gore Ave. Use it only if that is the site. Found by First Read on the address '320 E Hastings St, Vancouver, BC': geocoded by Nominatim as 'First United, 320, East Hastings Street, Japantown, Strathcona, Vancouver, Metro Vancouver Regional District, British Columbia, V6A 1P6, Canada'. Zoning district DEOD from the City's zoning districts dataset at that point. Lot area 1,362.3 m² from the parcel polygon, not a rectangle: the frontage and depth are an equivalent rectangle with the same area; frontage taken as the side along Gore Ave (OpenStreetMap; its centre line 28.0 m from the lot's centre). A corner lot: E Hastings St also runs beside it, 33.5 m from the centre. The frontage is taken on Gore Ave (36.1 m); the front could instead be the 37.7 m side on E Hastings St. Confirm which side is the front: it sets the yards, the envelope and the massing. Nearly a rectangle (94% of its 38.8 x 37.2 m bounding rectangle), 1,362 m2, 4 corners. Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'.",
+  "parcel": {
+    "polygon_lonlat": [
+      [
+        -123.09726971143613,
+        49.280822227365306
+      ],
+      [
+        -123.09679730647834,
+        49.280813718837294
+      ],
+      [
+        -123.09678344169669,
+        49.28114821616021
+      ],
+      [
+        -123.09731669375292,
+        49.28115793284111
+      ],
+      [
+        -123.09726971143613,
+        49.280822227365306
+      ]
+    ],
+    "civic_number": "438",
+    "streetname": "GORE AV",
+    "site_id": "031308236",
+    "metrics": {
+      "area_m2": 1362.3,
+      "frontage_m": 36.1,
+      "depth_m": 37.7,
+      "frontage_from": "the side parallel to the street",
+      "frontage_bearing_deg": 88.4,
+      "vertices": 4,
+      "rectangular": false,
+      "bounding_rectangle_area_m2": 1445.5,
+      "center": {
+        "lat": 49.280986,
+        "lon": -123.097042
+      },
+      "local_m": [
+        [
+          -16.58,
+          -18.16
+        ],
+        [
+          17.79,
+          -19.11
+        ],
+        [
+          18.8,
+          18.09
+        ],
+        [
+          -20.0,
+          19.17
+        ]
+      ]
+    },
+    "shape": {
+      "class": "near_rectangle",
+      "note": "Nearly a rectangle (94% of its 38.8 x 37.2 m bounding rectangle), 1,362 m2, 4 corners.",
+      "rectangularity": 0.942,
+      "vertices": 4,
+      "confidence": 0.91,
+      "alternative": "rectangle"
+    },
+    "street": {
+      "bearing_deg": 95.5,
+      "name": "Gore Ave",
+      "matched_by_name": true,
+      "distance_m": 28.0,
+      "cross_street": {
+        "name": "E Hastings St",
+        "distance_m": 33.5,
+        "bearing_deg": 178.4
+      }
+    },
+    "source": {
+      "title": "City of Vancouver Open Data: property parcel polygons",
+      "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"
+    }
+  },
+  "lookup": {
+    "center": {
+      "lat": 49.2810037,
+      "lon": -123.0970428
+    },
+    "geocoded_as": "First United, 320, East Hastings Street, Japantown, Strathcona, Vancouver, Metro Vancouver Regional District, British Columbia, V6A 1P6, Canada",
+    "typed": "320 E Hastings St, Vancouver, BC",
+    "civic_typed": 320,
+    "civic_found": 438,
+    "civic_mismatch": true,
+    "outside_vancouver": false,
+    "zoning_record": {
+      "object_id": "533879",
+      "zoning_classification": "Comprehensive Development",
+      "zoning_category": "DEOD",
+      "zoning_district": "DEOD",
+      "cd_1_number": null
+    }
+  },
+  "sources": [
+    {
+      "title": "OpenStreetMap Nominatim",
+      "url": "https://nominatim.openstreetmap.org/"
+    },
+    {
+      "title": "City of Vancouver Open Data: zoning districts and labels",
+      "url": "https://opendata.vancouver.ca/explore/dataset/zoning-districts-and-labels/"
+    },
+    {
+      "title": "City of Vancouver Open Data: property parcel polygons",
+      "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"
+    },
+    {
+      "title": "City of Vancouver Open Data: public streets, building footprints 2009, public trees (Open Government Licence – Vancouver)",
+      "url": "https://opendata.vancouver.ca/explore/"
+    }
+  ],
+  "osm": {
+    "source": "City of Vancouver Open Data: public streets, building footprints 2009, public trees",
+    "attribution": "Contains information licensed under the Open Government Licence – Vancouver (streets, building footprints 2009, public trees)",
+    "licence_url": "https://opendata.vancouver.ca/pages/licence/",
+    "fetched_at": "2026-11-23T22:03:27Z",
+    "center": {
+      "lat": 49.280986,
+      "lon": -123.097042,
+      "geocoded_as": "First United, 320, East Hastings Street, Japantown, Strathcona, Vancouver, Metro Vancouver Regional District, British Columbia, V6A 1P6, Canada"
+    },
+    "radius_m": 120.0,
+    "frame": {
+      "origin": "front-left lot corner: the lot's centre starts on the centre point, then the frame is nudged so the front street and any cross street sit half a right-of-way outside the lot lines (see snapped_m)",
+      "x_axis_bearing_deg": 174.5,
+      "front_street": "Gore Ave",
+      "front_street_way": 1000006,
+      "front_street_matched_by_name": true,
+      "snapped_m": {
+        "x": -3.3,
+        "y": 0.9,
+        "cross_street": {
+          "name": "E Hastings St",
+          "side": "left"
+        }
+      }
+    },
+    "counts": {
+      "roads": 10,
+      "buildings": 82,
+      "trees": 50,
+      "buildings_on_site_omitted": 2
+    },
+    "buildings_on_site_omitted": [
+      {
+        "id": 2000029,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.6
+      },
+      {
+        "id": 2000070,
+        "name": null,
+        "building": "yes",
+        "height_m": 11.2
+      }
+    ],
+    "roads": [
+      {
+        "id": 1000000,
+        "name": "Gore Ave",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -71.1,
+            -9.8
+          ],
+          [
+            -15.6,
+            -10.0
+          ]
+        ]
+      },
+      {
+        "id": 1000001,
+        "name": "Gore Ave",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            39.7,
+            -10.0
+          ],
+          [
+            90.2,
+            -10.2
+          ]
+        ]
+      },
+      {
+        "id": 1000002,
+        "name": "E Pender St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            90.2,
+            -10.2
+          ],
+          [
+            107.5,
+            127.4
+          ]
+        ]
+      },
+      {
+        "id": 1000003,
+        "name": "Gore Ave",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            90.2,
+            -10.2
+          ],
+          [
+            140.3,
+            -10.3
+          ]
+        ]
+      },
+      {
+        "id": 1000004,
+        "name": "E Hastings St",
+        "highway": "primary",
+        "width_m": 18.0,
+        "points": [
+          [
+            -15.6,
+            -10.0
+          ],
+          [
+            3.1,
+            140.8
+          ]
+        ]
+      },
+      {
+        "id": 1000005,
+        "name": "Dunlevy Ave",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            3.1,
+            140.8
+          ],
+          [
+            57.8,
+            133.6
+          ]
+        ]
+      },
+      {
+        "id": 1000006,
+        "name": "Gore Ave",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -15.6,
+            -10.0
+          ],
+          [
+            39.7,
+            -10.0
+          ]
+        ]
+      },
+      {
+        "id": 1000007,
+        "name": "E Hastings St",
+        "highway": "primary",
+        "width_m": 18.0,
+        "points": [
+          [
+            -28.5,
+            -112.9
+          ],
+          [
+            -15.6,
+            -10.0
+          ]
+        ]
+      },
+      {
+        "id": 1000008,
+        "name": "E Pender St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            75.8,
+            -125.8
+          ],
+          [
+            90.2,
+            -10.2
+          ]
+        ]
+      },
+      {
+        "id": 1000009,
+        "name": "Gore Ave",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -121.4,
+            -9.5
+          ],
+          [
+            -71.1,
+            -9.8
+          ]
+        ]
+      }
+    ],
+    "buildings": [
+      {
+        "id": 2000000,
+        "name": null,
+        "building": "yes",
+        "height_m": 11.6,
+        "levels": null,
+        "polygon": [
+          [
+            79.8,
+            29.9
+          ],
+          [
+            69.2,
+            30.9
+          ],
+          [
+            69.7,
+            35.4
+          ],
+          [
+            80.3,
+            34.4
+          ]
+        ]
+      },
+      {
+        "id": 2000001,
+        "name": null,
+        "building": "yes",
+        "height_m": 14.9,
+        "levels": null,
+        "polygon": [
+          [
+            -50.3,
+            68.8
+          ],
+          [
+            -50.6,
+            66.2
+          ],
+          [
+            -30.7,
+            64.3
+          ],
+          [
+            -30.5,
+            66.9
+          ],
+          [
+            -22.0,
+            66.1
+          ],
+          [
+            -22.8,
+            57.9
+          ],
+          [
+            -43.4,
+            59.9
+          ],
+          [
+            -51.3,
+            60.6
+          ],
+          [
+            -58.9,
+            61.3
+          ],
+          [
+            -58.1,
+            69.5
+          ]
+        ]
+      },
+      {
+        "id": 2000002,
+        "name": null,
+        "building": "yes",
+        "height_m": 20.6,
+        "levels": null,
+        "polygon": [
+          [
+            18.3,
+            65.7
+          ],
+          [
+            13.5,
+            66.2
+          ],
+          [
+            14.0,
+            70.7
+          ],
+          [
+            18.8,
+            70.2
+          ]
+        ]
+      },
+      {
+        "id": 2000003,
+        "name": null,
+        "building": "yes",
+        "height_m": 6.7,
+        "levels": null,
+        "polygon": [
+          [
+            46.7,
+            80.8
+          ],
+          [
+            45.8,
+            70.9
+          ],
+          [
+            17.8,
+            73.5
+          ],
+          [
+            18.1,
+            76.8
+          ],
+          [
+            10.9,
+            77.4
+          ],
+          [
+            12.1,
+            90.6
+          ],
+          [
+            30.3,
+            88.8
+          ],
+          [
+            47.4,
+            87.2
+          ],
+          [
+            47.2,
+            86.1
+          ]
+        ]
+      },
+      {
+        "id": 2000004,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.5,
+        "levels": null,
+        "polygon": [
+          [
+            80.5,
+            37.0
+          ],
+          [
+            69.3,
+            38.0
+          ],
+          [
+            69.8,
+            44.2
+          ],
+          [
+            81.1,
+            43.1
+          ]
+        ]
+      },
+      {
+        "id": 2000005,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.4,
+        "levels": null,
+        "polygon": [
+          [
+            -14.0,
+            126.1
+          ],
+          [
+            -35.8,
+            128.2
+          ],
+          [
+            -35.2,
+            134.1
+          ],
+          [
+            -13.4,
+            132.0
+          ]
+        ]
+      },
+      {
+        "id": 2000006,
+        "name": null,
+        "building": "yes",
+        "height_m": 17.8,
+        "levels": null,
+        "polygon": [
+          [
+            -47.1,
+            -23.3
+          ],
+          [
+            -33.9,
+            -24.6
+          ],
+          [
+            -35.4,
+            -38.3
+          ],
+          [
+            -48.4,
+            -37.1
+          ]
+        ]
+      },
+      {
+        "id": 2000007,
+        "name": null,
+        "building": "yes",
+        "height_m": 12.3,
+        "levels": null,
+        "polygon": [
+          [
+            34.3,
+            -79.1
+          ],
+          [
+            46.0,
+            -80.3
+          ],
+          [
+            45.1,
+            -88.8
+          ],
+          [
+            33.4,
+            -87.5
+          ]
+        ]
+      },
+      {
+        "id": 2000008,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.8,
+        "levels": null,
+        "polygon": [
+          [
+            9.3,
+            60.5
+          ],
+          [
+            15.5,
+            59.9
+          ],
+          [
+            15.8,
+            62.4
+          ],
+          [
+            37.3,
+            60.4
+          ],
+          [
+            36.9,
+            55.5
+          ],
+          [
+            9.0,
+            58.1
+          ]
+        ]
+      },
+      {
+        "id": 2000009,
+        "name": null,
+        "building": "yes",
+        "height_m": 16.2,
+        "levels": null,
+        "polygon": [
+          [
+            -70.5,
+            -19.4
+          ],
+          [
+            -33.3,
+            -20.2
+          ],
+          [
+            -33.9,
+            -24.6
+          ],
+          [
+            -47.1,
+            -23.3
+          ],
+          [
+            -48.4,
+            -37.1
+          ],
+          [
+            -55.7,
+            -36.4
+          ],
+          [
+            -54.5,
+            -23.0
+          ],
+          [
+            -70.6,
+            -21.4
+          ]
+        ]
+      },
+      {
+        "id": 2000010,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.1,
+        "levels": null,
+        "polygon": [
+          [
+            31.3,
+            -40.4
+          ],
+          [
+            29.9,
+            -55.1
+          ],
+          [
+            15.2,
+            -53.7
+          ],
+          [
+            -6.5,
+            -50.9
+          ],
+          [
+            -4.6,
+            -36.3
+          ],
+          [
+            22.7,
+            -39.6
+          ]
+        ]
+      },
+      {
+        "id": 2000011,
+        "name": null,
+        "building": "yes",
+        "height_m": 9.9,
+        "levels": null,
+        "polygon": [
+          [
+            45.1,
+            -88.8
+          ],
+          [
+            46.0,
+            -80.3
+          ],
+          [
+            34.3,
+            -79.1
+          ],
+          [
+            35.9,
+            -64.8
+          ],
+          [
+            72.8,
+            -68.8
+          ],
+          [
+            69.7,
+            -98.7
+          ],
+          [
+            40.6,
+            -95.7
+          ],
+          [
+            32.6,
+            -94.8
+          ],
+          [
+            33.4,
+            -87.5
+          ]
+        ]
+      },
+      {
+        "id": 2000012,
+        "name": null,
+        "building": "yes",
+        "height_m": 6.9,
+        "levels": null,
+        "polygon": [
+          [
+            29.4,
+            49.8
+          ],
+          [
+            28.7,
+            43.2
+          ],
+          [
+            24.3,
+            43.6
+          ],
+          [
+            7.8,
+            45.2
+          ],
+          [
+            8.4,
+            51.8
+          ]
+        ]
+      },
+      {
+        "id": 2000013,
+        "name": null,
+        "building": "yes",
+        "height_m": 9.7,
+        "levels": null,
+        "polygon": [
+          [
+            94.1,
+            -49.4
+          ],
+          [
+            121.0,
+            -51.9
+          ],
+          [
+            132.3,
+            -53.0
+          ],
+          [
+            131.6,
+            -60.6
+          ],
+          [
+            112.4,
+            -58.8
+          ],
+          [
+            111.6,
+            -67.3
+          ],
+          [
+            92.3,
+            -65.4
+          ]
+        ]
+      },
+      {
+        "id": 2000014,
+        "name": null,
+        "building": "yes",
+        "height_m": 9.1,
+        "levels": null,
+        "polygon": [
+          [
+            15.8,
+            128.8
+          ],
+          [
+            38.6,
+            126.6
+          ],
+          [
+            37.7,
+            117.5
+          ],
+          [
+            34.2,
+            117.9
+          ],
+          [
+            34.6,
+            121.7
+          ],
+          [
+            27.6,
+            122.3
+          ],
+          [
+            27.4,
+            119.5
+          ],
+          [
+            30.8,
+            119.2
+          ],
+          [
+            29.6,
+            106.0
+          ],
+          [
+            26.4,
+            106.3
+          ],
+          [
+            25.9,
+            101.8
+          ],
+          [
+            31.5,
+            101.3
+          ],
+          [
+            30.3,
+            88.8
+          ],
+          [
+            12.1,
+            90.6
+          ]
+        ]
+      },
+      {
+        "id": 2000015,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.1,
+        "levels": null,
+        "polygon": [
+          [
+            67.4,
+            22.5
+          ],
+          [
+            66.6,
+            14.2
+          ],
+          [
+            52.8,
+            15.5
+          ],
+          [
+            53.7,
+            24.2
+          ],
+          [
+            60.1,
+            23.6
+          ],
+          [
+            67.4,
+            22.9
+          ]
+        ]
+      },
+      {
+        "id": 2000016,
+        "name": null,
+        "building": "yes",
+        "height_m": 16.0,
+        "levels": null,
+        "polygon": [
+          [
+            92.3,
+            -65.4
+          ],
+          [
+            111.6,
+            -67.3
+          ],
+          [
+            129.8,
+            -69.0
+          ],
+          [
+            128.9,
+            -77.7
+          ],
+          [
+            100.5,
+            -75.0
+          ],
+          [
+            100.1,
+            -78.5
+          ],
+          [
+            127.8,
+            -81.1
+          ],
+          [
+            127.0,
+            -89.7
+          ],
+          [
+            90.0,
+            -86.1
+          ]
+        ]
+      },
+      {
+        "id": 2000017,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.2,
+        "levels": null,
+        "polygon": [
+          [
+            116.7,
+            -33.0
+          ],
+          [
+            116.4,
+            -36.4
+          ],
+          [
+            105.0,
+            -35.3
+          ],
+          [
+            105.6,
+            -29.1
+          ],
+          [
+            110.0,
+            -29.5
+          ],
+          [
+            109.7,
+            -32.3
+          ]
+        ]
+      },
+      {
+        "id": 2000018,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.4,
+        "levels": null,
+        "polygon": [
+          [
+            -46.1,
+            83.4
+          ],
+          [
+            -20.2,
+            81.0
+          ],
+          [
+            -20.4,
+            79.2
+          ],
+          [
+            -22.3,
+            79.4
+          ],
+          [
+            -22.6,
+            75.9
+          ],
+          [
+            -24.9,
+            76.1
+          ],
+          [
+            -25.4,
+            70.7
+          ],
+          [
+            -21.6,
+            70.3
+          ],
+          [
+            -22.0,
+            66.1
+          ],
+          [
+            -30.5,
+            66.9
+          ],
+          [
+            -30.7,
+            64.3
+          ],
+          [
+            -50.6,
+            66.2
+          ],
+          [
+            -50.3,
+            68.8
+          ],
+          [
+            -48.9,
+            83.7
+          ]
+        ]
+      },
+      {
+        "id": 2000019,
+        "name": null,
+        "building": "yes",
+        "height_m": 16.7,
+        "levels": null,
+        "polygon": [
+          [
+            -93.3,
+            28.0
+          ],
+          [
+            -88.0,
+            32.2
+          ],
+          [
+            -84.8,
+            28.2
+          ],
+          [
+            -82.7,
+            29.9
+          ],
+          [
+            -76.9,
+            22.7
+          ],
+          [
+            -80.0,
+            20.2
+          ],
+          [
+            -83.2,
+            17.7
+          ],
+          [
+            -79.2,
+            12.7
+          ],
+          [
+            -85.0,
+            8.1
+          ],
+          [
+            -93.9,
+            19.2
+          ],
+          [
+            -89.3,
+            22.9
+          ]
+        ]
+      },
+      {
+        "id": 2000020,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.8,
+        "levels": null,
+        "polygon": [
+          [
+            -53.4,
+            -52.8
+          ],
+          [
+            -54.2,
+            -60.5
+          ],
+          [
+            -58.2,
+            -60.1
+          ],
+          [
+            -62.2,
+            -59.7
+          ],
+          [
+            -61.5,
+            -52.0
+          ]
+        ]
+      },
+      {
+        "id": 2000021,
+        "name": null,
+        "building": "yes",
+        "height_m": 3.9,
+        "levels": null,
+        "polygon": [
+          [
+            28.7,
+            43.2
+          ],
+          [
+            35.6,
+            42.5
+          ],
+          [
+            38.8,
+            42.2
+          ],
+          [
+            38.0,
+            33.5
+          ],
+          [
+            23.4,
+            35.1
+          ],
+          [
+            24.3,
+            43.6
+          ]
+        ]
+      },
+      {
+        "id": 2000022,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.4,
+        "levels": null,
+        "polygon": [
+          [
+            -26.5,
+            25.9
+          ],
+          [
+            -27.0,
+            20.0
+          ],
+          [
+            -53.4,
+            22.5
+          ],
+          [
+            -52.8,
+            28.4
+          ]
+        ]
+      },
+      {
+        "id": 2000023,
+        "name": null,
+        "building": "yes",
+        "height_m": 2.8,
+        "levels": null,
+        "polygon": [
+          [
+            47.8,
+            -27.8
+          ],
+          [
+            54.4,
+            -28.6
+          ],
+          [
+            53.6,
+            -36.0
+          ],
+          [
+            47.0,
+            -35.3
+          ]
+        ]
+      },
+      {
+        "id": 2000024,
+        "name": null,
+        "building": "yes",
+        "height_m": 6.1,
+        "levels": null,
+        "polygon": [
+          [
+            -66.4,
+            10.2
+          ],
+          [
+            -36.2,
+            6.3
+          ],
+          [
+            -37.0,
+            0.1
+          ],
+          [
+            -67.3,
+            0.5
+          ]
+        ]
+      },
+      {
+        "id": 2000025,
+        "name": null,
+        "building": "yes",
+        "height_m": 13.9,
+        "levels": null,
+        "polygon": [
+          [
+            -82.7,
+            29.9
+          ],
+          [
+            -71.1,
+            28.8
+          ],
+          [
+            -72.0,
+            19.4
+          ],
+          [
+            -80.0,
+            20.2
+          ],
+          [
+            -76.9,
+            22.7
+          ]
+        ]
+      },
+      {
+        "id": 2000026,
+        "name": null,
+        "building": "yes",
+        "height_m": 9.0,
+        "levels": null,
+        "polygon": [
+          [
+            -28.4,
+            5.3
+          ],
+          [
+            -28.9,
+            -0.0
+          ],
+          [
+            -37.0,
+            0.1
+          ],
+          [
+            -36.2,
+            6.3
+          ]
+        ]
+      },
+      {
+        "id": 2000027,
+        "name": null,
+        "building": "yes",
+        "height_m": 11.0,
+        "levels": null,
+        "polygon": [
+          [
+            -53.4,
+            22.5
+          ],
+          [
+            -27.0,
+            20.0
+          ],
+          [
+            -28.4,
+            5.3
+          ],
+          [
+            -36.2,
+            6.3
+          ],
+          [
+            -66.4,
+            10.2
+          ],
+          [
+            -65.1,
+            23.6
+          ]
+        ]
+      },
+      {
+        "id": 2000028,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.9,
+        "levels": null,
+        "polygon": [
+          [
+            37.5,
+            -49.8
+          ],
+          [
+            54.4,
+            -51.6
+          ],
+          [
+            74.3,
+            -53.8
+          ],
+          [
+            73.6,
+            -61.2
+          ],
+          [
+            36.7,
+            -57.2
+          ]
+        ]
+      },
+      {
+        "id": 2000030,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.9,
+        "levels": null,
+        "polygon": [
+          [
+            24.3,
+            43.6
+          ],
+          [
+            23.4,
+            35.1
+          ],
+          [
+            8.5,
+            36.7
+          ],
+          [
+            3.6,
+            37.1
+          ],
+          [
+            4.4,
+            45.5
+          ],
+          [
+            7.8,
+            45.2
+          ]
+        ]
+      },
+      {
+        "id": 2000031,
+        "name": null,
+        "building": "yes",
+        "height_m": 14.6,
+        "levels": null,
+        "polygon": [
+          [
+            61.4,
+            72.7
+          ],
+          [
+            60.9,
+            67.3
+          ],
+          [
+            56.9,
+            67.7
+          ],
+          [
+            57.4,
+            73.1
+          ]
+        ]
+      },
+      {
+        "id": 2000032,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.1,
+        "levels": null,
+        "polygon": [
+          [
+            -21.7,
+            112.5
+          ],
+          [
+            -36.8,
+            113.9
+          ],
+          [
+            -36.4,
+            118.2
+          ],
+          [
+            -21.3,
+            116.8
+          ]
+        ]
+      },
+      {
+        "id": 2000033,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.6,
+        "levels": null,
+        "polygon": [
+          [
+            62.8,
+            -29.6
+          ],
+          [
+            69.2,
+            -30.3
+          ],
+          [
+            68.4,
+            -37.6
+          ],
+          [
+            62.0,
+            -36.9
+          ]
+        ]
+      },
+      {
+        "id": 2000034,
+        "name": null,
+        "building": "yes",
+        "height_m": 3.4,
+        "levels": null,
+        "polygon": [
+          [
+            36.3,
+            49.2
+          ],
+          [
+            35.6,
+            42.5
+          ],
+          [
+            28.7,
+            43.2
+          ],
+          [
+            29.4,
+            49.8
+          ]
+        ]
+      },
+      {
+        "id": 2000035,
+        "name": null,
+        "building": "yes",
+        "height_m": 12.3,
+        "levels": null,
+        "polygon": [
+          [
+            71.5,
+            112.7
+          ],
+          [
+            70.3,
+            99.8
+          ],
+          [
+            57.4,
+            101.1
+          ],
+          [
+            58.6,
+            113.9
+          ]
+        ]
+      },
+      {
+        "id": 2000036,
+        "name": null,
+        "building": "yes",
+        "height_m": 14.4,
+        "levels": null,
+        "polygon": [
+          [
+            -54.8,
+            -69.5
+          ],
+          [
+            -46.2,
+            -70.5
+          ],
+          [
+            -45.9,
+            -68.2
+          ],
+          [
+            -39.0,
+            -69.0
+          ],
+          [
+            -39.9,
+            -76.5
+          ],
+          [
+            -55.3,
+            -75.0
+          ],
+          [
+            -77.4,
+            -72.9
+          ],
+          [
+            -76.7,
+            -65.5
+          ],
+          [
+            -71.7,
+            -66.0
+          ],
+          [
+            -71.9,
+            -67.5
+          ]
+        ]
+      },
+      {
+        "id": 2000037,
+        "name": null,
+        "building": "yes",
+        "height_m": 13.6,
+        "levels": null,
+        "polygon": [
+          [
+            -100.2,
+            71.8
+          ],
+          [
+            -81.6,
+            70.0
+          ],
+          [
+            -82.0,
+            65.6
+          ],
+          [
+            -96.1,
+            66.9
+          ],
+          [
+            -97.5,
+            52.5
+          ],
+          [
+            -102.0,
+            53.0
+          ]
+        ]
+      },
+      {
+        "id": 2000038,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.7,
+        "levels": null,
+        "polygon": [
+          [
+            -52.0,
+            52.8
+          ],
+          [
+            -36.1,
+            51.3
+          ],
+          [
+            -23.6,
+            50.1
+          ],
+          [
+            -21.9,
+            49.9
+          ],
+          [
+            -22.6,
+            42.5
+          ],
+          [
+            -24.5,
+            42.6
+          ],
+          [
+            -25.9,
+            28.2
+          ],
+          [
+            -52.4,
+            30.7
+          ],
+          [
+            -51.7,
+            37.7
+          ],
+          [
+            -54.6,
+            38.0
+          ],
+          [
+            -54.3,
+            42.0
+          ],
+          [
+            -56.9,
+            42.2
+          ],
+          [
+            -56.5,
+            46.4
+          ],
+          [
+            -54.6,
+            46.2
+          ],
+          [
+            -54.2,
+            49.5
+          ],
+          [
+            -52.3,
+            49.3
+          ]
+        ]
+      },
+      {
+        "id": 2000039,
+        "name": null,
+        "building": "yes",
+        "height_m": 9.6,
+        "levels": null,
+        "polygon": [
+          [
+            36.9,
+            55.5
+          ],
+          [
+            36.3,
+            49.2
+          ],
+          [
+            29.4,
+            49.8
+          ],
+          [
+            8.4,
+            51.8
+          ],
+          [
+            9.0,
+            58.1
+          ]
+        ]
+      },
+      {
+        "id": 2000040,
+        "name": null,
+        "building": "yes",
+        "height_m": 15.6,
+        "levels": null,
+        "polygon": [
+          [
+            -18.7,
+            98.4
+          ],
+          [
+            -19.0,
+            95.6
+          ],
+          [
+            -36.1,
+            97.2
+          ],
+          [
+            -54.3,
+            98.9
+          ],
+          [
+            -54.0,
+            101.8
+          ],
+          [
+            -53.6,
+            105.9
+          ],
+          [
+            -53.6,
+            106.4
+          ],
+          [
+            -40.7,
+            105.2
+          ],
+          [
+            -18.3,
+            103.0
+          ]
+        ]
+      },
+      {
+        "id": 2000041,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.2,
+        "levels": null,
+        "polygon": [
+          [
+            -2.4,
+            -18.9
+          ],
+          [
+            34.9,
+            -19.6
+          ],
+          [
+            33.4,
+            -35.3
+          ],
+          [
+            23.2,
+            -34.3
+          ],
+          [
+            22.7,
+            -39.6
+          ],
+          [
+            -4.6,
+            -36.3
+          ]
+        ]
+      },
+      {
+        "id": 2000042,
+        "name": null,
+        "building": "yes",
+        "height_m": 14.7,
+        "levels": null,
+        "polygon": [
+          [
+            72.3,
+            120.8
+          ],
+          [
+            71.5,
+            112.7
+          ],
+          [
+            58.6,
+            113.9
+          ],
+          [
+            59.4,
+            122.0
+          ]
+        ]
+      },
+      {
+        "id": 2000043,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.7,
+        "levels": null,
+        "polygon": [
+          [
+            93.2,
+            115.6
+          ],
+          [
+            91.6,
+            98.5
+          ],
+          [
+            88.4,
+            98.8
+          ],
+          [
+            89.6,
+            111.7
+          ],
+          [
+            77.0,
+            112.9
+          ],
+          [
+            75.7,
+            113.0
+          ],
+          [
+            76.5,
+            120.4
+          ],
+          [
+            89.3,
+            119.2
+          ],
+          [
+            89.0,
+            116.0
+          ]
+        ]
+      },
+      {
+        "id": 2000044,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.3,
+        "levels": null,
+        "polygon": [
+          [
+            95.7,
+            -34.4
+          ],
+          [
+            105.0,
+            -35.3
+          ],
+          [
+            116.4,
+            -36.4
+          ],
+          [
+            133.8,
+            -38.0
+          ],
+          [
+            132.3,
+            -53.0
+          ],
+          [
+            121.0,
+            -51.9
+          ],
+          [
+            121.8,
+            -44.7
+          ],
+          [
+            94.9,
+            -41.8
+          ]
+        ]
+      },
+      {
+        "id": 2000045,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.3,
+        "levels": null,
+        "polygon": [
+          [
+            94.9,
+            -41.8
+          ],
+          [
+            121.8,
+            -44.7
+          ],
+          [
+            121.0,
+            -51.9
+          ],
+          [
+            94.1,
+            -49.4
+          ]
+        ]
+      },
+      {
+        "id": 2000046,
+        "name": null,
+        "building": "yes",
+        "height_m": 13.8,
+        "levels": null,
+        "polygon": [
+          [
+            -85.2,
+            32.2
+          ],
+          [
+            -82.7,
+            29.9
+          ],
+          [
+            -84.8,
+            28.2
+          ],
+          [
+            -88.0,
+            32.2
+          ],
+          [
+            -93.3,
+            28.0
+          ],
+          [
+            -89.3,
+            22.9
+          ],
+          [
+            -93.9,
+            19.2
+          ],
+          [
+            -85.0,
+            8.1
+          ],
+          [
+            -79.2,
+            12.7
+          ],
+          [
+            -83.2,
+            17.7
+          ],
+          [
+            -80.0,
+            20.2
+          ],
+          [
+            -72.0,
+            19.4
+          ],
+          [
+            -73.1,
+            8.4
+          ],
+          [
+            -81.3,
+            2.5
+          ],
+          [
+            -84.7,
+            -0.0
+          ],
+          [
+            -101.6,
+            1.6
+          ],
+          [
+            -102.6,
+            2.8
+          ],
+          [
+            -91.6,
+            11.6
+          ],
+          [
+            -95.6,
+            16.6
+          ],
+          [
+            -106.5,
+            7.8
+          ],
+          [
+            -108.2,
+            10.0
+          ],
+          [
+            -106.8,
+            24.8
+          ],
+          [
+            -89.4,
+            35.9
+          ]
+        ]
+      },
+      {
+        "id": 2000047,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.6,
+        "levels": null,
+        "polygon": [
+          [
+            11.0,
+            -101.9
+          ],
+          [
+            21.0,
+            -102.8
+          ],
+          [
+            19.8,
+            -115.3
+          ],
+          [
+            -14.2,
+            -112.1
+          ],
+          [
+            -11.3,
+            -89.4
+          ],
+          [
+            7.5,
+            -91.2
+          ],
+          [
+            6.8,
+            -97.6
+          ]
+        ]
+      },
+      {
+        "id": 2000048,
+        "name": null,
+        "building": "yes",
+        "height_m": 11.7,
+        "levels": null,
+        "polygon": [
+          [
+            26.7,
+            -86.2
+          ],
+          [
+            26.0,
+            -92.9
+          ],
+          [
+            7.5,
+            -91.2
+          ],
+          [
+            -11.3,
+            -89.4
+          ],
+          [
+            -8.4,
+            -65.8
+          ],
+          [
+            25.6,
+            -69.9
+          ],
+          [
+            24.0,
+            -85.9
+          ]
+        ]
+      },
+      {
+        "id": 2000049,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.9,
+        "levels": null,
+        "polygon": [
+          [
+            36.7,
+            -57.2
+          ],
+          [
+            73.6,
+            -61.2
+          ],
+          [
+            72.8,
+            -68.8
+          ],
+          [
+            35.9,
+            -64.8
+          ]
+        ]
+      },
+      {
+        "id": 2000050,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.4,
+        "levels": null,
+        "polygon": [
+          [
+            -67.5,
+            73.5
+          ],
+          [
+            -67.7,
+            71.0
+          ],
+          [
+            -88.5,
+            72.9
+          ],
+          [
+            -87.5,
+            83.4
+          ],
+          [
+            -84.2,
+            86.2
+          ]
+        ]
+      },
+      {
+        "id": 2000051,
+        "name": null,
+        "building": "yes",
+        "height_m": 17.5,
+        "levels": null,
+        "polygon": [
+          [
+            -54.5,
+            -23.0
+          ],
+          [
+            -55.7,
+            -36.4
+          ],
+          [
+            -71.9,
+            -34.9
+          ],
+          [
+            -70.6,
+            -21.4
+          ]
+        ]
+      },
+      {
+        "id": 2000052,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.8,
+        "levels": null,
+        "polygon": [
+          [
+            89.6,
+            111.7
+          ],
+          [
+            88.4,
+            98.8
+          ],
+          [
+            75.8,
+            100.0
+          ],
+          [
+            77.0,
+            112.9
+          ]
+        ]
+      },
+      {
+        "id": 2000053,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.3,
+        "levels": null,
+        "polygon": [
+          [
+            135.1,
+            -21.1
+          ],
+          [
+            133.8,
+            -34.6
+          ],
+          [
+            116.7,
+            -33.0
+          ],
+          [
+            117.9,
+            -20.8
+          ]
+        ]
+      },
+      {
+        "id": 2000054,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.0,
+        "levels": null,
+        "polygon": [
+          [
+            -22.8,
+            57.9
+          ],
+          [
+            -23.6,
+            50.1
+          ],
+          [
+            -36.1,
+            51.3
+          ],
+          [
+            -35.8,
+            54.7
+          ],
+          [
+            -43.8,
+            55.5
+          ],
+          [
+            -43.4,
+            59.9
+          ]
+        ]
+      },
+      {
+        "id": 2000055,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.0,
+        "levels": null,
+        "polygon": [
+          [
+            -52.8,
+            28.4
+          ],
+          [
+            -53.4,
+            22.5
+          ],
+          [
+            -65.1,
+            23.6
+          ],
+          [
+            -64.6,
+            29.5
+          ]
+        ]
+      },
+      {
+        "id": 2000056,
+        "name": null,
+        "building": "yes",
+        "height_m": 5.2,
+        "levels": null,
+        "polygon": [
+          [
+            27.6,
+            122.3
+          ],
+          [
+            34.6,
+            121.7
+          ],
+          [
+            34.2,
+            117.9
+          ],
+          [
+            37.7,
+            117.5
+          ],
+          [
+            38.6,
+            126.6
+          ],
+          [
+            52.6,
+            125.3
+          ],
+          [
+            51.1,
+            108.8
+          ],
+          [
+            36.9,
+            110.2
+          ],
+          [
+            37.2,
+            113.4
+          ],
+          [
+            32.7,
+            113.8
+          ],
+          [
+            31.5,
+            101.3
+          ],
+          [
+            25.9,
+            101.8
+          ],
+          [
+            26.4,
+            106.3
+          ],
+          [
+            29.6,
+            106.0
+          ],
+          [
+            30.8,
+            119.2
+          ],
+          [
+            27.4,
+            119.5
+          ]
+        ]
+      },
+      {
+        "id": 2000057,
+        "name": null,
+        "building": "yes",
+        "height_m": 11.9,
+        "levels": null,
+        "polygon": [
+          [
+            -96.1,
+            66.9
+          ],
+          [
+            -82.0,
+            65.6
+          ],
+          [
+            -81.6,
+            70.0
+          ],
+          [
+            -68.3,
+            68.8
+          ],
+          [
+            -69.4,
+            57.0
+          ],
+          [
+            -83.5,
+            58.4
+          ],
+          [
+            -84.2,
+            51.3
+          ],
+          [
+            -97.5,
+            52.5
+          ]
+        ]
+      },
+      {
+        "id": 2000058,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.2,
+        "levels": null,
+        "polygon": [
+          [
+            -58.2,
+            -60.1
+          ],
+          [
+            -54.2,
+            -60.5
+          ],
+          [
+            -53.4,
+            -52.8
+          ],
+          [
+            -37.3,
+            -54.3
+          ],
+          [
+            -39.0,
+            -69.0
+          ],
+          [
+            -45.9,
+            -68.2
+          ],
+          [
+            -46.2,
+            -70.5
+          ],
+          [
+            -54.8,
+            -69.5
+          ],
+          [
+            -54.6,
+            -67.6
+          ],
+          [
+            -54.3,
+            -64.5
+          ],
+          [
+            -58.6,
+            -64.1
+          ]
+        ]
+      },
+      {
+        "id": 2000059,
+        "name": null,
+        "building": "yes",
+        "height_m": 3.9,
+        "levels": null,
+        "polygon": [
+          [
+            50.9,
+            59.7
+          ],
+          [
+            56.9,
+            59.2
+          ],
+          [
+            56.5,
+            54.4
+          ],
+          [
+            61.9,
+            53.8
+          ],
+          [
+            62.4,
+            58.6
+          ],
+          [
+            71.9,
+            57.7
+          ],
+          [
+            71.6,
+            53.9
+          ],
+          [
+            67.4,
+            54.3
+          ],
+          [
+            66.7,
+            47.1
+          ],
+          [
+            62.0,
+            47.5
+          ],
+          [
+            61.5,
+            41.7
+          ],
+          [
+            49.3,
+            42.9
+          ]
+        ]
+      },
+      {
+        "id": 2000060,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.0,
+        "levels": null,
+        "polygon": [
+          [
+            -20.7,
+            119.9
+          ],
+          [
+            -36.8,
+            121.4
+          ],
+          [
+            -36.3,
+            126.3
+          ],
+          [
+            -20.2,
+            124.8
+          ]
+        ]
+      },
+      {
+        "id": 2000061,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.1,
+        "levels": null,
+        "polygon": [
+          [
+            -35.8,
+            54.7
+          ],
+          [
+            -36.1,
+            51.3
+          ],
+          [
+            -52.0,
+            52.8
+          ],
+          [
+            -51.3,
+            60.6
+          ],
+          [
+            -43.4,
+            59.9
+          ],
+          [
+            -43.8,
+            55.5
+          ]
+        ]
+      },
+      {
+        "id": 2000062,
+        "name": null,
+        "building": "yes",
+        "height_m": 16.9,
+        "levels": null,
+        "polygon": [
+          [
+            29.6,
+            -62.2
+          ],
+          [
+            28.8,
+            -70.2
+          ],
+          [
+            25.6,
+            -69.9
+          ],
+          [
+            -8.4,
+            -65.8
+          ],
+          [
+            -7.4,
+            -58.1
+          ],
+          [
+            14.6,
+            -60.8
+          ]
+        ]
+      },
+      {
+        "id": 2000063,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.9,
+        "levels": null,
+        "polygon": [
+          [
+            15.2,
+            -53.7
+          ],
+          [
+            14.6,
+            -60.8
+          ],
+          [
+            -7.4,
+            -58.1
+          ],
+          [
+            -6.5,
+            -50.9
+          ]
+        ]
+      },
+      {
+        "id": 2000064,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.5,
+        "levels": null,
+        "polygon": [
+          [
+            39.1,
+            -34.5
+          ],
+          [
+            47.0,
+            -35.3
+          ],
+          [
+            53.6,
+            -36.0
+          ],
+          [
+            62.0,
+            -36.9
+          ],
+          [
+            68.4,
+            -37.6
+          ],
+          [
+            75.9,
+            -38.5
+          ],
+          [
+            74.3,
+            -53.8
+          ],
+          [
+            54.4,
+            -51.6
+          ],
+          [
+            55.2,
+            -44.0
+          ],
+          [
+            38.3,
+            -42.1
+          ]
+        ]
+      },
+      {
+        "id": 2000065,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.7,
+        "levels": null,
+        "polygon": [
+          [
+            83.3,
+            25.5
+          ],
+          [
+            82.9,
+            21.4
+          ],
+          [
+            67.4,
+            22.9
+          ],
+          [
+            60.1,
+            23.6
+          ],
+          [
+            60.8,
+            30.7
+          ],
+          [
+            66.0,
+            30.2
+          ],
+          [
+            65.7,
+            27.2
+          ]
+        ]
+      },
+      {
+        "id": 2000066,
+        "name": null,
+        "building": "yes",
+        "height_m": 17.1,
+        "levels": null,
+        "polygon": [
+          [
+            97.3,
+            -20.4
+          ],
+          [
+            117.9,
+            -20.8
+          ],
+          [
+            116.7,
+            -33.0
+          ],
+          [
+            109.7,
+            -32.3
+          ],
+          [
+            110.0,
+            -29.5
+          ],
+          [
+            105.6,
+            -29.1
+          ],
+          [
+            105.0,
+            -35.3
+          ],
+          [
+            95.7,
+            -34.4
+          ]
+        ]
+      },
+      {
+        "id": 2000067,
+        "name": null,
+        "building": "yes",
+        "height_m": 17.7,
+        "levels": null,
+        "polygon": [
+          [
+            44.3,
+            54.7
+          ],
+          [
+            36.9,
+            55.5
+          ],
+          [
+            37.3,
+            60.4
+          ],
+          [
+            15.8,
+            62.4
+          ],
+          [
+            15.5,
+            59.9
+          ],
+          [
+            9.3,
+            60.5
+          ],
+          [
+            10.9,
+            77.4
+          ],
+          [
+            18.1,
+            76.8
+          ],
+          [
+            17.8,
+            73.5
+          ],
+          [
+            45.8,
+            70.9
+          ]
+        ]
+      },
+      {
+        "id": 2000068,
+        "name": null,
+        "building": "yes",
+        "height_m": 6.7,
+        "levels": null,
+        "polygon": [
+          [
+            58.4,
+            32.6
+          ],
+          [
+            48.7,
+            33.5
+          ],
+          [
+            49.3,
+            39.3
+          ],
+          [
+            58.9,
+            38.4
+          ]
+        ]
+      },
+      {
+        "id": 2000069,
+        "name": null,
+        "building": "yes",
+        "height_m": 14.6,
+        "levels": null,
+        "polygon": [
+          [
+            40.7,
+            -20.1
+          ],
+          [
+            77.8,
+            -20.7
+          ],
+          [
+            75.9,
+            -38.5
+          ],
+          [
+            68.4,
+            -37.6
+          ],
+          [
+            69.2,
+            -30.3
+          ],
+          [
+            62.8,
+            -29.6
+          ],
+          [
+            62.0,
+            -36.9
+          ],
+          [
+            53.6,
+            -36.0
+          ],
+          [
+            54.4,
+            -28.6
+          ],
+          [
+            47.8,
+            -27.8
+          ],
+          [
+            47.0,
+            -35.3
+          ],
+          [
+            39.1,
+            -34.5
+          ]
+        ]
+      },
+      {
+        "id": 2000071,
+        "name": null,
+        "building": "yes",
+        "height_m": 14.8,
+        "levels": null,
+        "polygon": [
+          [
+            -19.9,
+            83.6
+          ],
+          [
+            -20.2,
+            81.0
+          ],
+          [
+            -46.1,
+            83.4
+          ],
+          [
+            -45.9,
+            86.1
+          ],
+          [
+            -45.6,
+            89.3
+          ],
+          [
+            -40.9,
+            88.9
+          ],
+          [
+            -19.6,
+            86.9
+          ]
+        ]
+      },
+      {
+        "id": 2000072,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.5,
+        "levels": null,
+        "polygon": [
+          [
+            32.6,
+            -94.8
+          ],
+          [
+            40.6,
+            -95.7
+          ],
+          [
+            38.3,
+            -117.7
+          ],
+          [
+            30.2,
+            -117.0
+          ]
+        ]
+      },
+      {
+        "id": 2000073,
+        "name": null,
+        "building": "yes",
+        "height_m": 12.8,
+        "levels": null,
+        "polygon": [
+          [
+            -55.7,
+            -36.4
+          ],
+          [
+            -48.4,
+            -37.1
+          ],
+          [
+            -35.4,
+            -38.3
+          ],
+          [
+            -37.3,
+            -54.3
+          ],
+          [
+            -53.4,
+            -52.8
+          ],
+          [
+            -61.5,
+            -52.0
+          ],
+          [
+            -73.5,
+            -50.9
+          ],
+          [
+            -71.9,
+            -34.9
+          ]
+        ]
+      },
+      {
+        "id": 2000074,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.8,
+        "levels": null,
+        "polygon": [
+          [
+            -73.1,
+            8.4
+          ],
+          [
+            -73.7,
+            1.7
+          ],
+          [
+            -81.3,
+            2.5
+          ]
+        ]
+      },
+      {
+        "id": 2000075,
+        "name": null,
+        "building": "yes",
+        "height_m": 3.2,
+        "levels": null,
+        "polygon": [
+          [
+            38.3,
+            -42.1
+          ],
+          [
+            55.2,
+            -44.0
+          ],
+          [
+            54.4,
+            -51.6
+          ],
+          [
+            37.5,
+            -49.8
+          ]
+        ]
+      },
+      {
+        "id": 2000076,
+        "name": null,
+        "building": "yes",
+        "height_m": 13.0,
+        "levels": null,
+        "polygon": [
+          [
+            57.4,
+            73.1
+          ],
+          [
+            56.9,
+            67.7
+          ],
+          [
+            60.9,
+            67.3
+          ],
+          [
+            61.4,
+            72.7
+          ],
+          [
+            74.7,
+            71.4
+          ],
+          [
+            75.0,
+            74.6
+          ],
+          [
+            85.6,
+            73.6
+          ],
+          [
+            83.0,
+            45.5
+          ],
+          [
+            66.7,
+            47.1
+          ],
+          [
+            67.4,
+            54.3
+          ],
+          [
+            71.6,
+            53.9
+          ],
+          [
+            71.9,
+            57.7
+          ],
+          [
+            62.4,
+            58.6
+          ],
+          [
+            56.9,
+            59.2
+          ],
+          [
+            50.9,
+            59.7
+          ],
+          [
+            52.2,
+            73.5
+          ]
+        ]
+      },
+      {
+        "id": 2000077,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.9,
+        "levels": null,
+        "polygon": [
+          [
+            86.3,
+            76.8
+          ],
+          [
+            66.3,
+            78.7
+          ],
+          [
+            67.9,
+            95.5
+          ],
+          [
+            87.9,
+            93.6
+          ]
+        ]
+      },
+      {
+        "id": 2000078,
+        "name": null,
+        "building": "yes",
+        "height_m": 10.7,
+        "levels": null,
+        "polygon": [
+          [
+            108.1,
+            18.2
+          ],
+          [
+            109.5,
+            32.5
+          ],
+          [
+            116.8,
+            31.8
+          ],
+          [
+            117.1,
+            35.1
+          ],
+          [
+            112.3,
+            35.6
+          ],
+          [
+            116.6,
+            80.3
+          ],
+          [
+            124.7,
+            79.6
+          ],
+          [
+            125.0,
+            83.5
+          ],
+          [
+            130.0,
+            83.0
+          ],
+          [
+            129.4,
+            76.5
+          ],
+          [
+            133.0,
+            76.1
+          ],
+          [
+            129.6,
+            39.9
+          ],
+          [
+            139.3,
+            38.9
+          ],
+          [
+            136.8,
+            12.1
+          ],
+          [
+            129.6,
+            12.8
+          ],
+          [
+            129.9,
+            16.1
+          ]
+        ]
+      },
+      {
+        "id": 2000079,
+        "name": null,
+        "building": "yes",
+        "height_m": 7.9,
+        "levels": null,
+        "polygon": [
+          [
+            -15.6,
+            110.3
+          ],
+          [
+            -16.4,
+            102.8
+          ],
+          [
+            -18.3,
+            103.0
+          ],
+          [
+            -40.7,
+            105.2
+          ],
+          [
+            -40.0,
+            112.6
+          ]
+        ]
+      },
+      {
+        "id": 2000080,
+        "name": null,
+        "building": "yes",
+        "height_m": -0.7,
+        "levels": null,
+        "polygon": [
+          [
+            56.9,
+            59.2
+          ],
+          [
+            62.4,
+            58.6
+          ],
+          [
+            61.9,
+            53.8
+          ],
+          [
+            56.5,
+            54.4
+          ]
+        ]
+      },
+      {
+        "id": 2000081,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.1,
+        "levels": null,
+        "polygon": [
+          [
+            -70.8,
+            32.3
+          ],
+          [
+            -71.1,
+            28.8
+          ],
+          [
+            -82.7,
+            29.9
+          ],
+          [
+            -85.2,
+            32.2
+          ],
+          [
+            -83.4,
+            33.5
+          ]
+        ]
+      },
+      {
+        "id": 2000082,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.1,
+        "levels": null,
+        "polygon": [
+          [
+            -55.3,
+            -75.0
+          ],
+          [
+            -39.9,
+            -76.5
+          ],
+          [
+            -40.9,
+            -85.1
+          ],
+          [
+            -56.1,
+            -83.7
+          ]
+        ]
+      },
+      {
+        "id": 2000083,
+        "name": null,
+        "building": "yes",
+        "height_m": 4.3,
+        "levels": null,
+        "polygon": [
+          [
+            -40.3,
+            95.3
+          ],
+          [
+            -36.3,
+            94.9
+          ],
+          [
+            -36.1,
+            97.2
+          ],
+          [
+            -19.0,
+            95.6
+          ],
+          [
+            -19.2,
+            93.7
+          ],
+          [
+            -17.1,
+            93.5
+          ],
+          [
+            -17.7,
+            86.7
+          ],
+          [
+            -19.6,
+            86.9
+          ],
+          [
+            -40.9,
+            88.9
+          ]
+        ]
+      }
+    ],
+    "trees": [
+      {
+        "id": 3000000,
+        "x": 51.4,
+        "y": -2.7,
+        "species": "Magnolia ‘galaxy’",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000001,
+        "x": 87.0,
+        "y": 12.4,
+        "species": "Magnolia ‘galaxy’",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000002,
+        "x": 85.1,
+        "y": 4.9,
+        "species": "Magnolia ‘galaxy’",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000003,
+        "x": 87.9,
+        "y": 19.7,
+        "species": "Magnolia ‘galaxy’",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000004,
+        "x": -8.1,
+        "y": -25.6,
+        "species": "Bowhall Red Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000005,
+        "x": 102.5,
+        "y": 26.0,
+        "species": "Scotch Pine",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000006,
+        "x": 94.2,
+        "y": 88.0,
+        "species": "Fastigiata Maidenhair Tree",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000007,
+        "x": -80.7,
+        "y": -17.8,
+        "species": "Freeman's S.s. Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000008,
+        "x": -90.9,
+        "y": -17.9,
+        "species": "Freeman's S.s. Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000009,
+        "x": -65.2,
+        "y": -16.1,
+        "species": "Freeman's S.s. Maple",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000010,
+        "x": -56.6,
+        "y": -16.2,
+        "species": "Freeman's S.s. Maple",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000011,
+        "x": 8.7,
+        "y": -17.5,
+        "species": "Bowhall Red Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000012,
+        "x": 111.1,
+        "y": 90.5,
+        "species": "Scotch Pine",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000013,
+        "x": 101.6,
+        "y": 11.3,
+        "species": "Scotch Pine",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000014,
+        "x": 73.0,
+        "y": 125.5,
+        "species": "Black Locust",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000015,
+        "x": 58.0,
+        "y": -16.5,
+        "species": "Red Maple",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000016,
+        "x": 64.8,
+        "y": 126.7,
+        "species": "Thornless Honeylocust",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000017,
+        "x": -33.5,
+        "y": -70.4,
+        "species": "Aristocrat Pear",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000018,
+        "x": 87.2,
+        "y": 29.0,
+        "species": "Scotch Pine",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000019,
+        "x": 94.3,
+        "y": -32.0,
+        "species": "Bowhall Red Maple",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000020,
+        "x": 61.5,
+        "y": -2.3,
+        "species": "Magnolia ‘galaxy’",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000021,
+        "x": 70.1,
+        "y": -2.6,
+        "species": "Magnolia ‘galaxy’",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000022,
+        "x": 106.2,
+        "y": 55.1,
+        "species": "Scotch Pine",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000023,
+        "x": 104.9,
+        "y": 40.6,
+        "species": "Scotch Pine",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000024,
+        "x": 111.2,
+        "y": 2.8,
+        "species": "Pin Oak",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000025,
+        "x": 95.4,
+        "y": 98.8,
+        "species": "Scotch Pine",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000026,
+        "x": -10.6,
+        "y": -43.4,
+        "species": "Hungarian Oak",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000027,
+        "x": 17.4,
+        "y": -17.2,
+        "species": "Bowhall Red Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000028,
+        "x": 27.0,
+        "y": -17.2,
+        "species": "Bowhall Red Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000029,
+        "x": 93.0,
+        "y": 78.7,
+        "species": "Fastigiata Maidenhair Tree",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000030,
+        "x": 105.0,
+        "y": 101.2,
+        "species": "Cherry, Plum Or Peach Species",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000031,
+        "x": 110.2,
+        "y": 84.7,
+        "species": "Green Gable Blackgum",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000032,
+        "x": 45.3,
+        "y": -16.1,
+        "species": "Red Maple",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000033,
+        "x": 70.8,
+        "y": -16.6,
+        "species": "Red Maple",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000034,
+        "x": 108.1,
+        "y": 69.9,
+        "species": "Scotch Pine",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000035,
+        "x": 124.0,
+        "y": 1.2,
+        "species": "Pin Oak",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000036,
+        "x": 77.2,
+        "y": -53.7,
+        "species": "Thornless Honeylocust",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000037,
+        "x": -15.2,
+        "y": -93.2,
+        "species": "Aristocrat Pear",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000038,
+        "x": -28.0,
+        "y": -29.7,
+        "species": "Aristocrat Pear",
+        "crown_m": 3.2
+      },
+      {
+        "id": 3000039,
+        "x": -45.5,
+        "y": -16.1,
+        "species": "Freeman's S.s. Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000040,
+        "x": 102.2,
+        "y": 18.1,
+        "species": "Columnar Scotch Pine",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000041,
+        "x": 120.3,
+        "y": -17.9,
+        "species": "Red Maple",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000042,
+        "x": 109.4,
+        "y": -17.2,
+        "species": "Red Maple",
+        "crown_m": 4.2
+      },
+      {
+        "id": 3000043,
+        "x": -54.3,
+        "y": -58.1,
+        "species": "Planting Site",
+        "crown_m": 1.4
+      },
+      {
+        "id": 3000044,
+        "x": 105.0,
+        "y": 5.7,
+        "species": "Pin Oak",
+        "crown_m": 7.75
+      },
+      {
+        "id": 3000045,
+        "x": 74.4,
+        "y": -77.6,
+        "species": "Thornless Honeylocust",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000046,
+        "x": 88.5,
+        "y": 39.6,
+        "species": "Scotch Pine",
+        "crown_m": 4.1
+      },
+      {
+        "id": 3000047,
+        "x": 89.7,
+        "y": 52.0,
+        "species": "Scotch Pine",
+        "crown_m": 5.05
+      },
+      {
+        "id": 3000048,
+        "x": -9.2,
+        "y": -34.2,
+        "species": "Bowhall Red Maple",
+        "crown_m": 2.3
+      },
+      {
+        "id": 3000049,
+        "x": 88.6,
+        "y": -79.3,
+        "species": "Sunburst Honeylocust",
+        "crown_m": 1.4
+      }
+    ],
+    "query": "City of Vancouver Open Data within 120 m: 10 streets, 84 buildings, 50 trees"
+  },
+  "area_plan": "downtown_eastside",
+  "front_face": {
+    "street": "E Hastings St"
+  },
+  "front_street": "E Hastings St"
+}

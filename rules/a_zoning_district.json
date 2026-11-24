@@ -138,82 +138,6 @@
       ]
     },
     {
-      "id": "cov.rt.outright_fsr",
-      "title": "RT districts (family level) outright floor space ratio",
-      "jurisdiction": "City of Vancouver",
-      "applies_to_districts": [
-        "RT-4",
-        "RT-4A",
-        "RT-4N",
-        "RT-4AN",
-        "RT-5",
-        "RT-5A",
-        "RT-5N",
-        "RT-5AN",
-        "RT-6",
-        "RT-7",
-        "RT-8",
-        "RT-10",
-        "RT-10N",
-        "RT-11",
-        "RT-11N"
-      ],
-      "check": "district_outright_fsr",
-      "versions": [
-        {
-          "effective_from": "2023-01-01",
-          "params": {
-            "max_fsr": 0.6
-          },
-          "source": {
-            "title": "City of Vancouver Zoning and Development By-law, RT-4 District Schedule",
-            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
-            "section": "Family-level figure, not one schedule: a base outright FSR of 0.60 recalled as common to the RT-4, RT-5, RT-6, RT-7, RT-8, RT-10 and RT-11 schedules (each has its own PDF at the same address with its own code), with conditional increases that differ by schedule and are not entered. RT-1, RT-2 and RT-9 are left out. The effective date is a placeholder.",
-            "verified": false,
-            "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf before relying on it"
-          }
-        }
-      ]
-    },
-    {
-      "id": "cov.rt.outright_height",
-      "title": "RT districts (family level) outright maximum height",
-      "jurisdiction": "City of Vancouver",
-      "applies_to_districts": [
-        "RT-4",
-        "RT-4A",
-        "RT-4N",
-        "RT-4AN",
-        "RT-5",
-        "RT-5A",
-        "RT-5N",
-        "RT-5AN",
-        "RT-6",
-        "RT-7",
-        "RT-8",
-        "RT-10",
-        "RT-10N",
-        "RT-11",
-        "RT-11N"
-      ],
-      "check": "district_outright_height",
-      "versions": [
-        {
-          "effective_from": "2023-01-01",
-          "params": {
-            "max_height_m": 10.7
-          },
-          "source": {
-            "title": "City of Vancouver Zoning and Development By-law, RT-4 District Schedule",
-            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
-            "section": "Family-level figure, not one schedule: a maximum height of 10.7 m recalled as common to the RT-4, RT-5, RT-6, RT-7, RT-8, RT-10 and RT-11 schedules; storey limits differ by schedule and are not entered. The effective date is a placeholder.",
-            "verified": false,
-            "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf before relying on it"
-          }
-        }
-      ]
-    },
-    {
       "id": "cov.rm4.outright_fsr",
       "title": "RM-4 outright floor space ratio",
       "jurisdiction": "City of Vancouver",
@@ -898,6 +822,7 @@
             "fsr_discretionary_clause": "s.3.2.1.1(b)",
             "max_fsr_rental": 3.5,
             "rental_fsr_clause": "s.3.1.1.1, a mixed-use building with every home rental and 0.35 FSR of non-dwelling use at the street",
+            "rental_min_non_dwelling_fsr": 0.35,
             "max_fsr_rental_corner": {
               "corner": true,
               "min_frontage_m": 45.7,
@@ -985,6 +910,7 @@
             "max_fsr": 2.5,
             "max_fsr_rental": 3.5,
             "rental_fsr_clause": "s.3.1.1.1, a mixed-use building with every home rental and 0.35 FSR of non-dwelling use at the street",
+            "rental_min_non_dwelling_fsr": 0.35,
             "max_fsr_rental_corner": {
               "corner": true,
               "min_frontage_m": 45.7,
@@ -1072,6 +998,7 @@
             "max_fsr": 3.0,
             "max_fsr_rental": 3.5,
             "rental_fsr_clause": "s.3.1.1.1, a mixed-use building with every home rental and 0.35 FSR of non-dwelling use at the street",
+            "rental_min_non_dwelling_fsr": 0.35,
             "max_fsr_rental_corner": {
               "corner": true,
               "min_frontage_m": 45.7,
@@ -1159,6 +1086,7 @@
             "max_fsr": 3.0,
             "max_fsr_rental": 3.5,
             "rental_fsr_clause": "s.3.1.1.1, a mixed-use building with every home rental and 0.35 FSR of non-dwelling use at the street",
+            "rental_min_non_dwelling_fsr": 0.35,
             "max_fsr_rental_corner": {
               "corner": true,
               "min_frontage_m": 45.7,
@@ -1246,6 +1174,7 @@
             "max_fsr": 2.5,
             "max_fsr_rental": 3.5,
             "rental_fsr_clause": "s.3.1.1.1(a), a mixed-use residential building with every home rental and 0.35 FSR of non-dwelling use at the street",
+            "rental_min_non_dwelling_fsr": 0.35,
             "max_fsr_rental_corner": {
               "corner": true,
               "min_frontage_m": 45.7,
@@ -1932,6 +1861,1570 @@
             "title": "City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide)",
             "url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx",
             "section": "Parking By-law amendments, June 2024"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt4.outright_fsr",
+      "title": "RT-4 and RT-4A outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-4",
+        "RT-4A"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "max_fsr": 0.6
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 0.60. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), page 6"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt4.outright_height",
+      "title": "RT-4 and RT-4A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-4",
+        "RT-4A"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "max_height_m": 10.7,
+            "max_storeys": 3
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+            "section": "s.3.1.2.2: maximum building height 10.7 m and 3 storeys; s.3.1.2.8: the third storey must be a partial storey. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 6 and 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt4.setbacks",
+      "title": "RT-4 and RT-4A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-4",
+        "RT-4A"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "min_front_yard_m": 7.3,
+            "min_side_yard_m": 1.5,
+            "min_rear_yard_m": 10.7,
+            "max_site_coverage": 0.45,
+            "rear_yard_lane_reduction": "s.3.1.2.11",
+            "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less (s.3.1.2.4).",
+            "rear_yard_note": "10.7 m, less the distance from the rear property line to the ultimate centre line of a lane behind (s.3.1.2.11).",
+            "front_yard_note": "7.3 m; the Director of Planning may decrease it having regard to the adjacent front yards (s.3.1.2.9)."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+            "section": "s.3.1.2.3 (front yard 7.3 m), s.3.1.2.4 (side yard 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.5 and 3.1.2.11 (rear yard 10.7 m, reduced by the distance to a lane's ultimate centre line), s.3.1.2.6 (site coverage 45%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 6 and 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt5.outright_fsr",
+      "title": "RT-5 outright floor space ratio (multiple dwelling)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-5"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "max_fsr": 0.6,
+            "max_fsr_discretionary": 0.75,
+            "fsr_discretionary_clause": "s.3.1.1.1",
+            "units_per_hectare_max": 74,
+            "units_note": "At most 74 dwelling units a hectare, lock-off units and secondary suites included (s.3.1.1.2); not tested here."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+            "section": "s.3.1.1.1: for multiple dwelling on a site without a character house (or where one is demolished for new development on an under-utilized lot) the maximum floor space ratio is 0.60, which the Director of Planning may increase to 0.75; s.3.1.1.2: at most 74 dwelling units a hectare. Multiple dwelling is a conditional use (s.2.1) on a site of at least 338 m² (s.3.1.2.1). Other uses are under s.3.2 (0.50 to 0.75). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 and 11"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt5.outright_height",
+      "title": "RT-5 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-5"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "max_height_m": 10.7,
+            "max_storeys": 3
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+            "section": "s.3.1.2.3: maximum building height 10.7 m and 3 storeys for a building other than a rear building (a rear building 7.7 m and 2 storeys); s.3.1.2.10: the third storey must be a partial storey not exceeding 50% of the storey below. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 and 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt5.setbacks",
+      "title": "RT-5 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-5"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "min_front_yard_m": 7.3,
+            "min_side_yard_m": 1.5,
+            "min_rear_yard_m": 10.7,
+            "max_site_coverage": 0.45,
+            "rear_yard_lane_reduction": "s.3.1.2.11",
+            "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less (s.3.1.2.5).",
+            "rear_yard_note": "10.7 m where the average site depth does not exceed 36.6 m, 30% of the site depth beyond that (s.3.1.2.6; only the 10.7 m is tested), less the distance to a lane's ultimate centre line (s.3.1.2.11).",
+            "building_depth_note": "Maximum building depth 45% of the site depth (s.3.1.2.8), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+            "section": "s.3.1.2.4 (front yard 7.3 m), s.3.1.2.5 (side yard 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.6 and 3.1.2.11 (rear yard 10.7 m, or 30% of a site deeper than 36.6 m, reduced by the distance to a lane's ultimate centre line), s.3.1.2.7 (site coverage 45%); s.3.1.2.12 and 3.1.2.13 let the Director of Planning vary the yards. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 to 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt7.outright_fsr",
+      "title": "RT-7 outright floor space ratio (multiple dwelling)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-7"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "max_fsr": 1.0,
+            "max_dwelling_units": 6,
+            "max_dwelling_units_rental": 8,
+            "dwelling_units_clause": "s.3.1.1.2"
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+            "section": "s.3.1.1.1: for multiple dwelling, infill and multiple conversion dwelling with at least 3 dwelling units the maximum floor space ratio is 1.00; s.3.1.1.2: at most 8 dwelling units where all the residential floor area is secured as rental, 6 otherwise; s.3.1.2.2: 7 or 8 dwelling units need a site of at least 557 m², 4 to 6 at least 280 m². The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), page 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt7.outright_height",
+      "title": "RT-7 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-7"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "max_height_m": 11.5,
+            "max_storeys": 3
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+            "section": "s.3.1.2.4: maximum building height 11.5 m and 3 storeys (a rear building 8.5 m and 2 storeys; s.3.1.2.11 gives a rear building 11.5 m and 3 storeys on a site under 306 m² or with no developed secondary access). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), pages 7 and 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt7.setbacks",
+      "title": "RT-7 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-7"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "min_front_yard_m": 4.9,
+            "min_side_yard_m": 1.2,
+            "min_rear_yard_m": 10.7,
+            "rear_yard_note": "10.7 m; 0.9 m for buildings in a courtyard configuration (s.3.1.2.7), which need a site at least 33.5 m deep (s.3.1.2.3).",
+            "building_depth_note": "Maximum building depth 19.8 m and width 17.4 m (s.3.1.2.8, 3.1.2.9), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+            "section": "s.3.1.2.5 (front yard 4.9 m), s.3.1.2.6 (side yard 1.2 m), s.3.1.2.7 (rear yard 10.7 m, 0.9 m in a courtyard configuration). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt8.outright_fsr",
+      "title": "RT-8 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-8"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "max_fsr": 0.5,
+            "max_fsr_discretionary": 0.75,
+            "fsr_discretionary_clause": "s.3.1.1.1(a)(i)",
+            "units_per_hectare_max": 62,
+            "units_note": "A multiple dwelling may have at most 62 dwelling units a hectare (s.3.1.1.2(b)) and is permitted only where at least 50% of the units in any building have 2 or more bedrooms (s.2.2.5); neither is tested here."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 0.50; for dwelling uses, multiple dwelling among them, the Director of Planning may increase it to 0.75 (s.3.1.1.1(a)(i)), and beyond that only within an existing building; s.3.1.1.2(b): a multiple dwelling at most 62 units a hectare. Multiple dwelling is a conditional use (s.2.2.5). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 6 and 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt8.outright_height",
+      "title": "RT-8 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-8"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "max_height_m": 10.7,
+            "max_storeys": 2
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+            "section": "s.3.1.2.3: maximum building height 10.7 m and 2 storeys for all buildings other than infill (infill 7.7 m or 2 storeys); s.3.1.2.9: the Director of Planning may vary it to exceed 2 storeys (no figure given, so not entered as a limit). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), page 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt8.setbacks",
+      "title": "RT-8 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-8"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "min_side_yard_m": 1.5,
+            "max_site_coverage": 0.45,
+            "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less (s.3.1.2.5).",
+            "front_yard_note": "The minimum front yard is the average of the front yards of the 2 adjacent sites (s.3.1.2.4, 3.1.2.11); no fixed minimum, so the front is not tested.",
+            "rear_yard_note": "The schedule sets no minimum rear yard; the building may be no deeper than 35% of the site depth (s.3.1.2.7), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+            "section": "s.3.1.2.4 (front yard: the average of the 2 adjacent sites), s.3.1.2.5 (side yard 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.6 (site coverage 45%), s.3.1.2.7 (building depth at most 35% of the site depth). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 7 and 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt10.outright_fsr",
+      "title": "RT-10 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-10"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "max_fsr": 0.4,
+            "max_fsr_discretionary": 0.8,
+            "fsr_discretionary_clause": "s.3.1.1.1(a)",
+            "units_note": "At most 74 dwelling units a hectare on a site with at least 18.3 m of frontage, 3 dwelling units from 15.0 m, 2 below that (s.3.1.1.2); not tested here."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 0.40, which the Director of Planning may increase to 0.80 for dwelling uses and 0.60 for all other uses combined; s.3.1.1.2: dwelling units capped by the site frontage. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), page 6"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt10.outright_height",
+      "title": "RT-10 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-10"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "max_height_m": 10.7,
+            "max_storeys": 2
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+            "section": "s.3.1.2.2: maximum building height 10.7 m and 2 storeys in the front 60% of the site depth, 7.7 m and 2 storeys in the rear 40%; s.3.1.2.12: the Director of Planning may increase it (no figure given, so not entered as a limit). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), pages 7 and 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt10.setbacks",
+      "title": "RT-10 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-10"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "min_side_yard_m": 1.2,
+            "min_rear_yard_m": 0.6,
+            "max_site_coverage": 0.45,
+            "side_yard_note": "1.2 m where the site is wider than 12.0 m; 10% of the site width where it is 12.0 m or less (s.3.1.2.4).",
+            "front_yard_note": "The average of the front yards of the 2 adjacent sites; 4.9 m on a site wider than 18.3 m with more than 1 principal building (s.3.1.2.3). No fixed minimum, so the front is not tested.",
+            "building_depth_note": "With 1 principal building the building may be no deeper than 40% of the site depth (s.3.1.2.8), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+            "section": "s.3.1.2.3 (front yard: the average of the 2 adjacent sites), s.3.1.2.4 (side yard 10% of the site width up to 12.0 m wide, else 1.2 m), s.3.1.2.5 (rear yard 0.6 m), s.3.1.2.6 (site coverage 45%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), page 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt11.outright_fsr",
+      "title": "RT-11 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-11"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "max_fsr": 0.6,
+            "max_fsr_discretionary": 0.85,
+            "fsr_discretionary_clause": "s.3.1.1.2",
+            "units_note": "On a site of at least 511 m²: at most 74 dwelling units a hectare with 18.3 m of frontage or more, 3 dwelling units below that (s.3.1.1.5); not tested here."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 0.60 (0.75 for a duplex on a site with 1 principal building); s.3.1.1.2: the Director of Planning may increase it to 0.85 for dwelling uses other than duplex; s.3.1.1.5 and 3.1.1.6 cap the number of dwelling units. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), pages 8 and 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt11.outright_height",
+      "title": "RT-11 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-11"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "max_height_m": 10.7,
+            "max_storeys": 2
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+            "section": "s.3.1.2.3: maximum building height 10.7 m and 2 storeys in the front 60% of the site depth and 7.7 m and 2 storeys in the rear 40% (a duplex on a site with 1 principal building 10.7 m and 3 storeys). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), page 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt11.setbacks",
+      "title": "RT-11 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-11"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "min_side_yard_m": 1.2,
+            "min_rear_yard_m": 0.6,
+            "max_site_coverage": 0.45,
+            "front_yard_note": "The average of the front yards of the 2 adjacent sites; 4.9 m on a site wider than 18.3 m with more than 1 principal building (s.3.1.2.4). No fixed minimum, so the front is not tested.",
+            "building_depth_note": "Maximum building depth 40% of the site depth (s.3.1.2.9), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+            "section": "s.3.1.2.4 (front yard: the average of the 2 adjacent sites), s.3.1.2.5 (side yard 1.2 m), s.3.1.2.6 (rear yard 0.6 m), s.3.1.2.7 (site coverage 45%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), pages 9 and 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.m1.outright_fsr",
+      "title": "M-1 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "M-1"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2025-11-01",
+          "params": {
+            "max_fsr": 1.0,
+            "max_fsr_manufacturing_transport_wholesale": 5.0,
+            "housing_not_permitted": "M-1 is an industrial district: its schedule permits a dwelling unit only where it is essential to the operation of a business on the site (s.2.2.3), so housing as such is not a use it allows."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 5.00 for manufacturing, transportation and storage uses and wholesaling class A, and 1.00 for all other uses combined (the figure tested here). s.2.2.3: a dwelling unit only where essential to the operation of the business. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 2 and 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.m1.outright_height",
+      "title": "M-1 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "M-1"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2025-11-01",
+          "params": {
+            "max_height_m": 30.5
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+            "section": "s.3.1.2.1: maximum building height 30.5 m; s.3.1.2.4: the Director of Planning or the Development Permit Board may permit an increase (no figure given, so not entered as a limit). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 9 and 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.m1.setbacks",
+      "title": "M-1 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "M-1"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2025-11-01",
+          "params": {
+            "min_rear_yard_m": 3.1,
+            "rear_yard_lane_reduction": "s.3.1.2.7",
+            "rear_yard_note": "3.1 m, less the distance from the rear property line to the ultimate centre line of a lane behind (s.3.1.2.7). The Director of Planning may waive it (s.3.1.2.8).",
+            "side_yard_note": "No side yard unless the side adjoins a site in an R district without a lane between: 1.5 m beside an RM district, 0.9 m beside an R1, RT or RA district (s.3.1.2.2); not tested, since the site does not record its neighbours' districts."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+            "section": "s.3.1.2.2 (side yards only beside an R district), s.3.1.2.3 and 3.1.2.7 (rear yard 3.1 m, reduced by the distance to a lane's ultimate centre line). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 9 and 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.fm1.outright_fsr",
+      "title": "FM-1 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "FM-1"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.6,
+            "max_fsr_discretionary": 1.5,
+            "fsr_discretionary_clause": "s.3.1.1.1(b)"
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 0.60; (b) the Director of Planning or the Development Permit Board may increase it to 1.50 having regard to the site, open space, design and amenities of community benefit. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-fm-1.pdf (saved by hand from the by-law site), page 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.fm1.outright_height",
+      "title": "FM-1 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "FM-1"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 10.7
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf",
+            "section": "s.3.1.2.1: maximum building height 10.7 m; s.3.1.2.3: on a street running east and west, under an envelope 7.6 m high at the south property line; s.3.1.2.4: the Development Permit Board may increase it with Council's approval (no figure given, so not entered as a limit). The schedule's yards were not read into the rules. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-fm-1.pdf (saved by hand from the by-law site), pages 7 and 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm6.outright_fsr",
+      "title": "RM-6 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-6"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 1.0,
+            "max_fsr_discretionary": 2.5,
+            "fsr_discretionary_clause": "s.3.1.1.1"
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+            "section": "s.3.1.1.1: the maximum floor space ratio is 1.00, which the Director of Planning or the Development Permit Board may increase to 2.50. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), page 7"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm6.outright_height",
+      "title": "RM-6 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-6"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 12.2,
+            "max_height_m_discretionary": 64.0,
+            "height_discretionary_clause": "s.3.1.2.8(a)"
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+            "section": "s.3.1.2.1: maximum building height 12.2 m; s.3.1.2.8(a): the Director of Planning or the Development Permit Board may vary it to at most 64.0 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), pages 7 and 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm6.setbacks",
+      "title": "RM-6 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-6"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 12.2,
+            "min_side_yard_m": 2.1,
+            "min_rear_yard_m": 3.7,
+            "front_yard_note": "12.2 m for a building no higher than 12.2 m, 3.0 m for a taller one (s.3.1.2.2); the front yard is the side of the site on Georgia Street and the rear yard the side on Alberni Street (s.3.1.2.7).",
+            "side_yard_note": "2.1 m at an interior property line; portions of a building above 12.2 m take setbacks from the named side streets (s.3.1.2.4, 3.1.2.5), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+            "section": "s.3.1.2.2 (front yard, on Georgia Street: 12.2 m, or 3.0 m for a building higher than 12.2 m), s.3.1.2.3 (interior side yard 2.1 m), s.3.1.2.6 (rear yard, on Alberni Street: 3.7 m); s.3.1.2.8 lets the Director of Planning vary them. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), pages 7 and 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm7.outright_fsr",
+      "title": "RM-7 and RM-7A outright floor space ratio (townhouse)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-7",
+        "RM-7A"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.6,
+            "max_fsr_discretionary": 1.2,
+            "fsr_discretionary_clause": "s.3.2.1.1",
+            "units_note": "At most 100 dwelling units a hectare up to FSR 0.90 and 132 above it, lock-off units excluded (s.3.2.1.2); not tested here. The schedule's forms are townhouse, rowhouse, triplex and duplex: it has no apartment form."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+            "section": "s.3.2.1.1: for townhouse (other than in a courtyard configuration) the maximum floor space ratio is 0.60, which the Director of Planning may increase to 1.20; s.3.1.1.1 gives the same figures for a courtyard townhouse in RM-7A. s.3.2.2.1: a site of at least 445 m² for 1 townhouse building, 703 m² for more. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), pages 9 and 12"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm7.outright_height",
+      "title": "RM-7 and RM-7A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-7",
+        "RM-7A"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 10.7,
+            "max_storeys": 3
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+            "section": "s.3.2.2.3: maximum building height 10.7 m and 3 storeys; s.3.2.2.12: the third storey must be a partial storey not exceeding 50% of the storey below. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), pages 12 and 13"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm7.setbacks",
+      "title": "RM-7 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-7"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 4.9,
+            "min_side_yard_m": 1.2,
+            "max_site_coverage": 0.55,
+            "front_yard_note": "6.1 m on a site at least 27.4 m deep, 4.9 m on a shallower one (s.3.2.2.4); the 4.9 m is entered, so a deep site is tested against the smaller figure.",
+            "rear_yard_note": "RM-7 has no minimum rear yard (s.3.2.2.6); the building may be no deeper than 40% of the site depth (s.3.2.2.9), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-7 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+            "section": "s.3.2.2.4 (front yard 6.1 m, 4.9 m on a site under 27.4 m deep), s.3.2.2.5 (side yard 1.2 m), s.3.2.2.6 (rear yard: no minimum in RM-7), s.3.2.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), page 12"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm7a.setbacks",
+      "title": "RM-7A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-7A"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 4.9,
+            "min_side_yard_m": 1.2,
+            "min_rear_yard_m": 1.8,
+            "max_site_coverage": 0.55,
+            "front_yard_note": "6.1 m on a site at least 27.4 m deep, 4.9 m on a shallower one (s.3.2.2.4); the 4.9 m is entered, so a deep site is tested against the smaller figure."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-7A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+            "section": "s.3.2.2.4 (front yard 6.1 m, 4.9 m on a site under 27.4 m deep), s.3.2.2.5 (side yard 1.2 m), s.3.2.2.6 (rear yard 1.8 m in RM-7A), s.3.2.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), page 12"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm8.outright_fsr",
+      "title": "RM-8 and RM-8A outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-8",
+        "RM-8A"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 1.2,
+            "social_housing_note": "In RM-8A, on a single lot of at least 623 m² with 17.1 m of frontage west of Ontario or Carrall Street, at least 8% of the residential floor area must be social housing, or cash paid in lieu (s.3.1.1.3).",
+            "units_note": "At most 100 dwelling units a hectare up to FSR 0.90 and 145 above it, lock-off units excluded (s.3.1.1.4); not tested here."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+            "section": "s.3.1.1.2: for townhouse and mixed-use residential building the maximum floor space ratio is 1.20; s.3.1.1.1: developments requiring social housing are subject to Schedule J; s.3.1.1.3: the RM-8A social housing requirement. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), page 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm8.outright_height",
+      "title": "RM-8 and RM-8A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-8",
+        "RM-8A"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 11.5,
+            "max_storeys": 3
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+            "section": "s.3.1.2.3: maximum building height 11.5 m and 3 storeys for a building other than a rear building (a rear building 10.1 m and 3 storeys). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), page 10"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm8.setbacks",
+      "title": "RM-8 and RM-8A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-8",
+        "RM-8A"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 3.7,
+            "min_side_yard_m": 1.2,
+            "min_rear_yard_m": 1.8,
+            "max_site_coverage": 0.55,
+            "side_yard_note": "1.2 m; 2.4 m on a flanking street where the front doors face it (s.3.1.2.13), not tested.",
+            "building_depth_note": "Maximum building depth 40% of the site depth and width 27.0 m (s.3.1.2.9, 3.1.2.10), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+            "section": "s.3.1.2.4 (front yard 3.7 m), s.3.1.2.5 and 3.1.2.13 (side yard 1.2 m, 2.4 m on a flanking street the front doors face), s.3.1.2.6 (rear yard 1.8 m), s.3.1.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), page 11"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9a.outright_fsr",
+      "title": "RM-9A outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9A"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.7,
+            "units_note": "At most 100 dwelling units a hectare up to FSR 0.90, 132 up to 1.20 and 140 above it; the Director of Planning may allow 180 up to FSR 1.75 and 240 above it (s.3.1.1.2, 3.1.1.3); not tested here.",
+            "fsr_table": [
+              {
+                "min_frontage_m": 27.4,
+                "max_fsr": 2.0,
+                "label": "a site with at least 27.4 m of frontage (s.3.1.1.1(d))"
+              },
+              {
+                "corner": true,
+                "min_frontage_m": 15.2,
+                "max_fsr": 1.75,
+                "label": "a corner site with at least 15.2 m of frontage (s.3.1.1.1(c))"
+              },
+              {
+                "min_frontage_m": 15.2,
+                "max_fsr": 1.5,
+                "label": "a site with at least 15.2 m of frontage (s.3.1.1.1(b))"
+              },
+              {
+                "max_fsr": 0.7,
+                "label": "a site with less than 15.2 m of frontage (s.3.1.1.1; 1.20 where the Director of Planning finds it consists of locked-in lots, s.3.1.1.1(a))"
+              }
+            ]
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+            "section": "s.3.1.1.1: for apartment the maximum floor space ratio is 0.70, except 1.20 on a site under 15.2 m of frontage made of locked-in lots, 1.50 with at least 15.2 m of frontage, 1.75 on a corner site with at least 15.2 m, and 2.00 with at least 27.4 m. s.3.1.2.1 to 3.1.2.3: site area at least 445 m², frontage 15.2 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9a.outright_height",
+      "title": "RM-9A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9A"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 13.7,
+            "max_storeys": 4
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+            "section": "s.3.1.2.4: maximum building height 13.7 m and 4 storeys for an apartment (a townhouse 10.7 m and 3 storeys). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), page 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9a.setbacks",
+      "title": "RM-9A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9A"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 3.7,
+            "min_side_yard_m": 2.1,
+            "min_rear_yard_m": 3.7,
+            "max_site_coverage": 0.55,
+            "rear_yard_note": "3.7 m for an apartment; 1.2 m for an apartment in combination with townhouse (s.3.1.2.7). The Director of Planning may vary the yards (s.3.1.2.11)."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+            "section": "s.3.1.2.5 (front yard 3.7 m), s.3.1.2.6 (side yard 2.1 m), s.3.1.2.7 (rear yard 3.7 m for an apartment), s.3.1.2.8 (site coverage 55%); s.3.1.2.11 lets the Director of Planning vary them. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), page 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9.outright_fsr",
+      "title": "RM-9 outright floor space ratio (apartment and townhouse)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.75,
+            "units_note": "At most 100 dwelling units a hectare up to FSR 0.90, 132 up to 1.20 and 140 above it; the Director of Planning may allow 180 up to FSR 1.75 and 240 above it (s.3.1.1.2, 3.1.1.3); not tested here.",
+            "fsr_table": [
+              {
+                "min_frontage_m": 27.4,
+                "max_fsr": 2.0,
+                "label": "a site with at least 27.4 m of frontage (s.3.1.1.1(c))"
+              },
+              {
+                "min_frontage_m": 15.2,
+                "max_fsr": 1.5,
+                "label": "a site with at least 15.2 m of frontage (s.3.1.1.1(b))"
+              },
+              {
+                "min_frontage_m": 12.8,
+                "max_fsr": 1.2,
+                "label": "a site with at least 12.8 m of frontage (s.3.1.1.1(a))"
+              },
+              {
+                "max_fsr": 0.75,
+                "label": "a site with less than 12.8 m of frontage (s.3.1.1.1: 0.75 in RM-9)"
+              }
+            ]
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+            "section": "s.3.1.1.1: for apartment and townhouse the maximum floor space ratio is 0.75 in RM-9 and 0.70 in RM-9B, except 1.20 with at least 12.8 m of frontage, 1.50 with at least 15.2 m and 2.00 with at least 27.4 m. s.3.1.2.1 to 3.1.2.3: site area at least 445 m², frontage 12.8 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9b.outright_fsr",
+      "title": "RM-9B outright floor space ratio (apartment and townhouse)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9B"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.7,
+            "units_note": "At most 100 dwelling units a hectare up to FSR 0.90, 132 up to 1.20 and 140 above it; the Director of Planning may allow 180 up to FSR 1.75 and 240 above it (s.3.1.1.2, 3.1.1.3); not tested here.",
+            "fsr_table": [
+              {
+                "min_frontage_m": 27.4,
+                "max_fsr": 2.0,
+                "label": "a site with at least 27.4 m of frontage (s.3.1.1.1(c))"
+              },
+              {
+                "min_frontage_m": 15.2,
+                "max_fsr": 1.5,
+                "label": "a site with at least 15.2 m of frontage (s.3.1.1.1(b))"
+              },
+              {
+                "min_frontage_m": 12.8,
+                "max_fsr": 1.2,
+                "label": "a site with at least 12.8 m of frontage (s.3.1.1.1(a))"
+              },
+              {
+                "max_fsr": 0.7,
+                "label": "a site with less than 12.8 m of frontage (s.3.1.1.1: 0.70 in RM-9B)"
+              }
+            ]
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+            "section": "s.3.1.1.1: for apartment and townhouse the maximum floor space ratio is 0.75 in RM-9 and 0.70 in RM-9B, except 1.20 with at least 12.8 m of frontage, 1.50 with at least 15.2 m and 2.00 with at least 27.4 m. s.3.1.2.1 to 3.1.2.3: site area at least 445 m², frontage 12.8 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9.outright_height",
+      "title": "RM-9 and RM-9B outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9",
+        "RM-9B"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 12.2,
+            "max_storeys": 4,
+            "max_height_m_discretionary": 13.7,
+            "height_discretionary_clause": "s.3.1.2.12"
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+            "section": "s.3.1.2.4: maximum building height 12.2 m and 4 storeys for an apartment or townhouse other than a rear building (a rear building 10.7 m and 3 storeys); s.3.1.2.12: the Director of Planning may vary it to at most 13.7 m and 4 storeys. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9.setbacks",
+      "title": "RM-9 and RM-9B minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9",
+        "RM-9B"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 4.9,
+            "min_side_yard_m": 2.1,
+            "min_rear_yard_m": 3.7,
+            "max_site_coverage": 0.55,
+            "rear_yard_note": "3.7 m for an apartment; a townhouse 7.6 m, or 1.2 m in a courtyard configuration (s.3.1.2.7); the apartment figure is tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+            "section": "s.3.1.2.5 (front yard 4.9 m), s.3.1.2.6 (side yard 2.1 m), s.3.1.2.7 (rear yard 3.7 m for an apartment, 7.6 m for a townhouse, 1.2 m in a courtyard configuration), s.3.1.2.8 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm10.outright_fsr",
+      "title": "RM-10 outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-10"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.9,
+            "fsr_table": [
+              {
+                "min_frontage_m": 40.0,
+                "min_site_area_m2": 1115,
+                "max_fsr": 2.6,
+                "label": "a site with at least 40.0 m of frontage and 1,115 m² (s.3.1.1.1(c))"
+              },
+              {
+                "min_frontage_m": 30.0,
+                "min_site_area_m2": 855,
+                "max_fsr": 2.4,
+                "label": "a site with at least 30.0 m of frontage and 855 m² (s.3.1.1.1(b))"
+              },
+              {
+                "max_fsr": 0.9,
+                "label": "a smaller site (s.3.1.1.1; 2.00 with 15.0 to 30.0 m of frontage and 557 m² where the Director of Planning finds it consists of locked-in lots, s.3.1.1.1(a))"
+              }
+            ]
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+            "section": "s.3.1.1.1: for apartment and mixed-use residential building the maximum floor space ratio is 0.90, except 2.00 on locked-in lots with 15.0 to 30.0 m of frontage and at least 557 m², 2.40 with at least 30.0 m and 855 m², and 2.60 with at least 40.0 m and 1,115 m². s.3.1.2.1 to 3.1.2.3: site area at least 855 m², frontage 30.0 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm10.outright_height",
+      "title": "RM-10 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-10"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 20.0
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+            "section": "s.3.1.2.4: maximum building height 20.0 m; s.3.1.2.12 and 3.1.2.15: beside an R1 or RT site with no lane between, portions at or above the fourth storey set back 10.7 m (not tested). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), pages 8 and 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm10.setbacks",
+      "title": "RM-10 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-10"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 3.7,
+            "min_side_yard_m": 3.0,
+            "min_rear_yard_m": 3.7,
+            "max_site_coverage": 0.5,
+            "rear_yard_note": "3.7 m on a site no deeper than 36.2 m (with 6.1 m above the fourth storey, s.3.1.2.8), 6.1 m on a deeper site (s.3.1.2.7); the 3.7 m is tested.",
+            "side_yard_note": "3.0 m; the Director of Planning may reduce it to 2.1 m for half the building depth (s.3.1.2.14).",
+            "building_depth_note": "Maximum building depth 21.3 m (s.3.1.2.11), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+            "section": "s.3.1.2.5 (front yard 3.7 m), s.3.1.2.6 (side yard 3.0 m), s.3.1.2.7 (rear yard 3.7 m, 6.1 m on a site deeper than 36.2 m), s.3.1.2.9 (site coverage 50%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), pages 8 and 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm11.outright_fsr",
+      "title": "RM-11 outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-11"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 0.75,
+            "fsr_table": [
+              {
+                "min_frontage_m": 36.6,
+                "max_fsr": 1.7,
+                "label": "a site with at least 36.6 m of frontage (s.3.1.1.1)"
+              },
+              {
+                "max_fsr": 0.75,
+                "label": "a site with less than 36.6 m of frontage (s.3.1.1.1)"
+              }
+            ]
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+            "section": "s.3.1.1.1: for apartment and mixed-use residential building the maximum floor space ratio is 0.75, and 1.70 on a site with at least 36.6 m of frontage. s.3.1.2.1: site area at least 1,000 m². The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm11.outright_height",
+      "title": "RM-11 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-11"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 13.7
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+            "section": "s.3.1.2.4: maximum building height 13.7 m; s.3.1.2.12: beside an R1 or RT site with no lane between, portions at or above the fourth storey set back 4.6 m (not tested). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), pages 8 and 9"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm11.setbacks",
+      "title": "RM-11 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-11"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 3.7,
+            "min_side_yard_m": 2.1,
+            "min_rear_yard_m": 6.1,
+            "max_site_coverage": 0.55
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+            "section": "s.3.1.2.5 (front yard 3.7 m), s.3.1.2.6 (side yard 2.1 m), s.3.1.2.7 (rear yard 6.1 m), s.3.1.2.8 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm12.outright_fsr",
+      "title": "RM-12 outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-12"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_fsr": 1.7
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+            "section": "s.3.1.1.1: for apartment and mixed-use residential building the maximum floor space ratio is 1.70. s.3.1.2.1 and 3.1.2.2: site area at least 1,000 m² and frontage at least 36.6 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm12.outright_height",
+      "title": "RM-12 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-12"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "max_height_m": 13.7,
+            "max_storeys": 4
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+            "section": "s.3.1.2.3: maximum building height 13.7 m and 4 storeys for an apartment and for a mixed-use residential building other than a rear building. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm12.setbacks",
+      "title": "RM-12 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-12"
+      ],
+      "check": "district_setbacks",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "min_front_yard_m": 3.7,
+            "min_side_yard_m": 2.1,
+            "min_rear_yard_m": 6.1,
+            "max_site_coverage": 0.55,
+            "building_depth_note": "Maximum building width 26.0 m (s.3.1.2.9), not tested."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+            "section": "s.3.1.2.4 (front yard 3.7 m), s.3.1.2.5 (side yard 2.1 m), s.3.1.2.6 (rear yard 6.1 m), s.3.1.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), page 8"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.deod.outright_fsr",
+      "title": "Downtown-Eastside/Oppenheimer plan: floor space ratio by sub-area",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "DEOD"
+      ],
+      "check": "district_outright_fsr",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "sub_area_key": "odp_sub_area",
+            "sub_area_names": {
+              "1": "Main/Hastings",
+              "2": "Cordova Street",
+              "3": "Powell Street/Japantown",
+              "4": "Alexander/Powell"
+            },
+            "by_sub_area": {
+              "1": {
+                "max_fsr": 1.0,
+                "max_fsr_social_housing": 3.0,
+                "social_housing_fsr_clause": "s.4.5.1",
+                "max_fsr_discretionary": 11.0,
+                "fsr_discretionary_clause": "s.4.5.4, for an apartment or mixed-use residential building at least half residential, all of it secured rental, with at least 20% of the homes social housing"
+              },
+              "2": {
+                "max_fsr": 1.0,
+                "max_fsr_discretionary": 11.0,
+                "fsr_discretionary_clause": "s.5.5.3, for an apartment or mixed-use residential building at least half residential, all of it secured rental, with at least 20% of the homes social housing"
+              },
+              "3": {
+                "max_fsr": 1.0,
+                "max_fsr_discretionary": 11.0,
+                "fsr_discretionary_clause": "s.6.5.4, for an apartment or mixed-use residential building at least half residential, all of it secured rental, with at least 20% of the homes social housing",
+                "toa_note": "Inside a transit-oriented area an all-rental apartment with at least 20% social housing takes 3.0 without discretion (s.6.5.3); not tested here."
+              },
+              "4": {
+                "max_fsr": 1.0,
+                "max_fsr_discretionary": 11.0,
+                "fsr_discretionary_clause": "s.7.5.3, for an apartment or mixed-use residential building at least half residential, all of it secured rental, with at least 20% of the homes social housing"
+              }
+            },
+            "rental_note": "Sub-area 1's 3.0 (s.4.5.1) is for an all-rental apartment with at least 20% of the homes social housing; the tool grants it to a social housing option only, so a market rental building with 20% social housing is read at 1.0 and is for a person to judge.",
+            "frontage_note": "Above FSR 3.0 the site needs at least 15.0 m of frontage, which may be reduced for 100% social housing up to FSR 8.50; the frontage may not exceed 45.7 m (s.4.6.4, 4.6.5 and their twins); not tested.",
+            "heritage_note": "A further 10% for conserving a designated heritage property (s.4.5.5 and its twins); not tested."
+          },
+          "source": {
+            "title": "City of Vancouver, Downtown-Eastside/Oppenheimer Official Development Plan (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf",
+            "section": "Sub-area 1 Main/Hastings: s.4.5.1 (3.0 for an apartment or mixed-use residential building all secured as rental with at least 20% of the homes social housing), s.4.5.2 (1.0 for all other uses), s.4.5.4 (the Director of Planning or the Development Permit Board may vary it to 11.0 for such a building that is at least half residential). Sub-area 2 Cordova Street: s.5.5.1 (1.0), s.5.5.3 (to 11.0). Sub-area 3 Powell Street/Japantown: s.6.5.1 (1.0), s.6.5.3 (3.0 in a transit-oriented area), s.6.5.4 (to 11.0). Sub-area 4 Alexander/Powell: s.7.5.1 (1.0), s.7.5.3 (to 11.0). Developments requiring social housing are subject to Schedule J. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/odp-downtown-eastside-oppenheimer.pdf (saved by hand from the by-law site), pages 14, 15, 21, 27, 28, 35 and 36"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.deod.outright_height",
+      "title": "Downtown-Eastside/Oppenheimer plan: building height by sub-area",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "DEOD"
+      ],
+      "check": "district_outright_height",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "sub_area_key": "odp_sub_area",
+            "sub_area_names": {
+              "1": "Main/Hastings",
+              "2": "Cordova Street",
+              "3": "Powell Street/Japantown",
+              "4": "Alexander/Powell"
+            },
+            "by_sub_area": {
+              "1": {
+                "max_height_m": 30.0,
+                "max_height_m_discretionary": 100.0,
+                "height_discretionary_clause": "s.4.6.3",
+                "min_height_note": "A minimum of 11.0 m in the area marked A on the plan's Map 3 (s.4.6.1)."
+              },
+              "2": {
+                "max_height_m": 15.0,
+                "max_height_m_discretionary": 100.0,
+                "height_discretionary_clause": "s.5.6.2"
+              },
+              "3": {
+                "max_height_m": 15.0,
+                "max_height_m_toa": 30.0,
+                "toa_height_clause": "s.6.6.2",
+                "max_height_m_discretionary": 100.0,
+                "height_discretionary_clause": "s.6.6.3",
+                "min_height_note": "A minimum of 7.0 m (s.6.6.1)."
+              },
+              "4": {
+                "max_height_m": null,
+                "max_height_m_discretionary": 100.0,
+                "height_discretionary_clause": "s.7.6.2",
+                "no_maximum_note": "the plan prints a minimum building height of 15.0 m for this sub-area (s.7.6.1) and no maximum; s.7.6.2 lets the Director of Planning or the Development Permit Board go to 100.0 m"
+              }
+            },
+            "yards_note": "No front yard applies and no side yard is required, except a setback for light where the site abuts a residential building with windows to habitable rooms (s.4.6.6, 4.6.7 and their twins); the plan states no rear yard."
+          },
+          "source": {
+            "title": "City of Vancouver, Downtown-Eastside/Oppenheimer Official Development Plan (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf",
+            "section": "Sub-area 1: s.4.6.2 (30.0 m), s.4.6.3 (the Director of Planning or the Development Permit Board may vary it to at most 100.0 m). Sub-area 2: s.5.6.1 (15.0 m), s.5.6.2 (to 100.0 m). Sub-area 3: s.6.6.2 (15.0 m, 30.0 m in a transit-oriented area), s.6.6.3 (to 100.0 m). Sub-area 4: s.7.6.1 is printed as a minimum of 15.0 m, with s.7.6.2 allowing up to 100.0 m. The effective date is the consolidation's; the clauses may be older.",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "read_from": "inbox/city-2026-11-23/odp-downtown-eastside-oppenheimer.pdf (saved by hand from the by-law site), pages 15, 16, 23, 28, 29 and 36"
           }
         }
       ]

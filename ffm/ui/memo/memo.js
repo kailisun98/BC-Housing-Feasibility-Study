@@ -127,7 +127,7 @@ export function renderMemo(run) {
     </div>
     ${optionFiguresHtml(site, opt, run)}
     <div class="memo-actions" id="memo-actions"></div>
-    <p class="quiet memo-disclaimer">A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from.</p>
+    <p class="quiet memo-disclaimer">A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</p>
   </div>`);
   // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
   const note = (run.issues || []).filter(i => i.to === state.mode).slice(-1)[0];

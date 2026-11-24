@@ -6,7 +6,7 @@ import { state, STATIC } from "./core/state.js";
 import { optWord } from "./fields.js";
 import { rev } from "./runs.js";
 import { briefName, compareKind, dateWords, idBreak, memoRefs, optionName, takesRef } from "./memo/memo.js";
-import { fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, outrightWords, unverifiedRules } from "./memo/answers.js";
+import { fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, operatingRows, outrightWords, unverifiedRules } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
 import { sidesOf, tradeOff } from "./memo/side-by-side.js";
 import { changeWord, naChange } from "./memo/changes.js";
@@ -172,12 +172,23 @@ export function paperDocument(run) {
   }
   // the money, line by line, on paper: the board and the funder's officer read the gap here and nowhere else (15 Nov 2026);
   // first, land at $0, the 15% line and the 1.10 coverage in plain words (20 Nov 2026)
+  // what it takes to run, a year (23 Nov 2026): the operating page on paper, as answer 4 shows it on screen; the funder's
+  // officer reads the subsidy a home a month here. Rows from memo/answers.js operatingRows, the twin of proforma.operating_rows.
+  const opRows = pfOk ? operatingRows(run.proforma) : [];
+  const opMoney = x => (x < 0 ? `−${money(-x)}` : money(x));
+  const opTable = opRows.length ? `<p class="lead op-head"><b>What it takes to run, a year.</b> The rents, the running costs, what is left, and the subsidy needed.</p>
+      <table class="money op"><colgroup><col style="width:34%"><col style="width:16%"><col></colgroup>
+      <thead><tr><th>Line</th><th>A year</th><th>Note</th></tr></thead><tbody>
+      ${opRows.map(r => { const strong = r.kind === "result" || r.kind === "ask"; const lab = strong ? `<b>${h(r.label)}</b>` : h(r.label);
+        return `<tr><td>${lab}${r.ph ? ' <span class="st st-uncertain">placeholder</span>' : ""}${r.warn ? ' <span class="st st-uncertain">open</span>' : ""}</td><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : (strong ? `<b>${h(opMoney(r.value))}</b>` : h(opMoney(r.value)))}</td><td>${h(r.note || "")}</td></tr>`; }).join("")}
+      </tbody></table>
+      <p class="note">The rents and the running cost are placeholders until the operator's own are entered; support staffing and an operating subsidy are never assumed. The last line is an illustration on this screen's mortgage terms, not a funder's financing.</p>` : "";
   const moneyLines = pfOk ? `${moneyWords(run.proforma, run, "text") ? `<p class="lead">${h(moneyWords(run.proforma, run, "text"))}</p>` : ""}<table class="money"><colgroup><col style="width:6%"><col style="width:22%"><col style="width:16%"><col></colgroup>
       <thead><tr><th>Ref</th><th>Line</th><th>Figure</th><th>How, and from what</th></tr></thead><tbody>
       ${run.proforma.lines.map(ln => { const shown = ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + (ln.unit === "$/yr" ? " a year" : ln.unit === "$/m²" ? " per m²" : "") : (ln.value == null ? "not given" : fmtNum(ln.value));
         return `<tr><td>${ln.rule_id ? refTag(ln.rule_id) : '<span class="muted">option</span>'}</td><td><b>${h(ln.label)}</b>${ln.placeholder ? ' <span class="st st-uncertain">placeholder</span>' : ""}</td><td class="num">${h(shown)}</td><td>${h(ln.note || "")}${ln.rule_id ? ` <span class="muted">(${h(ref(ln.rule_id))}: ${h(titleOf[ln.rule_id] || ln.rule_id)})</span>` : ""}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="note">Capital cost ${h(money(run.proforma.capital.total))}, less funding ${h(money(run.proforma.funding.total))}, gives the gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the capital cost)` : ""}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; each rule's source is in section ${s.ledger}.</p>` : "";
+      <p class="note">Capital cost ${h(money(run.proforma.capital.total))}, less funding ${h(money(run.proforma.funding.total))}, gives the gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the capital cost)` : ""}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; each rule's source is in section ${s.ledger}.</p>${opTable}` : "";
 
   // 4. every clause that applies, in reference order
   const applied = res.filter(r => r.status !== "not_applicable");
@@ -309,6 +320,8 @@ export function paperDocument(run) {
     h3 { font-size: 8.8pt; margin: 9pt 0 3pt; break-after: avoid; }
     p { margin: 0 0 5pt; }
     .lead { font-size: 9pt; }
+    .op-head { margin-top: 10pt; break-after: avoid; }
+    table.op { break-inside: avoid; }
     .note { font-size: 7.6pt; color: #3d4752; }
     /* tables: ruled rows, headers that repeat on every page, rows that do not split */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0 0 5pt; font-size: 7.6pt; line-height: 1.38; }
@@ -455,7 +468,7 @@ export function paperDocument(run) {
     <h1>${h(address)}</h1>
     <p class="sub">First Read memo · ${h(revA)}${ran ? ` · run ${h(ran)}` : ""} · printed ${h(printed)}</p>
     ${titleBlock}
-    <p class="howto"><b class="disclaimer">A feasibility screen, not legal, planning or funding advice.</b> Rules are named by layer and place (A1, C4…) throughout.${s.words ? ` Section ${s.words} explains the words;` : ""} section ${s.ledger} gives each rule's finding, numbers and source; section ${s.verify} says how to reproduce the memo.</p>
+    <p class="howto"><b class="disclaimer">A feasibility screen, not legal, planning or funding advice; an independent student tool, not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</b> Rules are named by layer and place (A1, C4…) throughout.${s.words ? ` Section ${s.words} explains the words;` : ""} section ${s.ledger} gives each rule's finding, numbers and source; section ${s.verify} says how to reproduce the memo.</p>
     <section class="sec"><h2><span class="no">1</span> The four answers</h2>${answers}${unvLine}${p1figs}</section>
     <section class="sec"><h2><span class="no">2</span> Open items and who resolves them</h2>${open}</section>
     ${compare}

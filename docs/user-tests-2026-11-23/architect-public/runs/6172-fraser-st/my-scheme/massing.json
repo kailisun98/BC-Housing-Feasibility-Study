@@ -1,0 +1,202 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "6172-fraser-st",
+  "option_id": "6172-fraser-st-my-scheme",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        20.79,
+        1.17
+      ],
+      [
+        20.79,
+        1.18
+      ],
+      [
+        20.94,
+        36.13
+      ],
+      [
+        20.94,
+        36.14
+      ],
+      [
+        -4.07,
+        36.15
+      ],
+      [
+        -4.17,
+        1.16
+      ]
+    ],
+    "frontage_m": 25.1,
+    "depth_m": 35.1,
+    "area_m2": 881.1,
+    "street_side": "y = 0",
+    "corners": [
+      [
+        20.79,
+        1.17
+      ],
+      [
+        20.94,
+        36.14
+      ],
+      [
+        -4.07,
+        36.15
+      ],
+      [
+        -4.17,
+        1.16
+      ]
+    ],
+    "bbox": [
+      -4.17,
+      1.16,
+      20.94,
+      36.15
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 874.0,
+    "shape": {
+      "class": "rectangle",
+      "note": "A rectangle, 874 m2, 35.1 x 25.0 m bounding rectangle.",
+      "rectangularity": 0.997,
+      "vertices": 4,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in)"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        18.8,
+        3.67
+      ],
+      [
+        18.93,
+        34.64
+      ],
+      [
+        -2.07,
+        34.65
+      ],
+      [
+        -2.16,
+        3.66
+      ]
+    ],
+    "width_m": 20.0,
+    "depth_m": 30.0,
+    "area_m2": 650.0,
+    "setbacks_m": {
+      "front": 2.5,
+      "rear": 1.5,
+      "side": 2.0
+    },
+    "box": {
+      "x": -1.66,
+      "y": 4.16,
+      "w": 20.0,
+      "d": 30.0,
+      "area_m2": 600.0
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 6 storeys, FSR 3.50",
+      "footprint": [
+        [
+          -1.66,
+          4.16
+        ],
+        [
+          18.34,
+          4.16
+        ],
+        [
+          18.34,
+          29.827
+        ],
+        [
+          -1.66,
+          29.827
+        ]
+      ],
+      "plate_width_m": 20.0,
+      "plate_depth_m": 25.67,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 21.0,
+      "storeys": 6,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 513.3,
+      "gfa_m2": 3080.0,
+      "fsr": 3.496,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    },
+    {
+      "name": "outright",
+      "label": "Outright: FSR 3.5, 23.0 m",
+      "footprint": [
+        [
+          -1.66,
+          4.16
+        ],
+        [
+          18.34,
+          4.16
+        ],
+        [
+          18.34,
+          29.859
+        ],
+        [
+          -1.66,
+          29.859
+        ]
+      ],
+      "plate_width_m": 20.0,
+      "plate_depth_m": 25.7,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 19.8,
+      "storeys": 6,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 514.0,
+      "gfa_m2": 3083.9,
+      "fsr": 3.5,
+      "derived_from": [
+        "cov.c2a.outright_fsr",
+        "cov.c2a.outright_height",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 6,
+    "after": 6,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "Option height 21.0 m exceeds 6 x 3.3 m = 19.8 m; the extra 1.2 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
+  ],
+  "outright_height_limit_m": 23.0
+}

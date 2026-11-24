@@ -1,0 +1,69 @@
+{
+  "previous_stamp": "4227307d738e56fe",
+  "current_stamp": "4227307d738e56fe",
+  "previous_as_of": "2026-11-23",
+  "current_as_of": "2026-11-23",
+  "rules_changed": false,
+  "changes": [
+    {
+      "rule_id": "bc.bcbuilds.eligibility",
+      "change": "changed",
+      "from": "uncertain",
+      "to": "pass",
+      "from_version": "2024-02-13",
+      "to_version": "2024-02-13",
+      "finding": "BC Builds: meets the published criteria: non-residential space is 9.7% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter."
+    },
+    {
+      "rule_id": "bch.chf.eligibility",
+      "change": "changed",
+      "from": "uncertain",
+      "to": "pass",
+      "from_version": "2025-05-30",
+      "to_version": "2025-05-30",
+      "finding": "Community Housing Fund: meets the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (letter of intent) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026)."
+    },
+    {
+      "rule_id": "bch.design_guidelines.unit_areas",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 82 m² gross per unit, so net areas should be checked at the plan stage."
+    },
+    {
+      "rule_id": "cov.c2a.outright_fsr",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "FSR 3.50 (3,080 m² over 881.1 m²) is within the outright maximum of 3.5 for a building with every home secured as rental (s.3.1.1.1(a), a mixed-use residential building with every home rental and 0.35 FSR of non-dwelling use at the street; 2.5 otherwise)."
+    },
+    {
+      "rule_id": "cov.c2a.outright_height",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "Height 21.0 m is within the outright maximum of 23.0 m."
+    },
+    {
+      "rule_id": "cov.family_units",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "13 of 34 units (38.2%) have two or more bedrooms, against a 35.0% minimum; 4 (11.8%) have three or more, against a 5.0% minimum."
+    },
+    {
+      "rule_id": "cov.parking_minimums",
+      "change": "finding_changed",
+      "from": "info",
+      "to": "info",
+      "finding": "No minimum off-street parking applies citywide since June 2024; the option provides 8 vehicle and 60 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage."
+    },
+    {
+      "rule_id": "cov.social_housing_definition",
+      "change": "finding_changed",
+      "from": "pass",
+      "to": "pass",
+      "finding": "Meets the City's social housing definition: 70.0% of units for households below HILs (minimum 30.0%), owned by a non profit society, secured for 60 years."
+    }
+  ]
+}

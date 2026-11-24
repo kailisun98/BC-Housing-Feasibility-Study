@@ -172,8 +172,8 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
             title = f"CD-1 ({cd1}) is not in the rules"
             finding = (f"The site is zoned CD-1 ({cd1}), a district of its own whose limits are in its by-law and whatever its rezoning set; "
                        f"the rule stack holds no rules from that by-law, {envelope_words}")
-            action = (f"Architect: save CD-1 ({cd1})'s by-law (cd1-bylaws.vancouver.ca) into inbox/ and have its height, floor area and yards "
-                      "entered as rules (or read it with Claude at stop 3 and confirm its clauses).")
+            action = (f"Architect: read CD-1 ({cd1})'s by-law (cd1-bylaws.vancouver.ca) for its height, floor area and yards, and enter them for this option; "
+                      "to have them tested, the by-law is added to the rules (in the tool: on the site card, give a key and the by-law's PDF and have the tool read it, then confirm its clauses).")
         elif is_cd1:
             why = "the site's CD-1 number is not recorded, so no CD-1 by-law in the rules can be matched to it"
             title = "A CD-1 site with no CD-1 number"
@@ -184,8 +184,15 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
             why = f"the rules have no {district} schedule"
             title = f"No {district} schedule in the rules"
             finding = f"The rule stack has no {district} district schedule, {envelope_words}"
-            action = (f"Architect: save the {district} schedule into inbox/ and have its FSR, height and yards entered as rules "
-                      "(or read it with Claude at stop 3 and confirm its clauses).")
+            action = (f"Architect: read the {district} schedule for its FSR, height and yards, and whether housing is a permitted use, and enter them for this option; "
+                      "to have them tested, the schedule is added to the rules (in the tool: the architect's Site schedule, read the schedule with Claude, then confirm its clauses).")
+        # a district the City classes as industrial: whether homes are a permitted use at all comes before any envelope
+        # (23 Nov 2026: an M-1 lot read "not assessed" beside a six-storey suggestion, which reads as "probably fine")
+        cls = str(((site.get("lookup") or {}).get("zoning_record") or {}).get("zoning_classification") or "")
+        if "industrial" in cls.lower():
+            why += f"; the City classes {district} as {cls.lower()}, where housing may not be a permitted use"
+            finding += f" The City's zoning data classes {district} as {cls.lower()}: whether housing is a permitted use there is the first question, before any building is sized."
+            action = (f"Manager: ask a City planner whether housing is permitted in {district}, and by what route (a rezoning is likely), before any offer on the land. " + action)
         outright = {"verdict": "not assessed", "fail": [], "conditional": [], "uncertain": [], "why": why}
         by_rezoning = _verdict(policy_rules)
         extra_open.append({"rule_id": "coverage.district_schedule", "title": title, "status": "uncertain", "finding": finding, "action": action})
@@ -202,7 +209,7 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         extra_open.append({"rule_id": "coverage.schedule_unverified", "title": f"District schedule figures entered unverified ({district})", "status": "uncertain",
                            "finding": f"The figures in {', '.join(unverified)} were {'; '.join(why_unverified)}, and not read from {written_in} itself; "
                                       "until they are confirmed, a pass against them is not a permission.",
-                           "action": f"Architect: open {written_in} and confirm the FSR, height and yards; or drop its PDF into inbox/ and have the rule confirmed."})
+                           "action": f"Architect: open {written_in} and confirm the FSR, height and yards; or have the rule confirmed against its PDF."})
     # the yards: where no district yard rule tested them, the option's setbacks are its own figures, and a reader of the
     # site plan should know that nothing checked them (15 Nov 2026, from an architect's test)
     sb = option.get("setbacks_m") or {}
@@ -218,7 +225,7 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     if keep is None:
         extra_open.append({"rule_id": "coverage.existing_buildings", "title": "What stays on the lot", "status": "uncertain",
                            "finding": "The massing stands on a clear lot; whether the existing buildings (or part of them) stay is not stated.",
-                           "action": "Manager: say whether the buildings on the lot stay (stop 1); if they do, the architect draws the footprint that is kept and the massing moves off it."})
+                           "action": "Manager: say whether the buildings on the lot stay; if they do, the architect draws the footprint that is kept and the massing moves off it."})
     elif keep:
         extra_open.append({"rule_id": "coverage.existing_buildings", "title": "A building kept on the lot", "status": "conditional",
                            "finding": "The existing buildings stay, but the massing is drawn on the whole lot: the floor area and the plate here assume the ground they stand on.",
@@ -227,13 +234,81 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         extra_open.append({"rule_id": "coverage.heritage", "title": "Heritage register and designation", "status": "uncertain",
                            "finding": "The rules hold no heritage rule, and a church site is where the City's Heritage Register and heritage designations are most likely to apply; a listed building changes what can be demolished and how the rezoning is read.",
                            "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address."})
-    allowed = {"outright": outright, "by_rezoning": by_rezoning, "rezoning_path": option.get("rezoning_path")}
+    # An option allowed outright that proposes no rezoning is not read against the rules written for rezonings (23 Nov
+    # 2026: an outright C-2A scheme listed the Community Vision map and the family-unit minimum as open items, and the
+    # command line printed "by rezoning: no"). The by-rezoning answer says it is not needed.
+    from .checks import proposes_rezoning, housing_kind, HOUSING_WORDS, approval_route, ROUTE_WORDS
+    rezoning_only = lambda r: r.get("check") in ("family_unit_share", "rezoning_policy_social_housing")
+    route = approval_route(option)
+    no_rezoning_needed = not outside and tested and outright["verdict"] in ("yes", "yes, with conditions") and not proposes_rezoning(option)
+    if no_rezoning_needed:
+        by_rezoning = {"verdict": "not needed", "fail": [], "conditional": [], "uncertain": [],
+                       "why": "the option is allowed outright and proposes no rezoning"}
+    elif route in ("development_permit", "outright") and not outside:
+        # a person said the option goes by permit (a site already rezoned to its CD-1, a building under an official
+        # development plan): there is no rezoning to answer for, whatever the rules could test of the district
+        no_rezoning_needed = True
+        by_rezoning = {"verdict": "not needed", "fail": [], "conditional": [], "uncertain": [],
+                       "why": f"the option is approved by {ROUTE_WORDS[route]}, not by a rezoning"}
+    allowed = {"outright": outright, "by_rezoning": by_rezoning, "rezoning_path": option.get("rezoning_path"), "approval_route": route}
 
     # Question 2: does it fit the funders? Layer E rules the option targets.
     targets = set(option.get("target_programs") or [])
     e = [r for r in results if r["layer"] == "E" and (not targets or r["rule_id"] in targets)]
     funded = _verdict(e)
     funded.update(funders_words(funded, e))
+    # Supportive, transitional and shelter housing: the programs in the stack are not written for it, so the answer is
+    # "not assessed" with the reason and one open item for the manager, never a pass by default (23 Nov 2026).
+    kind = housing_kind(option)
+    # The programs the rules list without testing them (check program_match): the ones written for this option's kind of
+    # housing are named in answer 2 with whether each is taking proposals, whatever the option targets. A match is a
+    # door to knock on, never a verdict; "if" is a match that waits on one answer (Indigenous-led? leaving violence?).
+    listed = [r for r in results if r["layer"] == "E" and r.get("check") == "program_match"]
+    matches = []
+    for r in listed:
+        v = r.get("values") or {}
+        if v.get("match") in (True, "if"):
+            note = (v.get("intake") or {}).get("note") or ""
+            matches.append({"rule_id": r["rule_id"], "program": program_name(r), "if": v.get("asks") or [], "open": (v.get("intake") or {}).get("open"),
+                            "intake": note[4:] if note.startswith("its ") else note, "enters": v.get("how_a_project_enters"), "differs": v.get("differs"),
+                            "ended": bool(v.get("ended")), "what": v.get("what"), "funds": v.get("funds")})
+    funded["matches"] = matches
+    # a program that has ended (Rapid Response to Homelessness: all its homes are built) is listed in the ledger, not named as a door
+    sure = [m["program"] for m in matches if not m["if"] and not m["ended"]]
+    maybe = [m["program"] for m in matches if m["if"] and not m["ended"]]
+    tested_e = [r for r in e if r["status"] in (PASS, COND, UNSURE, FAIL)]
+    if kind != "independent" and not tested_e:
+        what = HOUSING_WORDS[kind]
+        named = sure or maybe
+        funded.update({"verdict": "not assessed",
+                       "words": (f"Not assessed: the rules list {len(named)} program{'s' if len(named) != 1 else ''} for {what} ({_and(named)}) and test none of their criteria" if named
+                                 else f"Not assessed: the rules hold no funding program for {what}"),
+                       "why": f"the option is {what}; the Community Housing Fund and BC Builds, whose criteria the rules test, are written for independent rental"})
+        closed = [m["program"] for m in matches if m["open"] is False and not m["ended"]]
+        extra_open.append({"rule_id": "coverage.funders", "title": (f"Programs for {what}: listed, not tested" if named else f"No funding program for {what} in the rules"), "status": "uncertain",
+                           "finding": (f"The option is {what}. The rules list {_and(named)} as written for it, each from its program page, and test none of their criteria"
+                                       + (f"; {_and(closed)} {'has' if len(closed) == 1 else 'have'} no intake open" if closed else "") + "." if named
+                                       else f"The option is {what}; the programs whose criteria the rules test are written for independent rental."),
+                           "action": (f"Manager: ask BC Housing's development staff which of these is taking proposals for {what} and how a project enters it, and settle who funds its operation (staffing and support) before the capital."
+                                      if named else f"Manager: ask BC Housing which program is open for {what}, and settle who funds its operation before the capital.")})
+    # Who runs the building (23 Nov 2026: a funder-side reader asks it first, and no memo said): an open item where the
+    # housing runs on its operator (supportive, transitional, a shelter) and none is named; and, where the operator is
+    # not the proponent, the agreement between them until the land tenure is chosen.
+    operator, proponent = str(option.get("operator") or "").strip(), str(option.get("proponent") or "").strip()
+    if kind != "independent" and not operator:
+        extra_open.append({"rule_id": "coverage.operator", "title": "Who operates the homes", "status": "uncertain",
+                           "finding": f"The option is {HOUSING_WORDS[kind]} and names no operator; the operator's experience with the people housed, its staffing and its budget are what a funder reads first.",
+                           "action": "Manager: name the operator, and get its operating budget (rents, staffing, the subsidy it needs) into the option's operating figures."})
+    elif operator and proponent and operator.lower() != proponent.lower() and not str(option.get("land_tenure") or "").strip():
+        extra_open.append({"rule_id": "coverage.operator_agreement", "title": "The agreement between the owner and the operator", "status": "uncertain",
+                           "finding": f"The proponent is {proponent} and the homes are operated by {operator}; how the operator holds the homes (a lease, an air-space parcel, an operating agreement) is not stated.",
+                           "action": "Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it."})
+    # what the answer covers, said with it: which programs' criteria were tested, and which are only listed
+    tested_names = [program_name(r) for r in e if r.get("check") != "program_match" and r["status"] != INFO]
+    funded["scope"] = ((f"This screen tests the criteria of {_and(tested_names)}." if tested_names else "This screen tests no program's criteria for this option.")
+                       + (f" Also written for this housing, listed and not tested: {_and(sure)}." if sure else "")
+                       + (f" Would be, depending on an answer not given: {_and(maybe)}." if maybe else "")
+                       + " A program not in the rules may fit as well.")
 
     # Question 3: what is still unsure, and who resolves it?
     # An outright limit the option exceeds is answered by the rezoning path (answer 1 says the rezoning is required), so
@@ -242,8 +317,50 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     unsure = extra_open + [
         {"rule_id": r["rule_id"], "title": r["title"], "status": r["status"], "finding": r["finding"], "action": r["action"]}
         for r in results if r["status"] in (UNSURE, COND, FAIL) and not answered_by_rezoning(r, option)
+        and not (no_rezoning_needed and rezoning_only(r))
+        # a program the option does not target is not an open item of the option (23 Nov 2026: BC Builds listed as a
+        # fail on an option that targeted the Community Housing Fund alone)
+        and not (r["layer"] == "E" and targets and r["rule_id"] not in targets)
     ]
+    # who to ask, by organisation and role (23 Nov 2026: every item named "Manager" or "Architect" and nobody outside
+    # the project). The role is the kind of person who settles the item; no name or phone number is invented.
+    for u in unsure:
+        who = contact_for(u["rule_id"], next((r.get("check") for r in results if r["rule_id"] == u["rule_id"]), None))
+        if who:
+            u["contact"] = who
+            u["action"] = (u["action"].rstrip() + (" " if u["action"] else "") + f"Ask: {who}.").strip()
     return {"counts": counts, "answers": {"allowed": allowed, "funded": funded, "unsure": unsure}}
+
+
+CONTACTS = {      # by coverage item or check: the organisation and the role that settles it
+    "coverage.district_schedule": "the City of Vancouver's Development and Building Services Centre, an enquiry officer or the district's planner",
+    "coverage.schedule_unverified": "the City of Vancouver's Development and Building Services Centre, for the consolidated by-law",
+    "coverage.yards": "the City of Vancouver's Development and Building Services Centre, a project facilitator",
+    "coverage.municipality": "the municipality's planning department",
+    "coverage.heritage": "the City of Vancouver's heritage planners (the Heritage Register and designations)",
+    "coverage.funders": "BC Housing, a development manager in Development and Asset Strategies",
+    "coverage.operator": "the operating society's executive director and board",
+    "coverage.operator_agreement": "the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes",
+    "coverage.existing_buildings": "the land owner, then the architect",
+    "district_setbacks": "the City of Vancouver's Development and Building Services Centre, a project facilitator",
+    "district_outright_fsr": "the City of Vancouver's planning staff for the district (a pre-application enquiry)",
+    "district_outright_height": "the City of Vancouver's planning staff for the district (a pre-application enquiry)",
+    "rezoning_policy_social_housing": "the City of Vancouver's rezoning centre, a rezoning planner (a pre-application enquiry)",
+    "family_unit_share": "the City of Vancouver's rezoning centre, the rezoning planner on the file",
+    "toa_status": "the City of Vancouver's planning staff, or the Province's transit-oriented areas map",
+    "tree_replacement": "a certified arborist, then the City staff who review trees with the development permit",
+    "social_housing_definition": "the City of Vancouver's housing policy staff, who draft the Housing Agreement",
+    "chf_fit": "BC Housing, a development manager in Development and Asset Strategies",
+    "bc_builds_fit": "BC Builds, through the address on each Property Opportunity Notice",
+    "ssmuh_minimum_units": "the City of Vancouver's Development and Building Services Centre",
+    "below_market_rental_policy": "the City of Vancouver's rezoning centre, a rezoning planner",
+}
+
+
+def contact_for(rule_id: str, check: str | None) -> str | None:
+    """The organisation and role to ask about an open item, from its coverage id or its rule's check; None where the
+    item is the project's own to settle. Pure."""
+    return CONTACTS.get(rule_id) or CONTACTS.get(check or "")
 
 
 def program_name(r: dict) -> str:
@@ -281,13 +398,16 @@ def funders_words(funded: dict, e: list[dict]) -> dict[str, Any]:
     if not tested:
         words = "No program the option targets has criteria the rules test" if e else "The option targets no program in the rules"
     elif v == "no":
-        words = f"Does not meet the criteria of {_and(of((FAIL,)))}"
+        words = f"Does not pass this screen's eligibility checks for {_and(of((FAIL,)))}"
     elif v == "not yet confirmed":
-        words = f"Whether it meets the criteria of {_and(of((UNSURE,)))} is not yet confirmed"
+        words = f"Whether it passes this screen's eligibility checks for {_and(of((UNSURE,)))} is not yet confirmed"
     elif v == "yes, with conditions":
-        words = f"Meets the criteria of {_and(of((PASS, COND)))}, with conditions"
+        words = f"Passes this screen's eligibility checks for {_and(of((PASS, COND)))}, with conditions"
     else:
-        words = f"Meets the criteria of {_and(of((PASS,)))}"
+        words = f"Passes this screen's eligibility checks for {_and(of((PASS,)))}"
+    # two programs are two separate tests: said so, so "A and B" is not read as one stack of money (23 Nov 2026)
+    if len(tested) > 1 and v != "not yet confirmed":
+        words += ", each read on its own"
     intake = []
     for r in e:
         vals = r.get("values") or {}

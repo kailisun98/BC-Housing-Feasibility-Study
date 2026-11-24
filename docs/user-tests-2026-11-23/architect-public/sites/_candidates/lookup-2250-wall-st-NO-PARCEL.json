@@ -1,0 +1,57 @@
+{
+  "id": "2250-wall-st-vancouver-bc",
+  "address": "Wall St., Hastings-Sunrise, Vancouver",
+  "municipality": "City of Vancouver",
+  "zoning_district": "RM-3A",
+  "site_area_m2": null,
+  "frontage_m": null,
+  "depth_m": null,
+  "in_former_community_vision_area": null,
+  "in_transit_oriented_area": null,
+  "toa_tier": null,
+  "frequent_bus_stop_within_400m": null,
+  "has_water_and_sewer": true,
+  "owner_type": null,
+  "owner": null,
+  "land_tenure_plan": null,
+  "existing_trees_on_site": [],
+  "street_trees": {
+    "count": null,
+    "street": null
+  },
+  "notes": "Found by First Read on the address '2250 Wall St, Vancouver, BC': geocoded by Nominatim as 'Wall St., Hastings-Sunrise, Vancouver, Metro Vancouver Regional District, British Columbia, V5L 1E7, Canada'. Zoning district RM-3A from the City's zoning districts dataset at that point. No parcel polygon found at that point; enter the area, frontage and depth by hand. Transit-oriented area, the Community Vision map, water and sewer, trees and the owner are not in these datasets: answer them, or leave them 'not sure'.",
+  "parcel": null,
+  "lookup": {
+    "center": {
+      "lat": 49.2907027,
+      "lon": -123.0565136
+    },
+    "geocoded_as": "Wall St., Hastings-Sunrise, Vancouver, Metro Vancouver Regional District, British Columbia, V5L 1E7, Canada",
+    "typed": "2250 Wall St, Vancouver, BC",
+    "civic_typed": 2250,
+    "civic_found": null,
+    "civic_mismatch": false,
+    "outside_vancouver": false,
+    "zoning_record": {
+      "object_id": "533685",
+      "zoning_classification": "Residential",
+      "zoning_category": "RM",
+      "zoning_district": "RM-3A",
+      "cd_1_number": null
+    }
+  },
+  "sources": [
+    {
+      "title": "OpenStreetMap Nominatim",
+      "url": "https://nominatim.openstreetmap.org/"
+    },
+    {
+      "title": "City of Vancouver Open Data: zoning districts and labels",
+      "url": "https://opendata.vancouver.ca/explore/dataset/zoning-districts-and-labels/"
+    },
+    {
+      "title": "City of Vancouver Open Data: property parcel polygons",
+      "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"
+    }
+  ]
+}

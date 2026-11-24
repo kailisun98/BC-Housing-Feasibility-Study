@@ -42,13 +42,14 @@ def cmd_run(a: argparse.Namespace) -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "ledger.json").write_text(json.dumps(ledger, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    m = svg_text = lay = None
+    m = svg_text = lay = massing_error = None
     if not a.no_massing:
         try:
             m = massing.build(site, option, ledger)
             pj, ps = massing.write(m, out)
             svg_text = ps.read_text(encoding="utf-8")
         except ValueError as e:
+            massing_error = str(e)
             print(f"massing skipped: {e}", file=sys.stderr)
         if m is not None:
             try:
@@ -65,13 +66,19 @@ def cmd_run(a: argparse.Namespace) -> int:
     pf = proforma.build(site, option, ledger, m)
     (out / "proforma.json").write_text(json.dumps(pf, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    pm, ph = memo.write(ledger, out, m, d, svg_text, proforma=pf, layout=lay)
+    pm, ph = memo.write(ledger, out, m, d, svg_text, proforma=pf, layout=lay, massing_error=massing_error)
 
     s = ledger["summary"]
     print(f"as of {ledger['run']['as_of']} · stamp {ledger['run']['stamp']['stamp']}")
-    print(f"allowed outright: {s['answers']['allowed']['outright']['verdict']} · by rezoning: {s['answers']['allowed']['by_rezoning']['verdict']} · funders: {s['answers']['funded']['verdict']}"
-          + (f" · money: {pf['verdict']['word']}" if pf.get("available") else ""))
+    # the answers as the memo words them (23 Nov 2026: "by rezoning: no" printed for options that proposed none, and
+    # "money: likely" for the key the memo words otherwise)
+    from .checks import proposes_rezoning
+    bz = s["answers"]["allowed"]["by_rezoning"]["verdict"] if (proposes_rezoning(option) or s["answers"]["allowed"]["by_rezoning"]["verdict"] == "not needed") else "none proposed"
+    print(f"allowed outright: {s['answers']['allowed']['outright']['verdict']} · by rezoning: {bz} · funders: {s['answers']['funded']['verdict']}"
+          + (f" · money: {proforma.VERDICT_WORDS.get(pf['verdict']['word'], pf['verdict']['word']).lower()}" if pf.get("available") else ""))
     print("counts: " + ", ".join(f"{k} {v}" for k, v in s["counts"].items() if v))
+    if lay and lay.get("units_total") and lay["units_placed"] < lay["units_total"]:
+        print(f"NOTE: the first layout places {lay['units_placed']} of {lay['units_total']} homes; the funders' checks and the money count all {lay['units_total']} (answer 3 lists it)")
     if lay:
         print(f"layout: {lay['units_placed']} of {lay['units_total']} units on {len(lay['floors'])} floors; " + ", ".join(f"{c['block'].replace('_', ' ')} {c['status']}" for c in lay["adjacencies"] if c["status"] != "info"))
     print(f"wrote {out / 'ledger.json'}, {pm.name}, {ph.name}, proforma.json" + (", massing.json, massing.svg" if m else "") + (", layout.json and five sheets" if lay else "") + (", diff.json" if d else ""))
@@ -161,10 +168,33 @@ def cmd_lookup(a: argparse.Namespace) -> int:
     the parcel. Prints the site JSON, or writes it with --out."""
     from . import lookup
     res = lookup.lookup(a.address)
-    text = json.dumps(res["site"], indent=2, ensure_ascii=False) + "\n"
+    site = res["site"]
+    text = json.dumps(site, indent=2, ensure_ascii=False) + "\n"
+    look = site.get("lookup") or {}
+    # A civic number the City's list does not have returns the nearest parcel, which can be another lot altogether
+    # (23 Nov 2026: "575 Drake St" wrote a strata parcel on Richards St with the warning only inside the JSON). The
+    # command says so first, and writes the file only when told the parcel is the one meant.
+    if look.get("civic_mismatch"):
+        print(f"WARNING: the City's address list has no such number on this street. The nearest parcel found is {site.get('address')} "
+              f"({site.get('zoning_district') or 'district not found'}, {site.get('site_area_m2') or 'area not found'} m²): it may be a different lot.", file=sys.stderr)
+        if look.get("nearest_on_street"):
+            print(f"The City's nearest number on the street you typed is {look['nearest_on_street']}: look that up instead if it is the lot.", file=sys.stderr)
+        if a.out and not a.accept_nearest:
+            print(f"Not written. If {site.get('address')} is the site, run again with --accept-nearest; otherwise try the address the City lists for the lot.", file=sys.stderr)
+            return 2
+    if look.get("outside_vancouver"):
+        print("WARNING: the point is outside the City of Vancouver; the zoning rules in the stack do not apply there.", file=sys.stderr)
     if a.out:
+        # the site is named for the file it is written to, so the file, the site and its run folders agree (23 Nov 2026:
+        # a file called 575-drake-st.json held a site called 1280-richards-st)
+        stem = Path(a.out).stem
+        if stem and site.get("id") != stem and not stem.startswith(("new", "site")):
+            site["notes"] = (f"Site id {stem!r} from the file name; the lookup named the parcel {site.get('id')!r}. " + str(site.get("notes") or "")).strip()
+            site["id"] = stem
+            text = json.dumps(site, indent=2, ensure_ascii=False) + "\n"
         Path(a.out).write_text(text, encoding="utf-8")
-        print(f"wrote {a.out}: {res['site']['zoning_district'] or 'district not found'}, {res['site']['site_area_m2'] or '?'} m²")
+        area = f"{site['site_area_m2']} m²" if site.get("site_area_m2") else "no parcel found, so no area or dimensions"
+        print(f"wrote {a.out}: {site.get('address')}, {site['zoning_district'] or 'district not found'}, {area}")
     else:
         print(text, end="")
     return 0
@@ -180,7 +210,15 @@ def cmd_suggest(a: argparse.Namespace) -> int:
         Path(a.out).write_text(json.dumps(res["option"], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"wrote {a.out}")
     o = res["option"]
-    print(f"{res['candidate']}: {o['storeys']} storeys, {o['height_m']} m, {o['gfa_m2']} m² GFA, units {o['units']}, tiers {o['rent_tiers_units']}, trees {o['replacement_trees_proposed']}")
+    # what was built, in words: the candidate asked for is not always the one built (no outright schedule, no benchmark)
+    if res.get("candidate_note"):
+        print(f"NOTE: {res['candidate_note']}.")
+    words = lambda d: ", ".join(f"{v} {k.replace('_', ' ')}" for k, v in (d or {}).items() if v is not None) or "not derived"
+    print(f"{res['candidate']}: {o['storeys']} storeys, {o['height_m']} m, {o['gfa_m2']} m² of floor area; homes: {words(o['units'])}; rent tiers: {words(o['rent_tiers_units'])}; replacement trees: {o['replacement_trees_proposed']}")
+    if res.get("falls_short"):
+        print(f"NOTE: {res['falls_short']}.")
+    if res.get("same_building_note"):
+        print(f"NOTE: {res['same_building_note']}.")
     for u in res["unsure"]:
         print(f"  unsure · {u['key']}: {u['why']} ({u['who']})")
     return 0
@@ -296,6 +334,8 @@ def main(argv: list[str] | None = None) -> int:
     lk = sub.add_parser("lookup", help="propose a site file from an address (Nominatim + City of Vancouver open data; needs the network)")
     lk.add_argument("address")
     lk.add_argument("--out", help="write the site JSON here instead of printing it")
+    lk.add_argument("--accept-nearest", action="store_true",
+                    help="write the file even when the civic number typed is not in the City's list and the nearest parcel was taken instead")
     lk.set_defaults(fn=cmd_lookup)
 
     sg = sub.add_parser("suggest", help="derive an option from a site and the chosen programs, every figure citing its rule")

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="701" height="436" viewBox="0 0 701 436" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 320-e-hastings-st · 38.75 × 37.01 m, 1,362 m²</text>
+<polygon points="289.2,332.1 48.0,331.9 48.1,72.0 320.3,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="48.0,72.0 320.3,72.0 320.3,332.1 48.0,332.1" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="48.0,72.0 320.3,72.0 320.3,228.3 48.0,228.3" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="348.07027027027027" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope 38.75 × 37.01 m</text>
+<text x="380.2972972972973" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
+<line x1="380.2972972972973" y1="332.07027027027027" x2="652.5945945945946" y2="332.07027027027027" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="380.3" y="72.1" width="272.3" height="260.0" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="380.3" y1="308.5" x2="652.6" y2="308.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="284.8" x2="652.6" y2="284.8" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="261.2" x2="652.6" y2="261.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="237.6" x2="652.6" y2="237.6" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="214.0" x2="652.6" y2="214.0" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="190.4" x2="652.6" y2="190.4" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="166.8" x2="652.6" y2="166.8" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="143.2" x2="652.6" y2="143.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="119.6" x2="652.6" y2="119.6" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="380.3" y1="96.0" x2="652.6" y2="96.0" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="386.3" y="66.1" fill="#2a6fb8" font-weight="600">Proposed: 11 storeys, FSR 6.96 · 37.0 m</text>
+<text x="48" y="372.07027027027027" fill="#1f2933">Proposed: 11 storeys, FSR 6.96: plate 862 m² × 11 = 9,480 m² (FSR 6.96), 37.0 m high</text>
+<text x="48" y="388.07027027027027" fill="#1f2933">Trees: Schedule C requires 8, plan leaves 0 (shortfall 8); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
+<text x="48" y="404.07027027027027" fill="#1f2933">Rules as of 2026-11-23 · drawn from the rules, not a survey</text>
+</svg>

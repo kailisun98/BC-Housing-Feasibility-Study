@@ -92,11 +92,11 @@ class Editor(unittest.TestCase):
 
     def test_the_architects_cores_stand_on_every_floor_and_the_program_goes_round_them(self):
         p = self.solved["plate"]
-        cores = [{"x": p["x"] + 6, "y": p["y"], "w": 3, "d": p["depth_m"]}, {"x": p["x"] + 24, "y": p["y"], "w": 3, "d": p["depth_m"]}]
+        cores = [{"x": p["x"] + 6, "y": p["y"], "w": 3, "d": p["depth_m"]}, {"x": p["x"] + 24, "y": p["y"], "w": 6, "d": p["depth_m"]}]
         lay = layout.solve(SITE, dict(OPTION, layout={"grid": {"bay_m": 6, "divide": 2}, "cores": cores}), self.L, self.m)
         for fl in lay["floors"]:
             got = sorted((z["x"], z["w"]) for z in fl["zones"] if z["block"] == "core")
-            self.assertEqual(got, [(round(p["x"] + 6, 2), 3.0), (round(p["x"] + 24, 2), 3.0)])
+            self.assertEqual(got, [(round(p["x"] + 6, 2), 3.0), (round(p["x"] + 24, 2), 6.0)])
             for z in fl["zones"]:
                 if z["block"] in ("core", "corridor"):
                     continue
@@ -193,6 +193,104 @@ class Editor(unittest.TestCase):
         wide = massing.build(SITE, dict(OPTION, massing={"angle_deg": 45}), self.L)
         self.assertTrue(any("past the setback envelope" in w for w in wide["warnings"]), wide["warnings"])
         self.assertNotIn("angle_deg", self.m["masses"][0])
+
+    def test_the_three_architects_fixes_of_23_november(self):
+        z = json.loads(json.dumps(self.zones))
+        base = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        # the height is read beside the FSR: this scheme stands under the benchmark, and a level more would pass it
+        cap = base["capacity"]
+        self.assertEqual(cap["height_limit_m"], 21.3)
+        self.assertLess(cap["height_m"], cap["height_limit_m"])
+        self.assertGreater(cap["height_with_one_more"], cap["height_limit_m"])
+        # commercial space is non-residential floor area: turning the non-residential blocks into it leaves nothing short
+        self.assertNotIn("non_residential", [s["block"] for s in base["shortfall"]])
+        for zs in z.values():
+            for u in zs:
+                if u["block"] == "non_residential":
+                    u["block"] = "commercial"
+        lay = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        self.assertNotIn("non_residential", [s["block"] for s in lay["shortfall"]])
+        rule = next(c for c in lay["adjacencies"] if c["id"] == "non_residential_street")
+        self.assertNotEqual(rule["note"], "no non-residential space in the option")
+        # a building of this height with no core large enough for an elevator is said, once
+        self.assertNotIn("no_elevator", [g["kind"] for g in base["geometry"]])
+        for zs in z.values():
+            zs[:] = [u for u in zs if not (u["block"] == "core" and min(u["w"], u["d"]) >= layout.ELEVATOR_CORE_M)]
+        bare = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        lift = [g for g in bare["geometry"] if g["kind"] == "no_elevator"]
+        self.assertEqual(len(lift), 1)
+        self.assertIn("every floor", lift[0]["note"])
+
+    def test_a_named_block_a_deep_home_and_a_stepped_mass(self):
+        z = json.loads(json.dumps(self.zones))
+        p = self.solved["plate"]
+        # a name the architect gave a block is kept, and drawn on the plans
+        nr = next(u for u in z["0"] if u["block"] == "non_residential")
+        nr["name"] = "Community hall"
+        lay = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        self.assertIn("Community hall", [u.get("name") for u in lay["floors"][0]["zones"]])
+        self.assertIn("Community hall", layout.sheets(lay, SITE, self.m, self.L)["plans"])
+        self.assertIn("Community hall", [u.get("name") for u in layout.zones_of(lay)["0"]])
+        # daylight: the solver's homes stand on a plate edge within the depth; one walled in by its neighbours and
+        # the corridor has no window, and one deeper than the limit is counted
+        self.assertEqual(lay["daylight"]["status"], "pass")
+        unit = next(u for u in z["1"] if u["block"] in layout.UNIT_KEYS)
+        unit.update(x=p["x"] + 20, y=p["y"] + 4, w=6, d=4)
+        dark = layout.place_zones(SITE, OPTION, self.L, self.m, z)["daylight"]
+        self.assertEqual((dark["status"], dark["no_window_wall"]), ("conditional", 1))
+        unit.update(y=p["y"], d=layout.UNIT_DEPTH_MAX_M + 2)
+        deep = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        self.assertEqual((deep["daylight"]["deep_units"], deep["daylight"]["deepest_m"]), (1, layout.UNIT_DEPTH_MAX_M + 2))
+        self.assertTrue(any(w.startswith("Daylight") for w in deep["warnings"]))
+        # a courtyard beside a walled-in home is its window wall
+        unit.update(x=p["x"] + 20, y=p["y"] + 4, w=6, d=4)
+        z["1"].append({"block": "void", "x": p["x"] + 26, "y": p["y"] + 4, "w": 3, "d": 4})
+        self.assertEqual(layout.place_zones(SITE, OPTION, self.L, self.m, z)["daylight"]["no_window_wall"], 0)
+        # a stepped mass: tiers the 3D view stacks, the base footprint and the plate unchanged
+        opt = dict(OPTION, massing={"steps": [{"from_level": 3, "front": 3, "left": 6}]})
+        pm = massing.build(SITE, opt, self.L)["masses"][0]
+        self.assertEqual([(t["from_level"], t["storeys"], t["width_m"], t["depth_m"]) for t in pm["tiers"]],
+                         [(0, 3, pm["plate_width_m"], pm["plate_depth_m"]), (3, 2, round(pm["plate_width_m"] - 6, 2), round(pm["plate_depth_m"] - 3, 2))])
+        self.assertEqual(pm["tiers"][1]["base_z"], round(3 * pm["floor_to_floor_m"], 2))
+        self.assertAlmostEqual(pm["tiers"][0]["height_m"] + pm["tiers"][1]["height_m"], pm["height_m"], places=2)
+        self.assertEqual(pm["footprint"], self.m["masses"][0]["footprint"])
+        self.assertNotIn("tiers", self.m["masses"][0])
+        # the elevations draw a floor the step-back's cut-outs take in from the face: nothing on a plan without them
+        zs = json.loads(json.dumps(self.zones))
+        top = str(p["storeys"] - 1)
+        zs[top] = [u for u in zs[top] if u["block"] in ("core", "corridor")] + [{"block": "void", "step": True, "x": p["x"], "y": p["y"], "w": p["width_m"], "d": 3.0}]
+        stepped = layout.place_zones(SITE, OPTION, self.L, self.m, zs)
+        self.assertEqual(layout._step_insets(stepped["floors"][-1], stepped["plate"]), (3.0, 0.0, 0.0, 0.0))
+        self.assertEqual(layout._step_insets(stepped["floors"][0], stepped["plate"]), (0.0, 0.0, 0.0, 0.0))
+        self.assertNotEqual(layout.svg_elevations(stepped, self.m), layout.svg_elevations(layout.place_zones(SITE, OPTION, self.L, self.m, self.zones), self.m))
+
+    def test_homes_keep_a_minimum_width_and_a_proportion(self):
+        # the solver's homes on this plate already stand within both
+        self.assertEqual(self.solved["proportions"]["status"], "pass")
+        self.assertEqual({b["key"]: b["min_width_m"] for b in self.solved["program"] if b["key"] in layout.UNIT_KEYS}, layout.UNIT_MIN_WIDTH_M)
+        # on a deep plate a home is as wide as its minimum and its depth ask, not its area over the depth alone
+        deep = dict(OPTION, massing={"width_m": 69.6, "depth_m": 27.0})
+        md = massing.build(SITE, deep, self.L)
+        lay = layout.solve(SITE, deep, self.L, md)
+        strip = lay["plate"]["unit_depth_m"]
+        self.assertGreater(strip, 12)
+        for fl in lay["floors"]:
+            for z in fl["zones"]:
+                if z.get("unit"):
+                    self.assertGreaterEqual(z["w"] + 0.02, max(layout.UNIT_MIN_WIDTH_M[z["unit"]], strip / layout.UNIT_DEPTH_RATIO_MAX), z)
+        self.assertEqual(lay["proportions"]["status"], "pass")
+        # a home narrowed by hand is counted and said, never a failure
+        z = json.loads(json.dumps(self.zones))
+        unit = next(u for u in z["1"] if u["block"] == "two_bed")
+        unit["w"] = 3.0
+        hand = layout.place_zones(SITE, OPTION, self.L, self.m, z)
+        self.assertEqual((hand["proportions"]["status"], hand["proportions"]["narrow_units"], hand["proportions"]["slender_units"]), ("conditional", 1, 1))
+        self.assertTrue(any(w.startswith("Proportions") for w in hand["warnings"]))
+        # and it is a problem to fix before issuing, as a home under its area is
+        narrow = [g for g in hand["geometry"] if g["kind"] == "narrow"]
+        self.assertEqual(len(narrow), 1)
+        self.assertIn("3.0 m wide, under the 7.5 m", narrow[0]["note"])
+        self.assertNotIn("narrow", [g["kind"] for g in layout.place_zones(SITE, OPTION, self.L, self.m, self.zones)["geometry"]])
 
     def test_the_memo_section_says_it_was_placed_by_hand(self):
         lay = layout.solve(SITE, dict(OPTION, layout={"zones": self.zones}), self.L, self.m)

@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="996" height="375" viewBox="0 0 996 375" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 2001-stainsbury-ave · 91.42 × 43.21 m, 2,967 m²</text>
+<polygon points="151.7,82.9 173.2,72.0 468.0,82.9 463.8,221.3 139.3,263.4 84.4,270.5 48.0,235.7" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="157.4,99.1 177.0,89.1 453.7,99.4 450.8,195.2 93.9,241.5 73.8,222.2" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="156.5,100.6 450.5,100.6 450.5,194.8 156.5,194.8" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="286.5145482388974" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope, plate box 64.0 × 20.5 m</text>
+<text x="528.0" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
+<line x1="528.0" y1="270.5145482388974" x2="948.0" y2="270.5145482388974" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="636.5" y="161.0" width="294.0" height="109.5" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="636.5" y1="255.4" x2="930.5" y2="255.4" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="636.5" y1="240.2" x2="930.5" y2="240.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="636.5" y1="225.0" x2="930.5" y2="225.0" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="636.5" y1="209.9" x2="930.5" y2="209.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="636.5" y1="194.7" x2="930.5" y2="194.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="636.5" y1="179.5" x2="930.5" y2="179.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="642.5" y="155.0" fill="#2a6fb8" font-weight="600">Proposed: 7 storeys, FSR 3.46 · 23.83 m</text>
+<line x1="528.0" y1="179.1" x2="948.0" y2="179.1" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="944.0" y="191.1" fill="#c77d14" text-anchor="end" font-size="11">staff benchmark 19.9 m</text>
+<line x1="528.0" y1="172.7" x2="948.0" y2="172.7" stroke="#c77d14" stroke-width="1" stroke-dasharray="4 3"/>
+<text x="944.0" y="169.7" fill="#c77d14" text-anchor="end" font-size="11">staff benchmark 21.3 m</text>
+<text x="48" y="310.5145482388974" fill="#1f2933">Proposed: 7 storeys, FSR 3.46: plate 1,312 m² × 7 = 9,184 m² (FSR 3.10), 23.83 m high</text>
+<text x="48" y="326.5145482388974" fill="#1f2933">Trees: Schedule C requires 25, plan leaves 0 (shortfall 25); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
+<text x="48" y="342.5145482388974" fill="#1f2933">Rules as of 2026-11-23 · drawn from the rules, not a survey</text>
+</svg>

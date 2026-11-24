@@ -62,7 +62,8 @@ export function figPlan(m, ctx, fsIn = null) {
 
   s += polyEl(P(lotRing), `id="lot-poly" fill="${FIG.paper}" stroke="${FIG.lot}" stroke-width="1.2"`);
   s += polyEl(P(m.envelope.polygon), `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
-  if (m.envelope.box && m.lot.bbox) { const b = m.envelope.box; s += polyEl(P([[b.x, b.y], [b.x + b.w, b.y], [b.x + b.w, b.y + b.d], [b.x, b.y + b.d]]), `fill="none" stroke="${FIG.env}" stroke-width="0.6" stroke-dasharray="1.5 1.5"`); }
+  // the plate box, dotted: where it stands turned to the lot's longest side (massing: envelope.box.ring) it is drawn turned
+  if (m.envelope.box && m.lot.bbox) { const b = m.envelope.box; s += polyEl(P(b.ring || [[b.x, b.y], [b.x + b.w, b.y], [b.x + b.w, b.y + b.d], [b.x, b.y + b.d]]), `fill="none" stroke="${FIG.env}" stroke-width="0.6" stroke-dasharray="1.5 1.5"`); }
   // the proposed footprint, then the outright one drawn over it as a heavy dashed outline, so both read in plan
   if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.5"`);
   if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" fill-opacity="${masses.proposed ? 0.35 : 0.9}" stroke="${FIG.outrightStroke}" stroke-width="2" stroke-dasharray="6 3"`);
@@ -243,7 +244,9 @@ function plateLabel(p, X, Y, fs, xc) {
   // the plate's own figures, to the second decimal where they have one (69.6 × 19.87, as the memo's head prints it)
   const dm = v => { const r = Math.round(Number(v) * 100) / 100; return Math.abs(r * 10 - Math.round(r * 10)) < 1e-6 ? r.toFixed(1) : r.toFixed(2); };
   const dims = `${dm(p.plate_width_m)} × ${dm(p.plate_depth_m)}`;
-  const text = [`plate ${dims} m`, `${dims} m`, dims].find(t => t.length * tfs * 0.55 <= along - fs * 0.6);
+  // a plate in two parts (massing: the plate box and a wing) is named by its floor area: the rectangle round it is not its size
+  const area = `${Math.round(p.plate_area_m2).toLocaleString("en-CA")} m²`;
+  const text = (p.parts ? [`plate in two parts, ${area}`, `two parts, ${area}`, area] : [`plate ${dims} m`, `${dims} m`, dims]).find(t => t.length * tfs * 0.55 <= along - fs * 0.6);
   if (!text) return "";
   const len = text.length * tfs * 0.55;
   const xs = fp.map(q => q[0]), ys = fp.map(q => q[1]);

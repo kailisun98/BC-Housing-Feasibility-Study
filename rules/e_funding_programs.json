@@ -1,28 +1,54 @@
 {
   "layer": "E",
-  "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+  "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
   "rules": [
     {
       "id": "bch.chf.eligibility",
       "title": "BC Housing Community Housing Fund: eligibility and unit mix",
       "jurisdiction": "BC Housing",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "chf_fit",
       "versions": [
         {
           "effective_from": "2025-05-30",
           "params": {
-            "eligible_proponent_types": ["non_profit_society", "housing_cooperative", "municipal_housing_provider", "first_nation"],
-            "mix": {"market": 0.30, "rgi": 0.50, "deep_subsidy": 0.20},
+            "eligible_proponent_types": [
+              "non_profit_society",
+              "housing_cooperative",
+              "municipal_housing_provider",
+              "first_nation"
+            ],
+            "mix": {
+              "market": 0.3,
+              "rgi": 0.5,
+              "deep_subsidy": 0.2
+            },
             "mix_tolerance": 0.02,
-            "low_moderate_income_limits_cad": {"under_two_bed": 85870, "two_bed_plus": 138770, "effective": "2025-03-01"},
+            "low_moderate_income_limits_cad": {
+              "under_two_bed": 85870,
+              "two_bed_plus": 138770,
+              "effective": "2025-03-01"
+            },
             "min_lease_years_nominal": 60,
             "min_accessible_unit_share": 0.05,
-            "readiness_site_control": ["finalized", "purchase_agreement", "letter_of_intent", "council_resolution"],
+            "readiness_site_control": [
+              "finalized",
+              "purchase_agreement",
+              "letter_of_intent",
+              "council_resolution"
+            ],
             "readiness_construction_start_months_after_award": 18,
             "provisional_grant_per_unit_cad_2025_26": 171211,
-            "rated_weights": {"development": 0.60, "operations": 0.40},
-            "rated_thresholds": {"development": 0.35, "operations": 0.25},
+            "rated_weights": {
+              "development": 0.6,
+              "operations": 0.4
+            },
+            "rated_thresholds": {
+              "development": 0.35,
+              "operations": 0.25
+            },
             "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
           },
           "source": {
@@ -31,6 +57,161 @@
             "section": "Eligibility; unit mix 30/50/20; minimum requirements; rated criteria",
             "rfp_2023_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
             "program_url": "https://www.bchousing.org/projects-partners/Building-BC/CHF"
+          },
+          "effective_to": "2025-12-31"
+        },
+        {
+          "effective_from": "2026-01-01",
+          "params": {
+            "eligible_proponent_types": [
+              "non_profit_society",
+              "housing_cooperative",
+              "municipal_housing_provider",
+              "first_nation"
+            ],
+            "mix": {
+              "market": 0.3,
+              "rgi": 0.5,
+              "deep_subsidy": 0.2
+            },
+            "mix_tolerance": 0.02,
+            "low_moderate_income_limits_cad": {
+              "under_two_bed": 90560,
+              "two_bed_plus": 146270,
+              "effective": "2026-01-01"
+            },
+            "min_lease_years_nominal": 60,
+            "min_accessible_unit_share": 0.05,
+            "readiness_site_control": [
+              "finalized",
+              "purchase_agreement",
+              "letter_of_intent",
+              "council_resolution"
+            ],
+            "readiness_construction_start_months_after_award": 18,
+            "provisional_grant_per_unit_cad_2025_26": 171211,
+            "rated_weights": {
+              "development": 0.6,
+              "operations": 0.4
+            },
+            "rated_thresholds": {
+              "development": 0.35,
+              "operations": 0.25
+            },
+            "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+            "deep_subsidy_income_limits_cad": {
+              "under_two_bed": 24596,
+              "two_bed_plus": 30745,
+              "effective": "2026 (1 Aug to 31 Jul for Community Housing Fund projects)"
+            },
+            "tiers": {
+              "market": "30% of homes: an initial market rent approved by BC Housing, kept at or above CMHC's average market rent; tenants under the low- and moderate-income limits, chosen by the operator; proof of income at move-in only",
+              "rgi": "50% of homes: rent by BC Housing's Rent Scale (the Rent Calculation Guide); tenants with an income below the Housing Income Limits, chosen from The Housing Registry; proof of income and assets every year",
+              "deep_subsidy": "20% of homes: rent by the Rent Scale; residents with an income below the Deep Subsidy Income Limits, chosen from The Housing Registry; proof of income and assets every year"
+            },
+            "does_not_fund": "support services or residential care",
+            "not_read_from_bc_housing": "the mix tolerance of 2 points is this tool's own rounding rule: no call document read gives one",
+            "non_residential_max_share": 0.3,
+            "grant_security": "a 35-year forgivable mortgage",
+            "financing": "interim construction and take-out financing up to 100% of the construction cost of the housing, by BC Housing's lending criteria; the take-out loan is CMHC-insured and amortized over 35 years",
+            "operating_subsidy": "limited, where required: the shortfall between the approved rental revenue and the approved operating costs, mortgage payments included",
+            "tenure_not_accepted": "a premises lease or a sublease (CMHC does not accept either for financing)",
+            "rgi_rent_estimate": "the 2023 call's Appendix 12 estimates rent-geared-to-income revenue on tenants averaging 70% of the Housing Income Limit, and deep-subsidy revenue on the income assistance shelter allowance (rule f.rgi_rents)"
+          },
+          "source": {
+            "title": "BC Housing, Community Housing Fund Program (program page) and Glossary (income limits effective 1 Jan 2026); 2025 call webinar slides (RFP #1070-2526-022, 16 Jun 2025); 2023 call overview (RFP #1070-2324-041)",
+            "url": "https://www.bchousing.org/projects-partners/funding-programs/CHF",
+            "glossary_url": "https://www.bchousing.org/glossary",
+            "section": "Program page: rental mix requirements. Slides: p.5 who can apply, p.6 funding and financing (grant a home), p.11 the three rent categories, p.18 rated criteria and thresholds. 2023 call: s.4.1 to 4.2 mandatory requirements (land holding, start within 18 months, at least 5% accessible homes), s.4.3.1 (non-residential space not more than 30%), s.5.1.2 (60-year lease at a nominal value), Appendix 12",
+            "read_on": "2026-11-23",
+            "verified": true,
+            "rfp_2025_slides_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf",
+            "rfp_2023_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
+            "verify": "the 2025 call did not proceed and the 2023 call is closed: read the next request for proposals for its own requirements; the 60-year lease, the 18 months and the 5% accessible homes are the 2023 call's wording",
+            "read_from": {
+              "slides": "inbox/bc-housing-2026-11-23/CHF-RFP-2526-022A-Webinar-Slides.pdf, pp.5, 6, 11, 18",
+              "call_2023": "inbox/bc-housing-2026-11-23/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf, pp.37 to 42, 51"
+            }
+          }
+        },
+        {
+          "effective_from": "2026-04-01",
+          "params": {
+            "eligible_proponent_types": [
+              "non_profit_society",
+              "housing_cooperative",
+              "municipal_housing_provider",
+              "first_nation"
+            ],
+            "mix": {
+              "market": 0.3,
+              "rgi": 0.5,
+              "deep_subsidy": 0.2
+            },
+            "mix_tolerance": 0.02,
+            "low_moderate_income_limits_cad": {
+              "under_two_bed": 90560,
+              "two_bed_plus": 146270,
+              "effective": "2026-01-01"
+            },
+            "min_lease_years_nominal": 60,
+            "min_accessible_unit_share": 0.05,
+            "readiness_site_control": [
+              "finalized",
+              "purchase_agreement",
+              "letter_of_intent",
+              "council_resolution"
+            ],
+            "readiness_construction_start_months_after_award": 18,
+            "rated_weights": {
+              "development": 0.6,
+              "operations": 0.4
+            },
+            "rated_thresholds": {
+              "development": 0.35,
+              "operations": 0.25
+            },
+            "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)",
+            "deep_subsidy_income_limits_cad": {
+              "under_two_bed": 24596,
+              "two_bed_plus": 30745,
+              "effective": "2026 (1 Aug to 31 Jul for Community Housing Fund projects)"
+            },
+            "tiers": {
+              "market": "30% of homes: an initial market rent approved by BC Housing, kept at or above CMHC's average market rent; tenants under the low- and moderate-income limits, chosen by the operator; proof of income at move-in only",
+              "rgi": "50% of homes: rent by BC Housing's Rent Scale (the Rent Calculation Guide); tenants with an income below the Housing Income Limits, chosen from The Housing Registry; proof of income and assets every year",
+              "deep_subsidy": "20% of homes: rent by the Rent Scale; residents with an income below the Deep Subsidy Income Limits, chosen from The Housing Registry; proof of income and assets every year"
+            },
+            "does_not_fund": "support services or residential care",
+            "not_read_from_bc_housing": "the mix tolerance of 2 points is this tool's own rounding rule: no call document read gives one",
+            "non_residential_max_share": 0.3,
+            "grant_security": "a 35-year forgivable mortgage",
+            "financing": "interim construction and take-out financing up to 100% of the construction cost of the housing, by BC Housing's lending criteria; the take-out loan is CMHC-insured and amortized over 35 years",
+            "operating_subsidy": "limited, where required: the shortfall between the approved rental revenue and the approved operating costs, mortgage payments included",
+            "tenure_not_accepted": "a premises lease or a sublease (CMHC does not accept either for financing)",
+            "rgi_rent_estimate": "the 2023 call's Appendix 12 estimates rent-geared-to-income revenue on tenants averaging 70% of the Housing Income Limit, and deep-subsidy revenue on the income assistance shelter allowance (rule f.rgi_rents)",
+            "provisional_grant_per_unit_cad": 178059,
+            "grant_fiscal_year": "2026-27",
+            "grant_earlier_years_cad": {
+              "2023-24": 158294,
+              "2025-26": 171211
+            }
+          },
+          "source": {
+            "title": "BC Housing, Community Housing Fund Program (program page) and Glossary (income limits effective 1 Jan 2026); 2025 call webinar slides (RFP #1070-2526-022, 16 Jun 2025); 2023 call overview (RFP #1070-2324-041)",
+            "url": "https://www.bchousing.org/projects-partners/funding-programs/CHF",
+            "glossary_url": "https://www.bchousing.org/glossary",
+            "section": "Program page: rental mix requirements. Slides: p.5 who can apply, p.6 funding and financing (grant a home), p.11 the three rent categories, p.18 rated criteria and thresholds. 2023 call: s.4.1 to 4.2 mandatory requirements (land holding, start within 18 months, at least 5% accessible homes), s.4.3.1 (non-residential space not more than 30%), s.5.1.2 (60-year lease at a nominal value), Appendix 12",
+            "read_on": "2026-11-23",
+            "verified": true,
+            "rfp_2025_slides_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf",
+            "rfp_2023_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
+            "verify": "the 2025 call did not proceed and the 2023 call is closed: read the next request for proposals for its own requirements; the 60-year lease, the 18 months and the 5% accessible homes are the 2023 call's wording",
+            "read_from": {
+              "slides": "inbox/bc-housing-2026-11-23/CHF-RFP-2526-022A-Webinar-Slides.pdf, pp.5, 6, 11, 18",
+              "call_2023": "inbox/bc-housing-2026-11-23/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf, pp.37 to 42, 51"
+            },
+            "effective_from_basis": "the start of BC Housing's 2026-27 fiscal year, the year the slides give the $178,059 provisional approval for"
           }
         }
       ]
@@ -39,19 +220,30 @@
       "id": "bc.bcbuilds.eligibility",
       "title": "BC Builds: eligibility and below-market requirement",
       "jurisdiction": "Province of BC / BC Housing",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "bc_builds_fit",
       "versions": [
         {
           "effective_from": "2024-02-13",
           "params": {
-            "min_below_market_unit_share": 0.20,
-            "min_discount_to_market": 0.20,
+            "min_below_market_unit_share": 0.2,
+            "min_discount_to_market": 0.2,
             "non_profit_must_team_with_developer": true,
-            "tenant_income_limits_cad": {"under_two_bed_no_children": 143900, "two_bed_plus_with_children": 212240},
-            "land_lease_years": [60, 99],
-            "max_non_residential_share": 0.30,
-            "ground_breaking_months_after_land_letter": [12, 18],
+            "tenant_income_limits_cad": {
+              "under_two_bed_no_children": 143900,
+              "two_bed_plus_with_children": 212240
+            },
+            "land_lease_years": [
+              60,
+              99
+            ],
+            "max_non_residential_share": 0.3,
+            "ground_breaking_months_after_land_letter": [
+              12,
+              18
+            ],
             "submission": "Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template"
           },
           "source": {
@@ -59,6 +251,70 @@
             "url": "https://www.bcbuildshomes.ca/developers-operators",
             "section": "Applicant requirements; grants; timelines",
             "announcement_url": "https://news.gov.bc.ca/releases/2024HOUS0021-000648"
+          },
+          "effective_to": "2025-12-31"
+        },
+        {
+          "effective_from": "2026-01-01",
+          "params": {
+            "min_below_market_unit_share": 0.2,
+            "min_discount_to_market": 0.2,
+            "non_profit_must_team_with_developer": true,
+            "tenant_income_limits_cad": {
+              "under_two_bed_no_children": 143900,
+              "two_bed_plus_with_children": 212240
+            },
+            "land_lease_years": [
+              60,
+              99
+            ],
+            "max_non_residential_share": 0.3,
+            "ground_breaking_months_after_land_letter": [
+              12,
+              18
+            ],
+            "submission": "Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template",
+            "max_non_residential_share_of_capital_cost": 0.3,
+            "takeout_financing": {
+              "rate_pct": {
+                "2026": 4.55,
+                "2027": 4.59,
+                "2028": 4.59,
+                "2029": 4.59
+              },
+              "amortization_years": 35,
+              "debt_coverage_ratio": 1.1,
+              "for": "non-profits, co-ops and public housing corporations"
+            },
+            "construction_financing_rate_pct": {
+              "2026": 2.75,
+              "2027": 2.95,
+              "2028": 3.05,
+              "2029": 3.2
+            },
+            "who_may_apply": "co-op or non-profit developers, public housing corporations, First Nations developers and private developers; a non-profit that wants to own and operate teams with a developer or builder, for-profit or non-profit (operators alone are not sought)",
+            "grants": "for buildings owned and operated by co-op or non-profit developers and First Nations controlled development corporations, to reach at least 20% of the homes at 20% below market rents",
+            "capital_grant_max_per_unit_cad": 225000,
+            "capital_grant_terms": "for a limited number of homes in select non-profit projects; at least 20% of the homes at 20% below market for 35 years; the homes owned and run by a non-profit provider, a public housing corporation or a First Nations-controlled development corporation; secured by a 35-year forgivable mortgage and a Section 219 covenant",
+            "rent_ceiling_share_of_middle_income_limit": 0.3,
+            "rents_held_min_years": 10,
+            "operating_subsidy": "none: the project must run without any operating subsidy from BC Housing",
+            "interim_financing": "up to 100% of the cost to complete the project, by BC Housing's lending criteria",
+            "partner_equity_required": true,
+            "lease_on_public_land_max_years": 99
+          },
+          "source": {
+            "title": "BC Builds, Residential Developers & Non-Profit Housing Operators (program page)",
+            "url": "https://www.bcbuildshomes.ca/developers-operators",
+            "section": "Non-profits; Program details; Eligibility; Project requirements; Lease terms; Financing rates; BC Housing Glossary, Middle Income Limits (effective 1 Jan 2026: $143,900 and $212,240, up from $136,210 and $201,030)",
+            "read_on": "2026-11-23",
+            "verified": true,
+            "effective_from_basis": "the first year of the page's financing-rate table",
+            "verify": "scoring and site-specific terms are in each Property Opportunity Notice, not read here; the framework's 2024 income figures are superseded by the glossary's 2026 limits",
+            "glossary_url": "https://www.bchousing.org/glossary",
+            "framework_title": "BC Housing, Rental Supply Program (BC Builds) Program Framework, February 2024",
+            "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/BC-Builds-Rental-Supply-Program-Framework.pdf",
+            "read_from": "inbox/bc-housing-2026-11-23/BC-Builds-Rental-Supply-Program-Framework.pdf, pp.4 to 7 (funding, grant, eligibility, rents, leases)"
           }
         }
       ]
@@ -67,12 +323,17 @@
       "id": "bch.pdf.predevelopment_loan",
       "title": "BC Housing Project Development Fund (pre-development loans)",
       "jurisdiction": "BC Housing",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "info_only",
       "versions": [
         {
           "effective_from": "2025-01-01",
-          "params": {"max_loan_cad": 250000, "eligible_costs": "due diligence, feasibility and design"},
+          "params": {
+            "max_loan_cad": 250000,
+            "eligible_costs": "due diligence, feasibility and design"
+          },
           "source": {
             "title": "UBCM resolution NR24 and the Province's response (Project Development Fund loans up to $250,000)",
             "url": "https://www.ubcm.ca/node/111136",
@@ -85,16 +346,375 @@
       "id": "cmhc.ahf.readiness",
       "title": "CMHC Affordable Housing Fund: readiness and submission mechanics",
       "jurisdiction": "CMHC",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "info_only",
       "versions": [
         {
           "effective_from": "2024-03-13",
-          "params": {"construction_start_months_after_approval": 6, "intake": "continuous", "submission": "online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist", "criteria_note": "Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding"},
+          "params": {
+            "construction_start_months_after_approval": 6,
+            "intake": "continuous",
+            "submission": "online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist",
+            "criteria_note": "Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding"
+          },
           "source": {
             "title": "CMHC, Affordable Housing Fund applicant guide",
             "url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx",
             "section": "Minimum submission requirements; readiness"
+          },
+          "effective_to": "2025-12-18"
+        },
+        {
+          "effective_from": "2025-12-19",
+          "params": {
+            "intake": "closed 19 Dec 2025: the application portal is closed and all program funding is committed; CMHC directs organizations to Build Canada Homes",
+            "what": "low-interest and forgivable loans and contributions for new affordable and community housing, shelters, transitional and supportive housing included; no new applications",
+            "construction_start_months_after_approval": 6
+          },
+          "source": {
+            "title": "CMHC, Affordable Housing Fund (program page: application portal closed)",
+            "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/funding-programs/all-funding-programs/affordable-housing-fund",
+            "section": "Important notice",
+            "read_on": "2026-11-23",
+            "verified": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.ihf.program",
+      "title": "BC Housing Indigenous Housing Fund: who it is for",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2018-01-01",
+          "params": {
+            "for_housing_types": [
+              "independent"
+            ],
+            "requires_indigenous_led": true,
+            "all_units_rgi": true,
+            "what": "affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve)",
+            "funds": "building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them)",
+            "how_a_project_enters": "by BC Housing's request for proposals",
+            "intake": "closed: no call is posted on the program page (read 23 Nov 2026); the last one found, issued 30 Nov 2023, took proposals to 30 Apr 2024",
+            "proponents_unverified": "Indigenous non-profit housing providers, First Nations and Indigenous governments, and non-profit providers or developers partnered with them (BC Housing's 2023 fact sheet, read as a copy on another site; the 2023 call's dates are from a provincial news release as a search summarised it)"
+          },
+          "source": {
+            "title": "BC Housing, Indigenous Housing Fund Program (program page) and Funding Programs (overview page)",
+            "url": "https://www.bchousing.org/projects-partners/funding-programs/IHF",
+            "section": "Opening paragraphs; Rent structure",
+            "overview_url": "https://www.bchousing.org/projects-partners/funding-programs",
+            "verified": true,
+            "verify": "the proponent list and the 2023 call's dates were not read from BC Housing's own documents; read the next request for proposals before relying on them",
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the program page: created in 2018"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.shf.program",
+      "title": "BC Housing Supportive Housing Fund: who it is for",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2018-01-01",
+          "params": {
+            "for_housing_types": [
+              "supportive"
+            ],
+            "what": "subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved",
+            "funds": "the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule",
+            "how_a_project_enters": "through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more)",
+            "intake": "not stated on the program page (read 23 Nov 2026)",
+            "owner": "the Provincial Rental Housing Corporation, the Province's land-holding company, in full; a non-profit operates the building",
+            "rents": "rent geared to income for every home; a resident on income assistance pays the maximum shelter component, and some projects set a flat rent",
+            "cross_subsidy": "none: the project must be financially viable by itself"
+          },
+          "source": {
+            "title": "BC Housing, Supportive Housing Fund Program (program page); Supportive Housing (who it houses)",
+            "url": "https://www.bchousing.org/projects-partners/funding-programs/SHF",
+            "section": "Whole page",
+            "about_url": "https://www.bchousing.org/housing-assistance/housing-with-support/supportive-housing",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the program page: created in 2018",
+            "framework_title": "BC Housing, Supportive Housing Program Framework, January 2024",
+            "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/Supportive-Housing-Program-Framework-2024.pdf",
+            "read_from": "inbox/bc-housing-2026-11-23/Supportive-Housing-Program-Framework-2024.pdf, pp.5, 6, 13",
+            "framework_section": "Key program elements (resident eligibility, rent, operating and support services subsidy); Roles and responsibilities; Appendix 3 Supportive Housing Fund",
+            "verify": "the framework gives no application route or intake dates; ask BC Housing how a site and an operator are chosen"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.wthf.program",
+      "title": "BC Housing Women's Transition Housing Fund: who it is for",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2018-01-01",
+          "params": {
+            "for_housing_types": [
+              "shelter",
+              "transitional",
+              "supportive",
+              "independent"
+            ],
+            "requires_women_leaving_violence": true,
+            "what": "housing with supports for women and their children who are at risk of, or have experienced, violence, in four streams: safe homes (stays of about 10 days), transition houses (about 30 days), second-stage housing (up to about 18 months) and long-term rental housing",
+            "funds": "1,500 new homes from 2018, and the service agreement each provider runs them under",
+            "how_a_project_enters": "by agreement with BC Housing: the framework names no application route, so ask BC Housing",
+            "intake": "not stated on the program page (read 23 Nov 2026)",
+            "owner": "the Provincial Rental Housing Corporation for the buildings and land created under the fund, leased to non-profit societies and co-operatives",
+            "rents": "30% of income in second-stage and long-term rental housing, by BC Housing's rent scale; a resident on income assistance pays the maximum shelter component",
+            "incomes": "low and moderate incomes for second-stage housing; at or below the Housing Income Limits for long-term rental housing"
+          },
+          "source": {
+            "title": "BC Housing, Women's Transition Housing Fund Program (program page)",
+            "url": "https://www.bchousing.org/projects-partners/funding-programs/WTHF",
+            "section": "Whole page",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the program page: established in 2018",
+            "framework_title": "BC Housing, Women's Transition Housing and Supports Program Framework, 2019",
+            "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/Womens-Transition-Housing-Supports-Program-Framework-2019.pdf",
+            "read_from": "inbox/bc-housing-2026-11-23/Womens-Transition-Housing-Supports-Program-Framework-2019.pdf, pp.4, 5, 11, 13",
+            "framework_section": "Introduction (the fund, ownership, the four streams); 6.2 Additional eligibility criteria (resident rents, income); 8 Agreements",
+            "verify": "design standards for these buildings are in BC Housing's Design Guidelines for Women's Safe Homes, Transition Houses, Second Stage Housing (2021 update), downloaded and not read into the rules"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.hearth.program",
+      "title": "BC Housing HEARTH (Homeless Encampment Action Response Temporary Housing): how it works",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2023-01-01",
+          "params": {
+            "for_housing_types": [
+              "shelter",
+              "transitional"
+            ],
+            "what": "new shelter and temporary housing spaces for people who are unsheltered or living in encampments",
+            "funds": "the operating cost of shelter and temporary housing sites in the communities the Province picks: program staff, direct program and support services, property management and administration, on a budget negotiated each year under agreements of up to three years",
+            "how_a_project_enters": "not by application: the Ministry of Housing, with BC Housing, picks priority communities and may sign a memorandum of understanding with the municipality; BC Housing then manages the procurement and chooses the non-profit operator. Ask the City whether it has one",
+            "intake": "not an application program: communities are selected by the Province",
+            "rents": "at a temporary housing site a fixed rent at the maximum shelter component of income assistance, or a rent geared to income under the operator agreement; at a shelter site none",
+            "incomes": "at or below the Housing Income Limits"
+          },
+          "source": {
+            "title": "BC Housing, Encampment & Homelessness Response: HEART & HEARTH",
+            "url": "https://www.bchousing.org/projects-partners/housing-provider-info/HEART-HEARTH",
+            "section": "How the program works; HEARTH",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "effective_from_basis": "Budget 2023, as provincial releases describe it; the program page gives no start date",
+            "framework_title": "BC Housing, HEART and HEARTH Program Framework, August 2024",
+            "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/HEART-and-HEARTH-Program-Framework.pdf",
+            "read_from": "inbox/bc-housing-2026-11-23/HEART-and-HEARTH-Program-Framework.pdf, pp.3, 10 to 12",
+            "framework_section": "Introduction (priority communities, memorandum of understanding); HEARTH: eligibility and rent, developments, operating funding and agreements"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.esp.program",
+      "title": "BC Housing Emergency Shelter Program: what a shelter is under it",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2019-01-01",
+          "params": {
+            "for_housing_types": [
+              "shelter"
+            ],
+            "what": "year-round, temporary (winter included) and extreme-weather shelters for anyone homeless or at risk of homelessness; a bed, meals, showers, laundry and support staff, free of charge; year-round shelters staffed 24 hours a day",
+            "funds": "running a shelter, not building one: BC Housing pays the provider's eligible program costs (program staff, direct program expenses, property management and administration) on an operating budget negotiated with each provider",
+            "how_a_project_enters": "by a support services agreement with BC Housing; the framework names no open application, and extreme-weather shelters sit under a separate framework",
+            "intake": "not stated on the page read (23 Nov 2026)",
+            "rents": "none: funded services are free to the people who use them",
+            "access": "24 hours a day, seven days a week unless BC Housing approves otherwise; a bed for each client; separate, secure sleeping spaces where a shelter serves more than one group"
+          },
+          "source": {
+            "title": "BC Housing, Emergency Shelter Program (services page)",
+            "url": "https://www.bchousing.org/housing-assistance/homelessness-services/emergency-shelter-program",
+            "section": "Types of shelters; Services",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "effective_from_basis": "no start date on the page read; set to the start of the oldest run this tool keeps",
+            "framework_title": "BC Housing, Emergency Shelter Program Framework, January 2018",
+            "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/Emergency-Shelter-Program-Framework-2018.pdf",
+            "read_from": "inbox/bc-housing-2026-11-23/Emergency-Shelter-Program-Framework-2018.pdf, pp.4 to 6",
+            "framework_section": "G Target populations and eligibility; I Operating funding and agreements; J Services",
+            "verify": "the framework does not say how the capital cost of a new shelter is paid; ask BC Housing"
+          }
+        }
+      ]
+    },
+    {
+      "id": "bch.rrh.program",
+      "title": "BC Housing Rapid Response to Homelessness (modular supportive housing): complete",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2017-01-01",
+          "params": {
+            "for_housing_types": [
+              "supportive"
+            ],
+            "what": "modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports",
+            "funds": "nothing new: the program page says all its homes are completed and operational",
+            "how_a_project_enters": "it does not: the program is complete",
+            "intake": "closed: all homes under the program are completed and operational (program page, read 23 Nov 2026)",
+            "ended": true
+          },
+          "source": {
+            "title": "BC Housing, Rapid Response to Homelessness (program page)",
+            "url": "https://www.bchousing.org/projects-partners/funding-programs/RRH",
+            "section": "Whole page",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the program page: started in 2017"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.chip.program",
+      "title": "City of Vancouver Community Housing Incentive Program (CHIP): who it is for",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2019-01-01",
+          "params": {
+            "for_housing_types": [
+              "independent",
+              "supportive",
+              "transitional"
+            ],
+            "municipality": "vancouver",
+            "eligible_proponent_types": [
+              "non_profit_society",
+              "housing_cooperative"
+            ],
+            "what": "a City grant toward building non-market housing, for non-profit and co-op organizations building on their own land in Vancouver; stream 1 for self-sustaining projects that leverage senior-government funding, stream 2 for deeply affordable projects that rely on senior-government operating subsidies",
+            "funds": "a capital grant, funded by the Empty Homes Tax",
+            "how_a_project_enters": "by the City's funding call, then Council approves each grant",
+            "intake": "closed: no funding call is open at this time (program page, read 23 Nov 2026)",
+            "amounts_unverified": "the 2025 call's maximums were reported as $10,000 a home at the Housing Income Limits and $25,000 a home at the shelter rate in stream 2, and up to $65,000 a home in stream 1's 2024 call (from the City's guidelines as a search summarised them; not read here and not counted in the money)"
+          },
+          "source": {
+            "title": "City of Vancouver, Community Housing Incentive Program (program page)",
+            "url": "https://vancouver.ca/people-programs/community-housing-incentive-program.aspx",
+            "section": "What you need to know",
+            "verified": true,
+            "verify": "grant maximums change with each call; read the call's guidelines",
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the program page: grants approved since 2019"
+          }
+        }
+      ]
+    },
+    {
+      "id": "canada.reaching_home.capital",
+      "title": "Reaching Home (Canada's Homelessness Strategy): capital investments",
+      "jurisdiction": "Government of Canada",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2026-04-17",
+          "params": {
+            "for_housing_types": [
+              "shelter",
+              "transitional",
+              "supportive"
+            ],
+            "what": "capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion",
+            "funds": "capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs",
+            "how_a_project_enters": "through the region's Community Entity, by its calls for proposals",
+            "intake": "by call for proposals from the Community Entity; none was read here",
+            "community_entity_unverified": "for Greater Vancouver the Community Entity was reported as Lu'ma Native Housing Society with Vancity Community Foundation (a search summary of their pages; confirm with them)"
+          },
+          "source": {
+            "title": "Housing, Infrastructure and Communities Canada, Reaching Home directives (modified 17 Apr 2026)",
+            "url": "https://housing-infrastructure.canada.ca/homelessness-sans-abri/directives-eng.html",
+            "section": "3.4 Capital investments",
+            "verified": true,
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the directives page's date modified"
+          }
+        }
+      ]
+    },
+    {
+      "id": "canada.bch.program",
+      "title": "Build Canada Homes (federal): where CMHC now points applicants",
+      "jurisdiction": "Government of Canada",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "program_match",
+      "versions": [
+        {
+          "effective_from": "2025-12-19",
+          "params": {
+            "for_housing_types": [
+              "independent",
+              "supportive",
+              "transitional",
+              "shelter"
+            ],
+            "what": "a federal Crown corporation that brings financing, land and partnerships to affordable housing; it counts housing as affordable at no more than 30% of a household's before-tax income",
+            "funds": "flexible financing, land and partnerships; no application terms were read",
+            "how_a_project_enters": "not stated on the page read; CMHC's Affordable Housing Fund page directs organizations to it",
+            "intake": "not stated on the page read (23 Nov 2026)"
+          },
+          "source": {
+            "title": "Build Canada Homes (home page)",
+            "url": "https://www.bch-mc.ca/",
+            "section": "Our priorities; Affordability, defined",
+            "verified": true,
+            "verify": "no program guide was read; read one before treating this as a source of funds",
+            "read_on": "2026-11-23",
+            "effective_from_basis": "the day CMHC's fund closed and began directing organizations to it"
           }
         }
       ]

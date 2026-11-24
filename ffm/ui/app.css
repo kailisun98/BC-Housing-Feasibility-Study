@@ -418,6 +418,12 @@ details.sg-group[open] > summary.sg-head::before { content: "▾ "; }
 .pf-lines summary { cursor: pointer; color: var(--muted); font-size: 12px; padding: 4px 0; }
 .pf-lines table.plain { margin-top: 6px; }
 .pf-lines td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* the operating page (23 Nov 2026): what is left and the subsidy needed carry the weight; the lines above them are plain */
+.op-table th[scope="row"] { text-align: left; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: inherit; color: inherit; }
+.op-table th.num { text-align: right; }
+.op-table tr.op-result th, .op-table tr.op-result td.num, .op-table tr.op-ask th, .op-table tr.op-ask td.num { font-weight: 600; color: var(--ink); }
+.op-table tr.op-result td, .op-table tr.op-result th { border-top: 1px solid var(--line-strong, var(--line)); }
+.ops-confirm label { display: flex; gap: 8px; align-items: baseline; font-size: 13px; }
 .pf-lines code { font: 11px var(--mono); overflow-wrap: anywhere; }
 .pf-lines .ph-tag, .prop-row .conf { font: 600 11px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--s-uncertain-text); white-space: nowrap; }
 .pf-lines p.cont { color: var(--muted); font-size: 11.5px; margin: 8px 0 0; max-width: 70ch; }
@@ -615,6 +621,22 @@ table.plain td.status { white-space: nowrap; }
 .ed-canvas .ed-plate-w { cursor: ew-resize; }
 .ed-canvas .ed-plate-d { cursor: ns-resize; }
 .ed-canvas .ed-plate-handle:hover { fill: #245f9c; }
+.ed-selbar input { border: 1px solid var(--line); background: var(--field); color: var(--ink); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.ed-selbar .ed-name { width: 150px; }
+.ed-selbar .ed-size input { width: 58px; }
+.ed-step { font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 5px 10px; background: var(--field); }
+.ed-step summary { cursor: pointer; }
+.ed-step-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; }
+.ed-step-row .field.inline { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; }
+.ed-step-row .label { font-size: 11px; color: var(--muted); }
+.ed-step-row input, .ed-step-row select { width: auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink); border-radius: 4px; padding: 3px 6px; font-size: 12px; }
+.ed-step-row input { width: 58px; }
+.ed-step-row .help { flex-basis: 100%; }
+.ed-variants { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; font-size: 12px; }
+.ed-var-table { width: 100%; }
+.ed-var-table th, .ed-var-table td { text-align: left; padding: 3px 8px 3px 0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ed-var-table tr.now th, .ed-var-table tr.now td { border-top: 1px solid var(--line); color: var(--muted); }
+.ed-step-list { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
 .ed-selbar .ed-kind { font-weight: 600; }
 .ed-bar select, .ed-selbar select { width: auto; flex: none; }
 .ed-selbar .field.inline { flex-direction: row; }
@@ -1585,3 +1607,14 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
   .clauses .info-fold:not([open]) > table { display: table; }
   .words:not([open]) > dl { display: grid; }
 }
+
+/* The top bar on a narrow window (23 Nov 2026: at 800 px the mode switch sat above the date and the revision, on two
+   rows, and the memo started lower): the wordmark's subtitle gives way first; the page's title still says what it is. */
+@media (max-width: 1020px) { .topbar .wordmark em { display: none; } }
+
+/* A CD-1 lot's own by-law, read with the person's key, on the manager's site card (24 Nov 2026) */
+#stage-cd1-slot:empty { display: none; }
+.claude-fold.cd1-read { border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; margin: 10px 0 4px; font-size: 13px; background: var(--panel); }
+.claude-fold.cd1-read > summary { font-size: 13.5px; }
+.cd1-steps { margin: 4px 0 10px; padding-left: 20px; display: grid; gap: 4px; max-width: 68ch; }
+.claude-fold.cd1-read .sched-form { display: grid; gap: 8px; max-width: 560px; }

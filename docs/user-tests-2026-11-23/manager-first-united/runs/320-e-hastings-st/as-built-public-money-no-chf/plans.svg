@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1356" viewBox="0 0 640 1356" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Floor plans by program">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plans by program · metres, street at the bottom</text>
+<text x="78.0" y="78.0" font-size="13" font-weight="600">Ground floor</text>
+<text x="78.0" y="93.0" font-size="10.5" fill="#2f7d4a">Egress: 4 exits, 2 required · separation 36.5 m, at least 9 m · pass</text>
+<rect x="78.0" y="100.0" width="348.5" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="78.0" y="100.0" width="19.8" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="220.8" y="100.0" width="62.9" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="406.7" y="100.0" width="19.8" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="191.9" width="348.5" height="16.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="208.1" width="348.5" height="91.9" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="97.8" y="100.0" width="123.0" height="91.9" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="283.8" y="100.0" width="122.9" height="91.9" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="142.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M78.0 153.2h19.8M78.0 158.3h19.8M78.0 163.3h19.8M78.0 168.3h19.8M78.0 173.4h19.8M78.0 178.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="87.9" y1="153.2" x2="87.9" y2="181.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="79.3" y1="191.9" x2="87.4" y2="191.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M79.3 183.8L79.3 191.9M87.4 191.9L87.2 189.8L86.4 187.9L85.1 186.2L83.4 184.9L81.4 184.1L79.3 183.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="220.8" y="142.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M220.8 153.2h19.8M220.8 158.3h19.8M220.8 163.3h19.8M220.8 168.3h19.8M220.8 173.4h19.8M220.8 178.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="230.7" y1="153.2" x2="230.7" y2="181.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="222.2" y1="191.9" x2="230.2" y2="191.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M222.2 183.8L222.2 191.9M230.2 191.9L230.0 189.8L229.2 187.9L227.9 186.2L226.2 184.9L224.2 184.1L222.2 183.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="264.0" y="142.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M264.0 153.2h19.8M264.0 158.3h19.8M264.0 163.3h19.8M264.0 168.3h19.8M264.0 173.4h19.8M264.0 178.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="273.9" y1="153.2" x2="273.9" y2="181.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="274.3" y1="191.9" x2="282.4" y2="191.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M274.3 183.8L274.3 191.9M282.4 191.9L282.1 189.8L281.3 187.9L280.0 186.2L278.4 184.9L276.4 184.1L274.3 183.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="243.3" y="172.1" width="18.0" height="19.8" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M243.3 172.1L261.3 191.9M243.3 191.9L261.3 172.1" stroke="#5f6672" stroke-width="0.6" fill="none"/>
+<rect x="406.7" y="142.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M406.7 153.2h19.8M406.7 158.3h19.8M406.7 163.3h19.8M406.7 168.3h19.8M406.7 173.4h19.8M406.7 178.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="416.6" y1="153.2" x2="416.6" y2="181.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="408.0" y1="191.9" x2="416.1" y2="191.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M408.0 183.8L408.0 191.9M416.1 191.9L415.9 189.8L415.0 187.9L413.8 186.2L412.1 184.9L410.1 184.1L408.0 183.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="252.2" y="203.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="252.2" y="257.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Non-residential</text>
+<text x="159.3" y="149.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Non-residential</text>
+<text x="345.2" y="149.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Non-residential</text>
+<path d="M252.3 320.0V303.0M248.3 309.0L252.3 303.0L256.3 309.0" stroke="#1f2933" stroke-width="1.4" fill="none"/>
+<text x="258.3" y="319.0" font-size="9.5" fill="#1f2933">entry</text>
+<path d="M78.0 327.0H426.5M78.0 323.0V331.0M426.5 323.0V331.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="252.2" y="339.0" font-size="10" text-anchor="middle" fill="#5f6672">38.75 m</text>
+<text x="252.2" y="352.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
+<line x1="66.0" y1="100.0" x2="66.0" y2="300.0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="200.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 200.0)">22.24 m</text>
+<text x="78.0" y="376.0" font-size="13" font-weight="600">Typical floor (levels 2 to 5)</text>
+<text x="78.0" y="391.0" font-size="10.5" fill="#2f7d4a">Egress: 4 exits, 2 required · separation 36.5 m, at least 9 m · pass</text>
+<rect x="78.0" y="398.0" width="348.5" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="78.0" y="398.0" width="19.8" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="220.8" y="398.0" width="62.9" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="406.7" y="398.0" width="19.8" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="489.9" width="348.5" height="16.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="506.1" width="348.5" height="91.9" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="97.8" y="398.0" width="123.0" height="91.9" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="283.8" y="398.0" width="122.9" height="91.9" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="440.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M78.0 451.2h19.8M78.0 456.3h19.8M78.0 461.3h19.8M78.0 466.3h19.8M78.0 471.4h19.8M78.0 476.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="87.9" y1="451.2" x2="87.9" y2="479.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="79.3" y1="489.9" x2="87.4" y2="489.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M79.3 481.8L79.3 489.9M87.4 489.9L87.2 487.8L86.4 485.9L85.1 484.2L83.4 482.9L81.4 482.1L79.3 481.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="220.8" y="440.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M220.8 451.2h19.8M220.8 456.3h19.8M220.8 461.3h19.8M220.8 466.3h19.8M220.8 471.4h19.8M220.8 476.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="230.7" y1="451.2" x2="230.7" y2="479.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="222.2" y1="489.9" x2="230.2" y2="489.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M222.2 481.8L222.2 489.9M230.2 489.9L230.0 487.8L229.2 485.9L227.9 484.2L226.2 482.9L224.2 482.1L222.2 481.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="264.0" y="440.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M264.0 451.2h19.8M264.0 456.3h19.8M264.0 461.3h19.8M264.0 466.3h19.8M264.0 471.4h19.8M264.0 476.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="273.9" y1="451.2" x2="273.9" y2="479.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="274.3" y1="489.9" x2="282.4" y2="489.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M274.3 481.8L274.3 489.9M282.4 489.9L282.1 487.8L281.3 485.9L280.0 484.2L278.4 482.9L276.4 482.1L274.3 481.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="243.3" y="470.1" width="18.0" height="19.8" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M243.3 470.1L261.3 489.9M243.3 489.9L261.3 470.1" stroke="#5f6672" stroke-width="0.6" fill="none"/>
+<rect x="406.7" y="440.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M406.7 451.2h19.8M406.7 456.3h19.8M406.7 461.3h19.8M406.7 466.3h19.8M406.7 471.4h19.8M406.7 476.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="416.6" y1="451.2" x2="416.6" y2="479.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="408.0" y1="489.9" x2="416.1" y2="489.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M408.0 481.8L408.0 489.9M416.1 489.9L415.9 487.8L415.0 485.9L413.8 484.2L412.1 482.9L410.1 482.1L408.0 481.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="252.2" y="501.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="252.2" y="555.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Non-residential</text>
+<text x="159.3" y="447.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Non-residential</text>
+<text x="345.2" y="447.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Non-residential</text>
+<path d="M78.0 625.0H426.5M78.0 621.0V629.0M426.5 621.0V629.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="252.2" y="637.0" font-size="10" text-anchor="middle" fill="#5f6672">38.75 m</text>
+<text x="252.2" y="650.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
+<line x1="66.0" y1="398.0" x2="66.0" y2="598.0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="498.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 498.0)">22.24 m</text>
+<text x="78.0" y="674.0" font-size="13" font-weight="600">Top floor (level 11): 9 one-bedroom, 3 studio · 34 m² spare</text>
+<text x="78.0" y="689.0" font-size="10.5" fill="#2f7d4a">Egress: 4 exits, 2 required · travel 7.2 m, limit 45 m · pass</text>
+<rect x="78.0" y="696.0" width="348.5" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="78.0" y="696.0" width="19.8" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="220.8" y="696.0" width="62.9" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="406.7" y="696.0" width="19.8" height="108.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="787.9" width="348.5" height="16.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="804.1" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="129.2" y="804.1" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="180.4" y="804.1" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="231.6" y="804.1" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="282.9" y="804.1" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="334.0" y="804.1" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="97.8" y="696.0" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="149.0" y="696.0" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="283.8" y="696.0" width="51.2" height="91.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="385.3" y="804.1" width="34.5" height="91.9" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="334.9" y="696.0" width="34.5" height="91.9" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="369.5" y="696.0" width="34.5" height="91.9" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="419.7" y="804.1" width="6.7" height="91.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="200.2" y="696.0" width="20.6" height="91.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="403.9" y="696.0" width="2.8" height="91.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="738.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M78.0 749.2h19.8M78.0 754.3h19.8M78.0 759.3h19.8M78.0 764.3h19.8M78.0 769.4h19.8M78.0 774.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="87.9" y1="749.2" x2="87.9" y2="777.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="79.3" y1="787.9" x2="87.4" y2="787.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M79.3 779.8L79.3 787.9M87.4 787.9L87.2 785.8L86.4 783.9L85.1 782.2L83.4 780.9L81.4 780.1L79.3 779.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="220.8" y="738.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M220.8 749.2h19.8M220.8 754.3h19.8M220.8 759.3h19.8M220.8 764.3h19.8M220.8 769.4h19.8M220.8 774.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="230.7" y1="749.2" x2="230.7" y2="777.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="222.2" y1="787.9" x2="230.2" y2="787.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M222.2 779.8L222.2 787.9M230.2 787.9L230.0 785.8L229.2 783.9L227.9 782.2L226.2 780.9L224.2 780.1L222.2 779.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="264.0" y="738.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M264.0 749.2h19.8M264.0 754.3h19.8M264.0 759.3h19.8M264.0 764.3h19.8M264.0 769.4h19.8M264.0 774.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="273.9" y1="749.2" x2="273.9" y2="777.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="274.3" y1="787.9" x2="282.4" y2="787.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M274.3 779.8L274.3 787.9M282.4 787.9L282.1 785.8L281.3 783.9L280.0 782.2L278.4 780.9L276.4 780.1L274.3 779.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<rect x="243.3" y="768.1" width="18.0" height="19.8" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M243.3 768.1L261.3 787.9M243.3 787.9L261.3 768.1" stroke="#5f6672" stroke-width="0.6" fill="none"/>
+<rect x="406.7" y="738.4" width="19.8" height="49.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M406.7 749.2h19.8M406.7 754.3h19.8M406.7 759.3h19.8M406.7 764.3h19.8M406.7 769.4h19.8M406.7 774.4h19.8" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<line x1="416.6" y1="749.2" x2="416.6" y2="777.1" stroke="#1f2933" stroke-width="0.8"/>
+<line x1="408.0" y1="787.9" x2="416.1" y2="787.9" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M408.0 779.8L408.0 787.9M416.1 787.9L415.9 785.8L415.0 783.9L413.8 782.2L412.1 780.9L410.1 780.1L408.0 779.8" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="252.2" y="799.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="103.6" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="154.8" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="206.0" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="257.2" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="308.4" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="359.6" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="123.4" y="745.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="174.5" y="745.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="309.3" y="745.5" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="402.6" y="853.5" font-size="9.5" text-anchor="middle" fill="#1f2933">ST</text>
+<text x="352.2" y="745.5" font-size="9.5" text-anchor="middle" fill="#1f2933">ST</text>
+<text x="386.7" y="745.5" font-size="9.5" text-anchor="middle" fill="#1f2933">ST</text>
+<text x="210.5" y="745.5" font-size="9.5" text-anchor="middle" fill="#1f2933">SP</text>
+<polyline points="154.8,804.1 154.8,796.0 97.8,796.0" fill="none" stroke="#1f2933" stroke-width="1.4" stroke-dasharray="4 2"/>
+<circle cx="154.8" cy="804.1" r="2.4" fill="#1f2933"/>
+<path d="M 94.8 793.0 L 100.8 799.0 M 94.8 799.0 L 100.8 793.0" stroke="#1f2933" stroke-width="1.4"/>
+<text x="126.3" y="792.0" font-size="10" text-anchor="middle" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">7.2 m</text>
+<path d="M78.0 923.0H426.5M78.0 919.0V927.0M426.5 919.0V927.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="252.2" y="935.0" font-size="10" text-anchor="middle" fill="#5f6672">38.75 m</text>
+<text x="252.2" y="948.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
+<line x1="66.0" y1="696.0" x2="66.0" y2="896.0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="796.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 796.0)">22.24 m</text>
+<g transform="translate(0.0 980.0)">
+<rect x="48.0" y="-9.0" width="12" height="12" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="1.0" fill="#5f6672" font-size="11">Non-residential · NR</text>
+<rect x="210.0" y="-9.0" width="12" height="12" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="226.0" y="1.0" fill="#5f6672" font-size="11">Amenity · AM</text>
+<rect x="319.2" y="-9.0" width="12" height="12" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="335.2" y="1.0" fill="#5f6672" font-size="11">Services, bicycles · SV</text>
+<rect x="48.0" y="9.0" width="12" height="12" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="19.0" fill="#5f6672" font-size="11">Core (stairs, elevator) · C</text>
+<rect x="256.2" y="9.0" width="12" height="12" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="272.2" y="19.0" fill="#5f6672" font-size="11">Corridor · CR</text>
+<rect x="372.0" y="9.0" width="12" height="12" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<text x="388.0" y="19.0" fill="#5f6672" font-size="11">Three-bedroom+ · 3B</text>
+<rect x="48.0" y="27.0" width="12" height="12" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="37.0" fill="#5f6672" font-size="11">Two-bedroom · 2B</text>
+<rect x="183.6" y="27.0" width="12" height="12" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="199.6" y="37.0" fill="#5f6672" font-size="11">One-bedroom · 1B</text>
+<rect x="319.2" y="27.0" width="12" height="12" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="335.2" y="37.0" fill="#5f6672" font-size="11">Studio · ST</text>
+<rect x="421.8" y="27.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
+<text x="437.8" y="37.0" fill="#5f6672" font-size="11">Spare · SP</text>
+</g>
+<circle cx="54" cy="1036.0" r="3.2" fill="#245f9c"/><text x="64" y="1040.0" font-size="11" fill="#5f6672">accessible unit</text>
+<rect x="48.0" y="1056.0" width="45.0" height="5" fill="#1f2933"/>
+<rect x="93.0" y="1056.0" width="45.0" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
+<text x="48.0" y="1072.0" font-size="9.5" text-anchor="middle" fill="#5f6672">0</text>
+<text x="93.0" y="1072.0" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
+<text x="137.9" y="1072.0" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
+<g transform="rotate(-181.6 189.3 1058.0)"><circle cx="189.3" cy="1058.0" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="189.3,1047.9 193.9,1064.0 189.3,1060.2 184.7,1064.0" fill="#1f2933"/></g>
+<text x="189.9" y="1082.0" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
+<text x="48.0" y="1100.0" font-size="12" fill="#1f2933">Unit depth 10.22 m either side of a 1.8 m corridor; core bay 7.0 m;</text>
+<text x="48.0" y="1116.0" font-size="12" fill="#1f2933">partitions +8% over net areas (declared placeholders). The rules read back</text>
+<text x="48.0" y="1132.0" font-size="12" fill="#1f2933">from the plates are listed with the figure.</text>
+<text x="48.0" y="1148.0" font-size="12" fill="#1f2933">The typical floor stands for levels 2 to 5; other floors differ: level 6, 2</text>
+<text x="48.0" y="1164.0" font-size="12" fill="#1f2933">one-bedroom; levels 7 to 10, 10 one-bedroom, 1 studio; level 11, 9</text>
+<text x="48.0" y="1180.0" font-size="12" fill="#1f2933">one-bedroom, 3 studio.</text>
+<text x="48.0" y="1196.0" font-size="12" fill="#1f2933">Stairs drawn with their treads and exit doors; a switchback stair's flights</text>
+<text x="48.0" y="1212.0" font-size="12" fill="#1f2933">either side of its divider, a scissor stair's two flights crossed; the</text>
+<text x="48.0" y="1228.0" font-size="12" fill="#1f2933">arrow is the entry from the street.</text>
+<text x="48.0" y="1244.0" font-size="12" fill="#1f2933">Egress (BC Building Code 2024, Part 3; figures to be verified): dashed, the</text>
+<text x="48.0" y="1260.0" font-size="12" fill="#1f2933">farthest unit door to its exit along the corridor;</text>
+<text x="48.0" y="1276.0" font-size="12" fill="#1f2933">sprinklered (assumed, a placeholder); a core 7 m wide read as two 2.2 m</text>
+<text x="48.0" y="1292.0" font-size="12" fill="#1f2933">stairs at its ends.</text>
+<text x="48.0" y="1308.0" font-size="12" fill="#1f2933">Rules as of 2026-11-23 · drawn from the option and the massing, not a</text>
+<text x="48.0" y="1324.0" font-size="12" fill="#1f2933">design</text>
+</svg>

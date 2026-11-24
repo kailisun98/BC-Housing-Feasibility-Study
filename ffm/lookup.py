@@ -100,6 +100,43 @@ def city_geocode(address: str) -> dict[str, Any] | None:
             "display": f"{civic_address(r.get('civic_number'), r.get('std_street'))}, Vancouver, BC (City of Vancouver property address{', ' + r['geo_local_area'] if r.get('geo_local_area') else ''})"}
 
 
+NEAREST_CIVIC_SPAN = 150    # how far either side of the number typed the City's list is searched for the nearest one
+
+
+def nearest_civic(rows: list[dict], number: int) -> dict | None:
+    """Of the City's address points on one street, the one whose civic number is nearest the number typed (a tie goes to
+    the same side of the street, then the lower number). Pure."""
+    # the City's list keeps the civic number as text ("2001"); a number with a letter or a fraction is left out
+    have = [(int(str(r["civic_number"]).strip()), r) for r in rows
+            if str(r.get("civic_number") or "").strip().isdigit() and (r.get("geo_point_2d") or {}).get("lat") is not None]
+    if not have:
+        return None
+    return min(have, key=lambda x: (abs(x[0] - number), (x[0] - number) % 2, x[0]))[1]
+
+
+def city_nearest(address: str) -> dict[str, Any] | None:
+    """Where the City's list has no such number on the street: its nearest number on that street, with the parcel it
+    belongs to (23 Nov 2026: the geocoder's point for the street put "2009 Stainsbury Ave" on 1851 Stainsbury, a different
+    district, and "3350 Kingsway" on 488 Kingsway). None where the street itself is not in the list."""
+    p = parse_address(address)
+    if not p["civic_number"] or not p["like"]:
+        return None
+    like = p["like"].replace('"', "")
+    n = int(p["civic_number"])
+    # civic_number is a text field in the City's dataset, so a range is asked for as the list of numbers in it
+    near = ", ".join(f'"{k}"' for k in range(max(1, n - NEAREST_CIVIC_SPAN), n + NEAREST_CIVIC_SPAN + 1))
+    rows = records_where(ADDRESS_DATASET, f'std_street like "{like}%" AND civic_number in ({near})', 100)
+    if p["suffix"]:
+        rows = [r for r in rows if str(r.get("std_street") or "").upper() == p["street"]] or rows
+    r = nearest_civic(rows, n)
+    if not r:
+        return None
+    pt = r["geo_point_2d"]
+    return {"lat": float(pt["lat"]), "lon": float(pt["lon"]), "civic_number": r.get("civic_number"), "std_street": r.get("std_street"),
+            "site_id": r.get("site_id"), "local_area": r.get("geo_local_area"),
+            "display": f"{civic_address(r.get('civic_number'), r.get('std_street'))}, Vancouver, BC (City of Vancouver property address; the nearest number to {n} on this street)"}
+
+
 def geocode_vancouver(address: str) -> tuple[float, float, str]:
     """Nominatim, kept inside Metro Vancouver and preferring a building over a street; the address is tried as typed
     and then with ', Vancouver, BC' added."""
@@ -414,6 +451,20 @@ def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_
             except (OSError, ValueError) as e:
                 note += f" The OpenStreetMap context could not be fetched either ({e}); run python -m ffm context later."
     res = assemble(address, lat, lon, display, zoning, parcels, elements, radius_m, q, source)
+    # A number the City's list does not have: the geocoder's parcel is one candidate (it found the church at 320 East
+    # Hastings under its Gore Avenue address) and the nearest number on the same street is another (2001 for "2009
+    # Stainsbury Ave", where the geocoder landed on 1851, a different district). Neither is always right, so the site
+    # keeps the first and names the second for a person to choose (23 Nov 2026).
+    look = res["site"].get("lookup") or {}
+    if look.get("civic_mismatch"):
+        try:
+            near = city_nearest(address)
+        except (OSError, ValueError):
+            near = None
+        other = civic_address(near.get("civic_number"), near.get("std_street")) if near else None
+        if other and other.lower() not in str(res["site"].get("address") or "").lower():
+            look["nearest_on_street"] = f"{other}, Vancouver, BC"
+            res["site"]["notes"] = (f"The City's nearest number on the street you typed is {other}: look that up if it is the lot. " + str(res["site"].get("notes") or "")).strip()
     if note.strip():
         res["site"]["notes"] += " " + note.strip()
     return res
@@ -531,12 +582,19 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     }
     if cd1:
         site["cd1_bylaw_number"] = cd1
+    # the area plan the rules hold, where the district itself says the lot is inside it: the Downtown-Eastside/Oppenheimer
+    # District lies within the Downtown Eastside Plan's area (23 Nov 2026: a DEOD lot was read against the city-wide
+    # family rule because nothing set the plan). Other districts inside the plan's area are left to the person.
+    if str(district or "").upper().startswith("DEOD"):
+        site["area_plan"] = "downtown_eastside"
+        site["notes"] += " The district is DEOD, inside the Downtown Eastside Plan's area, so the Plan's family-unit target is read (area plan: confirm)."
     if metrics and corner_yard_front(street, metrics):
         # the engine turns the lot to front_face; the page's "Which street is the front?" reads front_street
         site["front_face"] = {"street": street["cross_street"]["name"]}
         site["front_street"] = street["cross_street"]["name"]
     if site["context"] is None:
         del site["context"]
+    cross_front = site.get("front_face")
     # the surroundings, as python -m ffm context stores them, so the plan draws the real streets and buildings
     if elements and metrics:
         try:
@@ -551,6 +609,17 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
             site["osm"] = block
         except ValueError as e:
             site["notes"] += f" The context was not placed: {e}"
+    # a front the massing cannot find is not written (23 Nov 2026: 877 E Hastings St was given Campbell Ave as its front,
+    # a street the context did not show adjoining the lot, and every run then drew nothing)
+    if cross_front:
+        from .boundary import oriented_ring
+        try:
+            oriented_ring(site)
+        except ValueError:
+            site.pop("front_face", None)
+            site.pop("front_street", None)
+            site["notes"] += (f" A corner lot: {cross_front['street']} may be the front the yards are read from, but the streets on file do not show it adjoining the lot, "
+                              "so the front is left on the address street. Say which street is the front.")
     fields = {
         "zoning_district": {"value": district, "source": "zoning", "note": "the district polygon at the geocoded point"},
         "site_area_m2": {"value": site["site_area_m2"], "source": "parcel", "note": "from the parcel polygon"},

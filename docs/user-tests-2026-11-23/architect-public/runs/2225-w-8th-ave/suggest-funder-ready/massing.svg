@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="424" height="496" viewBox="0 0 424 496" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 2225-w-8th-ave · 15.2 × 36.5 m, 556 m²</text>
+<polygon points="181.7,72.0 181.8,178.5 181.9,285.3 182.0,391.9 115.1,392.0 48.3,392.0 48.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="171.1,104.6 171.4,339.1 58.8,339.2 58.6,104.6" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="63.0,104.6 168.7,104.6 168.7,338.0 63.0,338.0" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="408.00000000000006" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope, plate box 12.0 × 26.5 m</text>
+<text x="241.97192402972752" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
+<line x1="241.97192402972752" y1="392.00000000000006" x2="375.8557665840903" y2="392.00000000000006" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="256.9" y="217.6" width="105.7" height="174.4" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="256.9" y1="362.9" x2="362.6" y2="362.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="256.9" y1="333.9" x2="362.6" y2="333.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="256.9" y1="304.8" x2="362.6" y2="304.8" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="256.9" y1="275.7" x2="362.6" y2="275.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="256.9" y1="246.7" x2="362.6" y2="246.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="262.9" y="211.6" fill="#2a6fb8" font-weight="600">Proposed: 6 storeys, FSR 3.43 · 19.8 m</text>
+<text x="48" y="432.00000000000006" fill="#1f2933">Proposed: 6 storeys, FSR 3.43: plate 318 m² × 6 = 1,908 m² (FSR 3.43), 19.8 m high</text>
+<text x="48" y="448.00000000000006" fill="#1f2933">Trees: Schedule C requires 4, plan leaves 4 (shortfall 0); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
+<text x="48" y="464.00000000000006" fill="#1f2933">Rules as of 2026-11-23 · drawn from the rules, not a survey</text>
+</svg>

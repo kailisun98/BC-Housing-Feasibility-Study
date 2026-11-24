@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="444" height="496" viewBox="0 0 444 496" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 1302-seymour-st · 15.2 × 35.1 m, 535 m²</text>
+<polygon points="62.4,72.0 199.0,77.7 184.6,392.0 48.0,386.2" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="73.9,72.8 210.8,72.8 210.8,388.9 73.9,388.9" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="73.9,72.8 210.8,72.8 210.8,266.0 73.9,266.0" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="408.0" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope 15.2 × 35.1 m</text>
+<text x="259.03855896425557" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
+<line x1="259.03855896425557" y1="392.0" x2="395.9369546861807" y2="392.0" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="285.0" y="202.9" width="136.9" height="189.1" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="285.0" y1="354.2" x2="421.9" y2="354.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="285.0" y1="316.3" x2="421.9" y2="316.3" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="285.0" y1="278.5" x2="421.9" y2="278.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="285.0" y1="240.7" x2="421.9" y2="240.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="291.0" y="196.9" fill="#2a6fb8" font-weight="600">Proposed: 5 storeys, FSR 3.05 · 21.0 m</text>
+<text x="48" y="432.0" fill="#1f2933">Proposed: 5 storeys, FSR 3.05: plate 326 m² × 5 = 1,630 m² (FSR 3.05), 21.0 m high</text>
+<text x="48" y="448.0" fill="#1f2933">Trees: Schedule C requires 4, plan leaves 0 (shortfall 4); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
+<text x="48" y="464.0" fill="#1f2933">Rules as of 2026-11-23 · drawn from the rules, not a survey</text>
+</svg>

@@ -2,7 +2,7 @@
   "site_id": "1010-expo-blvd",
   "option_id": "1010-expo-blvd-as-permitted",
   "as_of": "2026-10-23",
-  "stamp": "6e72488249c79837",
+  "stamp": "31193259023b85e0",
   "units": "m",
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
@@ -16,6 +16,7 @@
     "double_loaded": false,
     "unit_depth_m": 7.41,
     "arrangement": "point",
+    "stacking": "bays",
     "side_depth_m": 10.45,
     "core_m": [
       7.0,
@@ -79,7 +80,7 @@
     {
       "id": "family_low",
       "block": "three_bed_plus",
-      "rule": "on the lowest residential floors",
+      "rule": "from the lowest residential floor up, stacked in the same bays",
       "status": "info",
       "note": "no three-bedroom units in the mix"
     },
@@ -3468,6 +3469,10 @@
     ]
   },
   "capacity": {
+    "height_m": 88.45,
+    "height_limit_m": 91.0,
+    "height_from": "the district schedule's outright maximum",
+    "height_with_one_more": 91.5,
     "site_area_m2": 3908.0,
     "storeys": 29,
     "plate_m2": 800.5,
@@ -3479,6 +3484,27 @@
     "room_m2": 389.3,
     "levels_room": 0,
     "fsr_with_one_more": 6.145
+  },
+  "daylight": {
+    "limit_m": 10.0,
+    "deep_units": 0,
+    "deepest_m": null,
+    "no_window_wall": 0,
+    "status": "pass",
+    "note": ""
+  },
+  "proportions": {
+    "min_width_m": {
+      "studio": 4.0,
+      "one_bed": 5.5,
+      "two_bed": 7.5,
+      "three_bed_plus": 9.5
+    },
+    "depth_ratio_max": 2.5,
+    "narrow_units": 0,
+    "slender_units": 0,
+    "status": "pass",
+    "note": ""
   },
   "totals": {
     "plates_m2": 23212.0,
@@ -3536,6 +3562,21 @@
       "key": "min_home_depth_m",
       "value": 4.0,
       "note": "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"
+    },
+    {
+      "key": "max_home_depth_m",
+      "value": 12.0,
+      "note": "the deepest a home runs back from its window wall before the back of it has no daylight; a placeholder, and the reason a deep plate takes its corridor the other way or wants a courtyard"
+    },
+    {
+      "key": "lobby_m2",
+      "value": 25.0,
+      "note": "an entry lobby on the street side of the ground floor, where the building is entered; a placeholder until the architect draws the entry"
+    },
+    {
+      "key": "min_room_width_m",
+      "value": 2.0,
+      "note": "a leftover of a ground-floor room narrower than this along the strip is not drawn: the room is that much smaller and the notes say so"
     }
   ],
   "warnings": [

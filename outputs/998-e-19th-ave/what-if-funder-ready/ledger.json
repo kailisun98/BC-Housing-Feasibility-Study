@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-10-23",
-      "rules_hash": "280b574d21bda783a480a372f034f9efbef4e7ac704b1c2c1dd79c010850ff8c",
+      "rules_hash": "65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf",
       "rules_files": {
-        "a_zoning_district.json": "bc89fd02e4bd0a63bd28788c71a42b80e692ba1949ef6d4f69c874579e4615e5",
+        "a_zoning_district.json": "06448eff1b2236406458bb430dc13dc5b06a2e01191441b65a684293af9015af",
         "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
-        "d_design_standards.json": "666cc2f2cc4405706d3b103715cdf6bef2812ac674e4eaa29ff088d00f2b0b85",
-        "e_funding_programs.json": "9267a33722068790ba1e02e479432231f279c952781444aa92118e6d2c412dbb",
-        "f_assumptions.json": "942a6dbab04d93fca08a7cb84f3af5ce4d95eb22ba165262176185aac691ae26"
+        "d_design_standards.json": "069a3dcad4ef9601cad46e5b86ae8e166f4dd98c1ec7b053bcef30377bf36343",
+        "e_funding_programs.json": "286bc77345ddf276f0eb1c1ef178b9daa1d1c4e00b9ddf4ee9d5d46a1d2ee1ad",
+        "f_assumptions.json": "5d6aad80b4dee51fbd2be7d89faa97528c8448e8b34bfbda22fbd758b30f3a3d"
       },
-      "stamp": "6e72488249c79837",
+      "stamp": "31193259023b85e0",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -51,20 +51,6 @@
           "version_effective_from": "2026-06-01",
           "version_effective_to": null,
           "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf"
-        },
-        {
-          "rule_id": "cov.rt.outright_fsr",
-          "layer": "A",
-          "version_effective_from": "2023-01-01",
-          "version_effective_to": null,
-          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
-        },
-        {
-          "rule_id": "cov.rt.outright_height",
-          "layer": "A",
-          "version_effective_from": "2023-01-01",
-          "version_effective_to": null,
-          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
         },
         {
           "rule_id": "cov.rm4.outright_fsr",
@@ -452,6 +438,363 @@
           "source_url": "https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx"
         },
         {
+          "rule_id": "cov.rt4.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rt4.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rt4.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rt5.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf"
+        },
+        {
+          "rule_id": "cov.rt5.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf"
+        },
+        {
+          "rule_id": "cov.rt5.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf"
+        },
+        {
+          "rule_id": "cov.rt7.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf"
+        },
+        {
+          "rule_id": "cov.rt7.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf"
+        },
+        {
+          "rule_id": "cov.rt7.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf"
+        },
+        {
+          "rule_id": "cov.rt8.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf"
+        },
+        {
+          "rule_id": "cov.rt8.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf"
+        },
+        {
+          "rule_id": "cov.rt8.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf"
+        },
+        {
+          "rule_id": "cov.rt10.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf"
+        },
+        {
+          "rule_id": "cov.rt10.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf"
+        },
+        {
+          "rule_id": "cov.rt10.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf"
+        },
+        {
+          "rule_id": "cov.rt11.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf"
+        },
+        {
+          "rule_id": "cov.rt11.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf"
+        },
+        {
+          "rule_id": "cov.rt11.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf"
+        },
+        {
+          "rule_id": "cov.m1.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2025-11-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf"
+        },
+        {
+          "rule_id": "cov.m1.outright_height",
+          "layer": "A",
+          "version_effective_from": "2025-11-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf"
+        },
+        {
+          "rule_id": "cov.m1.setbacks",
+          "layer": "A",
+          "version_effective_from": "2025-11-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf"
+        },
+        {
+          "rule_id": "cov.fm1.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf"
+        },
+        {
+          "rule_id": "cov.fm1.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf"
+        },
+        {
+          "rule_id": "cov.rm6.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf"
+        },
+        {
+          "rule_id": "cov.rm6.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf"
+        },
+        {
+          "rule_id": "cov.rm6.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf"
+        },
+        {
+          "rule_id": "cov.rm7.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf"
+        },
+        {
+          "rule_id": "cov.rm7.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf"
+        },
+        {
+          "rule_id": "cov.rm7.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf"
+        },
+        {
+          "rule_id": "cov.rm7a.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf"
+        },
+        {
+          "rule_id": "cov.rm8.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf"
+        },
+        {
+          "rule_id": "cov.rm8.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf"
+        },
+        {
+          "rule_id": "cov.rm8.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf"
+        },
+        {
+          "rule_id": "cov.rm9a.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf"
+        },
+        {
+          "rule_id": "cov.rm9a.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf"
+        },
+        {
+          "rule_id": "cov.rm9a.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf"
+        },
+        {
+          "rule_id": "cov.rm9.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf"
+        },
+        {
+          "rule_id": "cov.rm9b.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf"
+        },
+        {
+          "rule_id": "cov.rm9.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf"
+        },
+        {
+          "rule_id": "cov.rm9.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf"
+        },
+        {
+          "rule_id": "cov.rm10.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf"
+        },
+        {
+          "rule_id": "cov.rm10.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf"
+        },
+        {
+          "rule_id": "cov.rm10.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf"
+        },
+        {
+          "rule_id": "cov.rm11.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf"
+        },
+        {
+          "rule_id": "cov.rm11.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf"
+        },
+        {
+          "rule_id": "cov.rm11.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf"
+        },
+        {
+          "rule_id": "cov.rm12.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf"
+        },
+        {
+          "rule_id": "cov.rm12.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf"
+        },
+        {
+          "rule_id": "cov.rm12.setbacks",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf"
+        },
+        {
+          "rule_id": "cov.deod.outright_fsr",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf"
+        },
+        {
+          "rule_id": "cov.deod.outright_height",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf"
+        },
+        {
           "rule_id": "bc.ssmuh.minimum_units",
           "layer": "B",
           "version_effective_from": "2024-06-30",
@@ -529,16 +872,23 @@
           "source_url": "https://www.bccodes.ca/building-code.html"
         },
         {
+          "rule_id": "bch.shelter.bed_space",
+          "layer": "D",
+          "version_effective_from": "2017-09-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/sites/default/files/media/documents/Shelter-Design-Guidelines.pdf"
+        },
+        {
           "rule_id": "bch.chf.eligibility",
           "layer": "E",
-          "version_effective_from": "2025-05-30",
+          "version_effective_from": "2026-04-01",
           "version_effective_to": null,
-          "source_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf"
+          "source_url": "https://www.bchousing.org/projects-partners/funding-programs/CHF"
         },
         {
           "rule_id": "bc.bcbuilds.eligibility",
           "layer": "E",
-          "version_effective_from": "2024-02-13",
+          "version_effective_from": "2026-01-01",
           "version_effective_to": null,
           "source_url": "https://www.bcbuildshomes.ca/developers-operators"
         },
@@ -552,9 +902,72 @@
         {
           "rule_id": "cmhc.ahf.readiness",
           "layer": "E",
-          "version_effective_from": "2024-03-13",
+          "version_effective_from": "2025-12-19",
           "version_effective_to": null,
-          "source_url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx"
+          "source_url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/funding-programs/all-funding-programs/affordable-housing-fund"
+        },
+        {
+          "rule_id": "bch.ihf.program",
+          "layer": "E",
+          "version_effective_from": "2018-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/projects-partners/funding-programs/IHF"
+        },
+        {
+          "rule_id": "bch.shf.program",
+          "layer": "E",
+          "version_effective_from": "2018-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/projects-partners/funding-programs/SHF"
+        },
+        {
+          "rule_id": "bch.wthf.program",
+          "layer": "E",
+          "version_effective_from": "2018-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/projects-partners/funding-programs/WTHF"
+        },
+        {
+          "rule_id": "bch.hearth.program",
+          "layer": "E",
+          "version_effective_from": "2023-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/projects-partners/housing-provider-info/HEART-HEARTH"
+        },
+        {
+          "rule_id": "bch.esp.program",
+          "layer": "E",
+          "version_effective_from": "2019-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/housing-assistance/homelessness-services/emergency-shelter-program"
+        },
+        {
+          "rule_id": "bch.rrh.program",
+          "layer": "E",
+          "version_effective_from": "2017-01-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/projects-partners/funding-programs/RRH"
+        },
+        {
+          "rule_id": "cov.chip.program",
+          "layer": "E",
+          "version_effective_from": "2019-01-01",
+          "version_effective_to": null,
+          "source_url": "https://vancouver.ca/people-programs/community-housing-incentive-program.aspx"
+        },
+        {
+          "rule_id": "canada.reaching_home.capital",
+          "layer": "E",
+          "version_effective_from": "2026-04-17",
+          "version_effective_to": null,
+          "source_url": "https://housing-infrastructure.canada.ca/homelessness-sans-abri/directives-eng.html"
+        },
+        {
+          "rule_id": "canada.bch.program",
+          "layer": "E",
+          "version_effective_from": "2025-12-19",
+          "version_effective_to": null,
+          "source_url": "https://www.bch-mc.ca/"
         },
         {
           "rule_id": "f.hard_cost_base",
@@ -599,6 +1012,13 @@
           "source_url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres"
         },
         {
+          "rule_id": "f.rgi_rents",
+          "layer": "F",
+          "version_effective_from": "2025-12-01",
+          "version_effective_to": null,
+          "source_url": "https://www.bchousing.org/sites/default/files/media/documents/Housing-Income-Limits-Dec-2025.pdf"
+        },
+        {
           "rule_id": "f.operating",
           "layer": "F",
           "version_effective_from": "2026-10-01",
@@ -630,7 +1050,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2.outright_height",
@@ -653,7 +1074,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2.setbacks",
@@ -676,7 +1098,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2a.outright_fsr",
@@ -699,7 +1122,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2a.outright_height",
@@ -722,7 +1146,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2a.setbacks",
@@ -745,7 +1170,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2b.outright_fsr",
@@ -768,7 +1194,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2b.outright_height",
@@ -791,7 +1218,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2b.setbacks",
@@ -814,7 +1242,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2c.outright_fsr",
@@ -837,7 +1266,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2c.outright_height",
@@ -860,7 +1290,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2c.setbacks",
@@ -883,7 +1314,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2c1.outright_fsr",
@@ -906,7 +1338,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2c1.outright_height",
@@ -929,7 +1362,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.c2c1.setbacks",
@@ -952,7 +1386,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.cd1_324.floor_area",
@@ -975,7 +1410,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.cd1_324.outright_height",
@@ -998,7 +1434,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.cd1_819.outright_fsr",
@@ -1023,7 +1460,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.cd1_819.outright_height",
@@ -1048,7 +1486,108 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.deod.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "Downtown-Eastside/Oppenheimer plan: floor space ratio by sub-area",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver, Downtown-Eastside/Oppenheimer Official Development Plan (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf",
+        "section": "Sub-area 1 Main/Hastings: s.4.5.1 (3.0 for an apartment or mixed-use residential building all secured as rental with at least 20% of the homes social housing), s.4.5.2 (1.0 for all other uses), s.4.5.4 (the Director of Planning or the Development Permit Board may vary it to 11.0 for such a building that is at least half residential). Sub-area 2 Cordova Street: s.5.5.1 (1.0), s.5.5.3 (to 11.0). Sub-area 3 Powell Street/Japantown: s.6.5.1 (1.0), s.6.5.3 (3.0 in a transit-oriented area), s.6.5.4 (to 11.0). Sub-area 4 Alexander/Powell: s.7.5.1 (1.0), s.7.5.3 (to 11.0). Developments requiring social housing are subject to Schedule J. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/odp-downtown-eastside-oppenheimer.pdf (saved by hand from the by-law site), pages 14, 15, 21, 27, 28, 35 and 36"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for DEOD districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.deod.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "Downtown-Eastside/Oppenheimer plan: building height by sub-area",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver, Downtown-Eastside/Oppenheimer Official Development Plan (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf",
+        "section": "Sub-area 1: s.4.6.2 (30.0 m), s.4.6.3 (the Director of Planning or the Development Permit Board may vary it to at most 100.0 m). Sub-area 2: s.5.6.1 (15.0 m), s.5.6.2 (to 100.0 m). Sub-area 3: s.6.6.2 (15.0 m, 30.0 m in a transit-oriented area), s.6.6.3 (to 100.0 m). Sub-area 4: s.7.6.1 is printed as a minimum of 15.0 m, with s.7.6.2 allowing up to 100.0 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/odp-downtown-eastside-oppenheimer.pdf (saved by hand from the by-law site), pages 15, 16, 23, 28, 29 and 36"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for DEOD districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.fm1.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "FM-1 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 0.60; (b) the Director of Planning or the Development Permit Board may increase it to 1.50 having regard to the site, open space, design and amenities of community benefit. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-fm-1.pdf (saved by hand from the by-law site), page 7"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for FM-1 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.fm1.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "FM-1 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf",
+        "section": "s.3.1.2.1: maximum building height 10.7 m; s.3.1.2.3: on a street running east and west, under an envelope 7.6 m high at the south property line; s.3.1.2.4: the Development Permit Board may increase it with Council's approval (no figure given, so not entered as a limit). The schedule's yards were not read into the rules. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-fm-1.pdf (saved by hand from the by-law site), pages 7 and 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for FM-1 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.irp.social_housing_rezoning",
@@ -1077,6 +1616,81 @@
         "fsr": 2.49
       },
       "action": ""
+    },
+    {
+      "rule_id": "cov.m1.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "M-1 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 5.00 for manufacturing, transportation and storage uses and wholesaling class A, and 1.00 for all other uses combined (the figure tested here). s.2.2.3: a dwelling unit only where essential to the operation of the business. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 2 and 9"
+      },
+      "version_effective_from": "2025-11-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for M-1 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.m1.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "M-1 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+        "section": "s.3.1.2.1: maximum building height 30.5 m; s.3.1.2.4: the Director of Planning or the Development Permit Board may permit an increase (no figure given, so not entered as a limit). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 9 and 10"
+      },
+      "version_effective_from": "2025-11-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for M-1 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.m1.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "M-1 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+        "section": "s.3.1.2.2 (side yards only beside an R district), s.3.1.2.3 and 3.1.2.7 (rear yard 3.1 m, reduced by the distance to a lane's ultimate centre line). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 9 and 10"
+      },
+      "version_effective_from": "2025-11-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for M-1 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.parking_minimums",
@@ -1121,7 +1735,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.r1_1.outright_height",
@@ -1144,7 +1759,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.r1_1.setbacks",
@@ -1167,7 +1783,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm1.outright_fsr",
@@ -1219,6 +1836,231 @@
       "action": "Architect: confirm with City staff the height they will support under the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing)."
     },
     {
+      "rule_id": "cov.rm10.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-10 outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+        "section": "s.3.1.1.1: for apartment and mixed-use residential building the maximum floor space ratio is 0.90, except 2.00 on locked-in lots with 15.0 to 30.0 m of frontage and at least 557 m², 2.40 with at least 30.0 m and 855 m², and 2.60 with at least 40.0 m and 1,115 m². s.3.1.2.1 to 3.1.2.3: site area at least 855 m², frontage 30.0 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-10 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm10.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-10 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+        "section": "s.3.1.2.4: maximum building height 20.0 m; s.3.1.2.12 and 3.1.2.15: beside an R1 or RT site with no lane between, portions at or above the fourth storey set back 10.7 m (not tested). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), pages 8 and 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-10 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm10.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-10 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+        "section": "s.3.1.2.5 (front yard 3.7 m), s.3.1.2.6 (side yard 3.0 m), s.3.1.2.7 (rear yard 3.7 m, 6.1 m on a site deeper than 36.2 m), s.3.1.2.9 (site coverage 50%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), pages 8 and 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-10 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm11.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-11 outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+        "section": "s.3.1.1.1: for apartment and mixed-use residential building the maximum floor space ratio is 0.75, and 1.70 on a site with at least 36.6 m of frontage. s.3.1.2.1: site area at least 1,000 m². The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-11 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm11.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-11 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+        "section": "s.3.1.2.4: maximum building height 13.7 m; s.3.1.2.12: beside an R1 or RT site with no lane between, portions at or above the fourth storey set back 4.6 m (not tested). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), pages 8 and 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-11 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm11.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-11 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+        "section": "s.3.1.2.5 (front yard 3.7 m), s.3.1.2.6 (side yard 2.1 m), s.3.1.2.7 (rear yard 6.1 m), s.3.1.2.8 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-11 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm12.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-12 outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+        "section": "s.3.1.1.1: for apartment and mixed-use residential building the maximum floor space ratio is 1.70. s.3.1.2.1 and 3.1.2.2: site area at least 1,000 m² and frontage at least 36.6 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-12 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm12.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-12 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+        "section": "s.3.1.2.3: maximum building height 13.7 m and 4 storeys for an apartment and for a mixed-use residential building other than a rear building. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-12 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm12.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-12 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+        "section": "s.3.1.2.4 (front yard 3.7 m), s.3.1.2.5 (side yard 2.1 m), s.3.1.2.6 (rear yard 6.1 m), s.3.1.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-12 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm3.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1239,7 +2081,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm3.outright_height",
@@ -1262,7 +2105,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm3.setbacks",
@@ -1285,7 +2129,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm3a.outright_fsr",
@@ -1308,7 +2153,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm3a.outright_height",
@@ -1331,7 +2177,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm3a.setbacks",
@@ -1354,7 +2201,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm4.outright_fsr",
@@ -1377,7 +2225,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm4.outright_height",
@@ -1400,7 +2249,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm4.setbacks",
@@ -1423,7 +2273,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5.outright_fsr",
@@ -1446,7 +2297,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5.outright_height",
@@ -1469,7 +2321,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5.setbacks",
@@ -1492,7 +2345,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5ac.outright_fsr",
@@ -1515,7 +2369,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5b.outright_fsr",
@@ -1538,7 +2393,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5d.outright_fsr",
@@ -1561,7 +2417,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rm5d.outright_height",
@@ -1584,7 +2441,433 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm6.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-6 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 1.00, which the Director of Planning or the Development Permit Board may increase to 2.50. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), page 7"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-6 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm6.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-6 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+        "section": "s.3.1.2.1: maximum building height 12.2 m; s.3.1.2.8(a): the Director of Planning or the Development Permit Board may vary it to at most 64.0 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), pages 7 and 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-6 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm6.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-6 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+        "section": "s.3.1.2.2 (front yard, on Georgia Street: 12.2 m, or 3.0 m for a building higher than 12.2 m), s.3.1.2.3 (interior side yard 2.1 m), s.3.1.2.6 (rear yard, on Alberni Street: 3.7 m); s.3.1.2.8 lets the Director of Planning vary them. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), pages 7 and 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-6 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm7.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-7 and RM-7A outright floor space ratio (townhouse)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+        "section": "s.3.2.1.1: for townhouse (other than in a courtyard configuration) the maximum floor space ratio is 0.60, which the Director of Planning may increase to 1.20; s.3.1.1.1 gives the same figures for a courtyard townhouse in RM-7A. s.3.2.2.1: a site of at least 445 m² for 1 townhouse building, 703 m² for more. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), pages 9 and 12"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-7, RM-7A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm7.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-7 and RM-7A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+        "section": "s.3.2.2.3: maximum building height 10.7 m and 3 storeys; s.3.2.2.12: the third storey must be a partial storey not exceeding 50% of the storey below. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), pages 12 and 13"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-7, RM-7A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm7.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-7 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-7 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+        "section": "s.3.2.2.4 (front yard 6.1 m, 4.9 m on a site under 27.4 m deep), s.3.2.2.5 (side yard 1.2 m), s.3.2.2.6 (rear yard: no minimum in RM-7), s.3.2.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), page 12"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-7 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm7a.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-7A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-7A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+        "section": "s.3.2.2.4 (front yard 6.1 m, 4.9 m on a site under 27.4 m deep), s.3.2.2.5 (side yard 1.2 m), s.3.2.2.6 (rear yard 1.8 m in RM-7A), s.3.2.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), page 12"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-7A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm8.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-8 and RM-8A outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+        "section": "s.3.1.1.2: for townhouse and mixed-use residential building the maximum floor space ratio is 1.20; s.3.1.1.1: developments requiring social housing are subject to Schedule J; s.3.1.1.3: the RM-8A social housing requirement. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), page 10"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-8, RM-8A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm8.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-8 and RM-8A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+        "section": "s.3.1.2.3: maximum building height 11.5 m and 3 storeys for a building other than a rear building (a rear building 10.1 m and 3 storeys). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), page 10"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-8, RM-8A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm8.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-8 and RM-8A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+        "section": "s.3.1.2.4 (front yard 3.7 m), s.3.1.2.5 and 3.1.2.13 (side yard 1.2 m, 2.4 m on a flanking street the front doors face), s.3.1.2.6 (rear yard 1.8 m), s.3.1.2.7 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), page 11"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-8, RM-8A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9 outright floor space ratio (apartment and townhouse)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+        "section": "s.3.1.1.1: for apartment and townhouse the maximum floor space ratio is 0.75 in RM-9 and 0.70 in RM-9B, except 1.20 with at least 12.8 m of frontage, 1.50 with at least 15.2 m and 2.00 with at least 27.4 m. s.3.1.2.1 to 3.1.2.3: site area at least 445 m², frontage 12.8 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9 and RM-9B outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+        "section": "s.3.1.2.4: maximum building height 12.2 m and 4 storeys for an apartment or townhouse other than a rear building (a rear building 10.7 m and 3 storeys); s.3.1.2.12: the Director of Planning may vary it to at most 13.7 m and 4 storeys. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9, RM-9B districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9 and RM-9B minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+        "section": "s.3.1.2.5 (front yard 4.9 m), s.3.1.2.6 (side yard 2.1 m), s.3.1.2.7 (rear yard 3.7 m for an apartment, 7.6 m for a townhouse, 1.2 m in a courtyard configuration), s.3.1.2.8 (site coverage 55%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9, RM-9B districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9a.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9A outright floor space ratio (apartment)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+        "section": "s.3.1.1.1: for apartment the maximum floor space ratio is 0.70, except 1.20 on a site under 15.2 m of frontage made of locked-in lots, 1.50 with at least 15.2 m of frontage, 1.75 on a corner site with at least 15.2 m, and 2.00 with at least 27.4 m. s.3.1.2.1 to 3.1.2.3: site area at least 445 m², frontage 15.2 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9a.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+        "section": "s.3.1.2.4: maximum building height 13.7 m and 4 storeys for an apartment (a townhouse 10.7 m and 3 storeys). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), page 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9a.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+        "section": "s.3.1.2.5 (front yard 3.7 m), s.3.1.2.6 (side yard 2.1 m), s.3.1.2.7 (rear yard 3.7 m for an apartment), s.3.1.2.8 (site coverage 55%); s.3.1.2.11 lets the Director of Planning vary them. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), page 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9b.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9B outright floor space ratio (apartment and townhouse)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+        "section": "s.3.1.1.1: for apartment and townhouse the maximum floor space ratio is 0.75 in RM-9 and 0.70 in RM-9B, except 1.20 with at least 12.8 m of frontage, 1.50 with at least 15.2 m and 2.00 with at least 27.4 m. s.3.1.2.1 to 3.1.2.3: site area at least 445 m², frontage 12.8 m to 50.0 m. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9B districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr1.outright_fsr",
@@ -1607,7 +2890,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr1.outright_height",
@@ -1630,7 +2914,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr1.setbacks",
@@ -1653,7 +2938,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr2a.outright_fsr",
@@ -1676,7 +2962,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr2a.outright_height",
@@ -1699,7 +2986,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr2a.setbacks",
@@ -1722,7 +3010,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr2b.outright_fsr",
@@ -1745,7 +3034,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr2b.outright_height",
@@ -1768,7 +3058,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr2b.setbacks",
@@ -1791,7 +3082,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr3a.outright_fsr",
@@ -1814,7 +3106,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr3a.outright_height",
@@ -1837,7 +3130,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr3a.setbacks",
@@ -1860,7 +3154,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr3bc.outright_fsr",
@@ -1883,7 +3178,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr3bc.outright_height",
@@ -1906,7 +3202,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rr3bc.setbacks",
@@ -1929,53 +3226,158 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
-      "rule_id": "cov.rt.outright_fsr",
+      "rule_id": "cov.rt10.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
-      "title": "RT districts (family level) outright floor space ratio",
+      "title": "RT-10 outright floor space ratio",
       "jurisdiction": "City of Vancouver",
       "check": "district_outright_fsr",
       "source": {
-        "title": "City of Vancouver Zoning and Development By-law, RT-4 District Schedule",
-        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
-        "section": "Family-level figure, not one schedule: a base outright FSR of 0.60 recalled as common to the RT-4, RT-5, RT-6, RT-7, RT-8, RT-10 and RT-11 schedules (each has its own PDF at the same address with its own code), with conditional increases that differ by schedule and are not entered. RT-1, RT-2 and RT-9 are left out. The effective date is a placeholder.",
-        "verified": false,
-        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf before relying on it"
+        "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 0.40, which the Director of Planning may increase to 0.80 for dwelling uses and 0.60 for all other uses combined; s.3.1.1.2: dwelling units capped by the site frontage. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), page 6"
       },
-      "version_effective_from": "2023-01-01",
+      "version_effective_from": "2026-05-01",
       "version_effective_to": null,
       "status": "not_applicable",
-      "finding": "Written for RT-4, RT-4A, RT-4N, RT-4AN, RT-5, RT-5A, RT-5N, RT-5AN, RT-6, RT-7, RT-8, RT-10, RT-10N, RT-11, RT-11N districts; this site is zoned RM-1.",
+      "finding": "Written for RT-10 districts; this site is zoned RM-1.",
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
-      "rule_id": "cov.rt.outright_height",
+      "rule_id": "cov.rt10.outright_height",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
-      "title": "RT districts (family level) outright maximum height",
+      "title": "RT-10 outright maximum height",
       "jurisdiction": "City of Vancouver",
       "check": "district_outright_height",
       "source": {
-        "title": "City of Vancouver Zoning and Development By-law, RT-4 District Schedule",
-        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
-        "section": "Family-level figure, not one schedule: a maximum height of 10.7 m recalled as common to the RT-4, RT-5, RT-6, RT-7, RT-8, RT-10 and RT-11 schedules; storey limits differ by schedule and are not entered. The effective date is a placeholder.",
-        "verified": false,
-        "verify": "Entered from recollection of the schedule on 16 Nov 2026, not read from the PDF; confirm every figure against https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf before relying on it"
+        "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+        "section": "s.3.1.2.2: maximum building height 10.7 m and 2 storeys in the front 60% of the site depth, 7.7 m and 2 storeys in the rear 40%; s.3.1.2.12: the Director of Planning may increase it (no figure given, so not entered as a limit). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), pages 7 and 8"
       },
-      "version_effective_from": "2023-01-01",
+      "version_effective_from": "2026-05-01",
       "version_effective_to": null,
       "status": "not_applicable",
-      "finding": "Written for RT-4, RT-4A, RT-4N, RT-4AN, RT-5, RT-5A, RT-5N, RT-5AN, RT-6, RT-7, RT-8, RT-10, RT-10N, RT-11, RT-11N districts; this site is zoned RM-1.",
+      "finding": "Written for RT-10 districts; this site is zoned RM-1.",
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt10.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-10 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+        "section": "s.3.1.2.3 (front yard: the average of the 2 adjacent sites), s.3.1.2.4 (side yard 10% of the site width up to 12.0 m wide, else 1.2 m), s.3.1.2.5 (rear yard 0.6 m), s.3.1.2.6 (site coverage 45%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), page 7"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-10 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt11.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-11 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 0.60 (0.75 for a duplex on a site with 1 principal building); s.3.1.1.2: the Director of Planning may increase it to 0.85 for dwelling uses other than duplex; s.3.1.1.5 and 3.1.1.6 cap the number of dwelling units. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), pages 8 and 9"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-11 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt11.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-11 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+        "section": "s.3.1.2.3: maximum building height 10.7 m and 2 storeys in the front 60% of the site depth and 7.7 m and 2 storeys in the rear 40% (a duplex on a site with 1 principal building 10.7 m and 3 storeys). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), page 9"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-11 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt11.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-11 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+        "section": "s.3.1.2.4 (front yard: the average of the 2 adjacent sites), s.3.1.2.5 (side yard 1.2 m), s.3.1.2.6 (rear yard 0.6 m), s.3.1.2.7 (site coverage 45%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), pages 9 and 10"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-11 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rt3.outright_fsr",
@@ -1998,7 +3400,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rt3.outright_height",
@@ -2021,7 +3424,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "cov.rt3.setbacks",
@@ -2044,7 +3448,308 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt4.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-4 and RT-4A outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 0.60. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), page 6"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4, RT-4A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt4.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-4 and RT-4A outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "s.3.1.2.2: maximum building height 10.7 m and 3 storeys; s.3.1.2.8: the third storey must be a partial storey. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 6 and 7"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4, RT-4A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt4.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-4 and RT-4A minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "s.3.1.2.3 (front yard 7.3 m), s.3.1.2.4 (side yard 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.5 and 3.1.2.11 (rear yard 10.7 m, reduced by the distance to a lane's ultimate centre line), s.3.1.2.6 (site coverage 45%). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 6 and 7"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4, RT-4A districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt5.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-5 outright floor space ratio (multiple dwelling)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+        "section": "s.3.1.1.1: for multiple dwelling on a site without a character house (or where one is demolished for new development on an under-utilized lot) the maximum floor space ratio is 0.60, which the Director of Planning may increase to 0.75; s.3.1.1.2: at most 74 dwelling units a hectare. Multiple dwelling is a conditional use (s.2.1) on a site of at least 338 m² (s.3.1.2.1). Other uses are under s.3.2 (0.50 to 0.75). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 and 11"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-5 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt5.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-5 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+        "section": "s.3.1.2.3: maximum building height 10.7 m and 3 storeys for a building other than a rear building (a rear building 7.7 m and 2 storeys); s.3.1.2.10: the third storey must be a partial storey not exceeding 50% of the storey below. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 and 9"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-5 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt5.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-5 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+        "section": "s.3.1.2.4 (front yard 7.3 m), s.3.1.2.5 (side yard 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.6 and 3.1.2.11 (rear yard 10.7 m, or 30% of a site deeper than 36.6 m, reduced by the distance to a lane's ultimate centre line), s.3.1.2.7 (site coverage 45%); s.3.1.2.12 and 3.1.2.13 let the Director of Planning vary the yards. The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 to 10"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-5 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt7.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-7 outright floor space ratio (multiple dwelling)",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+        "section": "s.3.1.1.1: for multiple dwelling, infill and multiple conversion dwelling with at least 3 dwelling units the maximum floor space ratio is 1.00; s.3.1.1.2: at most 8 dwelling units where all the residential floor area is secured as rental, 6 otherwise; s.3.1.2.2: 7 or 8 dwelling units need a site of at least 557 m², 4 to 6 at least 280 m². The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), page 7"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-7 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt7.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-7 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+        "section": "s.3.1.2.4: maximum building height 11.5 m and 3 storeys (a rear building 8.5 m and 2 storeys; s.3.1.2.11 gives a rear building 11.5 m and 3 storeys on a site under 306 m² or with no developed secondary access). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), pages 7 and 8"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-7 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt7.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-7 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+        "section": "s.3.1.2.5 (front yard 4.9 m), s.3.1.2.6 (side yard 1.2 m), s.3.1.2.7 (rear yard 10.7 m, 0.9 m in a courtyard configuration). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-7 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt8.outright_fsr",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-8 outright floor space ratio",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_fsr",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+        "section": "s.3.1.1.1: the maximum floor space ratio is 0.50; for dwelling uses, multiple dwelling among them, the Director of Planning may increase it to 0.75 (s.3.1.1.1(a)(i)), and beyond that only within an existing building; s.3.1.1.2(b): a multiple dwelling at most 62 units a hectare. Multiple dwelling is a conditional use (s.2.2.5). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 6 and 7"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-8 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt8.outright_height",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-8 outright maximum height",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_height",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+        "section": "s.3.1.2.3: maximum building height 10.7 m and 2 storeys for all buildings other than infill (infill 7.7 m or 2 storeys); s.3.1.2.9: the Director of Planning may vary it to exceed 2 storeys (no figure given, so not entered as a limit). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), page 7"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-8 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt8.setbacks",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-8 minimum yards",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_setbacks",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+        "section": "s.3.1.2.4 (front yard: the average of the 2 adjacent sites), s.3.1.2.5 (side yard 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.6 (site coverage 45%), s.3.1.2.7 (building depth at most 35% of the site depth). The effective date is the consolidation's; the clauses may be older.",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 7 and 8"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-8 districts; this site is zoned RM-1.",
+      "values": {
+        "district": "RM-1"
+      },
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "bc.ssmuh.minimum_units",
@@ -2066,7 +3771,8 @@
       "values": {
         "district": "RM-1"
       },
-      "action": ""
+      "action": "",
+      "elsewhere": "district"
     },
     {
       "rule_id": "bc.toa.minimum_density",
@@ -2324,25 +4030,57 @@
         },
         "average_gross_area_per_unit_m2": 67.0
       },
+      "action": null
+    },
+    {
+      "rule_id": "bch.shelter.bed_space",
+      "layer": "D",
+      "layer_title": "Building code and funder design standards (flags, not checks, at this stage)",
+      "title": "BC Housing Shelter Design Guidelines: floor area for each bed",
+      "jurisdiction": "BC Housing",
+      "check": "shelter_beds",
+      "source": {
+        "title": "BC Housing, Shelter Design Guidelines, September 2017",
+        "url": "https://www.bchousing.org/sites/default/files/media/documents/Shelter-Design-Guidelines.pdf",
+        "section": "6 Shelter sleeping accommodation; 6.1 Multi-bed configurations (four beds a room at most, 4.6 m² a bed space); 6.2 Dormitory room configurations (upgraded shelters: eight single beds a room at most)",
+        "read_from": "inbox/bc-housing-2026-11-23/Shelter-Design-Guidelines.pdf, pp.27 to 29",
+        "read_on": "2026-11-23",
+        "verified": true,
+        "verify": "the guidelines size the sleeping rooms only; washrooms, dining, staff and program space are in the same document and are not read into this rule"
+      },
+      "version_effective_from": "2017-09-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Not for this option: this standard is for a shelter's sleeping rooms, and the option is independent rental.",
+      "values": {
+        "housing_type": "independent"
+      },
       "action": ""
     },
     {
       "rule_id": "bc.bcbuilds.eligibility",
       "layer": "E",
-      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
       "title": "BC Builds: eligibility and below-market requirement",
       "jurisdiction": "Province of BC / BC Housing",
       "check": "bc_builds_fit",
       "source": {
-        "title": "BC Builds, developers and operators (page current as of 22 Sep 2026); Province of BC BC Builds announcement 2024",
+        "title": "BC Builds, Residential Developers & Non-Profit Housing Operators (program page)",
         "url": "https://www.bcbuildshomes.ca/developers-operators",
-        "section": "Applicant requirements; grants; timelines",
-        "announcement_url": "https://news.gov.bc.ca/releases/2024HOUS0021-000648"
+        "section": "Non-profits; Program details; Eligibility; Project requirements; Lease terms; Financing rates; BC Housing Glossary, Middle Income Limits (effective 1 Jan 2026: $143,900 and $212,240, up from $136,210 and $201,030)",
+        "read_on": "2026-11-23",
+        "verified": true,
+        "effective_from_basis": "the first year of the page's financing-rate table",
+        "verify": "scoring and site-specific terms are in each Property Opportunity Notice, not read here; the framework's 2024 income figures are superseded by the glossary's 2026 limits",
+        "glossary_url": "https://www.bchousing.org/glossary",
+        "framework_title": "BC Housing, Rental Supply Program (BC Builds) Program Framework, February 2024",
+        "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/BC-Builds-Rental-Supply-Program-Framework.pdf",
+        "read_from": "inbox/bc-housing-2026-11-23/BC-Builds-Rental-Supply-Program-Framework.pdf, pp.4 to 7 (funding, grant, eligibility, rents, leases)"
       },
-      "version_effective_from": "2024-02-13",
+      "version_effective_from": "2026-01-01",
       "version_effective_to": null,
       "status": "pass",
-      "finding": "BC Builds: meets the published criteria: non-residential space is 15.7% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter.",
+      "finding": "BC Builds: passes the published items this screen checks: non-residential space is 15.7% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. BC Builds works opportunity by opportunity; middle-income rents and the team's capacity are not assessed here.",
       "values": {
         "fails": [],
         "unknown": [],
@@ -2354,28 +4092,48 @@
           "under_two_bed_no_children": 143900,
           "two_bed_plus_with_children": 212240
         },
-        "submission": "Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template"
+        "submission": "Proposal in any format by email against each Property Opportunity Notice; optional capital and operating budget template",
+        "takeout_financing": {
+          "rate_pct": {
+            "2026": 4.55,
+            "2027": 4.59,
+            "2028": 4.59,
+            "2029": 4.59
+          },
+          "amortization_years": 35,
+          "debt_coverage_ratio": 1.1,
+          "for": "non-profits, co-ops and public housing corporations"
+        }
       },
       "action": ""
     },
     {
       "rule_id": "bch.chf.eligibility",
       "layer": "E",
-      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
       "title": "BC Housing Community Housing Fund: eligibility and unit mix",
       "jurisdiction": "BC Housing",
       "check": "chf_fit",
       "source": {
-        "title": "BC Housing, Community Housing Fund 2025 RFP #1070-2526-022 webinar slides; 2023 RFP #1070-2324-041; CHF program page",
-        "url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf",
-        "section": "Eligibility; unit mix 30/50/20; minimum requirements; rated criteria",
+        "title": "BC Housing, Community Housing Fund Program (program page) and Glossary (income limits effective 1 Jan 2026); 2025 call webinar slides (RFP #1070-2526-022, 16 Jun 2025); 2023 call overview (RFP #1070-2324-041)",
+        "url": "https://www.bchousing.org/projects-partners/funding-programs/CHF",
+        "glossary_url": "https://www.bchousing.org/glossary",
+        "section": "Program page: rental mix requirements. Slides: p.5 who can apply, p.6 funding and financing (grant a home), p.11 the three rent categories, p.18 rated criteria and thresholds. 2023 call: s.4.1 to 4.2 mandatory requirements (land holding, start within 18 months, at least 5% accessible homes), s.4.3.1 (non-residential space not more than 30%), s.5.1.2 (60-year lease at a nominal value), Appendix 12",
+        "read_on": "2026-11-23",
+        "verified": true,
+        "rfp_2025_slides_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2526-022A-Webinar-Slides.pdf",
         "rfp_2023_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
-        "program_url": "https://www.bchousing.org/projects-partners/Building-BC/CHF"
+        "verify": "the 2025 call did not proceed and the 2023 call is closed: read the next request for proposals for its own requirements; the 60-year lease, the 18 months and the 5% accessible homes are the 2023 call's wording",
+        "read_from": {
+          "slides": "inbox/bc-housing-2026-11-23/CHF-RFP-2526-022A-Webinar-Slides.pdf, pp.5, 6, 11, 18",
+          "call_2023": "inbox/bc-housing-2026-11-23/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf, pp.37 to 42, 51"
+        },
+        "effective_from_basis": "the start of BC Housing's 2026-27 fiscal year, the year the slides give the $178,059 provisional approval for"
       },
-      "version_effective_from": "2025-05-30",
+      "version_effective_from": "2026-04-01",
       "version_effective_to": null,
       "status": "pass",
-      "finding": "Community Housing Fund: meets the eligibility criteria: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call was cancelled in February 2026, so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
+      "finding": "Community Housing Fund: passes the eligibility items this screen checks: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award. Not assessed here: need and demand, the operator's capacity, the fund's rated criteria and the budget. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
       "values": {
         "required_mix": {
           "market": 0.3,
@@ -2395,11 +4153,12 @@
           "site control (council resolution) meets the readiness bar",
           "construction must be able to start within 18 months of award"
         ],
-        "provisional_grant_per_unit_cad": 171211,
-        "indicative_grant_cad": 15066568,
+        "provisional_grant_per_unit_cad": 178059,
+        "grant_fiscal_year": "2026-27",
+        "indicative_grant_cad": 15669192,
         "intake": {
           "open": false,
-          "note": "its 2025 call was cancelled in February 2026, so no intake is open now",
+          "note": "its 2025 call did not proceed (February 2026), so no intake is open now",
           "more": "the program page says it will post when next seeking proposals (as of 22 Sep 2026)",
           "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
         }
@@ -2407,9 +4166,115 @@
       "action": ""
     },
     {
+      "rule_id": "bch.esp.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "BC Housing Emergency Shelter Program: what a shelter is under it",
+      "jurisdiction": "BC Housing",
+      "check": "program_match",
+      "source": {
+        "title": "BC Housing, Emergency Shelter Program (services page)",
+        "url": "https://www.bchousing.org/housing-assistance/homelessness-services/emergency-shelter-program",
+        "section": "Types of shelters; Services",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "effective_from_basis": "no start date on the page read; set to the start of the oldest run this tool keeps",
+        "framework_title": "BC Housing, Emergency Shelter Program Framework, January 2018",
+        "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/Emergency-Shelter-Program-Framework-2018.pdf",
+        "read_from": "inbox/bc-housing-2026-11-23/Emergency-Shelter-Program-Framework-2018.pdf, pp.4 to 6",
+        "framework_section": "G Target populations and eligibility; I Operating funding and agreements; J Services",
+        "verify": "the framework does not say how the capital cost of a new shelter is paid; ask BC Housing"
+      },
+      "version_effective_from": "2019-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Not for this option: the program is for a shelter, and the option is independent rental.",
+      "values": {
+        "match": false,
+        "housing_type": "independent"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bch.hearth.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "BC Housing HEARTH (Homeless Encampment Action Response Temporary Housing): how it works",
+      "jurisdiction": "BC Housing",
+      "check": "program_match",
+      "source": {
+        "title": "BC Housing, Encampment & Homelessness Response: HEART & HEARTH",
+        "url": "https://www.bchousing.org/projects-partners/housing-provider-info/HEART-HEARTH",
+        "section": "How the program works; HEARTH",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "effective_from_basis": "Budget 2023, as provincial releases describe it; the program page gives no start date",
+        "framework_title": "BC Housing, HEART and HEARTH Program Framework, August 2024",
+        "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/HEART-and-HEARTH-Program-Framework.pdf",
+        "read_from": "inbox/bc-housing-2026-11-23/HEART-and-HEARTH-Program-Framework.pdf, pp.3, 10 to 12",
+        "framework_section": "Introduction (priority communities, memorandum of understanding); HEARTH: eligibility and rent, developments, operating funding and agreements"
+      },
+      "version_effective_from": "2023-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Not for this option: the program is for a shelter or transitional housing, and the option is independent rental.",
+      "values": {
+        "match": false,
+        "housing_type": "independent"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bch.ihf.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "BC Housing Indigenous Housing Fund: who it is for",
+      "jurisdiction": "BC Housing",
+      "check": "program_match",
+      "source": {
+        "title": "BC Housing, Indigenous Housing Fund Program (program page) and Funding Programs (overview page)",
+        "url": "https://www.bchousing.org/projects-partners/funding-programs/IHF",
+        "section": "Opening paragraphs; Rent structure",
+        "overview_url": "https://www.bchousing.org/projects-partners/funding-programs",
+        "verified": true,
+        "verify": "the proponent list and the 2023 call's dates were not read from BC Housing's own documents; read the next request for proposals before relying on them",
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the program page: created in 2018"
+      },
+      "version_effective_from": "2018-01-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Would be a program for this housing if it is Indigenous-led, or partnered with an Indigenous housing provider or Nation (not said on the option): affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve). It funds building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them). A project enters by BC Housing's request for proposals. No intake is open now (closed: no call is posted on the program page (read 23 Nov 2026)). Its homes are all rent geared to income; this option has 26 market-rent homes, which it would not carry. Its criteria are not tested here.",
+      "values": {
+        "match": "if",
+        "ended": false,
+        "asks": [
+          "Indigenous-led, or partnered with an Indigenous housing provider or Nation"
+        ],
+        "housing_type": "independent",
+        "for_housing_types": [
+          "independent"
+        ],
+        "what": "affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve)",
+        "funds": "building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them)",
+        "how_a_project_enters": "by BC Housing's request for proposals",
+        "intake": {
+          "open": false,
+          "note": "no intake is open now (closed: no call is posted on the program page (read 23 Nov 2026))",
+          "more": "the last one found, issued 30 Nov 2023, took proposals to 30 Apr 2024",
+          "status": "closed: no call is posted on the program page (read 23 Nov 2026); the last one found, issued 30 Nov 2023, took proposals to 30 Apr 2024"
+        },
+        "differs": {
+          "market_units": 26
+        },
+        "proponents_unverified": "Indigenous non-profit housing providers, First Nations and Indigenous governments, and non-profit providers or developers partnered with them (BC Housing's 2023 fact sheet, read as a copy on another site; the 2023 call's dates are from a provincial news release as a search summarised it)"
+      },
+      "action": ""
+    },
+    {
       "rule_id": "bch.pdf.predevelopment_loan",
       "layer": "E",
-      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
       "title": "BC Housing Project Development Fund (pre-development loans)",
       "jurisdiction": "BC Housing",
       "check": "info_only",
@@ -2429,26 +4294,245 @@
       "action": ""
     },
     {
+      "rule_id": "bch.rrh.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "BC Housing Rapid Response to Homelessness (modular supportive housing): complete",
+      "jurisdiction": "BC Housing",
+      "check": "program_match",
+      "source": {
+        "title": "BC Housing, Rapid Response to Homelessness (program page)",
+        "url": "https://www.bchousing.org/projects-partners/funding-programs/RRH",
+        "section": "Whole page",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the program page: started in 2017"
+      },
+      "version_effective_from": "2017-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Not for this option: the program is for supportive housing, and the option is independent rental.",
+      "values": {
+        "match": false,
+        "housing_type": "independent"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bch.shf.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "BC Housing Supportive Housing Fund: who it is for",
+      "jurisdiction": "BC Housing",
+      "check": "program_match",
+      "source": {
+        "title": "BC Housing, Supportive Housing Fund Program (program page); Supportive Housing (who it houses)",
+        "url": "https://www.bchousing.org/projects-partners/funding-programs/SHF",
+        "section": "Whole page",
+        "about_url": "https://www.bchousing.org/housing-assistance/housing-with-support/supportive-housing",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the program page: created in 2018",
+        "framework_title": "BC Housing, Supportive Housing Program Framework, January 2024",
+        "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/Supportive-Housing-Program-Framework-2024.pdf",
+        "read_from": "inbox/bc-housing-2026-11-23/Supportive-Housing-Program-Framework-2024.pdf, pp.5, 6, 13",
+        "framework_section": "Key program elements (resident eligibility, rent, operating and support services subsidy); Roles and responsibilities; Appendix 3 Supportive Housing Fund",
+        "verify": "the framework gives no application route or intake dates; ask BC Housing how a site and an operator are chosen"
+      },
+      "version_effective_from": "2018-01-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Not for this option: the program is for supportive housing, and the option is independent rental.",
+      "values": {
+        "match": false,
+        "housing_type": "independent"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "bch.wthf.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "BC Housing Women's Transition Housing Fund: who it is for",
+      "jurisdiction": "BC Housing",
+      "check": "program_match",
+      "source": {
+        "title": "BC Housing, Women's Transition Housing Fund Program (program page)",
+        "url": "https://www.bchousing.org/projects-partners/funding-programs/WTHF",
+        "section": "Whole page",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the program page: established in 2018",
+        "framework_title": "BC Housing, Women's Transition Housing and Supports Program Framework, 2019",
+        "framework_url": "https://www.bchousing.org/sites/default/files/media/documents/Womens-Transition-Housing-Supports-Program-Framework-2019.pdf",
+        "read_from": "inbox/bc-housing-2026-11-23/Womens-Transition-Housing-Supports-Program-Framework-2019.pdf, pp.4, 5, 11, 13",
+        "framework_section": "Introduction (the fund, ownership, the four streams); 6.2 Additional eligibility criteria (resident rents, income); 8 Agreements",
+        "verify": "design standards for these buildings are in BC Housing's Design Guidelines for Women's Safe Homes, Transition Houses, Second Stage Housing (2021 update), downloaded and not read into the rules"
+      },
+      "version_effective_from": "2018-01-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Would be a program for this housing if it is for women, gender-diverse people and children leaving violence (not said on the option): housing with supports for women and their children who are at risk of, or have experienced, violence, in four streams: safe homes (stays of about 10 days), transition houses (about 30 days), second-stage housing (up to about 18 months) and long-term rental housing. It funds 1,500 new homes from 2018, and the service agreement each provider runs them under. A project enters by agreement with BC Housing: the framework names no application route, so ask BC Housing. The building is owned by the Provincial Rental Housing Corporation for the buildings and land created under the fund, leased to non-profit societies and co-operatives. Rents: 30% of income in second-stage and long-term rental housing, by BC Housing's rent scale; a resident on income assistance pays the maximum shelter component. Intake: not stated on the program page (read 23 Nov 2026). Its criteria are not tested here.",
+      "values": {
+        "match": "if",
+        "ended": false,
+        "asks": [
+          "for women, gender-diverse people and children leaving violence"
+        ],
+        "housing_type": "independent",
+        "for_housing_types": [
+          "shelter",
+          "transitional",
+          "supportive",
+          "independent"
+        ],
+        "what": "housing with supports for women and their children who are at risk of, or have experienced, violence, in four streams: safe homes (stays of about 10 days), transition houses (about 30 days), second-stage housing (up to about 18 months) and long-term rental housing",
+        "funds": "1,500 new homes from 2018, and the service agreement each provider runs them under",
+        "how_a_project_enters": "by agreement with BC Housing: the framework names no application route, so ask BC Housing",
+        "intake": {
+          "open": null,
+          "note": "intake: not stated on the program page (read 23 Nov 2026)",
+          "more": null,
+          "status": "not stated on the program page (read 23 Nov 2026)"
+        },
+        "owner": "the Provincial Rental Housing Corporation for the buildings and land created under the fund, leased to non-profit societies and co-operatives",
+        "rents": "30% of income in second-stage and long-term rental housing, by BC Housing's rent scale; a resident on income assistance pays the maximum shelter component"
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "canada.bch.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "Build Canada Homes (federal): where CMHC now points applicants",
+      "jurisdiction": "Government of Canada",
+      "check": "program_match",
+      "source": {
+        "title": "Build Canada Homes (home page)",
+        "url": "https://www.bch-mc.ca/",
+        "section": "Our priorities; Affordability, defined",
+        "verified": true,
+        "verify": "no program guide was read; read one before treating this as a source of funds",
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the day CMHC's fund closed and began directing organizations to it"
+      },
+      "version_effective_from": "2025-12-19",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "A program for this kind of housing (independent rental): a federal Crown corporation that brings financing, land and partnerships to affordable housing; it counts housing as affordable at no more than 30% of a household's before-tax income. It funds flexible financing, land and partnerships; no application terms were read. A project enters not stated on the page read; CMHC's Affordable Housing Fund page directs organizations to it. Intake: not stated on the page read (23 Nov 2026). Its criteria are not tested here.",
+      "values": {
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "independent",
+        "for_housing_types": [
+          "independent",
+          "supportive",
+          "transitional",
+          "shelter"
+        ],
+        "what": "a federal Crown corporation that brings financing, land and partnerships to affordable housing; it counts housing as affordable at no more than 30% of a household's before-tax income",
+        "funds": "flexible financing, land and partnerships; no application terms were read",
+        "how_a_project_enters": "not stated on the page read; CMHC's Affordable Housing Fund page directs organizations to it",
+        "intake": {
+          "open": null,
+          "note": "intake: not stated on the page read (23 Nov 2026)",
+          "more": null,
+          "status": "not stated on the page read (23 Nov 2026)"
+        }
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "canada.reaching_home.capital",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "Reaching Home (Canada's Homelessness Strategy): capital investments",
+      "jurisdiction": "Government of Canada",
+      "check": "program_match",
+      "source": {
+        "title": "Housing, Infrastructure and Communities Canada, Reaching Home directives (modified 17 Apr 2026)",
+        "url": "https://housing-infrastructure.canada.ca/homelessness-sans-abri/directives-eng.html",
+        "section": "3.4 Capital investments",
+        "verified": true,
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the directives page's date modified"
+      },
+      "version_effective_from": "2026-04-17",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Not for this option: the program is for a shelter, transitional housing or supportive housing, and the option is independent rental.",
+      "values": {
+        "match": false,
+        "housing_type": "independent"
+      },
+      "action": ""
+    },
+    {
       "rule_id": "cmhc.ahf.readiness",
       "layer": "E",
-      "layer_title": "Funding programs: eligibility criteria the memo tests (not the submission package)",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
       "title": "CMHC Affordable Housing Fund: readiness and submission mechanics",
       "jurisdiction": "CMHC",
       "check": "info_only",
       "source": {
-        "title": "CMHC, Affordable Housing Fund applicant guide",
-        "url": "https://cmhc-schl.gc.ca/-/media/sites/cmhc/nhs/co-investment-fund/nhs-co-invest-fund-app-guide-en.ashx",
-        "section": "Minimum submission requirements; readiness"
+        "title": "CMHC, Affordable Housing Fund (program page: application portal closed)",
+        "url": "https://www.cmhc-schl.gc.ca/professionals/project-funding-and-mortgage-financing/funding-programs/all-funding-programs/affordable-housing-fund",
+        "section": "Important notice",
+        "read_on": "2026-11-23",
+        "verified": true
       },
-      "version_effective_from": "2024-03-13",
+      "version_effective_from": "2025-12-19",
       "version_effective_to": null,
       "status": "info",
-      "finding": "construction start months after approval: 6; intake: continuous; submission: online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist.",
+      "finding": "intake: closed 19 Dec 2025: the application portal is closed and all program funding is committed; CMHC directs organizations to Build Canada Homes; what: low-interest and forgivable loans and contributions for new affordable and community housing, shelters, transitional and supportive housing included; no new applications; construction start months after approval: 6.",
       "values": {
-        "construction_start_months_after_approval": 6,
-        "intake": "continuous",
-        "submission": "online application with Project Assessment Workbook and Integrity Declaration; separate Required Documentation Checklist",
-        "criteria_note": "Affordability, accessibility and energy thresholds sit in the program scoring, not in the applicant guide; pull from cmhc.ca/ahf before encoding"
+        "intake": "closed 19 Dec 2025: the application portal is closed and all program funding is committed; CMHC directs organizations to Build Canada Homes",
+        "what": "low-interest and forgivable loans and contributions for new affordable and community housing, shelters, transitional and supportive housing included; no new applications",
+        "construction_start_months_after_approval": 6
+      },
+      "action": ""
+    },
+    {
+      "rule_id": "cov.chip.program",
+      "layer": "E",
+      "layer_title": "Funding programs: eligibility criteria the memo tests, and the other programs it lists without testing",
+      "title": "City of Vancouver Community Housing Incentive Program (CHIP): who it is for",
+      "jurisdiction": "City of Vancouver",
+      "check": "program_match",
+      "source": {
+        "title": "City of Vancouver, Community Housing Incentive Program (program page)",
+        "url": "https://vancouver.ca/people-programs/community-housing-incentive-program.aspx",
+        "section": "What you need to know",
+        "verified": true,
+        "verify": "grant maximums change with each call; read the call's guidelines",
+        "read_on": "2026-11-23",
+        "effective_from_basis": "the program page: grants approved since 2019"
+      },
+      "version_effective_from": "2019-01-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "A program for this kind of housing (independent rental): a City grant toward building non-market housing, for non-profit and co-op organizations building on their own land in Vancouver; stream 1 for self-sustaining projects that leverage senior-government funding, stream 2 for deeply affordable projects that rely on senior-government operating subsidies. It funds a capital grant, funded by the Empty Homes Tax. A project enters by the City's funding call, then Council approves each grant. No intake is open now (closed: no funding call is open at this time (program page, read 23 Nov 2026)). Its criteria are not tested here.",
+      "values": {
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "independent",
+        "for_housing_types": [
+          "independent",
+          "supportive",
+          "transitional"
+        ],
+        "what": "a City grant toward building non-market housing, for non-profit and co-op organizations building on their own land in Vancouver; stream 1 for self-sustaining projects that leverage senior-government funding, stream 2 for deeply affordable projects that rely on senior-government operating subsidies",
+        "funds": "a capital grant, funded by the Empty Homes Tax",
+        "how_a_project_enters": "by the City's funding call, then Council approves each grant",
+        "intake": {
+          "open": false,
+          "note": "no intake is open now (closed: no funding call is open at this time (program page, read 23 Nov 2026))",
+          "more": null,
+          "status": "closed: no funding call is open at this time (program page, read 23 Nov 2026)"
+        },
+        "amounts_unverified": "the 2025 call's maximums were reported as $10,000 a home at the Housing Income Limits and $25,000 a home at the shelter rate in stream 2, and up to $65,000 a home in stream 1's 2024 call (from the City's guidelines as a search summarised them; not read here and not counted in the money)"
       },
       "action": ""
     },
@@ -2636,6 +4720,55 @@
       "action": ""
     },
     {
+      "rule_id": "f.rgi_rents",
+      "layer": "F",
+      "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
+      "title": "Rent-geared-to-income and deep-subsidy rents, estimated the way BC Housing's call documents do",
+      "jurisdiction": "BC Housing",
+      "check": "assumption",
+      "source": {
+        "title": "BC Housing, Housing Income Limits (published October 2025, for use from 1 December 2025); Community Housing Fund request for proposals #1070-2324-041, Appendix 12 (RGI rent estimation tables)",
+        "url": "https://www.bchousing.org/sites/default/files/media/documents/Housing-Income-Limits-Dec-2025.pdf",
+        "method_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
+        "section": "HILs: Lower Mainland planning area, Vancouver row (the City of Vancouver is in the Vancouver HILs area, p.6). Appendix 12: rent-geared-to-income revenue on tenants averaging 70% of the Housing Income Limit; deep-subsidy revenue on the shelter allowance, and for three bedrooms and more on 30% of the deep-subsidy income limit",
+        "read_from": "inbox/bc-housing-2026-11-23/Housing-Income-Limits-Dec-2025.pdf, pp.1, 6; inbox/bc-housing-2026-11-23/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf, p.51",
+        "read_on": "2026-11-23",
+        "verified": true,
+        "effective_from_basis": "the day the Housing Income Limits read here came into use",
+        "verify": "the 70% is the 2023 call's estimating assumption (the 2025 call's own appendix was not read) and an estimate, not a rent: replace it with the operator's tenant income profile; check the shelter allowances against the Province's current rates; a site outside the Vancouver HILs area needs its own row of the table"
+      },
+      "version_effective_from": "2025-12-01",
+      "version_effective_to": null,
+      "status": "info",
+      "finding": "Rent geared to income estimated at 30% of an income of 70% of the Housing Income Limit (Vancouver, in use from 1 Dec 2025: $58,000 for one bedroom or less, $72,000 for two, $86,000 for three): $1,015, $1,260 and $1,505 a month; deep-subsidy rent at the income assistance shelter allowance, $500 and $695, and for three bedrooms 30% of the deep-subsidy income limit, $769 a month.",
+      "values": {
+        "hils_area": "Vancouver",
+        "housing_income_limits_cad": {
+          "studio": 58000,
+          "one_bed": 58000,
+          "two_bed": 72000,
+          "three_bed_plus": 86000
+        },
+        "housing_income_limit_four_bed_plus_cad": 107500,
+        "rgi_income_share_of_hil": 0.7,
+        "rgi_rent_share_of_income": 0.3,
+        "rgi_rent_monthly_cad": {
+          "studio": 1015,
+          "one_bed": 1015,
+          "two_bed": 1260,
+          "three_bed_plus": 1505
+        },
+        "deep_subsidy_rent_monthly_cad": {
+          "studio": 500,
+          "one_bed": 500,
+          "two_bed": 695,
+          "three_bed_plus": 769
+        },
+        "deep_subsidy_basis": "one and two bedrooms: the income assistance shelter allowance for the household size, as the 2023 call printed it ($500, $695); three bedrooms and more: 30% of the 2026 deep-subsidy income limit for two bedrooms and more ($30,745)"
+      },
+      "action": ""
+    },
+    {
       "rule_id": "f.soft_costs",
       "layer": "F",
       "layer_title": "Assumptions: costs, revenues and financing the pro-forma uses (dated, cited, refreshed)",
@@ -2664,8 +4797,8 @@
       "conditional": 0,
       "uncertain": 0,
       "pass": 6,
-      "info": 14,
-      "not_applicable": 62
+      "info": 19,
+      "not_applicable": 117
     },
     "answers": {
       "allowed": {
@@ -2684,24 +4817,82 @@
           "conditional": [],
           "uncertain": []
         },
-        "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing"
+        "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing",
+        "approval_route": null
       },
       "funded": {
         "verdict": "yes",
         "fail": [],
         "conditional": [],
         "uncertain": [],
-        "words": "Meets the criteria of BC Builds and the Community Housing Fund",
+        "words": "Passes this screen's eligibility checks for BC Builds and the Community Housing Fund, each read on its own",
         "intake": [
           {
             "rule_id": "bch.chf.eligibility",
             "program": "the Community Housing Fund",
             "open": false,
-            "note": "the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now",
+            "note": "the Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now",
             "more": "the program page says it will post when next seeking proposals (as of 22 Sep 2026)",
             "status": "2025 call (RFP #1070-2526-022) cancelled Feb 2026; program page says it will post when next seeking proposals (as of 22 Sep 2026)"
           }
-        ]
+        ],
+        "matches": [
+          {
+            "rule_id": "bch.ihf.program",
+            "program": "the Indigenous Housing Fund",
+            "if": [
+              "Indigenous-led, or partnered with an Indigenous housing provider or Nation"
+            ],
+            "open": false,
+            "intake": "no intake is open now (closed: no call is posted on the program page (read 23 Nov 2026))",
+            "enters": "by BC Housing's request for proposals",
+            "differs": {
+              "market_units": 26
+            },
+            "ended": false,
+            "what": "affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve)",
+            "funds": "building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them)"
+          },
+          {
+            "rule_id": "bch.wthf.program",
+            "program": "the Women's Transition Housing Fund",
+            "if": [
+              "for women, gender-diverse people and children leaving violence"
+            ],
+            "open": null,
+            "intake": "intake: not stated on the program page (read 23 Nov 2026)",
+            "enters": "by agreement with BC Housing: the framework names no application route, so ask BC Housing",
+            "differs": null,
+            "ended": false,
+            "what": "housing with supports for women and their children who are at risk of, or have experienced, violence, in four streams: safe homes (stays of about 10 days), transition houses (about 30 days), second-stage housing (up to about 18 months) and long-term rental housing",
+            "funds": "1,500 new homes from 2018, and the service agreement each provider runs them under"
+          },
+          {
+            "rule_id": "canada.bch.program",
+            "program": "Build Canada Homes",
+            "if": [],
+            "open": null,
+            "intake": "intake: not stated on the page read (23 Nov 2026)",
+            "enters": "not stated on the page read; CMHC's Affordable Housing Fund page directs organizations to it",
+            "differs": null,
+            "ended": false,
+            "what": "a federal Crown corporation that brings financing, land and partnerships to affordable housing; it counts housing as affordable at no more than 30% of a household's before-tax income",
+            "funds": "flexible financing, land and partnerships; no application terms were read"
+          },
+          {
+            "rule_id": "cov.chip.program",
+            "program": "the City of Vancouver Community Housing Incentive Program",
+            "if": [],
+            "open": false,
+            "intake": "no intake is open now (closed: no funding call is open at this time (program page, read 23 Nov 2026))",
+            "enters": "by the City's funding call, then Council approves each grant",
+            "differs": null,
+            "ended": false,
+            "what": "a City grant toward building non-market housing, for non-profit and co-op organizations building on their own land in Vancouver; stream 1 for self-sustaining projects that leverage senior-government funding, stream 2 for deeply affordable projects that rely on senior-government operating subsidies",
+            "funds": "a capital grant, funded by the Empty Homes Tax"
+          }
+        ],
+        "scope": "This screen tests the criteria of BC Builds and the Community Housing Fund. Also written for this housing, listed and not tested: Build Canada Homes and the City of Vancouver Community Housing Incentive Program. Would be, depending on an answer not given: the Indigenous Housing Fund and the Women's Transition Housing Fund. A program not in the rules may fit as well."
       },
       "unsure": [
         {
@@ -2709,14 +4900,16 @@
           "title": "Yards not checked: no RM-1 yard rule in the rules",
           "status": "uncertain",
           "finding": "The setbacks on the site plan (front 3.7, rear 6.0, side 3.0 m) are the option's own figures; no rule in the stack tested them against RM-1's minimum yards.",
-          "action": "Architect: read the yard clauses in the RM-1 schedule and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for."
+          "action": "Architect: read the yard clauses in the RM-1 schedule and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator.",
+          "contact": "the City of Vancouver's Development and Building Services Centre, a project facilitator"
         },
         {
           "rule_id": "coverage.heritage",
           "title": "Heritage register and designation",
           "status": "uncertain",
           "finding": "The rules hold no heritage rule, and a church site is where the City's Heritage Register and heritage designations are most likely to apply; a listed building changes what can be demolished and how the rezoning is read.",
-          "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address."
+          "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. Ask: the City of Vancouver's heritage planners (the Heritage Register and designations).",
+          "contact": "the City of Vancouver's heritage planners (the Heritage Register and designations)"
         }
       ]
     }

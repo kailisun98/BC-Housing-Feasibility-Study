@@ -39,6 +39,9 @@ LAYOUT_ASSUMPTIONS = {
     "window_width_m": (1.5, "one window per unit on the elevation, the unit module as the rhythm"),
     "stair_width_m": (2.2, "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"),
     "min_home_depth_m": (4.0, "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"),
+    "max_home_depth_m": (12.0, "the deepest a home runs back from its window wall before the back of it has no daylight; a placeholder, and the reason a deep plate takes its corridor the other way or wants a courtyard"),
+    "lobby_m2": (25.0, "an entry lobby on the street side of the ground floor, where the building is entered; a placeholder until the architect draws the entry"),
+    "min_room_width_m": (2.0, "a leftover of a ground-floor room narrower than this along the strip is not drawn: the room is that much smaller and the notes say so"),
 }
 
 # A walk-up (20 Nov 2026, on 609 Heatley Ave: a 9.4 × 12 m plate of three storeys placed no homes, its 7 m core bay and
@@ -61,6 +64,12 @@ WALKUP_ASSUMPTIONS = {
 SPRINKLERED_DEFAULT = True
 
 UNIT_KEYS = ("three_bed_plus", "two_bed", "one_bed", "studio")   # the order they are placed, bottom up
+
+# Declared placeholders, not rules, for a home's proportions (23 Nov 2026, Kai's figures to change): the least width
+# along its window wall by type, and how many times as deep as it is wide a home may be. The solver sizes homes to
+# them; a home drawn by hand under them is counted and said (`proportions`), never a failure.
+UNIT_MIN_WIDTH_M = {"studio": 4.0, "one_bed": 5.5, "two_bed": 7.5, "three_bed_plus": 9.5}
+UNIT_DEPTH_RATIO_MAX = 2.5
 UNIT_LABEL = {"studio": "Studio", "one_bed": "One-bedroom", "two_bed": "Two-bedroom", "three_bed_plus": "Three-bedroom+"}
 
 # The default adjacency rules, in plain words. Each names a block and what the solver does with it; the check
@@ -71,7 +80,7 @@ ADJACENCIES = [
     {"id": "services_lane", "block": "services", "rule": "on the ground floor, away from the street"},
     {"id": "core_centre", "block": "core", "rule": "at the centre of every floor, the corridor through it"},
     {"id": "units_both_sides", "block": "units", "rule": "on both sides of the corridor, above whatever the ground floor gives to other uses"},
-    {"id": "family_low", "block": "three_bed_plus", "rule": "on the lowest residential floors"},
+    {"id": "family_low", "block": "three_bed_plus", "rule": "from the lowest residential floor up, stacked in the same bays"},
     {"id": "accessible_core", "block": "accessible", "rule": "next to the core, on the lowest residential floor"},
 ]
 
@@ -107,6 +116,11 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
     areas_rule = _find(results, rule_id="bch.design_guidelines.unit_areas")
     mins = (areas_rule or {}).get("values", {}).get("min_net_area_m2") or {"studio": 33, "one_bed": 49, "two_bed": 67, "three_bed_plus": 86}
     allowance, _ = ASSUMPTIONS["design_allowance"]
+    # the architect's own unit sizes (23 Nov 2026: a built scheme of 103 homes placed 58 at "the minimum + 10%"): a
+    # factor on the BC Housing areas, 1.00 for the areas as published, kept between 0.8 and 1.5; blank is the 10%
+    own = option.get("unit_area_allowance")
+    if isinstance(own, (int, float)) and not isinstance(own, bool) and 0.8 <= float(own) <= 1.5:
+        allowance = float(own)
     partition, _ = LAYOUT_ASSUMPTIONS["partition_allowance"]
     units = option.get("units") or {}
     out: list[dict] = []
@@ -118,7 +132,7 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
         n_total += n
         net = round(float(mins[k]) * allowance, 1)
         gross = round(net * partition, 1)
-        out.append({"key": k, "label": UNIT_LABEL[k], "count": n, "net_m2_each": net, "gross_m2_each": gross, "min_gross_m2_each": round(float(mins[k]) * partition, 1), "area_m2": round(gross * n, 1),
+        out.append({"key": k, "label": UNIT_LABEL[k], "count": n, "net_m2_each": net, "gross_m2_each": gross, "min_gross_m2_each": round(float(mins[k]) * partition, 1), "min_width_m": UNIT_MIN_WIDTH_M[k], "area_m2": round(gross * n, 1),
                     "source": (areas_rule or {}).get("rule_id") or "placeholder", "note": f"{n} × {net} m² net ({mins[k]} m² minimum + {int((allowance - 1) * 100)}%), {gross} m² gross with partitions"})
     nonres = float(option.get("non_residential_gfa_m2") or 0)
     if nonres:
@@ -298,11 +312,40 @@ def _walkup_geometries(option: dict, massing: dict, prog: dict, one_exit_m2: flo
     return out
 
 
+def ground_extra(option: dict, f2f: float) -> float:
+    """How much taller the ground floor is than the floors above (`option.ground_floor_height_m`, 23 Nov 2026: a 4.5 m
+    shop floor was drawn at the 3.3 m of the floors over it). 0 where none is given, or where it is not taller; a
+    ground floor of 2.8 to 8 m is taken, anything else ignored."""
+    try:
+        g = float((option or {}).get("ground_floor_height_m") or 0)
+    except (TypeError, ValueError):
+        return 0.0
+    return round(g - f2f, 2) if 2.8 <= g <= 8.0 and g > f2f + 0.01 else 0.0
+
+
+def _floor_z(option: dict, lv: int, f2f: float) -> float:
+    """A floor's height above the ground floor: the storeys under it, the ground floor at its own height."""
+    return round(lv * f2f + (ground_extra(option, f2f) if lv >= 1 else 0.0), 2)
+
+
 def _run_rect(r: dict, length: float) -> tuple[float, float, float, float]:
     """The rectangle the next `length` of a run takes, from where it is filled to, in its direction: along x a strip
     of the run's depth, along y (a point tower's sides) the same turned. Pure."""
-    s = r["edge"] + r["dir"] * (r["len"] - r["left"]) + (0 if r["dir"] > 0 else -length)
+    s = r["edge"] + r["dir"] * (r["len"] - r["left"] - r.get("far", 0.0)) + (0 if r["dir"] > 0 else -length)
     return (s, r["at"], length, r["depth"]) if r["axis"] == "x" else (r["at"], s, r["depth"], length)
+
+
+def _far_rect(r: dict, length: float) -> tuple[float, float, float, float]:
+    """The rectangle `length` of a run takes at its far end, the end it is filled toward (a corridor run across the
+    plate puts the street's rooms at the street end of a strip, which a run filled from the core reaches last)."""
+    off = r["len"] - r.get("far", 0.0) - length
+    s = r["edge"] + r["dir"] * off + (0 if r["dir"] > 0 else -length)
+    return (s, r["at"], length, r["depth"]) if r["axis"] == "x" else (r["at"], s, r["depth"], length)
+
+
+def _t(z: dict) -> dict:
+    """A zone with its x and y swapped: the plan as it reads with the plate turned a quarter (see `_solve`, `across`)."""
+    return {**z, "x": z["y"], "y": z["x"], "w": z["d"], "d": z["w"]}
 
 
 def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, Any]:
@@ -315,8 +358,108 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     if zones:
         return place_zones(site, option, ledger, massing, zones)
     prog = blocks(option, ledger)
+    # a plate in two parts (massing: the plate box and a wing beside it) is laid out part by part and joined
+    parts = (next((x for x in massing["masses"] if x["name"] == "proposed"), None) or {}).get("parts")
+    if parts and len(parts) == 2:
+        return _solve_parts(site, option, ledger, massing, prog, parts)
+    return _solve_plate(site, option, ledger, massing, prog)
+
+
+def _solve_parts(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, parts: list[dict]) -> dict[str, Any]:
+    """A plate of two rectangles, the plate box and its wing (23 Nov 2026: a plate was one rectangle whatever the lot).
+    Each part is laid out as a plate of its own, with its own core, corridor and exits: the main part takes the
+    ground-floor uses and as many homes as it holds, the wing the homes that are left. The record is one plate, the
+    rectangle round both, with the ground neither part covers as cut-outs (`void` zones, which are not floor area),
+    so the sheets, the floor area and the block editor read it as any plate with a cut-out. The exits are read part by
+    part, since each part has its own, and each floor carries the worse of the two."""
+    import copy
+    pm = next(x for x in massing["masses"] if x["name"] == "proposed")
+
+    def sub(r: dict) -> dict:
+        mass = {k: v for k, v in pm.items() if k not in ("parts", "plate_origin", "angle_deg")}
+        mass.update(footprint=[[r["x"], r["y"]], [r["x"] + r["w"], r["y"]], [r["x"] + r["w"], r["y"] + r["d"]], [r["x"], r["y"] + r["d"]]],
+                    plate_width_m=r["w"], plate_depth_m=r["d"])
+        return {**massing, "masses": [mass] + [m for m in massing["masses"] if m["name"] != "proposed"]}
+
+    A = _solve_plate(site, option, ledger, sub(parts[0]), copy.deepcopy(prog))
+    owed = {s["block"]: int(s["units"]) for s in A["shortfall"] if s.get("units")}
+    flagged = sum(1 for fl in A["floors"] for z in fl["zones"] if z.get("accessible"))
+    prog_b = {**prog, "units_total": sum(owed.values()), "no_lobby": True, "accessible_units": max(0, int(option.get("accessible_units") or 0) - flagged),
+              "blocks": [{**b, "count": owed[b["key"]], "area_m2": round(owed[b["key"]] * b["gross_m2_each"], 1)} for b in prog["blocks"] if b["key"] in UNIT_KEYS and owed.get(b["key"])]}
+    B = _solve_plate(site, option, ledger, sub(parts[1]), prog_b)
+
+    x0, y0 = min(p["x"] for p in parts), min(p["y"] for p in parts)
+    x1, y1 = max(p["x"] + p["w"] for p in parts), max(p["y"] + p["d"] for p in parts)
+    xs = sorted({round(v, 2) for p in parts for v in (p["x"], p["x"] + p["w"])})
+    ys = sorted({round(v, 2) for p in parts for v in (p["y"], p["y"] + p["d"])})
+    covered = lambda cx, cy: any(p["x"] - 0.01 <= cx <= p["x"] + p["w"] + 0.01 and p["y"] - 0.01 <= cy <= p["y"] + p["d"] + 0.01 for p in parts)
+    voids: list[dict] = []
+    for j in range(len(ys) - 1):
+        run = None
+        for i in range(len(xs) - 1):
+            empty = not covered((xs[i] + xs[i + 1]) / 2, (ys[j] + ys[j + 1]) / 2)
+            if empty and run is None:
+                run = xs[i]
+            if run is not None and (not empty or i == len(xs) - 2):
+                end = xs[i + 1] if empty else xs[i]
+                voids.append({"block": "void", "label": "Cut-out", "x": run, "y": ys[j], "w": round(end - run, 2), "d": round(ys[j + 1] - ys[j], 2),
+                              "area_m2": round((end - run) * (ys[j + 1] - ys[j]), 1)})
+                run = None
+    mid = y0 + (y1 - y0) / 2
+    floors: list[dict] = []
+    for fa, fb in zip(A["floors"], B["floors"]):
+        zones = [dict(z) for z in fa["zones"]] + [dict(z, wing=True) for z in fb["zones"]] + [dict(v) for v in voids]
+        for z in zones:
+            z["side"] = "front" if z["y"] + z["d"] / 2 < mid else "rear"
+        floors.append({"level": fa["level"], "name": fa["name"], "z": fa["z"], "zones": zones, "spare_m2": round(fa["spare_m2"] + fb["spare_m2"], 1)})
+    pa, pb = A["plate"], B["plate"]
+    plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(x1 - x0, 2), "depth_m": round(y1 - y0, 2), "storeys": pa["storeys"], "floor_to_floor_m": pa["floor_to_floor_m"],
+             "double_loaded": pa["double_loaded"], "unit_depth_m": pa["unit_depth_m"], "arrangement": "wings", "stacking": pa.get("stacking"),
+             "parts": [{**{k: parts[i][k] for k in ("x", "y", "w", "d")}, "arrangement": p["arrangement"], **({"corridor": "across"} if p.get("corridor") == "across" else {}),
+                        **({"joins": parts[i]["joins"]} if parts[i].get("joins") else {})} for i, p in enumerate((pa, pb))]}
+    shortfall = [s for s in A["shortfall"] if not s.get("units")] + list(B["shortfall"])
+    seen: list[str] = []
+    for w in A["warnings"] + B["warnings"]:
+        if w not in seen and w not in (massing.get("warnings") or []):
+            seen.append(w)
+    w_part = parts[1]
+    seen.insert(0, f"The plate is in two parts: the plate box of {parts[0]['w']:g} × {parts[0]['d']:g} m and a wing of {w_part['w']:g} × {w_part['d']:g} m on its {w_part.get('joins', 'far')} side. "
+                   "Each is laid out with its own core, corridor and exits; where they meet is the architect's to draw (one core may serve both).")
+    L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, seen, edited=False, geometry=[])
+    ea, eb = A.get("egress"), B.get("egress")
+    if ea and eb:
+        per = []
+        for fa, fb in zip(ea["floors"], eb["floors"]):
+            worse = max((fa, fb), key=lambda f: (_STATUS_RANK.get(f["status"], 0), f.get("farthest_travel_m") or 0))
+            per.append({**worse, "exits": fa["exits"] + fb["exits"], "notes": list(fa["notes"]) + [f"the wing: {n}" for n in fb["notes"]]})
+        overall = max((f["status"] for f in per), key=lambda s: _STATUS_RANK.get(s, 0))
+        L["egress"] = {**ea, "floors": per, "status": overall, "by_part": True,
+                       "summary": f"{ea.get('summary') or ''} The wing, read with its own exits: {eb.get('summary') or ''}".strip()}
+    return L
+
+
+def _solve_plate(site: dict, option: dict, ledger: dict, massing: dict, prog: dict) -> dict[str, Any]:
+    """One rectangular plate laid out the ways it can be, and the best kept (see `solve`)."""
+    import copy
     slab = _solve(site, option, ledger, massing, prog, None)
     rank = lambda L: _STATUS_RANK.get((L.get("egress") or {}).get("status") or "pass", 0)
+    # the corridor run across the plate, from the street to the lane (23 Nov 2026, from an architect's test: on a lot
+    # 20 m wide and 26 m deep the corridor along the street served five homes a floor where one run back from the street
+    # serves seven). Tried on a plate deeper than it is wide, and kept where it places more homes with exits no worse.
+    # Not where the architect set a grid or cores, which are drawn for the plate as it stands.
+    pm_ = next((x for x in massing["masses"] if x["name"] == "proposed"), None) or {}
+    lay_spec = option.get("layout") or {}
+    if float(pm_.get("plate_depth_m") or 0) > float(pm_.get("plate_width_m") or 0) + 0.5 and not lay_spec.get("grid") and not lay_spec.get("cores"):
+        cross = _solve(site, option, ledger, massing, copy.deepcopy(prog), None, across=True)
+        # more homes with exits no worse, or as many homes with better exits; and always where the corridor along the
+        # street would leave homes deeper than daylight reaches and the corridor across does not (a 20 × 49 m plate
+        # laid along the street "placed" homes 23.6 m deep and 3 m wide)
+        deep_max, _ = LAYOUT_ASSUMPTIONS["max_home_depth_m"]
+        too_deep = lambda L: float(L["plate"].get("unit_depth_m") or 0) > deep_max + 0.05
+        if ((too_deep(slab) and not too_deep(cross))
+                or (not (too_deep(cross) and not too_deep(slab)) and ((cross["units_placed"] > slab["units_placed"] and rank(cross) <= rank(slab))
+                                                                      or (cross["units_placed"] == slab["units_placed"] and rank(cross) < rank(slab))))):
+            slab = cross
     # a low building is also tried as a walk-up (`_walkup_geometries`); one is kept only where it places more homes, its
     # exits no worse, or where the corridor plan places none
     best = slab
@@ -334,9 +477,14 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     return point if point["units_placed"] >= slab["units_placed"] and rank(point) <= rank(slab) else slab
 
 
-def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, point: dict | None) -> dict[str, Any]:
-    """One arrangement of the plates: along a corridor (`point` None), or the point tower `_point_geometry` drew."""
+def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, point: dict | None, across: bool = False) -> dict[str, Any]:
+    """One arrangement of the plates: along a corridor (`point` None), or the point tower `_point_geometry` drew.
+    `across`: the corridor run from the street to the lane. The plate is laid out turned a quarter (its depth taken as
+    its width), where everything below holds as written, and the record is turned back at the end (`_turn_back`):
+    the strip nearest the lot's left side is this frame's "front", and the street is at the low end of x."""
     pm, x0, y0, W, D, storeys, f2f = _plate(massing)
+    if across:
+        x0, y0, W, D = y0, x0, D, W
     corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
     core_w, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
     warnings: list[str] = []
@@ -427,14 +575,14 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
     for lv in range(storeys):
         if walkup:
             # the walk-up: the stair and its landing stand in the same place on every floor, the homes beside them
-            floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2),
+            floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": _floor_z(option, lv, f2f),
                            "zones": [dict(z) for z in point["zones"]], "runs": [dict(r) for r in point["runs"]], "spare_m2": 0.0})
             continue
         if point:
             # the point tower: its core, the ring round it, and the four strips of homes round that
             zones = [dict(point["core"]), *(dict(z) for z in point["ring"])]
             runs = [dict(r) for r in point["runs"]]
-            floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "runs": runs, "spare_m2": 0.0})
+            floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": _floor_z(option, lv, f2f), "zones": zones, "runs": runs, "spare_m2": 0.0})
             continue
         zones = [{"block": "core", "label": BLOCK_LABEL["core"], "x": round(c["x"], 2), "y": round(c["y"], 2), "w": round(c["w"], 2), "d": round(c["d"], 2), "area_m2": round(c["w"] * c["d"], 1),
                   **({"stairs": "scissor"} if c.get("stairs") == "scissor" else {})} for c in cores]
@@ -443,12 +591,30 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
         runs = band_runs("front", y0)
         if double:
             runs += band_runs("rear", corr_y + corr)
-        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "runs": runs, "spare_m2": 0.0})
+        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": _floor_z(option, lv, f2f), "zones": zones, "runs": runs, "spare_m2": 0.0})
 
-    def place(floor: dict, block: str, label: str, area: float, prefer: list[tuple[str, str]], extra: dict | None = None) -> float:
-        """Put `area` of a block into the floor's runs, preferring the named (side, end) runs; returns what did not fit."""
+    min_room, _ = LAYOUT_ASSUMPTIONS["min_room_width_m"]
+    trimmed: list[tuple[str, float]] = []
+
+    def place(floor: dict, block: str, label: str, area: float, prefer: list[tuple[str, str]], extra: dict | None = None, at: str | None = None, whole: float | None = None) -> float:
+        """Put `area` of a block into the floor's runs, preferring the named (side, end) runs; returns what did not fit.
+        `at` (the corridor across the plate only): "street" or "lane", the end of a strip the room must stand at; the
+        runs that reach that end are taken first, and the room is put at that end of them."""
         left = area
         order = [r for p in prefer for r in floor["runs"] if (r["side"], r["end"]) == p] + [r for r in floor["runs"] if (r["side"], r["end"]) not in prefer]
+        ends: dict[int, bool] = {}       # id(run) -> whether the room goes at the run's far end
+        if across and at:
+            def reach(r: dict) -> bool | None:
+                lo = r["edge"] if r["dir"] > 0 else r["edge"] - r["len"]
+                hi = r["edge"] + r["len"] if r["dir"] > 0 else r["edge"]
+                if at == "street" and abs(lo - x0) < 0.05:
+                    return r["dir"] < 0          # filled toward the street: its far end; filled from the street: its near end
+                if at == "lane" and abs(hi - (x0 + W)) < 0.05:
+                    return r["dir"] > 0
+                return None
+            near = [r for r in floor["runs"] if reach(r) is not None]
+            ends = {id(r): bool(reach(r)) for r in near}
+            order = near + [r for r in order if id(r) not in ends]
         for r in order:
             if left <= 0.05:
                 break
@@ -457,11 +623,20 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
             width = min(r["left"], q(left / r["depth"])) if r["depth"] else 0
             if width <= 0.05:
                 continue
-            x, y, w, d = _run_rect(r, width)
+            # the tail of a room that already has its main piece is not drawn as a sliver in another run (23 Nov 2026:
+            # an amenity room 0.86 m wide): the room is that much smaller, and the warning says by how much
+            if left < (whole or area) - 0.05 and width < min_room and block in ("amenity", "services", "design_space"):
+                trimmed.append((label, round(left, 1)))
+                left = 0.0
+                break
+            far = ends.get(id(r), False)
+            x, y, w, d = _far_rect(r, width) if far else _run_rect(r, width)
             z = {"block": block, "label": label, "x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "d": round(d, 2), "area_m2": round(width * r["depth"], 1), "side": r["side"]}
             if extra:
                 z.update(extra)
             floor["zones"].append(z)
+            if far:
+                r["far"] = r.get("far", 0.0) + width
             r["left"] -= width
             left -= width * r["depth"]
         return max(0.0, left)
@@ -469,23 +644,32 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
     shortfall: list[dict] = []
     by_key = {b["key"]: b for b in prog["blocks"]}
     ground = floors[0]
-    # the ground floor's other uses first, by their rules
+    # the entry: a lobby on the street side of the ground floor (23 Nov 2026: a building with a shop across its whole
+    # front had no way in, and the entry arrow pointed into the shop). Not in a walk-up, whose stair is its entry.
+    lobby_m2, _ = LAYOUT_ASSUMPTIONS["lobby_m2"]
+    if not walkup and prog["units_total"] and (strip or point) and not prog.get("no_lobby"):
+        place(ground, "design_space", "Lobby (entry)", lobby_m2, [("front", "left"), ("front", "right")], {"entry": True}, at="street")
+    # the ground floor's other uses, by their rules
     for key, prefer in (("non_residential", [("front", "left"), ("front", "right")]), ("amenity", [("front", "right"), ("front", "left")]), ("services", [("rear", "left"), ("rear", "right"), ("rear", "mid")])):
         b = by_key.get(key)
         if not b:
             continue
         rest = b["area_m2"]
-        for fl in floors:   # a ground floor that is full spills upward, and the check will say so
-            rest = place(fl, key, b["label"], rest, prefer)
+        # a ground floor that is full spills upward, and the check will say so; except the services, which go below
+        # grade with the parking instead of onto a floor of homes (23 Nov 2026: bicycle storage on level 2)
+        for fl in (floors[:1] if key == "services" else floors):
+            rest = place(fl, key, b["label"], rest, prefer, at="lane" if key == "services" else "street", whole=b["area_m2"])
             if rest <= 0.05:
                 break
-        if rest > 0.05:
+        if rest > 0.05 and key == "services":
+            warnings.append(f"{rest:,.0f} m² of the services and bicycle storage do not fit on the ground floor; they are taken below grade with the parking, which is not on the plates.")
+        elif rest > 0.05:
             shortfall.append({"block": key, "label": b["label"], "area_m2": round(rest, 1)})
     # the architect's own programs go on the ground floor facing the street, like the non-residential space
     for b in [b for b in prog["blocks"] if b["key"] == "other"]:
         rest = b["area_m2"]
         for fl in floors:
-            rest = place(fl, "other", b["label"], rest, [("front", "left"), ("front", "right")])
+            rest = place(fl, "other", b["label"], rest, [("front", "left"), ("front", "right")], at="street")
             if rest <= 0.05:
                 break
         if rest > 0.05:
@@ -498,9 +682,15 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
         whole number of modules, as long as that keeps it at or over the BC Housing minimum with its partitions,
         otherwise the next module up."""
         width = b["gross_m2_each"] / depth
+        # never narrower than the home's minimum width, nor so narrow that it is more than UNIT_DEPTH_RATIO_MAX times
+        # as deep as it is wide (declared placeholders; 23 Nov 2026: on a 12 m strip a studio came out 3.2 m wide)
+        # A walk-up's homes run the plate's full depth, lit at both ends: a different home, not held to these.
+        least = 0.0 if walkup else max(float(b.get("min_width_m") or 0), depth / UNIT_DEPTH_RATIO_MAX)
         if mod:
             near = max(1, round(width / mod)) * mod
-            width = near if near * depth + 0.5 >= b["min_gross_m2_each"] else q(width)
+            width = near if near * depth + 0.5 >= b["min_gross_m2_each"] and near + 1e-6 >= least else q(max(width, least))
+        else:
+            width = max(width, least)
         return width
 
     def place_unit(key: str, b: dict, flagged: bool) -> bool:
@@ -523,27 +713,148 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
                 return True
         return False
 
-    accessible_left = int(option.get("accessible_units") or 0)
-    for key in UNIT_KEYS:
-        b = by_key.get(key)
-        if not b or not (strip or point):
-            continue
-        for _ in range(b["count"]):
-            flagged = accessible_left > 0
-            if place_unit(key, b, flagged):
-                if flagged:
-                    accessible_left -= 1
+    for label, m2 in trimmed:
+        warnings.append(f"{label}: {m2:g} m² less than its brief, a leftover too narrow to be a room ({min_room:g} m).")
+
+    def by_floor() -> list[dict]:
+        """The homes placed floor by floor, each whole in the first run with room: family homes lowest, studios highest
+        (the arrangement of 3 Nov 2026). Returns the homes that did not fit, as shortfall rows."""
+        short: list[dict] = []
+        accessible_left = int(prog.get("accessible_units", option.get("accessible_units")) or 0)
+        for key in UNIT_KEYS:
+            b = by_key.get(key)
+            if not b or not (strip or point):
                 continue
-            sf = next((s for s in shortfall if s["block"] == key), None)
-            if sf:
-                sf["units"] += 1
-                sf["area_m2"] = round(sf["area_m2"] + b["gross_m2_each"], 1)
+            for _ in range(b["count"]):
+                flagged = accessible_left > 0
+                if place_unit(key, b, flagged):
+                    if flagged:
+                        accessible_left -= 1
+                    continue
+                sf = next((s for s in short if s["block"] == key), None)
+                if sf:
+                    sf["units"] += 1
+                    sf["area_m2"] = round(sf["area_m2"] + b["gross_m2_each"], 1)
+                else:
+                    short.append({"block": key, "label": UNIT_LABEL[key], "units": 1, "area_m2": b["gross_m2_each"]})
+        return short
+
+    def in_bays() -> list[dict]:
+        """The homes stacked in bays (23 Nov 2026, from an architect's test: three-bedrooms under two-bedrooms under
+        one-bedrooms put no party wall or wet wall over another). Floors that offer the same runs share one plan: its
+        slots are filled in the program's proportions, largest homes first, and the same home type stands in the same
+        slot on every floor above. Where the program runs out of a type before the top, the slot takes a smaller home
+        that fits, its near wall on the same line, or stays spare. Homes still left are placed wherever room remains."""
+        left = {k: (by_key[k]["count"] if k in by_key else 0) for k in UNIT_KEYS}
+        if not (strip or point) or not sum(left.values()):
+            return []
+        accessible_left = int(prog.get("accessible_units", option.get("accessible_units")) or 0)
+        order = lambda fl: sorted(range(len(fl["runs"])), key=lambda i: (fl["runs"][i]["side"] != "front", fl["runs"][i]["end"] != "left"))
+        sig = lambda fl: tuple((r["side"], r["end"], r["axis"], round(r["left"], 2), round(r.get("far", 0.0), 2), round(r["depth"], 2)) for r in fl["runs"])
+        groups: list[list[dict]] = []
+        for fl in floors:
+            if groups and sig(groups[-1][0]) == sig(fl):
+                groups[-1].append(fl)
             else:
-                shortfall.append({"block": key, "label": UNIT_LABEL[key], "units": 1, "area_m2": b["gross_m2_each"]})
+                groups.append([fl])
+        floors_left = len(floors)
+        for group in groups:
+            first = group[0]
+            # the plan of this group of floors: per run, the slots [(home type, offset from where the run starts filling, width)]
+            plan: list[tuple[int, str, float, float]] = []
+            count = {k: 0 for k in UNIT_KEYS}
+            for i in order(first):
+                r = first["runs"][i]
+                if r["depth"] <= 0:
+                    continue
+                at, room = r["len"] - r["left"] - r.get("far", 0.0), r["left"]
+                while True:
+                    # the home type the floors still owe most of, a floor, that fits what is left of the run
+                    want = [(left[k] / floors_left - count[k], -UNIT_KEYS.index(k), k) for k in UNIT_KEYS
+                            if left[k] / floors_left - count[k] > 1e-9 and unit_width(by_key[k], r["depth"]) <= room + 1e-9]
+                    if not want:
+                        break
+                    # the largest of them first: where the plates run short, it is the small homes that go without a
+                    # bay, as when the homes were placed floor by floor, never the family homes
+                    k = min(want, key=lambda t: UNIT_KEYS.index(t[2]))[2]
+                    w = unit_width(by_key[k], r["depth"])
+                    plan.append((i, k, at, w))
+                    count[k] += 1
+                    at, room = at + w, room - w
+            for fl in group:
+                ends: dict[int, float] = {}
+                for bay, (i, k, at, w) in enumerate(plan):
+                    r = fl["runs"][i]
+                    key = k if left[k] > 0 else next((s for s in UNIT_KEYS if left[s] > 0 and unit_width(by_key[s], r["depth"]) <= w + 1e-9), None)
+                    if key is None:
+                        continue      # nothing left that fits this bay on this floor: it stays spare
+                    uw = unit_width(by_key[key], r["depth"])
+                    s = r["edge"] + r["dir"] * at + (0 if r["dir"] > 0 else -uw)
+                    x, y, zw, zd = (s, r["at"], uw, r["depth"]) if r["axis"] == "x" else (r["at"], s, r["depth"], uw)
+                    flagged = accessible_left > 0
+                    fl["zones"].append({"block": key, "label": UNIT_LABEL[key], "x": round(x, 2), "y": round(y, 2), "w": round(zw, 2), "d": round(zd, 2),
+                                        "area_m2": round(uw * r["depth"], 1), "side": r["side"], "unit": key, "accessible": flagged, "bay": f"{i}.{bay}"})
+                    if flagged:
+                        accessible_left -= 1
+                    left[key] -= 1
+                    if uw < w - 0.3:      # a smaller home in a larger bay: the rest of the bay is spare, drawn so
+                        gs = r["edge"] + r["dir"] * (at + uw) + (0 if r["dir"] > 0 else -(w - uw))
+                        gx, gy, gw, gd = (gs, r["at"], w - uw, r["depth"]) if r["axis"] == "x" else (r["at"], gs, r["depth"], w - uw)
+                        fl["zones"].append({"block": "spare", "label": "Spare", "x": round(gx, 2), "y": round(gy, 2), "w": round(gw, 2), "d": round(gd, 2),
+                                            "area_m2": round((w - uw) * r["depth"], 1), "side": r["side"]})
+                        fl["gap_m2"] = fl.get("gap_m2", 0.0) + (w - uw) * r["depth"]
+                    ends[i] = max(ends.get(i, 0.0), at + w)
+                # what a run has left is what lies past its last bay, used or not, so the bays above stay aligned
+                last = {i: max(at + w for j, _, at, w in plan if j == i) for i in {j for j, *_ in plan}}
+                for i, end in last.items():
+                    fl["runs"][i]["left"] = max(0.0, fl["runs"][i]["len"] - end - fl["runs"][i].get("far", 0.0))
+                    fl["runs"][i]["units"] = sum(1 for j, *_ in plan if j == i)
+                floors_left -= 1
+        # the homes the bays did not take go wherever a run still has room, as before; the rest did not fit
+        short: list[dict] = []
+        for key in UNIT_KEYS:
+            for _ in range(left[key]):
+                flagged = accessible_left > 0
+                if place_unit(key, by_key[key], flagged):
+                    if flagged:
+                        accessible_left -= 1
+                    continue
+                sf = next((s for s in short if s["block"] == key), None)
+                if sf:
+                    sf["units"] += 1
+                    sf["area_m2"] = round(sf["area_m2"] + by_key[key]["gross_m2_each"], 1)
+                else:
+                    short.append({"block": key, "label": UNIT_LABEL[key], "units": 1, "area_m2": by_key[key]["gross_m2_each"]})
+        return short
+
+    # Both arrangements are laid out on the same floors. The bays are kept unless they cost more than a home or 2% of
+    # the program, whichever is more: walls and wet walls that line up are worth a home at a first layout, and the
+    # warning says what the other arrangement would hold. The plate says which it is.
+    import copy
+    stacking = "by floor"
+    if walkup:
+        shortfall += by_floor()
+    else:
+        before = copy.deepcopy(floors)
+        short_floor = by_floor()
+        placed_floor = sum(1 for fl in floors for z in fl["zones"] if z.get("unit"))
+        result_floor = floors
+        floors = before
+        short_bays = in_bays()
+        placed_bays = sum(1 for fl in floors for z in fl["zones"] if z.get("unit"))
+        if placed_bays >= placed_floor - max(1, round(0.02 * prog["units_total"])):
+            shortfall += short_bays
+            stacking = "bays"
+            if placed_bays < placed_floor:
+                warnings.append(f"The homes are stacked in bays, the same type above the same type; placed floor by floor with nothing lined up, the plates would hold {placed_floor} homes against {placed_bays}.")
+        else:
+            floors = result_floor
+            shortfall += short_floor
+            warnings.append(f"The homes are placed floor by floor, not stacked in bays: stacked, the plates held {placed_bays} homes against {placed_floor}.")
 
     # what is left on each floor is spare, drawn white
     for fl in floors:
-        spare = 0.0
+        spare = fl.pop("gap_m2", 0.0)
         for r in fl["runs"]:
             if r["left"] > 0.3:
                 x, y, w, d = _run_rect(r, r["left"])
@@ -553,7 +864,7 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
         del fl["runs"]
 
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2),
-             "arrangement": "double" if double else "single"}
+             "arrangement": "double" if double else "single", "stacking": stacking}
     if walkup:
         plate.update(arrangement="walkup", double_loaded=False, unit_depth_m=round(D, 2), walkup={"layout": point["layout"], "stair_m": point["stair_m"],
                                                                                                  "homes_per_floor": point["homes_per_floor"]})
@@ -563,7 +874,39 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
         plate.update(arrangement="point", double_loaded=False, unit_depth_m=round(point["uy"], 2), side_depth_m=round(point["ux"], 2), core_m=point["core_m"])
     if grid:
         plate["grid"] = grid
-    return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
+    deep_max, _ = LAYOUT_ASSUMPTIONS["max_home_depth_m"]
+    if not point and strip > deep_max + 0.05 and any(z.get("unit") for fl in floors for z in fl["zones"]):
+        warnings.append(f"The homes are {strip:.1f} m deep from their window wall, deeper than the {deep_max:g} m daylight is taken to reach: a plate this deep wants a courtyard or a narrower bar, "
+                        "and the homes counted here are not ones anyone would build.")
+    if ground_extra(option, f2f):
+        plate["ground_floor_m"] = round(f2f + ground_extra(option, f2f), 2)
+    L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
+    return _turn_back(L, option) if across else L
+
+
+def _turn_back(L: dict, option: dict) -> dict:
+    """A layout solved with the plate turned a quarter (`_solve`, `across`), put back in the plate's own frame: every
+    zone's x and y swapped, each zone's side read again from where it stands (the street half of the plate is the
+    front), the farthest unit's door and exit swapped, and the adjacency rules read back from the plan as it now
+    stands. The exits were measured in the turned frame, where the corridor runs along x, and stand as measured."""
+    p = L["plate"]
+    p["x"], p["y"], p["width_m"], p["depth_m"] = p["y"], p["x"], p["depth_m"], p["width_m"]
+    p.update(arrangement="cross", corridor="across")      # unit_depth_m stays: the homes' depth from their window wall, now measured across the plate
+    mid = p["y"] + p["depth_m"] / 2
+    for fl in L["floors"]:
+        fl["zones"] = [_t(z) for z in fl["zones"]]
+        for z in fl["zones"]:
+            z["side"] = "front" if z["y"] + z["d"] / 2 < mid else "rear"
+    for f in ((L.get("egress") or {}).get("floors") or []):
+        u = f.get("farthest_unit")
+        if u:
+            u["x"], u["y"] = u["y"], u["x"]
+            u["door"], u["exit"] = [u["door"][1], u["door"][0]], [u["exit"][1], u["exit"][0]]
+    prog = {"blocks": L["program"], "units_total": L["units_total"]}
+    L["adjacencies"] = [_check(rule, L["floors"], prog, L["shortfall"]) for rule in adjacencies_for(option)]
+    L["warnings"].insert(0, f"The corridor runs across the plate, from the street to the lane: the plate is {p['depth_m']:g} m deep and {p['width_m']:g} m wide, and a corridor "
+                            "run back from the street places more homes, or as many with better exits, than one along the street.")
+    return L
 
 
 def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited, geometry) -> dict[str, Any]:
@@ -577,6 +920,12 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
                 "rule_ids": [r["rule_id"] for r in (fsr_rule, h_rule) if r]}
     used = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] not in ("spare", "void")), 1)
     cut = round(sum(z["area_m2"] for fl in floors for z in fl["zones"] if z["block"] == "void"), 1)
+    light = daylight(floors, plate)
+    if light["status"] != "pass":
+        warnings = list(warnings) + [light["note"]]
+    shape = proportions(floors, plate)
+    if shape["status"] != "pass":
+        warnings = list(warnings) + [shape["note"]]
     exits_rule = _find(ledger["results"], rule_id=EGRESS_RULE)
     sprk = option.get("sprinklered")
     if sprk is None:
@@ -595,11 +944,106 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
         "program": prog["blocks"], "parking": prog["parking"], "units_total": prog["units_total"], "units_placed": placed_units,
         "adjacencies": checks, "geometry": geometry, "egress": eg, "floors": floors, "shortfall": shortfall, "outright": outright,
         "capacity": capacity(site, massing, outright, cut),
+        "daylight": light, "proportions": shape,
         "totals": {"plates_m2": gross_plates, "used_m2": used, "spare_m2": round(gross_plates - used - cut, 1), "gfa_m2": massing["masses"][0].get("gfa_m2"),
                    **({"void_m2": cut, "floor_area_m2": round(gross_plates - cut, 1)} if cut else {})},
         "assumptions": prog["assumptions"], "warnings": warnings + list(massing.get("warnings") or []),
         "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + (["option.layout.grid"] if plate.get("grid") else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
     }
+
+
+# ---------------------------------------------------------------- how deep the homes run from their windows
+
+# A declared placeholder, not a rule: past about this depth from its window wall a home has rooms without daylight.
+# It stands in for the daylight study an architect makes; the layout says how many homes pass it, never fails on it.
+UNIT_DEPTH_MAX_M = 10.0
+
+
+def _wide_deep(z: dict, x0: float, y0: float, W: float, D: float, tol: float = 0.06) -> tuple[float, float]:
+    """A home's width along its window wall and its depth from it: the wall is the street or lane side of the plate
+    where the home stands on one (width along x), else a side of the plate (width along y), else its longer side; a
+    home from the street side through to the lane side is lit at both ends and reads half its depth."""
+    along_x = z["y"] <= y0 + tol or z["y"] + z["d"] >= y0 + D - tol
+    along_y = z["x"] <= x0 + tol or z["x"] + z["w"] >= x0 + W - tol
+    wide, deep = (z["w"], z["d"]) if along_x or not along_y else (z["d"], z["w"])
+    if along_x and z["y"] <= y0 + tol and z["y"] + z["d"] >= y0 + D - tol:
+        deep = deep / 2
+    if not along_x and not along_y:
+        wide, deep = max(z["w"], z["d"]), min(z["w"], z["d"])
+    return wide, deep
+
+
+def proportions(floors: list[dict], plate: dict) -> dict[str, Any]:
+    """Every home's width along its window wall against the minimum for its type (UNIT_MIN_WIDTH_M), and its depth
+    against UNIT_DEPTH_RATIO_MAX times that width. The window wall is the plate edge the home stands on: the street
+    or lane side (its width runs along x), else a side of the plate (its width runs along y); a home on no edge is
+    read on its longer side. Counted and said in `note`; conditional where any home is under, never a failure. Pure."""
+    x0, y0, W, D = float(plate["x"]), float(plate["y"]), float(plate["width_m"]), float(plate["depth_m"])
+    tol = 0.06
+    narrow: list[tuple[str, float, float]] = []
+    slender: list[float] = []
+    for fl in ([] if plate.get("arrangement") == "walkup" else floors):   # a walk-up's through homes are not held to these
+        for z in fl["zones"]:
+            if not z.get("unit"):
+                continue
+            wide, deep = _wide_deep(z, x0, y0, W, D)
+            least = UNIT_MIN_WIDTH_M.get(z["unit"])
+            if least and wide + 0.05 < least:
+                narrow.append((z["unit"], wide, least))
+            if wide > 0 and deep / wide > UNIT_DEPTH_RATIO_MAX + 0.01:
+                slender.append(deep / wide)
+    bits = []
+    if narrow:
+        worst = min(narrow, key=lambda n: n[1] - n[2])
+        bits.append(f"{len(narrow)} home{'s' if len(narrow) != 1 else ''} {'is' if len(narrow) == 1 else 'are'} narrower than the minimum for {'its' if len(narrow) == 1 else 'their'} type "
+                    f"(the narrowest against its minimum: a {UNIT_LABEL[worst[0]].lower()} {worst[1]:.1f} m wide, {worst[2]:g} m asked)")
+    if slender:
+        bits.append(f"{len(slender)} home{'s' if len(slender) != 1 else ''} {'is' if len(slender) == 1 else 'are'} more than {UNIT_DEPTH_RATIO_MAX:g} times as deep as wide (up to {max(slender):.1f} times)")
+    return {"min_width_m": dict(UNIT_MIN_WIDTH_M), "depth_ratio_max": UNIT_DEPTH_RATIO_MAX, "narrow_units": len(narrow), "slender_units": len(slender),
+            "status": "conditional" if bits else "pass",
+            "note": ("Proportions (placeholders, not rules): " + "; ".join(bits) + ". Wider homes, or a shallower plate.") if bits else ""}
+
+
+def daylight(floors: list[dict], plate: dict) -> dict[str, Any]:
+    """Every home's depth from its window wall, read from the zones: the wall is a plate edge the home stands on, or
+    an edge it shares with a cut-out (a courtyard, a notch); a home that runs from the street side through to the lane
+    side is lit from both and reads half its depth. Homes deeper than UNIT_DEPTH_MAX_M, and homes with no window wall
+    at all, are counted and said in `note`; `status` is conditional where there are any. Pure."""
+    x0, y0, W, D = float(plate["x"]), float(plate["y"]), float(plate["width_m"]), float(plate["depth_m"])
+    tol = 0.06
+    deep: list[float] = []
+    dark = 0
+    for fl in floors:
+        voids = [z for z in fl["zones"] if z["block"] == "void"]
+        for z in fl["zones"]:
+            if not z.get("unit"):
+                continue
+            front, rear = z["y"] <= y0 + tol, z["y"] + z["d"] >= y0 + D - tol
+            left, right = z["x"] <= x0 + tol, z["x"] + z["w"] >= x0 + W - tol
+            for v in voids:
+                span_x = min(z["x"] + z["w"], v["x"] + v["w"]) - max(z["x"], v["x"])
+                span_y = min(z["y"] + z["d"], v["y"] + v["d"]) - max(z["y"], v["y"])
+                if span_x > 0.5 and abs(v["y"] + v["d"] - z["y"]) <= tol:
+                    front = True
+                if span_x > 0.5 and abs(z["y"] + z["d"] - v["y"]) <= tol:
+                    rear = True
+                if span_y > 0.5 and abs(v["x"] + v["w"] - z["x"]) <= tol:
+                    left = True
+                if span_y > 0.5 and abs(z["x"] + z["w"] - v["x"]) <= tol:
+                    right = True
+            depths = ([z["d"] / (2 if front and rear else 1)] if front or rear else []) + ([z["w"] / (2 if left and right else 1)] if left or right else [])
+            if not depths:
+                dark += 1
+            elif min(depths) > UNIT_DEPTH_MAX_M + tol:
+                deep.append(min(depths))
+    bits = []
+    if deep:
+        bits.append(f"{len(deep)} home{'s' if len(deep) != 1 else ''} run{'s' if len(deep) == 1 else ''} {max(deep):.1f} m from the window wall, past the {UNIT_DEPTH_MAX_M:g} m a home is usually lit to")
+    if dark:
+        bits.append(f"{dark} home{'s' if dark != 1 else ''} {'has' if dark == 1 else 'have'} no wall on the outside of the plate or on a cut-out, so no window")
+    return {"limit_m": UNIT_DEPTH_MAX_M, "deep_units": len(deep), "deepest_m": round(max(deep), 2) if deep else None, "no_window_wall": dark,
+            "status": "conditional" if bits else "pass",
+            "note": ("Daylight (a placeholder for the architect's study, not a rule): " + "; ".join(bits) + ". A shallower plate, a courtyard cut out of it, or wider homes.") if bits else ""}
 
 
 # ---------------------------------------------------------------- the floor space ratio left for another level
@@ -625,7 +1069,18 @@ def capacity(site: dict, massing: dict, outright: dict, void_m2: float = 0.0) ->
     # the cut-outs the architect drew (`void` zones) are not floor area: they come off the plates' total
     gfa, plate = max(0.0, float(pm["gfa_m2"]) - float(void_m2 or 0)), float(pm["plate_area_m2"])
     room = None if limit is None else round(limit * area - gfa, 1)
-    return {"site_area_m2": area, "storeys": pm["storeys"], "plate_m2": plate, "gfa_m2": gfa, "fsr": round(gfa / area, 3),
+    # the height beside it, read the same way: the benchmark's upper height where the policy fired, else the outright
+    # maximum (23 Nov 2026: a level added on the FSR alone took a test scheme past the benchmark height unsaid)
+    h_limit = h_from = None
+    bh = bench.get("height_m")
+    bh = max((v for v in bh if isinstance(v, (int, float))), default=None) if isinstance(bh, (list, tuple)) else bh
+    if isinstance(bh, (int, float)) and bh > 0:
+        h_limit, h_from = float(bh), "the rezoning policy's benchmark"
+    elif isinstance(outright.get("height_m"), (int, float)) and outright["height_m"] > 0:
+        h_limit, h_from = float(outright["height_m"]), "the district schedule's outright maximum"
+    height = {"height_m": float(pm["height_m"]), "height_limit_m": h_limit, "height_from": h_from,
+              "height_with_one_more": round(float(pm["height_m"]) + float(pm.get("floor_to_floor_m") or 0), 2)} if pm.get("height_m") else {}
+    return {**height, "site_area_m2": area, "storeys": pm["storeys"], "plate_m2": plate, "gfa_m2": gfa, "fsr": round(gfa / area, 3),
             "fsr_limit": limit, "limit_from": frm, "rule_id": rule_id, "room_m2": room,
             "levels_room": None if limit is None else max(0, int((room + 0.5) // plate)),
             "fsr_with_one_more": round((gfa + plate) / area, 3), **({"void_m2": round(float(void_m2), 1)} if void_m2 else {})}
@@ -666,6 +1121,22 @@ def _gap(a: dict, b: dict) -> float:
 
 
 def egress(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinklered: bool) -> dict[str, Any]:
+    """The exits, read on the plan as it stands. A plate whose corridor runs across it (`plate.corridor` "across") is
+    read turned a quarter, where the corridor lies along x as `_egress_along` expects, and the farthest unit's door and
+    exit are turned back; every figure is a distance, so none changes."""
+    if plate.get("corridor") != "across":
+        return _egress_along(L_floors, plate, prog, params, sprinklered)
+    turned = [{**fl, "zones": [_t(z) for z in fl["zones"]]} for fl in L_floors]
+    eg = _egress_along(turned, {**plate, "x": plate["y"], "y": plate["x"], "width_m": plate["depth_m"], "depth_m": plate["width_m"]}, prog, params, sprinklered)
+    for f in eg.get("floors") or []:
+        u = f.get("farthest_unit")
+        if u:
+            u["x"], u["y"] = u["y"], u["x"]
+            u["door"], u["exit"] = [u["door"][1], u["door"][0]], [u["exit"][1], u["exit"][0]]
+    return eg
+
+
+def _egress_along(L_floors: list[dict], plate: dict, prog: dict, params: dict, sprinklered: bool) -> dict[str, Any]:
     """The exits on every floor against BCBC 2024 Div B Part 3 (rule `bcbc.exits`): how many exits the floor
     needs and has (3.4.2.1), how far apart they are (3.4.2.3), how far the farthest unit door is from an exit
     along the corridor (3.4.2.4, 3.4.2.5), and how far a corridor runs past the last exit (3.3.1.9). Exits are the
@@ -872,6 +1343,10 @@ def egress_line(f: dict) -> str:
 
 # ---------------------------------------------------------------- a placement drawn by hand, re-checked
 
+# A declared placeholder: the least a core measures, each way, to hold an elevator and its lobby beside the stairs.
+# The solver's own cores are a core bay (7 m) wide; its end stairs are a stair's width and read as stairs alone.
+ELEVATOR_CORE_M = 5.0
+
 # `design_space` (a lobby, an atrium), `commercial` and `void` (a cut-out: open to below, a notch, a courtyard) are
 # the architect's own: no program asks for them, so they are measured and drawn but never short; a void is not
 # floor area, so it comes off the floor area the FSR is read on (`capacity`) and is never spare.
@@ -898,6 +1373,7 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
     geometry: list[dict] = []
     warnings: list[str] = []
     levels = {int(k): v for k, v in (zones_by_level.items() if isinstance(zones_by_level, dict) else enumerate(zones_by_level))}
+    lift_missing: list[int] = []
     floors: list[dict] = []
     for lv in range(storeys):
         raw = levels.get(lv) or []
@@ -920,6 +1396,16 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                 zone["accessible"] = bool(z.get("accessible"))
             if block == "corridor":
                 zone["through"] = "core"
+            # the architect's own name for a block (a lobby, an atrium, a café), drawn in place of the block's kind
+            name = str(z.get("name") or "").strip()[:40]
+            if name:
+                zone["name"] = name
+            if block == "void" and z.get("step"):
+                zone["step"] = True   # a cut-out the editor's step-back tool drew along an edge of an upper floor
+            if z.get("bay"):
+                zone["bay"] = str(z["bay"])     # the solver's bay, kept through the block editor so the stacking reads back
+            if block == "design_space" and z.get("entry"):
+                zone["entry"], zone["label"] = True, "Lobby (entry)"
             if block == "core" and z.get("stairs") in ("scissor", "single"):
                 zone["stairs"] = z["stairs"]   # the solver's scissor stair, or a walk-up's one stair, kept through the block editor
                 if z["stairs"] == "single":
@@ -944,11 +1430,21 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             geometry.append({"kind": "no_corridor", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has units but no corridor"})
         if zones and not any(z["block"] == "core" for z in zones):
             geometry.append({"kind": "no_core", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has no core: the stairs and the elevator must land on every floor"})
+        # above a walk-up's height the building needs an elevator: a core large enough to hold one beside its stairs
+        # on every floor (`elevator_core_m`, declared); a narrower core is read as an exit stair alone
+        if zones and storeys > WALKUP_MAX_STOREYS and not any(z["block"] == "core" and min(z["w"], z["d"]) + 1e-6 >= ELEVATOR_CORE_M for z in zones):
+            lift_missing.append(lv)
         used = sum(z["area_m2"] for z in zones if z["block"] not in ("spare", "void"))
         cut = sum(z["area_m2"] for z in zones if z["block"] == "void")
-        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": round(lv * f2f, 2), "zones": zones, "spare_m2": round(max(0.0, W * D - used - cut), 1)})
+        floors.append({"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": _floor_z(option, lv, f2f), "zones": zones, "spare_m2": round(max(0.0, W * D - used - cut), 1)})
         if cut:
             floors[-1]["void_m2"] = round(cut, 1)
+
+    if lift_missing:
+        n = len(lift_missing)
+        geometry.append({"kind": "no_elevator", "level": lift_missing[0], "block": "core",
+                         "note": f"no core large enough for an elevator on {'every floor' if n == storeys else f'{n} floor' + ('s' if n != 1 else '')}: a building of {storeys} storeys needs one, "
+                                 f"in a core at least {ELEVATOR_CORE_M:g} m wide and deep (narrower cores are read as exit stairs alone)"})
 
     # what the program still lacks, and what was placed beyond it
     shortfall: list[dict] = []
@@ -961,12 +1457,22 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                 warnings.append(f"{n - b['count']} more {b['label'].lower()} unit{'s' if n - b['count'] != 1 else ''} drawn than the option counts ({b['count']}): the option's unit mix is what the rules read")
         else:
             # an added program ("other") is told apart by its label
-            same = (lambda z: z["block"] == "other" and z["label"].strip().lower() == b["label"].strip().lower()) if b["key"] == "other" else (lambda z: z["block"] == b["key"])
+            # commercial space the architect drew is non-residential floor area: it counts toward that program
+            same = ((lambda z: z["block"] == "other" and z["label"].strip().lower() == b["label"].strip().lower()) if b["key"] == "other"
+                    else (lambda z: z["block"] in ("non_residential", "commercial")) if b["key"] == "non_residential" else (lambda z: z["block"] == b["key"]))
             placed = sum(z["area_m2"] for fl in floors for z in fl["zones"] if same(z))
-            if placed + 1.0 < b["area_m2"]:
+            if placed + 1.0 < b["area_m2"] and b["key"] == "services":
+                # services that do not fit at grade go below it with the parking, as the solver takes them
+                warnings.append(f"{b['area_m2'] - placed:,.0f} m² of the services and bicycle storage are not on the ground floor; they are taken below grade with the parking, which is not on the plates.")
+            elif placed + 1.0 < b["area_m2"]:
                 shortfall.append({"block": b["key"], "label": b["label"], "area_m2": round(b["area_m2"] - placed, 1)})
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2),
-             "arrangement": "double" if double else "single"}
+             "arrangement": "double" if double else "single",
+             "stacking": "bays" if any(z.get("bay") for fl in floors for z in fl["zones"]) else "by hand"}
+    # a plan kept from the solver's corridor across the plate: every corridor taller than it is wide, none ringing a core
+    corrs_all = [z for fl in floors for z in fl["zones"] if z["block"] == "corridor"]
+    if corrs_all and all(z["d"] > z["w"] for z in corrs_all):
+        plate.update(arrangement="cross", corridor="across", unit_depth_m=round(max(0.0, (W - corr) / 2), 2))
     # a placement round a ringed core (the solver's point tower, kept or moved by hand) is still a point tower
     ring = next(((fl, z) for fl in floors for z in fl["zones"] if z["block"] == "core" and _ringed(z, [c for c in fl["zones"] if c["block"] == "corridor"])), None)
     if ring:
@@ -977,6 +1483,16 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
         plate.update(arrangement="walkup", double_loaded=False, unit_depth_m=round(D, 2))
     if grid_of(option):
         plate["grid"] = grid_of(option)
+    # a home drawn narrower than its type's minimum width is a problem to fix, as a home under its area is (23 Nov
+    # 2026, Kai); how deep it runs for its width stays a note (`proportions`). A walk-up's through homes are not held to it.
+    if plate.get("arrangement") != "walkup":
+        for fl in floors:
+            for z in fl["zones"]:
+                least = UNIT_MIN_WIDTH_M.get(z.get("unit") or "")
+                if least and _wide_deep(z, x0, y0, W, D)[0] + 0.05 < least:
+                    where = "the ground floor" if fl["level"] == 0 else f"level {fl['level'] + 1}"
+                    geometry.append({"kind": "narrow", "level": fl["level"], "block": z["block"],
+                                     "note": f"a {z['label'].lower()} on {where} is {_wide_deep(z, x0, y0, W, D)[0]:.1f} m wide, under the {least:g} m a {z['label'].lower()} needs along its window wall"})
     return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
 
 
@@ -986,6 +1502,8 @@ def zones_of(L: dict) -> dict[str, list[dict]]:
     for fl in L["floors"]:
         out[str(fl["level"])] = [{k: z[k] for k in ("block", "x", "y", "w", "d")} | ({"accessible": True} if z.get("accessible") else {}) | ({"label": z["label"]} if z["block"] == "other" else {})
                                  | ({"stairs": z["stairs"]} if z.get("stairs") in ("scissor", "single") else {})
+                                 | ({"bay": z["bay"]} if z.get("bay") else {}) | ({"entry": True} if z.get("entry") else {})
+                                 | ({"name": z["name"]} if z.get("name") else {}) | ({"step": True} if z.get("step") else {})
                                  for z in fl["zones"] if z["block"] != "spare"]
     return out
 
@@ -996,7 +1514,7 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
     zones = [(fl, z) for fl in floors for z in fl["zones"]]
     out = {**rule, "status": "info", "note": ""}
     if key == "non_residential":
-        zs = [(fl, z) for fl, z in zones if z["block"] == key]
+        zs = [(fl, z) for fl, z in zones if z["block"] in (key, "commercial")]
         if not zs:
             out["note"] = "no non-residential space in the option"
             return out
@@ -1049,6 +1567,16 @@ def _check(rule: dict, floors: list[dict], prog: dict, shortfall: list[dict]) ->
         small = [fl["level"] for fl, z in zones if z.get("unit") in ("studio", "one_bed")]
         if not fam:
             out["note"] = "no three-bedroom units in the mix"
+            return out
+        # stacked in bays (the zones carry `bay`): the rule holds where the three-bedroom bays start at the lowest floor
+        # that has homes; placed floor by floor, where they sit under the smaller homes
+        stacked = any(z.get("bay") for fl, z in zones if z.get("unit") == "three_bed_plus")
+        if stacked:
+            lowest = min(fl["level"] for fl, z in zones if z.get("unit"))
+            bays = len({z["bay"] for fl, z in zones if z.get("unit") == "three_bed_plus" and z.get("bay")})
+            ok = min(fam) <= lowest + 1
+            out.update(status="pass" if ok else "conditional",
+                       note=f"three-bedroom homes stacked in {bays} bay{'s' if bays != 1 else ''}, levels {min(fam) + 1} to {max(fam) + 1}" + ("" if ok else ", starting above the lowest floor of homes"))
             return out
         ok = not small or max(fam) <= min(small) + 1
         out.update(status="pass" if ok else "conditional", note=f"three-bedroom units on levels {min(fam) + 1} to {max(fam) + 1}" + ("" if ok else ", above some smaller units"))
@@ -1261,6 +1789,13 @@ def _stair_boxes(z: dict, zones: list[dict]) -> list[dict]:
     bay, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
     x, y, w, d = z["x"], z["y"], z["w"], z["d"]
     corrs = [c for c in zones if c["block"] == "corridor"]
+    # a core on a corridor that runs across the plate (the corridor taller than it is wide, and no ring round the
+    # core): the stairs as they stand with the plan turned a quarter, turned back, their doors on the faces that become
+    crossing = [c for c in corrs if _touches(c, z)]
+    if crossing and all(c["d"] > c["w"] for c in crossing) and not _ringed(z, corrs):
+        face = {"x0": "y0", "x1": "y1", "y0": "x0", "y1": "x1"}
+        return [{"x": b["y"], "y": b["x"], "w": b["d"], "d": b["w"], "kind": b["kind"], "doors": [(dy, dx, face[f]) for dx, dy, f in b["doors"]]}
+                for b in _stair_boxes(_t(z), [_t(c) for c in zones])]
     # the corridor crossing the core along x: the stairs go in the core's longer part beside it
     y0, y1 = y, y + d
     for c in corrs:
@@ -1350,6 +1885,9 @@ def _entry_x(L: dict, fl: dict) -> float:
     st = next((z for z in zs if z["block"] == "core" and z.get("stairs") == "single"), None)
     if st:
         return st["x"] + st["w"] / 2
+    lobby = next((z for z in zs if z.get("entry")), None)
+    if lobby:
+        return lobby["x"] + lobby["w"] / 2
     am = next((z for z in zs if z["block"] == "amenity" and z.get("side") == "front"), None)
     if am:
         return am["x"] + am["w"] / 2
@@ -1393,6 +1931,8 @@ def _plan(out: list[str], L: dict, fl: dict, ox: float, oy: float, scale: float,
         if d < 13 or z["block"] == "core":
             continue
         name = ("Landing" if z.get("label") == "Landing" else str(z.get("label") or "")) if z["block"] in ("corridor", "other") else BLOCK_LABEL.get(z["block"], z["block"])
+        if z.get("name"):
+            name = str(z["name"])      # the architect's own name for the block
         lab = _fit([name, BLOCK_SHORT.get(z["block"], "")], w, 9.5)
         if lab:
             out.append(f'<text x="{x + w / 2:.1f}" y="{y + d / 2 + 3.5:.1f}" font-size="9.5" text-anchor="middle" fill="{TONES["ink"]}">{_esc(lab)}</text>')
@@ -1569,6 +2109,26 @@ def svg_plans(L: dict, bearing: float | None = None, street: str | None = None) 
     return "\n".join(out)
 
 
+def _step_insets(fl: dict, p: dict) -> tuple[float, float, float, float]:
+    """How far a floor stands in from the plate's street side, lane side, left and right: the depth of the
+    step-back's cut-outs (`void` zones marked `step`) along each edge. Zeros on a floor without one."""
+    f = r = l = rt = 0.0
+    for z in fl["zones"]:
+        if z["block"] != "void" or not z.get("step"):
+            continue
+        if z["w"] >= z["d"]:
+            if abs(z["y"] - p["y"]) < 0.06:
+                f = max(f, z["d"])
+            elif abs(z["y"] + z["d"] - p["y"] - p["depth_m"]) < 0.06:
+                r = max(r, z["d"])
+        if z["d"] > z["w"] or z["w"] < p["width_m"] - 0.5:
+            if abs(z["x"] - p["x"]) < 0.06 and z["d"] > z["w"]:
+                l = max(l, z["w"])
+            elif abs(z["x"] + z["w"] - p["x"] - p["width_m"]) < 0.06 and z["d"] > z["w"]:
+                rt = max(rt, z["w"])
+    return f, r, l, rt
+
+
 def svg_elevations(L: dict, massing: dict) -> str:
     """Front and side elevations: storeys × floor to floor, a window per unit as the rhythm, the ground floor's
     glazing where the non-residential space is, the outright height and the staff benchmark as lines; the floor levels
@@ -1577,7 +2137,8 @@ def svg_elevations(L: dict, massing: dict) -> str:
     "benchmark 1…" ran off the sheet, and the notes were cut mid-word)."""
     p = L["plate"]
     f2f, n = p["floor_to_floor_m"], p["storeys"]
-    H = f2f * n
+    g_extra = max(0.0, float(p.get("ground_floor_m") or f2f) - f2f)     # a taller ground floor lifts every level above it
+    H = f2f * n + g_extra
     masses = {m["name"]: m for m in massing["masses"]}
     bench = massing.get("policy_benchmark") or {}
     out_h = (L.get("outright") or {}).get("height_m") or (masses.get("outright") or {}).get("height_m")
@@ -1604,7 +2165,8 @@ def svg_elevations(L: dict, massing: dict) -> str:
     gap = lab_w + 36
     width = max(pad + marks + fw + gap + sw + lab_w + pad, 720)
     inner = width - 2 * pad
-    lines = [f'{_metres(Hp)} m high, as the section' + (f': {n} storeys × {f2f} m = {_metres(H)} m to the top floor level (thin line), the {_metres(Hp - H)} m above it parapet, roof or a taller ground floor' if Hp > H + 0.05 else f': {n} storeys × {f2f} m'),
+    lines = [f'{_metres(Hp)} m high, as the section' + (f': {n} storeys × {f2f} m{f" with a ground floor of {_metres(p['ground_floor_m'])} m" if g_extra else ""} = {_metres(H)} m to the top floor level (thin line), the {_metres(Hp - H)} m above it parapet{"" if g_extra else ", roof or a taller ground floor"}' if Hp > H + 0.05
+              else f': {n} storeys × {f2f} m' + (f", the ground floor {_metres(p['ground_floor_m'])} m" if g_extra else "")),
              (f'Outright maximum height {_metres(out_h)} m, dashed grey' if out_h else "No outright height in the stack for this district"),
              *([f'Staff benchmark {_metres(bench["height_m"][0])} to {_metres(bench["height_m"][1])} m, amber'] if bench.get("height_m") else []),
              f'Windows: one per unit on its side, {LAYOUT_ASSUMPTIONS["window_width_m"][0]} m wide, the unit module as the rhythm; a placeholder for the elevation study',
@@ -1624,11 +2186,26 @@ def svg_elevations(L: dict, massing: dict) -> str:
         out.append(f'<rect x="{ox:.1f}" y="{base - Hp * scale:.1f}" width="{length:.1f}" height="{Hp * scale:.1f}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
         if Hp > H + 0.05:
             out.append(f'<line x1="{ox:.1f}" y1="{base - H * scale:.1f}" x2="{ox + length:.1f}" y2="{base - H * scale:.1f}" stroke="{TONES["muted"]}" stroke-width="0.6" stroke-dasharray="3 2"/>')
+        below = (0.0, 0.0)
         for fl in L["floors"]:
             y_top = base - (fl["z"] + f2f) * scale
             y_floor = base - fl["z"] * scale
+            # a stepped floor (the step-back's cut-outs along its edges) stands in from the face below: the strip it
+            # gives up is cleared to the top of the building and its own face drawn, the roof of the floor below under it
+            ins = _step_insets(fl, p)
+            a, b = (ins[2], ins[3]) if axis == "x" else (ins[0], ins[1])
+            top = base - Hp * scale if fl["level"] == len(L["floors"]) - 1 else y_top
+            for cut, x_at, edge in ((a, ox - 1.5, ox + a * scale), (b, ox + length - b * scale, ox + length - b * scale)):
+                if cut > 0.05:
+                    out.append(f'<rect x="{x_at:.1f}" y="{top - 1.5:.1f}" width="{cut * scale + 1.5:.1f}" height="{y_floor - top + 1.5:.1f}" fill="{TONES["paper"]}"/>')
+                    out.append(f'<line x1="{edge:.1f}" y1="{top:.1f}" x2="{edge:.1f}" y2="{y_floor:.1f}" stroke="{TONES["ink"]}" stroke-width="1.2"/>')
+            if a > 0.05 or b > 0.05:
+                out.append(f'<line x1="{ox + a * scale:.1f}" y1="{top:.1f}" x2="{ox + length - b * scale:.1f}" y2="{top:.1f}" stroke="{TONES["ink"]}" stroke-width="{1.2 if fl["level"] == len(L["floors"]) - 1 else 0}"/>')
             if fl["level"]:
-                out.append(f'<line x1="{ox:.1f}" y1="{y_floor:.1f}" x2="{ox + length:.1f}" y2="{y_floor:.1f}" stroke="{TONES["muted"]}" stroke-width="0.6"/>')
+                la, lb = min(a, below[0]), min(b, below[1])
+                roof = a > below[0] + 0.05 or b > below[1] + 0.05
+                out.append(f'<line x1="{ox + la * scale:.1f}" y1="{y_floor:.1f}" x2="{ox + length - lb * scale:.1f}" y2="{y_floor:.1f}" stroke="{TONES["ink"] if roof else TONES["muted"]}" stroke-width="{1.2 if roof else 0.6}"/>')
+            below = (a, b)
             # windows: the zones on the face this elevation looks at
             face = [z for z in fl["zones"] if (axis == "x" and z.get("side") == "front") or (axis == "y" and z["block"] not in ("corridor",) and z.get("side") in ("front", "rear"))]
             if axis == "x":
@@ -1759,7 +2336,7 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
     bb = lot.get("bbox") or [0, 0, W, D]      # a polygon lot is drawn as itself, in its own extent
     polygon_lot = bool(lot.get("bbox"))
     bw, bd = max(bb[2] - bb[0], 1.0), max(bb[3] - bb[1], 1.0)
-    foot = pm["plate_width_m"] * pm["plate_depth_m"]
+    foot = float(pm["plate_area_m2"]) if pm.get("parts") else pm["plate_width_m"] * pm["plate_depth_m"]      # a plate in two parts: its own area, not the rectangle round it
     rows = [("Site area", f'{lot["area_m2"]:,.1f} m²', "", "")]
     fsr = _find(results, check="district_outright_fsr")
     rows.append(("Floor space ratio", f'{pm["fsr"]:.2f} ({pm["gfa_m2"]:,.0f} m²)', f'{fsr["values"].get("max_fsr_outright")} outright' if fsr else "no schedule in the stack", fsr["status"] if fsr else "info"))
@@ -1817,14 +2394,17 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
     out.append(f'<polygon points="{pts(lot_ring)}" fill="{TONES["lot"]}" stroke="{TONES["ink"]}" stroke-width="1.5"/>')
     if env_ring:
         out.append(f'<polygon points="{pts(env_ring)}" fill="none" stroke="{TONES["envelope"]}" stroke-width="1.2" stroke-dasharray="6 4"/>')
-    if polygon_lot and env.get("box"):
+    if polygon_lot and (env.get("box") or {}).get("ring"):
+        out.append(f'<polygon points="{pts(env["box"]["ring"])}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')    # a turned plate box
+    elif polygon_lot and env.get("box"):
         bx = env["box"]
         out.append(f'<rect x="{T(bx["x"], bx["y"] + bx["d"])[0]:.1f}" y="{T(bx["x"], bx["y"] + bx["d"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
     # the footprint as the massing has it: a rectangle, turned where the architect turned the mass
     out.append(f'<polygon points="{pts(pm["footprint"])}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
     fp_x = min(x for x, _ in pm["footprint"]); fp_y = max(y for _, y in pm["footprint"])
     fx, fy = T(fp_x, fp_y)
-    fp_words = f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys' + (f', turned {pm["angle_deg"]:g}°' if pm.get("angle_deg") else "")
+    fp_words = (f'two parts, {pm["plate_area_m2"]:,.0f} m² a floor, {pm["storeys"]} storeys' if pm.get("parts") else
+                f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys' + (f', turned {pm["angle_deg"]:g}°' if pm.get("angle_deg") else ""))
     fp_room = (max(x for x, _ in pm["footprint"]) - fp_x) * scale
     if _tw(fp_words, 10) + 8 > fp_room:
         fp_words = _fit([fp_words, f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m', f'{pm["storeys"]} st.'], fp_room - 4, 10) or ""

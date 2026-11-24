@@ -44,6 +44,7 @@ it makes. IronPython 2.7 and CPython 3 compatible: no f-strings, no annotations.
 
 import glob
 import json
+import math
 import os
 import traceback
 
@@ -346,14 +347,30 @@ def stage_masses(doc, data, stamp, result):
         label = "{0} | plate {1} m2 x {2} = {3} m2, FSR {4}, {5} m | {6}".format(
             mass.get("label"), mass.get("plate_area_m2"), mass.get("storeys"), mass.get("gfa_m2"),
             mass.get("fsr"), mass.get("height_m"), stamp)
-        ds = make_extrusion(doc, mass["footprint"], mass.get("base_z", 0.0), mass["height_m"], name, label)
+        # a stepped mass (massing.json `tiers`, 24 Nov 2026) is built tier by tier, each on its own outline; the first
+        # tier stands for the mass in the result. Without tiers, the one box as before.
+        tiers = mass.get("tiers") if mass.get("name") == "proposed" else None
+        if tiers and len(tiers) > 1:
+            ds = None
+            for ti, tier in enumerate(tiers):
+                piece = make_extrusion(doc, tier["footprint"], float(tier.get("base_z", 0.0)), float(tier["height_m"]),
+                                       "{0} tier {1}".format(name, ti + 1), label)
+                if ds is None:
+                    ds = piece
+        else:
+            tiers = None
+            ds = make_extrusion(doc, mass["footprint"], mass.get("base_z", 0.0), mass["height_m"], name, label)
         built["masses"][mass.get("name")] = ds
         result["built"].append({"kind": "mass", "name": name, "element_id": id_value(ds), "height_m": mass["height_m"],
                                 "storeys": mass.get("storeys"), "plate_area_m2": mass.get("plate_area_m2"), "fsr": mass.get("fsr")})
         if mass.get("name") == "proposed":
             f2f = float(mass.get("floor_to_floor_m", 3.0))
             for k in range(1, int(mass.get("storeys", 1))):
-                make_extrusion(doc, mass["footprint"], k * f2f, PLATE_THICKNESS_M,
+                plate_ring = mass["footprint"]
+                for tier in (tiers or []):          # the plate of the tier this level stands in
+                    if int(tier.get("from_level", 0)) <= k:
+                        plate_ring = tier["footprint"]
+                make_extrusion(doc, plate_ring, k * f2f, PLATE_THICKNESS_M,
                                "FFM proposed level {0}".format(k + 1), "floor plate | " + stamp)
                 built["plates"] += 1
     result["built"].append({"kind": "floor plates", "count": built["plates"]})
@@ -374,14 +391,23 @@ def stage_masses(doc, data, stamp, result):
                 made_levels += 1
             except Exception:
                 result["errors"].append({"stage": "masses/levels " + lname, "traceback": traceback.format_exc()})
-            f2f = float(layout.get("plate", {}).get("floor_to_floor_m", 3.0))
+            plate = layout.get("plate", {})
+            f2f = float(plate.get("floor_to_floor_m", 3.0))
+            # a mass turned on the lot (plate `angle_deg`, counter-clockwise about the plate's centre): its blocks are
+            # kept in the plate's own frame in layout.json, so they are turned here to stand inside the turned mass
+            turn = math.radians(float(plate.get("angle_deg") or 0.0))
+            pcx = float(plate.get("x", 0.0)) + float(plate.get("width_m", 0.0)) / 2.0
+            pcy = float(plate.get("y", 0.0)) + float(plate.get("depth_m", 0.0)) / 2.0
             for zone in fl.get("zones", []):
-                if zone.get("block") in ("spare", "corridor"):
+                if zone.get("block") in ("spare", "corridor", "void"):     # a cut-out is no floor: nothing is built
                     continue
                 try:
                     x, y, w, d = float(zone["x"]), float(zone["y"]), float(zone["w"]), float(zone["d"])
                     ring = [[x, y], [x + w, y], [x + w, y + d], [x, y + d]]
-                    label = "{0} | {1} | {2:,.0f} m2 | {3}".format(lname, zone.get("label") or zone.get("block"), w * d, stamp)
+                    if turn:
+                        ring = [[pcx + (px - pcx) * math.cos(turn) - (py - pcy) * math.sin(turn),
+                                 pcy + (px - pcx) * math.sin(turn) + (py - pcy) * math.cos(turn)] for px, py in ring]
+                    label = "{0} | {1} | {2:,.0f} m2 | {3}".format(lname, zone.get("name") or zone.get("label") or zone.get("block"), w * d, stamp)
                     make_extrusion(doc, ring, z + 0.05, max(0.5, f2f - 0.35), "FFM {0} {1}".format(lname.replace("FFM ", ""), zone.get("block")), label)
                     made_zones += 1
                 except Exception:

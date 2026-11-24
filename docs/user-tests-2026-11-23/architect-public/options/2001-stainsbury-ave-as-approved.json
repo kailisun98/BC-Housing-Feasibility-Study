@@ -1,0 +1,57 @@
+{
+  "id": "2001-stainsbury-ave-as-approved",
+  "name": "As approved and announced (public record figures)",
+  "proponent": "More Than a Roof Housing Society (owner-operator on a 60-year lease: public record)",
+  "proponent_type": "non_profit_society",
+  "developer_partner": null,
+  "tenure": "social_housing",
+  "rezoning_path": "CD-1 (849), rezoned from RS-1; approved by Council 28 Jul 2022",
+  "storeys": 7,
+  "height_m": 23.83,
+  "gfa_m2": 10254.0,
+  "residential_gfa_m2": 10254.0,
+  "non_residential_gfa_m2": 0,
+  "units": {
+    "studio": 29,
+    "one_bed": 37,
+    "two_bed": 35,
+    "three_bed_plus": 22
+  },
+  "rent_tiers_units": {
+    "market": 37,
+    "rgi": 61,
+    "deep_subsidy": 25
+  },
+  "share_below_hils": 0.7,
+  "max_rent_share_of_income": 0.3,
+  "owner_type_at_completion": "non_profit_society",
+  "housing_agreement_years": 60,
+  "accessible_units": 12,
+  "below_market_unit_share": 0.7,
+  "below_market_discount": 0.2,
+  "site_control": "finalized",
+  "parking_spaces": 35,
+  "bicycle_spaces": 227,
+  "replacement_trees_proposed": null,
+  "target_programs": [
+    "bch.chf.eligibility"
+  ],
+  "floor_to_floor_m": 3.3,
+  "setbacks_m": {
+    "front": 3.7,
+    "rear": 6.0,
+    "side": 3.0
+  },
+  "notes": "Simulated user test 2026-11-23. PUBLIC RECORD (https://www.shapeyourcity.ca/2009-2037-stainsbury-ave): seven storeys, height 23.83 m, net floor area 10,254 m2, FSR 3.46, 123 social housing units, 35 vehicle and 227 bicycle spaces. PUBLIC RECORD (https://news.gov.bc.ca/releases/2024HOUS0021-000204, 15 Feb 2024): 29 studio, 37 one-bedroom, 35 two-bedroom, 16 three-bedroom and 6 four-bedroom homes (the tool has no four-bedroom type, so 22 are entered as three-bedroom+); 25 homes at shelter rates, 61 rent geared to income, 37 affordable market; 60-year lease; ten per cent accessible (entered as 12, my rounding). MY ASSUMPTION: share below HILs 0.70 (the 86 RGI and shelter-rate homes over 123), the setbacks (the tool's placeholders 3.7/6.0/3.0 m), floor to floor 3.3 m, the Community Housing Fund as the program tested (the release names it), trees left blank.",
+  "sources": [
+    {
+      "title": "Shape Your City, 2009-2037 Stainsbury Ave rezoning application",
+      "url": "https://www.shapeyourcity.ca/2009-2037-stainsbury-ave"
+    },
+    {
+      "title": "BC Gov News, Vienna House, 15 Feb 2024",
+      "url": "https://news.gov.bc.ca/releases/2024HOUS0021-000204"
+    }
+  ],
+  "land_tenure_plan": "60-year lease from the City of Vancouver to More Than a Roof Housing Society (public record: news.gov.bc.ca/releases/2024HOUS0021-000204)"
+}

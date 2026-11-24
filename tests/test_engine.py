@@ -103,7 +103,7 @@ class TypicalCase(unittest.TestCase):
         self.assertEqual(by_id(self.L, "bc.bcbuilds.eligibility")["status"], "uncertain")
         self.assertEqual(self.L["summary"]["answers"]["funded"]["verdict"], "not yet confirmed")
         self.assertEqual(self.L["summary"]["answers"]["funded"]["words"],
-                         "Whether it meets the criteria of BC Builds and the Community Housing Fund is not yet confirmed")
+                         "Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed")
 
 
 class FundersCriteriaAndIntake(unittest.TestCase):
@@ -116,19 +116,19 @@ class FundersCriteriaAndIntake(unittest.TestCase):
 
     def test_the_verdict_key_is_unchanged_and_the_words_say_criteria(self):
         self.assertEqual(self.F["verdict"], "yes")
-        self.assertEqual(self.F["words"], "Meets the criteria of BC Builds and the Community Housing Fund")
+        self.assertEqual(self.F["words"], "Passes this screen's eligibility checks for BC Builds and the Community Housing Fund, each read on its own")
         chf = by_id(self.L, "bch.chf.eligibility")
-        self.assertTrue(chf["finding"].startswith("Community Housing Fund: meets the eligibility criteria"), chf["finding"])
+        self.assertTrue(chf["finding"].startswith("Community Housing Fund: passes the eligibility items this screen checks"), chf["finding"])
         self.assertNotIn("fits", chf["finding"])
 
     def test_the_closed_intake_is_said_beside_the_verdict(self):
         intake = {i["rule_id"]: i for i in self.F["intake"]}
         chf = intake["bch.chf.eligibility"]
         self.assertIs(chf["open"], False)
-        self.assertEqual(chf["note"], "the Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now")
-        self.assertIn("Its 2025 call was cancelled in February 2026", by_id(self.L, "bch.chf.eligibility")["finding"])
+        self.assertEqual(chf["note"], "the Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now")
+        self.assertIn("Its 2025 call did not proceed (February 2026)", by_id(self.L, "bch.chf.eligibility")["finding"])
         from ffm import memo
-        self.assertIn("**Meets the criteria of BC Builds and the Community Housing Fund.** The Community Housing Fund's 2025 call was cancelled in February 2026, so no intake is open now.",
+        self.assertIn("**Passes this screen's eligibility checks for BC Builds and the Community Housing Fund, each read on its own.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now.",
                       memo.markdown(self.L))
 
     def test_intake_words(self):
@@ -140,7 +140,11 @@ class FundersCriteriaAndIntake(unittest.TestCase):
         # an open program with a continuous intake (CMHC's Affordable Housing Fund) is listed, not said beside the verdict
         L = evaluate(SITE, {**OPTION, "target_programs": ["cmhc.ahf.readiness"]}, AS_OF)
         F = L["summary"]["answers"]["funded"]
-        self.assertEqual(F["intake"][0]["note"], "the CMHC Affordable Housing Fund's intake is continuous")
+        # CMHC closed the fund's portal on 19 Dec 2025 (its page, read 23 Nov 2026): the rule's second version says so
+        self.assertIs(F["intake"][0]["open"], False)
+        self.assertTrue(F["intake"][0]["note"].startswith("the CMHC Affordable Housing Fund: no intake is open now (closed 19 Dec 2025"))
+        before = evaluate(SITE, {**OPTION, "target_programs": ["cmhc.ahf.readiness"]}, date(2025, 6, 1))["summary"]["answers"]["funded"]
+        self.assertEqual(before["intake"][0]["note"], "the CMHC Affordable Housing Fund's intake is continuous")
         self.assertEqual(F["words"], "No program the option targets has criteria the rules test")
 
     def test_every_result_has_a_source(self):

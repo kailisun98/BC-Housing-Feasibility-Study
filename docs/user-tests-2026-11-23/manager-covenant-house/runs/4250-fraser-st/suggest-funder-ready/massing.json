@@ -1,0 +1,196 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "4250-fraser-st",
+  "option_id": "4250-fraser-st-suggested-funder-ready",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        18.97,
+        1.08
+      ],
+      [
+        18.97,
+        1.09
+      ],
+      [
+        18.89,
+        29.4
+      ],
+      [
+        -2.09,
+        29.41
+      ],
+      [
+        -2.06,
+        1.1
+      ]
+    ],
+    "frontage_m": 21.1,
+    "depth_m": 28.4,
+    "area_m2": 599.7,
+    "street_side": "y = 0",
+    "corners": [
+      [
+        18.97,
+        1.08
+      ],
+      [
+        18.89,
+        29.4
+      ],
+      [
+        -2.09,
+        29.41
+      ],
+      [
+        -2.06,
+        1.1
+      ]
+    ],
+    "bbox": [
+      -2.09,
+      1.08,
+      18.97,
+      29.41
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 594.8,
+    "shape": {
+      "class": "rectangle",
+      "note": "A rectangle, 595 m2, 28.4 x 21.0 m bounding rectangle.",
+      "rectangularity": 0.997,
+      "vertices": 4,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in)"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        17.26,
+        3.58
+      ],
+      [
+        17.19,
+        27.9
+      ],
+      [
+        -0.39,
+        27.91
+      ],
+      [
+        -0.36,
+        3.6
+      ]
+    ],
+    "width_m": 17.0,
+    "depth_m": 23.5,
+    "area_m2": 427.9,
+    "setbacks_m": {
+      "front": 2.5,
+      "rear": 1.5,
+      "side": 1.7
+    },
+    "box": {
+      "x": 0.11,
+      "y": 4.08,
+      "w": 17.0,
+      "d": 23.5,
+      "area_m2": 399.5
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 6 storeys, FSR 3.50",
+      "footprint": [
+        [
+          0.11,
+          4.08
+        ],
+        [
+          17.11,
+          4.08
+        ],
+        [
+          17.11,
+          24.658
+        ],
+        [
+          0.11,
+          24.658
+        ]
+      ],
+      "plate_width_m": 17.0,
+      "plate_depth_m": 20.58,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 19.8,
+      "storeys": 6,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 349.8,
+      "gfa_m2": 2099.0,
+      "fsr": 3.5,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    },
+    {
+      "name": "outright",
+      "label": "Outright: FSR 3.5, 23.0 m",
+      "footprint": [
+        [
+          0.11,
+          4.08
+        ],
+        [
+          17.11,
+          4.08
+        ],
+        [
+          17.11,
+          24.658
+        ],
+        [
+          0.11,
+          24.658
+        ]
+      ],
+      "plate_width_m": 17.0,
+      "plate_depth_m": 20.58,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 19.8,
+      "storeys": 6,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 349.8,
+      "gfa_m2": 2099.0,
+      "fsr": 3.5,
+      "derived_from": [
+        "cov.c2a.outright_fsr",
+        "cov.c2a.outright_height",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 5,
+    "after": 5,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [],
+  "outright_height_limit_m": 23.0
+}

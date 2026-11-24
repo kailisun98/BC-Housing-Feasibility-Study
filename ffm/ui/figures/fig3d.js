@@ -79,7 +79,9 @@ export function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   if (masses.proposed) {
     const p = masses.proposed;
     const depth = p.footprint.reduce((s, [x, y]) => s + proj([x, y, 0]).d, 0) / p.footprint.length;
-    items.push({ d: depth, s: box(p.footprint, p.base_z || 0, (p.base_z || 0) + p.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: p.storeys, f2f: p.floor_to_floor_m }) });
+    // a stepped mass is its tiers stacked, each with its own outline (massing's `tiers`); the upper ones painted last
+    if (p.tiers && p.tiers.length > 1) p.tiers.forEach((t, k) => items.push({ d: depth - k * 1e-4, s: box(t.footprint, t.base_z, t.base_z + t.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: t.storeys, f2f: p.floor_to_floor_m }) }));
+    else items.push({ d: depth, s: box(p.footprint, p.base_z || 0, (p.base_z || 0) + p.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: p.storeys, f2f: p.floor_to_floor_m }) });
   }
   // the outright mass sits inside the proposed one: paint it right before the proposed box
   const prop = items.find(i => i.d !== -1e9 && i.s.includes(FIG.proposedFill));

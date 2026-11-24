@@ -639,6 +639,75 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   the plate's `width_m`/`depth_m`. Not turned: the Plans by program sheets and the floor picker (the plate's own frame,
   by design), and the Revit script's floor blocks from `layout.json` (the masses turn, the blocks do not yet).
 
+- **Five fixes from a three-architect run of the block editor (23 Nov 2026; a simulated review, on 998 E 19th Ave).**
+  (1) `layout.capacity` also carries `height_m`, `height_limit_m` (the benchmark's upper height where the policy fired,
+  else the outright maximum), `height_from` and `height_with_one_more`; the editor says an FSR or height overrun under
+  the plate (`oversOf`, `.ed-over`), in the plate and add-level status lines and on the + Level tooltip. Nothing is
+  blocked. (2) `commercial` zones count toward the non-residential program (`place_zones` shortfall, `_check`, the
+  editor's `programTracker`). (3) The editor's grid defaults to quarter bays (`editor.divide` 4), so a studio is 4.5 m
+  and a one-bedroom 6 m on a 6 m bay; a unit's program row shows the area it is drawn at. (4) `place_zones` adds one
+  `no_elevator` geometry problem where a building over `WALKUP_MAX_STOREYS` has a floor with no core at least
+  `ELEVATOR_CORE_M` (5 m, a declared placeholder) wide and deep. (5) A block added by click or Enter with no free place
+  is not added (it used to land on the front-left corner over what stood there). Still open from that review: stepped
+  massing, unit depth and daylight, naming and typing a block's size, copy and mirror, the editor closing on Run, the
+  plate drifting after Auto with an added level, "Suggest a plan" in messages against the "Suggest a grid plan" button.
+
+- **The rest of that review (23 Nov 2026).** (a) *Stepped massing.* The editor's "Step back the upper floors" (`setStep`,
+  `rebuildSteps`, `editor.steps`: one entry {from_level, front, rear, left, right}) draws the step as cut-outs marked
+  `step` along the named sides of every floor from that level up, shortens those floors' corridors (the zone keeps its
+  own length in `full`), and takes the blocks standing in a strip off (back to the program). New blocks on a stepped
+  floor are sized for the shallower strip (`bandsOf` gives `frontD`/`rearD`, `fitBand`). Apply writes
+  `option.massing.steps`; `massing.build` then gives the proposed mass `tiers` (each its own outline, turned with the
+  mass), which the 3D view stacks (`fig3d.js`). The floor area a step takes off is the cut-outs', so the FSR follows.
+  The section, the elevations and the Revit masses still draw the unstepped box. A side step that meets an end stair
+  is an overlap for the architect to resolve (the cores are the same on every floor). (b) *Daylight.* `layout.daylight`
+  (in every layout as `daylight`): homes deeper than `UNIT_DEPTH_MAX_M` (10 m, a declared placeholder) from their
+  window wall, and homes with no wall on a plate edge or a cut-out; conditional, never a failure; a note in the
+  layout's warnings and a line under the plate. (c) A block takes a `name` (kept by the engine, drawn on the plans) and
+  a typed width and depth. (d) Duplicate (Ctrl+D) and Mirror this floor (cores stay). (e) A re-rendered memo reopens an
+  open editor on its floor in architect mode (`editor.resume`, `openEditor(resume)`). (f) Auto returns to the plate
+  there was before one was set (`editor.base.auto`), so an added level no longer carries a stale plate. (g) Messages
+  say "Suggest a grid plan", as the button.
+
+- **Unit widths and proportions (23 Nov 2026; figures Kai accepted as placeholders).** `layout.UNIT_MIN_WIDTH_M` (studio
+  4.0, one-bedroom 5.5, two-bedroom 7.5, three-bedroom 9.5 m along the window wall) and `UNIT_DEPTH_RATIO_MAX` (2.5: a
+  home at most that many times as deep as wide). The solver's `unit_width` never sizes a home under either, with or
+  without a grid (a walk-up's through homes are exempt); a program block carries `min_width_m`; the editor's `unitW`
+  does the same. `layout.proportions` (in every layout as `proportions`) counts homes drawn narrower or more slender by
+  hand: conditional, a note in the warnings and a line under the plate, never a geometry failure; the selection line
+  says it for the block in hand. This changes the memo's own plan on deep plates (strips over about 10 m), so committed
+  runs on such plates differ from a fresh run until they are regenerated. A home drawn by hand narrower than its minimum is also a `narrow` geometry problem in `place_zones` (it counts in Apply and in the memo's open item), the depth ratio stays a note. Of the committed runs only `375-glen-drive/as-proposed` and `375-glen-drive/first-run` hold homes under these widths (strips of 11.85 and 11.06 m); `as-proposed` was regenerated the same evening with the rest of the tree (a fresh run matches it file for file: studios 4.74 m, one-bedrooms 5.5 m, two-bedrooms 7.5 m, three-bedrooms 9.5 m, 144 of 163 homes); `first-run` is that site's frozen first revision under the earlier rules and is left as it was made. On a strip past 12.5 m the depth ask alone
+  makes a studio as wide as a one-bedroom; the daylight note says the plate is too deep.
+
+- **More of the block editor's open list (23 Nov 2026, late).** A block's `name` is carried onto a fresh plan's nearest
+  block of the same kind on the same floor (`suggestPlan`). "Fit the plate to the turn" beside the turned-mass warning
+  (`fitTurned`): the largest plate of the present proportions that stands inside the setback envelope when turned, at
+  the middle of the plate box (`editor.anchor` = "centre", written as `option.massing.anchor`; a plate against a corner
+  of the envelope puts a corner out at any angle). "Export DXF" (`dxfOf`): every floor's plate and blocks as closed
+  polylines, a layer per block kind (`FR-…`), names and areas as text, metres, the floors side by side; made in the
+  page from the editor's own state, so it needs no run. FIG 02's section cuts a stepped mass tier by tier
+  (`figures/section.js`). The floor picker's plan is north up (`floorPlanHtml`: the site's bearing less the mass's own
+  angle). Real mouse drags on the turned, north-up canvas were tested (a block dragged off onto the program, a studio
+  dragged on). Still open: shadow and separation distances; a column grid in both directions and the parkade; the
+  elevations and the Revit script for a stepped or turned mass (the Revit script cannot be tried without Revit); more
+  than one step-back; comparing massing options inside the editor (runs compare in the Side by side card).
+
+- **The last of the block editor's open list (24 Nov 2026).** *Step-backs:* `editor.steps` holds one a level (`stepAt`
+  gives the deepest inset a side at a level; the form adds or replaces, each has Remove); the elevations draw a stepped
+  floor in from the face below (`layout._step_insets`, from the cut-outs marked `step`). *Options to compare:* "Keep as
+  an option to compare" stores the plan with its plate, turn, steps and levels (`editor.variants`, for this site and
+  option, in the page only) and a table sets them beside what is on the plate now; Restore brings one back. *Shadows
+  and separation:* the "shadows" box draws the mass's shadow at the equinox at 10 am, noon and 2 pm daylight time
+  (`shadowsOf`: one box of the full height on flat ground, Vancouver's hour angles, the site's latitude; a first
+  reading, not the City's shadow study); the status line gives the distance to the nearest neighbouring building and
+  lot line (`ringGap`). *Structure and parking:* the canvas draws the grid across the plate too, with a column where
+  the bays meet, and a "Parkade, a first count" line (stalls at the layout's 30 m² each, the levels that takes under
+  what the setbacks leave, a 24 m ramp a level at 12.5%, stalls a bay at 2.6 m): placeholders, nothing is checked
+  against them. *Revit:* `revit/ffm_massing_pyrevit.py` builds a stepped mass tier by tier (and its floor plates on
+  the tier's outline), turns the floor blocks with a turned mass, names a block by its `name`, and builds nothing for a
+  cut-out; it compiles, and has NOT been run in Revit since: run it on a stepped or turned scheme before relying on it.
+  A lane-side step-back meets the cores where they stand on that edge, an overlap for the architect to resolve.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,
@@ -858,6 +927,87 @@ an architect, a board/funder reader, a tester, the detector) wrote `.impeccable/
   ledger and source list with one line counting them. On 998 R1: the policy A1, the RM-1 outright FSR and height A3
   and A4, the trees C6 (the area-plan family rule in layer C still applies city-wide).
 
+## The simulated user tests and their fixes (23 Nov 2026)
+
+`docs/user-tests-2026-11-23/` holds four role-played reviews (an architect, two development managers, a funder-side
+reader; AI role-plays, never to be quoted as practitioners or credited in the README), a browser walk, their wish
+lists, and a README that lists what was fixed and what is still open. What a later session must know:
+- **Housing type.** `option.housing_type` (independent, supportive, transitional, shelter; `checks.housing_kind`, which
+  also reads an option whose homes are all `supportive_units` as supportive). For the last three `chf_fit` and
+  `bc_builds_fit` return not applicable ("not the test for this option"), `engine.summarise` makes the funders verdict
+  `"not assessed"` with a `coverage.funders` open item, and `family_unit_share` returns uncertain (the City's to say).
+  The page asks it at stop 02 (`HOUSING_TYPES` in `fields.js`). `funded.scope` says which programs were tested.
+- **No rezoning.** `checks.proposes_rezoning(option)`: a `rezoning_path` that is blank or begins "none" is not a
+  rezoning. The family rule is then not applicable (where the path says "none…"), and an option allowed outright that
+  proposes none gets `by_rezoning.verdict == "not needed"` with the rezoning-only rules left out of the open items.
+- **Grants follow answer 2.** `proforma.build` counts the Community Housing Fund grant only where its check is not a
+  fail or not applicable (`funding.not_counted` otherwise); a counted grant is `illustrative`, and "likely" becomes
+  "unsure" where the cost is covered only by a grant from a fund with no open intake or unconfirmed criteria.
+  `verdict.operating_shortfall` (rents under the running costs) forces "unlikely" and `OPERATING_FUNDER` as the next step.
+- **C-2's rental FSR** needs `rental_min_non_dwelling_fsr` (0.35) of `non_residential_gfa_m2` over the site area;
+  `fsr_limit` returns `rental_short` and the base figure otherwise; `suggest.street_floor_m2` puts it in the suggestion.
+- **memo.md** carries `memo.layout_open_items` (the twin of the page's `layoutOpenItems`), prints only the rules
+  `takes_ref` keeps, and takes `massing_error`. Wording: "passes the eligibility items this screen checks", "did not
+  proceed" for a cancelled call, no "inbox/" or stop numbers in an action.
+- **Lookup.** The City's `civic_number` is text: `city_nearest` asks for a range as a list of numbers. On a civic
+  mismatch the geocoder's parcel stays the site and `lookup.nearest_on_street` names the other candidate; the CLI
+  refuses `--out` without `--accept-nearest`. A cross-street front the context does not show adjoining is not written.
+  The static build's own lookup (in the page) was not changed.
+- The committed runs were regenerated (fingerprints cd95334f97a184b5 for 23 Oct, ed83d80023e8f142 for 27 Oct,
+  ab455d78c14492b9 for 17 Nov; `375-glen-drive/first-run` untouched). Glen Drive as proposed now reads a 76% gap.
+- **The operating page** (same day, later). `option.operations` {rent_market_monthly_cad, rent_rgi_monthly_cad,
+  rent_deep_monthly_cad, operating_cost_per_unit_year_cad, support_staffing_cad_year, operating_subsidy_cad_year,
+  subsidy_confirmed, subsidy_source}: each stands over the layer F placeholder (`proforma.build`, the line's rule id is
+  then None and its note says "entered"). `operating.page` holds the table's figures; `proforma.operating_rows` /
+  `operating_markdown` and the page's `operatingRows` / `operatingTable` (memo/answers.js) are twins. `noi` is now after
+  support staffing and before any subsidy; a subsidy sizes debt only when confirmed; `staffing_missing` (supportive,
+  transitional or shelter housing with none entered) and an unconfirmed subsidy both stop "likely". The inputs are
+  `OPERATING_FIELDS` (`ops: true` in fields.js), a fold at stop 03 beside the money. `paper.js` prints the same rows
+  (`opTable`, after the money's line table).
+- **Sources and leftovers** (same day, final pass; the user-tests README has the list). `option.approval_route`
+  (rezoning | development_permit | outright; `checks.approval_route`, `APPROVAL_ROUTES`): by permit or outright the
+  rezoning-only rules are not applicable and `by_rezoning.verdict` is "not needed". `engine.summarise` drops open items
+  of layer-E programs the option does not target and appends "Ask: <contact>." (`CONTACTS`, `contact_for`; the item
+  carries `contact`). `finance.non_residential_cost_per_m2_cad` / `_income_cad_year` / `_funding_cad` are pro-forma
+  lines (`hard_nonres`, `nonres_income`, `nonres_funding`). `option.ground_floor_height_m` adds to the height
+  (`layout.ground_extra`, `plate.ground_floor_m`, absent when not set). `suggest` returns `same_building_note`.
+  `memo.markdown` ends with "Words in this memo" (`GLOSSARY`). `massing.svg` has the street at the bottom.
+  `bch.chf.eligibility` and `bc.bcbuilds.eligibility` have 2026-01-01 versions read from BC Housing's HTML pages
+  (verified); `cmhc.ahf.readiness` says its intake closed 19 Dec 2025. BC Housing's PDFs (Housing Income Limits, Design
+  Guidelines, the program frameworks) were **not** read: a download needs Kai's permission, and the browser pane
+  answers a bchousing.org PDF link with a save dialog. Fingerprints now 8bc2390c7cd9cbdb (23 Oct), 00b916863ab4ff5b
+  (27 Oct), 16df88bd0f50baba (17 Nov); gaps read 43%; 342 tests.
+- **BC Housing's PDFs read** (same day, with Kai's permission; `inbox/bc-housing-2026-11-23/`, fourteen files, text
+  extracted with `uv run --with pypdf`). New rules: `f.rgi_rents` (from 1 Dec 2025: Vancouver Housing Income Limits,
+  RGI rent at 30% of 70% of the limit as the fund's 2023 call estimates it, deep-subsidy rent by bedroom; `proforma`
+  reads it over `f.rents`' placeholder, line rule id `f.rgi_rents`) and `bch.shelter.bed_space` (check `shelter_beds`:
+  4.6 m² a bed space, four beds a room; not applicable unless `housing_type` is shelter). New versions:
+  `bch.chf.eligibility` from 1 Apr 2026 (`provisional_grant_per_unit_cad` 178,059, `grant_fiscal_year`; `checks._chf_grant`
+  reads either key) and `bch.design_guidelines.unit_areas` from 23 Nov 2026 (verified; `edition_status: archived`, since
+  BC Housing's own copy of the 2019 edition is stamped archived with no replacement named; four-bedroom 112 m²).
+  `program_match` prints `owner` and `rents` where a rule has them (the Supportive Housing Fund's buildings are owned by
+  the Province). Rules made earlier this session and never committed were edited in place, not re-versioned.
+  Fingerprints now e270210b5ed562c7 (23 Oct), 7c057234c9d4da8d (27 Oct), 46276d4e929a2c2f (17 Nov); 998 as approved
+  reads a 22% gap ($11.8M), funder-ready 45%; 95 rules; 350 tests. Not found in any of them: a cost per square metre
+  by building type, the fund's mix tolerance, a replacement for the archived guidelines.
+- **A CD-1 lot and a key; seventeen City schedules** (24 Nov 2026; the user-tests README has the table). The manager's
+  site card shows the schedule form for a CD-1 lot the rules do not hold (`cd1Slot` in route-stage.js; `renderClaude`
+  draws the one form into `#stage-cd1-slot` in manager mode, else `#claude-schedule-slot`; kept across card re-renders
+  by its `data-sig`). The tool cannot fetch a CD-1 by-law: `cd1-bylaws.vancouver.ca` returns 403 to a program, as the
+  other City hosts do. Layer A gained 51 verified rules from PDFs Kai saved (`inbox/city-2026-11-23/`): RT-4/4A, RT-5,
+  RT-7, RT-8, RT-10, RT-11, RM-6, RM-7/7A, RM-8/8A, RM-9A, RM-9, RM-9B, RM-10, RM-11, RM-12, FM-1, M-1 and the
+  Downtown-Eastside/Oppenheimer plan (district `DEOD`). `cov.rt.*` (from memory) now covers only RT-6 and the N
+  variants. New in `checks.py`: `_for_sub_area` (a rule's `by_sub_area` table read by `site.odp_sub_area`; uncertain
+  until it is recorded; asked at stop 01 for a DEOD lot), `housing_not_permitted` on a schedule (M-1: the FSR rule fails
+  for housing), and a height rule whose maximum is None (sub-area 4: discretion only, conditional). `suggest` handles
+  all three. The schedule generator was a scratch script; the rules file is the record. Fingerprints now
+  53056660a42fb57b (23 Oct), 30cfd9b9ac04c178 (27 Oct), a3bef23d7edb36b9 (17 Nov); 146 rules; 361 tests.
+- **Corrected by Kai, 24 Nov 2026** (this stands over the two bullets above where they differ): RT-6 and the N variants
+  are not districts (the City's map has RT-1, 2, 3, 4, 4A, 5, 7, 8, 9, 10, 11), so `cov.rt.*` is deleted and no RT site is
+  unverified; BC Housing's 2019 Design Guidelines are the standard (its page says so; the "archived" stamp is on the
+  PDF only), so `edition_status` is `current` and the unit-areas finding raises nothing. 144 rules, five unverified.
+  Fingerprints 31193259023b85e0 (23 Oct), 2c0cee962e81cc28 (27 Oct), 5cfd6a34b23f68ab (17 Nov). Kai saves by-law PDFs
+  in `02 A2\00 Research`, beside the repo.
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.
@@ -927,6 +1077,7 @@ an architect, a board/funder reader, a tester, the detector) wrote `.impeccable/
   `options/375-glen-drive-as-proposed.json` (the referral report's figures; the report PDF is `02 A2\rr5.pdf`, outside
   the repository) and the run in `outputs/375-glen-drive/as-proposed/`.
 - `rules/f_assumptions.json`: soft costs 25%, contingency 10%, operating $6,500 and reserve $600 per unit,
-  the RGI income at half the fund's limit are declared placeholders (`placeholder: true`); the hard-cost base
+  are declared placeholders (`placeholder: true`; the RGI income at half the fund's limit is overridden by
+  `f.rgi_rents` from 1 Dec 2025); the hard-cost base
   is a 2- to 4-unit catalogue figure; bachelor, one-bedroom and three-bedroom rents are null until typed from
   the CMHC data tables.

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="632" height="512" viewBox="0 0 632 512" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plan · 4250-fraser-st · 21.1 × 28.4 m, 600 m²</text>
+<polygon points="285.9,72.0 285.9,72.1 285.0,391.9 48.0,392.0 48.3,72.2" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
+<polygon points="71.6,66.6 309.9,66.6 309.9,312.8 71.6,312.8" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
+<polygon points="71.6,66.6 309.9,66.6 309.9,253.8 71.6,253.8" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
+<polygon points="71.6,66.6 309.9,66.6 309.9,253.9 71.6,253.9" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="408.0" fill="#5f6672">street (y = 0 is the top edge) · dashed = setback envelope 21.1 × 21.8 m</text>
+<text x="345.88210377691496" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
+<line x1="345.88210377691496" y1="392.0" x2="584.2160254147548" y2="392.0" stroke="#1f2933" stroke-width="1.5"/>
+<rect x="369.5" y="168.4" width="238.3" height="223.6" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5"/>
+<text x="375.5" y="386.0" fill="#1f2933">Outright: FSR 3.5, 23.0 m · 6 storeys (grey)</text>
+<rect x="369.5" y="168.4" width="238.3" height="223.6" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="369.5" y1="354.7" x2="607.8" y2="354.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="369.5" y1="317.5" x2="607.8" y2="317.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="369.5" y1="280.2" x2="607.8" y2="280.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="369.5" y1="242.9" x2="607.8" y2="242.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="369.5" y1="205.6" x2="607.8" y2="205.6" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="375.5" y="162.4" fill="#2a6fb8" font-weight="600">Proposed: 6 storeys, FSR 3.50 · 19.8 m</text>
+<text x="48" y="432.0" fill="#1f2933">Proposed: 6 storeys, FSR 3.50: plate 350 m² × 6 = 2,099 m² (FSR 3.50), 19.8 m high</text>
+<text x="48" y="448.0" fill="#1f2933">Outright: FSR 3.5, 23.0 m: plate 350 m² × 6 = 2,099 m² (FSR 3.50), 19.8 m high</text>
+<text x="48" y="464.0" fill="#1f2933">Trees: Schedule C requires 5, plan leaves 0 (shortfall 5); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>
+<text x="48" y="480.0" fill="#1f2933">Rules as of 2026-11-23 · drawn from the rules, not a survey</text>
+</svg>

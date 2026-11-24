@@ -1,0 +1,207 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "2001-stainsbury-ave",
+  "option_id": "2001-stainsbury-ave-what-if-6-storey",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        22.58,
+        2.38
+      ],
+      [
+        27.26,
+        0.0
+      ],
+      [
+        91.42,
+        2.38
+      ],
+      [
+        90.5,
+        32.5
+      ],
+      [
+        19.88,
+        41.66
+      ],
+      [
+        7.93,
+        43.21
+      ],
+      [
+        0.0,
+        35.63
+      ]
+    ],
+    "frontage_m": 91.42,
+    "depth_m": 43.21,
+    "area_m2": 2966.7,
+    "street_side": "y = 0",
+    "front_face": {
+      "street": "Stainsbury Ave"
+    },
+    "orientation": {
+      "rotate_deg": 2.114627,
+      "tx": -3.817,
+      "ty": -1.098
+    },
+    "front_edge": 1,
+    "corners": [
+      [
+        22.58,
+        2.38
+      ],
+      [
+        27.26,
+        0.0
+      ],
+      [
+        91.42,
+        2.38
+      ],
+      [
+        90.5,
+        32.5
+      ],
+      [
+        7.93,
+        43.21
+      ],
+      [
+        0.0,
+        35.63
+      ]
+    ],
+    "bbox": [
+      0.0,
+      0.0,
+      91.42,
+      43.21
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 2943.3,
+    "shape": {
+      "class": "irregular",
+      "note": "Irregular: 6 corners, 77% of its 94.9 x 40.4 m bounding rectangle, 2,943 m2.",
+      "rectangularity": 0.768,
+      "vertices": 6,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in); turned so lot edge 1 is the front (front_face {'street': 'Stainsbury Ave'})"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        23.81,
+        5.9
+      ],
+      [
+        28.08,
+        3.73
+      ],
+      [
+        88.31,
+        5.97
+      ],
+      [
+        87.67,
+        26.82
+      ],
+      [
+        10.0,
+        36.89
+      ],
+      [
+        5.62,
+        32.7
+      ]
+    ],
+    "width_m": 64.0,
+    "depth_m": 20.5,
+    "area_m2": 1973.3,
+    "setbacks_m": {
+      "front": 3.7,
+      "rear": 6.0,
+      "side": 3.0
+    },
+    "box": {
+      "x": 23.62,
+      "y": 6.23,
+      "w": 64.0,
+      "d": 20.5,
+      "area_m2": 1312.0
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 6 storeys, FSR 2.96",
+      "footprint": [
+        [
+          23.62,
+          6.23
+        ],
+        [
+          87.62,
+          6.23
+        ],
+        [
+          87.62,
+          26.73
+        ],
+        [
+          23.62,
+          26.73
+        ]
+      ],
+      "plate_width_m": 64.0,
+      "plate_depth_m": 20.5,
+      "at_street_corner": "left",
+      "base_z": 0.0,
+      "height_m": 19.8,
+      "storeys": 6,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 1312.0,
+      "gfa_m2": 7872.0,
+      "fsr": 2.653,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m",
+        "site.front_face"
+      ]
+    }
+  ],
+  "policy_benchmark": {
+    "height_m": [
+      19.9,
+      21.3
+    ],
+    "fsr": 3.0,
+    "rule_id": "cov.irp.social_housing_rezoning",
+    "source": {
+      "title": "Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026)",
+      "url": "https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf",
+      "section": "s.3.1.1; staff benchmark from the 998 E 19th Ave referral report",
+      "verify": "Map 1 of the policy decides whether a site is inside a former Community Vision area; outside it the Affordable Housing Policies (1989) apply."
+    }
+  },
+  "trees": {
+    "required": 25,
+    "after": 25,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "Proposed plate of 1,465 m² exceeds the plate box of 1,312 m² (the largest rectangle inside the 1,973 m² envelope); the mass fills it and the shortfall must go into more storeys, smaller setbacks or a plate that follows the lot line."
+  ],
+  "outright_height_limit_m": null
+}

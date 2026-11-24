@@ -95,7 +95,10 @@ class Egress(unittest.TestCase):
         self.assertEqual(f["farthest_unit"]["exit"][0], x0 + 7)
         self.assertEqual(f["status"], "fail")
         self.assertTrue(any("3.4.2.5" in n for n in f["notes"]), f["notes"])
-        svg = layout.svg_plans(layout.place_zones(SITE, OPTION, self.L, self.m, {**layout.zones_of(self.solved), "1": zones}))
+        # on every floor between the ground and the top, so the sheet's typical floor is the one that fails (the homes
+        # are stacked in bays since 23 Nov 2026, and one odd floor is no longer the typical one)
+        mid = {str(i): zones for i in range(1, self.solved["plate"]["storeys"] - 1)}
+        svg = layout.svg_plans(layout.place_zones(SITE, OPTION, self.L, self.m, {**layout.zones_of(self.solved), **mid}))
         self.assertIn("Egress: 2 exits, 2 required · travel 50.9 m, limit 45 m", svg)
         self.assertIn('stroke-dasharray="4 2"', svg)
 

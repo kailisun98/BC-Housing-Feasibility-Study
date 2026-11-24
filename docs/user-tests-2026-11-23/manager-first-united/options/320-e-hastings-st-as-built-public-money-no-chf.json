@@ -1,0 +1,74 @@
+{
+  "id": "320-e-hastings-st-as-built-public-money-no-chf",
+  "name": "320 E Hastings St as built (public record): 11 storeys, four floors of First United community services, seven floors with 103 homes operated by Lu'ma Native Housing Society; the publicly announced money entered (only the CMHC flag targeted, so no Community Housing Fund grant is counted)",
+  "proponent": "First United Church Community Ministry Society (land owner, community floors) with Lu'ma Native Housing Society (housing operator)",
+  "proponent_type": "non_profit_society",
+  "developer_partner": null,
+  "tenure": "social_housing",
+  "rezoning_path": "none: development permit DP-2020-00721 under DEOD Sub-area 1 (Development Permit Board, 25 Jan 2021; permit issued 15 Mar 2022)",
+  "storeys": 11,
+  "height_m": 37.0,
+  "gfa_m2": 9480.0,
+  "residential_gfa_m2": 5764.0,
+  "non_residential_gfa_m2": 3716.0,
+  "units": {
+    "studio": 52,
+    "one_bed": 51,
+    "two_bed": 0,
+    "three_bed_plus": 0
+  },
+  "supportive_units": 35,
+  "rent_tiers_units": {
+    "market": 0,
+    "rgi": 89,
+    "deep_subsidy": 14
+  },
+  "share_below_hils": 1.0,
+  "max_rent_share_of_income": 0.3,
+  "owner_type_at_completion": null,
+  "housing_agreement_years": null,
+  "accessible_units": null,
+  "below_market_unit_share": 1.0,
+  "below_market_discount": null,
+  "site_control": "finalized",
+  "parking_spaces": 12,
+  "bicycle_spaces": null,
+  "replacement_trees_proposed": null,
+  "target_programs": [
+    "cmhc.ahf.readiness"
+  ],
+  "floor_to_floor_m": 3.36,
+  "setbacks_m": {
+    "front": 0.0,
+    "rear": 0.0,
+    "side": 0.0
+  },
+  "notes": "Work-round: an empty target_programs list is read as 'every program' and a $17.6M Community Housing Fund grant is added. Same building. No program targeted (none of the real ones is in the tool). Money, all PUBLIC RECORD (https://news.gov.bc.ca/releases/2023HOUS0151-001731): other grants $40.28M = BC Housing $28.4M (Indigenous Housing Fund $15.3M + Supportive Housing Fund $13.06M) + CMHC $5.15M + City $6.73M (CHIP $4.83M and waivers); equity $34.0M = First United $24.4M (land costs and equity raised) + $9.6M still to be raised in Nov 2023. MY ASSUMPTION: land cost entered as 0 because the release folds the land into First United's $24.4M without a split, so the equity figure overstates cash by the land's value. PUBLIC RECORD: 11 storeys, 103 homes = 35 supportive + 68 rental prioritized for Indigenous people, floors 1-4 First United, operator Lu'ma (https://news.gov.bc.ca/releases/2023HOUS0151-001731); about 40,000 sq ft = 3,716 m2 of community space, 14 homes under $500 a month and the rest rent geared to income (https://broadview.org/?p=62916); all studios and one-bedrooms, 12 underground stalls (https://www.urbanyvr.com/?p=16166, 2020, which says 105 homes). MY ASSUMPTIONS: residential floor area 5,764 m2 (103 homes at about 40 m2 net over 0.72), hence total 9,480 m2; height 37.0 m; the 52/51 studio/one-bedroom split ('roughly even'); share below HILs 1.0; zero setbacks (a street-wall building); floor to floor is height over storeys. The floor area, FSR and height are in the Development Permit Board report (https://vancouver.ca/files/cov/320-ehastings.pdf), which refuses automated fetches and was not read. NOT PUBLIC, left blank: owner at completion, housing agreement term, accessible units. The programs targeted are the two the tool has; the real ones were BC Housing's Indigenous Housing Fund and Supportive Housing Fund, CMHC's National Housing Co-Investment Fund and the City's CHIP.",
+  "sources": [
+    {
+      "title": "Province of BC news release, 6 Nov 2023",
+      "url": "https://news.gov.bc.ca/releases/2023HOUS0151-001731"
+    },
+    {
+      "title": "CMHC news release, 6 Nov 2023",
+      "url": "https://cmhc-schl.gc.ca/media-newsroom/news-releases/2023/canada-supports-103-new-affordable-homes-vancouver"
+    },
+    {
+      "title": "Broadview, 26 Jun 2026",
+      "url": "https://broadview.org/?p=62916"
+    },
+    {
+      "title": "BCBusiness, 18 Nov 2021",
+      "url": "https://bcbusiness.ca/business/general/moving-first-forward/"
+    },
+    {
+      "title": "urbanYVR, 19 Nov 2020",
+      "url": "https://www.urbanyvr.com/?p=16166"
+    }
+  ],
+  "finance": {
+    "land_cost_cad": 0,
+    "equity_cad": 34000000,
+    "other_grants_cad": 40280000
+  }
+}

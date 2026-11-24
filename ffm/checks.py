@@ -46,6 +46,55 @@ def smallest_split(mix: dict[str, float], tolerance: float, limit: int = 400) ->
 _smallest_split = smallest_split
 
 
+# What kind of housing the option is (23 Nov 2026, from three simulated user tests: a youth shelter and a supportive
+# building were failed against the Community Housing Fund's 30/50/20 mix and the family-unit minimum, and told to "add
+# family units"). `option.housing_type` says it (independent, supportive, transitional, shelter); where it is blank, an
+# option whose homes are all supportive (`supportive_units` equal to the homes) is read as supportive. Independent
+# rental is what the funder and family rules in the stack are written for; for the other three they say so instead of
+# failing, and hand the question to a person. Pure; the page's fields.js housingKind is the twin.
+HOUSING_TYPES = ("independent", "supportive", "transitional", "shelter")
+HOUSING_WORDS = {"supportive": "supportive housing", "transitional": "transitional housing", "shelter": "a shelter"}
+
+
+def housing_kind(option: Option) -> str:
+    kind = str((option or {}).get("housing_type") or "").strip().lower()
+    if kind in HOUSING_TYPES:
+        return kind
+    total = _units_total(option or {})
+    supportive = int((option or {}).get("supportive_units") or 0)
+    return "supportive" if total and supportive >= total else "independent"
+
+
+def proposes_rezoning(option: Option) -> bool:
+    """Whether the option states a rezoning: a `rezoning_path` that is not blank and does not begin "none" (a
+    development permit under an official development plan, or an outright scheme, is written "none: …")."""
+    route = approval_route(option)
+    if route in ("development_permit", "outright"):
+        return False
+    if route == "rezoning":
+        return True
+    path = str((option or {}).get("rezoning_path") or "").strip().lower()
+    return bool(path) and not path.startswith(("none", "no rezoning", "not a rezoning"))
+
+
+APPROVAL_ROUTES = ("rezoning", "development_permit", "outright")
+ROUTE_WORDS = {"rezoning": "a rezoning", "development_permit": "a development permit under the district's schedule or official development plan",
+               "outright": "an outright development permit"}
+
+
+def approval_route(option: Option) -> str | None:
+    """How the option is approved, where a person said (`option.approval_route`, 23 Nov 2026: a development-permit
+    building in the Downtown Eastside and two sites already rezoned were read against the rules written for rezonings,
+    because the only way to say otherwise was to type "none: …" as the rezoning path). None where it was not said."""
+    route = str((option or {}).get("approval_route") or "").strip().lower()
+    return route if route in APPROVAL_ROUTES else None
+
+
+def no_rezoning_stated(option: Option) -> bool:
+    """A person said there is no rezoning: by the approval route, or by a rezoning path that begins "none"."""
+    return approval_route(option) in ("development_permit", "outright") or (bool(str((option or {}).get("rezoning_path") or "").strip()) and not proposes_rezoning(option))
+
+
 def fsr(site: Site, option: Option) -> float | None:
     if site.get("site_area_m2") and option.get("gfa_m2"):
         return option["gfa_m2"] / site["site_area_m2"]
@@ -99,14 +148,43 @@ def _best_row(site: Site, option: Option, rows: list[dict], key: str) -> dict | 
     return max(fits, key=lambda r: r[key]) if fits else None
 
 
+def _for_sub_area(site: Site, p: Params) -> tuple[Params, dict | None]:
+    """A plan that sets its figures by sub-area (the Downtown-Eastside/Oppenheimer plan, read 23 Nov 2026): the rule's
+    params with the site's sub-area's own laid over them, or, where the site does not record one the plan has, the
+    params as they are and what is missing ({key, choices, names})."""
+    table = p.get("by_sub_area")
+    if not table:
+        return p, None
+    key = p.get("sub_area_key") or "odp_sub_area"
+    sub = str((site or {}).get(key) or "").strip()
+    names = p.get("sub_area_names") or {}
+    if sub not in table:
+        return p, {"key": key, "choices": sorted(table), "names": names}
+    merged = {k: v for k, v in p.items() if k != "by_sub_area"}
+    merged.update(table[sub])
+    merged["_sub_area"] = sub
+    merged["_sub_area_words"] = f" in sub-area {sub}" + (f" ({names[sub]})" if names.get(sub) else "")
+    return merged, None
+
+
+def _which_sub_area(need: dict) -> Result:
+    said = ", ".join(f"{c} {need['names'][c]}" if need["names"].get(c) else c for c in need["choices"])
+    return _r(UNSURE, f"The plan sets this limit by sub-area ({said}) and the site does not record which one it is in.", {"sub_area": None},
+              action="Manager or architect: find the lot on the plan's sub-area map and record its sub-area on the site.")
+
+
 def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
     """The FSR a schedule's rule allows this site and option: `max` the most allowed without discretion (None where the
     site meets no row of the schedule's table), `words` how the schedule gets there, `discretionary` what the Director
     may allow above it and its clause, `increases` formula increases not computed here, `floor_area_cap` a CD-1's fixed
     floor area in m² (its `max` is then that area over the site), `short` why no figure applies."""
     tenure = option.get("tenure")
-    out: dict[str, Any] = {"max": p.get("max_fsr"), "base": p.get("max_fsr"), "words": "", "discretionary": None, "discretionary_clause": None,
+    p, need = _for_sub_area(site, p)
+    out: dict[str, Any] = {"max": p.get("max_fsr"), "base": p.get("max_fsr"), "words": p.get("_sub_area_words") or "", "discretionary": None, "discretionary_clause": None,
                            "increases": p.get("fsr_increases"), "floor_area_cap": None, "short": None}
+    if need:
+        out["short"] = "the plan sets it by sub-area and the site's sub-area is not recorded"
+        return out
     if p.get("fsr_table"):
         row = _best_row(site, option, p["fsr_table"], "max_fsr")
         if row is None:
@@ -128,7 +206,20 @@ def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
         r = p["max_fsr_rental"]
         if p.get("max_fsr_rental_corner") and _row_fits(site, option, p["max_fsr_rental_corner"]):
             r = max(r, p["max_fsr_rental_corner"]["max_fsr"])
-        out.update({"max": r, "words": f" for a building with every home secured as rental ({p.get('rental_fsr_clause') or 'the schedule'}; {out['base']} otherwise)"})
+        # The rental figure can ask for non-dwelling floor area at the street (C-2 s.3.1.1.1: 0.35 FSR). It is tested, not
+        # assumed (23 Nov 2026: an all-residential C-2A option read "outright: yes" at 3.5 beside the clause that asks
+        # for the shops); short of it the base figure stands and the words say what the higher one needs.
+        need = p.get("rental_min_non_dwelling_fsr")
+        area = float(site.get("site_area_m2") or 0)
+        have = (float(option.get("non_residential_gfa_m2") or 0) / area) if area else 0.0
+        if need and round(have, 2) + 1e-9 < need:
+            out.update({"rental_short": {"needs_non_dwelling_fsr": need, "has_non_dwelling_fsr": round(have, 2), "max_fsr_rental": r,
+                                         "needs_m2": round(need * area) if area else None},
+                        "words": f" ({r} is open to a building with every home rental and {need} FSR of non-dwelling use at the street, "
+                                 f"{round(need * area):,.0f} m² on this lot; this option has {float(option.get('non_residential_gfa_m2') or 0):,.0f} m², FSR {have:.2f}; "
+                                 f"{p.get('rental_fsr_clause') or 'the schedule'})"})
+        else:
+            out.update({"max": r, "words": f" for a building with every home secured as rental ({p.get('rental_fsr_clause') or 'the schedule'}; {out['base']} otherwise)"})
     if tenure == SOCIAL and p.get("max_fsr_social_housing") and (out["max"] is None or p["max_fsr_social_housing"] > out["max"]):
         out.update({"max": p["max_fsr_social_housing"], "words": f" for 100% social housing ({p.get('social_housing_fsr_clause') or 'the schedule'}; {out['base']} otherwise)"})
     disc = p.get("max_fsr_discretionary")
@@ -154,7 +245,8 @@ def height_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
     the site's row of a table counted), `words`, and `discretionary` with its clause and whether it is for social
     housing only (RM-4 s.3.1.2.11) or for any building (RM-5 s.3.1.2.7)."""
     tenure = option.get("tenure")
-    out: dict[str, Any] = {"max": p.get("max_height_m"), "storeys": p.get("max_storeys"), "base": p.get("max_height_m"), "words": "",
+    p, _need = _for_sub_area(site, p)
+    out: dict[str, Any] = {"max": p.get("max_height_m"), "storeys": p.get("max_storeys"), "base": p.get("max_height_m"), "words": p.get("_sub_area_words") or "",
                            "discretionary": None, "discretionary_clause": None, "discretionary_social": False}
     if p.get("height_table"):
         row = _best_row(site, option, p["height_table"], "max_height_m")
@@ -190,7 +282,18 @@ def district_outright_fsr(site, option, p) -> Result:
         return _r(FAIL, f"Every home in this district must be secured as residential rental tenure ({p.get('rental_only_clause') or 'the schedule'}); "
                   f"this option's tenure is {str(tenure or 'not stated').replace('_', ' ')}.", {"tenure": tenure},
                   action="Choose social housing or secured rental, or a site in another district.")
+    need = _for_sub_area(site, p)[1]
+    if need:
+        return _which_sub_area(need)
+    # a schedule that does not permit housing as a use (M-1, read 23 Nov 2026: a dwelling unit only where essential to
+    # a business): that comes before any floor area, and a schedule in the rules must not read as "allowed"
+    if p.get("housing_not_permitted"):
+        d, path = site.get("zoning_district") or "this district", option.get("rezoning_path")
+        tail = f"so it is not allowed outright; rezoning is required ({path})." if proposes_rezoning(option) else "so it is not allowed outright, and no rezoning path is stated."
+        return _r(FAIL, f"{p['housing_not_permitted']} This option is housing, {tail}", {"housing_permitted": False},
+                  action=f"Manager: ask a City planner whether housing is permitted in {d} at all, and by what route, before any design work.")
     lim = fsr_limit(site, option, p)
+    p = _for_sub_area(site, p)[0]
     # a CD-1 by-law can fix the site area its FSR is computed on (CD-1 (819) s.5.1: the site before dedications)
     fixed = p.get("fsr_site_area_m2")
     area = fixed or site.get("site_area_m2")
@@ -258,10 +361,21 @@ def district_outright_height(site, option, p) -> Result:
     h = option.get("height_m")
     if h is None:
         return _r(UNSURE, "Height missing.", action="Enter the proposed height to the roof parapet in metres.")
+    p, need = _for_sub_area(site, p)
+    if need:
+        return _which_sub_area(need)
     lim = height_limit(site, option, p)
     mx, ms = lim["max"], lim["storeys"]
     st = option.get("storeys")
     vals = {"height_m": h, "max_height_m_outright": mx, "storeys": st}
+    if mx is None:      # a sub-area the plan gives no maximum for (the Oppenheimer plan's sub-area 4): discretion only
+        var = lim["discretionary"]
+        why = p.get("no_maximum_note") or "the plan states no maximum height here"
+        if var and h <= var:
+            vals["max_height_m_variance"] = var
+            return _r(COND, f"No outright maximum height applies{lim['words']}: {why}. Height {h} m is within that, by discretion, not assumed.", vals,
+                      action=f"Architect: confirm the height limit with City staff and ask for the height under {lim['discretionary_clause']}.")
+        return _r(UNSURE, f"No outright maximum height applies{lim['words']}: {why}.", vals, action="Architect: confirm the height limit with City staff.")
     if ms:
         vals["max_storeys_outright"] = ms
     if mx != lim["base"]:
@@ -292,10 +406,12 @@ def district_outright_height(site, option, p) -> Result:
 def rezoning_policy_social_housing(site, option, p) -> Result:
     if option.get("tenure") != "social_housing":
         return _r(NA, "The interim rezoning policy applies to 100% social housing; this option is not social housing.")
+    if no_rezoning_stated(option):
+        return _r(NA, "No rezoning is proposed (the option's approval route says so), so the rezoning policy is not read.")
     inside = site.get("in_former_community_vision_area")
     if inside is None:
         return _r(UNSURE, "Whether the site is inside a former Community Vision area (Map 1 of the policy) is not confirmed.",
-                  action="Architect: check Map 1 of the policy for this address.")
+                  action="Manager: check Map 1 of the policy for this address, and answer it at 01.")
     if not inside:
         return _r(NA, "The site is outside the former Community Vision areas; social housing there is considered under the Affordable Housing Policies (1989) or an area plan.")
     h, f = option.get("height_m"), fsr(site, option)
@@ -355,7 +471,7 @@ def toa_status(site, option, p) -> Result:
     inside = site.get("in_transit_oriented_area")
     if inside is None:
         return _r(UNSURE, "Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.",
-                  action="Architect: check the City's transit-oriented areas map and record the tier.")
+                  action="Manager: check the City's transit-oriented areas map for this address and record the tier at 01.")
     if not inside:
         return _r(NA, "The site is outside the transit-oriented areas; no provincial minimum height applies.")
     tier = str(site.get("toa_tier") or "")
@@ -387,10 +503,26 @@ def family_unit_share(site, option, p) -> Result:
         return _r(NA, f"The site is inside the {AREA_PLAN_FAMILY_TARGETS[site_plan]} area, whose own family-unit target applies in place of the city-wide one.")
     u = option.get("units") or {}
     all_units = total = _units_total(option)
+    # The requirement is read in rezonings (its title says so): an option that states no rezoning, or states that there
+    # is none (a development permit, an outright scheme), is not tested against it (23 Nov 2026: 320 East Hastings, a
+    # development-permit building, and an outright C-2A scheme both read "fail").
+    if no_rezoning_stated(option):
+        return _r(NA, "No rezoning is proposed (the option's approval route says so), and this requirement is read in rezonings; "
+                      "a development permit is read against the district's own schedule or plan.")
     if total == 0:
         return _r(UNSURE, "Unit mix missing.", action="Enter the unit counts by bedroom type.")
     two_plus = int(u.get("two_bed", 0) or 0) + int(u.get("three_bed_plus", 0) or 0)
     three_plus = int(u.get("three_bed_plus", 0) or 0)
+    # Supportive, transitional and shelter housing with too few family homes: whether the family minimum applies to that
+    # use is the City's to say, so it is an open question for a person, never "add family units" (23 Nov 2026).
+    kind = housing_kind(option)
+    if kind != "independent" and two_plus / total + 1e-9 < p["min_two_plus_bed_share"]:
+        what = HOUSING_WORDS[kind]
+        return _r(UNSURE, f"The option is {what} with {two_plus} of {total} homes of two or more bedrooms, under the {_pct(p['min_two_plus_bed_share'])} "
+                          f"this requirement asks of family housing; whether it applies to {what} is the City's to say, and it is not assumed here.",
+                  {"units_total": total, "two_plus_bed_units": two_plus, "two_plus_bed_share": round(two_plus / total, 4),
+                   "min_two_plus_bed_share": p["min_two_plus_bed_share"], "housing_type": kind},
+                  action=f"Manager: ask the City's rezoning planner whether the family-unit requirement applies to {what}, and get the answer in writing.")
     left_out = ""
     if p.get("exclude_supportive_units"):
         supportive = int(option.get("supportive_units") or 0)
@@ -506,7 +638,9 @@ def tree_replacement(site, option, p) -> Result:
             "cash_in_lieu_cad": cash, "protection_barriers": barriers, "survey_scope": p["survey_scope"]}
     if not trees:
         return _r(UNSURE, f"Schedule C requires {required} trees on a {area:,.0f} m² site; no tree survey is on file.",
-                  vals, action="Architect: obtain the arborist report and survey (" + p["survey_scope"] + ").")
+                  vals, action=("Architect: confirm with the City how the by-law's minimum is met on a lot built to its lines (street trees, a roof or courtyard planting, cash in lieu); "
+                                "an arborist's survey only if a tree stands on or beside the lot." if site.get("builds_to_lot_lines") is True
+                                else "Architect: obtain the arborist report and survey (" + p["survey_scope"] + ")."))
     base = (f"Schedule C requires {required} trees on {area:,.0f} m²; the option keeps {len(retained)} of {len(trees)} and plants {proposed}, "
             f"leaving {after}")
     if shortfall == 0:
@@ -517,7 +651,8 @@ def tree_replacement(site, option, p) -> Result:
 
 def dcl_cac(site, option, p) -> Result:
     if option.get("tenure") == "social_housing":
-        church = "church" in str(site.get("owner_type") or "").lower() or "church" in str(site.get("owner") or "").lower()
+        # the owner's kind as a person chose it, not the word "church" in a society's name (23 Nov 2026)
+        church = str(site.get("owner_type") or "").strip().lower() == "church"
         return _r(INFO, "Social housing is exempt from development cost levies and from community amenity contributions in a rezoning"
                   + ("; the existing church use is also DCL-exempt" if church else "") + ". The exemption's value is worth stating in the memo.",
                   {"dcl_exempt": True, "cac_exempt": True})
@@ -531,11 +666,18 @@ def unit_area_flags(site, option, p) -> Result:
     res = option.get("residential_gfa_m2")
     mins = p["min_net_area_m2"]
     vals = {"min_net_area_m2": mins}
+    # what BC Housing's own copy says (read 23 Nov 2026): a four-bedroom area, and that the 2019 edition is archived
+    four = f", four-bedroom {p['four_bed_net_area_m2']}" if p.get("four_bed_net_area_m2") else ""
+    archived, action = "", None
+    if p.get("edition_status") == "archived":
+        vals["edition_status"] = "archived"
+        archived = " BC Housing has archived the 2019 edition these come from: it is no longer mandatory for new projects, and no replacement is named."
+        action = "Architect: ask the BC Housing project team which design standard applies before fixing unit sizes."
     if total and res:
         avg = res / total
         vals["average_gross_area_per_unit_m2"] = round(avg, 1)
-        return _r(INFO, f"BC Housing minimum net unit areas are studio {mins['studio']}, one-bedroom {mins['one_bed']}, two-bedroom {mins['two_bed']}, three-bedroom {mins['three_bed_plus']} m²; the option averages {avg:.0f} m² gross per unit, so net areas should be checked at the plan stage.", vals)
-    return _r(INFO, "BC Housing minimum net unit areas apply if BC Housing funds the project.", vals)
+        return _r(INFO, f"BC Housing minimum net unit areas are studio {mins['studio']}, one-bedroom {mins['one_bed']}, two-bedroom {mins['two_bed']}, three-bedroom {mins['three_bed_plus']}{four} m²; the option averages {avg:.0f} m² gross per unit, so net areas should be checked at the plan stage.{archived}", vals, action)
+    return _r(INFO, f"BC Housing minimum net unit areas apply if BC Housing funds the project.{archived}", vals, action)
 
 
 def code_basis_flags(site, option, p) -> Result:
@@ -548,9 +690,57 @@ def code_basis_flags(site, option, p) -> Result:
     return _r(INFO, msg, vals)
 
 
+def shelter_beds(site, option, p) -> Result:
+    """The sleeping space a shelter's beds need, from BC Housing's Shelter Design Guidelines (read 23 Nov 2026). Not
+    applicable to anything but a shelter. With `option.beds`: the floor area the beds alone need and the fewest rooms at
+    the recommended four to a room; info, never a verdict, since the guidelines size much more than the sleeping rooms."""
+    kind = housing_kind(option)
+    if kind != "shelter":
+        return _r(NA, f"Not for this option: this standard is for a shelter's sleeping rooms, and the option is {KIND_WORDS[kind]}.", {"housing_type": kind})
+    per, room = float(p["min_floor_area_per_bed_m2"]), int(p["recommended_max_beds_per_room"])
+    beds = option.get("beds")
+    vals: dict[str, Any] = {"min_floor_area_per_bed_m2": per, "recommended_max_beds_per_room": room, "beds": beds}
+    if not isinstance(beds, (int, float)) or isinstance(beds, bool) or beds <= 0:
+        return _r(INFO, f"BC Housing's Shelter Design Guidelines ask at least {per:g} m² of floor for each bed space and recommend no more than {room} beds a room; "
+                        "enter the number of beds to see what that comes to.", vals)
+    beds = int(beds)
+    need, rooms = round(beds * per, 1), -(-beds // room)
+    vals.update({"beds": beds, "sleeping_area_min_m2": need, "rooms_min": rooms})
+    return _r(INFO, f"{beds} beds need at least {need:g} m² of sleeping floor ({per:g} m² a bed space) in at least {rooms} rooms of no more than {room} beds, by BC Housing's "
+                    "Shelter Design Guidelines; washrooms, dining, staff and program space come on top and are not sized here.", vals,
+              "Architect: size the sleeping rooms from the bed count, then the rest of the shelter from the same guidelines.")
+
+
 # ---------------------------------------------------------------- Layer E: funding programs
 
+def _chf_grant(p) -> float:
+    """The fund's provisional grant a home: the current year's figure where the version names one, else 2025-26's."""
+    return p.get("provisional_grant_per_unit_cad") or p["provisional_grant_per_unit_cad_2025_26"]
+
+# Since 23 Nov 2026 the rules list other programs (the Indigenous, Supportive and Women's Transition Housing Funds, HEARTH,
+# the shelter program, the City's CHIP, Reaching Home, Build Canada Homes) with who each is for and whether an intake is
+# open, read from each program's page; none of their criteria are tested. Answer 2 names the ones written for the option.
+OTHER_PROGRAMS = ("answer 2 lists the other programs in the rules written for this housing; their criteria are not tested here, "
+                  "and a program not in the rules may fit as well")
+
+
+def _not_the_program(option: Option, program: str, written_for: str) -> Result | None:
+    """A funder rule read against housing it was not written for: not applicable, with the reason and who to ask,
+    instead of a fail on a mix the program never asked of that housing (23 Nov 2026)."""
+    kind = housing_kind(option)
+    if kind == "independent":
+        return None
+    what = HOUSING_WORDS[kind]
+    head = program[4:] if program.startswith("the ") else program     # as the other findings of the rule begin
+    return _r(NA, f"{head}: not the test for this option. It is {what}, and {program} is written for {written_for}; "
+                  f"{OTHER_PROGRAMS}.", {"housing_type": kind},
+              action=f"Manager: ask BC Housing which program is open for {what}, and who funds its operation.")
+
+
 def chf_fit(site, option, p) -> Result:
+    other = _not_the_program(option, "the Community Housing Fund", "independent rental at a 30/50/20 mix of rents")
+    if other:
+        return other
     fails, unknown, notes = [], [], []
     if not option.get("proponent_type"):
         unknown.append("the proponent type (" + ", ".join(t.replace("_", " ") for t in p["eligible_proponent_types"]) + ")")
@@ -565,6 +755,10 @@ def chf_fit(site, option, p) -> Result:
         off = {k: abs(shares[k] - p["mix"][k]) for k in p["mix"]}
         if any(v > p["mix_tolerance"] for v in off.values()):
             msg = "unit mix " + ", ".join(f"{k.replace('_', ' ')} {_pct(shares[k])}" for k in p["mix"]) + " is not 30/50/20"
+            # a scheme with no market-rent homes is deeper than this fund's mix, not short of it: say which way it
+            # misses, so the reader does not take it for "not fundable" (23 Nov 2026)
+            if shares.get("market", 0) + 1e-9 < p["mix"].get("market", 0) - p["mix_tolerance"] and shares.get("deep_subsidy", 0) + shares.get("rgi", 0) > 0.9:
+                msg += " (deeper affordability than this fund's mix: it points to another program, not to a weaker project)"
             if total < _smallest_split(p["mix"], p["mix_tolerance"]):
                 msg += (f" (no split of {total} homes lands within {_pct(p['mix_tolerance'])} of it; "
                         f"{_smallest_split(p['mix'], p['mix_tolerance'])} homes is the smallest count that can)")
@@ -578,9 +772,18 @@ def chf_fit(site, option, p) -> Result:
         unknown.append("accessible unit count (5% minimum)")
     elif total and acc / total + 1e-9 < p["min_accessible_unit_share"]:
         fails.append(f"{acc} accessible units is under 5% of {total}")
+    # how the land is held: the choice made at 02 (option.land_tenure) is read where there is one; the sentence typed
+    # at 01 is the fallback, read as before (23 Nov 2026: a text box decided a funder criterion by the word "confirm")
+    held = str(option.get("land_tenure") or "").strip()
     tenure_plan = (option.get("land_tenure_plan") or site.get("land_tenure_plan") or "")
-    if "confirm" in tenure_plan.lower() or not tenure_plan:
-        unknown.append(f"land tenure (lease of at least {p['min_lease_years_nominal']} years at nominal value, or ownership)")
+    need_tenure = f"land tenure (lease of at least {p['min_lease_years_nominal']} years at nominal value, or ownership)"
+    if held == "lease_shorter":
+        fails.append(f"the land is held on a lease shorter than the {p['min_lease_years_nominal']} years at a nominal rent the fund asks for")
+    elif held in ("owned", "lease_60_plus", "air_space_parcel"):
+        notes.append({"owned": "the land is owned", "lease_60_plus": f"the land is leased for {p['min_lease_years_nominal']} years or more at a nominal rent",
+                      "air_space_parcel": "the homes are an air-space parcel or strata lot of their own (confirm the fund's security on it)"}[held])
+    elif held == "to_confirm" or (not held and ("confirm" in tenure_plan.lower() or not tenure_plan)):
+        unknown.append(need_tenure)
     sc = option.get("site_control")
     bar = ", ".join(s.replace("_", " ") for s in p["readiness_site_control"])
     if sc is None or sc == "":
@@ -592,8 +795,8 @@ def chf_fit(site, option, p) -> Result:
         notes.append(f"site control ({sc.replace('_', ' ')}) meets the readiness bar")
     notes.append(f"construction must be able to start within {p['readiness_construction_start_months_after_award']} months of award")
     vals.update({"fails": fails, "unknown": unknown, "notes": notes,
-                 "provisional_grant_per_unit_cad": p["provisional_grant_per_unit_cad_2025_26"],
-                 "indicative_grant_cad": (p["provisional_grant_per_unit_cad_2025_26"] * total) if total else None})
+                 "provisional_grant_per_unit_cad": _chf_grant(p), "grant_fiscal_year": p.get("grant_fiscal_year") or "2025-26",
+                 "indicative_grant_cad": (_chf_grant(p) * total) if total else None})
     head = "Community Housing Fund: "
     # whether the fund is taking proposals, said beside the verdict (20 Nov 2026: the what-if read "fits the funders:
     # yes" while the 2025 call had been cancelled); a closed intake is a sentence of its own, not a note at the end
@@ -607,24 +810,31 @@ def chf_fit(site, option, p) -> Result:
         notes.append(f"program status: {p['status']}")
     if fails:
         return _r(FAIL, head + "does not meet the criteria: " + "; ".join(fails) + "." + closed, vals,
-                  action="Manager: resolve the failing criteria or target another program.")
+                  action=f"Manager: change what fails, or ask BC Housing which program fits the scheme as it is ({OTHER_PROGRAMS}).")
     if unknown:
         said = "; ".join(notes)   # one sentence, capitalised once ("; Construction must…" was each note's capital)
+        # the action names what to supply and no dollar figure (23 Nov 2026: a funder-side reader took "the indicative
+        # grant … would be $17,634,733" in the open items for an expectation)
         return _r(UNSURE, head + "whether it meets the criteria cannot be confirmed without the " + "; ".join(unknown) + ". "
                   + (said[:1].upper() + said[1:] + "." if said else "") + closed,
-                  vals, action="Manager: supply the missing figures; the indicative grant at 2025-26 rates would be "
-                  + (f"${vals['indicative_grant_cad']:,.0f} for {total} units." if total else "set by unit count."))
-    return _r(PASS, head + "meets the eligibility criteria: " + "; ".join(notes) + "." + closed, vals)
+                  vals, action="Manager: supply what is missing (" + "; ".join(u.split(" (")[0] for u in unknown) + ").")
+    # a pass is a pass of what was checked, and says what was not (23 Nov 2026: "meets the criteria" read as a funding
+    # assessment); the rated criteria, need and demand, operator capacity and the budget are a funder's to judge
+    return _r(PASS, head + "passes the eligibility items this screen checks: " + "; ".join(notes) + ". "
+              "Not assessed here: need and demand, the operator's capacity, the fund's rated criteria and the budget." + closed, vals)
 
 
 def bc_builds_fit(site, option, p) -> Result:
+    other = _not_the_program(option, "BC Builds", "middle-income rental")
+    if other:
+        return other
     fails, unknown, notes = [], [], []
     if p["non_profit_must_team_with_developer"] and option.get("proponent_type") == "non_profit_society":
         partner = option.get("developer_partner")
         if partner is None or partner == "":
             unknown.append("non-profit's developer or builder partner (the program requires one; say whether there is one)")
         elif not partner:
-            fails.append("a non-profit must team with a developer or builder to propose")
+            fails.append("a non-profit that wants to own and operate must team with a developer or builder, for-profit or non-profit, to propose (the program does not take operators alone)")
     share, disc = option.get("below_market_unit_share"), option.get("below_market_discount")
     if share is None or disc is None:
         unknown.append("share of units at least 20% below market")
@@ -640,6 +850,8 @@ def bc_builds_fit(site, option, p) -> Result:
     lo, hi = p["ground_breaking_months_after_land_letter"]
     notes.append(f"ground must break within {lo} to {hi} months of the conditional land contribution letter")
     vals = {"fails": fails, "unknown": unknown, "notes": notes, "tenant_income_limits_cad": p["tenant_income_limits_cad"], "submission": p["submission"]}
+    if p.get("takeout_financing"):
+        vals["takeout_financing"] = p["takeout_financing"]      # the program's own published loan terms, for the operating page
     if fails:
         return _r(FAIL, "BC Builds: does not meet the criteria: " + "; ".join(fails) + ".", vals, action="Manager: resolve the failing criteria.")
     if unknown:
@@ -650,7 +862,8 @@ def bc_builds_fit(site, option, p) -> Result:
             + (["state the below-market share and discount"] if any("below market" in u for u in unknown) else [])
         return _r(UNSURE, "BC Builds: whether it meets the criteria cannot be confirmed without the " + "; ".join(unknown) + ". " + (said[:1].upper() + said[1:] + "." if said else ""),
                   vals, action=f"Manager: {' and '.join(asks) or 'supply what is missing'}; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices.")
-    return _r(PASS, "BC Builds: meets the published criteria: " + "; ".join(notes) + ".", vals)
+    return _r(PASS, "BC Builds: passes the published items this screen checks: " + "; ".join(notes) + ". "
+              "BC Builds works opportunity by opportunity; middle-income rents and the team's capacity are not assessed here.", vals)
 
 
 _MONTHS = {m[:3].lower(): m for m in ("January", "February", "March", "April", "May", "June", "July", "August", "September",
@@ -673,8 +886,12 @@ def program_intake(status: Any) -> dict[str, Any] | None:
         m = re.search(r"\b(\d{4})(?:[-/]\d{2,4})?\s+(call|intake|rfp)\b.*?\b(cancell?ed|closed|paused|suspended|withdrawn)\s+(?:in\s+|on\s+)?(\d{1,2}\s+)?([A-Za-z]{3,9})\.?\s+(\d{4})", head, re.I)
         if m:
             month = _MONTHS.get(m.group(5)[:3].lower(), m.group(5))
-            verb = "cancelled" if m.group(3).lower().startswith("cancel") else m.group(3).lower()
-            note = f"its {m.group(1)} {m.group(2).lower()} was {verb} in {month} {m.group(6)}, so no intake is open now"
+            # "did not proceed", not "was cancelled" (23 Nov 2026: the Province disputes that the program was cancelled;
+            # applicants were told the 2025 call would not proceed), whatever the rule's record calls it
+            if m.group(3).lower().startswith("cancel"):
+                note = f"its {m.group(1)} {m.group(2).lower()} did not proceed ({month} {m.group(6)}), so no intake is open now"
+            else:
+                note = f"its {m.group(1)} {m.group(2).lower()} was {m.group(3).lower()} in {month} {m.group(6)}, so no intake is open now"
         else:
             note = f"no intake is open now ({head.strip()})"
         more = more.strip()
@@ -718,6 +935,81 @@ def info_only(site, option, p) -> Result:
     # of the finding the memo prints
     bits = [param_words(k, v) for k, v in p.items() if v is not None and not isinstance(v, (dict, list)) and not re.search(r"(^|_)notes?$", k)]
     return _r(INFO, "; ".join(bits) + ".", dict(p))
+
+
+KIND_WORDS = {"independent": "independent rental", **HOUSING_WORDS}
+
+
+def program_match(site, option, p) -> Result:
+    """A funding program the rules list without testing its criteria (23 Nov 2026: the simulated reviewers' housing,
+    supportive, transitional, shelter and Indigenous-led, had no program in the stack, and the funders answer could only
+    say so). The rule records who the program is for, what it funds, how a project enters it and whether an intake is
+    open, each from the page cited; this check says whether the option is the kind of housing it is written for.
+
+    Not applicable where it is not (the kind of housing, a requirement the option answers no to, another municipality,
+    a proponent the program does not take). Otherwise info, with `values.match` true where everything it asks about the
+    option is known, or "if" where one answer is missing (`values.asks` names it). Info never moves a verdict: a match
+    is a door to knock on, and the finding says its criteria are not tested here. Where the program fixes something the
+    option states (the Indigenous Housing Fund's homes are all rent geared to income), the finding says how they differ."""
+    kind = housing_kind(option)
+    for_types = p.get("for_housing_types") or list(HOUSING_TYPES)
+    if kind not in for_types:
+        return _r(NA, f"Not for this option: the program is for {_or([KIND_WORDS[k] for k in for_types])}, and the option is {KIND_WORDS[kind]}.",
+                  {"match": False, "housing_type": kind})
+    where = str(p.get("municipality") or "").lower()
+    town = str((site or {}).get("municipality") or "City of Vancouver").lower()
+    if where and where not in town:
+        return _r(NA, f"Not for this option: the program is for sites in {where.title()}, and this one is in {(site or {}).get('municipality')}.", {"match": False})
+    takes = p.get("eligible_proponent_types")
+    who = option.get("proponent_type")
+    if takes and who and who not in takes:
+        return _r(NA, f"Not for this option: the program takes {_or([t.replace('_', ' ') for t in takes])} proponents, and this one is a {str(who).replace('_', ' ')}.", {"match": False})
+    asks: list[str] = []
+    for key, flag, said in (("requires_indigenous_led", "indigenous_led", "Indigenous-led, or partnered with an Indigenous housing provider or Nation"),
+                            ("requires_women_leaving_violence", "women_leaving_violence", "for women, gender-diverse people and children leaving violence")):
+        if not p.get(key):
+            continue
+        if option.get(flag) is False:
+            return _r(NA, f"Not for this option: the program is for housing that is {said}, and the option says it is not.", {"match": False})
+        if option.get(flag) is None:
+            asks.append(said)
+    vals: dict[str, Any] = {"match": "if" if asks else True, "ended": bool(p.get("ended")), "asks": asks, "housing_type": kind, "for_housing_types": for_types,
+                            "what": p.get("what"), "funds": p.get("funds"), "how_a_project_enters": p.get("how_a_project_enters")}
+    intake = program_intake(p.get("intake"))
+    if intake:
+        vals["intake"] = intake
+    lead = (f"Would be a program for this housing if it is {' and '.join(asks)} (not said on the option)" if asks
+            else f"A program for this kind of housing ({KIND_WORDS[kind]})")
+    bits = [f"{lead}: {p.get('what')}."]
+    if p.get("funds"):
+        bits.append(f"It funds {p['funds']}.")
+    if p.get("how_a_project_enters"):
+        bits.append(f"A project enters {p['how_a_project_enters']}.")
+    # who owns the building and what residents pay, where the program's framework says (read 23 Nov 2026): a society
+    # planning to build on its own land needs to know the Province owns what the Supportive Housing Fund builds
+    for key, lead_in in (("owner", "The building is owned by"), ("rents", "Rents:")):
+        if p.get(key):
+            vals[key] = p[key]
+            bits.append(f"{lead_in} {p[key]}.")
+    if intake:
+        note = intake["note"]
+        bits.append((note[:1].upper() + note[1:] if not note.startswith("its ") else "Its " + note[4:]) + ".")
+    # the one thing some programs fix that an option states: every home rent geared to income
+    tiers, total = option.get("rent_tiers_units") or {}, _units_total(option)
+    if p.get("all_units_rgi") and tiers and total:
+        market = int(tiers.get("market") or 0)
+        if market:
+            vals["differs"] = {"market_units": market}
+            bits.append(f"Its homes are all rent geared to income; this option has {market} market-rent home{'s' if market != 1 else ''}, which it would not carry.")
+    bits.append("Its criteria are not tested here.")
+    for k in ("proponents_unverified", "amounts_unverified", "community_entity_unverified"):
+        if p.get(k):
+            vals[k] = p[k]
+    return _r(INFO, " ".join(bits), vals)
+
+
+def _or(words: list[str]) -> str:
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " or " + words[-1]
 
 
 # Where a schedule reduces the rear yard by the distance to a lane's ultimate centre line (RT-3 s.3.1.2.17) and the site
@@ -977,4 +1269,6 @@ CHECKS: dict[str, Callable[[Site, Option, Params], Result]] = {
     "chf_fit": chf_fit,
     "bc_builds_fit": bc_builds_fit,
     "info_only": info_only,
+    "program_match": program_match,
+    "shelter_beds": shelter_beds,
 }

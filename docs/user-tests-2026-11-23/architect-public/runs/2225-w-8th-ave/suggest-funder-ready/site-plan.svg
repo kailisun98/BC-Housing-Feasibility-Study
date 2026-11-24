@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="780" viewBox="0 0 680 780" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Code site plan">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="tick" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M3 0V6" stroke="#c81e1e" stroke-width="1.2"/></marker></defs>
+<text x="48" y="44" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>
+<polygon points="406.7,392.0 406.8,285.5 406.9,178.7 407.0,72.1 340.1,72.0 273.3,72.0 273.0,392.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5"/>
+<polygon points="396.2,359.4 396.4,124.9 283.8,124.8 283.6,359.4" fill="none" stroke="#c81e1e" stroke-width="1.2" stroke-dasharray="6 4"/>
+<rect x="288.0" y="126.0" width="105.7" height="233.4" fill="none" stroke="#c81e1e" stroke-width="0.8" stroke-dasharray="2 2"/>
+<polygon points="288.0,359.4 393.7,359.4 393.7,126.0 288.0,126.0" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
+<text x="294.0" y="140.0" font-size="10" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">12.0 × 26.5 m</text>
+<path d="M340.0 392.0L340.0 359.4" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="344.0" y="379.2" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">front 3.7 m</text>
+<path d="M340.0 124.9L340.0 72.0" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="344.0" y="101.9" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">rear 6.0 m</text>
+<path d="M273.1 242.1L283.7 242.1" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="269.1" y="245.6" font-size="9.5" text-anchor="end" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">side 1.2 m</text>
+<path d="M396.3 242.1L406.8 242.1" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="410.8" y="245.6" font-size="9.5" text-anchor="start" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">side 1.2 m</text>
+<line x1="273.0" y1="404.0" x2="407.0" y2="404.0" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="1 3"/>
+<text x="340.0" y="422.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">W 8TH AVE · STREET SIDE</text>
+<rect x="48.0" y="438.0" width="44.0" height="5" fill="#1f2933"/>
+<rect x="92.0" y="438.0" width="44.0" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
+<text x="48.0" y="454.0" font-size="9.5" text-anchor="middle" fill="#5f6672">0</text>
+<text x="92.0" y="454.0" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
+<text x="136.1" y="454.0" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
+<g transform="rotate(-1.4 187.5 440.0)"><circle cx="187.5" cy="440.0" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="187.5,429.9 192.1,446.1 187.5,442.2 182.9,446.1" fill="#1f2933"/></g>
+<text x="187.0" y="424.0" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
+<text x="48" y="474.0" font-size="11" fill="#5f6672">Lot polygon 552 m² (rectangle); dashed red: the setback envelope, dotted: the plate box</text>
+<text x="48" y="490.0" font-size="11" fill="#5f6672">12.0 × 26.5 m; blue: the footprint.</text>
+<text x="48" y="526.0" font-size="12" font-weight="600">What the plan checker reads</text>
+<line x1="48" y1="553.0" x2="589.2" y2="553.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="548.0" font-size="11" fill="#5f6672">Site area</text>
+<text x="178.2" y="548.0" font-size="11">556.0 m²</text>
+<line x1="48" y1="571.0" x2="589.2" y2="571.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="566.0" font-size="11" fill="#5f6672">Floor space ratio</text>
+<text x="178.2" y="566.0" font-size="11">3.43 (1,908 m²)</text>
+<text x="321.6" y="566.0" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="564.0" y="566.0" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="589.0" x2="589.2" y2="589.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="584.0" font-size="11" fill="#5f6672">Height</text>
+<text x="178.2" y="584.0" font-size="11">19.8 m, 6 storeys</text>
+<text x="321.6" y="584.0" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="564.0" y="584.0" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="607.0" x2="589.2" y2="607.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="602.0" font-size="11" fill="#5f6672">Site coverage</text>
+<text x="178.2" y="602.0" font-size="11">57% (318 m²)</text>
+<text x="321.6" y="602.0" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="564.0" y="602.0" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="625.0" x2="589.2" y2="625.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="620.0" font-size="11" fill="#5f6672">Front yard</text>
+<text x="178.2" y="620.0" font-size="11">3.7 m</text>
+<text x="321.6" y="620.0" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="564.0" y="620.0" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="643.0" x2="589.2" y2="643.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="638.0" font-size="11" fill="#5f6672">Rear yard</text>
+<text x="178.2" y="638.0" font-size="11">6.0 m</text>
+<text x="321.6" y="638.0" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="564.0" y="638.0" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="661.0" x2="589.2" y2="661.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="656.0" font-size="11" fill="#5f6672">Side yard</text>
+<text x="178.2" y="656.0" font-size="11">1.2 m</text>
+<text x="321.6" y="656.0" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
+<text x="564.0" y="656.0" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="679.0" x2="589.2" y2="679.0" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="674.0" font-size="11" fill="#5f6672">Trees</text>
+<text x="178.2" y="674.0" font-size="11">4 after development</text>
+<text x="321.6" y="674.0" font-size="11" fill="#5f6672">Schedule C requires 4</text>
+<text x="564.0" y="674.0" font-size="10.5" font-weight="600" fill="#2f7d4a">pass</text>
+<text x="48" y="706.0" font-size="11" font-weight="600">Allowed outright: not assessed</text>
+<text x="48" y="722.0" font-size="11">No rezoning path stated</text>
+<text x="48.0" y="748.0" font-size="12" fill="#1f2933">Rules as of 2026-11-23 · drawn from the option and the massing, not a design</text>
+</svg>

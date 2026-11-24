@@ -7,7 +7,9 @@
       "id": "f.hard_cost_base",
       "title": "Hard construction cost, base ($/m², Vancouver)",
       "jurisdiction": "BC Ministry of Housing / BC Housing (standardized designs)",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {
@@ -19,8 +21,14 @@
             "base_period": "2024-07-01",
             "basis": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); the catalogue's ten designs run $401 to $585 per build sq ft; the report's regional review gives Vancouver $350 to $475 per sq ft",
             "excludes": "soft costs, utility connections, existing buildings, rock or shoring, pad-mounted transformers (the report's stated assumptions)",
-            "design_range_per_sqft_cad": [401, 585],
-            "regional_range_per_sqft_cad": [350, 475]
+            "design_range_per_sqft_cad": [
+              401,
+              585
+            ],
+            "regional_range_per_sqft_cad": [
+              350,
+              475
+            ]
           },
           "source": {
             "title": "SHP Class D Estimate Report, V3 (Chris Hill, CPA CMA, for the BC Ministry of Housing Standardized Designs Catalogue), 21 Aug 2024",
@@ -35,7 +43,9 @@
       "id": "f.escalation_bcpi",
       "title": "Construction price escalation (Statistics Canada BCPI, Vancouver, residential)",
       "jurisdiction": "Statistics Canada",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {
@@ -51,9 +61,18 @@
             "latest_period": "2026-07-01",
             "latest_value": 109.4,
             "observations": {
-              "2023-10-01": 102.9, "2024-01-01": 103.6, "2024-04-01": 105.4, "2024-07-01": 106.1, "2024-10-01": 106.3,
-              "2025-01-01": 107.4, "2025-04-01": 108.5, "2025-07-01": 108.8, "2025-10-01": 108.5,
-              "2026-01-01": 109.2, "2026-04-01": 109.2, "2026-07-01": 109.4
+              "2023-10-01": 102.9,
+              "2024-01-01": 103.6,
+              "2024-04-01": 105.4,
+              "2024-07-01": 106.1,
+              "2024-10-01": 106.3,
+              "2025-01-01": 107.4,
+              "2025-04-01": 108.5,
+              "2025-07-01": 108.8,
+              "2025-10-01": 108.5,
+              "2026-01-01": 109.2,
+              "2026-04-01": 109.2,
+              "2026-07-01": 109.4
             },
             "released": "2026-10-29"
           },
@@ -70,7 +89,9 @@
       "id": "f.soft_costs",
       "title": "Soft costs and contingency, as shares of hard cost",
       "jurisdiction": "Declared placeholder",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {
@@ -78,7 +99,7 @@
           "params": {
             "summary": "Soft costs 25% of hard cost (design, permits, levies where they apply, financing, legal, insurance, marketing) and a 10% contingency: declared placeholders until a practitioner gives this project's figures",
             "soft_cost_share_of_hard": 0.25,
-            "contingency_share_of_hard": 0.10
+            "contingency_share_of_hard": 0.1
           },
           "source": {
             "title": "Declared placeholder (no public source): to be replaced by the proponent's development budget",
@@ -92,14 +113,28 @@
       "id": "f.land",
       "title": "Land: nominal lease from a church, a society or a government; else the assessed value, entered",
       "jurisdiction": "BC Assessment / the owner",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {
           "effective_from": "2026-10-01",
           "params": {
             "summary": "Land is carried at a nominal value where the owner is a church, a non-profit society, a co-operative, a First Nation, the City or the Province and the tenure plan is a long lease or a transfer; otherwise the BC Assessment value or the agreed price is entered by hand, and until it is the pro-forma is unsure",
-            "nominal_lease_owner_types": ["church", "society", "non_profit", "non_profit_society", "co-op", "cooperative", "first_nation", "municipality", "city", "province", "government"],
+            "nominal_lease_owner_types": [
+              "church",
+              "society",
+              "non_profit",
+              "non_profit_society",
+              "co-op",
+              "cooperative",
+              "first_nation",
+              "municipality",
+              "city",
+              "province",
+              "government"
+            ],
             "nominal_value_cad": 0
           },
           "source": {
@@ -114,7 +149,9 @@
       "id": "f.mortgage",
       "title": "Mortgage rate, amortization and debt coverage (Bank of Canada; CMHC MLI Select)",
       "jurisdiction": "Bank of Canada / CMHC",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {
@@ -125,7 +162,7 @@
             "rate_series": "V80691335",
             "rate_date": "2026-10-28",
             "amortization_years": 40,
-            "debt_coverage_ratio": 1.10,
+            "debt_coverage_ratio": 1.1,
             "insured_rate_note": "an insured multi-unit loan is usually priced below the posted conventional rate; the posted rate is the conservative ceiling"
           },
           "source": {
@@ -143,7 +180,9 @@
       "id": "f.rents",
       "title": "Rents by tier: CMHC average market rent, rent-geared-to-income, the shelter rate",
       "jurisdiction": "CMHC / BC Housing / Province of BC",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {
@@ -151,10 +190,16 @@
           "params": {
             "summary": "Market rent from the CMHC Rental Market Survey of October 2025, Vancouver CMA, purpose-built apartments: two-bedroom $2,363 a month, all unit types $1,963, vacancy 3.7% (the other bedroom types are left to be typed from the CMHC data tables); rent-geared-to-income at 30% of a household income taken, as a placeholder, at half the Community Housing Fund's low-to-moderate income limit for the unit size; the deep-subsidy rent at the income assistance shelter rate of $500",
             "survey": "October 2025",
-            "market_rent_monthly_cad": {"studio": null, "one_bed": null, "two_bed": 2363, "three_bed_plus": null, "all_units": 1963},
+            "market_rent_monthly_cad": {
+              "studio": null,
+              "one_bed": null,
+              "two_bed": 2363,
+              "three_bed_plus": null,
+              "all_units": 1963
+            },
             "vacancy_rate": 0.037,
-            "rgi_rent_share_of_income": 0.30,
-            "rgi_income_share_of_chf_limit": 0.50,
+            "rgi_rent_share_of_income": 0.3,
+            "rgi_income_share_of_chf_limit": 0.5,
             "deep_subsidy_rent_monthly_cad": 500
           },
           "source": {
@@ -168,10 +213,63 @@
       ]
     },
     {
+      "id": "f.rgi_rents",
+      "title": "Rent-geared-to-income and deep-subsidy rents, estimated the way BC Housing's call documents do",
+      "jurisdiction": "BC Housing",
+      "applies_to_districts": [
+        "*"
+      ],
+      "check": "assumption",
+      "versions": [
+        {
+          "effective_from": "2025-12-01",
+          "params": {
+            "summary": "Rent geared to income estimated at 30% of an income of 70% of the Housing Income Limit (Vancouver, in use from 1 Dec 2025: $58,000 for one bedroom or less, $72,000 for two, $86,000 for three): $1,015, $1,260 and $1,505 a month; deep-subsidy rent at the income assistance shelter allowance, $500 and $695, and for three bedrooms 30% of the deep-subsidy income limit, $769 a month",
+            "hils_area": "Vancouver",
+            "housing_income_limits_cad": {
+              "studio": 58000,
+              "one_bed": 58000,
+              "two_bed": 72000,
+              "three_bed_plus": 86000
+            },
+            "housing_income_limit_four_bed_plus_cad": 107500,
+            "rgi_income_share_of_hil": 0.7,
+            "rgi_rent_share_of_income": 0.3,
+            "rgi_rent_monthly_cad": {
+              "studio": 1015,
+              "one_bed": 1015,
+              "two_bed": 1260,
+              "three_bed_plus": 1505
+            },
+            "deep_subsidy_rent_monthly_cad": {
+              "studio": 500,
+              "one_bed": 500,
+              "two_bed": 695,
+              "three_bed_plus": 769
+            },
+            "deep_subsidy_basis": "one and two bedrooms: the income assistance shelter allowance for the household size, as the 2023 call printed it ($500, $695); three bedrooms and more: 30% of the 2026 deep-subsidy income limit for two bedrooms and more ($30,745)"
+          },
+          "source": {
+            "title": "BC Housing, Housing Income Limits (published October 2025, for use from 1 December 2025); Community Housing Fund request for proposals #1070-2324-041, Appendix 12 (RGI rent estimation tables)",
+            "url": "https://www.bchousing.org/sites/default/files/media/documents/Housing-Income-Limits-Dec-2025.pdf",
+            "method_url": "https://www.bchousing.org/sites/default/files/media/documents/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf",
+            "section": "HILs: Lower Mainland planning area, Vancouver row (the City of Vancouver is in the Vancouver HILs area, p.6). Appendix 12: rent-geared-to-income revenue on tenants averaging 70% of the Housing Income Limit; deep-subsidy revenue on the shelter allowance, and for three bedrooms and more on 30% of the deep-subsidy income limit",
+            "read_from": "inbox/bc-housing-2026-11-23/Housing-Income-Limits-Dec-2025.pdf, pp.1, 6; inbox/bc-housing-2026-11-23/CHF-RFP-2324-041-Community-Housing-Fund-Overview.pdf, p.51",
+            "read_on": "2026-11-23",
+            "verified": true,
+            "effective_from_basis": "the day the Housing Income Limits read here came into use",
+            "verify": "the 70% is the 2023 call's estimating assumption (the 2025 call's own appendix was not read) and an estimate, not a rent: replace it with the operator's tenant income profile; check the shelter allowances against the Province's current rates; a site outside the Vancouver HILs area needs its own row of the table"
+          }
+        }
+      ]
+    },
+    {
       "id": "f.operating",
       "title": "Operating cost and replacement reserve per unit",
       "jurisdiction": "Declared placeholder",
-      "applies_to_districts": ["*"],
+      "applies_to_districts": [
+        "*"
+      ],
       "check": "assumption",
       "versions": [
         {

@@ -35,8 +35,14 @@ export function answerAllowed(L, run = null) {
   const outLines = res.filter(r => (isOutrightLimit(r) || (r.check === "district_setbacks" && (r.values || {}).no_envelope)) && r.status !== "not_applicable");
   const policy = res.filter(r => ["A", "B", "C"].includes(r.layer) && ["fail", "conditional", "uncertain"].includes(r.status) && !isOutrightLimit(r));
   // the operative words wear the status colour: by rezoning where a path is stated, else the outright answer
-  let verdict = path ? h(outrightWords(o, outLines)) : `<em>${h(outrightWords(o, outLines))}</em>`;
-  if (path) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
+  // a path that says there is no rezoning (a development permit under an official development plan, "none: …") is an
+  // approval route, not a rezoning; and an outright scheme that proposes none needs none (23 Nov 2026, checks.proposes_rezoning)
+  const route = ans.allowed.approval_route || "";
+  const proposes = route === "rezoning" || (!["development_permit", "outright"].includes(route) && !!path && !/^(none|no rezoning|not a rezoning)/i.test(String(path).trim()));
+  const notNeeded = bz.verdict === "not needed";
+  let verdict = proposes ? h(outrightWords(o, outLines)) : `<em>${h(outrightWords(o, outLines))}</em>`;
+  if (proposes) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
+  else if (notNeeded) verdict += " No rezoning needed.";
   const district = districtOf(site) || "the district";
   let body = "";
   // nothing was tested: say why, in the words answer 3 repeats with the person who settles it
@@ -47,10 +53,10 @@ export function answerAllowed(L, run = null) {
       <ul class="finding-list rule-list">${outLines.map(r => ruleItem(r, `${leadCont(r.finding)} <span class="cont">(${h(r.title)})</span>`)).join("")}</ul>`;
   } else if (!o.why) body += `<p class="path ans-sub">Outright under ${h(district)}</p>`;
   if (path) {
-    body += `<p class="path ans-sub">By rezoning: ${h(path)}</p>`;
+    body += `<p class="path ans-sub">${proposes ? "By rezoning" : "Approval route, no rezoning"}: ${h(path)}</p>`;
     if (policy.length) body += `<ul class="finding-list rule-list">${policy.map(r => ruleItem(r, `<span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span>`)).join("")}</ul>`;
-  } else body += `<p class="path ans-sub">No rezoning path stated</p>`;
-  const status = verdictStatus(path ? bz.verdict : o.verdict);   // the operative answer: by rezoning when a path is stated
+  } else body += `<p class="path ans-sub">${notNeeded ? "Allowed outright; no rezoning is proposed or needed" : "No rezoning path stated"}</p>`;
+  const status = verdictStatus(proposes ? bz.verdict : o.verdict);   // the operative answer: by rezoning when a path is stated
   // the figures worker's drawing of outright against proposed (figures/envelope.js, envelopeFigure(run)) goes here
   const drawing = run ? envelopeFigure(run) : "";
   return `<section class="card answer" data-verdict="${h(status)}">
@@ -65,7 +71,7 @@ export function answerAllowed(L, run = null) {
    gap and a cancelled call): the programs' published criteria are met, or not; whether the money closes is answer 4.
    The verdict sentence takes the engine's own words (summary.answers.funded.words, engine.funders_words: "Meets the
    criteria of the Community Housing Fund and BC Builds"); a pill or a mark takes the short form. */
-export const FUNDED_WORD = { yes: "Meets the criteria", "yes, with conditions": "Meets the criteria, with conditions", no: "Does not meet the criteria", "not yet confirmed": "Criteria not yet confirmed", "not assessed": "Criteria not assessed" };
+export const FUNDED_WORD = { yes: "Passes the screen", "yes, with conditions": "Passes the screen, with conditions", no: "Does not pass the screen", "not yet confirmed": "Screen not yet confirmed", "not assessed": "Not assessed" };
 export function fundedWord(f, long = false) {
   const own = long && f && typeof f.words === "string" && f.words ? f.words : null;
   return own ? cap(own) : FUNDED_WORD[f && f.verdict] || cap((f && f.verdict) || "");
@@ -89,8 +95,10 @@ export function moneyPhrase(pf) {
 export function answerFunders(L, run = null) {
   const res = L.results, ans = L.summary.answers, opt = L.inputs.option;
   const targets = new Set(opt.target_programs || []);
-  const rows = res.filter(r => r.layer === "E" && (!targets.size || targets.has(r.rule_id)));
-  const others = res.filter(r => r.layer === "E" && targets.size && !targets.has(r.rule_id));
+  // the programs whose criteria the rules test; the ones only listed (check program_match) follow as doors to knock on
+  const rows = res.filter(r => r.layer === "E" && r.check !== "program_match" && (!targets.size || targets.has(r.rule_id)));
+  const others = res.filter(r => r.layer === "E" && r.check !== "program_match" && targets.size && !targets.has(r.rule_id));
+  const doors = ((ans.funded || {}).matches || []).filter(m => !m.ended);
   let body = `<ul class="finding-list rule-list">${rows.map(r => ruleItem(r, `<span class="title">${h(r.title)}:</span> <span class="cont">${h(withoutRepeat(r.title, r.finding))}</span>`)).join("")}</ul>`;
   const intake = intakeNote(ans.funded);
   if (intake) body = `<p class="finding intake-note">${leadCont(intake)}</p>` + body;
@@ -98,6 +106,16 @@ export function answerFunders(L, run = null) {
   const pf = run && run.proforma && run.proforma.available ? run.proforma : null;
   if (pf) body += `<p class="finding money-link"><span class="lead">The criteria are not the money.</span> <span class="cont">Answer 4: ${h(moneyPhrase(pf))}.</span></p>`;
   if (others.length) body += `<p class="path" style="margin-top:12px">Not targeted, listed in the ledger: ${others.map(r => h(r.title)).join("; ")}.</p>`;
+  if (doors.length) {
+    const up = s => String(s || "").charAt(0).toUpperCase() + String(s || "").slice(1);
+    body += `<p class="path ans-sub">Other programs written for this kind of housing · listed from their own pages, not tested</p>
+      <ul class="finding-list door-list">${doors.map(m => `<li><span class="fl-marks">${refTagOf(m.rule_id).trim()}${m.open === false ? ' <span class="ph-tag">no intake open</span>' : ""}</span><span><span class="title">${h(up(m.program))}${m.if && m.if.length ? ` <span class="cont">· if the housing is ${h(m.if.join(" and "))}</span>` : ""}:</span> <span class="cont">${h(m.what || "")}. A project enters ${h(m.enters || "in a way its page does not state")}.${m.intake ? ` ${h(up(String(m.intake).replace(/\.$/, "")))}.` : ""}${m.differs ? ` Its homes are all rent geared to income; this option has ${h(m.differs.market_units)} at market rent.` : ""}</span></span></li>`).join("")}</ul>`;
+  }
+  // what the answer covers, in the engine's words: a short list of programs is a limit of the tool, not of the project
+  if (ans.funded.scope) body += `<p class="path funders-scope">${h(ans.funded.scope)}</p>`;
+  // the homes the first layout does not place are counted by the funders' checks all the same: said beside the verdict
+  const lay = run && run.layout;
+  if (lay && lay.units_total && (lay.units_placed || 0) < lay.units_total) body = `<p class="finding intake-note">${leadCont(`The first layout places ${lay.units_placed} of ${lay.units_total} homes on the plates as drawn (answer 3); this answer counts all ${lay.units_total}.`)}</p>` + body;
   return `<section class="card answer" data-verdict="${h(verdictStatus(ans.funded.verdict))}">
     <h2><span class="badge">2</span> Does it fit the funders?</h2>
     <p class="verdict"><em>${h(fundedWord(ans.funded, true))}.</em></p>
@@ -200,6 +218,8 @@ export const MONEY_WORD = { likely: "Likely", unlikely: "Needs more sources", un
 export const moneyWord = v => MONEY_WORD[v.word] || cap(v.word);
 export function moneyNext(pf) {
   const v = pf.verdict || {}, gap = (pf.gap || {}).value, c = pf.capital || {}, homes = (pf.inputs || {}).units_total;
+  // rents that do not cover the running costs: the operating funder comes before the capital (proforma.OPERATING_FUNDER)
+  if (v.operating_shortfall) return "Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or shelter housing, the staffing as well), then enter the project's own rents and running costs and run again. This screen has no operating-subsidy line; the rents and the running cost are placeholders.";
   if (v.word === "unlikely") return "Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.";
   if (v.word === "unsure" && homes && gap != null && gap > 0 && c.total != null && c.land != null) return "Another source, or firmer figures for the placeholders, would settle it.";
   return "";
@@ -244,6 +264,42 @@ export function moneyWords(pf, run = null, tag = "p") {
   return tag === "p" ? `<p class="path money-words">${h(out.join(" "))}</p>` : out.join(" ");
 }
 
+/* The operating page: what runs the building a year, and the subsidy it needs (proforma.operating_rows is the twin;
+   both read proforma.operating.page). Income, costs, what is left, then the two figures a funder reads. Pure. */
+const FROM_WORD = { entered: "entered", placeholder: "placeholder", rule: "the rules' figure" };
+export function operatingRows(pf) {
+  const p = pf && pf.operating && pf.operating.page;
+  if (!p || p.gross == null) return [];
+  const homes = (pf.inputs || {}).units_total || 0, usd = x => `$${Math.round(x).toLocaleString("en-CA")}`;
+  const rows = [];
+  for (const t of p.tiers || []) {
+    if (!t.homes) continue;
+    rows.push({ label: `${t.label}, ${t.homes} homes`, value: t.rent_year, note: `${t.rent_month_per_home != null ? `${usd(t.rent_month_per_home)} a month a home` : "no rent figure"} (${FROM_WORD[t.from] || t.from})`, kind: "income", ph: t.from === "placeholder" });
+  }
+  rows.push({ label: "Vacancy", value: -(p.vacancy || 0), note: "the CMHC survey's rate, on all tiers", kind: "cost" });
+  rows.push({ label: "Operating cost", value: -(p.operating_cost || 0), note: `${usd(p.operating_cost_per_home || 0)} a home a year (${FROM_WORD[p.operating_cost_from] || ""})`, kind: "cost", ph: p.operating_cost_from === "placeholder" });
+  rows.push({ label: "Replacement reserve", value: -(p.reserve || 0), note: "", kind: "cost" });
+  rows.push({ label: "Support staffing", value: p.support_staffing != null ? -p.support_staffing : null, note: p.support_staffing != null ? "entered" : (p.staffing_missing ? "not entered, and this kind of housing runs on it" : ""), kind: "cost", warn: !!p.staffing_missing });
+  rows.push({ label: "Left after running costs", value: p.net_before_subsidy, note: "before any operating subsidy or loan payment", kind: "result" });
+  if (p.subsidy) rows.push({ label: "Operating subsidy entered", value: p.subsidy, note: `${p.subsidy_source ? `${p.subsidy_source}; ` : ""}${p.subsidy_confirmed ? "confirmed" : "not yet confirmed"}`, kind: "income", warn: !p.subsidy_confirmed });
+  rows.push({ label: "Loan payment", value: -(p.debt_service || 0), note: "on the loan the funding counts", kind: "cost" });
+  rows.push({ label: "Subsidy needed to run it", value: p.subsidy_to_run, note: `${p.subsidy_to_run ? `${usd(p.subsidy_to_run_per_home_month)} a home a month over ${homes} homes${p.beds && p.subsidy_to_run_per_bed_month != null ? ` (${usd(p.subsidy_to_run_per_bed_month)} a bed a month over ${p.beds} beds)` : ""}; ` : "none: the rents cover the running costs; "}before any loan payment`, kind: "ask" });
+  const f = p.if_gap_financed;
+  if (f) rows.push({ label: "Subsidy needed if the capital still missing were borrowed", value: f.subsidy_year, note: `${usd(f.per_home_month)} a home a month: the payment on ${usd(f.loan)} at ${f.rate_pct}% over ${f.amortization_years} years is ${usd(f.annual_payment)} a year. An illustration on this screen's mortgage terms, not a funder's financing`, kind: "ask" });
+  const t = f && f.on_program_terms;
+  if (t) rows.push({ label: `The same, on ${t.program}' published take-out terms`, value: t.subsidy_year, note: `${usd(t.per_home_month)} a home a month: ${t.rate_pct}% over ${t.amortization_years} years is ${usd(t.annual_payment)} a year. The program's page gives the rate; whether this project gets that loan is the program's to say`, kind: "ask" });
+  return rows;
+}
+export function operatingTable(pf) {
+  const rows = operatingRows(pf);
+  if (!rows.length) return "";
+  const body = rows.map(r => `<tr class="op-${h(r.kind)}"><th scope="row">${h(r.label)}</th><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : h(r.value < 0 ? `−${money(-r.value)}` : money(r.value))}</td><td class="cont"><span class="measure">${h(r.note)}${r.ph ? ' <span class="ph-tag">placeholder</span>' : ""}${r.warn ? ' <span class="ph-tag">open</span>' : ""}</span></td></tr>`).join("");
+  return `<details class="pf-lines op-page" open><summary>What it takes to run, a year <span class="cont">· the rents, the running costs and the subsidy needed</span></summary>
+      <table class="plain op-table"><thead><tr><th scope="col">Line</th><th scope="col" class="num">A year</th><th scope="col">Note</th></tr></thead><tbody>${body}</tbody></table>
+      <p class="cont">The rents and the running cost are placeholders until the operator's own are entered at 03 (What it takes to run); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.</p>
+    </details>`;
+}
+
 export function answerMoney(run) {
   const pf = run.proforma;
   if (!pf) return "";
@@ -278,6 +334,7 @@ export function answerMoney(run) {
     ${moneyWords(pf, run)}
     ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
     ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
+    ${operatingTable(pf)}
     <details class="pf-lines"><summary>Every line, where it came from, and its source <span class="cont">(${(pf.lines || []).length} lines)</span></summary>
       <table class="plain"><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>
       <p class="cont">A feasibility screen, not a lender's model. Hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked.</p>

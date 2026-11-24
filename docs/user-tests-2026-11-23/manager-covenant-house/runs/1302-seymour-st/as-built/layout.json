@@ -1,0 +1,861 @@
+{
+  "site_id": "1302-seymour-st",
+  "option_id": "1302-seymour-st-as-built",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "edited": false,
+  "plate": {
+    "x": 0.0,
+    "y": 0.0,
+    "width_m": 15.2,
+    "depth_m": 21.45,
+    "storeys": 5,
+    "floor_to_floor_m": 4.2,
+    "double_loaded": true,
+    "unit_depth_m": 9.82,
+    "arrangement": "double"
+  },
+  "program": [
+    {
+      "key": "studio",
+      "label": "Studio",
+      "count": 28,
+      "net_m2_each": 36.3,
+      "gross_m2_each": 39.2,
+      "min_gross_m2_each": 35.6,
+      "area_m2": 1097.6,
+      "source": "bch.design_guidelines.unit_areas",
+      "note": "28 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions"
+    },
+    {
+      "key": "amenity",
+      "label": "Amenity",
+      "count": 1,
+      "area_m2": 42.0,
+      "source": "placeholder",
+      "note": "1.5 m² per unit, at least 40 m²"
+    },
+    {
+      "key": "services",
+      "label": "Services, bicycles",
+      "count": 1,
+      "area_m2": 40.0,
+      "source": "placeholder",
+      "note": "40 m² services + 0 bicycle spaces × 1.0 m²"
+    }
+  ],
+  "parking": {
+    "spaces": 0,
+    "area_m2": 0.0,
+    "where": "below grade, not on the plates",
+    "source": null
+  },
+  "units_total": 28,
+  "units_placed": 23,
+  "adjacencies": [
+    {
+      "id": "non_residential_street",
+      "block": "non_residential",
+      "rule": "on the ground floor, facing the street",
+      "status": "info",
+      "note": "no non-residential space in the option"
+    },
+    {
+      "id": "amenity_entry",
+      "block": "amenity",
+      "rule": "on the ground floor, next to the entry",
+      "status": "pass",
+      "note": "on the ground floor beside the core, where the entry is"
+    },
+    {
+      "id": "services_lane",
+      "block": "services",
+      "rule": "on the ground floor, away from the street",
+      "status": "pass",
+      "note": "on the ground floor, lane side"
+    },
+    {
+      "id": "core_centre",
+      "block": "core",
+      "rule": "at the centre of every floor, the corridor through it",
+      "status": "pass",
+      "note": "one core bay at the centre of every floor, the corridor through it"
+    },
+    {
+      "id": "units_both_sides",
+      "block": "units",
+      "rule": "on both sides of the corridor, above whatever the ground floor gives to other uses",
+      "status": "conditional",
+      "note": "units on both sides of the corridor; 5 studio (196 m²) did not fit: more storeys, a larger plate or a smaller program"
+    },
+    {
+      "id": "family_low",
+      "block": "three_bed_plus",
+      "rule": "on the lowest residential floors",
+      "status": "info",
+      "note": "no three-bedroom units in the mix"
+    },
+    {
+      "id": "accessible_core",
+      "block": "accessible",
+      "rule": "next to the core, on the lowest residential floor",
+      "status": "info",
+      "note": "no accessible units stated on the option"
+    }
+  ],
+  "geometry": [],
+  "egress": {
+    "rule_id": "bcbc.exits",
+    "sprinklered": true,
+    "sprinklered_is_placeholder": true,
+    "limits": {
+      "two_exits_over_floor_area_m2": 150.0,
+      "two_exits_over_occupant_load": 60.0,
+      "separation_min_m": 9.0,
+      "separation_share_of_diagonal": 0.5,
+      "travel_limit_m": 45.0,
+      "travel_limit_sprinklered_m": 45,
+      "travel_limit_unsprinklered_m": 30,
+      "dead_end_max_m": 6.0,
+      "occupant_load_persons_per_sleeping_room": 2.0,
+      "sleeping_rooms_by_unit": {
+        "studio": 1,
+        "one_bed": 1,
+        "two_bed": 2,
+        "three_bed_plus": 3
+      },
+      "stair_width_m": 2.2,
+      "core_bay_m": 7.0
+    },
+    "floors": [
+      {
+        "level": 0,
+        "name": "Ground floor",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 2.89,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 11.1,
+          "y": 11.62,
+          "door": [
+            13.09,
+            11.62
+          ],
+          "exit": [
+            11.1,
+            10.72
+          ]
+        },
+        "dead_end_m": 4.1,
+        "dead_end_limit_m": 6.0,
+        "status": "conditional",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 11.6 m deep, so stairs at its front and rear ends could be 9.4 m apart: an arrangement for the architect to draw"
+        ]
+      },
+      {
+        "level": 1,
+        "name": "Level 2",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 3.0,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 0.0,
+          "y": 0.0,
+          "door": [
+            2.0,
+            9.82
+          ],
+          "exit": [
+            4.1,
+            10.72
+          ]
+        },
+        "dead_end_m": 4.1,
+        "dead_end_limit_m": 6.0,
+        "status": "conditional",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 11.6 m deep, so stairs at its front and rear ends could be 9.4 m apart: an arrangement for the architect to draw"
+        ]
+      },
+      {
+        "level": 2,
+        "name": "Level 3",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 3.0,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 0.0,
+          "y": 0.0,
+          "door": [
+            2.0,
+            9.82
+          ],
+          "exit": [
+            4.1,
+            10.72
+          ]
+        },
+        "dead_end_m": 4.1,
+        "dead_end_limit_m": 6.0,
+        "status": "conditional",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 11.6 m deep, so stairs at its front and rear ends could be 9.4 m apart: an arrangement for the architect to draw"
+        ]
+      },
+      {
+        "level": 3,
+        "name": "Level 4",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 3.0,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 0.0,
+          "y": 0.0,
+          "door": [
+            2.0,
+            9.82
+          ],
+          "exit": [
+            4.1,
+            10.72
+          ]
+        },
+        "dead_end_m": 4.1,
+        "dead_end_limit_m": 6.0,
+        "status": "conditional",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 11.6 m deep, so stairs at its front and rear ends could be 9.4 m apart: an arrangement for the architect to draw"
+        ]
+      },
+      {
+        "level": 4,
+        "name": "Level 5",
+        "exits": 2,
+        "exits_required": 2,
+        "separation_m": 4.8,
+        "separation_min_m": 9.0,
+        "farthest_travel_m": 3.0,
+        "travel_limit_m": 45.0,
+        "farthest_unit": {
+          "block": "studio",
+          "x": 0.0,
+          "y": 0.0,
+          "door": [
+            2.0,
+            9.82
+          ],
+          "exit": [
+            4.1,
+            10.72
+          ]
+        },
+        "dead_end_m": 4.1,
+        "dead_end_limit_m": 6.0,
+        "status": "conditional",
+        "notes": [
+          "the two stairs are 4.8 m apart, under the 9 m required (3.4.2.3), read as two 2.2 m stairs at the ends of a 7 m core; the core runs 11.6 m deep, so stairs at its front and rear ends could be 9.4 m apart: an arrangement for the architect to draw"
+        ]
+      }
+    ],
+    "status": "conditional",
+    "scissor_stair": false,
+    "summary": "Egress (sprinklered, BCBC 2024 Part 3): conditional; 5 floors: 5 conditional; exits 4.8 m apart, at least 9 m needed, on 5 floors; farthest travel 3.0 m, limit 45 m."
+  },
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground floor",
+      "z": 0.0,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 4.1,
+          "y": 9.82,
+          "w": 7.0,
+          "d": 11.62,
+          "area_m2": 81.4
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 0.0,
+          "y": 9.82,
+          "w": 15.2,
+          "d": 1.8,
+          "area_m2": 27.4,
+          "through": "core"
+        },
+        {
+          "block": "amenity",
+          "label": "Amenity",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 4.27,
+          "d": 9.82,
+          "area_m2": 42.0,
+          "side": "front"
+        },
+        {
+          "block": "services",
+          "label": "Services, bicycles",
+          "x": 0.03,
+          "y": 11.62,
+          "w": 4.07,
+          "d": 9.82,
+          "area_m2": 40.0,
+          "side": "rear"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 4.27,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 8.26,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 11.1,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 12.25,
+          "y": 0.0,
+          "w": 2.95,
+          "d": 9.82,
+          "area_m2": 28.9,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 28.9
+    },
+    {
+      "level": 1,
+      "name": "Level 2",
+      "z": 4.2,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 4.1,
+          "y": 9.82,
+          "w": 7.0,
+          "d": 11.62,
+          "area_m2": 81.4
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 0.0,
+          "y": 9.82,
+          "w": 15.2,
+          "d": 1.8,
+          "area_m2": 27.4,
+          "through": "core"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 3.99,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 7.98,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.11,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 11.1,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 11.97,
+          "y": 0.0,
+          "w": 3.23,
+          "d": 9.82,
+          "area_m2": 31.7,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 31.7
+    },
+    {
+      "level": 2,
+      "name": "Level 3",
+      "z": 8.4,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 4.1,
+          "y": 9.82,
+          "w": 7.0,
+          "d": 11.62,
+          "area_m2": 81.4
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 0.0,
+          "y": 9.82,
+          "w": 15.2,
+          "d": 1.8,
+          "area_m2": 27.4,
+          "through": "core"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 3.99,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 7.98,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.11,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 11.1,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 11.97,
+          "y": 0.0,
+          "w": 3.23,
+          "d": 9.82,
+          "area_m2": 31.7,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 31.7
+    },
+    {
+      "level": 3,
+      "name": "Level 4",
+      "z": 12.6,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 4.1,
+          "y": 9.82,
+          "w": 7.0,
+          "d": 11.62,
+          "area_m2": 81.4
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 0.0,
+          "y": 9.82,
+          "w": 15.2,
+          "d": 1.8,
+          "area_m2": 27.4,
+          "through": "core"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 3.99,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 7.98,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.11,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 11.1,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 11.97,
+          "y": 0.0,
+          "w": 3.23,
+          "d": 9.82,
+          "area_m2": 31.7,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 31.7
+    },
+    {
+      "level": 4,
+      "name": "Level 5",
+      "z": 16.8,
+      "zones": [
+        {
+          "block": "core",
+          "label": "Core (stairs, elevator)",
+          "x": 4.1,
+          "y": 9.82,
+          "w": 7.0,
+          "d": 11.62,
+          "area_m2": 81.4
+        },
+        {
+          "block": "corridor",
+          "label": "Corridor",
+          "x": 0.0,
+          "y": 9.82,
+          "w": 15.2,
+          "d": 1.8,
+          "area_m2": 27.4,
+          "through": "core"
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.0,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 3.99,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 7.98,
+          "y": 0.0,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 0.11,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "studio",
+          "label": "Studio",
+          "x": 11.1,
+          "y": 11.62,
+          "w": 3.99,
+          "d": 9.82,
+          "area_m2": 39.2,
+          "side": "rear",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 11.97,
+          "y": 0.0,
+          "w": 3.23,
+          "d": 9.82,
+          "area_m2": 31.7,
+          "side": "front"
+        }
+      ],
+      "spare_m2": 31.7
+    }
+  ],
+  "shortfall": [
+    {
+      "block": "studio",
+      "label": "Studio",
+      "units": 5,
+      "area_m2": 196.0
+    }
+  ],
+  "outright": {
+    "fsr": null,
+    "height_m": null,
+    "rule_ids": []
+  },
+  "capacity": {
+    "site_area_m2": 534.6,
+    "storeys": 5,
+    "plate_m2": 326.1,
+    "gfa_m2": 1630.5,
+    "fsr": 3.05,
+    "fsr_limit": null,
+    "limit_from": null,
+    "rule_id": null,
+    "room_m2": null,
+    "levels_room": null,
+    "fsr_with_one_more": 3.66
+  },
+  "totals": {
+    "plates_m2": 1630.2,
+    "used_m2": 1527.6,
+    "spare_m2": 102.6,
+    "gfa_m2": 1630.5
+  },
+  "assumptions": [
+    {
+      "key": "partition_allowance",
+      "value": 1.08,
+      "note": "gross unit area over net: walls and the entry, 8% at this stage (the net areas already carry the suggestion's 10% design allowance)"
+    },
+    {
+      "key": "corridor_width_m",
+      "value": 1.8,
+      "note": "a double-loaded corridor, the wider of the two usual widths"
+    },
+    {
+      "key": "core_bay_m",
+      "value": 7.0,
+      "note": "one bay across the plate at its centre for two stairs, the elevator and risers"
+    },
+    {
+      "key": "services_base_m2",
+      "value": 40.0,
+      "note": "mechanical, electrical, garbage and recycling on the ground floor"
+    },
+    {
+      "key": "bicycle_m2_per_space",
+      "value": 1.0,
+      "note": "a bicycle space with its aisle share"
+    },
+    {
+      "key": "amenity_m2_per_unit",
+      "value": 1.5,
+      "note": "indoor amenity, at least 40 m²; a placeholder until the operator's brief"
+    },
+    {
+      "key": "parking_m2_per_space",
+      "value": 30.0,
+      "note": "a below-grade stall with its aisle share; not on the plates"
+    },
+    {
+      "key": "window_width_m",
+      "value": 1.5,
+      "note": "one window per unit on the elevation, the unit module as the rhythm"
+    },
+    {
+      "key": "stair_width_m",
+      "value": 2.2,
+      "note": "one exit stair's width along the core; a core at least one core bay wide holds two stairs at its ends"
+    },
+    {
+      "key": "min_home_depth_m",
+      "value": 4.0,
+      "note": "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"
+    }
+  ],
+  "warnings": [
+    "The setbacks leave no envelope inside the lot polygon that a rectangular plate fits; the equivalent rectangle is used for the envelope."
+  ],
+  "derived_from": [
+    "option.units",
+    "option.non_residential_gfa_m2",
+    "option.accessible_units",
+    "option.bicycle_spaces",
+    "massing.masses[proposed]",
+    "bch.design_guidelines.unit_areas"
+  ]
+}

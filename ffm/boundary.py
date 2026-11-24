@@ -465,9 +465,10 @@ def inset(ring: list, sb: dict | None) -> list[list[float]] | None:
     return [[round(x, 2), round(y, 2)] for x, y in out]
 
 
-def largest_rect(poly: list, step: float = 0.5) -> dict[str, float] | None:
+def largest_rect(poly: list, step: float = 0.5, exclude: dict | None = None) -> dict[str, float] | None:
     """The largest rectangle aligned with the axes inside the polygon, found on a grid of `step` metres (the
-    answer is good to about a step on each side). None for a polygon too small for one cell."""
+    answer is good to about a step on each side). None for a polygon too small for one cell. `exclude` {x, y, w, d}:
+    a rectangle the answer may not overlap (the plate box, when a second one is looked for beside it)."""
     pts = _ccw(_open(poly))
     if len(pts) < 3:
         return None
@@ -504,6 +505,10 @@ def largest_rect(poly: list, step: float = 0.5) -> dict[str, float] | None:
     for r in range(rows):
         above = cells_inside(spans(y0 + (r + 1) * step - eps))
         inside = [below[c] and above[c] for c in range(cols)]
+        if exclude:
+            ry0, ry1 = y0 + r * step, y0 + (r + 1) * step
+            if ry1 > exclude["y"] + 1e-6 and ry0 < exclude["y"] + exclude["d"] - 1e-6:
+                inside = [inside[c] and not (x0 + (c + 1) * step > exclude["x"] + 1e-6 and x0 + c * step < exclude["x"] + exclude["w"] - 1e-6) for c in range(cols)]
         below = cells_inside(spans(y0 + (r + 1) * step + eps))
         heights = [heights[c] + 1 if inside[c] else 0 for c in range(cols)]
         # the largest rectangle under the histogram of column heights ending at this row
@@ -524,6 +529,100 @@ def largest_rect(poly: list, step: float = 0.5) -> dict[str, float] | None:
     _, c, r, w, hgt = best
     return {"x": round(x0 + c * step, 2), "y": round(y0 + r * step, 2), "w": round(w * step, 2), "d": round(hgt * step, 2),
             "area_m2": round(w * hgt * step * step, 1)}
+
+
+WING_MIN_SIDE_M = 9.8      # the shallowest wing homes are laid out in (a single-loaded corridor and one strip)
+WING_MIN_AREA_M2 = 150.0   # a smaller leftover is not worth a second core
+WING_MIN_JOINT_M = 3.0     # the wing meets the main plate along at least this much of a wall
+
+
+def wing_rect(poly: list, box: dict, step: float = 0.5) -> dict[str, Any] | None:
+    """A second rectangle inside the polygon beside the plate box: the largest one that does not overlap it, where it
+    is big enough to hold homes and meets the box along a wall (23 Nov 2026: a plate was one rectangle, and on an L
+    or a wedge of a lot the rest of the envelope stood empty). Returns {x, y, w, d, area_m2, joins} with `joins` the
+    side of the box it stands on ("left", "right", "front", "rear"), or None."""
+    r = largest_rect(poly, step, exclude=box)
+    if not r or r["area_m2"] < WING_MIN_AREA_M2 or min(r["w"], r["d"]) < WING_MIN_SIDE_M:
+        return None
+    tol = step + 0.01
+    over_y = min(r["y"] + r["d"], box["y"] + box["d"]) - max(r["y"], box["y"])
+    over_x = min(r["x"] + r["w"], box["x"] + box["w"]) - max(r["x"], box["x"])
+    if abs(r["x"] - (box["x"] + box["w"])) <= tol and over_y >= WING_MIN_JOINT_M:
+        return {**r, "x": box["x"] + box["w"], "joins": "right"}       # closed up to the box where the grid left a step
+    if abs(r["x"] + r["w"] - box["x"]) <= tol and over_y >= WING_MIN_JOINT_M:
+        return {**r, "x": box["x"] - r["w"], "joins": "left"}
+    if abs(r["y"] - (box["y"] + box["d"])) <= tol and over_x >= WING_MIN_JOINT_M:
+        return {**r, "y": box["y"] + box["d"], "joins": "rear"}
+    if abs(r["y"] + r["d"] - box["y"]) <= tol and over_x >= WING_MIN_JOINT_M:
+        return {**r, "y": box["y"] - r["d"], "joins": "front"}
+    return None
+
+
+def rects_outline(rects: list[dict]) -> list[list[float]]:
+    """The outline of rectangles that touch, as one ring (counter-clockwise from its lowest, then leftmost corner):
+    an L, a T or a step. The rectangles are cut on each other's edges into cells, and the edges with a cell on one
+    side only are chained. Pure; for two or three rectangles that meet along walls."""
+    xs = sorted({round(v, 3) for r in rects for v in (r["x"], r["x"] + r["w"])})
+    ys = sorted({round(v, 3) for r in rects for v in (r["y"], r["y"] + r["d"])})
+    full = lambda i, j: 0 <= i < len(xs) - 1 and 0 <= j < len(ys) - 1 and any(
+        r["x"] - 1e-6 <= xs[i] and xs[i + 1] <= r["x"] + r["w"] + 1e-6 and r["y"] - 1e-6 <= ys[j] and ys[j + 1] <= r["y"] + r["d"] + 1e-6 for r in rects)
+    nxt: dict[tuple[float, float], tuple[float, float]] = {}
+    for i in range(len(xs) - 1):
+        for j in range(len(ys) - 1):
+            if not full(i, j):
+                continue
+            if not full(i, j - 1):
+                nxt[(xs[i], ys[j])] = (xs[i + 1], ys[j])                 # along the bottom, going right
+            if not full(i + 1, j):
+                nxt[(xs[i + 1], ys[j])] = (xs[i + 1], ys[j + 1])         # up the right side
+            if not full(i, j + 1):
+                nxt[(xs[i + 1], ys[j + 1])] = (xs[i], ys[j + 1])         # along the top, going left
+            if not full(i - 1, j):
+                nxt[(xs[i], ys[j + 1])] = (xs[i], ys[j])                 # down the left side
+    if not nxt:
+        return []
+    start = min(nxt, key=lambda p: (p[1], p[0]))
+    ring, at = [start], nxt[start]
+    while at != start and len(ring) <= len(nxt):
+        ring.append(at)
+        at = nxt[at]
+    # drop the points that lie on a straight wall
+    out = [p for k, p in enumerate(ring) if not ((ring[k - 1][0] == p[0] == ring[(k + 1) % len(ring)][0]) or (ring[k - 1][1] == p[1] == ring[(k + 1) % len(ring)][1]))]
+    return [[round(x, 2), round(y, 2)] for x, y in out]
+
+
+TURN_MIN_DEG = 2.0     # a longest edge this close to the frontage's direction is not worth turning to
+TURN_GAIN = 1.10       # a turned plate box is taken only where it is at least this much larger
+
+
+def rotate_pt(pt, deg: float) -> Point:
+    """A point turned counter-clockwise about the origin (the same turn massing._turn makes about a centre)."""
+    c, s = math.cos(math.radians(deg)), math.sin(math.radians(deg))
+    return (pt[0] * c - pt[1] * s, pt[0] * s + pt[1] * c)
+
+
+def turned_rect(poly: list, step: float = 0.5) -> dict[str, float] | None:
+    """The plate box, tried twice: square to the frontage (`largest_rect`), and square to the polygon's longest edge
+    (23 Nov 2026, from an architect's test: on a lot whose long sides run at an angle to its front, 2001 Stainsbury Ave
+    read from Victoria Drive, the box square to the front was a third of the one along the lot line). The turned box
+    is taken where it is at least 10% larger. Returns the box with `angle_deg`: 0, or the turn; a turned box's x, y,
+    w, d are in the frame turned by minus that angle about the origin, and `rotate_pt(centre, angle_deg)` brings its
+    centre back to the lot's frame."""
+    base = largest_rect(poly, step)
+    pts = _open(poly)
+    if len(pts) < 3:
+        return base
+    n = len(pts)
+    a, b = max(((pts[i], pts[(i + 1) % n]) for i in range(n)), key=lambda e: math.dist(e[0], e[1]))
+    ang = math.degrees(math.atan2(b[1] - a[1], b[0] - a[0])) % 90.0
+    if ang > 45.0:
+        ang -= 90.0
+    if abs(ang) < TURN_MIN_DEG:
+        return {**base, "angle_deg": 0.0} if base else None
+    turned = largest_rect([list(rotate_pt(p, -ang)) for p in pts], step)
+    if turned and (not base or turned["area_m2"] >= TURN_GAIN * base["area_m2"]):
+        return {**turned, "angle_deg": round(ang, 2)}
+    return {**base, "angle_deg": 0.0} if base else None
 
 
 def shape_summary(ring: list) -> dict[str, Any] | None:

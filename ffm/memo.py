@@ -14,10 +14,11 @@ from __future__ import annotations
 
 import html
 import json
+import re
 from pathlib import Path
 from typing import Any
 
-from .engine import counts_outright
+from .engine import counts_outright, takes_ref
 from .rules_loader import district_of
 
 STATUS_WORD = {
@@ -63,20 +64,83 @@ def _fmt_vals(v: dict) -> str:
     return "; ".join(bits)
 
 
+# The terms a reader outside the trade meets in the memo, each in a sentence; printed only where the memo uses the word.
+GLOSSARY = [
+    ("FSR", r"\bFSR\b", "floor space ratio: the building's floor area divided by the site's area. FSR 3.0 on a 1,000 m² lot is 3,000 m² of floor."),
+    ("Outright", r"[Oo]utright", "what the zoning district allows with a permit and no vote of Council."),
+    ("Rezoning", r"[Rr]ezoning", "asking Council to change what the land may hold, after a public hearing; what it allows is negotiated, not read from a table."),
+    ("CD-1", r"\bCD-1\b", "a zoning district written for one site, with its own by-law."),
+    ("RGI", r"\bRGI\b|rent[- ]geared[- ]to[- ]income", "rent geared to income: the tenant pays a share of household income, about 30%, whatever the home would rent for."),
+    ("Deep subsidy", r"[Dd]eep[- ]subsidy", "homes for the lowest incomes, such as people on income or disability assistance or a basic pension; the rent is a small fixed amount."),
+    ("HILs", r"\bHILs?\b|Housing Income Limits", "Housing Income Limits: the highest household income, set by BC Housing by home size and place, at which a household qualifies for subsidized housing."),
+    ("Net operating income", r"[Nn]et operating income", "the rent left each year after vacancy, running costs and the reserve, before any loan payment."),
+    ("Debt coverage", r"coverage|\bDCR\b", "how many times the yearly net income covers the yearly loan payment; a lender asks for more than once."),
+    ("Plate", r"\bplate\b", "one floor of the building, as an outline."),
+    ("Setback", r"[Ss]etback|\byards?\b", "the strip of the lot along each property line that must stay unbuilt."),
+    ("Placeholder", r"[Pp]laceholder", "a figure the tool assumes until the project's own replaces it; every one is marked."),
+]
+
+
+def layout_open_items(lay: dict | None) -> list[dict]:
+    """What the first layout leaves open, as rows of answer 3: homes that do not fit the plates, blocks placed by hand
+    that break the plate, and floors that do not pass the exit clauses. The page's memo/answers.js layoutOpenItems is the
+    twin; memo.md lacked them until 23 Nov 2026, so a memo could read "fits the funders" on 123 homes over a plan that
+    placed 93 with no row saying so. Pure."""
+    if not lay:
+        return []
+    out: list[dict] = []
+    short = [s for s in lay.get("shortfall") or [] if s.get("units") or s.get("area_m2")]
+    total, placed = lay.get("units_total"), lay.get("units_placed")
+    if short and total:
+        words = ", ".join((f"{s['units']} " if s.get("units") else "") + str(s.get("label") or "").lower() for s in short)
+        out.append({"title": "Homes that do not fit the plates", "status": "conditional",
+                    "action": f"Architect: {placed} of {total} homes fit the plates on {len(lay.get('floors') or [])} floors at the unit sizes assumed; did not fit: {words}. "
+                              f"More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all {total}."})
+    broken = lay.get("geometry") or []
+    if broken:
+        out.append({"title": "Blocks placed by hand that break the plate", "status": "fail",
+                    "action": f"Architect: {len(broken)} problem{'' if len(broken) == 1 else 's'} in the hand placement: "
+                              + "; ".join(str(g.get("note") or g.get("kind") or "") for g in broken[:3]) + ("; …" if len(broken) > 3 else "") + ". Fix them in Edit blocks before issuing."})
+    eg = lay.get("egress") or {}
+    if eg.get("status") in ("fail", "conditional", "uncertain"):
+        floors = eg.get("floors") or []
+        bad = [x for x in floors if x.get("status") != "pass"]
+        out.append({"title": "Exits: travel distance, separation and dead ends (BC Building Code)", "status": eg["status"],
+                    "action": f"Architect: {len(bad)} of {len(floors)} floors {'does' if len(bad) == 1 else 'do'} not pass the exit clauses. {eg.get('summary') or ''} "
+                              "Move or add a stair; the clause figures are unverified against the code text."})
+    return out
+
+
 def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None, title: str | None = None,
-             revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None) -> str:
+             revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None, massing_error: str | None = None) -> str:
     run, res, summ = ledger["run"], ledger["results"], ledger["summary"]
     site, opt = ledger["inputs"]["site"], ledger["inputs"]["option"]
     ans = summ["answers"]
     L: list[str] = []
     L.append(f"# First Read memo: {site.get('address', site.get('id'))}")
     L.append("")
+    # the address as the person typed it, where the City lists the lot under another (23 Nov 2026: a board would not
+    # recognise "438 Gore Ave" as 320 East Hastings Street)
+    typed = str((site.get("lookup") or {}).get("typed") or "").strip()
+    if typed and (site.get("lookup") or {}).get("civic_mismatch"):
+        L.append(f"*Looked up as \"{typed}\"; the City lists the lot as {site.get('address')}.*  ")
+    if opt.get("as_built") is True:
+        L.append("> **A calibration run against a completed project.** The figures are the project's as built or approved; a fail or a \"not assessed\" below shows a limit of the rules in this tool, not of the building.")
+        L.append("")
     L.append(f"**Option:** {opt.get('name', opt.get('id'))}  ")
-    L.append(f"**Proponent:** {opt.get('proponent', '—')} ({str(opt.get('proponent_type', '')).replace('_', ' ')})  ")
+    # a proponent not named is said so (23 Nov 2026: "Proponent: None (non profit society)" on every unnamed memo)
+    L.append(f"**Proponent:** {opt.get('proponent') or 'not named'} ({str(opt.get('proponent_type') or 'type not given').replace('_', ' ')})  ")
+    if opt.get("operator"):
+        L.append(f"**Operator:** {opt['operator']}  ")
     L.append(f"**Rules as of:** {run['as_of']} · **version stamp:** `{run['stamp']['stamp']}` · engine {run['engine_version']}  ")
     L.append("")
     L.append("> Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. "
-             "It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there.")
+             "It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. "
+             "An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.")
+    # the first layout's open items belong on page one: a count the plates do not hold changes how answers 2 and 4 read
+    lay_items = layout_open_items(layout)
+    unplaced = (f" The first layout places {layout.get('units_placed')} of {layout.get('units_total')} homes on the plates as drawn (answer 3); this answer counts all {layout.get('units_total')}."
+                if layout and layout.get("units_total") and (layout.get("units_placed") or 0) < layout["units_total"] else "")
     L.append("")
 
     # ---------------- the three answers
@@ -86,8 +150,20 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     L.append(f"**Outright, under {district_of(site) or 'the district'}: {o['verdict']}.** " + " ".join(f"{r['finding']} ({r['rule_id']})" for r in out_lines)
              + (f" Not assessed: {o['why']}; the envelope is the option's own figure, not a permitted one." if o.get("why") else ""))
     L.append("")
-    if ans["allowed"].get("rezoning_path"):
-        L.append(f"**By rezoning ({ans['allowed']['rezoning_path']}): {bz['verdict']}.**")
+    from .checks import proposes_rezoning
+    if bz.get("verdict") == "not needed":
+        L.append(f"**By rezoning: not needed.** {bz['why'][:1].upper() + bz['why'][1:]}.")
+        L.append("")
+    elif (ans["allowed"].get("rezoning_path") or ans["allowed"].get("approval_route")) and not proposes_rezoning(opt):
+        # an approval route that is not a rezoning (a development permit under an official development plan): said as
+        # the route, and the open items of layers A to C listed under it without a by-rezoning verdict (23 Nov 2026)
+        L.append(f"**Approval route: {ans['allowed'].get('rezoning_path') or ans['allowed'].get('approval_route', '').replace('_', ' ')}.** No rezoning is proposed, so the rules written for rezonings are not read; what else is open in the City's and the Province's rules:")
+        for r in res:
+            if r["layer"] in ("A", "B", "C") and r["status"] in ("fail", "conditional", "uncertain") and not r.get("check", "").startswith("district_outright"):
+                L.append(f"- *{STATUS_WORD[r['status']]}* — {r['title']}: {r['finding']}")
+        L.append("")
+    elif ans["allowed"].get("rezoning_path") or ans["allowed"].get("approval_route") == "rezoning":
+        L.append(f"**By rezoning ({ans['allowed'].get('rezoning_path') or 'path not written'}): {bz['verdict']}.**")
         for r in res:
             if r["layer"] in ("A", "B", "C") and r["status"] in ("fail", "conditional", "uncertain") and not r.get("check", "").startswith("district_outright"):
                 L.append(f"- *{STATUS_WORD[r['status']]}* — {r['title']}: {r['finding']}")
@@ -97,16 +173,35 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     # a ledger written before `words` existed falls back to the verdict key
     fd = ans["funded"]
     closed = [i["note"] for i in fd.get("intake") or [] if i.get("open") is False]
-    L.append(f"**{fd.get('words') or fd['verdict'].capitalize()}.**" + "".join(f" {c[:1].upper() + c[1:]}." for c in closed))
+    L.append(f"**{fd.get('words') or fd['verdict'].capitalize()}.**" + "".join(f" {c[:1].upper() + c[1:]}." for c in closed) + unplaced)
     for r in res:
-        if r["layer"] == "E" and r["rule_id"] in (opt.get("target_programs") or [r["rule_id"]]):
+        if r["layer"] == "E" and r.get("check") != "program_match" and r["rule_id"] in (opt.get("target_programs") or [r["rule_id"]]):
             L.append(f"- *{STATUS_WORD[r['status']]}* — {r['title']}: {r['finding']}")
+    # the programs the rules list without testing them, where they are written for this housing (23 Nov 2026)
+    doors = [m for m in fd.get("matches") or [] if not m.get("ended")]
+    if doors:
+        L.append("")
+        L.append("Other programs written for this kind of housing, listed from their own pages and **not tested**:")
+        for m in doors:
+            cond = f" (if the housing is {' and '.join(m['if'])})" if m.get("if") else ""
+            intake = (m.get("intake") or "").rstrip(".")
+            L.append(f"- **{m['program'][:1].upper() + m['program'][1:]}**{cond}: {m.get('what') or ''}. A project enters {m.get('enters') or 'in a way its page does not state'}."
+                     + (f" {intake[:1].upper() + intake[1:]}." if intake else "")
+                     + (f" Its homes are all rent geared to income; this option has {m['differs']['market_units']} at market rent." if m.get("differs") else ""))
+    if fd.get("scope"):
+        L.append("")
+        L.append(f"*{fd['scope']}*")
     L.append("")
     L.append("## 3. What is still unsure, and who resolves it?")
-    if ans["unsure"]:
+    open_items = list(ans["unsure"]) + lay_items
+    if massing_error:
+        # a run whose massing could not be drawn says so, with the reason (23 Nov 2026: a memo with no drawings and no word why)
+        open_items.append({"title": "No massing or drawings in this memo", "status": "uncertain",
+                           "action": f"Architect: the massing could not be drawn from the site as recorded ({massing_error.rstrip('.')}). Correct the site's front street or dimensions and run again."})
+    if open_items:
         L.append("| Item | Status | Who / what |")
         L.append("|---|---|---|")
-        for u in ans["unsure"]:
+        for u in open_items:
             L.append(f"| {u['title']} | {STATUS_WORD[u['status']]} | {u['action'] or '—'} |")
     else:
         L.append("Nothing outstanding.")
@@ -200,9 +295,19 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
         L.append("")
 
     # ---------------- the full ledger
+    # the rules that apply to this site, as the page and the paper list them; one written for another district or not in
+    # force on the date is counted in a line, not printed (23 Nov 2026: 60-odd "Not applicable: written for C-2
+    # districts" rows made the memo 95 KB and buried the 20 that applied). ledger.json keeps every one.
     L.append("## Full ledger")
+    elsewhere = [r for r in res if not takes_ref(r)]
+    if elsewhere:
+        L.append("")
+        L.append(f"{len(res) - len(elsewhere)} of the {len(res)} rules in force apply to this site and are listed. The other {len(elsewhere)} are written for other districts "
+                 "or are not in force on this date; `ledger.json` lists them with their reasons.")
     cur_layer = None
     for r in res:
+        if not takes_ref(r):
+            continue
         if r["layer"] != cur_layer:
             cur_layer = r["layer"]
             L.append("")
@@ -212,6 +317,15 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
             L.append("|---|---|---|---|---|")
         L.append(f"| {r['title']} (`{r['rule_id']}`, v {r.get('version_effective_from') or '—'}) | {STATUS_WORD[r['status']]} | {r['finding']} | {_fmt_vals(r.get('values', {}))} | {_src(r)} |")
     L.append("")
+
+    # ---------------- the words a board will not have (23 Nov 2026: HILs, RGI and deep subsidy stood unexplained in memo.md)
+    said = "\n".join(L)
+    words = [(k, v) for k, pat, v in GLOSSARY if re.search(pat, said)]
+    if words:
+        L.append("## Words in this memo")
+        for k, v in words:
+            L.append(f"- **{k}**: {v}")
+        L.append("")
 
     # ---------------- inputs and sources
     L.append("## Inputs")
@@ -382,7 +496,7 @@ def load_revit_result(out_dir: Path, stamp: str) -> dict | None:
 
 
 def write(ledger: dict, out_dir: Path, massing: dict | None = None, diff: dict | None = None, svg_text: str | None = None,
-          revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None) -> tuple[Path, Path]:
+          revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None, massing_error: str | None = None) -> tuple[Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     if revit is None:
         revit = load_revit_result(out_dir, ledger["run"]["stamp"]["stamp"])
@@ -402,7 +516,7 @@ def write(ledger: dict, out_dir: Path, massing: dict | None = None, diff: dict |
         p = out_dir / f"{name}.svg"
         if p.exists():
             svgs[p.name] = p.read_text(encoding="utf-8")
-    md = markdown(ledger, massing, diff, revit=revit, proforma=proforma, layout=layout)
+    md = markdown(ledger, massing, diff, revit=revit, proforma=proforma, layout=layout, massing_error=massing_error)
     pm = out_dir / "memo.md"
     ph = out_dir / "memo.html"
     pm.write_text(md, encoding="utf-8")

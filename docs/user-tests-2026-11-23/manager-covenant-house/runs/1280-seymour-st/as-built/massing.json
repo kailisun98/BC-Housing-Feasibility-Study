@@ -1,0 +1,148 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "1280-seymour-st",
+  "option_id": "1280-seymour-st-as-built",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        24.83,
+        -2.04
+      ],
+      [
+        24.69,
+        34.4
+      ],
+      [
+        1.89,
+        34.4
+      ],
+      [
+        2.03,
+        -2.04
+      ]
+    ],
+    "frontage_m": 22.9,
+    "depth_m": 36.6,
+    "area_m2": 837.3,
+    "street_side": "y = 0",
+    "corners": [
+      [
+        24.83,
+        -2.04
+      ],
+      [
+        24.69,
+        34.4
+      ],
+      [
+        1.89,
+        34.4
+      ],
+      [
+        2.03,
+        -2.04
+      ]
+    ],
+    "bbox": [
+      1.89,
+      -2.04,
+      24.83,
+      34.4
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 830.8,
+    "shape": {
+      "class": "rectangle",
+      "note": "A rectangle, 831 m2, 36.5 x 22.8 m bounding rectangle.",
+      "rectangularity": 0.998,
+      "vertices": 4,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in)"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        22.9,
+        0.0
+      ],
+      [
+        22.9,
+        36.6
+      ],
+      [
+        0.0,
+        36.6
+      ]
+    ],
+    "width_m": 22.9,
+    "depth_m": 36.6,
+    "area_m2": 838.1,
+    "setbacks_m": {
+      "front": 0.0,
+      "rear": 0.0,
+      "side": 0.0
+    }
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 10 storeys, FSR 5.15",
+      "footprint": [
+        [
+          2.367,
+          0.0
+        ],
+        [
+          22.9,
+          0.0
+        ],
+        [
+          22.9,
+          21.0
+        ],
+        [
+          2.367,
+          21.0
+        ]
+      ],
+      "plate_width_m": 20.53,
+      "plate_depth_m": 21.0,
+      "at_street_corner": "right",
+      "base_z": 0.0,
+      "height_m": 36.0,
+      "storeys": 10,
+      "floor_to_floor_m": 3.6,
+      "plate_area_m2": 431.2,
+      "gfa_m2": 4312.0,
+      "fsr": 5.15,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 6,
+    "after": 0,
+    "shortfall": 6,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [
+    "The setbacks leave no envelope inside the lot polygon that a rectangular plate fits; the equivalent rectangle is used for the envelope."
+  ],
+  "outright_height_limit_m": null
+}

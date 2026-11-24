@@ -8,7 +8,7 @@ import { engine, loadEngine } from "./core/engine.js";
 import { districtOf, SITE_FIELDS } from "./fields.js";
 import { refreshSummary, renderForm } from "./schedule.js";
 import { onSiteChange } from "./files.js";
-import { scheduleFor } from "./route-stage.js";
+import { renderStage, scheduleFor } from "./route-stage.js";
 
 /* Claude proposes, the person confirms; in the architect's Site schedule only (16 Nov 2026: the manager no longer
    meets it at stops 1 and 3). The model is reached with a key: the local server's own (FFM_CLAUDE_KEY on that
@@ -58,7 +58,7 @@ function wireKeyBoxes(el) {
 /* The architect's two Claude folds in the Site schedule: an odd lot at its head, a missing district schedule under
    the district's row. Drawn again after each schedule render and each step of a reading. */
 export function renderClaude() {
-  const top = $("#site-claude"), slot = $("#claude-schedule-slot");
+  const top = $("#site-claude"), schedSlot = $("#claude-schedule-slot"), stageSlot = $("#stage-cd1-slot");
   if (top) {
     top.innerHTML = state.site ? `<details class="claude-fold"${guide.proposal || guide.busy.claude ? " open" : ""}><summary>Odd lot? Ask Claude about it <span class="cont">(with a key; optional)</span></summary>
       <p class="help">The model proposes the equivalent rectangle, the frontage street and what is odd, with its evidence; you confirm each field under your name.</p>
@@ -67,17 +67,35 @@ export function renderClaude() {
     </details>` : "";
     wireClaude(top);
   }
+  // One copy of the schedule form in the page: on the manager's site card for a CD-1 lot (24 Nov 2026, Kai: a CD-1
+  // site should let the person give a key and have the tool read its by-law), else under the architect's district row.
+  const manager = document.documentElement.dataset.mode === "manager";
+  const onStage = manager && stageSlot;
+  if (stageSlot && !onStage) stageSlot.innerHTML = "";
+  if (schedSlot && onStage) schedSlot.innerHTML = "";
+  const slot = onStage ? stageSlot : schedSlot;
   if (slot) {
     const district = districtOf(state.site || {}).toUpperCase();
     const known = scheduleFor(district, (state.site || {}).cd1_bylaw_number);
-    slot.innerHTML = district && (!known || guide.ruleProposal) ? `<details class="claude-fold"${hasClaude() || guide.ruleProposal ? " open" : ""}><summary>Read the ${h(district)} schedule with Claude <span class="cont">(the rules have ${known ? "it now" : "none for it"})</span></summary>
-      <p class="help">Save the schedule's PDF from the City's by-law site (it refuses scripts), choose it here, and the model proposes its clauses with the quote behind each. You check the quotes against the PDF and confirm under your name; the rules file then cites the schedule, the model and you.</p>
+    const isCd1 = /^CD-1/.test(district), numbered = /^CD-1 \(/.test(district);
+    const cityUrl = numbered ? `https://cd1-bylaws.vancouver.ca/${district.replace(/\s+/g, "").toLowerCase()}.PDF` : "https://cd1-bylaws.vancouver.ca/index.htm";
+    const what = isCd1 ? `${numbered ? `${h(district)}'s` : "the CD-1"} by-law` : `the ${h(district)} schedule`;
+    const help = isCd1
+      ? `<p class="help">A CD-1 lot has a by-law of its own in place of a district schedule: its height, floor area and yards are written there and nowhere else. The City's site refuses a program's download, so the by-law reaches the tool through you:</p>
+      <ol class="help cd1-steps">
+        <li>${numbered ? `Open <a href="${h(cityUrl)}" target="_blank" rel="noopener">${h(district)} on the City's site</a> and save the PDF.` : `No CD-1 number is recorded for this lot. Find it on <a href="${h(cityUrl)}" target="_blank" rel="noopener">the City's CD-1 index</a>, save its PDF, and type the district below as it is written there, for example CD-1 (324).`}</li>
+        <li>Give a key and choose the PDF below. The model reads it and proposes each limit with the sentence it came from.</li>
+        <li>Check the quotes against the PDF and confirm under your name. The by-law is then in the rules, cited, and this site is read under it.</li>
+      </ol>`
+      : `<p class="help">Save the schedule's PDF from the City's by-law site (it refuses scripts), choose it here, and the model proposes its clauses with the quote behind each. You check the quotes against the PDF and confirm under your name; the rules file then cites the schedule, the model and you.</p>`;
+    slot.innerHTML = district && (!known || guide.ruleProposal) ? `<details class="claude-fold${onStage ? " cd1-read" : ""}"${hasClaude() || guide.ruleProposal ? " open" : ""}><summary>${onStage ? `Have the tool read ${what}` : `Read ${what} with Claude`} <span class="cont">(${known ? "the rules have it now" : onStage ? "with your Anthropic key; optional" : "the rules have none for it"})</span></summary>
+      ${help}
       ${renderKeyBox("keybox-rule")}
       ${hasClaude() ? `<div class="sched-form">
-        <label class="field"><span class="label">Schedule PDF</span><input type="file" id="sched-file" accept=".pdf,.png,.jpg,.jpeg,.txt"></label>
+        <label class="field"><span class="label">${isCd1 ? "The by-law's PDF" : "Schedule PDF"}</span><input type="file" id="sched-file" accept=".pdf,.png,.jpg,.jpeg,.txt"></label>
         <label class="field"><span class="label">District</span><input type="text" id="sched-district" value="${h(guide.scheduleDistrict || district)}" placeholder="RT-3"></label>
-        <label class="field"><span class="label">Its address on the City's site</span><input type="url" id="sched-url" value="${h(guide.scheduleUrl || (/^CD-1 \(/.test(district) ? `https://cd1-bylaws.vancouver.ca/${district.replace(/\s+/g, "").toLowerCase()}.PDF` : `https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-${district.toLowerCase()}.pdf`))}" placeholder="https://bylaws.vancouver.ca/zoning/…"></label>
-        <div class="form-actions"><button class="btn btn-small" type="button" id="guide-read-schedule"${guide.busy.schedule ? " disabled" : ""}>${guide.busy.schedule ? "Reading…" : "Read the schedule"}</button><span class="help">The PDF goes to the model and nowhere else; the log keeps its name and hash.</span></div>
+        <label class="field"><span class="label">Its address on the City's site</span><input type="url" id="sched-url" value="${h(guide.scheduleUrl || (isCd1 ? (numbered ? cityUrl : "") : `https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-${district.toLowerCase()}.pdf`))}" placeholder="https://bylaws.vancouver.ca/zoning/…"></label>
+        <div class="form-actions"><button class="btn btn-small" type="button" id="guide-read-schedule"${guide.busy.schedule ? " disabled" : ""}>${guide.busy.schedule ? "Reading…" : isCd1 ? "Read the by-law" : "Read the schedule"}</button><span class="help">The PDF goes to the model and nowhere else; the log keeps its name and hash.</span></div>
       </div>${renderRuleProposal(guide.ruleProposal)}` : ""}
     </details>` : "";
     wireClaude(slot);
@@ -150,7 +168,7 @@ async function guideReadSchedule() {
   const file = fileIn && fileIn.files && fileIn.files[0];
   const district = (($("#sched-district") || {}).value || "").trim().toUpperCase();
   const url = (($("#sched-url") || {}).value || "").trim();
-  if (!file) { toast("Choose the schedule's PDF first.", true); return; }
+  if (!file) { toast(/^CD-1/.test(district) ? "Choose the by-law's PDF first." : "Choose the schedule's PDF first.", true); return; }
   if (!district) { toast("Name the district the schedule is for.", true); return; }
   if (file.size > 12 * 1024 * 1024) { toast("The file is over 12 MB; a district schedule is a few hundred KB.", true); return; }
   guide.busy.schedule = true; guide.scheduleDistrict = district; guide.scheduleUrl = url; renderClaude();
@@ -179,6 +197,7 @@ async function confirmRuleProposal() {
     P.by = by;
     state.rules = await api(`/api/rules?as_of=${encodeURIComponent($("#as-of").value || todayISO())}`);
     guide.reading = null; guide.suggestion = null;
+    if ($("#stage-cd1-slot")) renderStage();      // the manager's site card now says the by-law is in the rules
     renderClaude();
     setStatus(`${rep.confirmed.length} rule${rep.confirmed.length === 1 ? "" : "s"} confirmed by ${by} for ${P.district}: ${rep.confirmed.join(", ")}. Run the rules again: the schedule now applies.`, "ok");
   } catch (e) {

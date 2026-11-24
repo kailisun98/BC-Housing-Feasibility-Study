@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1452" viewBox="0 0 640 1452" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Floor plans by program">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="48" y="44" font-size="14" font-weight="600">Plans by program · metres, street at the bottom</text>
+<text x="78.0" y="78.0" font-size="13" font-weight="600">Ground floor: 1 three-bedroom+, 2 two-bedroom, 2 one-bedroom</text>
+<text x="78.0" y="93.0" font-size="10.5" fill="#2f7d4a">Egress: 2 exits, 2 required · travel 7.2 m, limit 45 m · pass</text>
+<rect x="78.0" y="100.0" width="218.6" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="160.5" y="173.1" width="53.7" height="53.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="226.8" width="81.3" height="13.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="159.4" width="81.3" height="13.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="173.1" width="13.8" height="53.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="214.2" y="173.1" width="13.8" height="53.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="240.6" width="153.2" height="59.4" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="99.9" width="39.7" height="59.4" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="117.7" y="99.9" width="101.3" height="59.4" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="172.4" width="68.7" height="68.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="228.0" y="172.4" width="68.7" height="68.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="231.2" y="240.6" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="219.0" y="99.9" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="289.0" y="240.6" width="7.7" height="59.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="276.8" y="99.9" width="19.9" height="59.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="159.3" width="68.7" height="13.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="228.0" y="159.3" width="68.7" height="13.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="160.5" y="189.2" width="53.7" height="21.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M169.7 189.2v21.5M174.0 189.2v21.5M178.3 189.2v21.5M182.6 189.2v21.5M186.9 189.2v21.5M191.2 189.2v21.5M195.5 189.2v21.5M199.7 189.2v21.5M204.0 189.2v21.5" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<path d="M160.5 189.2L214.2 210.7M160.5 210.7L214.2 189.2" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="160.5" y1="203.4" x2="160.5" y2="196.5" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M167.4 203.4L160.5 203.4M160.5 196.5L162.3 196.7L163.9 197.4L165.4 198.5L166.4 200.0L167.1 201.6L167.4 203.4" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="214.2" y1="203.4" x2="214.2" y2="196.5" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M207.3 203.4L214.2 203.4M214.2 196.5L212.4 196.7L210.7 197.4L209.3 198.5L208.2 200.0L207.5 201.6L207.3 203.4" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="187.3" y="237.2" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="187.3" y="169.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="154.6" y="273.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Amenity</text>
+<text x="97.8" y="133.1" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
+<circle cx="124.7" cy="106.9" r="3.2" fill="#245f9c"/>
+<text x="168.3" y="133.1" font-size="9.5" text-anchor="middle" fill="#1f2933">Three-bedroom+</text>
+<text x="112.3" y="210.0" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="262.3" y="210.0" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="260.0" y="273.8" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="247.9" y="133.1" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="286.7" y="133.1" font-size="9.5" text-anchor="middle" fill="#1f2933">SP</text>
+<text x="112.3" y="169.4" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<text x="262.3" y="169.4" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<polyline points="112.3,240.6 112.3,233.7 160.5,233.7" fill="none" stroke="#1f2933" stroke-width="1.4" stroke-dasharray="4 2"/>
+<circle cx="112.3" cy="240.6" r="2.4" fill="#1f2933"/>
+<path d="M 157.5 230.7 L 163.5 236.7 M 157.5 236.7 L 163.5 230.7" stroke="#1f2933" stroke-width="1.4"/>
+<text x="136.4" y="229.7" font-size="10" text-anchor="middle" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">7.2 m</text>
+<path d="M154.6 320.0V303.0M150.6 309.0L154.6 303.0L158.6 309.0" stroke="#1f2933" stroke-width="1.4" fill="none"/>
+<text x="160.6" y="319.0" font-size="9.5" fill="#1f2933">entry</text>
+<path d="M78.0 327.0H296.6M78.0 323.0V331.0M296.6 323.0V331.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="187.3" y="339.0" font-size="10" text-anchor="middle" fill="#5f6672">28.5 m</text>
+<text x="187.3" y="352.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
+<line x1="66.0" y1="100.0" x2="66.0" y2="300.0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="200.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 200.0)">26.07 m</text>
+<text x="78.0" y="376.0" font-size="13" font-weight="600">Typical floor (levels 5 to 7): 6 two-bedroom, 2 one-bedroom</text>
+<text x="78.0" y="391.0" font-size="10.5" fill="#2f7d4a">Egress: 2 exits, 2 required · travel 7.5 m, limit 45 m · pass</text>
+<rect x="78.0" y="398.0" width="218.6" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="160.5" y="471.1" width="53.7" height="53.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="524.8" width="81.3" height="13.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="457.4" width="81.3" height="13.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="471.1" width="13.8" height="53.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="214.2" y="471.1" width="13.8" height="53.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="538.6" width="78.9" height="59.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="156.9" y="538.6" width="78.9" height="59.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="397.9" width="78.9" height="59.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="156.9" y="397.9" width="78.9" height="59.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="470.4" width="68.7" height="68.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="228.0" y="470.4" width="68.7" height="68.2" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="235.9" y="538.6" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="235.9" y="397.9" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="293.7" y="538.6" width="3.0" height="59.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="293.7" y="397.9" width="3.0" height="59.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="457.3" width="68.7" height="13.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="228.0" y="457.3" width="68.7" height="13.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="160.5" y="487.2" width="53.7" height="21.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M169.7 487.2v21.5M174.0 487.2v21.5M178.3 487.2v21.5M182.6 487.2v21.5M186.9 487.2v21.5M191.2 487.2v21.5M195.5 487.2v21.5M199.7 487.2v21.5M204.0 487.2v21.5" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<path d="M160.5 487.2L214.2 508.7M160.5 508.7L214.2 487.2" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="160.5" y1="501.4" x2="160.5" y2="494.5" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M167.4 501.4L160.5 501.4M160.5 494.5L162.3 494.7L163.9 495.4L165.4 496.5L166.4 498.0L167.1 499.6L167.4 501.4" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="214.2" y1="501.4" x2="214.2" y2="494.5" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M207.3 501.4L214.2 501.4M214.2 494.5L212.4 494.7L210.7 495.4L209.3 496.5L208.2 498.0L207.5 499.6L207.3 501.4" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="187.3" y="535.2" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="187.3" y="467.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="117.5" y="571.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="196.4" y="571.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="117.5" y="431.1" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="196.4" y="431.1" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="112.3" y="508.0" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="262.3" y="508.0" font-size="9.5" text-anchor="middle" fill="#1f2933">Two-bedroom</text>
+<text x="264.7" y="571.8" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="264.7" y="431.1" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="112.3" y="467.4" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<text x="262.3" y="467.4" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<polyline points="264.7,457.3 264.7,464.3 214.2,464.3" fill="none" stroke="#1f2933" stroke-width="1.4" stroke-dasharray="4 2"/>
+<circle cx="264.7" cy="457.3" r="2.4" fill="#1f2933"/>
+<path d="M 211.2 461.3 L 217.2 467.3 M 211.2 467.3 L 217.2 461.3" stroke="#1f2933" stroke-width="1.4"/>
+<text x="264.7" y="451.3" font-size="10" text-anchor="middle" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">7.5 m</text>
+<path d="M78.0 625.0H296.6M78.0 621.0V629.0M296.6 621.0V629.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="187.3" y="637.0" font-size="10" text-anchor="middle" fill="#5f6672">28.5 m</text>
+<text x="187.3" y="650.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
+<line x1="66.0" y1="398.0" x2="66.0" y2="598.0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="498.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 498.0)">26.07 m</text>
+<text x="78.0" y="674.0" font-size="13" font-weight="600">Top floor (level 11): 8 one-bedroom, 2 studio · 87 m² spare</text>
+<text x="78.0" y="689.0" font-size="10.5" fill="#2f7d4a">Egress: 2 exits, 2 required · travel 8.3 m, limit 45 m · pass</text>
+<rect x="78.0" y="696.0" width="218.6" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="160.5" y="769.1" width="53.7" height="53.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="822.8" width="81.3" height="13.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="755.4" width="81.3" height="13.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="146.7" y="769.1" width="13.8" height="53.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="214.2" y="769.1" width="13.8" height="53.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="836.6" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="135.7" y="836.6" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="193.5" y="836.6" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="695.9" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="135.7" y="695.9" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="193.5" y="695.9" width="57.7" height="59.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="786.8" width="68.7" height="49.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="228.0" y="786.8" width="68.7" height="49.9" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="251.1" y="836.6" width="38.9" height="59.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="251.1" y="695.9" width="38.9" height="59.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="290.0" y="836.6" width="6.6" height="59.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="290.0" y="695.9" width="6.6" height="59.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="755.3" width="68.7" height="31.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="228.0" y="755.3" width="68.7" height="31.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="160.5" y="785.2" width="53.7" height="21.5" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M169.7 785.2v21.5M174.0 785.2v21.5M178.3 785.2v21.5M182.6 785.2v21.5M186.9 785.2v21.5M191.2 785.2v21.5M195.5 785.2v21.5M199.7 785.2v21.5M204.0 785.2v21.5" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<path d="M160.5 785.2L214.2 806.7M160.5 806.7L214.2 785.2" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="160.5" y1="799.4" x2="160.5" y2="792.5" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M167.4 799.4L160.5 799.4M160.5 792.5L162.3 792.7L163.9 793.4L165.4 794.5L166.4 796.0L167.1 797.6L167.4 799.4" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="214.2" y1="799.4" x2="214.2" y2="792.5" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M207.3 799.4L214.2 799.4M214.2 792.5L212.4 792.7L210.7 793.4L209.3 794.5L208.2 796.0L207.5 797.6L207.3 799.4" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="187.3" y="833.2" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="187.3" y="765.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="106.8" y="869.8" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="164.5" y="869.8" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="222.3" y="869.8" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="106.8" y="729.1" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="164.5" y="729.1" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="222.3" y="729.1" font-size="9.5" text-anchor="middle" fill="#1f2933">1B</text>
+<text x="112.3" y="815.2" font-size="9.5" text-anchor="middle" fill="#1f2933">One-bedroom</text>
+<text x="262.3" y="815.2" font-size="9.5" text-anchor="middle" fill="#1f2933">One-bedroom</text>
+<text x="270.6" y="869.8" font-size="9.5" text-anchor="middle" fill="#1f2933">Studio</text>
+<text x="270.6" y="729.1" font-size="9.5" text-anchor="middle" fill="#1f2933">Studio</text>
+<text x="112.3" y="774.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<text x="262.3" y="774.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<polyline points="270.6,755.3 270.6,762.3 214.2,762.3" fill="none" stroke="#1f2933" stroke-width="1.4" stroke-dasharray="4 2"/>
+<circle cx="270.6" cy="755.3" r="2.4" fill="#1f2933"/>
+<path d="M 211.2 759.3 L 217.2 765.3 M 211.2 765.3 L 217.2 759.3" stroke="#1f2933" stroke-width="1.4"/>
+<text x="242.4" y="758.3" font-size="10" text-anchor="middle" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">8.3 m</text>
+<path d="M78.0 923.0H296.6M78.0 919.0V927.0M296.6 919.0V927.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="187.3" y="935.0" font-size="10" text-anchor="middle" fill="#5f6672">28.5 m</text>
+<text x="187.3" y="948.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
+<line x1="66.0" y1="696.0" x2="66.0" y2="896.0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="62.0" y="796.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 796.0)">26.07 m</text>
+<g transform="translate(0.0 980.0)">
+<rect x="48.0" y="-9.0" width="12" height="12" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="1.0" fill="#5f6672" font-size="11">Non-residential · NR</text>
+<rect x="210.0" y="-9.0" width="12" height="12" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<text x="226.0" y="1.0" fill="#5f6672" font-size="11">Amenity · AM</text>
+<rect x="319.2" y="-9.0" width="12" height="12" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<text x="335.2" y="1.0" fill="#5f6672" font-size="11">Services, bicycles · SV</text>
+<rect x="48.0" y="9.0" width="12" height="12" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="19.0" fill="#5f6672" font-size="11">Core (stairs, elevator) · C</text>
+<rect x="256.2" y="9.0" width="12" height="12" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<text x="272.2" y="19.0" fill="#5f6672" font-size="11">Corridor · CR</text>
+<rect x="372.0" y="9.0" width="12" height="12" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
+<text x="388.0" y="19.0" fill="#5f6672" font-size="11">Three-bedroom+ · 3B</text>
+<rect x="48.0" y="27.0" width="12" height="12" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.8"/>
+<text x="64.0" y="37.0" fill="#5f6672" font-size="11">Two-bedroom · 2B</text>
+<rect x="183.6" y="27.0" width="12" height="12" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.8"/>
+<text x="199.6" y="37.0" fill="#5f6672" font-size="11">One-bedroom · 1B</text>
+<rect x="319.2" y="27.0" width="12" height="12" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
+<text x="335.2" y="37.0" fill="#5f6672" font-size="11">Studio · ST</text>
+<rect x="421.8" y="27.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
+<text x="437.8" y="37.0" fill="#5f6672" font-size="11">Spare · SP</text>
+</g>
+<circle cx="54" cy="1036.0" r="3.2" fill="#245f9c"/><text x="64" y="1040.0" font-size="11" fill="#5f6672">accessible unit</text>
+<rect x="48.0" y="1056.0" width="38.4" height="5" fill="#1f2933"/>
+<rect x="86.4" y="1056.0" width="38.4" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
+<text x="48.0" y="1072.0" font-size="9.5" text-anchor="middle" fill="#5f6672">0</text>
+<text x="86.4" y="1072.0" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
+<text x="124.7" y="1072.0" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
+<g transform="rotate(-181.6 176.1 1058.0)"><circle cx="176.1" cy="1058.0" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="176.1,1047.9 180.7,1064.0 176.1,1060.2 171.5,1064.0" fill="#1f2933"/></g>
+<text x="176.7" y="1082.0" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
+<text x="48.0" y="1100.0" font-size="12" fill="#1f2933">A point tower: homes 7.74 m deep in front and behind, 8.95 m beside, round</text>
+<text x="48.0" y="1116.0" font-size="12" fill="#1f2933">a 1.8 m corridor ringing the core;</text>
+<text x="48.0" y="1132.0" font-size="12" fill="#1f2933">partitions +8% over net areas (declared placeholders). The rules read back</text>
+<text x="48.0" y="1148.0" font-size="12" fill="#1f2933">from the plates are listed with the figure.</text>
+<text x="48.0" y="1164.0" font-size="12" fill="#1f2933">The typical floor stands for levels 5 to 7; other floors differ: levels 2</text>
+<text x="48.0" y="1180.0" font-size="12" fill="#1f2933">to 3, 4 three-bedroom+, 2 two-bedroom; level 4, 1 three-bedroom+, 5</text>
+<text x="48.0" y="1196.0" font-size="12" fill="#1f2933">two-bedroom, 1 one-bedroom; level 8, 4 two-bedroom, 4 one-bedroom; levels 9</text>
+<text x="48.0" y="1212.0" font-size="12" fill="#1f2933">to 11, 8 one-bedroom, 2 studio.</text>
+<text x="48.0" y="1228.0" font-size="12" fill="#1f2933">Stairs drawn with their treads and exit doors; a switchback stair's flights</text>
+<text x="48.0" y="1244.0" font-size="12" fill="#1f2933">either side of its divider, a scissor stair's two flights crossed; the</text>
+<text x="48.0" y="1260.0" font-size="12" fill="#1f2933">arrow is the entry from the street.</text>
+<text x="48.0" y="1276.0" font-size="12" fill="#1f2933">Each home is a block of its area: in a shallow strip it runs long along the</text>
+<text x="48.0" y="1292.0" font-size="12" fill="#1f2933">facade, where a design would turn the corner.</text>
+<text x="48.0" y="1308.0" font-size="12" fill="#1f2933">Egress (BC Building Code 2024, Part 3; figures to be verified): dashed, the</text>
+<text x="48.0" y="1324.0" font-size="12" fill="#1f2933">farthest unit door to its exit along the corridor;</text>
+<text x="48.0" y="1340.0" font-size="12" fill="#1f2933">sprinklered (assumed, a placeholder).</text>
+<text x="48.0" y="1356.0" font-size="12" fill="#1f2933">The scissor stair: two stairs interlocked in one shaft, its doors on the</text>
+<text x="48.0" y="1372.0" font-size="12" fill="#1f2933">core's opposite faces, apart by the way round it; a smoke-tight rated</text>
+<text x="48.0" y="1388.0" font-size="12" fill="#1f2933">separation between them.</text>
+<text x="48.0" y="1404.0" font-size="12" fill="#1f2933">Rules as of 2026-11-23 · drawn from the option and the massing, not a</text>
+<text x="48.0" y="1420.0" font-size="12" fill="#1f2933">design</text>
+</svg>

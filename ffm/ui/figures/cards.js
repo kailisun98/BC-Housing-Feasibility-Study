@@ -9,7 +9,7 @@ import { refreshSummary } from "../schedule.js";
 import { markStale } from "../files.js";
 import { refOf } from "../memo/memo.js";
 import { egressLine } from "../memo/answers.js";
-import { fitLabels, outrightLimit, siteContext } from "./common.js";
+import { fitLabels, northArrow, outrightLimit, siteContext, turnFrame, turnOf, upright } from "./common.js";
 import { boundaryTools, figPlan } from "./plan.js";
 import { figSection } from "./section.js";
 import { fig3d, VIEW3D } from "./fig3d.js";
@@ -307,7 +307,10 @@ export function renderFigures(run) {
    floors on a tab, the stacking, the elevations and the code site plan. Every one carries the stamp. */
 function renderSheets(run, n0) {
   const L = run.layout, S = run.sheets;
-  editor.open = false;   // a re-rendered memo starts with the editor closed; its state lives in the option once applied
+  // a re-rendered memo redraws this figure, so an open editor is put away; in architect mode it comes back on the
+  // floor it was on (23 Nov 2026: after Apply and Run the rules the architect had to reopen it and find the floor again)
+  editor.resume = editor.open && state.mode === "architect" ? { level: editor.level } : null;
+  editor.open = false;
   editor.result = null;  // and the floor picker reads this run's layout until the editor has checked a placement
   if (planFloor != null && !L.floors[planFloor]) planFloor = null;
   const fig = k => `FIG ${String(k).padStart(2, "0")}`;
@@ -368,7 +371,7 @@ function floorPlanHtml(L, lv) {
   const f = v => v.toFixed(1);
   const zones = fl.zones.map(z => {
     const x = M + (z.x - p.x) * scale, y = M + (p.depth_m - (z.y - p.y) - z.d) * scale, w = Math.max(1, z.w * scale), d = Math.max(1, z.d * scale);
-    const name = z.block === "other" ? String(z.label || "other").toLowerCase() : (PLAN_SHORT[z.block] ?? z.block);
+    const name = z.name ? String(z.name) : z.block === "other" ? String(z.label || "other").toLowerCase() : (PLAN_SHORT[z.block] ?? z.block);
     const two = w > 44 && d > 34 && z.block !== "corridor" && z.block !== "spare";
     return `<rect x="${f(x)}" y="${f(y)}" width="${f(w)}" height="${f(d)}" fill="${PLAN_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "spare" || z.block === "void" ? ` stroke-dasharray="4 3"` : ""}/>
       ${z.accessible ? `<circle cx="${f(x + 8)}" cy="${f(y + 8)}" r="3.6" fill="#245f9c"/>` : ""}
@@ -377,14 +380,21 @@ function floorPlanHtml(L, lv) {
   }).join("");
   const counts = PLAN_UNITS.map(([k, word]) => [fl.zones.filter(z => z.unit === k || (z.unit == null && z.block === k)).length, word]).filter(([c]) => c).map(([c, word]) => `${c} ${word}`).join(", ");
   const eg = L.egress && (L.egress.floors || []).find(e => e.level === lv);
+  // north up, as FIG 01 and the editor: the plate is drawn in its own frame and turned by the site's bearing, less
+  // the angle the mass itself is turned by, where the context gives a bearing; the labels stay readable
+  const ms = (editor.open && editor.massing) || (state.run && state.run.massing);
+  const site = ms && ms.lot ? siteContext(state.site, ms) : null, bearing = site && site.osm ? site.osm.bearing : null;
+  const turn = bearing == null ? 0 : turnOf(bearing) - (p.angle_deg || 0), frame = turnFrame(W, H, turn);
   return `<div class="plans-floor-head"><b>${h(fl.name)}</b><span class="cont">${counts ? ` · ${h(counts)}` : " · no units"}${fl.spare_m2 ? ` · ${h(fmtNum(Math.round(fl.spare_m2)))} m² spare` : ""}</span></div>
     ${eg ? `<div class="help">${pill(eg.status)} Exits: ${h(egressLine(eg))}${eg.notes && eg.notes.length ? ` <span class="cont">· ${h(eg.notes[0])}</span>` : ""}</div>` : ""}
-    <svg viewBox="0 0 ${W} ${f(H)}" width="${W}" height="${f(H)}" role="img" aria-label="Plan of ${h(fl.name)}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
+    <svg viewBox="0 0 ${f(frame.W)} ${f(frame.H)}" width="${f(frame.W)}" height="${f(frame.H)}" role="img" aria-label="Plan of ${h(fl.name)}${turn ? ", north up" : ""}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
+      ${frame.open}${upright(`
       <rect x="${M}" y="${M}" width="${f(p.width_m * scale)}" height="${f(p.depth_m * scale)}" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
       ${zones}
       <rect x="${M}" y="${M}" width="${f(p.width_m * scale)}" height="${f(p.depth_m * scale)}" fill="none" stroke="#1f2933" stroke-width="1.2"/>
       <text x="${f(M + p.width_m * scale / 2)}" y="${f(H - 10)}" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.width_m)} m · street side</text>
-      <text transform="translate(${M - 12} ${f(M + p.depth_m * scale / 2)}) rotate(-90)" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.depth_m)} m</text>
+      <text x="${M - 12}" y="${f(M + p.depth_m * scale / 2)}" transform="rotate(-90 ${M - 12} ${f(M + p.depth_m * scale / 2)})" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.depth_m)} m</text>`, turn)}</g>
+      ${bearing != null ? northArrow(frame.W - 26, 28, 90, 11) : ""}
     </svg>`;
 }
 
@@ -423,6 +433,10 @@ function wireSheets() {
     $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== b.dataset.sheetView; });
   }));
   refreshPlanFloor();
+  if (editor.resume) {
+    const back = editor.resume; editor.resume = null;
+    loadBlocks().then(b => { if (!editor.open && $("#sheet-editor")) b.openEditor(back); }).catch(() => {});
+  }
   const eb = $("#edit-blocks");
   if (eb) eb.addEventListener("click", () => loadBlocks()
     .then(b => (editor.open ? b.closeEditor() : b.openEditor()))

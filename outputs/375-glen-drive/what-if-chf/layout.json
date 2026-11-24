@@ -2,7 +2,7 @@
   "site_id": "375-glen-drive",
   "option_id": "375-glen-drive-what-if-chf",
   "as_of": "2026-11-17",
-  "stamp": "4227307d738e56fe",
+  "stamp": "5cfd6a34b23f68ab",
   "units": "m",
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
@@ -15,7 +15,8 @@
     "floor_to_floor_m": 3.05,
     "double_loaded": true,
     "unit_depth_m": 8.5,
-    "arrangement": "double"
+    "arrangement": "double",
+    "stacking": "by floor"
   },
   "program": [
     {
@@ -25,6 +26,7 @@
       "net_m2_each": 94.6,
       "gross_m2_each": 102.2,
       "min_gross_m2_each": 92.9,
+      "min_width_m": 9.5,
       "area_m2": 511.0,
       "source": "bch.design_guidelines.unit_areas",
       "note": "5 × 94.6 m² net (86 m² minimum + 10%), 102.2 m² gross with partitions"
@@ -36,6 +38,7 @@
       "net_m2_each": 73.7,
       "gross_m2_each": 79.6,
       "min_gross_m2_each": 72.4,
+      "min_width_m": 7.5,
       "area_m2": 2388.0,
       "source": "bch.design_guidelines.unit_areas",
       "note": "30 × 73.7 m² net (67 m² minimum + 10%), 79.6 m² gross with partitions"
@@ -47,6 +50,7 @@
       "net_m2_each": 53.9,
       "gross_m2_each": 58.2,
       "min_gross_m2_each": 52.9,
+      "min_width_m": 5.5,
       "area_m2": 2269.8,
       "source": "bch.design_guidelines.unit_areas",
       "note": "39 × 53.9 m² net (49 m² minimum + 10%), 58.2 m² gross with partitions"
@@ -58,6 +62,7 @@
       "net_m2_each": 36.3,
       "gross_m2_each": 39.2,
       "min_gross_m2_each": 35.6,
+      "min_width_m": 4.0,
       "area_m2": 1411.2,
       "source": "bch.design_guidelines.unit_areas",
       "note": "36 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions"
@@ -126,7 +131,7 @@
     {
       "id": "family_low",
       "block": "three_bed_plus",
-      "rule": "on the lowest residential floors",
+      "rule": "from the lowest residential floor up, stacked in the same bays",
       "status": "pass",
       "note": "three-bedroom units on levels 1 to 2"
     },
@@ -170,18 +175,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 5.65,
+        "farthest_travel_m": 6.76,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "three_bed_plus",
-          "x": 39.54,
+          "x": 42.48,
           "y": 3.0,
           "door": [
-            45.55,
+            48.49,
             11.5
           ],
           "exit": [
-            40.8,
+            54.35,
             12.4
           ]
         },
@@ -617,9 +622,20 @@
           "through": "core"
         },
         {
+          "block": "design_space",
+          "label": "Lobby (entry)",
+          "x": 18.05,
+          "y": 3.0,
+          "w": 2.94,
+          "d": 8.5,
+          "area_m2": 25.0,
+          "side": "front",
+          "entry": true
+        },
+        {
           "block": "amenity",
           "label": "Amenity",
-          "x": 18.05,
+          "x": 20.99,
           "y": 3.0,
           "w": 19.41,
           "d": 8.5,
@@ -649,7 +665,7 @@
         {
           "block": "services",
           "label": "Services, bicycles",
-          "x": 37.46,
+          "x": 40.4,
           "y": 3.0,
           "w": 2.08,
           "d": 8.5,
@@ -659,7 +675,7 @@
         {
           "block": "three_bed_plus",
           "label": "Three-bedroom+",
-          "x": 39.54,
+          "x": 42.48,
           "y": 3.0,
           "w": 12.02,
           "d": 8.5,
@@ -669,29 +685,17 @@
           "accessible": true
         },
         {
-          "block": "studio",
-          "label": "Studio",
-          "x": 51.56,
-          "y": 3.0,
-          "w": 4.61,
-          "d": 8.5,
-          "area_m2": 39.2,
-          "side": "front",
-          "unit": "studio",
-          "accessible": false
-        },
-        {
           "block": "spare",
           "label": "Spare",
-          "x": 56.17,
+          "x": 54.5,
           "y": 3.0,
-          "w": 0.38,
+          "w": 2.05,
           "d": 8.5,
-          "area_m2": 3.2,
+          "area_m2": 17.4,
           "side": "front"
         }
       ],
-      "spare_m2": 3.2
+      "spare_m2": 17.4
     },
     {
       "level": 1,
@@ -3007,13 +3011,25 @@
           "accessible": false
         },
         {
-          "block": "spare",
-          "label": "Spare",
+          "block": "studio",
+          "label": "Studio",
           "x": 41.11,
           "y": 3.0,
-          "w": 15.44,
+          "w": 4.61,
           "d": 8.5,
-          "area_m2": 131.2,
+          "area_m2": 39.2,
+          "side": "front",
+          "unit": "studio",
+          "accessible": false
+        },
+        {
+          "block": "spare",
+          "label": "Spare",
+          "x": 45.72,
+          "y": 3.0,
+          "w": 10.83,
+          "d": 8.5,
+          "area_m2": 92.0,
           "side": "front"
         },
         {
@@ -3037,7 +3053,7 @@
           "side": "rear"
         }
       ],
-      "spare_m2": 361.6
+      "spare_m2": 322.4
     }
   ],
   "shortfall": [],
@@ -3050,6 +3066,10 @@
     ]
   },
   "capacity": {
+    "height_m": 45.75,
+    "height_limit_m": 51.0,
+    "height_from": "the district schedule's outright maximum",
+    "height_with_one_more": 48.8,
     "site_area_m2": 2134.4,
     "storeys": 15,
     "plate_m2": 723.8,
@@ -3062,10 +3082,31 @@
     "levels_room": 5,
     "fsr_with_one_more": 5.426
   },
+  "daylight": {
+    "limit_m": 10.0,
+    "deep_units": 0,
+    "deepest_m": null,
+    "no_window_wall": 0,
+    "status": "pass",
+    "note": ""
+  },
+  "proportions": {
+    "min_width_m": {
+      "studio": 4.0,
+      "one_bed": 5.5,
+      "two_bed": 7.5,
+      "three_bed_plus": 9.5
+    },
+    "depth_ratio_max": 2.5,
+    "narrow_units": 0,
+    "slender_units": 0,
+    "status": "pass",
+    "note": ""
+  },
   "totals": {
     "plates_m2": 10857.0,
-    "used_m2": 9795.1,
-    "spare_m2": 1061.9,
+    "used_m2": 9820.1,
+    "spare_m2": 1036.9,
     "gfa_m2": 10857.0
   },
   "assumptions": [
@@ -3118,9 +3159,25 @@
       "key": "min_home_depth_m",
       "value": 4.0,
       "note": "the shallowest strip a point tower lays homes in, round its ringed core; a home this shallow runs long along the facade"
+    },
+    {
+      "key": "max_home_depth_m",
+      "value": 12.0,
+      "note": "the deepest a home runs back from its window wall before the back of it has no daylight; a placeholder, and the reason a deep plate takes its corridor the other way or wants a courtyard"
+    },
+    {
+      "key": "lobby_m2",
+      "value": 25.0,
+      "note": "an entry lobby on the street side of the ground floor, where the building is entered; a placeholder until the architect draws the entry"
+    },
+    {
+      "key": "min_room_width_m",
+      "value": 2.0,
+      "note": "a leftover of a ground-floor room narrower than this along the strip is not drawn: the room is that much smaller and the notes say so"
     }
   ],
   "warnings": [
+    "The homes are placed floor by floor, not stacked in bays: stacked, the plates held 99 homes against 110.",
     "Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.",
     "The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site."
   ],

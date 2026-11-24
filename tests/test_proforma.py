@@ -21,7 +21,7 @@ class LayerF(unittest.TestCase):
     def test_the_assumptions_are_in_the_ledger_as_information(self):
         L = evaluate(SITE, OPTION, AS_OF)
         F = [r for r in L["results"] if r["layer"] == "F"]
-        self.assertEqual(len(F), 7)
+        self.assertEqual(len(F), 8)      # f.rgi_rents joined on 23 Nov 2026
         self.assertTrue(all(r["status"] == "info" for r in F))
         hc = next(r for r in F if r["rule_id"] == "f.hard_cost_base")
         self.assertEqual(hc["values"]["value_per_m2_cad"], 4693)
@@ -67,7 +67,7 @@ class RealCase(unittest.TestCase):
         self.assertEqual(f["debt"]["supportable"], round(o["noi"] / 1.10 / k))
         self.assertEqual(f["grants"][0]["program"], "bch.chf.eligibility")
         n = sum(OPTION["units"].values())
-        self.assertEqual(f["grants"][0]["value"], 171211 * n)
+        self.assertEqual(f["grants"][0]["value"], 178059 * n)      # the 2026-27 provisional grant a home
 
     def test_every_line_names_its_source_or_the_option(self):
         for ln in self.pf["lines"]:

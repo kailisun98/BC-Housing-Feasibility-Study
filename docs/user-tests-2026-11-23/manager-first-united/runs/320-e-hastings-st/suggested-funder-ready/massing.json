@@ -1,0 +1,164 @@
+{
+  "units": "m",
+  "origin": "front-left lot corner; x along frontage, y into the lot, z up",
+  "site_id": "320-e-hastings-st",
+  "option_id": "438-gore-ave-suggested-funder-ready",
+  "as_of": "2026-11-23",
+  "stamp": "4227307d738e56fe",
+  "lot": {
+    "polygon": [
+      [
+        34.32,
+        37.01
+      ],
+      [
+        0.0,
+        36.99
+      ],
+      [
+        0.02,
+        0.0
+      ],
+      [
+        38.75,
+        0.0
+      ]
+    ],
+    "frontage_m": 38.75,
+    "depth_m": 37.01,
+    "area_m2": 1362.3,
+    "street_side": "y = 0",
+    "front_face": {
+      "street": "E Hastings St"
+    },
+    "orientation": {
+      "rotate_deg": 97.088324,
+      "tx": 38.736,
+      "ty": -0.526
+    },
+    "front_edge": 2,
+    "corners": [
+      [
+        34.32,
+        37.01
+      ],
+      [
+        0.0,
+        36.99
+      ],
+      [
+        0.02,
+        0.0
+      ],
+      [
+        38.75,
+        0.0
+      ]
+    ],
+    "bbox": [
+      0.0,
+      0.0,
+      38.75,
+      37.01
+    ],
+    "source": "parcel",
+    "frame": "context",
+    "polygon_area_m2": 1351.4,
+    "shape": {
+      "class": "near_rectangle",
+      "note": "Nearly a rectangle (94% of its 38.7 x 37.0 m bounding rectangle), 1,351 m2, 4 corners.",
+      "rectangularity": 0.943,
+      "vertices": 4,
+      "confidence": 0.91,
+      "alternative": "rectangle"
+    },
+    "note": "the City's parcel polygon in the site's context frame (the frame the streets and buildings are drawn in); turned so lot edge 2 is the front (front_face {'street': 'E Hastings St'})"
+  },
+  "envelope": {
+    "polygon": [
+      [
+        32.12,
+        31.01
+      ],
+      [
+        2.9,
+        30.99
+      ],
+      [
+        2.92,
+        3.7
+      ],
+      [
+        35.39,
+        3.7
+      ]
+    ],
+    "width_m": 28.5,
+    "depth_m": 27.0,
+    "area_m2": 842.1,
+    "setbacks_m": {
+      "front": 3.7,
+      "rear": 6.0,
+      "side": 2.9
+    },
+    "box": {
+      "x": 3.4,
+      "y": 3.7,
+      "w": 28.5,
+      "d": 27.0,
+      "area_m2": 769.5
+    },
+    "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
+  },
+  "masses": [
+    {
+      "name": "proposed",
+      "label": "Proposed: 6 storeys, FSR 2.97",
+      "footprint": [
+        [
+          3.4,
+          3.7
+        ],
+        [
+          31.9,
+          3.7
+        ],
+        [
+          31.9,
+          27.343
+        ],
+        [
+          3.4,
+          27.343
+        ]
+      ],
+      "plate_width_m": 28.5,
+      "plate_depth_m": 23.64,
+      "at_street_corner": "right",
+      "base_z": 0.0,
+      "height_m": 19.8,
+      "storeys": 6,
+      "floor_to_floor_m": 3.3,
+      "plate_area_m2": 673.8,
+      "gfa_m2": 4043.0,
+      "fsr": 2.968,
+      "derived_from": [
+        "option.gfa_m2",
+        "option.storeys",
+        "option.setbacks_m",
+        "option.floor_to_floor_m",
+        "site.front_face"
+      ]
+    }
+  ],
+  "policy_benchmark": null,
+  "trees": {
+    "required": 8,
+    "after": 8,
+    "shortfall": 0,
+    "retained_barriers": [],
+    "rule_id": "cov.trees.replacement"
+  },
+  "warnings": [],
+  "outright_height_limit_m": null
+}

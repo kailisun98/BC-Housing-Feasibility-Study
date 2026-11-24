@@ -128,6 +128,51 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 29 floors: 29 pass; the core's two
 - *pass* — Level 28: 2 exits, 2 required · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m. No units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured.
 - *pass* — Level 29: 2 exits, 2 required · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m. No units on this floor: travel distance measured from unit doors only, the other uses' travel is not measured.
 
+### Area schedule
+
+| Floor | Homes | Circulation m² | Cores m² | Services m² | Spare m² | Gross m² | Efficiency |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Ground floor | 0 | 63 | 49 | 576 | 111 | 799 | 0% |
+| Level 2 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 3 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 4 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 5 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 6 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 7 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 8 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 9 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 10 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 11 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 12 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 13 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 14 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 15 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 16 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 17 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 18 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 19 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 20 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 21 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 22 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 23 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 24 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 25 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 26 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 27 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 28 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| Level 29 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
+| **Total** | 0 | 1,839 | 1,421 | 576 | 19,380 | 23,216 | 0% |
+
+Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). The same table is `area-schedule.csv` beside this memo.
+
+### What an operator checks first
+
+- *info* — Elevators: no elevator: 29 storeys or fewer, a walk-up.
+- *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
+- *pass* — Garbage, recycling and services: 576 m² of services for 0 homes
+- *pass* — Accessible homes: 0 accessible homes drawn, 0 wanted (BC Housing's 5% of 0)
+- *info* — Shared indoor space: no shared indoor room drawn
+
 ![Stacking diagram](stacking.svg)
 
 ![Plans by program](plans.svg)

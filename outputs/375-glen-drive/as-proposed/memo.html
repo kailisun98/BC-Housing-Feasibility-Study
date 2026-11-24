@@ -23,7 +23,7 @@
 <li><em>Uncertain</em> — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 12 trees on a 2,134 m² site; no tree survey is on file.</li>
 </ul>
 <h2>2. Does it fit the funders?</h2>
-<p><strong>Does not pass this screen's eligibility checks for the Community Housing Fund.</strong> The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The first layout places 144 of 163 homes on the plates as drawn (answer 3); this answer counts all 163.</p>
+<p><strong>Does not pass this screen's eligibility checks for the Community Housing Fund.</strong> The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The first layout places 134 of 163 homes on the plates as drawn (answer 3); this answer counts all 163.</p>
 <ul>
 <li><em>Fail</em> — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: does not meet the criteria: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).</li>
 </ul>
@@ -45,9 +45,11 @@
 <tr><td>Yards not checked: no CD-1 (819) yard rule in the rules</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Architect: read the yard clauses in CD-1 (819)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator.</td></tr>
 <tr><td>Parts of the building the funders answer does not test</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Manager: settle who funds and operates the 25 supportive housing homes and 80 shelter beds (BC Housing's development staff for the programs, the operator for the staffing), and enter their staffing and subsidy in the option's operating figures.</td></tr>
 <tr><td>Who operates the homes</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Manager: name the operator, and get its operating budget (rents, staffing, the subsidy it needs) into the option's operating figures. Ask: the operating society's executive director and board.</td></tr>
+<tr><td>Operating figures not yet signed by the operator</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Operator: review the operating page, enter the building's own rents, running costs, staffing, reserve and vacancy, and sign them (the Operator layout).</td></tr>
+<tr><td>The staffing model and its cost</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Operator: give the staffing model (who is on site, by shift) and its yearly cost.</td></tr>
 <tr><td>Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu</td><td><span class="pill" style="background:#a3640c">Uncertain</span></td><td>Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit.</td></tr>
 <tr><td>BC Housing Community Housing Fund: eligibility and unit mix</td><td><span class="pill" style="background:#c81e1e">Fail</span></td><td>Manager: change what fails, or ask BC Housing which program fits the scheme as it is (answer 2 lists the other programs in the rules written for this housing; their criteria are not tested here, and a program not in the rules may fit as well). Ask: BC Housing, a development manager in Development and Asset Strategies.</td></tr>
-<tr><td>Homes that do not fit the plates</td><td><span class="pill" style="background:#9a6b00">Conditional</span></td><td>Architect: 144 of 163 homes fit the plates on 15 floors at the unit sizes assumed; did not fit: 19 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 163.</td></tr>
+<tr><td>Homes that do not fit the plates</td><td><span class="pill" style="background:#9a6b00">Conditional</span></td><td>Architect: 134 of 163 homes fit the plates on 15 floors at the unit sizes assumed; did not fit: 29 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 163.</td></tr>
 </tbody></table>
 <h2>4. Does the money work? (feasibility grade)</h2>
 <p><strong>Needs more sources.</strong> The gap is $74,062,200, 77% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes and the 80 shelter beds, so the running costs here are the building's alone and the subsidy it needs is not known. No Community Housing Fund grant is counted: the option does not meet the fund's criteria (answer 2). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.</p>
@@ -145,52 +147,96 @@
 </svg><figcaption>Rule-derived massing: plan and section, to scale.</figcaption></figure>
 <p><code>massing.json</code> carries the same geometry for the Revit script (<code>revit/ffm_massing_pyrevit.py</code>).</p>
 <h2>Layouts derived from the option</h2>
-<p>15 floors of 38.5 × 25.5 m (982 m² each); a double-loaded corridor, units 11.85 m deep; 144 of 163 units placed.</p>
+<p>15 floors of 38.5 × 25.5 m (982 m² each); a double-loaded corridor, units 11.85 m deep; 134 of 163 units placed.</p>
 <table><thead><tr><th>Block</th><th>Count</th><th>Area</th><th>From</th></tr></thead><tbody>
 <tr><td>Three-bedroom+</td><td>5</td><td>511 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 5 × 94.6 m² net (86 m² minimum + 10%), 102.2 m² gross with partitions</td></tr>
 <tr><td>Two-bedroom</td><td>35</td><td>2,786 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 35 × 73.7 m² net (67 m² minimum + 10%), 79.6 m² gross with partitions</td></tr>
 <tr><td>One-bedroom</td><td>72</td><td>4,190 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 72 × 53.9 m² net (49 m² minimum + 10%), 58.2 m² gross with partitions</td></tr>
 <tr><td>Studio</td><td>51</td><td>1,999 m²</td><td><code>bch.design_guidelines.unit_areas</code>: 51 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions</td></tr>
-<tr><td>Amenity</td><td>1</td><td>244 m²</td><td>placeholder: 1.5 m² per unit, at least 40 m²</td></tr>
 <tr><td>Services, bicycles</td><td>1</td><td>348 m²</td><td>placeholder: 40 m² services + 308 bicycle spaces × 1.0 m²</td></tr>
+<tr><td>Shelter: 24/7 front desk</td><td>1</td><td>12 m²</td><td>placeholder: 24/7 access unless BC Housing approves otherwise (Emergency Shelter Program Framework)</td></tr>
+<tr><td>Shelter: Staff office</td><td>1</td><td>15 m²</td><td>placeholder: the housing type's default brief, a placeholder</td></tr>
+<tr><td>Shelter: Sleeping rooms</td><td>1</td><td>405 m²</td><td>placeholder: 20 rooms of up to 4 beds for 80 beds; four beds a room at most, 4.6 m² a bed space (Shelter Design Guidelines, rule bch.shelter.bed_space), plus 10% for the room's door and clearances</td></tr>
+<tr><td>Shelter: Washrooms and showers</td><td>1</td><td>48 m²</td><td>placeholder: 0.6 m² a bed × 80 beds</td></tr>
+<tr><td>Shelter: Dining</td><td>1</td><td>80 m²</td><td>placeholder: 1 m² a bed × 80 beds, at least 30 m²</td></tr>
+<tr><td>Shelter: Laundry</td><td>1</td><td>20 m²</td><td>placeholder: 0.25 m² a bed × 80 beds, at least 12 m²</td></tr>
+<tr><td>Shelter: Lockers and storage</td><td>1</td><td>24 m²</td><td>placeholder: 0.3 m² a bed × 80 beds</td></tr>
+<tr><td>Supportive: 24/7 front desk</td><td>1</td><td>12 m²</td><td>placeholder: staffed at all hours, beside the entry with a view of it and of the lift</td></tr>
+<tr><td>Supportive: Staff office</td><td>1</td><td>15 m²</td><td>placeholder: the housing type's default brief, a placeholder</td></tr>
+<tr><td>Supportive: Staff washroom</td><td>1</td><td>4 m²</td><td>placeholder: the housing type's default brief, a placeholder</td></tr>
+<tr><td>Supportive: Program room</td><td>1</td><td>40 m²</td><td>placeholder: case planning, groups, life skills</td></tr>
+<tr><td>Supportive: Laundry</td><td>1</td><td>65 m²</td><td>placeholder: 0.4 m² a home × 163, at least 15 m²</td></tr>
+<tr><td>Supportive: Harm reduction room</td><td>1</td><td>10 m²</td><td>placeholder: a room the operator can staff for overdose prevention, where its model includes one</td></tr>
 <tr><td>Parking</td><td>59</td><td>1,770 m²</td><td>placeholder: below grade, not on the plates</td></tr>
 </tbody></table>
 <p>Adjacency rules, in plain words, read back from the plates:</p>
 <ul>
 <li><em>info</em> — non residential: on the ground floor, facing the street. No non-residential space in the option</li>
-<li><em>pass</em> — amenity: on the ground floor, next to the entry. On the ground floor beside the core, where the entry is</li>
+<li><em>info</em> — amenity: on the ground floor, next to the entry. No amenity in the program</li>
 <li><em>conditional</em> — services: on the ground floor, away from the street. On the ground floor but facing the street: the lane side has no room left beside the core</li>
 <li><em>pass</em> — core: at the centre of every floor, the corridor through it. One core bay at the centre of every floor, the corridor through it, and an exit stair at each end of the corridor</li>
-<li><em>conditional</em> — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 19 studio (745 m²) did not fit: more storeys, a larger plate or a smaller program</li>
-<li><em>pass</em> — three bed plus: from the lowest residential floor up, stacked in the same bays. Three-bedroom units on levels 1 to 2</li>
+<li><em>conditional</em> — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 29 studio (1,137 m²) did not fit: more storeys, a larger plate or a smaller program</li>
+<li><em>conditional</em> — three bed plus: from the lowest residential floor up, stacked in the same bays. Three-bedroom units on levels 2 to 3, above some smaller units</li>
 <li><em>info</em> — accessible: next to the core, on the lowest residential floor. No accessible units stated on the option</li>
 </ul>
-<p>Did not fit on the plates: Studio × 19 (745 m²). More storeys, a larger plate or a smaller program.</p>
+<p>Did not fit on the plates: Studio × 29 (1,137 m²). More storeys, a larger plate or a smaller program.</p>
 <ul>
-<li>Note: The homes are placed floor by floor, not stacked in bays: stacked, the plates held 127 homes against 144.</li>
-<li>Note: Daylight (a placeholder for the architect's study, not a rule): 125 homes run 11.8 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.</li>
+<li>Note: The homes are placed floor by floor, not stacked in bays: stacked, the plates held 121 homes against 134.</li>
+<li>Note: Daylight (a placeholder for the architect's study, not a rule): 116 homes run 11.8 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.</li>
 <li>Note: Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.</li>
 <li>Note: The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.</li>
 <li>Note: Option height 51.0 m exceeds 15 x 3.05 m = 45.8 m; the extra 5.2 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.</li>
+<li>Note: The homes are 59% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.</li>
 </ul>
 <h3>Egress</h3>
-<p>Egress (sprinklered, BCBC 2024 Part 3): pass; 15 floors: 15 pass; farthest travel 7.4 m, limit 45 m. Read against <code>bcbc.exits</code> (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; <code>sprinklered: false</code> on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.</p>
+<p>Egress (sprinklered, BCBC 2024 Part 3): pass; 15 floors: 15 pass; farthest travel 7.3 m, limit 45 m. Read against <code>bcbc.exits</code> (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; <code>sprinklered: false</code> on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.</p>
 <ul>
-<li><em>pass</em> — Ground floor: 4 exits, 2 required · travel 7.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
-<li><em>pass</em> — Level 2: 4 exits, 2 required · travel 4.7 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
-<li><em>pass</em> — Level 3: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+<li><em>pass</em> — Ground floor: 4 exits, 2 required · travel 1.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+<li><em>pass</em> — Level 2: 4 exits, 2 required · travel 5.7 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+<li><em>pass</em> — Level 3: 4 exits, 2 required · travel 5.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 4: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 5: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 6: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
-<li><em>pass</em> — Level 7: 4 exits, 2 required · travel 6.2 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
-<li><em>pass</em> — Level 8: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+<li><em>pass</em> — Level 7: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+<li><em>pass</em> — Level 8: 4 exits, 2 required · travel 6.2 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 9: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 10: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 11: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 12: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
-<li><em>pass</em> — Level 13: 4 exits, 2 required · travel 7.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+<li><em>pass</em> — Level 13: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 14: 4 exits, 2 required · travel 7.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 15: 4 exits, 2 required · travel 7.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+</ul>
+<h3>Area schedule</h3>
+<table><thead><tr><th>Floor</th><th>Homes</th><th>Homes m²</th><th>Circulation m²</th><th>Cores m²</th><th>Program m²</th><th>Services m²</th><th>Spare m²</th><th>Gross m²</th><th>Efficiency</th></tr></thead><tbody>
+<tr><td>Ground floor</td><td>1</td><td>52</td><td>94</td><td>156</td><td>345</td><td>348</td><td>0</td><td>999</td><td>5%</td></tr>
+<tr><td>Level 2</td><td>2</td><td>208</td><td>69</td><td>156</td><td>405</td><td>0</td><td>147</td><td>1,002</td><td>21%</td></tr>
+<tr><td>Level 3</td><td>8</td><td>680</td><td>69</td><td>156</td><td>0</td><td>0</td><td>43</td><td>1,002</td><td>68%</td></tr>
+<tr><td>Level 4</td><td>9</td><td>697</td><td>69</td><td>156</td><td>0</td><td>0</td><td>25</td><td>1,002</td><td>70%</td></tr>
+<tr><td>Level 5</td><td>9</td><td>697</td><td>69</td><td>156</td><td>0</td><td>0</td><td>25</td><td>1,002</td><td>70%</td></tr>
+<tr><td>Level 6</td><td>9</td><td>697</td><td>69</td><td>156</td><td>0</td><td>0</td><td>25</td><td>1,002</td><td>70%</td></tr>
+<tr><td>Level 7</td><td>9</td><td>697</td><td>69</td><td>156</td><td>0</td><td>0</td><td>25</td><td>1,002</td><td>70%</td></tr>
+<tr><td>Level 8</td><td>9</td><td>631</td><td>69</td><td>156</td><td>0</td><td>0</td><td>96</td><td>1,002</td><td>63%</td></tr>
+<tr><td>Level 9</td><td>11</td><td>664</td><td>69</td><td>156</td><td>0</td><td>0</td><td>60</td><td>1,002</td><td>66%</td></tr>
+<tr><td>Level 10</td><td>11</td><td>664</td><td>69</td><td>156</td><td>0</td><td>0</td><td>60</td><td>1,002</td><td>66%</td></tr>
+<tr><td>Level 11</td><td>11</td><td>664</td><td>69</td><td>156</td><td>0</td><td>0</td><td>60</td><td>1,002</td><td>66%</td></tr>
+<tr><td>Level 12</td><td>11</td><td>664</td><td>69</td><td>156</td><td>0</td><td>0</td><td>60</td><td>1,002</td><td>66%</td></tr>
+<tr><td>Level 13</td><td>11</td><td>664</td><td>69</td><td>156</td><td>0</td><td>0</td><td>60</td><td>1,002</td><td>66%</td></tr>
+<tr><td>Level 14</td><td>11</td><td>589</td><td>69</td><td>156</td><td>0</td><td>0</td><td>141</td><td>1,002</td><td>59%</td></tr>
+<tr><td>Level 15</td><td>12</td><td>624</td><td>69</td><td>156</td><td>0</td><td>0</td><td>103</td><td>1,002</td><td>62%</td></tr>
+<tr><td><strong>Total</strong></td><td>134</td><td>8,894</td><td>1,064</td><td>2,332</td><td>750</td><td>348</td><td>932</td><td>15,032</td><td>59%</td></tr>
+</tbody></table>
+<p>Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). <strong>Flagged.</strong> The same table is <code>area-schedule.csv</code> beside this memo.</p>
+<h3>What an operator checks first</h3>
+<ul>
+<li><em>pass</em> — Elevators: 3 elevators for 163 homes on 15 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis).</li>
+<li><em>pass</em> — Desk: a staffed front desk by the entry drawn</li>
+<li><em>pass</em> — Staff office: a staff office drawn</li>
+<li><em>pass</em> — Desk sees the entry: the desk is beside the entry</li>
+<li><em>pass</em> — Laundry: a shared laundry room drawn</li>
+<li><em>pass</em> — Garbage, recycling and services: 348 m² of services for 134 homes</li>
+<li><em>missing</em> — Accessible homes: 0 accessible homes drawn, 7 wanted (BC Housing's 5% of 134)</li>
+<li><em>info</em> — Shared indoor space: 80 m² of amenity or dining, 0.6 m² a home</li>
 </ul>
 <figure><svg xmlns="http://www.w3.org/2000/svg" width="760" height="764" viewBox="0 0 760 764" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Stacking diagram">
 <rect width="100%" height="100%" fill="#ffffff"/>
@@ -212,10 +258,12 @@
 <text x="132.0" y="123.0" font-size="10" fill="#1f2933">C</text>
 <rect x="208.7" y="106" width="35.9" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="212.7" y="123.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="244.6" y="106" width="349.8" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="248.6" y="123.0" font-size="10" fill="#1f2933">Studio × 12</text>
-<rect x="594.4" y="106" width="53.6" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="598.4" y="123.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="244.6" y="106" width="67.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="248.6" y="123.0" font-size="10" fill="#1f2933">1B × 2</text>
+<rect x="312.3" y="106" width="262.4" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="316.3" y="123.0" font-size="10" fill="#1f2933">Studio × 9</text>
+<rect x="574.6" y="106" width="73.4" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="578.6" y="123.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="132" x2="656" y2="132" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="135.0" font-size="9.5" fill="#5f6672">+39.65 m</text>
 <text x="48" y="157.0" font-size="11" fill="#5f6672">Level 13</text>
@@ -223,12 +271,10 @@
 <text x="132.0" y="157.0" font-size="10" fill="#1f2933">C</text>
 <rect x="208.7" y="140" width="35.9" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="212.7" y="157.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="244.6" y="140" width="101.5" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
-<text x="248.6" y="157.0" font-size="10" fill="#1f2933">One-bedroom × 3</text>
-<rect x="346.1" y="140" width="233.2" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="350.1" y="157.0" font-size="10" fill="#1f2933">Studio × 8</text>
-<rect x="579.3" y="140" width="68.7" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="583.3" y="157.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="244.6" y="140" width="372.1" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="248.6" y="157.0" font-size="10" fill="#1f2933">One-bedroom × 11</text>
+<rect x="616.7" y="140" width="31.3" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="620.7" y="157.0" font-size="10" fill="#1f2933">SP</text>
 <line x1="650" y1="166" x2="656" y2="166" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="169.0" font-size="9.5" fill="#5f6672">+36.6 m</text>
 <text x="48" y="191.0" font-size="11" fill="#5f6672">Level 12</text>
@@ -278,12 +324,14 @@
 <text x="48" y="327.0" font-size="11" fill="#5f6672">Level 8</text>
 <rect x="128.0" y="310" width="80.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
 <text x="132.0" y="327.0" font-size="10" fill="#1f2933">C</text>
-<rect x="208.7" y="310" width="35.9" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<rect x="208.7" y="310" width="36.0" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="212.7" y="327.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="244.6" y="310" width="372.1" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
-<text x="248.6" y="327.0" font-size="10" fill="#1f2933">One-bedroom × 11</text>
-<rect x="616.7" y="310" width="31.3" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="620.7" y="327.0" font-size="10" fill="#1f2933">SP</text>
+<rect x="244.6" y="310" width="184.5" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="248.6" y="327.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
+<rect x="429.1" y="310" width="169.1" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="433.1" y="327.0" font-size="10" fill="#1f2933">One-bedroom × 5</text>
+<rect x="598.2" y="310" width="49.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="602.2" y="327.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="336" x2="656" y2="336" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="339.0" font-size="9.5" fill="#5f6672">+21.35 m</text>
 <text x="48" y="361.0" font-size="11" fill="#5f6672">Level 7</text>
@@ -291,12 +339,11 @@
 <text x="132.0" y="361.0" font-size="10" fill="#1f2933">C</text>
 <rect x="208.7" y="344" width="36.0" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="212.7" y="361.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="244.6" y="344" width="230.6" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
-<text x="248.6" y="361.0" font-size="10" fill="#1f2933">Two-bedroom × 5</text>
-<rect x="475.2" y="344" width="135.3" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
-<text x="479.2" y="361.0" font-size="10" fill="#1f2933">One-bedroom × 4</text>
-<rect x="610.5" y="344" width="37.5" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="614.5" y="361.0" font-size="10" fill="#1f2933">SP</text>
+<rect x="244.6" y="344" width="322.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="248.6" y="361.0" font-size="10" fill="#1f2933">Two-bedroom × 7</text>
+<rect x="567.5" y="344" width="67.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="571.5" y="361.0" font-size="10" fill="#1f2933">1B × 2</text>
+<rect x="635.1" y="344" width="12.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
 <line x1="650" y1="370" x2="656" y2="370" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="373.0" font-size="9.5" fill="#5f6672">+18.3 m</text>
 <text x="48" y="395.0" font-size="11" fill="#5f6672">Level 6</text>
@@ -340,11 +387,14 @@
 <text x="132.0" y="497.0" font-size="10" fill="#1f2933">C</text>
 <rect x="208.7" y="480" width="36.0" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="212.7" y="497.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="244.6" y="480" width="322.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
-<text x="248.6" y="497.0" font-size="10" fill="#1f2933">Two-bedroom × 7</text>
-<rect x="567.5" y="480" width="67.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
-<text x="571.5" y="497.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="635.1" y="480" width="12.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<rect x="244.6" y="480" width="175.3" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="248.6" y="497.0" font-size="10" fill="#1f2933">Three-bedroom+ × 3</text>
+<rect x="419.9" y="480" width="138.4" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="423.9" y="497.0" font-size="10" fill="#1f2933">Two-bedroom × 3</text>
+<rect x="558.2" y="480" width="67.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="562.2" y="497.0" font-size="10" fill="#1f2933">1B × 2</text>
+<rect x="625.9" y="480" width="22.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="629.9" y="497.0" font-size="10" fill="#1f2933">SP</text>
 <line x1="650" y1="506" x2="656" y2="506" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="509.0" font-size="9.5" fill="#5f6672">+6.1 m</text>
 <text x="48" y="531.0" font-size="11" fill="#5f6672">Level 2</text>
@@ -352,29 +402,26 @@
 <text x="132.0" y="531.0" font-size="10" fill="#1f2933">C</text>
 <rect x="208.7" y="514" width="36.0" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="212.7" y="531.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="244.6" y="514" width="233.7" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="248.6" y="531.0" font-size="10" fill="#1f2933">Three-bedroom+ × 4</text>
-<rect x="478.3" y="514" width="92.2" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
-<text x="482.3" y="531.0" font-size="10" fill="#1f2933">2B × 2</text>
-<rect x="570.5" y="514" width="67.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
-<text x="574.5" y="531.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="638.2" y="514" width="9.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<rect x="244.6" y="514" width="116.8" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="248.6" y="531.0" font-size="10" fill="#1f2933">Three-bedroom+ × 2</text>
+<rect x="361.5" y="514" width="76.5" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="365.5" y="531.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="438.0" y="514" width="210.0" height="26" fill="#e6dfd0" stroke="#ffffff" stroke-width="1"/>
+<text x="442.0" y="531.0" font-size="10" fill="#1f2933">other</text>
 <line x1="650" y1="540" x2="656" y2="540" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="543.0" font-size="9.5" fill="#5f6672">+3.05 m</text>
 <text x="48" y="565.0" font-size="11" fill="#5f6672">Ground floor</text>
-<rect x="128.0" y="548" width="126.8" height="26" fill="#f6e7c1" stroke="#ffffff" stroke-width="1"/>
-<text x="132.0" y="565.0" font-size="10" fill="#1f2933">Amenity</text>
-<rect x="254.8" y="548" width="180.6" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
-<text x="258.8" y="565.0" font-size="10" fill="#1f2933">Services, bicycles</text>
-<rect x="435.4" y="548" width="80.7" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
-<text x="439.4" y="565.0" font-size="10" fill="#1f2933">C</text>
-<rect x="516.1" y="548" width="36.0" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
-<text x="520.1" y="565.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="552.1" y="548" width="58.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="556.1" y="565.0" font-size="10" fill="#1f2933">3B × 1</text>
-<rect x="610.5" y="548" width="24.5" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="614.5" y="565.0" font-size="10" fill="#1f2933">SP</text>
-<rect x="635.0" y="548" width="13.0" height="26" fill="#d9e6d2" stroke="#ffffff" stroke-width="1"/>
+<rect x="128.0" y="548" width="181.1" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
+<text x="132.0" y="565.0" font-size="10" fill="#1f2933">Services, bicycles</text>
+<rect x="309.1" y="548" width="80.9" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="313.1" y="565.0" font-size="10" fill="#1f2933">C</text>
+<rect x="390.1" y="548" width="36.1" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="394.1" y="565.0" font-size="10" fill="#1f2933">CR</text>
+<rect x="426.1" y="548" width="29.2" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="430.1" y="565.0" font-size="10" fill="#1f2933">ST</text>
+<rect x="455.4" y="548" width="13.0" height="26" fill="#d9e6d2" stroke="#ffffff" stroke-width="1"/>
+<rect x="468.4" y="548" width="179.6" height="26" fill="#e6dfd0" stroke="#ffffff" stroke-width="1"/>
+<text x="472.4" y="565.0" font-size="10" fill="#1f2933">other</text>
 <line x1="650" y1="574" x2="656" y2="574" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="577.0" font-size="9.5" fill="#5f6672">+0.0 m</text>
 <g transform="translate(0.0 600.0)">
@@ -399,8 +446,8 @@
 <rect x="48.0" y="27.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
 <text x="64.0" y="37.0" fill="#5f6672" font-size="11">Spare · SP</text>
 </g>
-<text x="48.0" y="668.0" font-size="12" fill="#1f2933">144 of 163 units placed on 15 floors of 38.5 × 25.5 m (982 m² each)</text>
-<text x="48.0" y="684.0" font-size="12" fill="#1f2933">Did not fit: Studio × 19, 745 m²</text>
+<text x="48.0" y="668.0" font-size="12" fill="#1f2933">134 of 163 units placed on 15 floors of 38.5 × 25.5 m (982 m² each)</text>
+<text x="48.0" y="684.0" font-size="12" fill="#1f2933">Did not fit: Studio × 29, 1,137 m²</text>
 <text x="48.0" y="700.0" font-size="12" fill="#1f2933">A segment too short for its name carries its short name from the key, or none; the levels at</text>
 <text x="48.0" y="716.0" font-size="12" fill="#1f2933">the right are each floor's height above the ground floor.</text>
 <text x="48.0" y="732.0" font-size="12" fill="#1f2933">Rules as of 17 Nov 2026 · drawn from the option and the massing, not a design</text>
@@ -408,20 +455,30 @@
 <figure><svg xmlns="http://www.w3.org/2000/svg" width="640" height="1372" viewBox="0 0 640 1372" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Floor plans by program">
 <rect width="100%" height="100%" fill="#ffffff"/>
 <text x="48" y="44" font-size="14" font-weight="600">Plans by program · metres, street at the bottom</text>
-<text x="78.0" y="78.0" font-size="13" font-weight="600">Ground floor: 1 three-bedroom+ · 47 m² spare</text>
-<text x="78.0" y="93.0" font-size="10.5" fill="#2f7d4a">Egress: 4 exits, 2 required · travel 7.4 m, limit 45 m · pass</text>
+<text x="78.0" y="78.0" font-size="13" font-weight="600">Ground floor: 1 studio</text>
+<text x="78.0" y="93.0" font-size="10.5" fill="#2f7d4a">Egress: 4 exits, 2 required · travel 1.3 m, limit 45 m · pass</text>
 <rect x="78.0" y="100.0" width="302.0" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
 <rect x="78.0" y="100.0" width="17.3" height="107.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="201.5" y="100.0" width="54.9" height="107.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="362.7" y="100.0" width="17.3" height="107.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="78.0" y="192.9" width="302.0" height="14.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="78.0" y="207.1" width="16.5" height="92.9" fill="#d9e6d2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="94.5" y="207.1" width="161.8" height="92.9" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="94.5" y="207.1" width="7.9" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="102.5" y="207.1" width="7.9" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="95.3" y="100.0" width="106.3" height="92.9" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="256.4" y="100.0" width="106.3" height="92.9" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="256.4" y="207.1" width="17.8" height="92.9" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="274.2" y="207.1" width="74.5" height="92.9" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="348.7" y="207.1" width="31.3" height="92.9" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="110.5" y="207.1" width="17.8" height="92.9" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="128.2" y="207.1" width="10.0" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="138.2" y="207.1" width="31.8" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="169.9" y="207.1" width="52.9" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="222.9" y="207.1" width="13.3" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="236.1" y="207.1" width="15.9" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="252.0" y="207.1" width="10.0" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="261.9" y="207.1" width="2.7" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="264.6" y="207.1" width="26.5" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="291.0" y="207.1" width="43.1" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="334.2" y="207.1" width="6.6" height="92.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="340.8" y="207.1" width="37.2" height="92.9" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="78.0" y="149.8" width="17.3" height="43.1" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
 <path d="M78.0 159.2h17.3M78.0 163.6h17.3M78.0 168.0h17.3M78.0 172.4h17.3M78.0 176.8h17.3M78.0 181.2h17.3" stroke="#5f6672" stroke-width="0.5" fill="none"/>
 <line x1="86.6" y1="159.2" x2="86.6" y2="183.5" stroke="#1f2933" stroke-width="0.8"/>
@@ -446,16 +503,19 @@
 <path d="M363.9 185.9L363.9 192.9M370.9 192.9L370.7 191.1L370.0 189.4L368.9 187.9L367.4 186.8L365.7 186.1L363.9 185.9" stroke="#1f2933" stroke-width="0.7" fill="none"/>
 <text x="229.0" y="203.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
 <text x="86.3" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">DS</text>
-<text x="175.5" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">Amenity</text>
 <text x="148.4" y="150.0" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
 <text x="309.6" y="150.0" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
-<text x="265.3" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
-<text x="311.4" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">3B</text>
-<text x="364.3" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">SP</text>
-<polyline points="311.4,207.1 311.4,200.0 362.7,200.0" fill="none" stroke="#1f2933" stroke-width="1.4" stroke-dasharray="4 2"/>
-<circle cx="311.4" cy="207.1" r="2.4" fill="#1f2933"/>
+<text x="119.4" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
+<text x="154.0" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
+<text x="196.4" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
+<text x="244.1" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
+<text x="277.8" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
+<text x="312.6" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
+<text x="359.4" y="257.0" font-size="9.5" text-anchor="middle" fill="#1f2933">ST</text>
+<polyline points="359.4,207.1 362.7,207.1 362.7,200.0" fill="none" stroke="#1f2933" stroke-width="1.4" stroke-dasharray="4 2"/>
+<circle cx="359.4" cy="207.1" r="2.4" fill="#1f2933"/>
 <path d="M 359.7 197.0 L 365.7 203.0 M 359.7 203.0 L 365.7 197.0" stroke="#1f2933" stroke-width="1.4"/>
-<text x="337.1" y="196.0" font-size="10" text-anchor="middle" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">7.4 m</text>
+<text x="362.7" y="199.5" font-size="10" text-anchor="middle" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">1.3 m</text>
 <path d="M86.3 320.0V303.0M82.3 309.0L86.3 303.0L90.3 309.0" stroke="#1f2933" stroke-width="1.4" fill="none"/>
 <text x="92.3" y="319.0" font-size="9.5" fill="#1f2933">entry</text>
 <path d="M78.0 327.0H380.0M78.0 323.0V331.0M380.0 323.0V331.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
@@ -463,7 +523,7 @@
 <text x="229.0" y="352.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E HASTINGS ST · STREET SIDE</text>
 <line x1="66.0" y1="100.0" x2="66.0" y2="300.0" stroke="#5f6672" stroke-width="0.8"/>
 <text x="62.0" y="200.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 200.0)">25.5 m</text>
-<text x="78.0" y="376.0" font-size="13" font-weight="600">Typical floor (levels 8 to 12): 11 one-bedroom · 60 m² spare</text>
+<text x="78.0" y="376.0" font-size="13" font-weight="600">Typical floor (levels 9 to 13): 11 one-bedroom · 60 m² spare</text>
 <text x="78.0" y="391.0" font-size="10.5" fill="#2f7d4a">Egress: 4 exits, 2 required · travel 7.0 m, limit 45 m · pass</text>
 <rect x="78.0" y="398.0" width="302.0" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
 <rect x="78.0" y="398.0" width="17.3" height="107.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
@@ -629,10 +689,10 @@
 <text x="48.0" y="1100.0" font-size="12" fill="#1f2933">Unit depth 11.85 m either side of a 1.8 m corridor; core bay 7.0 m;</text>
 <text x="48.0" y="1116.0" font-size="12" fill="#1f2933">partitions +8% over net areas (declared placeholders). The rules read back</text>
 <text x="48.0" y="1132.0" font-size="12" fill="#1f2933">from the plates are listed with the figure.</text>
-<text x="48.0" y="1148.0" font-size="12" fill="#1f2933">The typical floor stands for levels 8 to 12; other floors differ: level 2,</text>
-<text x="48.0" y="1164.0" font-size="12" fill="#1f2933">4 three-bedroom+, 2 two-bedroom, 2 one-bedroom; levels 3 to 6, 7</text>
-<text x="48.0" y="1180.0" font-size="12" fill="#1f2933">two-bedroom, 2 one-bedroom; level 7, 5 two-bedroom, 4 one-bedroom; level</text>
-<text x="48.0" y="1196.0" font-size="12" fill="#1f2933">13, 3 one-bedroom, 8 studio; levels 14 to 15, 12 studio.</text>
+<text x="48.0" y="1148.0" font-size="12" fill="#1f2933">The typical floor stands for levels 9 to 13; other floors differ: level 2,</text>
+<text x="48.0" y="1164.0" font-size="12" fill="#1f2933">2 three-bedroom+; level 3, 3 three-bedroom+, 3 two-bedroom, 2 one-bedroom;</text>
+<text x="48.0" y="1180.0" font-size="12" fill="#1f2933">levels 4 to 7, 7 two-bedroom, 2 one-bedroom; level 8, 4 two-bedroom, 5</text>
+<text x="48.0" y="1196.0" font-size="12" fill="#1f2933">one-bedroom; level 14, 2 one-bedroom, 9 studio; level 15, 12 studio.</text>
 <text x="48.0" y="1212.0" font-size="12" fill="#1f2933">Stairs drawn with their treads and exit doors; a switchback stair's flights</text>
 <text x="48.0" y="1228.0" font-size="12" fill="#1f2933">either side of its divider, a scissor stair's two flights crossed; the</text>
 <text x="48.0" y="1244.0" font-size="12" fill="#1f2933">arrow is the entry from the street.</text>
@@ -650,19 +710,13 @@
 <line x1="78.0" y1="292.0" x2="264.1" y2="292.0" stroke="#1f2933" stroke-width="1.5"/>
 <rect x="88.0" y="72.0" width="166.1" height="220.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
 <line x1="88.0" y1="94.6" x2="254.1" y2="94.6" stroke="#5f6672" stroke-width="0.6" stroke-dasharray="3 2"/>
-<rect x="99.1" y="281.0" width="85.0" height="9.3" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="213.1" y="282.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="239.5" y="282.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="278.8" x2="254.1" y2="278.8" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="105.3" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="146.2" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="187.2" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="228.2" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="265.7" x2="254.1" y2="265.7" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="100.9" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="133.3" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="165.6" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="198.0" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="230.4" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="105.3" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="146.2" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="187.2" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="223.9" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="252.5" x2="254.1" y2="252.5" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="100.9" y="243.3" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="133.3" y="243.3" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -688,13 +742,11 @@
 <rect x="198.0" y="203.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="230.4" y="203.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="199.9" x2="254.1" y2="199.9" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="96.6" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="120.4" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="144.1" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="167.8" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="191.5" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="215.3" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="239.0" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="100.9" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="133.3" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="165.6" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="198.0" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="226.0" y="190.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="186.7" x2="254.1" y2="186.7" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="96.6" y="177.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="120.4" y="177.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -731,19 +783,18 @@
 <rect x="96.6" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="120.4" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="144.1" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="166.2" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="186.6" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="207.1" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="227.5" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="167.8" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="191.5" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="215.3" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="239.0" y="124.8" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="121.0" x2="254.1" y2="121.0" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="95.0" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="115.4" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="135.9" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="156.3" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="176.8" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="197.2" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="217.7" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="238.1" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="96.6" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="120.4" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="142.4" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="162.9" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="183.3" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="203.8" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<rect x="224.2" y="111.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="88.0" y1="107.8" x2="254.1" y2="107.8" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="95.0" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="115.4" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -763,7 +814,6 @@
 <line x1="400.1" y1="94.6" x2="510.1" y2="94.6" stroke="#5f6672" stroke-width="0.6" stroke-dasharray="3 2"/>
 <rect x="422.4" y="282.7" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="400.1" y1="278.8" x2="510.1" y2="278.8" stroke="#5f6672" stroke-width="0.6"/>
-<rect x="422.4" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="481.3" y="269.6" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="400.1" y1="265.7" x2="510.1" y2="265.7" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="422.4" y="256.4" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -862,27 +912,32 @@
 <polygon points="187.1,317.2 254.7,317.2 229.1,332.0 161.5,332.0" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,315.0 269.5,315.0 265.6,317.2 73.6,317.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="103.1,300.2 113.6,300.2 88.0,315.0 77.5,315.0" fill="#d9e6d2" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="113.6,300.2 216.5,300.2 190.9,315.0 88.0,315.0" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="216.5,300.2 227.8,300.2 202.2,315.0 190.9,315.0" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="227.8,300.2 275.2,300.2 249.6,315.0 202.2,315.0" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="275.2,300.2 295.1,300.2 269.5,315.0 249.6,315.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="113.6,300.2 118.6,300.2 93.0,315.0 88.0,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="118.6,300.2 123.7,300.2 98.1,315.0 93.0,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="123.7,300.2 135.0,300.2 109.5,315.0 98.1,315.0" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="135.0,300.2 141.3,300.2 115.7,315.0 109.4,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="141.3,300.2 161.5,300.2 135.9,315.0 115.7,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="161.5,300.2 195.2,300.2 169.6,315.0 135.9,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="195.2,300.2 203.6,300.2 178.0,315.0 169.6,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="203.6,300.2 213.8,300.2 188.2,315.0 178.0,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="213.7,300.2 220.0,300.2 194.5,315.0 188.1,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="220.0,300.2 221.7,300.2 196.1,315.0 194.5,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="221.7,300.2 238.6,300.2 213.0,315.0 196.1,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="238.6,300.2 266.0,300.2 240.4,315.0 213.0,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="266.0,300.2 270.2,300.2 244.6,315.0 240.4,315.0" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="270.2,300.2 293.9,300.2 268.3,315.0 244.6,315.0" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
 <text x="301.1" y="330.0" font-size="10" fill="#5f6672">Ground floor</text>
 <polygon points="103.1,285.0 295.1,285.0 240.0,316.8 48.0,316.8" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="77.5,299.8 88.5,299.8 59.0,316.8 48.0,316.8" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="156.0,299.8 191.0,299.8 161.5,316.8 126.6,316.8" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="258.5,299.8 269.5,299.8 240.0,316.8 229.1,316.8" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="84.6,302.0 122.0,302.0 96.4,316.8 59.0,316.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="187.1,302.0 224.5,302.0 198.9,316.8 161.5,316.8" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="122.0,302.0 149.4,302.0 123.8,316.8 96.4,316.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="224.5,302.0 251.9,302.0 226.3,316.8 198.9,316.8" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="149.4,302.0 152.2,302.0 126.6,316.8 123.8,316.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="251.9,302.0 254.7,302.0 229.1,316.8 226.3,316.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="84.6,302.0 132.0,302.0 106.4,316.8 59.0,316.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="187.1,302.0 234.5,302.0 208.9,316.8 161.5,316.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="132.0,302.0 152.2,302.0 126.6,316.8 106.4,316.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="234.5,302.0 254.7,302.0 229.1,316.8 208.9,316.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,299.8 269.5,299.8 265.6,302.0 73.6,302.0" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="103.1,285.0 150.5,285.0 124.9,299.8 77.5,299.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="150.5,285.0 197.8,285.0 172.3,299.8 124.9,299.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="197.8,285.0 245.2,285.0 219.6,299.8 172.3,299.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="245.2,285.0 292.6,285.0 267.0,299.8 219.6,299.8" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="292.6,285.0 295.1,285.0 269.5,299.8 267.0,299.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="103.1,285.0 273.5,285.0 247.9,299.8 77.5,299.8" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="273.5,285.0 295.1,285.0 269.5,299.8 247.9,299.8" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <text x="301.1" y="314.8" font-size="10" fill="#5f6672">Level 2</text>
 <polygon points="103.1,269.8 295.1,269.8 240.0,301.6 48.0,301.6" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="77.5,284.6 88.5,284.6 59.0,301.6 48.0,301.6" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
@@ -895,12 +950,11 @@
 <polygon points="149.4,286.8 152.2,286.8 126.6,301.6 123.8,301.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="251.9,286.8 254.7,286.8 229.1,301.6 226.3,301.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,284.6 269.5,284.6 265.6,286.8 73.6,286.8" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="103.1,269.8 140.5,269.8 114.9,284.6 77.5,284.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="140.5,269.8 177.9,269.8 152.3,284.6 114.9,284.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="177.9,269.8 215.3,269.8 189.7,284.6 152.3,284.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="215.3,269.8 252.7,269.8 227.1,284.6 189.7,284.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="252.7,269.8 290.1,269.8 264.5,284.6 227.1,284.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="290.1,269.8 295.1,269.8 269.5,284.6 264.5,284.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="103.1,269.8 150.5,269.8 124.9,284.6 77.5,284.6" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="150.5,269.8 197.8,269.8 172.3,284.6 124.9,284.6" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="197.8,269.8 245.2,269.8 219.6,284.6 172.3,284.6" fill="#6b9fd4" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="245.2,269.8 282.6,269.8 257.1,284.6 219.6,284.6" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="282.6,269.8 295.1,269.8 269.5,284.6 257.1,284.6" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <text x="301.1" y="299.6" font-size="10" fill="#5f6672">Level 3</text>
 <polygon points="103.1,254.6 295.1,254.6 240.0,286.4 48.0,286.4" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="77.5,269.3 88.5,269.3 59.0,286.4 48.0,286.4" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
@@ -960,12 +1014,12 @@
 <polygon points="77.5,223.7 88.5,223.7 59.0,240.7 48.0,240.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="156.0,223.7 191.0,223.7 161.5,240.7 126.6,240.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="258.5,223.7 269.5,223.7 240.0,240.7 229.1,240.7" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="84.6,225.9 112.0,225.9 86.4,240.7 59.0,240.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="112.0,225.9 139.4,225.9 113.8,240.7 86.4,240.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="187.1,225.9 214.5,225.9 188.9,240.7 161.5,240.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="214.5,225.9 241.9,225.9 216.3,240.7 188.9,240.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="139.4,225.9 152.2,225.9 126.6,240.7 113.8,240.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="241.9,225.9 254.7,225.9 229.1,240.7 216.3,240.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="84.6,225.9 122.0,225.9 96.4,240.7 59.0,240.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="187.1,225.9 224.5,225.9 198.9,240.7 161.5,240.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="122.0,225.9 149.4,225.9 123.8,240.7 96.4,240.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="224.5,225.9 251.9,225.9 226.3,240.7 198.9,240.7" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="149.4,225.9 152.2,225.9 126.6,240.7 123.8,240.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="251.9,225.9 254.7,225.9 229.1,240.7 226.3,240.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,223.7 269.5,223.7 265.6,225.9 73.6,225.9" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="103.1,208.9 140.5,208.9 114.9,223.7 77.5,223.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="140.5,208.9 177.9,208.9 152.3,223.7 114.9,223.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
@@ -985,13 +1039,12 @@
 <polygon points="139.4,210.7 152.2,210.7 126.6,225.5 113.8,225.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="241.9,210.7 254.7,210.7 229.1,225.5 216.3,225.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,208.5 269.5,208.5 265.6,210.7 73.6,210.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="103.1,193.7 130.5,193.7 104.9,208.5 77.5,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="130.5,193.7 157.9,193.7 132.4,208.5 104.9,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="157.9,193.7 185.4,193.7 159.8,208.5 132.4,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="185.4,193.7 212.8,193.7 187.2,208.5 159.8,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="212.8,193.7 240.2,193.7 214.7,208.5 187.2,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="240.2,193.7 267.7,193.7 242.1,208.5 214.7,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="267.7,193.7 295.1,193.7 269.5,208.5 242.1,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="103.1,193.7 140.5,193.7 114.9,208.5 77.5,208.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="140.5,193.7 177.9,193.7 152.3,208.5 114.9,208.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="177.9,193.7 215.3,193.7 189.7,208.5 152.3,208.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="215.3,193.7 252.7,193.7 227.1,208.5 189.7,208.5" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="252.7,193.7 280.2,193.7 254.6,208.5 227.1,208.5" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="280.2,193.7 295.1,193.7 269.5,208.5 254.6,208.5" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <text x="301.1" y="223.5" font-size="10" fill="#5f6672">Level 8</text>
 <polygon points="103.1,178.5 295.1,178.5 240.0,210.3 48.0,210.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="77.5,193.3 88.5,193.3 59.0,210.3 48.0,210.3" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
@@ -1073,21 +1126,20 @@
 <polygon points="77.5,132.4 88.5,132.4 59.0,149.4 48.0,149.4" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="156.0,132.4 191.0,132.4 161.5,149.4 126.6,149.4" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="258.5,132.4 269.5,132.4 240.0,149.4 229.1,149.4" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="84.6,134.7 108.2,134.7 82.6,149.4 59.0,149.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="108.2,134.7 131.9,134.7 106.3,149.4 82.6,149.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="187.1,134.7 210.7,134.7 185.1,149.4 161.5,149.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="210.7,134.7 234.4,134.7 208.8,149.4 185.1,149.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="131.9,134.7 152.2,134.7 126.6,149.4 106.3,149.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="234.4,134.7 254.7,134.7 229.1,149.4 208.8,149.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="84.6,134.7 112.0,134.7 86.4,149.4 59.0,149.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="112.0,134.7 139.4,134.7 113.8,149.4 86.4,149.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="187.1,134.7 214.5,134.7 188.9,149.4 161.5,149.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="214.5,134.7 241.9,134.7 216.3,149.4 188.9,149.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="139.4,134.7 152.2,134.7 126.6,149.4 113.8,149.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="241.9,134.7 254.7,134.7 229.1,149.4 216.3,149.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,132.4 269.5,132.4 265.6,134.7 73.6,134.7" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="103.1,117.6 130.5,117.6 104.9,132.4 77.5,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="130.5,117.6 157.9,117.6 132.4,132.4 104.9,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="157.9,117.6 185.4,117.6 159.8,132.4 132.4,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="185.4,117.6 209.0,117.6 183.4,132.4 159.8,132.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="209.0,117.6 232.7,117.6 207.1,132.4 183.4,132.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="232.7,117.6 256.3,117.6 230.7,132.4 207.1,132.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="256.3,117.6 280.0,117.6 254.4,132.4 230.7,132.4" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="280.0,117.6 295.1,117.6 269.5,132.4 254.4,132.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="185.4,117.6 212.8,117.6 187.2,132.4 159.8,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="212.8,117.6 240.2,117.6 214.7,132.4 187.2,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="240.2,117.6 267.7,117.6 242.1,132.4 214.7,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="267.7,117.6 295.1,117.6 269.5,132.4 242.1,132.4" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
 <text x="301.1" y="147.4" font-size="10" fill="#5f6672">Level 13</text>
 <polygon points="103.1,102.4 295.1,102.4 240.0,134.2 48.0,134.2" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="77.5,117.2 88.5,117.2 59.0,134.2 48.0,134.2" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>
@@ -1100,15 +1152,14 @@
 <polygon points="131.9,119.4 152.2,119.4 126.6,134.2 106.3,134.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="234.4,119.4 254.7,119.4 229.1,134.2 208.8,134.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="77.5,117.2 269.5,117.2 265.6,119.4 73.6,119.4" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="103.1,102.4 126.7,102.4 101.1,117.2 77.5,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="126.7,102.4 150.4,102.4 124.8,117.2 101.1,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="150.4,102.4 174.0,102.4 148.4,117.2 124.8,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="174.0,102.4 197.6,102.4 172.1,117.2 148.4,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="197.6,102.4 221.3,102.4 195.7,117.2 172.1,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="221.3,102.4 244.9,102.4 219.3,117.2 195.7,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="244.9,102.4 268.6,102.4 243.0,117.2 219.3,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="268.6,102.4 292.2,102.4 266.6,117.2 243.0,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="292.2,102.4 295.1,102.4 269.5,117.2 266.6,117.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="103.1,102.4 130.5,102.4 104.9,117.2 77.5,117.2" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="130.5,102.4 157.9,102.4 132.4,117.2 104.9,117.2" fill="#b9d4f0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="157.9,102.4 181.6,102.4 156.0,117.2 132.4,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="181.6,102.4 205.2,102.4 179.6,117.2 156.0,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="205.2,102.4 228.9,102.4 203.3,117.2 179.6,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="228.9,102.4 252.5,102.4 226.9,117.2 203.3,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="252.5,102.4 276.2,102.4 250.6,117.2 226.9,117.2" fill="#dbe9f8" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="276.2,102.4 295.1,102.4 269.5,117.2 250.6,117.2" fill="#ffffff" stroke="#5f6672" stroke-width="0.6"/>
 <text x="301.1" y="132.2" font-size="10" fill="#5f6672">Level 14</text>
 <polygon points="103.1,87.2 295.1,87.2 240.0,119.0 48.0,119.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="77.5,102.0 88.5,102.0 59.0,119.0 48.0,119.0" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>

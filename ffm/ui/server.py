@@ -566,7 +566,7 @@ def do_suggest(body: Any) -> dict:
 
 # ---------------------------------------------------------------- issues: a run handed from one reader to the next
 
-ROLES = ("manager", "architect", "reader")
+ROLES = ("manager", "architect", "reader", "operator")
 
 
 def list_issues(site_id: str | None) -> list[dict]:

@@ -98,6 +98,7 @@ export const MODES = {
   manager: { who: "the development manager", line: "three stops, the site, the option and the run, then the memo with Download PDF for the board." },
   architect: { who: "the architect", line: "the Site and Option schedules beside the memo, every ledger layer open but the money's (Show the pro-forma on answer 4 opens it), two runs compared, the block editor on FIG 03, and the massing to Revit." },
   reader: { who: "a reader", line: "the memo alone, as on paper, with Download PDF and Print. Switch to Manager or Architect to change anything." },
+  operator: { who: "the operator", line: "the operating figures to enter and sign, what an operator checks on the plans, then the memo; Run again carries the figures in." },
 };
 
 /* The switch's paper thumb slides under the pressed reader; it is measured, so it follows the fonts and the window. */
@@ -119,7 +120,7 @@ export function setMode(mode, remember = true, announce = true) {
   guide.over = false;
   const railWord = mode === "manager" ? "Stops" : "Inputs";
   $(".rail-label").textContent = railWord;
-  if (mode === "reader") {
+  if (mode === "reader" || mode === "operator") {
     showInputs(false, false);
     closeExportPanel();
     if (state.view !== "detailed") setView("detailed", false);   // the reader has no view switch: never land them in the 3D view with the answers hidden

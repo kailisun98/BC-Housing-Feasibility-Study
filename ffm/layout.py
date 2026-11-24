@@ -138,7 +138,8 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
     if nonres:
         out.append({"key": "non_residential", "label": "Non-residential", "count": 1, "area_m2": round(nonres, 1), "source": "option.non_residential_gfa_m2", "note": "the option's non-residential floor area (childcare, a hall, shops)"})
     amen_per, _ = LAYOUT_ASSUMPTIONS["amenity_m2_per_unit"]
-    amenity = round(max(40.0, amen_per * n_total), 1) if n_total else 0.0
+    brief = program_brief(option)
+    amenity = round(max(40.0, amen_per * n_total), 1) if n_total and not any(b["replaces_amenity"] for b in brief) else 0.0
     if amenity:
         out.append({"key": "amenity", "label": "Amenity", "count": 1, "area_m2": amenity, "source": "placeholder", "note": f"{amen_per} m² per unit, at least 40 m²"})
     serv_base, _ = LAYOUT_ASSUMPTIONS["services_base_m2"]
@@ -155,6 +156,10 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
             continue
         if label and area > 0:
             out.append({"key": "other", "label": label, "count": 1, "area_m2": round(area, 1), "source": "option.layout.extra_programs", "note": "a program the architect added in the block editor"})
+    # the program brief (the operator's, or the housing type's default): named blocks of kind "other", with where they go
+    for b in brief:
+        out.append({"key": "other", "label": b["label"], "count": 1, "area_m2": b["area_m2"], "source": b["source"], "brief": True,
+                    "next_to": b["next_to"], "where": b["where"], "note": b["note"] or ("the program brief" if b["source"] != "placeholder" else "the housing type's default brief, a placeholder")})
     park_each, _ = LAYOUT_ASSUMPTIONS["parking_m2_per_space"]
     stalls = int(option.get("parking_spaces") or 0)
     parking = {"spaces": stalls, "area_m2": round(stalls * park_each, 1), "where": "below grade, not on the plates", "source": "placeholder" if stalls else None}
@@ -348,6 +353,481 @@ def _t(z: dict) -> dict:
     return {**z, "x": z["y"], "y": z["x"], "w": z["d"], "d": z["w"]}
 
 
+# ---------------------------------------------------------------- building types, the program brief, lifts (24 Nov 2026)
+
+# What kind of building the option is (`option.building_type`). A second simulated panel found every option laid out as
+# one double-loaded apartment slab: a sixplex got a lift core and a corridor, a tower a 21 m-deep bar, a supportive
+# building no desk or staff room. "apartment" is the solver as it was; the other two are laid out by their own rules.
+BUILDING_TYPES = ("apartment", "ground_oriented", "tower")
+BUILDING_TYPE_WORDS = {"apartment": "an apartment building (homes off a corridor and a core)",
+                       "ground_oriented": "ground-oriented homes (townhouses, a multiplex, stacked townhouses: each home its own door, no corridor or lift)",
+                       "tower": "a tower (a podium and a tower plate over it, one core with a scissor stair and the lifts)"}
+
+# Declared placeholders for the two new types and the lifts, not rules.
+TYPOLOGY_ASSUMPTIONS = {
+    "go_row_depth_m": (11.0, "a ground-oriented home's depth from its front wall to its back wall; a deeper plate takes a second row behind a courtyard"),
+    "go_row_min_m": (7.5, "the shallowest row of ground-oriented homes; under it there is no second row"),
+    "go_courtyard_m": (6.0, "the courtyard between a front and a rear building, which both rows' homes face"),
+    "go_min_width_m": (4.2, "the narrowest a ground-oriented home is laid out, its stair included"),
+    "go_amenity_homes": (12, "below this many ground-oriented homes no indoor amenity room is laid out, each home has its own outdoor space"),
+    "go_services_m2": (10.0, "garbage, recycling and meters for ground-oriented homes, plus the bicycle spaces"),
+    "tower_plate_m2": (650.0, "a tower's floor plate, within the 550 to 750 m² a single core with a scissor stair serves well"),
+    "lift_homes_each": (70, "homes one elevator serves at this stage; BC Housing's guidelines ask for an elevator analysis, which this stands in for"),
+    "lift_min_over_six": (2, "elevators in a building over six storeys at the least, so one can be out of service"),
+}
+
+
+def building_type(option: dict) -> str:
+    """The option's building type, "apartment" where none is given or the word is not one of BUILDING_TYPES."""
+    t = str((option or {}).get("building_type") or "").strip().lower()
+    return t if t in BUILDING_TYPES else "apartment"
+
+
+def lifts_needed(homes: int, storeys: int, ground_oriented: bool = False) -> dict[str, Any]:
+    """The elevators a building of this many homes and storeys wants, a declared placeholder (24 Nov 2026: an operator's
+    review asked for lifts by home count; the layout drew one whatever the homes). None for ground-oriented homes or a
+    walk-up of at most three storeys (Part 9), one per `lift_homes_each` homes above that, at least two over six storeys."""
+    each, _ = TYPOLOGY_ASSUMPTIONS["lift_homes_each"]
+    floor_two, _ = TYPOLOGY_ASSUMPTIONS["lift_min_over_six"]
+    if ground_oriented or storeys <= WALKUP_MAX_STOREYS or not homes:
+        return {"lifts": 0, "words": "no elevator: " + ("each home has its own door at grade" if ground_oriented else f"{storeys} storeys or fewer, a walk-up")}
+    n = max(1, math.ceil(homes / each))
+    if storeys > MIDRISE_MAX_STOREYS:
+        n = max(n, floor_two)
+    return {"lifts": n, "words": f"{n} elevator{'s' if n != 1 else ''} for {homes} homes on {storeys} storeys: one per {each} homes"
+                                 + (f", at least {floor_two} over {MIDRISE_MAX_STOREYS} storeys" if storeys > MIDRISE_MAX_STOREYS else "") + " (a placeholder for an elevator analysis)"}
+
+
+# The program brief (`option.program_brief`): the spaces a kind of housing runs on beyond its homes, each a named block
+# with an area and where it goes. A brief the option does not carry is the default for its housing type below, every
+# figure a declared placeholder until the operator's own brief replaces it (24 Nov 2026: a supportive building had no
+# desk, staff room, clinic or laundry, and a shelter no sleeping rooms).
+BRIEF_DEFAULTS: dict[str, list[dict]] = {
+    "supportive": [
+        {"label": "24/7 front desk", "area_m2": 12, "next_to": "entry", "note": "staffed at all hours, beside the entry with a view of it and of the lift"},
+        {"label": "Staff office", "area_m2": 15},
+        {"label": "Staff washroom", "area_m2": 4},
+        {"label": "Program room", "area_m2": 40, "note": "case planning, groups, life skills"},
+        {"label": "Shared kitchen and dining", "per_home_m2": 1.0, "min_m2": 40, "replaces_amenity": True, "note": "meals that meet Canada's Food Guide (the Supportive Housing Program Framework's services)"},
+        {"label": "Laundry", "per_home_m2": 0.4, "min_m2": 15},
+        {"label": "Harm reduction room", "area_m2": 10, "note": "a room the operator can staff for overdose prevention, where its model includes one"},
+    ],
+    "transitional": [
+        {"label": "Front desk", "area_m2": 10, "next_to": "entry"},
+        {"label": "Staff office", "area_m2": 15},
+        {"label": "Program room", "area_m2": 30},
+        {"label": "Laundry", "per_home_m2": 0.4, "min_m2": 15},
+    ],
+    "shelter": [
+        {"label": "24/7 front desk", "area_m2": 12, "next_to": "entry", "note": "24/7 access unless BC Housing approves otherwise (Emergency Shelter Program Framework)"},
+        {"label": "Staff office", "area_m2": 15},
+        {"label": "Sleeping rooms", "beds_per_room": 4, "per_bed_m2": 4.6, "where": "upper", "note": "four beds a room at most, 4.6 m² a bed space (Shelter Design Guidelines, rule bch.shelter.bed_space), plus 10% for the room's door and clearances"},
+        {"label": "Washrooms and showers", "per_bed_m2": 0.6},
+        {"label": "Dining", "per_bed_m2": 1.0, "min_m2": 30, "replaces_amenity": True},
+        {"label": "Laundry", "per_bed_m2": 0.25, "min_m2": 12},
+        {"label": "Lockers and storage", "per_bed_m2": 0.3},
+    ],
+}
+
+
+def program_brief(option: dict) -> list[dict]:
+    """The option's brief, or the default for its housing type, each item with its area worked out: a fixed area, or
+    an area a home or a bed with a least area, or a shelter's sleeping rooms by beds. Items with no area are dropped.
+    Every item says whether it is the operator's (`option.program_brief`) or the default placeholder. Pure."""
+    from .checks import housing_kind, housing_parts
+    own = option.get("program_brief")
+    kind = housing_kind(option)
+    parts = housing_parts(option)
+    homes = sum(int((option.get("units") or {}).get(k) or 0) for k in UNIT_KEYS)
+    beds = option.get("beds")
+    beds = int(beds) if isinstance(beds, (int, float)) and not isinstance(beds, bool) and beds > 0 else 0
+    if isinstance(own, list) and own:
+        items, source = own, "option.program_brief"
+    else:
+        items = list(BRIEF_DEFAULTS.get(kind, []))
+        # a shelter or supportive part of a mixed building takes the part's own spaces
+        if kind == "independent" and "shelter" in parts:
+            items += [dict(i, label=f"Shelter: {i['label']}") for i in BRIEF_DEFAULTS["shelter"]]
+        if kind == "independent" and "supportive" in parts:
+            items += [dict(i, label=f"Supportive: {i['label']}") for i in BRIEF_DEFAULTS["supportive"] if not i.get("replaces_amenity")]
+        source = "placeholder"
+    out = []
+    for it in items:
+        if not isinstance(it, dict) or not str(it.get("label") or "").strip():
+            continue
+        try:
+            if it.get("beds_per_room"):
+                rooms = math.ceil(beds / int(it["beds_per_room"])) if beds else 0
+                area = rooms * int(it["beds_per_room"]) * float(it.get("per_bed_m2") or 4.6) * 1.10
+                words = f"{rooms} rooms of up to {int(it['beds_per_room'])} beds for {beds} beds"
+            elif it.get("per_bed_m2"):
+                area = max(float(it.get("min_m2") or 0), beds * float(it["per_bed_m2"])) if beds else 0
+                words = f"{float(it['per_bed_m2']):g} m² a bed × {beds} beds" + (f", at least {float(it['min_m2']):g} m²" if it.get("min_m2") else "")
+            elif it.get("per_home_m2"):
+                n = homes or beds
+                area = max(float(it.get("min_m2") or 0), n * float(it["per_home_m2"])) if n else 0
+                words = f"{float(it['per_home_m2']):g} m² a home × {n}" + (f", at least {float(it['min_m2']):g} m²" if it.get("min_m2") else "")
+            else:
+                area, words = float(it.get("area_m2") or 0), ""
+        except (TypeError, ValueError):
+            continue
+        if area <= 0:
+            continue
+        out.append({"label": str(it["label"]).strip(), "area_m2": round(area, 1), "next_to": it.get("next_to"), "where": it.get("where") or "ground",
+                    "replaces_amenity": bool(it.get("replaces_amenity")), "source": source, "note": "; ".join(x for x in (words, it.get("note") or "") if x)})
+    return out
+
+
+def _go_program(option: dict, prog: dict) -> dict:
+    """The program of ground-oriented homes: no indoor amenity under `go_amenity_homes` homes, services at
+    `go_services_m2` plus the bicycles, and the typology's assumptions listed."""
+    serv, _ = TYPOLOGY_ASSUMPTIONS["go_services_m2"]
+    few, _ = TYPOLOGY_ASSUMPTIONS["go_amenity_homes"]
+    bike_each, _ = LAYOUT_ASSUMPTIONS["bicycle_m2_per_space"]
+    bikes = int(option.get("bicycle_spaces") or 0)
+    out = []
+    for b in prog["blocks"]:
+        if b["key"] == "amenity" and prog["units_total"] < few:
+            continue
+        if b["key"] == "services":
+            # bicycles go in each home or its yard, not a shared room
+            b = dict(b, area_m2=round(serv, 1), note=f"{serv:.0f} m² services for ground-oriented homes; the {bikes} bicycle spaces are in the homes and their yards")
+        out.append(b)
+    return dict(prog, blocks=out, assumptions=prog["assumptions"] + [{"key": k, "value": v, "note": n} for k, (v, n) in TYPOLOGY_ASSUMPTIONS.items() if k.startswith("go_")])
+
+
+def _solve_ground_oriented(site: dict, option: dict, ledger: dict, massing: dict, prog: dict) -> dict[str, Any]:
+    """Ground-oriented homes on the plate: rows of homes side by side across the plate's width, each home the row's
+    depth and running up through its floors with its own door and stair (a townhouse); over three storeys the homes
+    stack two storeys at a time (stacked townhouses, the upper one by its own stair). A plate deep enough for two rows
+    and a courtyard takes a front and a rear building. No corridor, no core, no lift. The ground floor's other uses
+    take a slice of the front row's ground floor; the floors above that slice hold one-floor homes where one fits."""
+    pm, x0, y0, W, D, storeys, f2f = _plate(massing)
+    prog = _go_program(option, prog)
+    row_max, _ = TYPOLOGY_ASSUMPTIONS["go_row_depth_m"]
+    row_min, _ = TYPOLOGY_ASSUMPTIONS["go_row_min_m"]
+    court, _ = TYPOLOGY_ASSUMPTIONS["go_courtyard_m"]
+    w_min, _ = TYPOLOGY_ASSUMPTIONS["go_min_width_m"]
+    warnings: list[str] = []
+    if D >= 2 * row_min + court:
+        dr = min(row_max, (D - court) / 2)
+        rows = [{"side": "front", "y": y0, "d": dr}, {"side": "rear", "y": y0 + D - dr, "d": dr}]
+        court_d = D - 2 * dr
+    else:
+        dr = min(row_max, D)
+        rows = [{"side": "front", "y": y0, "d": dr}]
+        court_d = 0.0
+        if D > dr + 0.5:
+            warnings.append(f"The plate is {D:.1f} m deep; one row of homes {dr:.1f} m deep stands at the street, the {D - dr:.1f} m behind it is yard (two rows and a courtyard need {2 * row_min + court:g} m).")
+    # the floors a home spans: all of them up to three; over three, pairs (stacked townhouses), an odd top floor of flats
+    if storeys <= WALKUP_MAX_STOREYS:
+        tiers = [(0, storeys)]
+    else:
+        tiers = [(a, min(a + 2, storeys)) for a in range(0, storeys, 2)]
+    r2 = lambda v: round(v, 2)
+    floors = [{"level": lv, "name": "Ground floor" if lv == 0 else f"Level {lv + 1}", "z": _floor_z(option, lv, f2f), "zones": [], "spare_m2": 0.0} for lv in range(storeys)]
+    # each row's width left, tier by tier
+    left = {(ri, ti): W for ri in range(len(rows)) for ti in range(len(tiers))}
+    used_x = {(ri, ti): x0 for ri in range(len(rows)) for ti in range(len(tiers))}
+    shortfall: list[dict] = []
+    # the ground floor's other uses: a slice of the front row's ground floor each, at the street end; the floors over it
+    # are taken by the tier above or left as spare
+    for b in [b for b in prog["blocks"] if b["key"] in ("non_residential", "amenity", "services", "other")]:
+        width = b["area_m2"] / rows[0]["d"]
+        ri = len(rows) - 1 if b["key"] == "services" else 0
+        if width > left[(ri, 0)] + 0.01:
+            if b["key"] == "services":
+                warnings.append(f"The {b['area_m2']:,.0f} m² of services do not fit the ground floor beside the homes: a shed in the yard, or below grade.")
+            else:
+                shortfall.append({"block": b["key"], "label": b["label"], "area_m2": round(b["area_m2"], 1)})
+            continue
+        x = used_x[(ri, 0)]
+        floors[0]["zones"].append({"block": b["key"], "label": b["label"], "x": r2(x), "y": r2(rows[ri]["y"]), "w": r2(width), "d": r2(rows[ri]["d"]),
+                                   "area_m2": round(b["area_m2"], 1), "side": rows[ri]["side"], **({"entry": True} if b.get("next_to") == "entry" else {})})
+        used_x[(ri, 0)] += width
+        left[(ri, 0)] -= width
+        # the floors over a ground-only use in the first tier: as many as the tier spans less the ground, kept by
+        # marking the slice as spare above (one-floor homes go there below if they fit)
+        lo, hi = tiers[0]
+        for lv in range(lo + 1, hi):
+            floors[lv]["zones"].append({"block": "spare", "label": "Over the ground floor's other uses", "x": r2(x), "y": r2(rows[ri]["y"]), "w": r2(width), "d": r2(rows[ri]["d"]),
+                                        "area_m2": round(width * rows[ri]["d"], 1), "side": rows[ri]["side"]})
+    # the homes, the largest first, each in the first row and tier with room, ground tiers first
+    queue = [b for b in prog["blocks"] if b["key"] in UNIT_KEYS]
+    acc_left = int(option.get("accessible_units") or 0)
+    hid = 0
+    slots = [(ti, ri) for ti in range(len(tiers)) for ri in range(len(rows))]
+    for b in queue:
+        for _ in range(int(b["count"])):
+            placed = False
+            for ti, ri in slots:
+                lo, hi = tiers[ti]
+                span = hi - lo
+                width = max(w_min, b["gross_m2_each"] / (rows[ri]["d"] * span))
+                if width <= left[(ri, ti)] + 0.01:
+                    x = used_x[(ri, ti)]
+                    hid += 1
+                    for lv in range(lo, hi):
+                        z = {"block": b["key"], "label": b["label"], "x": r2(x), "y": r2(rows[ri]["y"]), "w": r2(width), "d": r2(rows[ri]["d"]),
+                             "area_m2": round(width * rows[ri]["d"], 1), "side": rows[ri]["side"], "home": hid, "levels": [lo, hi - 1],
+                             "entry": "at grade" if lo == 0 else "by its own stair"}
+                        if lv == lo:
+                            z["unit"] = b["key"]          # as the corridor solver marks a home (`_homes_on` reads the key)
+                            # an accessible home needs its rooms on one floor at grade: only a one-floor home at grade counts
+                            if acc_left and lo == 0 and span == 1:
+                                z["accessible"] = True
+                                acc_left -= 1
+                        floors[lv]["zones"].append(z)
+                    used_x[(ri, ti)] += width
+                    left[(ri, ti)] -= width
+                    placed = True
+                    break
+            if not placed:
+                sf = next((s for s in shortfall if s["block"] == b["key"]), None)
+                if sf:
+                    sf["units"] += 1
+                    sf["area_m2"] = round(sf["area_m2"] + b["gross_m2_each"], 1)
+                else:
+                    shortfall.append({"block": b["key"], "label": b["label"], "units": 1, "area_m2": b["gross_m2_each"]})
+    if int(option.get("accessible_units") or 0) and acc_left:
+        warnings.append(f"{acc_left} of the {int(option.get('accessible_units') or 0)} accessible homes are not drawn: an accessible home needs its rooms on one floor at grade, "
+                        "and the homes here run over more than one floor. A one-floor home at grade (a garden flat under a stacked townhouse) is the architect's to draw.")
+    # what is left in each row and tier is spare; the courtyard is a cut-out on every floor (open to the sky)
+    for (ri, ti), rest in left.items():
+        if rest > 0.3:
+            lo, hi = tiers[ti]
+            for lv in range(lo, hi):
+                floors[lv]["zones"].append({"block": "spare", "label": "Spare", "x": r2(used_x[(ri, ti)]), "y": r2(rows[ri]["y"]), "w": r2(rest), "d": r2(rows[ri]["d"]),
+                                            "area_m2": round(rest * rows[ri]["d"], 1), "side": rows[ri]["side"]})
+    for fl in floors:
+        if court_d > 0.3:
+            fl["zones"].append({"block": "void", "label": "Courtyard", "x": r2(x0), "y": r2(y0 + rows[0]["d"]), "w": r2(W), "d": r2(court_d), "area_m2": round(W * court_d, 1), "side": "front"})
+        elif D > dr + 0.3:
+            fl["zones"].append({"block": "void", "label": "Yard", "x": r2(x0), "y": r2(y0 + dr), "w": r2(W), "d": r2(D - dr), "area_m2": round(W * (D - dr), 1), "side": "rear"})
+        fl["spare_m2"] = round(sum(z["area_m2"] for z in fl["zones"] if z["block"] == "spare"), 1)
+    homes_kind = "townhouses" if len(tiers) == 1 and storeys > 1 else ("stacked townhouses" if storeys > WALKUP_MAX_STOREYS else "one-floor homes")
+    plate = {"x": r2(x0), "y": r2(y0), "width_m": r2(W), "depth_m": r2(D), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": False, "unit_depth_m": r2(dr),
+             "arrangement": "ground_oriented", "stacking": "homes",
+             "ground_oriented": {"rows": len(rows), "row_depth_m": r2(dr), "courtyard_m": r2(court_d), "home_spans": [hi - lo for lo, hi in tiers], "homes": homes_kind}}
+    if ground_extra(option, f2f):
+        plate["ground_floor_m"] = round(f2f + ground_extra(option, f2f), 2)
+    L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
+    # the corridor-and-core rules do not apply; what applies is that every home has a door of its own
+    L["adjacencies"] = [c for c in L["adjacencies"] if c["id"] not in ("core_centre", "units_both_sides", "accessible_core", "amenity_entry")]
+    upper = any(lo > 0 for lo, hi in tiers)
+    L["adjacencies"].append({"id": "own_entry", "block": "units", "rule": "every home with a door of its own, no common corridor or lift", "status": "pass" if not upper else "conditional",
+                             "note": ("each home's door is at grade and its stair inside it" if not upper else
+                                      "the lower homes' doors are at grade; the upper homes are reached by their own stair, whose run and exit the architect draws")})
+    L["egress"] = _ground_egress(L["floors"], tiers)
+    return L
+
+
+def _ground_egress(floors: list[dict], tiers: list[tuple[int, int]]) -> dict[str, Any]:
+    """Exits for ground-oriented homes: each home its own door, its own stair inside it. A home over three storeys, or
+    an upper home reached by its own stair, is a placeholder the architect confirms against Part 9 (9.9.9: egress from
+    dwelling units), which the rules do not hold."""
+    out = []
+    for fl in floors:
+        homes = sorted({z["home"] for z in fl["zones"] if z.get("home")})
+        upper = any(z.get("home") and z["levels"][0] > 0 for z in fl["zones"])
+        out.append({"level": fl["level"], "name": fl["name"], "exits": len(homes), "exits_required": 1 if homes else 0, "separation_m": None, "separation_min_m": None,
+                    "farthest_travel_m": None, "travel_limit_m": None, "farthest_unit": None, "dead_end_m": None, "dead_end_limit_m": None,
+                    "status": "uncertain" if upper else "pass",
+                    "notes": (["each home on this floor reaches its own door; the upper homes do so by their own stair, to confirm against Part 9 (9.9.9), not in the rules"] if upper
+                              else ["each home on this floor has its own door and stair; no common corridor"] if homes else [])})
+    overall = "uncertain" if any(f["status"] == "uncertain" for f in out) else "pass"
+    return {"rule_id": EGRESS_RULE, "sprinklered": False, "sprinklered_is_placeholder": True, "limits": {}, "floors": out, "status": overall, "scissor_stair": False, "ground_oriented": True,
+            "summary": "Egress (ground-oriented homes): every home has its own door" + (" at grade" if overall == "pass" else "; the upper homes reach theirs by their own stair, a placeholder to confirm against Part 9")
+                       + "; no common corridor, exit stair or lift."}
+
+
+def _solve_tower(site: dict, option: dict, ledger: dict, massing: dict, prog: dict) -> dict[str, Any]:
+    """A tower: the podium's floors on the podium plate and the tower's floors on the tower plate over it (massing's
+    `tower`), each laid out as a plate of its own and joined, the ground around the tower plate on its floors a cut-out
+    (the podium's roof). The podium takes the ground floor's uses and the homes it holds, the tower the rest. Without a
+    podium the tower plate runs from the ground."""
+    import copy
+    pm = next(x for x in massing["masses"] if x["name"] == "proposed")
+    tw = pm["tower"]
+    P = int(pm.get("podium_storeys") or 0)
+    S = int(pm["storeys"])
+
+    def sub(r: dict, storeys: int) -> dict:
+        mass = {k: v for k, v in pm.items() if k not in ("parts", "plate_origin", "angle_deg", "tower", "tiers")}
+        mass.update(footprint=[[r["x"], r["y"]], [r["x"] + r["w"], r["y"]], [r["x"] + r["w"], r["y"] + r["d"]], [r["x"], r["y"] + r["d"]]],
+                    plate_width_m=r["w"], plate_depth_m=r["d"], storeys=storeys)
+        return {**massing, "masses": [mass] + [m for m in massing["masses"] if m["name"] != "proposed"]}
+
+    if P <= 0:
+        L = _solve_plate(site, option, ledger, sub(tw, S), prog)
+        L["plate"]["tower"] = {**{k: tw[k] for k in ("x", "y", "w", "d")}, "from_level": 0}
+        return L
+    pod = {"x": float(pm["footprint"][0][0]), "y": float(pm["footprint"][0][1]), "w": float(pm["plate_width_m"]), "d": float(pm["plate_depth_m"])}
+    A = _solve_plate(site, option, ledger, sub(pod, P), copy.deepcopy(prog))
+    owed = {s["block"]: int(s["units"]) for s in A["shortfall"] if s.get("units")}
+    prog_b = {**prog, "units_total": sum(owed.values()), "no_lobby": True, "accessible_units": 0,
+              "blocks": [{**b, "count": owed[b["key"]], "area_m2": round(owed[b["key"]] * b["gross_m2_each"], 1)} for b in prog["blocks"] if b["key"] in UNIT_KEYS and owed.get(b["key"])]}
+    B = _solve_plate(site, option, ledger, sub(tw, S - P), prog_b) if prog_b["units_total"] else None
+    f2f = float(pm["floor_to_floor_m"])
+    top = A["floors"][-1]["z"] + f2f
+    floors = [dict(fl) for fl in A["floors"]]
+    r2 = lambda v: round(v, 2)
+    # the podium roof round the tower plate, on each tower floor: cut-outs, not floor area
+    ring_voids = []
+    for x, y, w, d in ((pod["x"], pod["y"], pod["w"], tw["y"] - pod["y"]), (pod["x"], tw["y"] + tw["d"], pod["w"], pod["y"] + pod["d"] - tw["y"] - tw["d"]),
+                       (pod["x"], tw["y"], tw["x"] - pod["x"], tw["d"]), (tw["x"] + tw["w"], tw["y"], pod["x"] + pod["w"] - tw["x"] - tw["w"], tw["d"])):
+        if w > 0.05 and d > 0.05:
+            ring_voids.append({"block": "void", "label": "Podium roof", "x": r2(x), "y": r2(y), "w": r2(w), "d": r2(d), "area_m2": round(w * d, 1), "side": "front"})
+    for i in range(S - P):
+        lv = P + i
+        zones = [dict(z) for z in (B["floors"][i]["zones"] if B else [])] + [dict(v) for v in ring_voids]
+        if not B:
+            zones.append({"block": "spare", "label": "Spare", "x": r2(tw["x"]), "y": r2(tw["y"]), "w": r2(tw["w"]), "d": r2(tw["d"]), "area_m2": round(tw["w"] * tw["d"], 1), "side": "front"})
+        floors.append({"level": lv, "name": f"Level {lv + 1}", "z": round(top + i * f2f, 2), "zones": zones,
+                       "spare_m2": (B["floors"][i]["spare_m2"] if B else round(tw["w"] * tw["d"], 1))})
+    plate = dict(A["plate"], storeys=S, arrangement="tower",
+                 tower={**{k: r2(tw[k]) for k in ("x", "y", "w", "d")}, "from_level": P, "arrangement": (B["plate"]["arrangement"] if B else None)})
+    shortfall = [s for s in A["shortfall"] if not s.get("units")] + (list(B["shortfall"]) if B else [{**s} for s in A["shortfall"] if s.get("units")])
+    warnings = [w for w in A["warnings"] + (B["warnings"] if B else []) if w not in (massing.get("warnings") or [])]
+    warnings = list(dict.fromkeys(warnings))
+    warnings.insert(0, f"A tower: {P} podium floor{'s' if P != 1 else ''} of {pod['w']:g} × {pod['d']:g} m, and {S - P} tower floors of {tw['w']:g} × {tw['d']:g} m ({tw['w'] * tw['d']:,.0f} m²) over them. "
+                       "Each is laid out with its own core here; where the tower's core lands in the podium is the architect's to draw (one core runs through both).")
+    L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
+    ea, eb = A.get("egress"), (B or {}).get("egress")
+    if ea:
+        per = list(ea["floors"]) + [dict(f, level=f["level"] + P, name=f"Level {f['level'] + P + 1}") for f in ((eb or {}).get("floors") or [])]
+        overall = max((f["status"] for f in per), key=lambda s: _STATUS_RANK.get(s, 0)) if per else "pass"
+        L["egress"] = {**ea, "floors": per, "status": overall,
+                       "summary": f"The podium: {ea.get('summary') or ''}" + (f" The tower: {eb.get('summary') or ''}" if eb else "")}
+    return L
+
+
+# ---------------------------------------------------------------- the area schedule and what the operator runs
+
+AREA_GROUPS = (("homes", "Homes (net, inside their walls)"), ("circulation", "Corridors, lobby, landings"), ("core", "Cores: stairs, elevators, shafts"),
+               ("program", "Program spaces (desk, staff, dining, laundry, sleeping rooms)"), ("amenity", "Amenity"), ("services", "Services and bicycles"),
+               ("non_residential", "Non-residential and commercial"), ("spare", "Spare (not yet used)"))
+EFFICIENCY_FLOOR = 0.70    # a declared placeholder: below this share of homes in the floor area a plate is flagged
+
+
+def _area_group(z: dict) -> str | None:
+    b = z["block"]
+    if b in UNIT_KEYS:
+        return "homes"
+    if b == "corridor" or (b == "design_space" and z.get("entry")):
+        return "circulation"
+    if b == "core":
+        return "core"
+    if b in ("other", "design_space"):
+        return "program"
+    if b in ("amenity", "services", "spare"):
+        return b
+    if b in ("non_residential", "commercial"):
+        return "non_residential"
+    return None      # a cut-out (void) is not floor area
+
+
+def area_schedule(L: dict) -> dict[str, Any]:
+    """The area schedule: for each floor, the homes by type and the floor area by use (homes net of their partitions,
+    circulation, cores, program, amenity, services, non-residential, spare), the floor's gross area and its efficiency
+    (the homes' net over the gross). A home over more than one floor counts once, on its entry floor, and its area on
+    each floor it spans. Totals for the building and a flag where the efficiency is under EFFICIENCY_FLOOR. Pure."""
+    partition, _ = LAYOUT_ASSUMPTIONS["partition_allowance"]
+    rows = []
+    for fl in L["floors"]:
+        by = {g: 0.0 for g, _ in AREA_GROUPS}
+        homes = {k: 0 for k in UNIT_KEYS}
+        for z in fl["zones"]:
+            g = _area_group(z)
+            if not g:
+                continue
+            a = float(z["area_m2"])
+            by[g] += a / partition if g == "homes" else a
+            if z.get("unit"):
+                homes[z["block"]] += 1
+        walls = sum(float(z["area_m2"]) for z in fl["zones"] if z["block"] in UNIT_KEYS) - by["homes"]
+        gross = sum(by.values()) + walls
+        rows.append({"level": fl["level"], "name": fl["name"], "homes": {k: v for k, v in homes.items() if v}, "homes_total": sum(homes.values()),
+                     "m2": {g: round(v, 1) for g, v in by.items()}, "partitions_m2": round(walls, 1), "gross_m2": round(gross, 1),
+                     "efficiency": round(by["homes"] / gross, 3) if gross else None})
+    tot = {g: round(sum(r["m2"][g] for r in rows), 1) for g, _ in AREA_GROUPS}
+    walls = round(sum(r["partitions_m2"] for r in rows), 1)
+    gross = round(sum(r["gross_m2"] for r in rows), 1)
+    homes = {k: sum(r["homes"].get(k, 0) for r in rows) for k in UNIT_KEYS}
+    eff = round(tot["homes"] / gross, 3) if gross else None
+    built = [r for r in rows if r["gross_m2"]]
+    return {"floors": rows, "totals": {"m2": tot, "partitions_m2": walls, "gross_m2": gross, "homes": {k: v for k, v in homes.items() if v}, "homes_total": sum(homes.values()),
+                                       "efficiency": eff, "net_to_gross": eff},
+            "efficiency_floor": EFFICIENCY_FLOOR, "flag": bool(eff is not None and eff < EFFICIENCY_FLOOR and sum(homes.values()) and built),
+            "groups": [{"key": g, "label": lab} for g, lab in AREA_GROUPS],
+            "note": (f"Homes are counted net of their partitions ({int(round((partition - 1) * 100))}% of a home's gross is its walls, shown apart); a home over more than one floor is "
+                     "counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; "
+                     f"under {int(EFFICIENCY_FLOOR * 100)}% is flagged (a placeholder for what a cost consultant would query).")}
+
+
+def area_schedule_csv(sched: dict) -> str:
+    """The area schedule as CSV, a row a floor and a total row: the homes by type, then the areas by use in m²."""
+    keys = [g for g, _ in AREA_GROUPS]
+    head = ["Floor", "Homes"] + [UNIT_LABEL[k] for k in UNIT_KEYS] + [lab for _, lab in AREA_GROUPS] + ["Partitions", "Gross", "Efficiency"]
+    lines = [",".join(f'"{h}"' for h in head)]
+    for r in sched["floors"] + [{"name": "Total", "homes_total": sched["totals"]["homes_total"], "homes": sched["totals"]["homes"], "m2": sched["totals"]["m2"],
+                                 "partitions_m2": sched["totals"]["partitions_m2"], "gross_m2": sched["totals"]["gross_m2"], "efficiency": sched["totals"]["efficiency"]}]:
+        cells = [f'"{r["name"]}"', str(r["homes_total"])] + [str(r["homes"].get(k, 0)) for k in UNIT_KEYS] + [f"{r['m2'][k]:.1f}" for k in keys]
+        cells += [f"{r['partitions_m2']:.1f}", f"{r['gross_m2']:.1f}", f"{r['efficiency']:.3f}" if r["efficiency"] is not None else ""]
+        lines.append(",".join(cells))
+    return "\n".join(lines) + "\n"
+
+
+def operability(L: dict, option: dict) -> dict[str, Any]:
+    """What an operator checks on the plans before saying it can run the building (24 Nov 2026, the operator's review):
+    the elevators against the homes, the staffed spaces the housing type runs on, laundry, the services room against the
+    homes, the accessible homes against BC Housing's 5%, and the amenity. Each item pass / missing / info with a note;
+    the figures are this screen's placeholders, never an operator's standard."""
+    from .checks import housing_kind, housing_parts
+    kind = housing_kind(option)
+    parts = housing_parts(option)
+    zones = [z for fl in L["floors"] for z in fl["zones"]]
+    labels = [str(z.get("label") or "").lower() for z in zones]
+    homes = int(L.get("units_placed") or 0)
+    p = L["plate"]
+    go = p.get("arrangement") == "ground_oriented"
+    lift = lifts_needed(int(L.get("units_total") or 0), int(p["storeys"]), ground_oriented=go)
+    cores = [z for fl in L["floors"][:1] for z in fl["zones"] if z["block"] == "core" and min(z["w"], z["d"]) >= ELEVATOR_CORE_M - 1e-6]
+    items = [{"key": "lifts", "label": "Elevators", "status": "info" if not lift["lifts"] else ("pass" if cores else "missing"),
+              "note": lift["words"] + ("" if not lift["lifts"] or cores else "; no core on the ground floor is large enough to hold an elevator") + "."}]
+    staffed = kind != "independent" or any(k != "independent" for k in parts)
+    for want, words in (("desk", "a staffed front desk by the entry"), ("staff office", "a staff office")):
+        if staffed:
+            hit = any(want in l for l in labels)
+            items.append({"key": want.replace(" ", "_"), "label": want.capitalize(), "status": "pass" if hit else "missing",
+                          "note": f"{words} drawn" if hit else f"{words}: none on the plans (a supportive, transitional or shelter part runs on one)"})
+    if staffed:
+        desk = next((z for z in zones if "desk" in str(z.get("label") or "").lower()), None)
+        entry = next((z for z in zones if z.get("entry")), None)
+        if desk and entry:
+            near = _touches(desk, entry, 0.6) or _gap(desk, entry) < 3.0
+            items.append({"key": "desk_entry", "label": "Desk sees the entry", "status": "pass" if near else "missing",
+                          "note": "the desk is beside the entry" if near else "the desk is not beside the entry: move it where it sees the door"})
+    laundry = any("laundry" in l for l in labels)
+    items.append({"key": "laundry", "label": "Laundry", "status": "pass" if laundry or go else "missing",
+                  "note": "a shared laundry room drawn" if laundry else ("each home has its own" if go else "no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state")})
+    serv = sum(float(z["area_m2"]) for z in zones if z["block"] == "services")
+    need = 0.3 * homes
+    items.append({"key": "services", "label": "Garbage, recycling and services", "status": "pass" if serv >= need or go else "missing",
+                  "note": f"{serv:,.0f} m² of services for {homes} homes" + ("" if serv >= need or go else f"; about {need:,.0f} m² (0.3 m² a home, a placeholder) is what a garbage and recycling room for this many homes takes")})
+    acc = sum(1 for z in zones if z.get("accessible"))
+    want_acc = math.ceil(0.05 * homes) if homes else 0
+    items.append({"key": "accessible", "label": "Accessible homes", "status": "pass" if acc >= want_acc else "missing",
+                  "note": f"{acc} accessible homes drawn, {want_acc} wanted (BC Housing's 5% of {homes})"})
+    amen = sum(float(z["area_m2"]) for z in zones if z["block"] == "amenity" or "dining" in str(z.get("label") or "").lower())
+    items.append({"key": "amenity", "label": "Shared indoor space", "status": "info",
+                  "note": f"{amen:,.0f} m² of amenity or dining, {amen / homes:.1f} m² a home" if homes and amen else "no shared indoor room drawn"})
+    missing = [i for i in items if i["status"] == "missing"]
+    return {"items": items, "lifts": lift["lifts"], "status": "missing" if missing else "pass",
+            "summary": ("Operability: " + (", ".join(i["label"].lower() for i in missing) + " missing" if missing else "the items an operator checks first are on the plans")
+                        + f"; {lift['words']}.")}
+
+
 def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, Any]:
     """Place the blocks on the proposed mass's plates, floor by floor, and say what held and what did not. Where
     the option carries a placement of its own (`layout.zones`, written by the block editor), that placement is
@@ -358,8 +838,14 @@ def solve(site: dict, option: dict, ledger: dict, massing: dict) -> dict[str, An
     if zones:
         return place_zones(site, option, ledger, massing, zones)
     prog = blocks(option, ledger)
+    # the building types (24 Nov 2026): ground-oriented homes by their own rows; a tower as a podium and a tower plate
+    pm_ = next((x for x in massing["masses"] if x["name"] == "proposed"), None) or {}
+    if building_type(option) == "ground_oriented":
+        return _solve_ground_oriented(site, option, ledger, massing, prog)
+    if pm_.get("tower"):
+        return _solve_tower(site, option, ledger, massing, prog)
     # a plate in two parts (massing: the plate box and a wing beside it) is laid out part by part and joined
-    parts = (next((x for x in massing["masses"] if x["name"] == "proposed"), None) or {}).get("parts")
+    parts = pm_.get("parts")
     if parts and len(parts) == 2:
         return _solve_parts(site, option, ledger, massing, prog, parts)
     return _solve_plate(site, option, ledger, massing, prog)
@@ -649,6 +1135,11 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
     lobby_m2, _ = LAYOUT_ASSUMPTIONS["lobby_m2"]
     if not walkup and prog["units_total"] and (strip or point) and not prog.get("no_lobby"):
         place(ground, "design_space", "Lobby (entry)", lobby_m2, [("front", "left"), ("front", "right")], {"entry": True}, at="street")
+    # a brief's space that belongs beside the entry (a staffed desk) comes straight after the lobby, so it stands by it
+    for b in [b for b in prog["blocks"] if b["key"] == "other" and b.get("next_to") == "entry"]:
+        rest = place(ground, "other", b["label"], b["area_m2"], [("front", "left"), ("front", "right")], at="street")
+        if rest > 0.05:
+            shortfall.append({"block": "other", "label": b["label"], "area_m2": round(rest, 1)})
     # the ground floor's other uses, by their rules
     for key, prefer in (("non_residential", [("front", "left"), ("front", "right")]), ("amenity", [("front", "right"), ("front", "left")]), ("services", [("rear", "left"), ("rear", "right"), ("rear", "mid")])):
         b = by_key.get(key)
@@ -666,9 +1157,9 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
         elif rest > 0.05:
             shortfall.append({"block": key, "label": b["label"], "area_m2": round(rest, 1)})
     # the architect's own programs go on the ground floor facing the street, like the non-residential space
-    for b in [b for b in prog["blocks"] if b["key"] == "other"]:
+    for b in [b for b in prog["blocks"] if b["key"] == "other" and b.get("next_to") != "entry"]:
         rest = b["area_m2"]
-        for fl in floors:
+        for fl in (floors[1:] + floors[:1] if b.get("where") == "upper" and len(floors) > 1 else floors):
             rest = place(fl, "other", b["label"], rest, [("front", "left"), ("front", "right")], at="street")
             if rest <= 0.05:
                 break
@@ -937,7 +1428,8 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
     turned = next((x.get("angle_deg") for x in massing["masses"] if x["name"] == "proposed"), None)
     if turned:
         plate["angle_deg"] = turned   # the mass is turned on the lot; the plate and its blocks are drawn in the plate's own frame
-    return {
+    plate.setdefault("building_type", building_type(option))
+    L = {
         "site_id": site.get("id"), "option_id": option.get("id"), "as_of": ledger["run"]["as_of"], "stamp": ledger["run"]["stamp"]["stamp"],
         "units": "m", "origin": massing.get("origin"), "edited": edited,
         "plate": plate,
@@ -950,6 +1442,12 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
         "assumptions": prog["assumptions"], "warnings": warnings + list(massing.get("warnings") or []),
         "derived_from": (["option.layout.zones (placed by hand)"] if edited else []) + (["option.layout.grid"] if plate.get("grid") else []) + ["option.units", "option.non_residential_gfa_m2", "option.accessible_units", "option.bicycle_spaces", "massing.masses[proposed]", "bch.design_guidelines.unit_areas"],
     }
+    L["area_schedule"] = area_schedule(L)
+    L["operability"] = operability(L, option)
+    if L["area_schedule"]["flag"]:
+        L["warnings"].append(f"The homes are {L['area_schedule']['totals']['efficiency'] * 100:.0f}% of the floor area (net to gross), under the {int(EFFICIENCY_FLOOR * 100)}% this screen flags: "
+                             "cores, corridors or spare floor take more than a cost consultant would expect.")
+    return L
 
 
 # ---------------------------------------------------------------- how deep the homes run from their windows
@@ -982,7 +1480,8 @@ def proportions(floors: list[dict], plate: dict) -> dict[str, Any]:
     tol = 0.06
     narrow: list[tuple[str, float, float]] = []
     slender: list[float] = []
-    for fl in ([] if plate.get("arrangement") == "walkup" else floors):   # a walk-up's through homes are not held to these
+    # a walk-up's through homes and ground-oriented homes over several floors (their width is a townhouse's) are not held to these
+    for fl in ([] if plate.get("arrangement") in ("walkup", "ground_oriented") else floors):
         for z in fl["zones"]:
             if not z.get("unit"):
                 continue
@@ -2561,6 +3060,9 @@ def write(L: dict, site: dict, massing: dict, ledger: dict, out_dir: Path) -> di
     out_dir.mkdir(parents=True, exist_ok=True)
     paths = {"layout.json": out_dir / "layout.json"}
     paths["layout.json"].write_text(json.dumps(L, indent=2, ensure_ascii=False), encoding="utf-8")
+    if L.get("area_schedule"):
+        paths["area-schedule.csv"] = out_dir / "area-schedule.csv"
+        paths["area-schedule.csv"].write_text(area_schedule_csv(L["area_schedule"]), encoding="utf-8")
     for name, text in sheets(L, site, massing, ledger).items():
         p = out_dir / f"{name}.svg"
         p.write_text(text, encoding="utf-8")
@@ -2574,7 +3076,13 @@ def markdown(L: dict) -> list[str]:
     M.append("## Layouts derived from the option")
     p = L["plate"]
     wu = p.get("walkup") or {}
-    shape = (f"a point tower, the homes round a corridor ringing the core, {p['unit_depth_m']} m deep in front and behind and {p.get('side_depth_m')} m beside"
+    go = p.get("ground_oriented") or {}
+    shape = (f"ground-oriented {go.get('homes', 'homes')}, each with its own door, in {go.get('rows')} row{'s' if go.get('rows') != 1 else ''} {go.get('row_depth_m')} m deep"
+             + (f" either side of a {go.get('courtyard_m')} m courtyard" if go.get("courtyard_m") else "") + ", no corridor or lift"
+             if p.get("arrangement") == "ground_oriented" else
+             f"a tower: a podium, and {p['storeys'] - p['tower']['from_level']} tower floors of {p['tower']['w']:g} × {p['tower']['d']:g} m over it"
+             if p.get("arrangement") == "tower" else
+             f"a point tower, the homes round a corridor ringing the core, {p['unit_depth_m']} m deep in front and behind and {p.get('side_depth_m')} m beside"
              if p.get("arrangement") == "point" else
              (f"a walk-up, one stair and no elevator, every home the plate's full depth ({p['unit_depth_m']} m) with its door on the stair's landing, "
               + ("one each side of the stair" if wu.get("homes_per_floor") == 2 else "one a floor beside the stair"))
@@ -2617,9 +3125,36 @@ def markdown(L: dict) -> list[str]:
         for f in eg["floors"]:
             M.append(f"- *{f['status']}* — {f['name']}: {egress_line(f).rsplit(' · ', 1)[0]}." + (" " + "; ".join(f["notes"])[0].upper() + "; ".join(f["notes"])[1:] + "." if f["notes"] else ""))
         M.append("")
+    M += area_schedule_markdown(L)
+    ob = L.get("operability")
+    if ob:
+        M.append("### What an operator checks first")
+        M.append("")
+        for i in ob["items"]:
+            M.append(f"- *{i['status']}* — {i['label']}: {i['note']}")
+        M.append("")
     for name, cap in (("stacking", "Stacking diagram"), ("plans", "Plans by program"), ("elevations", "Preliminary elevations"), ("axon", "The floors stacked"), ("site-plan", "Code site plan")):
         M.append(f"![{cap}]({name}.svg)")
         M.append("")
     M.append("`layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.")
+    M.append("")
+    return M
+
+
+def area_schedule_markdown(L: dict) -> list[str]:
+    """The memo's area schedule: a row a floor, the homes and the areas by use, the totals and the efficiency."""
+    s = L.get("area_schedule")
+    if not s:
+        return []
+    keys = [g["key"] for g in s["groups"]]
+    short = {"homes": "Homes", "circulation": "Circulation", "core": "Cores", "program": "Program", "amenity": "Amenity", "services": "Services", "non_residential": "Non-res.", "spare": "Spare"}
+    used = [k for k in keys if s["totals"]["m2"][k]]
+    M = ["### Area schedule", "", "| Floor | Homes | " + " | ".join(short[k] + " m²" for k in used) + " | Gross m² | Efficiency |",
+         "|---|---:|" + "---:|" * len(used) + "---:|---:|"]
+    for r in s["floors"] + [{"name": "**Total**", "homes_total": s["totals"]["homes_total"], "m2": s["totals"]["m2"], "gross_m2": s["totals"]["gross_m2"], "efficiency": s["totals"]["efficiency"]}]:
+        M.append(f"| {r['name']} | {r['homes_total']} | " + " | ".join(f"{r['m2'][k]:,.0f}" for k in used) + f" | {r['gross_m2']:,.0f} | "
+                 + (f"{r['efficiency'] * 100:.0f}%" if r["efficiency"] is not None else "") + " |")
+    M.append("")
+    M.append(s["note"] + (" **Flagged.**" if s["flag"] else "") + " The same table is `area-schedule.csv` beside this memo.")
     M.append("")
     return M

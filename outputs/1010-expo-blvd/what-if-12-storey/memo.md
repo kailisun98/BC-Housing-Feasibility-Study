@@ -125,6 +125,7 @@ Adjacency rules, in plain words, read back from the plates:
 Did not fit on the plates: One-bedroom × 11 (640 m²); Studio × 8 (314 m²). More storeys, a larger plate or a smaller program.
 - Note: Daylight (a placeholder for the architect's study, not a rule): 35 homes run 10.4 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.
 - Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
+- Note: The homes are 66% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.
 
 ### Egress
 
@@ -142,6 +143,34 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest trave
 - *pass* — Level 10: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
 - *pass* — Level 11: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
 - *pass* — Level 12: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+
+### Area schedule
+
+| Floor | Homes | Homes m² | Circulation m² | Cores m² | Amenity m² | Services m² | Spare m² | Gross m² | Efficiency |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ground floor | 2 | 168 | 88 | 49 | 180 | 260 | 40 | 799 | 21% |
+| Level 2 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 3 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 4 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 5 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 6 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 7 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 8 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 9 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Level 10 | 9 | 554 | 63 | 49 | 0 | 0 | 89 | 800 | 69% |
+| Level 11 | 9 | 495 | 63 | 49 | 0 | 0 | 154 | 800 | 62% |
+| Level 12 | 9 | 495 | 63 | 49 | 0 | 0 | 154 | 800 | 62% |
+| **Total** | 101 | 6,304 | 786 | 588 | 180 | 260 | 979 | 9,601 | 66% |
+
+Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). **Flagged.** The same table is `area-schedule.csv` beside this memo.
+
+### What an operator checks first
+
+- *pass* — Elevators: 2 elevators for 120 homes on 12 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis).
+- *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
+- *pass* — Garbage, recycling and services: 260 m² of services for 101 homes
+- *pass* — Accessible homes: 6 accessible homes drawn, 6 wanted (BC Housing's 5% of 101)
+- *info* — Shared indoor space: 180 m² of amenity or dining, 1.8 m² a home
 
 ![Stacking diagram](stacking.svg)
 

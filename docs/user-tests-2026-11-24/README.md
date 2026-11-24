@@ -116,3 +116,39 @@ a confidential-address mode; Revit base point and true north; the lookup's dista
 a point; memo Sources filtered to the rules that apply; a short memo for small sites.
 
 Fingerprints after these fixes: d8114c4301640d47 (23 Oct), 9da6dabc8def1912 (27 Oct), c0cd775dd41c5779 (17 Nov). 373 tests.
+
+## Built the next day: the operator flow, the program brief, two building types, the area schedule (24 Nov 2026)
+
+Four of the larger requests above, at Kai's request. Every new figure is a declared placeholder listed in the layout's
+`assumptions`.
+
+- **The area schedule** (`layout.area_schedule`, in every `layout.json`; `area-schedule.csv` beside each run; a table and
+  a CSV download under the drawings in every layout; a section in memo.md): homes by type and floor, the floor area by use
+  (homes net of their partitions, circulation, cores, program, amenity, services, non-residential, spare), gross, and net
+  to gross, flagged under 70%.
+- **Building types** (`option.building_type`, asked at stop 02):
+  - *Ground-oriented* (`layout._solve_ground_oriented`): rows of homes across the plate, each running up through its
+    floors with its own door and stair; over three storeys they stack two storeys at a time; a deep plate takes a front
+    and a rear building with a courtyard. No corridor, core or lift; amenity only from 12 homes. Exits: each home its own
+    door; stacked upper homes are a Part 9 placeholder.
+  - *Tower* (`massing` `tower`, `layout._solve_tower`): `podium_storeys` on the plate the floor area allows, and a tower
+    plate of `tower_plate_m2` (650 m² placeholder) over it, each laid out with its own core and joined; the podium roof is a
+    cut-out on the tower floors; the 3D view stacks the two tiers.
+  - *Apartment* is the solver as it was.
+- **Lifts by home count** (`layout.lifts_needed`): none for ground-oriented homes or a walk-up; one per 70 homes; at least
+  two over six storeys (placeholders for an elevator analysis).
+- **The program brief** (`option.program_brief`, `layout.program_brief`, `ffm/ui/brief.js`): the spaces a kind of housing
+  runs on — supportive: a 24/7 desk by the entry, staff office and washroom, program room, kitchen and dining (in place of
+  the amenity room), laundry, a harm reduction room; shelter: desk, staff office, sleeping rooms (four beds, 4.6 m² a bed,
+  on the upper floors), washrooms, dining, laundry, lockers; transitional; and the parts of a mixed building. Editable at
+  stop 02 and on the operator's desk. The suggester derives all studios for supportive housing and no homes for a shelter.
+- **The operator flow** (`docs/user-flows.md` Flow 4): an Operator layout; the operator's desk with the operating figures,
+  the brief and *What an operator checks first* (`layout.operability`); a signature (`operations.signed`) the memo prints;
+  an Operator lane in answer 3 (`engine.operator_items`: figures not signed, subsidy not confirmed, a term shorter than the
+  loan, the staffing); the manager can issue to the operator and the operator back.
+
+Not done: the PDF (`paper.js`) does not yet print the area schedule or the operability list; the block editor still
+draws one floor at a time (a ground-oriented home over several floors is drawn floor by floor); the Revit script does
+not yet build the tower's two tiers as separate masses (it reads `level_z_m`); the building type is not offered as a
+suggestion candidate of its own. Glen Drive as proposed now reads eight open items (the operator's two added).
+

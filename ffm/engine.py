@@ -115,6 +115,40 @@ def memo_refs(results: list[dict]) -> dict[str, str]:
     return out
 
 
+def operator_items(option: dict, kind: str, staffed: dict) -> list[dict]:
+    """The open items an operator resolves, addressed "Operator: …" so the page's lanes give them a lane of their own.
+    Only where an operator is in play: a building with a staffed part, an operator named, or operating figures entered."""
+    ops = option.get("operations") or {}
+    entered = [k for k, v in ops.items() if k not in ("signed", "subsidy_confirmed", "subsidy_source") and v not in (None, "")]
+    who = str(option.get("operator") or "").strip()
+    if not (staffed or kind != "independent" or who or entered):
+        return []
+    to = f"Operator{' (' + who + ')' if who else ''}: "
+    out: list[dict] = []
+    signed = ops.get("signed") if isinstance(ops.get("signed"), dict) else None
+    if not (signed and signed.get("by")):
+        out.append({"rule_id": "operator.figures", "title": "Operating figures not yet signed by the operator", "status": "uncertain",
+                    "finding": ("The rents, running costs and staffing here are " + ("the figures entered on the option" if entered else "the screen's placeholders")
+                                + ", and no operator has signed them as theirs; a funder and a board read the operating page as the operator's."),
+                    "action": to + "review the operating page, enter the building's own rents, running costs, staffing, reserve and vacancy, and sign them (the Operator layout)."})
+    sub = ops.get("operating_subsidy_cad_year")
+    if isinstance(sub, (int, float)) and sub > 0 and ops.get("subsidy_confirmed") is not True:
+        out.append({"rule_id": "operator.subsidy", "title": "The operating subsidy is not confirmed", "status": "uncertain",
+                    "finding": f"An operating subsidy of ${sub:,.0f} a year is entered" + (f" from {ops['subsidy_source']}" if ops.get("subsidy_source") else "") + " but not confirmed; until it is, no loan is sized on it and the money cannot read likely.",
+                    "action": to + "confirm the subsidy with its funder, in writing, with its term."})
+    term = ops.get("subsidy_term_years")
+    if isinstance(sub, (int, float)) and sub > 0 and ops.get("subsidy_confirmed") is True and not (isinstance(term, (int, float)) and term >= 40):
+        out.append({"rule_id": "operator.term", "title": "The operating agreement's term and renewal", "status": "uncertain",
+                    "finding": "The subsidy is confirmed " + (f"for {term:g} years" if isinstance(term, (int, float)) else "for a term not entered") + ", shorter than the loan: the building runs only while it is renewed.",
+                    "action": to + "state the agreement's term, and what funds the running costs if it is not renewed."})
+    staffing = ops.get("support_staffing_cad_year")
+    if (staffed or kind != "independent") and not (isinstance(staffing, (int, float)) and staffing >= 0):
+        out.append({"rule_id": "operator.staffing", "title": "The staffing model and its cost", "status": "uncertain",
+                    "finding": "Supportive, transitional and shelter housing runs on staffing this screen never assumes; none is entered, so the subsidy it needs is not known.",
+                    "action": to + "give the staffing model (who is on site, by shift) and its yearly cost."})
+    return out
+
+
 def counts_outright(r: dict) -> bool:
     """A result the outright answer reads: the district's FSR and height, and its yards where they leave no envelope."""
     check = r.get("check") or ""
@@ -323,6 +357,11 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         extra_open.append({"rule_id": "coverage.operator_agreement", "title": "The agreement between the owner and the operator", "status": "uncertain",
                            "finding": f"The proponent is {proponent} and the homes are operated by {operator}; how the operator holds the homes (a lease, an air-space parcel, an operating agreement) is not stated.",
                            "action": "Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it."})
+    # The operator's lane (24 Nov 2026, the second panel's operator: "open items never name the operator"). What only the
+    # operator settles: the operating figures signed as theirs, an operating subsidy confirmed and its term, and the
+    # staffing a supportive, transitional or shelter part runs on. Read from the option alone, so the memo, the page and
+    # the paper carry the same items.
+    extra_open += operator_items(option, kind, staffed)
     # what the answer covers, said with it: which programs' criteria were tested, and which are only listed
     tested_names = [program_name(r) for r in e if r.get("check") != "program_match" and r["status"] != INFO]
     funded["scope"] = ((f"This screen tests the criteria of {_and(tested_names)}." if tested_names else "This screen tests no program's criteria for this option.")

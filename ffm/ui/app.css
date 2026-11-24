@@ -1667,3 +1667,34 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .claude-fold.cd1-read > summary { font-size: 13.5px; }
 .cd1-steps { margin: 4px 0 10px; padding-left: 20px; display: grid; gap: 4px; max-width: 68ch; }
 .claude-fold.cd1-read .sched-form { display: grid; gap: 8px; max-width: 560px; }
+
+
+/* The operator's layout (24 Nov 2026): the memo in a reading column, led by the operator's desk; the run stays */
+[data-mode="operator"] .inputs, [data-mode="operator"] .memo-tools, [data-mode="operator"] #tool-compare, [data-mode="operator"] #compare-note,
+[data-mode="operator"] #dl-massing, [data-mode="operator"] #revit-btn, [data-mode="operator"] .ledger .tools, [data-mode="operator"] #edit-blocks,
+[data-mode="operator"] #sheet-editor, [data-mode="operator"] .bnd-tools, [data-mode="operator"] .mass-tools, [data-mode="operator"] #guide, [data-mode="operator"] #rail-tabs { display: none !important; }
+[data-mode="operator"] .panes, [data-mode="operator"] .panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
+[data-mode="operator"] .memo-pane { width: min(100%, 1080px); margin-inline: auto; padding: 24px 24px 64px; }
+.operator-desk { display: grid; gap: 12px; }
+.operator-desk h2 { font-size: 20px; font-weight: 400; margin: 0; }
+.operator-desk h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; margin: 8px 0 0; color: var(--muted); }
+.op-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 14px; }
+.op-fields input, .op-sign input { width: 100%; min-height: 34px; }
+.op-sign { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
+.op-sign .field { flex: 1 1 200px; }
+.op-checks { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.op-checks li { padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; }
+.op-checks li[data-status="missing"] { border-color: color-mix(in srgb, var(--amber) 55%, var(--line)); background: color-mix(in srgb, var(--amber) 8%, var(--panel)); }
+.pill-mini { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .04em; }
+.area-schedule h2 { font-size: 18px; font-weight: 400; margin: 0 0 8px; }
+.area-table td.num, .area-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+.area-table tr.total th, .area-table tr.total td { font-weight: 600; border-top: 1px solid var(--ink); }
+.table-scroll { overflow-x: auto; }
+@media (pointer: coarse) { .op-fields input, .op-sign input { min-height: 44px; } }
+
+/* The program brief's table (24 Nov 2026) */
+.brief-table input[type="text"] { width: 100%; min-width: 140px; }
+.brief-table input[type="number"] { width: 6em; }
+.brief-table td { vertical-align: middle; padding: 3px 6px; }
+@media (pointer: coarse) { .brief-table input, .brief-table select { min-height: 44px; } }
+.operator-desk h2 .cont { display: block; font-size: 13px; margin-top: 2px; }

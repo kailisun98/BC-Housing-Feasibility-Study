@@ -21,7 +21,8 @@
     "core_m": [
       7.0,
       7.0
-    ]
+    ],
+    "building_type": "apartment"
   },
   "program": [
     {
@@ -3589,5 +3590,652 @@
     "option.bicycle_spaces",
     "massing.masses[proposed]",
     "bch.design_guidelines.unit_areas"
-  ]
+  ],
+  "area_schedule": {
+    "floors": [
+      {
+        "level": 0,
+        "name": "Ground floor",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 576.1,
+          "non_residential": 0.0,
+          "spare": 110.8
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 799.3,
+        "efficiency": 0.0
+      },
+      {
+        "level": 1,
+        "name": "Level 2",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 2,
+        "name": "Level 3",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 3,
+        "name": "Level 4",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 4,
+        "name": "Level 5",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 5,
+        "name": "Level 6",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 6,
+        "name": "Level 7",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 7,
+        "name": "Level 8",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 8,
+        "name": "Level 9",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 9,
+        "name": "Level 10",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 10,
+        "name": "Level 11",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 11,
+        "name": "Level 12",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 12,
+        "name": "Level 13",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 13,
+        "name": "Level 14",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 14,
+        "name": "Level 15",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 15,
+        "name": "Level 16",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 16,
+        "name": "Level 17",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 17,
+        "name": "Level 18",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 18,
+        "name": "Level 19",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 19,
+        "name": "Level 20",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 20,
+        "name": "Level 21",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 21,
+        "name": "Level 22",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 22,
+        "name": "Level 23",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 23,
+        "name": "Level 24",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 24,
+        "name": "Level 25",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 25,
+        "name": "Level 26",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 26,
+        "name": "Level 27",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 27,
+        "name": "Level 28",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      },
+      {
+        "level": 28,
+        "name": "Level 29",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 63.4,
+          "core": 49.0,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 688.2
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 800.6,
+        "efficiency": 0.0
+      }
+    ],
+    "totals": {
+      "m2": {
+        "homes": 0.0,
+        "circulation": 1838.6,
+        "core": 1421.0,
+        "program": 0.0,
+        "amenity": 0.0,
+        "services": 576.1,
+        "non_residential": 0.0,
+        "spare": 19380.4
+      },
+      "partitions_m2": 0.0,
+      "gross_m2": 23216.1,
+      "homes": {},
+      "homes_total": 0,
+      "efficiency": 0.0,
+      "net_to_gross": 0.0
+    },
+    "efficiency_floor": 0.7,
+    "flag": false,
+    "groups": [
+      {
+        "key": "homes",
+        "label": "Homes (net, inside their walls)"
+      },
+      {
+        "key": "circulation",
+        "label": "Corridors, lobby, landings"
+      },
+      {
+        "key": "core",
+        "label": "Cores: stairs, elevators, shafts"
+      },
+      {
+        "key": "program",
+        "label": "Program spaces (desk, staff, dining, laundry, sleeping rooms)"
+      },
+      {
+        "key": "amenity",
+        "label": "Amenity"
+      },
+      {
+        "key": "services",
+        "label": "Services and bicycles"
+      },
+      {
+        "key": "non_residential",
+        "label": "Non-residential and commercial"
+      },
+      {
+        "key": "spare",
+        "label": "Spare (not yet used)"
+      }
+    ],
+    "note": "Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query)."
+  },
+  "operability": {
+    "items": [
+      {
+        "key": "lifts",
+        "label": "Elevators",
+        "status": "info",
+        "note": "no elevator: 29 storeys or fewer, a walk-up."
+      },
+      {
+        "key": "laundry",
+        "label": "Laundry",
+        "status": "missing",
+        "note": "no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state"
+      },
+      {
+        "key": "services",
+        "label": "Garbage, recycling and services",
+        "status": "pass",
+        "note": "576 m² of services for 0 homes"
+      },
+      {
+        "key": "accessible",
+        "label": "Accessible homes",
+        "status": "pass",
+        "note": "0 accessible homes drawn, 0 wanted (BC Housing's 5% of 0)"
+      },
+      {
+        "key": "amenity",
+        "label": "Shared indoor space",
+        "status": "info",
+        "note": "no shared indoor room drawn"
+      }
+    ],
+    "lifts": 0,
+    "status": "missing",
+    "summary": "Operability: laundry missing; no elevator: 29 storeys or fewer, a walk-up."
+  }
 }

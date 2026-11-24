@@ -130,6 +130,7 @@ Did not fit on the plates: One-bedroom × 6 (349 m²); Studio × 29 (1,137 m²).
 - Note: 300 m² of the services and bicycle storage do not fit on the ground floor; they are taken below grade with the parking, which is not on the plates.
 - Note: The homes are stacked in bays, the same type above the same type; placed floor by floor with nothing lined up, the plates would hold 71 homes against 70.
 - Note: Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.
+- Note: The homes are 56% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.
 
 ### Egress
 
@@ -141,6 +142,28 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 6 floors: 6 pass; farthest travel 
 - *pass* — Level 4: 4 exits, 2 required · travel 15.2 m, limit 45 m · separation 67.4 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 5: 4 exits, 2 required · travel 15.2 m, limit 45 m · separation 67.4 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 6: 4 exits, 2 required · travel 14.4 m, limit 45 m · separation 67.4 m, at least 9 m · dead end 0.0 m, limit 6 m.
+
+### Area schedule
+
+| Floor | Homes | Homes m² | Circulation m² | Cores m² | Amenity m² | Non-res. m² | Spare m² | Gross m² | Efficiency |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ground floor | 0 | 0 | 150 | 123 | 0 | 1,130 | 0 | 1,403 | 0% |
+| Level 2 | 10 | 762 | 125 | 123 | 158 | 121 | 53 | 1,403 | 54% |
+| Level 3 | 15 | 1,030 | 125 | 123 | 0 | 0 | 43 | 1,403 | 73% |
+| Level 4 | 15 | 1,030 | 125 | 123 | 0 | 0 | 43 | 1,403 | 73% |
+| Level 5 | 15 | 1,030 | 125 | 123 | 0 | 0 | 43 | 1,403 | 73% |
+| Level 6 | 15 | 907 | 125 | 123 | 0 | 0 | 175 | 1,403 | 65% |
+| **Total** | 70 | 4,759 | 777 | 740 | 158 | 1,250 | 355 | 8,420 | 56% |
+
+Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). **Flagged.** The same table is `area-schedule.csv` beside this memo.
+
+### What an operator checks first
+
+- *pass* — Elevators: 2 elevators for 105 homes on 6 storeys: one per 70 homes (a placeholder for an elevator analysis).
+- *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
+- *missing* — Garbage, recycling and services: 0 m² of services for 70 homes; about 21 m² (0.3 m² a home, a placeholder) is what a garbage and recycling room for this many homes takes
+- *missing* — Accessible homes: 0 accessible homes drawn, 4 wanted (BC Housing's 5% of 70)
+- *info* — Shared indoor space: 158 m² of amenity or dining, 2.2 m² a home
 
 ![Stacking diagram](stacking.svg)
 

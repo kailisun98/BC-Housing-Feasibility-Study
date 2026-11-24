@@ -15,9 +15,12 @@ const ISSUE_NAME_KEY = "ffm.issue.name";
 /* who a run goes to: the manager hands it to the architect, the architect hands it back to the manager to review
    (16 Nov 2026; before, the architect could only issue to the board). The board is not offered (24 Nov 2026): it has
    no layout on this machine to see it in, and reads the PDF. */
-const ISSUE_TO = { manager: "architect", architect: "manager", reader: null };
+const ISSUE_TO = { manager: "architect", architect: "manager", reader: null, operator: "manager" };
 
-const ISSUE_WORD = { architect: "the architect", manager: "the development manager", reader: "the board, planner and funder" };
+const ISSUE_WORD = { architect: "the architect", manager: "the development manager", reader: "the board, planner and funder", operator: "the operator" };
+
+/* the manager can also send the memo to the operator (24 Nov 2026): "can you operate this?" with the figures to check */
+const ISSUE_ALSO = { manager: ["operator"] };
 
 let issueTimer = 0;
 
@@ -40,10 +43,11 @@ function issueFormHtml(scope) {
   // what it does, said plainly (24 Nov 2026: "They see it in their top bar" promised a delivery; nothing leaves this
   // machine, and the board was offered a top bar it does not have)
   return `<form class="issue-panel" data-issue="${h(scope)}" aria-label="${h(label)} to ${h(ISSUE_WORD[to])}">
-    <input type="hidden" name="to" value="${h(to)}">
+    ${(ISSUE_ALSO[state.mode] || []).length ? "" : `<input type="hidden" name="to" value="${h(to)}">`}
     <div class="issue-row">
       <label class="field"><span class="label">Your name</span><input type="text" name="name" value="${h(issueName())}" placeholder="so they know who sent it" autocomplete="name" maxlength="80"></label>
-      <p class="field"><span class="label">To</span><span>${h(cap(ISSUE_WORD[to]))}</span></p>
+      ${(ISSUE_ALSO[state.mode] || []).length ? `<label class="field"><span class="label">To</span><select name="to">${[to, ...ISSUE_ALSO[state.mode]].map(t => `<option value="${h(t)}">${h(cap(ISSUE_WORD[t]))}</option>`).join("")}</select></label>`
+        : `<p class="field"><span class="label">To</span><span>${h(cap(ISSUE_WORD[to]))}</span></p>`}
     </div>
     <label class="field"><span class="label">A note</span><textarea name="note" rows="2" maxlength="600" placeholder="What changed, and what you want checked"></textarea></label>
     <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">${h(label)}</button><button class="btn btn-quiet btn-small" type="button" data-issue-cancel>Not now</button><span class="help">${draft ? `The draft becomes ${h(nextRev())}. ` : ""}Recorded on this machine: ${h(ISSUE_WORD[to])}'s layout here shows it, with your note under the memo's title. To reach someone elsewhere, send the link or the PDF; for the board, Download PDF.</span></div>

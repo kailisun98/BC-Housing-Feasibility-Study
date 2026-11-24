@@ -85,6 +85,9 @@ def check_mix(mix: Any) -> dict[str, float] | None:
 FIXED_KEYS = ("storeys", "height_m", "gfa_m2")
 
 
+DESCRIBES = ("housing_type", "building_type", "podium_storeys", "tower_plate_m2", "beds")
+
+
 def check_fixed(fixed: Any) -> dict[str, Any]:
     """The manager's own figures the derivation carries on from, checked: storeys (a whole number), height_m and gfa_m2
     (positive numbers) and units (a count per bedroom type), each optional. None is {}. Raises ValueError with a plain
@@ -93,6 +96,8 @@ def check_fixed(fixed: Any) -> dict[str, Any]:
         return {}
     if not isinstance(fixed, dict):
         raise ValueError("The fixed figures must be a set: storeys, height_m, gfa_m2, units.")
+    # what the manager said of the building (24 Nov 2026) travels with the figures and is not a figure to check here
+    fixed = {k: v for k, v in fixed.items() if k not in DESCRIBES}
     extra = [k for k in fixed if k not in FIXED_KEYS + ("units",)]
     if extra:
         raise ValueError(f"Unknown fixed figures: {', '.join(map(str, extra))}. Use storeys, height_m, gfa_m2, units.")
@@ -609,6 +614,12 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     allowance, _ = ASSUMPTIONS["design_allowance"]
     shares = mine if mine is not None else dict(ASSUMPTIONS["mix_shares"][0])
     shares_words = f"your shares ({_pct(shares)})" if mine is not None else f"the starting shares ({_pct(shares)}, a placeholder)"
+    # the kind of housing the manager said at 02 (24 Nov 2026: a supportive building was derived as a family mix with 12
+    # replacement trees): supportive housing is studios unless the manager set the shares
+    kind = str((fixed_given or {}).get("housing_type") or "").strip().lower()      # check_fixed keeps only the figures
+    if mine is None and kind == "supportive":
+        shares = {"studio": 1.0, "one_bed": 0.0, "two_bed": 0.0, "three_bed_plus": 0.0}
+        shares_words = "all studios, as supportive housing is laid out (a placeholder; the operator's brief decides)"
     mix_basis = "rule" if mine is not None else "placeholder"
 
     # which candidates the site can take
@@ -943,6 +954,15 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         "unit_areas_m2": dict((p_areas or {}).get("min_net_area_m2") or {}), "allowance": allowance,
     }
     label, falls_short = says_what_it_is(candidate, option, fields, p_chf, n)
+    # what the manager said of the building travels with the option: the kind of housing, the building type and a
+    # tower's podium (24 Nov 2026)
+    for k in ("housing_type", "building_type", "podium_storeys", "tower_plate_m2", "beds"):
+        if (fixed_given or {}).get(k) not in (None, ""):
+            option[k] = fixed_given[k]
+    if kind == "shelter":
+        option["units"] = {k: 0 for k in (option.get("units") or {})} or option.get("units")
+        option["rent_tiers_units"] = None
+        unsure.append({"key": "beds", "why": "a shelter is counted in beds, not homes: the derived homes are set to none", "who": "Manager: enter the beds the operator plans"})
     return {
         "candidate": candidate, "candidate_note": candidate_note, "candidates": cands, "option": option, "fields": fields,
         "unsure": unsure, "assumptions": assumptions, "envelope": rough, "mix": mix,

@@ -16,7 +16,8 @@
     "double_loaded": true,
     "unit_depth_m": 9.04,
     "arrangement": "double",
-    "stacking": "bays"
+    "stacking": "bays",
+    "building_type": "apartment"
   },
   "program": [
     {
@@ -1922,7 +1923,8 @@
   "warnings": [
     "300 m² of the services and bicycle storage do not fit on the ground floor; they are taken below grade with the parking, which is not on the plates.",
     "The homes are stacked in bays, the same type above the same type; placed floor by floor with nothing lined up, the plates would hold 71 homes against 70.",
-    "Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height."
+    "Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.",
+    "The homes are 56% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect."
   ],
   "derived_from": [
     "option.units",
@@ -1931,5 +1933,239 @@
     "option.bicycle_spaces",
     "massing.masses[proposed]",
     "bch.design_guidelines.unit_areas"
-  ]
+  ],
+  "area_schedule": {
+    "floors": [
+      {
+        "level": 0,
+        "name": "Ground floor",
+        "homes": {},
+        "homes_total": 0,
+        "m2": {
+          "homes": 0.0,
+          "circulation": 150.3,
+          "core": 123.4,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 1129.6,
+          "spare": 0.0
+        },
+        "partitions_m2": 0.0,
+        "gross_m2": 1403.3,
+        "efficiency": 0.0
+      },
+      {
+        "level": 1,
+        "name": "Level 2",
+        "homes": {
+          "three_bed_plus": 3,
+          "two_bed": 6,
+          "studio": 1
+        },
+        "homes_total": 10,
+        "m2": {
+          "homes": 762.4,
+          "circulation": 125.3,
+          "core": 123.4,
+          "program": 0.0,
+          "amenity": 157.5,
+          "services": 0.0,
+          "non_residential": 120.7,
+          "spare": 53.0
+        },
+        "partitions_m2": 61.0,
+        "gross_m2": 1403.3,
+        "efficiency": 0.543
+      },
+      {
+        "level": 2,
+        "name": "Level 3",
+        "homes": {
+          "three_bed_plus": 3,
+          "two_bed": 5,
+          "one_bed": 7
+        },
+        "homes_total": 15,
+        "m2": {
+          "homes": 1029.6,
+          "circulation": 125.3,
+          "core": 123.4,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 42.6
+        },
+        "partitions_m2": 82.4,
+        "gross_m2": 1403.3,
+        "efficiency": 0.734
+      },
+      {
+        "level": 3,
+        "name": "Level 4",
+        "homes": {
+          "three_bed_plus": 3,
+          "two_bed": 5,
+          "one_bed": 7
+        },
+        "homes_total": 15,
+        "m2": {
+          "homes": 1029.6,
+          "circulation": 125.3,
+          "core": 123.4,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 42.6
+        },
+        "partitions_m2": 82.4,
+        "gross_m2": 1403.3,
+        "efficiency": 0.734
+      },
+      {
+        "level": 4,
+        "name": "Level 5",
+        "homes": {
+          "three_bed_plus": 3,
+          "two_bed": 5,
+          "one_bed": 7
+        },
+        "homes_total": 15,
+        "m2": {
+          "homes": 1029.6,
+          "circulation": 125.3,
+          "core": 123.4,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 42.6
+        },
+        "partitions_m2": 82.4,
+        "gross_m2": 1403.3,
+        "efficiency": 0.734
+      },
+      {
+        "level": 5,
+        "name": "Level 6",
+        "homes": {
+          "two_bed": 5,
+          "one_bed": 10
+        },
+        "homes_total": 15,
+        "m2": {
+          "homes": 907.4,
+          "circulation": 125.3,
+          "core": 123.4,
+          "program": 0.0,
+          "amenity": 0.0,
+          "services": 0.0,
+          "non_residential": 0.0,
+          "spare": 174.6
+        },
+        "partitions_m2": 72.6,
+        "gross_m2": 1403.3,
+        "efficiency": 0.647
+      }
+    ],
+    "totals": {
+      "m2": {
+        "homes": 4758.6,
+        "circulation": 776.8,
+        "core": 740.4,
+        "program": 0.0,
+        "amenity": 157.5,
+        "services": 0.0,
+        "non_residential": 1250.3,
+        "spare": 355.4
+      },
+      "partitions_m2": 380.8,
+      "gross_m2": 8419.8,
+      "homes": {
+        "three_bed_plus": 12,
+        "two_bed": 26,
+        "one_bed": 31,
+        "studio": 1
+      },
+      "homes_total": 70,
+      "efficiency": 0.565,
+      "net_to_gross": 0.565
+    },
+    "efficiency_floor": 0.7,
+    "flag": true,
+    "groups": [
+      {
+        "key": "homes",
+        "label": "Homes (net, inside their walls)"
+      },
+      {
+        "key": "circulation",
+        "label": "Corridors, lobby, landings"
+      },
+      {
+        "key": "core",
+        "label": "Cores: stairs, elevators, shafts"
+      },
+      {
+        "key": "program",
+        "label": "Program spaces (desk, staff, dining, laundry, sleeping rooms)"
+      },
+      {
+        "key": "amenity",
+        "label": "Amenity"
+      },
+      {
+        "key": "services",
+        "label": "Services and bicycles"
+      },
+      {
+        "key": "non_residential",
+        "label": "Non-residential and commercial"
+      },
+      {
+        "key": "spare",
+        "label": "Spare (not yet used)"
+      }
+    ],
+    "note": "Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query)."
+  },
+  "operability": {
+    "items": [
+      {
+        "key": "lifts",
+        "label": "Elevators",
+        "status": "pass",
+        "note": "2 elevators for 105 homes on 6 storeys: one per 70 homes (a placeholder for an elevator analysis)."
+      },
+      {
+        "key": "laundry",
+        "label": "Laundry",
+        "status": "missing",
+        "note": "no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state"
+      },
+      {
+        "key": "services",
+        "label": "Garbage, recycling and services",
+        "status": "missing",
+        "note": "0 m² of services for 70 homes; about 21 m² (0.3 m² a home, a placeholder) is what a garbage and recycling room for this many homes takes"
+      },
+      {
+        "key": "accessible",
+        "label": "Accessible homes",
+        "status": "missing",
+        "note": "0 accessible homes drawn, 4 wanted (BC Housing's 5% of 70)"
+      },
+      {
+        "key": "amenity",
+        "label": "Shared indoor space",
+        "status": "info",
+        "note": "158 m² of amenity or dining, 2.2 m² a home"
+      }
+    ],
+    "lifts": 2,
+    "status": "missing",
+    "summary": "Operability: laundry, garbage, recycling and services, accessible homes missing; 2 elevators for 105 homes on 6 storeys: one per 70 homes (a placeholder for an elevator analysis)."
+  }
 }

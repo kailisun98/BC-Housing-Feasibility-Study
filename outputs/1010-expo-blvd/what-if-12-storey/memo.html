@@ -160,6 +160,7 @@
 <ul>
 <li>Note: Daylight (a placeholder for the architect's study, not a rule): 35 homes run 10.4 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.</li>
 <li>Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.</li>
+<li>Note: The homes are 66% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.</li>
 </ul>
 <h3>Egress</h3>
 <p>Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest travel 9.2 m, limit 45 m; the core's two exits are a scissor stair, its doors on the core's opposite faces, 14.0 m apart as smoke would go round the core (3.4.2.3.(3)); the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings. Read against <code>bcbc.exits</code> (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; <code>sprinklered: false</code> on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.</p>
@@ -176,6 +177,31 @@
 <li><em>pass</em> — Level 10: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.</li>
 <li><em>pass</em> — Level 11: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.</li>
 <li><em>pass</em> — Level 12: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.</li>
+</ul>
+<h3>Area schedule</h3>
+<table><thead><tr><th>Floor</th><th>Homes</th><th>Homes m²</th><th>Circulation m²</th><th>Cores m²</th><th>Amenity m²</th><th>Services m²</th><th>Spare m²</th><th>Gross m²</th><th>Efficiency</th></tr></thead><tbody>
+<tr><td>Ground floor</td><td>2</td><td>168</td><td>88</td><td>49</td><td>180</td><td>260</td><td>40</td><td>799</td><td>21%</td></tr>
+<tr><td>Level 2</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 3</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 4</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 5</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 6</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 7</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 8</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 9</td><td>9</td><td>574</td><td>63</td><td>49</td><td>0</td><td>0</td><td>68</td><td>800</td><td>72%</td></tr>
+<tr><td>Level 10</td><td>9</td><td>554</td><td>63</td><td>49</td><td>0</td><td>0</td><td>89</td><td>800</td><td>69%</td></tr>
+<tr><td>Level 11</td><td>9</td><td>495</td><td>63</td><td>49</td><td>0</td><td>0</td><td>154</td><td>800</td><td>62%</td></tr>
+<tr><td>Level 12</td><td>9</td><td>495</td><td>63</td><td>49</td><td>0</td><td>0</td><td>154</td><td>800</td><td>62%</td></tr>
+<tr><td><strong>Total</strong></td><td>101</td><td>6,304</td><td>786</td><td>588</td><td>180</td><td>260</td><td>979</td><td>9,601</td><td>66%</td></tr>
+</tbody></table>
+<p>Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). <strong>Flagged.</strong> The same table is <code>area-schedule.csv</code> beside this memo.</p>
+<h3>What an operator checks first</h3>
+<ul>
+<li><em>pass</em> — Elevators: 2 elevators for 120 homes on 12 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis).</li>
+<li><em>missing</em> — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state</li>
+<li><em>pass</em> — Garbage, recycling and services: 260 m² of services for 101 homes</li>
+<li><em>pass</em> — Accessible homes: 6 accessible homes drawn, 6 wanted (BC Housing's 5% of 101)</li>
+<li><em>info</em> — Shared indoor space: 180 m² of amenity or dining, 1.8 m² a home</li>
 </ul>
 <figure><svg xmlns="http://www.w3.org/2000/svg" width="760" height="678" viewBox="0 0 760 678" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Stacking diagram">
 <rect width="100%" height="100%" fill="#ffffff"/>

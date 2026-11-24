@@ -9,6 +9,7 @@
    route. The engine does every derivation (ffm/suggest.py); this only asks and shows. The stage's map is Leaflet,
    loaded only when a site is on the stage. The route's actions (look up, read, derive) are guide.js. */
 
+import { briefEditor, wireBriefEditor } from "./brief.js";
 import {
   $, $$, cap, fmtNum, getPath, h, keyWords, pill, scrollBehavior, setPath, setStatus, toast, todayISO
 } from "./core/util.js";
@@ -518,7 +519,7 @@ function askControl(key, labelId) {
    answer changes and where to find it (20 Nov 2026: the manager was asked "Inside a former Community Vision area?"
    with no word on why it mattered or where to look); over the table, that Not sure is a fine answer. */
 function askTable(stop) {
-  const keys = Object.keys(ANSWERS).filter(k => ANSWERS[k].stop === stop && (!ANSWERS[k].when || ANSWERS[k].when(state.site || {})));
+  const keys = Object.keys(ANSWERS).filter(k => ANSWERS[k].stop === stop && (!ANSWERS[k].when || ANSWERS[k].when(state.site || {}, answerValue)));
   if (!keys.length) return "";
   const whyOf = a => {
     if (!a.why && !a.where) return "";
@@ -574,12 +575,16 @@ function takeAnswer(key, raw) {
   if (guide.suggestion && !guide.suggestionUsed) {
     guide.answers = guide.answers || {};
     guide.answers[key] = v;
+    // what the building is shapes the derivation (24 Nov 2026): the homes are derived again for it
+    if (["housing_type", "building_type", "podium_storeys", "beds"].includes(key)) { guideSuggest({ said: `${said}; the option is derived again for it.` }); return; }
     setStatus(`${said}; it travels with the option.`, "info");
   } else if (state.option) {
     setPath(state.option, key, v);
     onOptionChange(key);
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
     setStatus(`${said}.${stale()}`, fresh ? "busy" : "info");
+    // a question that depends on this answer (a tower's podium) and the brief for the kind of housing show at once
+    if (["building_type", "housing_type", "beds"].includes(key)) renderStage();
   }
 }
 
@@ -605,6 +610,8 @@ function stageOptionNow() {
       const v = kind === "text" ? raw : shareFromScreen(k, Number(raw));
       if (kind === "text" || Number.isFinite(v)) setPath(o, k, v);
     }
+    // what was said of the building at 02 (the kind of housing, the building type, the brief) shows on the card at once
+    for (const [k, v] of Object.entries(guide.answers || {})) if (["housing_type", "building_type", "podium_storeys", "beds", "program_brief"].includes(k)) setPath(o, k, v);
     return o;
   }
   return state.option || (S && S.option) || null;
@@ -641,6 +648,7 @@ function cardOption() {
       </dd></div>
       <div><dt>The building</dt><dd>${guide.busy.suggest ? `<p class="help">Deriving the ${h(guide.candidate)} option from the rules…</p>` : (o ? figureBlock(o, fromSaved ? null : S) : `<p class="help">Choose where to start.</p>`)}</dd></div>
       <div><dt>Left to you</dt><dd>${askTable(2)}${leftToPerson(S, fromSaved)}</dd></div>
+      <div><dt>What it runs on</dt><dd>${briefEditor(o)}</dd></div>
     </dl>`;
   // a building the figures cannot make waits here: Continue stays off and says which figure to change (17 Nov 2026:
   // 19 storeys in 19.8 m and a floor larger than the lot both went on to the run)
@@ -985,6 +993,7 @@ function cardRun() {
 
 function wireStage(el) {
   const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
+  if (guide.step === 2) wireBriefEditor(el, stageOptionNow(), renderStage);
   on("#stage-back", backToMemo);
   on("#stage-resume", () => resumeDraft(stageDraft || readDraft()).catch(e => toast(e.message, true)));
   on("#stage-discard", () => { discardDraft(); renderStage(); });

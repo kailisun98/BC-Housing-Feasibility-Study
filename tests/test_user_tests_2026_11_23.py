@@ -1018,6 +1018,150 @@ class TheSecondPanelsDefects(unittest.TestCase):
         prop = massing.build(SITE, g, evaluate(SITE, g, AS_OF))["masses"][0]
         self.assertEqual(prop["level_z_m"][:3], [0.0, 4.5, 4.5 + READY["floor_to_floor_m"]])
 
+class TheFourFeatures(unittest.TestCase):
+    """24 Nov 2026 (Kai): the operator flow, the program brief, ground-oriented and tower building types, the area schedule."""
+
+    UI = Path(__file__).resolve().parent.parent / "ffm" / "ui"
+
+    def _lay(self, site, o):
+        L = evaluate(site, o, AS_OF)
+        m = massing.build(site, o, L)
+        lay = layout.solve(site, o, L, m)
+        layout.sheets(lay, site, m, L)          # the drawings stand for every type
+        return lay, m, L
+
+    SMALL = None
+
+    def small(self):
+        s = dict(SITE, frontage_m=15.2, depth_m=36.6, site_area_m2=556.3)
+        for k in ("osm", "parcel", "boundary_m"):
+            s.pop(k, None)
+        return s
+
+    # ---- the area schedule
+    def test_every_layout_carries_an_area_schedule_whose_floors_add_up(self):
+        lay, _, _ = self._lay(SITE, READY)
+        s = lay["area_schedule"]
+        self.assertAlmostEqual(sum(r["gross_m2"] for r in s["floors"]), s["totals"]["gross_m2"], delta=1)
+        self.assertEqual(s["totals"]["homes_total"], lay["units_placed"])
+        self.assertAlmostEqual(s["totals"]["efficiency"], s["totals"]["m2"]["homes"] / s["totals"]["gross_m2"], places=2)
+        csv = layout.area_schedule_csv(s).strip().split("\n")
+        self.assertEqual(len(csv), len(s["floors"]) + 2)
+        self.assertTrue(csv[0].startswith('"Floor","Homes"'))
+        self.assertIn("### Area schedule", "\n".join(layout.markdown(lay)))
+        js = (self.UI / "memo" / "operator.js").read_text(encoding="utf-8")
+        self.assertIn("export function areaScheduleCsv", js)
+
+    def test_a_plate_mostly_core_and_corridor_is_flagged(self):
+        o = dict(READY, housing_type="supportive", supportive_units=60, units={"studio": 60, "one_bed": 0, "two_bed": 0, "three_bed_plus": 0})
+        lay, _, _ = self._lay(SITE, o)
+        self.assertTrue(lay["area_schedule"]["flag"])
+        self.assertTrue(any("net to gross" in w for w in lay["warnings"]))
+
+    # ---- ground-oriented homes
+    def test_ground_oriented_homes_have_their_own_doors_and_no_core_corridor_or_lift(self):
+        o = dict(READY, building_type="ground_oriented", storeys=3, height_m=10.0, gfa_m2=900, residential_gfa_m2=900, non_residential_gfa_m2=0,
+                 units={"studio": 0, "one_bed": 0, "two_bed": 2, "three_bed_plus": 2}, rent_tiers_units=None, accessible_units=0)
+        lay, _, _ = self._lay(self.small(), o)
+        self.assertEqual(lay["plate"]["arrangement"], "ground_oriented")
+        blocks = {z["block"] for fl in lay["floors"] for z in fl["zones"]}
+        self.assertFalse(blocks & {"core", "corridor"})
+        homes = [z for fl in lay["floors"] for z in fl["zones"] if z.get("home")]
+        self.assertEqual(len({z["home"] for z in homes}), lay["units_placed"])
+        self.assertTrue(all(z["levels"] == [0, 2] for z in homes))                       # townhouses, three floors
+        self.assertEqual(lay["egress"]["status"], "pass")
+        self.assertEqual(lay["operability"]["lifts"], 0)
+        self.assertEqual(next(c for c in lay["adjacencies"] if c["id"] == "own_entry")["status"], "pass")
+        self.assertEqual(lay["area_schedule"]["totals"]["homes_total"], lay["units_placed"])
+
+    def test_over_three_storeys_they_stack_and_the_upper_homes_are_a_placeholder(self):
+        o = dict(READY, building_type="ground_oriented", storeys=4, height_m=13.2, gfa_m2=1000, residential_gfa_m2=1000, non_residential_gfa_m2=0,
+                 units={"studio": 0, "one_bed": 4, "two_bed": 4, "three_bed_plus": 0}, rent_tiers_units=None)
+        lay, _, _ = self._lay(self.small(), o)
+        self.assertEqual(lay["plate"]["ground_oriented"]["home_spans"], [2, 2])
+        self.assertEqual(lay["plate"]["ground_oriented"]["homes"], "stacked townhouses")
+        self.assertEqual(lay["egress"]["status"], "uncertain")
+        self.assertIn("Part 9", lay["egress"]["summary"])
+
+    # ---- a tower
+    def test_a_tower_is_a_podium_and_a_tower_plate(self):
+        o = dict(READY, building_type="tower", podium_storeys=4, storeys=18, height_m=59.4, gfa_m2=4 * 1400 + 14 * 650,
+                 units={"studio": 50, "one_bed": 60, "two_bed": 40, "three_bed_plus": 10})
+        lay, m, _ = self._lay(SITE, o)
+        pm = m["masses"][0]
+        self.assertEqual((pm["podium_storeys"], len(pm["tiers"])), (4, 2))
+        self.assertAlmostEqual(pm["tower"]["area_m2"], 650, delta=15)
+        self.assertEqual(lay["plate"]["arrangement"], "tower")
+        self.assertEqual(len(lay["floors"]), 18)
+        self.assertFalse(any(z["block"] == "void" for z in lay["floors"][0]["zones"]))
+        self.assertTrue(any(z["label"] == "Podium roof" for z in lay["floors"][10]["zones"]))
+        self.assertGreaterEqual(lay["operability"]["lifts"], 2)
+        self.assertAlmostEqual(pm["gfa_m2"], 4 * pm["plate_area_m2"] + 14 * pm["tower"]["area_m2"], delta=2)
+
+    def test_lifts_follow_the_homes(self):
+        self.assertEqual(layout.lifts_needed(40, 3)["lifts"], 0)
+        self.assertEqual(layout.lifts_needed(60, 5)["lifts"], 1)
+        self.assertEqual(layout.lifts_needed(160, 5)["lifts"], 3)
+        self.assertEqual(layout.lifts_needed(60, 12)["lifts"], 2)
+        self.assertEqual(layout.lifts_needed(60, 12, ground_oriented=True)["lifts"], 0)
+
+    # ---- the program brief
+    def test_supportive_housing_gets_its_default_brief_with_the_desk_by_the_entry(self):
+        o = dict(READY, housing_type="supportive", supportive_units=60, units={"studio": 60, "one_bed": 0, "two_bed": 0, "three_bed_plus": 0})
+        lay, _, _ = self._lay(SITE, o)
+        labels = [b["label"] for b in lay["program"] if b.get("brief")]
+        self.assertIn("24/7 front desk", labels)
+        self.assertNotIn("amenity", [b["key"] for b in lay["program"]])                  # dining replaces it
+        items = {i["key"]: i["status"] for i in lay["operability"]["items"]}
+        self.assertEqual((items["desk"], items["staff_office"], items["desk_entry"]), ("pass", "pass", "pass"))
+
+    def test_a_shelter_lays_out_sleeping_rooms_above_the_ground_floor(self):
+        o = dict(READY, housing_type="shelter", beds=60, storeys=3, height_m=10.0, gfa_m2=1500, residential_gfa_m2=1500, non_residential_gfa_m2=0,
+                 units={k: 0 for k in READY["units"]}, rent_tiers_units=None)
+        lay, _, _ = self._lay(SITE, o)
+        sleep = [z for fl in lay["floors"] for z in fl["zones"] if z.get("label") == "Sleeping rooms"]
+        self.assertTrue(sleep and all(fl["level"] > 0 for fl in lay["floors"] for z in fl["zones"] if z.get("label") == "Sleeping rooms"))
+        self.assertAlmostEqual(sum(z["area_m2"] for z in sleep), 15 * 4 * 4.6 * 1.10, delta=2)
+
+    def test_the_operators_own_brief_replaces_the_default(self):
+        o = dict(READY, housing_type="supportive", program_brief=[{"label": "Clinic", "area_m2": 120, "where": "ground"}, {"label": "Desk", "area_m2": 10, "next_to": "entry"}])
+        labels = [b["label"] for b in layout.blocks(o, evaluate(SITE, o, AS_OF))["blocks"] if b.get("brief")]
+        self.assertEqual(labels, ["Clinic", "Desk"])
+
+    def test_the_pages_default_brief_matches_the_engines(self):
+        js = (self.UI / "brief.js").read_text(encoding="utf-8")
+        for kind, items in layout.BRIEF_DEFAULTS.items():
+            for it in items:
+                self.assertIn(f'label: "{it["label"]}"', js, (kind, it["label"]))
+
+    def test_supportive_housing_is_derived_as_studios(self):
+        from ffm.suggest import suggest
+        o = suggest(SITE, ["bch.chf.eligibility"], AS_OF, "funder-ready", fixed={"housing_type": "supportive", "building_type": "apartment"})["option"]
+        self.assertEqual((o["units"]["one_bed"], o["units"]["two_bed"], o["units"]["three_bed_plus"]), (0, 0, 0))
+        self.assertEqual((o["housing_type"], o["building_type"]), ("supportive", "apartment"))
+
+    # ---- the operator flow
+    def test_the_operator_has_a_lane_of_open_items_until_the_figures_are_signed(self):
+        o = dict(READY, operator="A housing society", operations={"operating_subsidy_cad_year": 900_000, "rent_rgi_monthly_cad": 850})
+        ids = open_ids(evaluate(SITE, o, AS_OF))
+        self.assertIn("operator.figures", ids)
+        self.assertIn("operator.subsidy", ids)
+        item = next(u for u in evaluate(SITE, o, AS_OF)["summary"]["answers"]["unsure"] if u["rule_id"] == "operator.figures")
+        self.assertTrue(item["action"].startswith("Operator (A housing society): "))
+        signed = dict(o, operations=dict(o["operations"], subsidy_confirmed=True, subsidy_term_years=5, signed={"by": "R. Lee", "org": "A housing society", "on": "2026-11-24"}))
+        L2 = evaluate(SITE, signed, AS_OF)
+        self.assertNotIn("operator.figures", open_ids(L2))
+        self.assertIn("operator.term", open_ids(L2))
+        self.assertIn("**Operating figures:** signed by R. Lee of A housing society, 2026-11-24", memo.markdown(L2))
+        self.assertNotIn("operator.figures", open_ids(evaluate(SITE, READY, AS_OF)))       # no operator in play
+
+    def test_the_page_has_an_operator_layout_and_lane(self):
+        self.assertIn('data-mode="operator"', (self.UI / "index.html").read_text(encoding="utf-8"))
+        self.assertIn("operator: {", (self.UI / "modes.js").read_text(encoding="utf-8"))
+        self.assertIn('["Operator", "The operator"]', (self.UI / "memo" / "lanes.js").read_text(encoding="utf-8"))
+        self.assertIn('"operator"', (self.UI / "server.py").read_text(encoding="utf-8").split("ROLES = ")[1].split("\n")[0])
+        self.assertIn("ISSUE_ALSO", (self.UI / "issue.js").read_text(encoding="utf-8"))
+
 
 if __name__ == "__main__":
     unittest.main()

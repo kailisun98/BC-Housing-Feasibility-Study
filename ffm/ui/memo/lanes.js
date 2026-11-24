@@ -8,13 +8,13 @@ import { cap, h } from "../core/util.js";
 
 /* The person an action names, the longest name first so "Manager and owner" is not read as "Manager"; an action
    with no name is the manager's, who carries the memo. */
-export const WHO = /^(Manager and owner|Manager and architect|Manager or architect|Manager|Architect|Owner|Planner|City|Funder|Developer|Both)\b:?\s*/i;
+export const WHO = /^(Manager and owner|Manager and architect|Manager or architect|Manager|Architect|Operator|Owner|Planner|City|Funder|Developer|Both)\b(?: \([^)]*\))?:?\s*/i;
 export const whoOf = u => { const m = WHO.exec((u && u.action) || ""); return m ? cap(m[1].toLowerCase()) : "Manager"; };
 export const todoOf = u => cap(((u && u.action) || "").replace(WHO, "")) || "";
 
 /* The lanes, in the order a reader meets the people: the one who carries the memo, the one who draws, then the
    others. A joint action sits in the first person's lane and names the second. */
-const LANES = [["Manager", "Development manager"], ["Architect", "Architect"], ["Owner", "Owner"], ["City", "The City"], ["Funder", "The funder"], ["Developer", "Developer"]];
+const LANES = [["Manager", "Development manager"], ["Architect", "Architect"], ["Operator", "The operator"], ["Owner", "Owner"], ["City", "The City"], ["Funder", "The funder"], ["Developer", "Developer"]];
 const laneOf = who => {
   const w = String(who).toLowerCase();
   if (w.startsWith("manager")) return "Manager";

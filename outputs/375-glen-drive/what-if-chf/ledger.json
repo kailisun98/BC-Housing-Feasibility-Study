@@ -5000,6 +5000,20 @@
           "contact": "the operating society's executive director and board"
         },
         {
+          "rule_id": "operator.figures",
+          "title": "Operating figures not yet signed by the operator",
+          "status": "uncertain",
+          "finding": "The rents, running costs and staffing here are the screen's placeholders, and no operator has signed them as theirs; a funder and a board read the operating page as the operator's.",
+          "action": "Operator: review the operating page, enter the building's own rents, running costs, staffing, reserve and vacancy, and sign them (the Operator layout)."
+        },
+        {
+          "rule_id": "operator.staffing",
+          "title": "The staffing model and its cost",
+          "status": "uncertain",
+          "finding": "Supportive, transitional and shelter housing runs on staffing this screen never assumes; none is entered, so the subsidy it needs is not known.",
+          "action": "Operator: give the staffing model (who is on site, by shift) and its yearly cost."
+        },
+        {
           "rule_id": "cov.trees.replacement",
           "title": "Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu",
           "status": "uncertain",

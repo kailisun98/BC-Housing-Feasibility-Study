@@ -24,6 +24,9 @@ const TENURES = [["social_housing", "Social housing"], ["secured_market_rental",
 
 /* What kind of housing the option is (23 Nov 2026; checks.HOUSING_TYPES, housing_kind): the funder and family-unit rules
    in the stack are written for independent rental, and say so for the other three instead of failing them. */
+// layout.BUILDING_TYPES (24 Nov 2026): what kind of building the homes are laid out as
+const BUILDING_TYPES = [["", "Not said (an apartment building)"], ["apartment", "An apartment building: homes off a corridor, a core with the lift"],
+  ["ground_oriented", "Ground-oriented: townhouses, a multiplex, stacked townhouses, each home its own door"], ["tower", "A tower: a podium and a tower plate over it"]];
 const HOUSING_TYPES = [["", "Not said (read as independent rental)"], ["independent", "Independent rental: families, seniors, singles"],
   ["supportive", "Supportive housing"], ["transitional", "Transitional housing"], ["shelter", "A shelter"]];
 const AREA_PLANS = [["", "None, or not sure"], ["downtown_eastside", "The Downtown Eastside Plan"]];
@@ -153,6 +156,16 @@ const FIELDS = [
     ask: { stop: 2, q: "Who are the homes for?", who: "you", kind: "select", options: HOUSING_TYPES,
       why: "The funders and the family-unit rule in the rules are written for independent rental. Supportive, transitional and shelter housing are not failed against them: the memo says no program in the rules fits and who to ask." },
     info: "Independent rental is what the Community Housing Fund, BC Builds and the family-unit requirement are written for. For supportive or transitional housing or a shelter those rules read not applicable or uncertain, with the question handed to BC Housing or the City's planner; the money then needs the project's own rents and running costs." },
+  { on: "option", key: "building_type", group: "Building", label: "Building type", type: "select", options: BUILDING_TYPES, need: "figure",
+    ask: { stop: 2, q: "What kind of building?", who: "you, or the architect", kind: "select", options: BUILDING_TYPES,
+      why: "Sets how the homes are laid out: off a corridor and a lift, each with its own door at grade, or a tower on a podium. The plans, the area schedule and the elevators follow it." },
+    info: "Ground-oriented homes run through their floors with their own door and stair (over three storeys they stack two storeys at a time); no corridor, core or lift. A tower takes a podium of the storeys you give on the plate the floor area allows, and a tower plate of 650 m² (a placeholder) over it." },
+  { on: "option", key: "podium_storeys", group: "Building", label: "Podium storeys (a tower)", type: "number", int: true, need: "figure",
+    ask: { stop: 2, q: "How many storeys of podium under the tower?", who: "you, or the architect", when: (site, val) => !!val && val("building_type") === "tower",
+      why: "The podium takes the plate the floor area gives; the tower plate stands over it. 0 runs the tower plate from the ground." },
+    info: "The storeys the podium has. The ground floor's uses go in it, the tower's homes over it." },
+  { on: "option", key: "tower_plate_m2", group: "Building", label: "Tower plate (m²)", type: "number", need: "figure",
+    info: "A tower floor's area. Blank uses 650 m², a placeholder within the 550 to 750 m² one core with a scissor stair serves well." },
   { on: "option", key: "indigenous_led", group: "Option", label: "Indigenous-led or partnered", type: TRI, need: "rule", reads: ["program_match"],
     ask: { stop: 2, q: "Indigenous-led, or partnered with an Indigenous housing provider or Nation?", who: "you",
       why: "The Indigenous Housing Fund is for housing built with Indigenous housing providers, First Nations and Indigenous organizations. Not sure leaves it listed as a program that would fit." },

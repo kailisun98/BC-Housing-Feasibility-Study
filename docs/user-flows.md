@@ -12,6 +12,7 @@ can wait behind a disclosure.
 | Development manager at a non-profit | an address, a rough option, a board meeting date | the three answers and who resolves each open item | the PDF memo for the board; a list of people to call |
 | Architect doing the feasibility work | the option's numbers, a Revit seat | the ledger's arithmetic and clauses, the massing, a comparison of two options | an option file, two memos compared, masses on an annotated Revit sheet |
 | Board member, planner or funder's officer | the PDF, no briefing | two pages they can follow and cite | a vote, a comment on an uncertain rule, a read of the funding fit |
+| Operator (added 24 Nov 2026) | a memo issued by the development manager: "can you operate this?" | the operating page with the building's own figures, what the plans give the people who run it | operating figures signed as theirs, the memo issued back |
 
 ## Flow 1: the development manager (site in, memo out)
 
@@ -137,6 +138,24 @@ pages 3+:   clauses applied · massing · full ledger · inputs · sources · ho
 Design consequences: the site's "The case" page is laid out like page one of the PDF; status is a
 word with a mark; the revision and the rules date are in every title block.
 
+## Flow 4: the operator (memo in, signed operating figures out)
+
+Added 24 Nov 2026, after a simulated operator's review: "the operator is not in the flow". The operator runs the
+building for decades after it opens; the money's verdict and a funder's read rest on figures only the operator can give.
+
+1. **The development manager sends the memo.** At stop 02 the manager has said the kind of housing, the building type and
+   the brief (what the building runs on beyond its homes). After the run, *Mark issued* offers the operator as well as
+   the architect.
+2. **The operator opens it in the Operator layout** (`?mode=operator`). The memo opens on *The operator's figures*: rents
+   by tier, the running cost, support staffing, the subsidy with its term and its funder, the reserve and the vacancy,
+   each with what a blank uses. Under it, the brief (editable) and *What an operator checks first, on the plans*: the
+   elevators against the homes, the staffed desk by the entry, the staff office, laundry, the garbage room, the
+   accessible homes, the shared indoor space.
+3. **The operator signs.** A name and an organization; *Run again* carries the figures in. The memo then says "Operating
+   figures: signed by …"; until then answer 3 carries the operator's own lane (figures not signed, a subsidy not
+   confirmed, an agreement shorter than the loan, the staffing model), each item addressed "Operator: …".
+4. **The operator issues it back** to the development manager, with a note.
+
 ## The process the memo sits in
 
 Five stages, from the research document: Site found → Feasibility → Pre-development ($200k to
@@ -148,14 +167,15 @@ The memo reads all five on day one.
 
 ## The switch in the tool
 
-The three flows are three layouts of the same page, chosen with Manager · Architect · Reader in the
-tool's top bar (`?mode=manager|architect|reader` in a link; kept in the browser for the next visit):
+The four flows are four layouts of the same page, chosen with Manager · Architect · Reader · Operator in the
+tool's top bar (`?mode=manager|architect|reader|operator` in a link; kept in the browser for the next visit):
 
 | Mode | Inputs rail | Forms | Ledger | Run controls | Export bar leads with |
 |---|---|---|---|---|---|
 | Manager | open, cards as summaries | on Edit | closed | yes | Download PDF |
 | Architect | open, forms open | open | every layer open | yes, with the pickers | Export to Revit, massing.json |
 | Reader | hidden | hidden | closed | none | Download PDF, Print |
+| Operator | hidden; the operator's desk leads the memo | the operating figures and the brief | closed | Run again | Download PDF, Mark issued to the manager |
 
 The engine, the memo and its numbers are the same in every mode.
 

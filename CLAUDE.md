@@ -1080,6 +1080,26 @@ same day, and lists what is still open. What a later session must know:
   reads a 56% gap now (no rent tiers, so no grant). Fingerprints d8114c4301640d47 (23 Oct), 9da6dabc8def1912 (27 Oct),
   c0cd775dd41c5779 (17 Nov); 373 tests. `tests/fixtures/1130-jervis-st.json` is a public lookup kept for the corner test.
 
+## The operator flow, the program brief, two building types and the area schedule (24 Nov 2026)
+
+Built at Kai's request from the second panel's list (`docs/user-tests-2026-11-24/README.md`, last section, has the detail).
+- `layout.py`: `BUILDING_TYPES` / `building_type(option)` ("apartment", "ground_oriented", "tower"); `_solve_ground_oriented`
+  (rows, `home` ids and `levels` on each zone, `z["unit"]` the unit key on the entry floor only, `_ground_egress`);
+  `_solve_tower` (reads massing's `tower` and `podium_storeys`, joins two `_solve_plate` results like `_solve_parts`);
+  `TYPOLOGY_ASSUMPTIONS`; `lifts_needed`; `BRIEF_DEFAULTS` / `program_brief(option)` (brief items become `other` blocks with
+  `brief`, `next_to` "entry" placed straight after the lobby, `where` "upper" starting above the ground floor; a dining item
+  replaces the amenity block); `area_schedule` / `area_schedule_csv` / `area_schedule_markdown`; `operability(L, option)`.
+  `_assemble` adds `area_schedule` and `operability` to every layout; `write` adds `area-schedule.csv`.
+- `massing.py`: a tower's podium plate, `tower` rect, `podium_storeys` and two `tiers`.
+- `suggest.py`: `DESCRIBES` keys pass `check_fixed` and travel to the option; supportive housing derives studios.
+- `engine.operator_items`: the Operator lane (`operator.figures`, `.subsidy`, `.term`, `.staffing`), only where an operator
+  is in play. `memo.py` prints "Operating figures: signed by …" from `operations.signed`.
+- Page: `memo/operator.js` (the operator's desk, the area schedule table and its CSV twin), `brief.js` (the editor and the
+  JS twin of `BRIEF_DEFAULTS`, a test keeps the labels equal), Operator mode in `modes.js` / `index.html` / app.css,
+  `ISSUE_ALSO` in issue.js, the Operator lane in `memo/lanes.js`, `ROLES` in server.py, the stop-02 questions in
+  fields.js (`building_type`, `podium_storeys`, `tower_plate_m2`; a question's `when(site, answerValue)` can read another
+  answer). 386 tests.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

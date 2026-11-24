@@ -25,7 +25,7 @@ export function syncRunButton() {
   if (!b) return;
   const p = progress();
   const asOf = $("#as-of").value || todayISO();
-  if (state.mode === "manager") {
+  if (state.mode === "manager" || state.mode === "operator") {
     b.hidden = !state.run;
     b.classList.add("btn-again");
     // a date moved off the memo's own is said on the button, where the run will use it (24 Nov 2026)
@@ -49,7 +49,7 @@ export function syncRunButton() {
    revision of the same inputs). The architect may run the same inputs again on purpose. */
 function runRefused() {
   if (state.mode === "reader") return "The reader's view reads memos; it does not run the rules.";
-  if (state.mode === "manager" && state.run && !state.runStale)
+  if ((state.mode === "manager" || state.mode === "operator") && state.run && !state.runStale)
     return `Nothing has changed since ${rev(state.run.run_id)}: change a figure, an answer or the rules date to run again.`;
   return null;
 }
@@ -152,7 +152,7 @@ export async function runRules() {
     setCompareNote(run.diff);
     syncUrl();
     // the manager's route folds once the memo is in: the memo takes the width (the reader's own choice is not changed)
-    if (state.mode === "manager") showInputs(false, false);
+    if (state.mode === "manager" || state.mode === "operator") showInputs(false, false);
     renderRoute();
     const ms = Math.round(performance.now() - t0);
     toast(`Ran the rules as of ${dateWords(run.as_of)}: ${rev(run.run_id)}, in ${ms} ms${run.diff ? ` · ${compareSummary(run)}` : ""}. Download PDF is under the title.`);
@@ -295,7 +295,7 @@ export async function openRun(runId) {
   state.run = run;
   state.runStale = null;
   guide.over = false;
-  if (state.mode === "manager") showInputs(false, false);
+  if (state.mode === "manager" || state.mode === "operator") showInputs(false, false);
   // the date in the top bar is the date of the memo on screen, and so of the next run; a date that moves is said in
   // the status line below (24 Nov 2026: it changed under the reader without a word)
   const wasAsOf = $("#as-of").value;

@@ -1,6 +1,7 @@
 /* The memo pane: the quiet cards before a run, "No memo is open" for the reader, and the memo itself (title block,
    answers, figures, clauses, ledger, inputs, sources, stamp), with the run tools moved into its title block. */
 
+import { areaScheduleHtml, operatorDesk, wireAreaSchedule, wireOperatorDesk } from "./operator.js";
 import { $, $$, cap, fmtNum, h, REV, scrollBehavior, toast, todayISO } from "../core/util.js";
 import { state, STATIC } from "../core/state.js";
 import { optWord } from "../fields.js";
@@ -160,10 +161,14 @@ export function renderMemo(run) {
   rest.push(renderStamp(L.run, run.run_id));
   // the clauses stand on their own so the reader's order can be the paper's: answers, comparison, clauses, massing, ledger
   const figures = renderFigures(run);
+  // the operator's desk leads the operator's layout; the area schedule follows the drawings in every layout (24 Nov 2026)
+  const desk = operatorDesk(run);
+  if (desk) parts.push(desk);
   parts.push(`<div class="memo-body">
     <div class="answers">${answerAllowed(L, run)}${answerFunders(L, run)}${answerUnsure(L, run)}${answerMoney(run)}${unverifiedLine(L)}${wordsHtml(run)}</div>
     ${compare ? `<div class="memo-compare">${compare}</div>` : ""}
     ${figures}
+    ${areaScheduleHtml(run) ? `<div class="memo-areas">${areaScheduleHtml(run)}</div>` : ""}
     <div class="memo-clauses">${renderClauses(res, L, changed, run)}</div>
     <div class="memo-rest">${rest.join("\n")}</div>
   </div>`);
@@ -188,6 +193,8 @@ export function renderMemo(run) {
   wireLedger();
   applyModeToMemo();
   wireMoneyFold();
+  wireOperatorDesk();
+  wireAreaSchedule(run);
   setPrintFooter(run);
   syncStaleBand();
 }
@@ -199,6 +206,7 @@ const MEMO_INDEX = [
   ["answers", ".memo-body > .answers", "The four answers"],
   ["compare", ".memo-compare", "The comparison"],
   ["figures", ".memo-body > .figures", "Drawings"],
+  ["areas", ".memo-areas", "Area schedule"],
   ["clauses", ".memo-clauses", "Clauses"],
   ["ledger", ".memo-rest .ledger", "Ledger"],
   ["inputs", ".memo-rest .inputs-used", "Inputs"],

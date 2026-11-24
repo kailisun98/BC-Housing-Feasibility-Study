@@ -163,6 +163,7 @@
 <li>Note: 300 m² of the services and bicycle storage do not fit on the ground floor; they are taken below grade with the parking, which is not on the plates.</li>
 <li>Note: The homes are stacked in bays, the same type above the same type; placed floor by floor with nothing lined up, the plates would hold 71 homes against 70.</li>
 <li>Note: Option height 22.3 m exceeds 6 x 3.3 m = 19.8 m; the extra 2.5 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.</li>
+<li>Note: The homes are 56% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.</li>
 </ul>
 <h3>Egress</h3>
 <p>Egress (sprinklered, BCBC 2024 Part 3): pass; 6 floors: 6 pass; farthest travel 15.2 m, limit 45 m. Read against <code>bcbc.exits</code> (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; <code>sprinklered: false</code> on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.</p>
@@ -173,6 +174,25 @@
 <li><em>pass</em> — Level 4: 4 exits, 2 required · travel 15.2 m, limit 45 m · separation 67.4 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 5: 4 exits, 2 required · travel 15.2 m, limit 45 m · separation 67.4 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
 <li><em>pass</em> — Level 6: 4 exits, 2 required · travel 14.4 m, limit 45 m · separation 67.4 m, at least 9 m · dead end 0.0 m, limit 6 m.</li>
+</ul>
+<h3>Area schedule</h3>
+<table><thead><tr><th>Floor</th><th>Homes</th><th>Homes m²</th><th>Circulation m²</th><th>Cores m²</th><th>Amenity m²</th><th>Non-res. m²</th><th>Spare m²</th><th>Gross m²</th><th>Efficiency</th></tr></thead><tbody>
+<tr><td>Ground floor</td><td>0</td><td>0</td><td>150</td><td>123</td><td>0</td><td>1,130</td><td>0</td><td>1,403</td><td>0%</td></tr>
+<tr><td>Level 2</td><td>10</td><td>762</td><td>125</td><td>123</td><td>158</td><td>121</td><td>53</td><td>1,403</td><td>54%</td></tr>
+<tr><td>Level 3</td><td>15</td><td>1,030</td><td>125</td><td>123</td><td>0</td><td>0</td><td>43</td><td>1,403</td><td>73%</td></tr>
+<tr><td>Level 4</td><td>15</td><td>1,030</td><td>125</td><td>123</td><td>0</td><td>0</td><td>43</td><td>1,403</td><td>73%</td></tr>
+<tr><td>Level 5</td><td>15</td><td>1,030</td><td>125</td><td>123</td><td>0</td><td>0</td><td>43</td><td>1,403</td><td>73%</td></tr>
+<tr><td>Level 6</td><td>15</td><td>907</td><td>125</td><td>123</td><td>0</td><td>0</td><td>175</td><td>1,403</td><td>65%</td></tr>
+<tr><td><strong>Total</strong></td><td>70</td><td>4,759</td><td>777</td><td>740</td><td>158</td><td>1,250</td><td>355</td><td>8,420</td><td>56%</td></tr>
+</tbody></table>
+<p>Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). <strong>Flagged.</strong> The same table is <code>area-schedule.csv</code> beside this memo.</p>
+<h3>What an operator checks first</h3>
+<ul>
+<li><em>pass</em> — Elevators: 2 elevators for 105 homes on 6 storeys: one per 70 homes (a placeholder for an elevator analysis).</li>
+<li><em>missing</em> — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state</li>
+<li><em>missing</em> — Garbage, recycling and services: 0 m² of services for 70 homes; about 21 m² (0.3 m² a home, a placeholder) is what a garbage and recycling room for this many homes takes</li>
+<li><em>missing</em> — Accessible homes: 0 accessible homes drawn, 4 wanted (BC Housing's 5% of 70)</li>
+<li><em>info</em> — Shared indoor space: 158 m² of amenity or dining, 2.2 m² a home</li>
 </ul>
 <figure><svg xmlns="http://www.w3.org/2000/svg" width="760" height="474" viewBox="0 0 760 474" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Stacking diagram">
 <rect width="100%" height="100%" fill="#ffffff"/>

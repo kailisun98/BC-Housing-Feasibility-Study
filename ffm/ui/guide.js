@@ -121,6 +121,12 @@ function fixedFigures() {
     if (Number.isFinite(v) && v >= 0) units[u] = Math.round(v);
   }
   if (Object.keys(units).length) out.units = units;
+  // what the manager said of the building at 02 shapes the derivation (24 Nov 2026): the kind of housing, the building
+  // type and a tower's podium, from the answers before the suggestion is used, else the option
+  for (const k of ["housing_type", "building_type", "podium_storeys", "beds"]) {
+    const v = guide.answers && k in guide.answers ? guide.answers[k] : getPath(state.option || {}, k);
+    if (v !== undefined && v !== null && v !== "") out[k] = v;
+  }
   return Object.keys(out).length ? out : null;
 }
 
@@ -219,7 +225,7 @@ function useSuggestionNow({ live = false } = {}) {
     if (kind !== "text" && raw !== "" && !Number.isFinite(v)) { toast(`${label}: not a number.`, true); return false; }
     setPath(opt, k, v);
   }
-  for (const [k, v] of Object.entries(guide.answers || {})) if (ANSWERS[k] && ANSWERS[k].on === "option") setPath(opt, k, v);
+  for (const [k, v] of Object.entries(guide.answers || {})) if ((ANSWERS[k] && ANSWERS[k].on === "option") || k === "program_brief") setPath(opt, k, v);
   if (guide.programs) opt.target_programs = guide.programs.slice();
   if (state.option && state.option.finance) opt.finance = Object.assign({}, state.option.finance);   // the money in survives a change of option
   if (!opt.rent_tiers_units || Object.values(opt.rent_tiers_units).every(v => v == null)) opt.rent_tiers_units = null;

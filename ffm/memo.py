@@ -132,6 +132,12 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     L.append(f"**Proponent:** {opt.get('proponent') or 'not named'} ({str(opt.get('proponent_type') or 'type not given').replace('_', ' ')})  ")
     if opt.get("operator"):
         L.append(f"**Operator:** {opt['operator']}  ")
+    # whose the operating figures are (24 Nov 2026): signed by the operator, or not seen by one
+    signed = ((opt.get("operations") or {}).get("signed") or {}) if isinstance((opt.get("operations") or {}).get("signed"), dict) else {}
+    if signed.get("by"):
+        L.append(f"**Operating figures:** signed by {signed['by']}" + (f" of {signed['org']}" if signed.get("org") else "") + (f", {signed['on']}" if signed.get("on") else "") + "  ")
+    elif opt.get("operations") or opt.get("operator"):
+        L.append("**Operating figures:** not yet signed by an operator  ")
     L.append(f"**Rules as of:** {run['as_of']} · **version stamp:** `{run['stamp']['stamp']}` · engine {run['engine_version']}  ")
     L.append("")
     L.append("> Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. "

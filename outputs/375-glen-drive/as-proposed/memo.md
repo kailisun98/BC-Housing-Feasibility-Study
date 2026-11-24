@@ -13,7 +13,7 @@
 - *Uncertain* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 12 trees on a 2,134 m² site; no tree survey is on file.
 
 ## 2. Does it fit the funders?
-**Does not pass this screen's eligibility checks for the Community Housing Fund.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The first layout places 144 of 163 homes on the plates as drawn (answer 3); this answer counts all 163.
+**Does not pass this screen's eligibility checks for the Community Housing Fund.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The first layout places 134 of 163 homes on the plates as drawn (answer 3); this answer counts all 163.
 - *Fail* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: does not meet the criteria: unit mix market 54.6%, rgi 22.7%, deep subsidy 22.7% is not 30/50/20. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).
 
 Other programs written for this kind of housing, listed from their own pages and **not tested**:
@@ -35,9 +35,11 @@ Other programs written for this kind of housing, listed from their own pages and
 | Yards not checked: no CD-1 (819) yard rule in the rules | Uncertain | Architect: read the yard clauses in CD-1 (819)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
 | Parts of the building the funders answer does not test | Uncertain | Manager: settle who funds and operates the 25 supportive housing homes and 80 shelter beds (BC Housing's development staff for the programs, the operator for the staffing), and enter their staffing and subsidy in the option's operating figures. |
 | Who operates the homes | Uncertain | Manager: name the operator, and get its operating budget (rents, staffing, the subsidy it needs) into the option's operating figures. Ask: the operating society's executive director and board. |
+| Operating figures not yet signed by the operator | Uncertain | Operator: review the operating page, enter the building's own rents, running costs, staffing, reserve and vacancy, and sign them (the Operator layout). |
+| The staffing model and its cost | Uncertain | Operator: give the staffing model (who is on site, by shift) and its yearly cost. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Fail | Manager: change what fails, or ask BC Housing which program fits the scheme as it is (answer 2 lists the other programs in the rules written for this housing; their criteria are not tested here, and a program not in the rules may fit as well). Ask: BC Housing, a development manager in Development and Asset Strategies. |
-| Homes that do not fit the plates | Conditional | Architect: 144 of 163 homes fit the plates on 15 floors at the unit sizes assumed; did not fit: 19 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 163. |
+| Homes that do not fit the plates | Conditional | Architect: 134 of 163 homes fit the plates on 15 floors at the unit sizes assumed; did not fit: 29 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 163. |
 
 ## 4. Does the money work? (feasibility grade)
 **Needs more sources.** The gap is $74,062,200, 77% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes and the 80 shelter beds, so the running costs here are the building's alone and the subsidy it needs is not known. No Community Housing Fund grant is counted: the option does not meet the fund's criteria (answer 2). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
@@ -106,7 +108,7 @@ Other programs written for this kind of housing, listed from their own pages and
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
 
 ## Layouts derived from the option
-15 floors of 38.5 × 25.5 m (982 m² each); a double-loaded corridor, units 11.85 m deep; 144 of 163 units placed.
+15 floors of 38.5 × 25.5 m (982 m² each); a double-loaded corridor, units 11.85 m deep; 134 of 163 units placed.
 
 | Block | Count | Area | From |
 |---|---|---|---|
@@ -114,46 +116,93 @@ Other programs written for this kind of housing, listed from their own pages and
 | Two-bedroom | 35 | 2,786 m² | `bch.design_guidelines.unit_areas`: 35 × 73.7 m² net (67 m² minimum + 10%), 79.6 m² gross with partitions |
 | One-bedroom | 72 | 4,190 m² | `bch.design_guidelines.unit_areas`: 72 × 53.9 m² net (49 m² minimum + 10%), 58.2 m² gross with partitions |
 | Studio | 51 | 1,999 m² | `bch.design_guidelines.unit_areas`: 51 × 36.3 m² net (33 m² minimum + 10%), 39.2 m² gross with partitions |
-| Amenity | 1 | 244 m² | placeholder: 1.5 m² per unit, at least 40 m² |
 | Services, bicycles | 1 | 348 m² | placeholder: 40 m² services + 308 bicycle spaces × 1.0 m² |
+| Shelter: 24/7 front desk | 1 | 12 m² | placeholder: 24/7 access unless BC Housing approves otherwise (Emergency Shelter Program Framework) |
+| Shelter: Staff office | 1 | 15 m² | placeholder: the housing type's default brief, a placeholder |
+| Shelter: Sleeping rooms | 1 | 405 m² | placeholder: 20 rooms of up to 4 beds for 80 beds; four beds a room at most, 4.6 m² a bed space (Shelter Design Guidelines, rule bch.shelter.bed_space), plus 10% for the room's door and clearances |
+| Shelter: Washrooms and showers | 1 | 48 m² | placeholder: 0.6 m² a bed × 80 beds |
+| Shelter: Dining | 1 | 80 m² | placeholder: 1 m² a bed × 80 beds, at least 30 m² |
+| Shelter: Laundry | 1 | 20 m² | placeholder: 0.25 m² a bed × 80 beds, at least 12 m² |
+| Shelter: Lockers and storage | 1 | 24 m² | placeholder: 0.3 m² a bed × 80 beds |
+| Supportive: 24/7 front desk | 1 | 12 m² | placeholder: staffed at all hours, beside the entry with a view of it and of the lift |
+| Supportive: Staff office | 1 | 15 m² | placeholder: the housing type's default brief, a placeholder |
+| Supportive: Staff washroom | 1 | 4 m² | placeholder: the housing type's default brief, a placeholder |
+| Supportive: Program room | 1 | 40 m² | placeholder: case planning, groups, life skills |
+| Supportive: Laundry | 1 | 65 m² | placeholder: 0.4 m² a home × 163, at least 15 m² |
+| Supportive: Harm reduction room | 1 | 10 m² | placeholder: a room the operator can staff for overdose prevention, where its model includes one |
 | Parking | 59 | 1,770 m² | placeholder: below grade, not on the plates |
 
 Adjacency rules, in plain words, read back from the plates:
 
 - *info* — non residential: on the ground floor, facing the street. No non-residential space in the option
-- *pass* — amenity: on the ground floor, next to the entry. On the ground floor beside the core, where the entry is
+- *info* — amenity: on the ground floor, next to the entry. No amenity in the program
 - *conditional* — services: on the ground floor, away from the street. On the ground floor but facing the street: the lane side has no room left beside the core
 - *pass* — core: at the centre of every floor, the corridor through it. One core bay at the centre of every floor, the corridor through it, and an exit stair at each end of the corridor
-- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 19 studio (745 m²) did not fit: more storeys, a larger plate or a smaller program
-- *pass* — three bed plus: from the lowest residential floor up, stacked in the same bays. Three-bedroom units on levels 1 to 2
+- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 29 studio (1,137 m²) did not fit: more storeys, a larger plate or a smaller program
+- *conditional* — three bed plus: from the lowest residential floor up, stacked in the same bays. Three-bedroom units on levels 2 to 3, above some smaller units
 - *info* — accessible: next to the core, on the lowest residential floor. No accessible units stated on the option
 
-Did not fit on the plates: Studio × 19 (745 m²). More storeys, a larger plate or a smaller program.
-- Note: The homes are placed floor by floor, not stacked in bays: stacked, the plates held 127 homes against 144.
-- Note: Daylight (a placeholder for the architect's study, not a rule): 125 homes run 11.8 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.
+Did not fit on the plates: Studio × 29 (1,137 m²). More storeys, a larger plate or a smaller program.
+- Note: The homes are placed floor by floor, not stacked in bays: stacked, the plates held 121 homes against 134.
+- Note: Daylight (a placeholder for the architect's study, not a rule): 116 homes run 11.8 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.
 - Note: Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.
 - Note: The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 - Note: Option height 51.0 m exceeds 15 x 3.05 m = 45.8 m; the extra 5.2 m is parapet, roof structure or taller ground floor, and the mass uses the stated height.
+- Note: The homes are 59% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.
 
 ### Egress
 
-Egress (sprinklered, BCBC 2024 Part 3): pass; 15 floors: 15 pass; farthest travel 7.4 m, limit 45 m. Read against `bcbc.exits` (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; `sprinklered: false` on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.
+Egress (sprinklered, BCBC 2024 Part 3): pass; 15 floors: 15 pass; farthest travel 7.3 m, limit 45 m. Read against `bcbc.exits` (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; `sprinklered: false` on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.
 
-- *pass* — Ground floor: 4 exits, 2 required · travel 7.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
-- *pass* — Level 2: 4 exits, 2 required · travel 4.7 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
-- *pass* — Level 3: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+- *pass* — Ground floor: 4 exits, 2 required · travel 1.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+- *pass* — Level 2: 4 exits, 2 required · travel 5.7 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+- *pass* — Level 3: 4 exits, 2 required · travel 5.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 4: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 5: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 6: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
-- *pass* — Level 7: 4 exits, 2 required · travel 6.2 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
-- *pass* — Level 8: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+- *pass* — Level 7: 4 exits, 2 required · travel 5.4 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+- *pass* — Level 8: 4 exits, 2 required · travel 6.2 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 9: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 10: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 11: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 12: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
-- *pass* — Level 13: 4 exits, 2 required · travel 7.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+- *pass* — Level 13: 4 exits, 2 required · travel 7.0 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 14: 4 exits, 2 required · travel 7.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
 - *pass* — Level 15: 4 exits, 2 required · travel 7.3 m, limit 45 m · separation 36.3 m, at least 9 m · dead end 0.0 m, limit 6 m.
+
+### Area schedule
+
+| Floor | Homes | Homes m² | Circulation m² | Cores m² | Program m² | Services m² | Spare m² | Gross m² | Efficiency |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| Ground floor | 1 | 52 | 94 | 156 | 345 | 348 | 0 | 999 | 5% |
+| Level 2 | 2 | 208 | 69 | 156 | 405 | 0 | 147 | 1,002 | 21% |
+| Level 3 | 8 | 680 | 69 | 156 | 0 | 0 | 43 | 1,002 | 68% |
+| Level 4 | 9 | 697 | 69 | 156 | 0 | 0 | 25 | 1,002 | 70% |
+| Level 5 | 9 | 697 | 69 | 156 | 0 | 0 | 25 | 1,002 | 70% |
+| Level 6 | 9 | 697 | 69 | 156 | 0 | 0 | 25 | 1,002 | 70% |
+| Level 7 | 9 | 697 | 69 | 156 | 0 | 0 | 25 | 1,002 | 70% |
+| Level 8 | 9 | 631 | 69 | 156 | 0 | 0 | 96 | 1,002 | 63% |
+| Level 9 | 11 | 664 | 69 | 156 | 0 | 0 | 60 | 1,002 | 66% |
+| Level 10 | 11 | 664 | 69 | 156 | 0 | 0 | 60 | 1,002 | 66% |
+| Level 11 | 11 | 664 | 69 | 156 | 0 | 0 | 60 | 1,002 | 66% |
+| Level 12 | 11 | 664 | 69 | 156 | 0 | 0 | 60 | 1,002 | 66% |
+| Level 13 | 11 | 664 | 69 | 156 | 0 | 0 | 60 | 1,002 | 66% |
+| Level 14 | 11 | 589 | 69 | 156 | 0 | 0 | 141 | 1,002 | 59% |
+| Level 15 | 12 | 624 | 69 | 156 | 0 | 0 | 103 | 1,002 | 62% |
+| **Total** | 134 | 8,894 | 1,064 | 2,332 | 750 | 348 | 932 | 15,032 | 59% |
+
+Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). **Flagged.** The same table is `area-schedule.csv` beside this memo.
+
+### What an operator checks first
+
+- *pass* — Elevators: 3 elevators for 163 homes on 15 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis).
+- *pass* — Desk: a staffed front desk by the entry drawn
+- *pass* — Staff office: a staff office drawn
+- *pass* — Desk sees the entry: the desk is beside the entry
+- *pass* — Laundry: a shared laundry room drawn
+- *pass* — Garbage, recycling and services: 348 m² of services for 134 homes
+- *missing* — Accessible homes: 0 accessible homes drawn, 7 wanted (BC Housing's 5% of 134)
+- *info* — Shared indoor space: 80 m² of amenity or dining, 0.6 m² a home
 
 ![Stacking diagram](stacking.svg)
 

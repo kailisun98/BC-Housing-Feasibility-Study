@@ -378,6 +378,49 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
                            "plate_width_m": round(bx1 - bx0, 2), "plate_depth_m": round(by1 - by0, 2),
                            "plate_area_m2": round(total, 1), "gfa_m2": round(total * storeys, 1), "fsr": round(total * storeys / area, 3)})
         masses[-1]["derived_from"].append("the setback envelope (a wing beside the plate box)")
+    # A tower (`option.building_type` "tower", 24 Nov 2026): a podium of `podium_storeys` on the plate the floor area
+    # gives, and a tower plate of `tower_plate_m2` (a placeholder, 650 m²) over it, centred on the podium; without a
+    # podium the tower plate runs from the ground. `tower` is the tower plate in the plate's frame, which the layout lays
+    # out apart; `tiers` are the two boxes the 3D view stacks.
+    from .layout import building_type, TYPOLOGY_ASSUMPTIONS
+    if building_type(option) == "tower" and storeys > 1 and not wing:
+        try:
+            P = max(0, min(storeys - 1, int(option.get("podium_storeys") or 0)))
+        except (TypeError, ValueError):
+            P = 0
+        T = float(option.get("tower_plate_m2") or TYPOLOGY_ASSUMPTIONS["tower_plate_m2"][0])
+        T = max(250.0, min(T, plate_cap))
+        side = math.sqrt(T)
+        tw_ = min(env_w, max(side, T / env_d)) if env_d else env_w
+        td_ = min(env_d, T / tw_) if tw_ else 0.0
+        t_area = tw_ * td_
+        if P:
+            pod_area = (gfa - (storeys - P) * t_area) / P if gfa else plate_cap
+            pod_area = max(t_area, min(pod_area, plate_cap))
+            p_ring, p_w, depth = footprint(pod_area, P)
+            plate = pod_area
+        else:
+            x_t = box["x"] + (env_w - tw_) / 2
+            p_ring, p_w, depth = lot_rect(x_t, box["y"], tw_, td_), tw_, td_
+            plate = t_area
+        px, py = float(p_ring[0][0]), float(p_ring[0][1])
+        tx, ty = px + (p_w - tw_) / 2, py + (depth - td_) / 2
+        total = plate * P + t_area * (storeys - P)
+        pod_top = round(P * f2f + (g_extra if P else 0.0), 2)
+        masses[-1].update({"footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "plate_area_m2": round(plate, 1),
+                           "tower": {"x": round(tx, 2), "y": round(ty, 2), "w": round(tw_, 2), "d": round(td_, 2), "area_m2": round(t_area, 1)},
+                           "podium_storeys": P, "gfa_m2": round(total, 1), "fsr": round(total / area, 3) if area else None,
+                           "label": f"Proposed: a tower of {storeys} storeys" + (f" on a {P}-storey podium" if P else "") + (f", FSR {total / area:.2f}" if area else "")})
+        masses[-1]["derived_from"].append("option.building_type (tower), option.podium_storeys, option.tower_plate_m2")
+        if P:
+            t_ring = lot_rect(tx, ty, tw_, td_)
+            masses[-1]["tiers"] = [{"from_level": 0, "storeys": P, "base_z": 0.0, "width_m": round(p_w, 2), "depth_m": round(depth, 2), "footprint": p_ring, "height_m": pod_top},
+                                   {"from_level": P, "storeys": storeys - P, "base_z": pod_top, "width_m": round(tw_, 2), "depth_m": round(td_, 2), "footprint": t_ring,
+                                    "height_m": round(h - pod_top, 2)}]
+        warnings.append(f"A tower: " + (f"a {P}-storey podium of {p_w:.1f} × {depth:.1f} m and " if P else "")
+                        + f"{storeys - P} floors of {tw_:.1f} × {td_:.1f} m ({t_area:,.0f} m², the tower plate a placeholder of {T:,.0f} m²): {total:,.0f} m² in all"
+                        + (f", against the option's {gfa:,.0f} m²" if gfa and abs(total - gfa) > 0.02 * gfa else "") + ".")
+
     # the mass turned on the lot (`option.massing.angle_deg`, counter-clockwise in the lot frame, about the plate's
     # centre): `footprint` is the turned outline, which the plan, the 3D view and the Revit masses draw; the plate
     # itself, and every block laid out on it, stays in its own frame, whose front-left corner is `plate_origin`.

@@ -1,0 +1,8 @@
+"Floor","Homes","Three-bedroom+","Two-bedroom","One-bedroom","Studio","Homes (net, inside their walls)","Corridors, lobby, landings","Cores: stairs, elevators, shafts","Program spaces (desk, staff, dining, laundry, sleeping rooms)","Amenity","Services and bicycles","Non-residential and commercial","Spare (not yet used)","Partitions","Gross","Efficiency"
+"Ground floor",0,0,0,0,0,0.0,150.3,123.4,0.0,0.0,0.0,1129.6,0.0,0.0,1403.3,0.000
+"Level 2",10,3,6,0,1,762.4,125.3,123.4,0.0,157.5,0.0,120.7,53.0,61.0,1403.3,0.543
+"Level 3",15,3,5,7,0,1029.6,125.3,123.4,0.0,0.0,0.0,0.0,42.6,82.4,1403.3,0.734
+"Level 4",15,3,5,7,0,1029.6,125.3,123.4,0.0,0.0,0.0,0.0,42.6,82.4,1403.3,0.734
+"Level 5",15,3,5,7,0,1029.6,125.3,123.4,0.0,0.0,0.0,0.0,42.6,82.4,1403.3,0.734
+"Level 6",15,0,5,10,0,907.4,125.3,123.4,0.0,0.0,0.0,0.0,174.6,72.6,1403.3,0.647
+"Total",70,12,26,31,1,4758.6,776.8,740.4,0.0,157.5,0.0,1250.3,355.4,380.8,8419.8,0.565

@@ -383,11 +383,12 @@ it, and none is a chart for its own sake: no axis that isn't metres or dollars o
 
 **Character:** A working sans that stays out of the way, set small and tight so a whole memo fits
 the eye at once, and a mono that marks what the machine recorded. The loudest thing on the page
-is a verdict sentence at 18px weight 600 with its operative words in the status text colour.
+is a verdict sentence at 24px weight 400, light and large, with its operative words in the status text colour
+(as the build sets it; see Answer cards).
 
 ### Hierarchy
-- **Title** (600, 18px, 1.3): the memo's title, the site address; the verdict sentence is the same
-  size.
+- **Title** (600, 18px, 1.3): the memo's title, the site address. The verdict sentence is larger, 24px 400
+  (Answer cards).
 - **Wordmark** (600, 17px): the top bar's name with a muted 12.5px subtitle.
 - **Heading** (600, 14px): panel and card headings, each with a 20px round badge in front.
 - **Body** (400, 13px, 1.45): findings and prose; the first sentence of a finding is Ink, the rest Muted.
@@ -660,7 +661,7 @@ follow at one shared scale.
   the rules, each revision's rules date.
 - **Answers:** the four answers for each run as pills, open items included; under them, behind a
   disclosure, each run's open items with the person who resolves them.
-- **Rules:** "n of 14 rules read differently" over a table of only those rules, each status with
+- **Rules:** "n of N rules read differently" (N: the rules that apply to either run) over a table of only those rules, each status with
   what that option proposed under it; the rules that read the same wait behind a disclosure. No row
   band and no ≠: the table holds only differences.
 - The answer cards below carry no A | B strip; this card is the comparison's one place.
@@ -683,8 +684,27 @@ own (17 Nov 2026); a status moving to or from not applicable stays in view. The 
 the paper memo lists only those rules, with a line for the rest. On a
 phone the table stacks, each value under its column's name.
 
+### The title block's index and the comparison's result (24 Nov 2026)
+Under the memo's actions, **In this memo**: one line of the memo's parts, numbered 01, 02… in mono as a drawing set
+lists its sheets (the four answers, the comparison, drawings, clauses, ledger, inputs, sources, fingerprint), only the
+parts this memo has; Summary hides the parts it leaves out and 3D preview hides the line. A jump opens any fold its
+target sits in, brings Detailed where the layout left the target out, and moves the keyboard there. When two memos
+are compared, the Compared with (or Revised from) cell carries the result in a line ("4 of 27 rules read
+differently; the gap $20.7M here, $11.8M in R1") and a jump to Side by side or What changed. The view switch stays
+above the memo while the run pickers sit in the Side by side card.
+
+### Revisions and drafts (24 Nov 2026, Kai: "only issued runs get a number")
+A run made in the tool is a **draft**, named by the time it was made ("Draft 14:03", "Draft 23 Nov, 14:03"); the
+title block's Revision cell says "not issued; issuing makes it R4". **Mark issued to the architect** (or to the
+manager) gives it the site's next number, in the order memos were first issued, so no number moves once given.
+Committed runs keep R1, R2…. The reader is offered issued memos only. The pickers and the stop 01 list name each
+memo by revision and option ("R1 · As approved by Council, 25 Jul 2024 · rules as of 23 Oct 2026"), never a folder.
+A "Rules as of" date that differs from the memo's own leaves the memo out of date, as an edit does: the band says so
+and Run again reads "Run again as of 27 Oct 2026"; the date put back, the memo is current again.
+
 ### Answer cards
-The signature component. A heading set as the site's key (a mono "01" then the question in 11px tracked
+The signature component. The answers keep a 920px reading width (the architect's two columns from 1600px excepted),
+so a wash ends with its words instead of running the pane's width. A heading set as the site's key (a mono "01" then the question in 11px tracked
 caps), the verdict at 24px 400, light and large the way the site sets its headlines, with the operative
 words in the status text colour, then findings in lead-and-continuation prose or a pill-led list;
 the third card holds a table of open items with a Who / what column in Muted. Wash and tone come
@@ -710,7 +730,7 @@ The drawings in the answers (20 Nov 2026, after a six-reviewer critique; the Dra
 - **Answer 4, the capital stack** (`memo/stack.js`): HTML on white paper, two columns at one scale (what it
   costs: hard, soft, contingency, land; what pays for it: grants, equity, debt) with the gap hatched "Not
   yet found" and an amber line at 15% of the cost, "this tool's screening line, not a funder's rule"; small
-  parts get leaders, and under 400px of its own width the labels become a list. The sentences explain land
+  parts get leaders, and under 500px of its own width the labels become a list. The sentences explain land
   at $0, the 15% line and the 1.10 coverage with this memo's figures.
 - After the answers, **"Words in this memo"**, a fold of one-sentence definitions of only the terms the
   memo uses (FSR, outright, by rezoning, plate, RGI, HILs, conditional, revision…), and **the unverified
@@ -747,14 +767,21 @@ storeys, 9.9 m"), the benchmark as a band and mapped neighbours at their heights
 lines with the key figures in ink; a lot with no plate says "no plate fits on the lot as fronted", never a
 zero. The engine's sheets (plans by program, stacking, elevations, code site plan) carry a two-half scale
 bar, the street named at its edge, a north arrow where the frame gives the bearing, stairs with treads
-(scissor stairs and lifts), exit doors and an entry arrow; their text is measured so nothing overprints.
+(scissor stairs and lifts), exit doors and an entry arrow; their text is measured so nothing overprints. Since 24
+Nov 2026 the code site plan (FIG 06) is turned to project north as FIG 01 is (`layout.project_turn`, the page's
+`projectTurn`), the street named on whichever side it then falls; the plans by program stay in the plate's own
+frame. Plans by program and stacking show in every layout, stamped "First layout from the rules · not yet checked by
+the architect" until the architect marks the memo issued back to the manager. A drawing's foot line gives its rules
+date in words. Text on a drawing is at least the street-name grey (tree ids, the elevations' outright and benchmark
+labels); a removed tree's mark is at least 3:1.
 
 ### Who is reading
 The tool's top bar carries a three-way pill, Manager · Architect · Reader, after the lockup: the flows in
 `docs/user-flows.md` as three layouts of the same page. The pressed segment is paper on the ink bar. Manager
 (the default): the memo first, the inputs beside it as summaries, Download PDF leads the export bar.
-Architect: the Site and Option forms open, every ledger layer open but F (it opens with the money), the figures beside the answers from
-1280px, Export to Revit and massing.json lead. Reader: the rail, the steps, the date, Run, the run pickers and
+Architect: the Site and Option forms open, every ledger layer open but F (it opens with the money), the four answers
+in two columns from 1600px with the drawings full width under them (two sheets to a row from 1800px), Export to Revit
+leads the actions (first in the DOM, so the tab order matches). Reader: the rail, the steps, the date, Run, the run pickers and
 the Revit buttons are gone; the memo alone sits in a 980px reading column at 14px with Download PDF and
 Print. The status strip says which layout is on; the page title says who it is for; a link can carry
 `?mode=` and the choice is kept for the next visit. Nothing in the engine or the memo changes with the mode.

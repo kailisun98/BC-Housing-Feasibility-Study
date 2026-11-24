@@ -167,7 +167,8 @@ export function polyEl(pts, attrs) {
    on-site trees, whose positions are rarely public, are placed schematically along the rear. */
 export const HALF = { street: tok("--c-half-road", "#e9e9e6"), parcel: tok("--c-bldg", "#f4f4f2"), building: tok("--c-half-building", "#e2e2df"),
                line: tok("--c-half-line", "#c9c9c5"), text: tok("--c-street-text", "#63635f"), tree: tok("--c-tree", "#9fb07f"),
-               treeLine: tok("--c-tree-line", "#7f9664"), gone: tok("--c-lane", "#bdbdbd") };
+               // a removed tree's mark at 3:1 against the paper at least (24 Nov 2026: the lane grey, 1.9:1, could not be seen)
+               treeLine: tok("--c-tree-line", "#7f9664"), gone: tok("--c-street", "#8e8e8e") };
 
 export function siteContext(site, m) {
   const W = m.lot.frontage_m, D = m.lot.depth_m;

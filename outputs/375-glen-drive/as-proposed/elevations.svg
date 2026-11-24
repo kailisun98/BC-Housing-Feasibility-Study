@@ -110,8 +110,8 @@
 <rect x="238.1" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="78.0" y1="72.0" x2="264.1" y2="72.0" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
 <text x="268.1" y="76.0" font-size="10" fill="#1f2933">51.0 m</text>
-<line x1="264.1" y1="72.0" x2="266.1" y2="84.0" stroke="#8e8e8e" stroke-width="0.6"/>
-<text x="268.1" y="88.0" font-size="10" fill="#8e8e8e">outright 51.0 m</text>
+<line x1="264.1" y1="72.0" x2="266.1" y2="84.0" stroke="#5f6672" stroke-width="0.6"/>
+<text x="268.1" y="88.0" font-size="10" fill="#5f6672">outright 51.0 m</text>
 <text x="400.1" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
 <line x1="390.1" y1="292.0" x2="520.1" y2="292.0" stroke="#1f2933" stroke-width="1.5"/>
 <rect x="400.1" y="72.0" width="110.0" height="220.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
@@ -161,8 +161,8 @@
 <rect x="481.3" y="98.5" width="6.5" height="5.4" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="390.1" y1="72.0" x2="520.1" y2="72.0" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
 <text x="524.1" y="76.0" font-size="10" fill="#1f2933">51.0 m</text>
-<line x1="520.1" y1="72.0" x2="522.1" y2="84.0" stroke="#8e8e8e" stroke-width="0.6"/>
-<text x="524.1" y="88.0" font-size="10" fill="#8e8e8e">outright 51.0 m</text>
+<line x1="520.1" y1="72.0" x2="522.1" y2="84.0" stroke="#5f6672" stroke-width="0.6"/>
+<text x="524.1" y="88.0" font-size="10" fill="#5f6672">outright 51.0 m</text>
 <line x1="74.0" y1="292.0" x2="78.0" y2="292.0" stroke="#5f6672" stroke-width="0.8"/>
 <text x="72.0" y="295.0" font-size="9" text-anchor="end" fill="#5f6672">±0.0</text>
 <line x1="74.0" y1="278.8" x2="78.0" y2="278.8" stroke="#5f6672" stroke-width="0.8"/>
@@ -204,5 +204,5 @@
 <text x="48.0" y="410.0" font-size="12" fill="#1f2933">Windows: one per unit on its side, 1.5 m wide, the unit module as the rhythm; a</text>
 <text x="48.0" y="426.0" font-size="12" fill="#1f2933">placeholder for the elevation study</text>
 <text x="48.0" y="442.0" font-size="12" fill="#1f2933">Floor levels at the left, metres above the ground floor.</text>
-<text x="48.0" y="458.0" font-size="12" fill="#1f2933">Rules as of 2026-11-17 · drawn from the option and the massing, not a design</text>
+<text x="48.0" y="458.0" font-size="12" fill="#1f2933">Rules as of 17 Nov 2026 · drawn from the option and the massing, not a design</text>
 </svg>

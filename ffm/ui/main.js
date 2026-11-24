@@ -9,12 +9,12 @@ import { api } from "./core/api.js";
 import { checkForNewerBuild, loadEngine } from "./core/engine.js";
 import { OPTION_FIELDS } from "./fields.js";
 import { renderForm, setRailTab, syncCards } from "./schedule.js";
-import { loadSites, onOptionChange, saveAs, saveNow, selectOption, selectSite } from "./files.js";
-import { applyCompare, fillRunSelects, followHistory, loadRuns, openRun, rev, runRules } from "./runs.js";
-import { renderNoMemo, renderQuiet } from "./memo/memo.js";
+import { DATE_STALE, loadSites, markStale, onOptionChange, saveAs, saveNow, selectOption, selectSite, syncStaleBand } from "./files.js";
+import { applyCompare, fillRunSelects, followHistory, loadRuns, openRun, rev, runRules, syncRunButton } from "./runs.js";
+import { dateWords, renderNoMemo, renderQuiet } from "./memo/memo.js";
 import { closeExportPanel, renderExportPanel } from "./revit.js";
 import { offerTour, startTour } from "./tour.js";
-import { enterOption, renderGuide, renderStage } from "./route-stage.js";
+import { enterOption, renderGuide, renderStage, stageShown } from "./route-stage.js";
 import { renderClaude } from "./claude.js";
 import { closeIssuePanel, issueButtonLabel, openIssuePanel, startIssuePolling } from "./issue.js";
 import {
@@ -74,9 +74,23 @@ async function init() {
   if ("ResizeObserver" in window) new ResizeObserver(() => placeModeThumb()).observe($(".topbar"));
   let thumbFrame = 0;
   window.addEventListener("resize", () => { if (!thumbFrame) thumbFrame = requestAnimationFrame(() => { thumbFrame = 0; placeModeThumb(); }); });
+  // a rules date off the memo's own leaves the memo out of date, as an edit does: the band says so, Run again goes live
+  // and names the date, Issue waits; back to the memo's date with nothing else changed, the memo is current again
+  // (24 Nov 2026: the date changed and the page still offered the old memo as current)
   $("#as-of").addEventListener("change", () => {
-    if (!state.run) renderQuiet();
-    else setStatus(`The next run will read the rules as of ${$("#as-of").value}; the memo on screen is as of ${state.run.as_of}.`, "info");
+    const asOf = $("#as-of").value || todayISO();
+    if (!state.run) { renderQuiet(); syncRunButton(); return; }
+    const r = rev(state.run.run_id);
+    if (asOf !== state.run.as_of) {
+      markStale(DATE_STALE);
+      setStatus(`The next run reads the rules as of ${dateWords(asOf)}; ${r} on screen is as of ${dateWords(state.run.as_of)}.${state.mode === "reader" ? "" : ` ${state.mode === "manager" ? "Run again, in the top bar," : "Run the rules"} reads them.`}`, "busy");
+    } else if (state.runStale === DATE_STALE) {
+      state.runStale = null;
+      syncStaleBand();
+      setStatus(`Rules as of is back to ${dateWords(asOf)}, ${r}'s own date: the memo on screen is current.`, "ok");
+    }
+    syncRunButton();
+    if (stageShown()) renderStage();
   });
   $$(".steps a[data-step]").forEach(a => a.addEventListener("click", e => {
     e.preventDefault();
@@ -95,7 +109,10 @@ async function init() {
     renderExportPanel(state.run);
     setStep(4);
     setStatus(`Export to Revit: the two lines that build sheet FFM-01 for this memo, ${rev(state.run.run_id)}.`, "info");
-    panel.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+    // the panel opens under the button now (memo.js placeActions); the keyboard goes to its heading
+    panel.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
+    const head = $("h3", panel);
+    if (head) { head.tabIndex = -1; head.focus({ preventScroll: true }); }
   });
   // printing opens every ledger layer, and closes the ones it opened afterwards
   // the ledger's layers and the clauses' folded text print open
@@ -174,6 +191,7 @@ async function followLink() {
       // the reader's pane stops saying "Opening the memo…" and offers what it can
       state.runLinkFailed = true;
       if (state.mode === "reader") renderNoMemo();
+      else if (stageShown()) renderStage();   // the stage held its map back for the memo; it draws it now
     }
   }
   if (q.get("tour")) startTour(0);

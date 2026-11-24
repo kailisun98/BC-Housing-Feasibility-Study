@@ -27,9 +27,9 @@ export const PRELOAD_SITE = "998-e-19th-ave";
 export const PRELOAD_OPTION = "998-e-19th-ave-as-approved";
 
 /* The manager's route (route-stage.js, guide.js): the stop, the address and the lookup, the programs, the reading,
-   the suggestion and the candidate, the manager's own figures and answers, what is busy, and whether a route row's
-   card is over the memo. */
-export const guide = { step: 1, address: "", lookup: null, programs: null, reading: null, suggestion: null, candidate: "funder-ready", mine: {}, answers: {}, busy: {}, over: false };
+   the suggestion and the candidate, the manager's own figures and answers, what is busy, whether a route row's
+   card is over the memo, and whether the manager has been to 02 on this site (a saved option counts only then). */
+export const guide = { step: 1, address: "", lookup: null, programs: null, reading: null, suggestion: null, candidate: "funder-ready", mine: {}, answers: {}, busy: {}, over: false, optionSeen: false };
 
 /* The boundary editor on FIG 01 (editors/boundary.js; the plan draws its handles while it is open). */
 export const bnd = { open: false, ring: null, sel: null, drag: null, busy: false };

@@ -136,6 +136,10 @@ export function setMode(mode, remember = true, announce = true) {
   if (!state.run) renderQuiet();   // the manager's stage, the reader's empty page, or the quiet cards for the architect
   issueButtonLabel();
   closeIssuePanel();
+  // the architect's Revit button leads the actions in the DOM, so the tab order is the order on screen; the others have
+  // it after Print (24 Nov 2026: a CSS order moved it on screen only)
+  const bar = $("#export-actions"), revitBtn = $("#revit-btn");
+  if (bar && revitBtn) { if (mode === "architect") bar.prepend(revitBtn); else { const pr = $("#print-btn", bar); if (pr) pr.after(revitBtn); } }
   if (remember) { try { localStorage.setItem(MODE_KEY, mode); } catch (e) { /* storage off: the choice lasts this visit */ } }
   // a link that names the layout names the one on screen, so Back and a reload come back to it (20 Nov 2026: Back
   // restores each entry's layout, and an entry still saying ?mode=manager would have undone the switch)

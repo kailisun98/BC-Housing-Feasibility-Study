@@ -24,7 +24,7 @@ import {
   discardDraft, loadDemo, markStale, onOptionChange, onSiteChange, readDraft, resumeDraft, saveDraft, saveNow,
   selectOption, selectSite
 } from "./files.js";
-import { byRev, openRun, rev, runRules, syncRunButton } from "./runs.js";
+import { byRev, openRun, rev, runName, runRules, syncRunButton } from "./runs.js";
 import { dateWords, placeRunTools, renderMemo } from "./memo/memo.js";
 import { money } from "./memo/answers.js";
 import { tok } from "./figures/common.js";
@@ -91,6 +91,9 @@ function loadLeaflet() {
 
 async function mountStageMap(site, box = $("#stage-map")) {
   if (!box || !site) return;
+  // a link that names a memo opens it over this stage: Leaflet and its tiles wait until the stage is what stays on
+  // screen (24 Nov 2026: a ?run= link loaded Leaflet and 12 tiles for a map the memo replaced within a second)
+  if (new URLSearchParams(location.search).has("run") && !state.run && !state.runLinkFailed) return;
   const ring = site.parcel && site.parcel.polygon_lonlat;
   const c = (site.lookup && site.lookup.center) || (site.osm && site.osm.center) || ((site.context || {}).center) || null;
   if (!ring && !c) { box.innerHTML = `<p class="help">No coordinates for this site: look it up by address to place it on the map.</p>`; return; }
@@ -124,11 +127,19 @@ export const stopOf = n => (!n || n <= 1 ? 1 : n <= 4 ? 2 : 3);
 
 const CHECK_SVG = `<svg class="route-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.4 6.6 11.3 12.5 4.9"/></svg>`;
 
+/* What a rule asks of the site before the run, in a word that is not a status: it applies, it waits on the option's
+   figures, or it does not apply here. The status pills and their verdicts belong to the memo. Pure. */
+const READING_MARK = { not_applicable: ["not here", "rm-not"], uncertain: ["needs your figures", "rm-needs"] };
+const readingMark = s => { const [w, c] = READING_MARK[s] || ["applies", "rm-applies"]; return `<span class="rmark ${c}">${w}</span>`; };
+
 /* What is decided so far. The manager's option counts once it is a saved one, a used suggestion, or the option of a
    run; the architect's whenever there is one to run. Run, the route and the status line all read this. */
 export function progress() {
   const site = !!(state.site && (state.siteId || state.site.zoning_district || state.site.address));
-  const option = !!(state.option && (state.optionId || guide.suggestionUsed || state.run
+  // a saved site brings its first saved option with it: the manager's 02 counts it only once they have been to 02
+  // (24 Nov 2026: row 02 wore its check mark while the manager was still at 01)
+  const saved = !!state.optionId && (state.mode !== "manager" || !!guide.optionSeen);
+  const option = !!(state.option && (saved || guide.suggestionUsed || state.run
     || (state.mode !== "manager" && (state.option.storeys != null || state.option.gfa_m2 != null))));
   return { site, option, run: !!state.run };
 }
@@ -280,6 +291,7 @@ export function focusStage() {
 /* Entering 02: the site is read against layers A to C and an option derived, without a button for either. */
 export function enterOption() {
   if (!state.site) return;
+  guide.optionSeen = true;
   if ((!guide.reading || guide.readStale) && !guide.busy.read) guideReadSite();
   if (((!guide.suggestion && !state.optionId && !guide.suggestionUsed) || guide.suggestStale) && !guide.busy.suggest) guideSuggest();
 }
@@ -331,6 +343,14 @@ export const foot = (quiet, main) => `<div class="foot-quiet">${quiet || ""}</di
    holds at the click (20 Nov 2026: by then the blank page's own saveDraft had removed it, and Resume threw). */
 let stageDraft = null;
 
+/* A stored UTC time as the reader's clock reads it, in words: "24 Nov 2026, 14:03" (24 Nov 2026: the resume line
+   printed UTC, hours off the reader's own time). */
+function localWhen(iso) {
+  const t = new Date(iso || "");
+  if (isNaN(t)) return "";
+  return dateWords(new Date(t.getTime() - t.getTimezoneOffset() * 60000).toISOString(), true);
+}
+
 function stageHtml() {
   const site = state.site;
   const n = guide.step || 1;
@@ -338,11 +358,11 @@ function stageHtml() {
   const draft = stageDraft = blank ? readDraft() : null;
   const head = `<header class="stage-head">
       <div class="stage-title">
-        <h1>${site ? h(site.address || site.id) : "A site, a funder, an option, a memo"}</h1>
+        <h1>${site ? h(site.address || site.id) : "Start with the site"}</h1>
         ${state.run && guide.over ? `<button type="button" class="btn btn-quiet btn-small" id="stage-back">Back to ${h(rev(state.run.run_id))}</button>` : ""}
       </div>
       ${blank ? `<p class="quiet">Three stops, one card at a time: the site, the option, the run. Each card asks one thing and shows what it found.</p>` : ""}
-      ${draft ? `<div class="form-actions resume"><button type="button" class="btn btn-small" id="stage-resume">Resume where you were</button><button type="button" class="btn btn-quiet btn-small" id="stage-discard">Start fresh</button><span class="help">${h((draft.site && (draft.site.address || draft.site.id)) || ((state.sites || []).find(s => s.id === draft.siteId) || {}).address || draft.siteId ||(draft.guide && draft.guide.lookup && draft.guide.lookup.site && draft.guide.lookup.site.address) || "a site")}, left in this tab ${h(String(draft.saved_at || "").replace("T", " ").slice(0, 16))}.</span></div>` : ""}
+      ${draft ? `<div class="form-actions resume"><button type="button" class="btn btn-small" id="stage-resume">Resume where you were</button><button type="button" class="btn btn-quiet btn-small" id="stage-discard">Start fresh</button><span class="help">${h((draft.site && (draft.site.address || draft.site.id)) || ((state.sites || []).find(s => s.id === draft.siteId) || {}).address || draft.siteId ||(draft.guide && draft.guide.lookup && draft.guide.lookup.site && draft.guide.lookup.site.address) || "a site")}, left in this tab ${h(localWhen(draft.saved_at))}.</span></div>` : ""}
     </header>`;
   const card = n === 1 ? cardSite() : n === 2 ? cardOption() : cardRun();
   return head + card + (blank && n === 1 ? ghostHtml() : "");
@@ -368,9 +388,10 @@ function cardSite() {
   const chosen = progress().site && !guide.changing;
   if (chosen) {
     const runs = byRev((state.runs || []).filter(r => r.run_id.startsWith((state.siteId || site.id || "") + "/")));
-    const memos = runs.length ? `<p class="stage-memos"><span class="cont">This site has ${runs.length} memo${runs.length === 1 ? "" : "s"}:</span> ${runs.map(r => `<button type="button" class="linkish" data-open-run="${h(r.run_id)}">${h(rev(r.run_id))}</button>`).join(" ")}</p>` : "";
+    // each memo named by its revision and its option, never a bare "R1 R2 R3" (24 Nov 2026)
+    const memos = runs.length ? `<p class="stage-memos"><span class="cont">This site has ${runs.length} memo${runs.length === 1 ? "" : "s"}:</span> ${runs.map(r => `<button type="button" class="linkish" data-open-run="${h(r.run_id)}">${h(runName(r))}</button>`).join("<span class=\"cont\"> · </span>")}</p>` : "";
     const body = `${siteFacts(site)}${cd1Slot(site)}${memos}${askTable(1)}${saveSiteInline()}`;
-    const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-change-site">Change the site</button>${!state.siteId || state.siteDirty ? `<button type="button" class="btn btn-quiet btn-small" id="guide-keep-site" aria-expanded="${!!guide.saveOpen}" aria-controls="stage-save">Keep as a site file…</button>` : ""}`;
+    const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-change-site">Change the site</button>${!state.siteId || state.siteDirty ? `<button type="button" class="btn btn-quiet btn-small" id="guide-keep-site" aria-expanded="${!!guide.saveOpen}" aria-controls="stage-save">Save site as…</button>` : ""}`;
     return stageCard(1, "What the open data could not tell", body, foot(quiet, `<button type="button" class="btn btn-primary" id="guide-next-1">Continue to the option →</button>`));
   }
   const lk = guide.lookup;
@@ -386,8 +407,8 @@ function cardSite() {
   // 2026); the field takes no autofill, since the browser's offer is the reader's own home address
   const err = !busy && guide.lookupError;
   const body = `
+    <label class="addr-label" for="guide-address">The site's address</label>
     <div class="addr-row">
-      <label class="sr-only" for="guide-address">Address</label>
       <input type="text" id="guide-address" value="${h(guide.address)}" placeholder="e.g. 609 Heatley Ave" autocomplete="off" spellcheck="false"${err ? ' aria-invalid="true" aria-describedby="guide-address-err"' : ""}>
       <button class="btn btn-primary" type="button" id="guide-lookup"${busy ? " disabled" : ""}>${busy ? "Looking up…" : "Look up"}</button>
     </div>
@@ -601,8 +622,10 @@ function cardOption() {
   const cands = S ? S.candidates : [{ id: "funder-ready", title: "Funder-ready", what: "the envelope the site gets, with the funder questions answered" }, { id: "outright", title: "Outright", what: "what the district allows as of right" }, { id: "benchmark", title: "Benchmark", what: "the staff benchmark under the rezoning policy" }];
   const fromSaved = !!(state.optionId && !(S && !guide.suggestionUsed));
   const candWhy = cands.filter(c => c.available === false).map(c => `<li><b>${h(c.title)}</b>: ${h(c.why)}.</li>`).join("");
-  const reading = guide.busy.read ? `<p class="help">Reading the site against layers A to C…</p>`
-    : R ? `<ul class="reading-list">${R.results.map(r => `<li>${pill(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul>` : `<p class="help">Not read yet.</p>`;
+  // the rules that apply here, without verdicts (24 Nov 2026, critique: the probe's "Pass" and "Uncertain" stood where
+  // the memo then said Fail and Conditional for the same option); the verdicts come with the run, on the option's figures
+  const reading = guide.busy.read ? `<p class="help">Reading the rules that apply to this site…</p>`
+    : R ? `<ul class="reading-list">${R.results.map(r => `<li>${readingMark(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">Which rules apply here. Their verdicts come with the run, on the option's figures.</p>` : `<p class="help">Not read yet.</p>`;
   const dl = `<dl class="stage-dl">
       <div><dt>For</dt><dd>
         <div class="chips" role="group" aria-label="The programs in view">${progs.map(r => `<label class="chip"><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
@@ -763,7 +786,7 @@ function figureBlock(o, S) {
   const homesLine = ownHomes && homes && o.gfa_m2 ? `<p class="help fig4-note">Your ${h(homes)} homes in ${h(fmtNum(o.gfa_m2))}&nbsp;m² of floor area: about ${h(fmtNum(Math.round(o.gfa_m2 / homes)))}&nbsp;m² a home, corridors and cores included. Change FSR or the storeys to size the building to them.</p>` : "";
   const sketch = sectionSketch(o, S);
   const wrap = inner => `<div class="fig4-wrap"><div class="fig4-main">${inner}</div>${sketch}</div>`;
-  if (!S) return wrap(block + heightLine + floorLine) + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. The architect's schedule holds every field.</p>`;
+  if (!S) return wrap(block + heightLine + floorLine) + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. Every other field is in the Option schedule: switch to Architect in the top bar.</p>`;
   // what the suggestion is, in the engine's words where it gives them, and what it falls short of (20 Nov 2026: a
   // 4-home outright-sized option read "Suggested, funder-ready")
   const short2 = fallsShort(S);
@@ -942,11 +965,15 @@ function cardRun() {
   const dl = `<dl class="stage-dl">
       <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p>${short3.length ? `<p class="dd-line fig4-short"><span class="cont">It falls short:</span> ${h(short3.join("; "))}.</p>` : ""}</dd></div>
       <div><dt>Money in</dt><dd>${money}${opsFold}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
-      <div><dt>Rules as of</dt><dd><p class="dd-line"><code>${h($("#as-of").value || todayISO())}</code> <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
+      <div><dt>Rules as of</dt><dd><p class="dd-line">${h(dateWords($("#as-of").value || todayISO()))} <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
     </dl>`;
   const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-back-2">Back to the option</button>`;
-  // the shortcut is labelled as one (20 Nov 2026: a bare "Ctrl+Enter" beside the button read as stray text)
-  const main = `<span class="kbd-help" id="run-kbd">Shortcut <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span><button type="button" class="btn btn-primary" id="guide-run" aria-keyshortcuts="Control+Enter" aria-describedby="run-kbd"${busy ? " disabled" : ""}>${busy ? "Running…" : "Run the rules"}</button>`;
+  // the shortcut is labelled as one (20 Nov 2026: a bare "Ctrl+Enter" beside the button read as stray text); over a
+  // memo nothing has changed since, the run waits and says why (runs.js refuses it too)
+  const fresh = !!(state.run && !state.runStale);
+  const main = fresh
+    ? `<span class="kbd-help" id="run-kbd">Nothing has changed since ${h(rev(state.run.run_id))}</span><button type="button" class="btn btn-primary" id="guide-run" aria-disabled="true" aria-describedby="run-kbd">Run again</button>`
+    : `<span class="kbd-help" id="run-kbd">Shortcut <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span><button type="button" class="btn btn-primary" id="guide-run" aria-keyshortcuts="Control+Enter" aria-describedby="run-kbd"${busy ? " disabled" : ""}>${busy ? "Running…" : state.run ? "Run again" : "Run the rules"}</button>`;
   return stageCard(3, "Money in, then run", dl, foot(quiet, main));
 }
 

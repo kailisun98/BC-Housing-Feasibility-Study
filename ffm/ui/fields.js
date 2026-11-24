@@ -42,17 +42,22 @@ const FIELDS = [
     reads: ["district_outright_fsr", "district_outright_height", "district_setbacks", "ssmuh_minimum_units"],
     help: "As written in the by-law: RM-1, RS-1, RT-3, R1-1 …",
     info: "The district schedule that applies without a rezoning, as the by-law writes it. The rule stack holds the outright limits read from the schedules for RM-1/RM-1N, RM-3, RM-3A, RM-4, the RM-5 family, RT-3, R1-1 (multiplex), C-2, C-2A, C-2B, C-2C, C-2C1, RR-1, RR-2A, RR-2B and RR-3A/3B/3C (with their social housing, rental and site-size figures), and the rest of the RT family entered unverified (the memo says so), plus the SSMUH rule for R1-1, RS and RT. A CD-1 is its own by-law: its rules are matched on the CD-1 number (CD-1 (324) is in, read from its by-law; CD-1 (819) from its referral report, unverified). A district or CD-1 not in the stack reads 'not assessed', says so, and the rough envelope stands in." },
+  // `only`: the schedule shows the row for a site it applies to, or one that already holds a value (24 Nov 2026: an
+  // RM-1 site's schedule listed the CD-1 and Oppenheimer rows, cited A3 and A4, which read neither)
   { on: "site", key: "cd1_bylaw_number", group: "Identity", label: "CD-1 number", type: "text", need: "",
+    only: site => /^CD-1/i.test(String(site.zoning_district || "")),
     reads: ["district_outright_fsr", "district_outright_height", "district_setbacks"],
     help: "For a CD-1 site only: 324 for CD-1 (324). The lookup fills it from the City's zoning data.",
     info: "Each CD-1 is its own by-law, so a CD-1 site is matched to its rules by this number and no other: CD-1 (324)'s rules never apply to CD-1 (819). Blank on a CD-1 site, no by-law can be matched and the outright answer reads 'not assessed'. Leave it blank for any other district." },
   { on: "site", key: "odp_sub_area", group: "Identity", label: "Sub-area of the Oppenheimer plan", type: "select", options: ODP_SUB_AREAS, need: "rule",
+    only: site => /^DEOD/i.test(String(site.zoning_district || "")),
     reads: ["district_outright_fsr", "district_outright_height"],
     ask: { stop: 1, q: "Which sub-area of the Downtown-Eastside/Oppenheimer plan?", who: "you, from the plan's map", kind: "select", options: ODP_SUB_AREAS,
       when: site => /^DEOD/i.test(String(site.zoning_district || "")),
       why: "The plan sets the floor space ratio and the height by sub-area: 30 m in Main/Hastings, 15 m in Cordova Street and Powell Street/Japantown." },
     info: "A DEOD lot is under the Downtown-Eastside/Oppenheimer Official Development Plan, which has four sub-areas with their own limits. Find the lot on the plan's sub-area map." },
   { on: "site", key: "cd1_sub_area", group: "Identity", label: "CD-1 sub-area", type: "text", need: "",
+    only: site => /^CD-1/i.test(String(site.zoning_district || "")),
     reads: ["district_outright_fsr"],
     help: "Where the CD-1 by-law sets figures by sub-area: B for 1010 Expo Blvd in CD-1 (324).",
     info: "Some CD-1 by-laws fix the floor area per sub-area drawn on their Schedule A (CD-1 (324): sub-area A 19,300 m², B 23,600 m² of residential floor area). Read the site's sub-area off that map; blank, the floor area reads 'uncertain' and says so." },
@@ -114,10 +119,9 @@ const FIELDS = [
       why: "The drawings assume a clear lot; a building that stays changes the massing." },
     info: "The massing is drawn on a clear lot. Yes means a building stays and the architect must draw the kept footprint; No means the lot is cleared; Not sure becomes an open item with the manager's name." },
   { on: "site", key: "land_tenure_plan", group: "Owner", label: "Land tenure plan", type: "text", need: "rule", reads: ["chf_fit"],
+    // asked once, at 02, as the option's "How will the land under the homes be held?" (24 Nov 2026: it was asked here
+    // as free text and again at 02 as a choice); the architect's schedule keeps this field
     help: "Write “to confirm” if it is not settled; the funders' checks read that honestly.",
-    ask: { stop: 1, q: "How will the land be held?", who: "you", placeholder: "e.g. owned, or a 60-year nominal lease",
-      examples: ["owned by the society", "a 60-year lease at a nominal rent", "a 99-year lease at a nominal rent", "to confirm"],
-      why: "The Community Housing Fund needs ownership, or a lease of 60 years or more at a nominal rent.", where: ["the owner's agreement"] },
     info: "Who will hold the land. The Community Housing Fund needs a lease of at least 60 years at nominal value, or ownership. Write 'to confirm' while it is unsettled: the check then returns uncertain instead of guessing. The option's own tenure plan overrides this one." },
   { on: "site", key: "notes", group: "Owner", label: "Notes", type: "textarea", need: "", ref: "note",
     info: "Placeholders, assumptions and what still needs checking. The memo prints them." },
@@ -279,10 +283,12 @@ const FIELDS = [
       why: "A funder asks who runs the building before anything else. Blank is an open item where the housing is supportive, transitional or a shelter, or where the land owner is not the proponent." },
     info: "The operator's name, printed in the memo's title block. Where it differs from the proponent, the memo asks for the agreement between them." },
   { on: "option", key: "land_tenure", group: "Funding", label: "How the homes' land is held", type: "select", need: "rule", reads: ["chf_fit"],
-    options: [["", "Not sure"], ["owned", "Owned by the proponent"], ["lease_60_plus", "A lease of 60 years or more at a nominal rent"], ["lease_shorter", "A shorter lease"], ["air_space_parcel", "An air-space parcel or strata lot"], ["to_confirm", "Still to settle"]],
+    // one "Not sure" (24 Nov 2026: "Not sure" and "Still to settle" sat side by side and meant the same; the engine
+    // still reads a saved "to_confirm" as unsure)
+    options: [["", "Not sure"], ["owned", "Owned by the proponent"], ["lease_60_plus", "A lease of 60 years or more at a nominal rent"], ["lease_shorter", "A shorter lease"], ["air_space_parcel", "An air-space parcel or strata lot"]],
     ask: { stop: 2, q: "How will the land under the homes be held?", who: "you, with the land owner",
-      why: "The Community Housing Fund needs ownership, or a lease of 60 years or more at a nominal rent. A choice here is read in place of the sentence typed at 01." },
-    info: "Read by the Community Housing Fund check in place of the free-text land tenure plan: ownership, an air-space parcel or a lease of 60 years or more passes; a shorter lease fails; still to settle is uncertain." },
+      why: "The Community Housing Fund needs ownership, or a lease of 60 years or more at a nominal rent. Not sure comes back as an open item." },
+    info: "Read by the Community Housing Fund check in place of the free-text land tenure plan: ownership, an air-space parcel or a lease of 60 years or more passes; a shorter lease fails; not sure is uncertain." },
   { on: "option", key: "as_built", group: "Option", label: "A completed project, entered to check the tool", type: TRI, need: "figure",
     info: "Yes puts a line at the head of the memo saying this is a calibration run against a completed project: a fail then shows a limit of the rules, not of the building." },
   // the operator's own figures (23 Nov 2026, proforma.build reads option.operations): each stands over the layer F placeholder

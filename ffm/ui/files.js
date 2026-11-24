@@ -92,7 +92,7 @@ export async function selectSite(id) {
   await loadRuns();
   fillRunSelects();
   setStep(state.step);
-  guide.reading = null; guide.suggestion = null; guide.mine = {};
+  guide.reading = null; guide.suggestion = null; guide.mine = {}; guide.optionSeen = false;
   renderGuide();
   pollIssues();
 }
@@ -218,9 +218,15 @@ export async function saveNow(kind, given = null) {
 
 /* An edit to the site, the option or the money after a run leaves the answers on screen out of date: a band over the
    memo says so, and Issue waits for a new run. runRules and openRun clear it. */
+export const DATE_STALE = "the rules date";
+
 export function markStale(what) {
-  if (!state.run || state.runStale) { if (state.run) syncStaleBand(); return; }
-  state.runStale = what || "the inputs";
+  if (!state.run) return;
+  const why = what || "the inputs";
+  // a memo out of date only by its rules date is current again when the date goes back (main.js), so an edit made
+  // meanwhile is added to the reason, never lost under it
+  if (state.runStale && !(state.runStale === DATE_STALE && why !== DATE_STALE)) { syncStaleBand(); return; }
+  state.runStale = state.runStale === DATE_STALE ? `${why} and ${DATE_STALE}` : why;
   syncStaleBand();
   // the status line says so once, at the change that left the memo out of date (20 Nov 2026: a three-state answer
   // after a run changed nothing on screen but the band); a caller with more to say writes after this
@@ -263,7 +269,7 @@ export function saveDraft() {
       const d = { version: 3, saved_at: new Date().toISOString(), as_of: $("#as-of").value, siteId: state.siteId, site: state.siteId ? null : state.site, siteDirty: state.siteDirty,
         optionId: state.optionId, option: state.optionId ? null : state.option, optionDirty: state.optionDirty,
         guide: { step: guide.step, address: guide.address, way: guide.way, programs: guide.programs, candidate: guide.candidate, mine: guide.mine, answers: guide.answers,
-                 lookup: guide.lookup, suggestion: guide.suggestion, suggestionUsed: guide.suggestionUsed, reading: guide.reading } };
+                 lookup: guide.lookup, suggestion: guide.suggestion, suggestionUsed: guide.suggestionUsed, reading: guide.reading, optionSeen: !!guide.optionSeen } };
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(d));
     } catch (e) { /* storage off or full: the draft is not kept */ }
   }, 400);
@@ -301,6 +307,7 @@ export async function resumeDraft(d) {
   Object.assign(guide, d.guide || {});
   guide.busy = {};
   guide.step = d.version === 3 ? (guide.step || 1) : stopOf(guide.step);   // a draft from the seven-stop guide
+  guide.optionSeen = !!guide.optionSeen || guide.step >= 2;   // a draft from before the flag: past 01 means 02 was seen
   if (!guide.mine) guide.mine = {};
   syncCards();
   renderGuide();

@@ -69,11 +69,15 @@ function massTools(m) {
   return `<details class="mass-tools"${mass.open ? " open" : ""}><summary>Place the mass and choose the front <span class="cont">· ${h(ANCHOR_NAMES.find(([k]) => k === cur.anchor)?.[1] || cur.anchor)}${cur.dx_m || cur.dy_m ? `, shifted ${h(cur.dx_m)} / ${h(cur.dy_m)} m` : ""}${cur.rotate ? ", turned a quarter" : ""}${cur.angle_deg ? `, turned ${h(cur.angle_deg)}°` : ""}${pl.clamped ? " · held inside the envelope" : ""}</span></summary>
     <div class="mass-row">
       <div class="mass-anchor" role="group" aria-label="Where the mass stands in the plate box">${ANCHOR_NAMES.map(([k, l]) => `<button type="button" class="segbtn" data-anchor="${k}" aria-pressed="${cur.anchor === k}" title="${h(l)}"><span class="sr-only">${h(l)}</span></button>`).join("")}</div>
-      <label class="field inline"><span class="label">Across (m)</span><input type="number" step="0.5" id="mass-dx" value="${h(cur.dx_m)}" aria-label="Shift along the frontage in metres"></label>
-      <label class="field inline"><span class="label">Back (m)</span><input type="number" step="0.5" id="mass-dy" value="${h(cur.dy_m)}" aria-label="Shift into the lot in metres"></label>
+      <!-- each control is named by its visible label, the longer sense said as its description (24 Nov 2026: the
+           aria-labels replaced "Across (m)" with words a voice user could not see to say) -->
+      <span class="sr-only" id="mass-dx-d">shifts the mass along the frontage</span><span class="sr-only" id="mass-dy-d">shifts the mass into the lot</span>
+      <span class="sr-only" id="mass-angle-d">turns the mass on the lot, counter-clockwise; a corner past the setback envelope is said, not moved back</span><span class="sr-only" id="mass-front-d">which face of the lot is the street side</span>
+      <label class="field inline"><span class="label">Across (m)</span><input type="number" step="0.5" id="mass-dx" value="${h(cur.dx_m)}" aria-describedby="mass-dx-d"></label>
+      <label class="field inline"><span class="label">Back (m)</span><input type="number" step="0.5" id="mass-dy" value="${h(cur.dy_m)}" aria-describedby="mass-dy-d"></label>
       <label class="ed-acc"><input type="checkbox" id="mass-rotate"${cur.rotate ? " checked" : ""}> turn a quarter</label>
-      <label class="field inline"><span class="label">Turn (°)</span><input type="number" step="1" min="-180" max="180" id="mass-angle" value="${h(cur.angle_deg || 0)}" aria-label="Turn the mass on the lot, degrees counter-clockwise" title="Turn the mass on the lot by any angle, counter-clockwise; a corner past the setback envelope is said, not moved back"></label>
-      <label class="field inline"><span class="label">Front</span><select id="mass-front" aria-label="Which face of the lot is the street side">
+      <label class="field inline"><span class="label">Turn (°)</span><input type="number" step="1" min="-180" max="180" id="mass-angle" value="${h(cur.angle_deg || 0)}" aria-describedby="mass-angle-d" title="Turn the mass on the lot by any angle, counter-clockwise; a corner past the setback envelope is said, not moved back"></label>
+      <label class="field inline"><span class="label">Front</span><select id="mass-front" aria-describedby="mass-front-d">
         <option value=""${ffVal === "" ? " selected" : ""}>as found (${h((state.site.context && state.site.context.street && state.site.context.street.name) || "the lookup's street")})</option>
         ${roads.map(r => `<option value="street:${h(r)}"${ffVal === `street:${r}` ? " selected" : ""}>${h(r)}</option>`).join("")}
         ${["front", "rear", "left", "right"].map(s => `<option value="side:${s}"${ffVal === `side:${s}` ? " selected" : ""}>the ${s} side as drawn</option>`).join("")}
@@ -327,12 +331,13 @@ function renderSheets(run, n0) {
   const short = (L.shortfall || []).length ? ` Did not fit: ${L.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()} (${fmtNum(Math.round(s.area_m2))} m²)`).join("; ")}; more storeys, a larger plate or a smaller program.` : "";
   const out = [];
   const broken = (L.geometry || []).map(g => `<li>${pill("fail")}<span><span class="title">broken:</span> <span class="cont">${h(g.note)}.</span></span></li>`).join("");
-  // the plans and the stacking are the architect's working drawings: the manager sees them once the architect has
-  // issued the run to them (Kai, 15 Nov 2026); until then a quiet card holds their place
-  out.push(`<div class="card figure layout-wait"><div class="eyebrow">${fig(n0)} and ${fig(n0 + 1)} · Plans by program and stacking</div>
-    <p class="note">The schematic plans are the architect's to draw and check. They appear here once the architect issues this run back${state.mode === "reader" ? " to the development manager" : " to you"}; the massing above and the elevations and site plan below are the rule-derived envelope.</p></div>`);
+  // the plans and the stacking are the architect's working drawings. Every layout shows them, stamped as a first layout
+  // until the architect marks the memo issued back to the manager (24 Nov 2026: they were hidden from the manager and
+  // the reader until then, while answer 3 cited "70 of 105 homes fit the plate" and the PDF printed them; Kai's rule of
+  // 15 Nov 2026, that the plans are the architect's to check, is kept by the stamp)
+  const stamp = `<span class="layout-stamp">First layout from the rules · not yet checked by the architect</span>`;
   out.push(`<figure class="card figure sheet layout-sheet" data-sheet="plans">
-    <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>
+    <div class="fig-head"><div class="eyebrow">${fig(n0)} · Plans by program${L.edited ? ' <span class="cont">· placed by hand</span>' : ""}</div>${stamp}
       <div class="fig-tools"><div class="seg" role="group" aria-label="Plans or axonometric"><button type="button" class="segbtn" data-sheet-view="plans" aria-pressed="true">Plan</button><button type="button" class="segbtn" data-sheet-view="axon" aria-pressed="false">Axon</button></div>
       <button type="button" class="btn btn-small" id="edit-blocks" aria-expanded="false" title="Drag, resize, add or remove the blocks; the engine checks every move">Edit blocks</button></div></div>
     <div class="sheet-body" data-view="plans">
@@ -346,7 +351,7 @@ function renderSheets(run, n0) {
     <ul class="finding-list sheet-rules">${broken}${rules.map(c => `<li>${pill(c.status)}<span><span class="title">${h(c.block.replace(/_/g, " "))}:</span> <span class="cont">${h(c.rule)}. ${h(c.note ? c.note[0].toUpperCase() + c.note.slice(1) : "")}</span></span></li>`).join("")}</ul>
     ${egressHtml(L.egress)}
   </figure>`);
-  out.push(`<figure class="card figure sheet layout-sheet"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div><div class="sheet-body">${S.stacking || ""}</div>
+  out.push(`<figure class="card figure sheet layout-sheet"><div class="fig-head"><div class="eyebrow">${fig(n0 + 1)} · Stacking</div>${stamp}</div><div class="sheet-body">${S.stacking || ""}</div>
     <figcaption>One bar per floor, top first; each segment the share of the plate a block takes. Core and corridor are the same on every floor; what is left after the units is spare, dashed.</figcaption></figure>`);
   out.push(`<figure class="card figure sheet"><div class="eyebrow">${fig(n0 + 2)} · Preliminary elevations</div><div class="sheet-body">${S.elevations || ""}</div>
     <figcaption>Storeys × floor to floor; one window per unit on its side as the rhythm, the ground floor glazed where the non-residential space is; the outright height dashed grey${run.massing && run.massing.policy_benchmark && run.massing.policy_benchmark.height_m ? ", the staff benchmark amber" : ""}. A placeholder for the elevation study, not a design.</figcaption></figure>`);

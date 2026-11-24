@@ -179,11 +179,11 @@ export function renderClauses(res, L, changed = new Set(), run = null) {
   const notesWhat = layersOf(notes).includes("F") ? "the cost assumptions and other information" : "information the rules carry";
   return `<section class="card section clauses">
     <h2>Clauses applied · ${applied.length} of ${res.length} rules</h2>
-    <p class="intro">Every clause that applies to this site and option, worst first. <b>Proposed</b> is what the option puts forward and the simulation used; <b>permitted or required</b> is the clause's own limit; <b>the ask</b> is the relaxation, negotiation or missing figure that stands between them.</p>
+    <p class="intro">Every clause that applies to this site and option, worst first. <b>Proposed</b> is what the option puts forward, as the rules read it; <b>permitted or required</b> is the clause's own limit; <b>the ask</b> is the relaxation, negotiation or missing figure that stands between them.</p>
     <div class="counts">${countPills}</div>
     ${rows ? `<table class="plain">${colgroup}
-      <thead><tr><th>Clause</th><th>Status</th><th>Proposed (simulated)</th><th>Permitted or required</th><th>The ask</th></tr></thead><tbody>${rows}</tbody></table>` : ""}
-    ${notes.length ? `<details class="fold info-fold"><summary>${notes.length} note${notes.length === 1 ? "" : "s"}: ${notesWhat}</summary>
+      <thead><tr><th>Clause</th><th>Status</th><th>Proposed</th><th>Permitted or required</th><th>The ask</th></tr></thead><tbody>${rows}</tbody></table>` : ""}
+    ${notes.length ? `<details class="fold info-fold"><summary>${notes.length} marked Info: ${notesWhat}</summary>
       <table class="plain">${colgroup}<tbody>${notes.map(row).join("")}</tbody></table></details>` : ""}
     ${na.length ? `<details class="fold na"><summary>Not applicable here: ${na.length} rule${na.length === 1 ? "" : "s"}, for other districts, policies or programs</summary><ul class="na-list">${na.map(r => `<li>${h(r.title)} <code class="rule-id">${idBreak(r.rule_id)}</code></li>`).join("")}</ul></details>` : ""}
   </section>`;

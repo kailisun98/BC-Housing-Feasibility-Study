@@ -89,10 +89,13 @@ export function stackDrawing(stacks, opts = {}) {
     const found = pay.top, total = s.total || cost.top;
     if (s.gap != null && s.gap > 0) {
       const g = s.gap * k, words = `${s.share != null ? `${Math.round(s.share * 100)}% of the cost` : ""}`;
-      gapHtml = g >= 2 * lh + 2
-        ? `<div class="ms-seg s-gap" style="bottom:${at(found * k)};height:${at(g)}"><span class="ms-in"><span class="ms-ink">Not yet found</span><br><b>${h(millionsOf(s.gap))}</b>${g >= 3 * lh + 2 && words ? `<br><span class="ms-ink">${h(words)}</span>` : ""}</span></div>`
+      // the gap's label sits on a paper patch with 2 px above and below, inside a 1 px border: n lines need n × lh + 6
+      // (24 Nov 2026: the threshold counted the lines alone, and at 1366 the third line was cut off in a 46 px box)
+      const fits = n => g >= n * lh + 6;
+      gapHtml = fits(2)
+        ? `<div class="ms-seg s-gap" style="bottom:${at(found * k)};height:${at(g)}"><span class="ms-in"><span class="ms-ink">Not yet found</span><br><b>${h(millionsOf(s.gap))}</b>${fits(3) && words ? `<br><span class="ms-ink">${h(words)}</span>` : ""}</span></div>`
         : `<div class="ms-seg s-gap" style="bottom:${at(found * k)};height:${at(g)}"></div>`;
-      if (g < 2 * lh + 2) outside.pay.push({ at: (found + s.gap / 2) * k, text: `Not yet found <b>${h(millionsOf(s.gap))}</b>` });
+      if (!fits(2)) outside.pay.push({ at: (found + s.gap / 2) * k, text: `Not yet found <b>${h(millionsOf(s.gap))}</b>` });
     } else if (s.gap != null && s.gap < 0) {
       outside.pay.push({ at: total * k, text: `Headroom <b>${h(millionsOf(-s.gap))}</b> over the cost` });
     }

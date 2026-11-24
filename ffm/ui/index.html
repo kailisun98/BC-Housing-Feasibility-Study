@@ -19,7 +19,9 @@
 
 <div class="bars">
 <header class="topbar">
-  <h1 class="wordmark"><a href="./" title="Back to the home page"><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg>First Read</a> <em>a funding-fit memo for BC non-profit housing</em></h1>
+  <!-- the wordmark is not a heading: the pane's own title (the memo's address, the stage's site) is the page's one h1
+       (24 Nov 2026: two h1s on every screen) -->
+  <p class="wordmark"><a href="./" title="Back to the home page"><svg class="fr-mark" aria-hidden="true"><use href="brand/mark.svg#mark"/></svg>First Read</a> <em>a funding-fit memo for BC non-profit housing</em></p>
   <div class="mode" role="group" aria-label="Who is reading">
     <span class="eyebrow" id="mode-key">For the</span>
     <div class="seg-mode" id="mode-switch">
@@ -30,9 +32,10 @@
     </div>
   </div>
   <div class="topbar-controls">
-    <label class="asof" title="The memo reads the rules in force on this date: the memo on screen was made on it, and the next run reads it">
+    <!-- the help is said once, as the field's description (24 Nov 2026: two titles and the description were read in turn) -->
+    <label class="asof">
       <span class="eyebrow asof-key">Rules as of</span>
-      <input type="date" id="as-of" aria-describedby="as-of-help" title="The memo reads the rules in force on this date">
+      <input type="date" id="as-of" aria-describedby="as-of-help">
       <span id="as-of-help" class="sr-only">The memo reads the rules in force on this date; the next run reads them as of it.</span>
     </label>
     <button id="run-btn" class="btn btn-primary" type="button" title="Run the rules (Ctrl+Enter)" aria-keyshortcuts="Control+Enter">Run the rules</button>
@@ -119,8 +122,8 @@
   <section class="memo-pane" id="step-run" tabindex="-1" aria-label="The memo">
     <div class="memo-tools">
       <label class="tool" id="tool-open">
-        <span class="eyebrow">Open a past run</span>
-        <select id="open-run"><option value="">This run</option></select>
+        <span class="eyebrow">Open a memo</span>
+        <select id="open-run"><option value="">This memo</option></select>
       </label>
       <label class="tool" id="tool-compare">
         <span class="eyebrow">Compare with…</span>
@@ -139,7 +142,7 @@
       <h2>Export</h2>
       <div class="action-bar" id="export-actions">
         <button id="pdf-btn" class="btn" type="button" disabled>Download PDF</button>
-        <button id="issue-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="issue-panel">Issue to the architect</button>
+        <button id="issue-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="issue-panel">Mark issued to the architect</button>
         <button id="print-btn" class="btn btn-quiet" type="button" disabled>Print</button>
         <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel">Export to Revit</button>
         <details class="more-formats"><summary class="btn btn-quiet">More formats</summary>

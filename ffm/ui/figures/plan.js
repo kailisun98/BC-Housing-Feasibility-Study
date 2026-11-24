@@ -92,7 +92,8 @@ export function figPlan(m, ctx, fsIn = null) {
     const tx = f2(X(tr.x)), ty = f2(Y(tr.y));
     if (tr.retained) s += `<circle cx="${tx}" cy="${ty}" r="${tr.crown}" fill="${HALF.tree}" fill-opacity="0.45" stroke="${HALF.treeLine}" stroke-width="0.8" ${NS}/>`;
     else s += `<circle cx="${tx}" cy="${ty}" r="${tr.crown}" fill="none" stroke="${HALF.gone}" stroke-width="0.6" stroke-dasharray="1.5 1.5" ${NS}/>${tr.crown > fs * 0.5 ? `<text x="${tx}" y="${f2(Y(tr.y) + fs * 0.35)}" font-size="${f2(fs * 0.9)}" text-anchor="middle" fill="${HALF.gone}">×</text>` : ""}`;
-    if (ids) s += `<text x="${f2(X(tr.x) + tr.crown + 0.5)}" y="${f2(Y(tr.y) - tr.crown * 0.6)}" font-size="${f2(fs * 0.85)}" fill="${tr.retained ? HALF.treeLine : HALF.gone}" ${halo(fs)}>${h(tr.id)}</text>`;
+    // the ids are text: the street-name grey, readable at their size (24 Nov 2026: T2 to T9 read at 1.9:1)
+    if (ids) s += `<text x="${f2(X(tr.x) + tr.crown + 0.5)}" y="${f2(Y(tr.y) - tr.crown * 0.6)}" font-size="${f2(fs * 0.85)}" fill="${HALF.text}" ${halo(fs)}>${h(tr.id)}</text>`;
   }
 
   // what the street names must keep clear of, as circles in the drawing's coordinates

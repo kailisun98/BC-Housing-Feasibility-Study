@@ -142,7 +142,8 @@ async function staticRun(body) {
     downloads: { html: blobUrl(out.memo_html, "text/html"), md: blobUrl(out.memo_md, "text/markdown"),
                  massing: out.massing ? blobUrl(JSON.stringify(out.massing, null, 2), "application/json") : null } };
   const summary = { run_id: runId, folder, folder_abs: null, as_of: L.run.as_of, stamp: L.run.stamp.stamp, option_id: L.run.option_id,
-    option_name: (L.inputs.option || {}).name, written: now.toISOString().slice(0, 19),
+    // local time, as the server writes it and the folder names it (24 Nov 2026: this one was UTC)
+    option_name: (L.inputs.option || {}).name, written: new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19),
     verdicts: { outright: ans.allowed.outright.verdict, by_rezoning: ans.allowed.by_rezoning.verdict, funded: ans.funded.verdict },
     has_diff: !!out.diff, has_massing: !!out.massing, revit: null };
   browserRuns.set(runId, { payload, summary });

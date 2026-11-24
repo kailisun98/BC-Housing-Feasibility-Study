@@ -37,7 +37,7 @@ Other programs written for this kind of housing, listed from their own pages and
 ## 4. Does the money work? (feasibility grade)
 **Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
 
-**For the development manager:** Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.
+**For the development manager:** Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$62,597,262**: hard $46,368,342 (escalated ×1.0292), soft $11,592,086, contingency $4,636,834, land $0.
 - Net operating income **$965,615 a year**: rent $1,887,451 less vacancy $69,836, operating cost $780,000 and reserve $72,000.

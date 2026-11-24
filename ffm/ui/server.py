@@ -278,6 +278,13 @@ def list_runs(site_id: str | None) -> list[dict]:
         except Exception:
             continue
         stamp = run["stamp"]["stamp"]
+        # when the run was first issued: a run made in the tool takes its revision number then (runs.js noteRevisions)
+        issued_at = None
+        if (p / "issues.json").exists():
+            try:
+                issued_at = min((i.get("issued_at") for i in _read(p / "issues.json") if i.get("issued_at")), default=None)
+            except Exception:
+                issued_at = None
         runs.append({
             "run_id": f"{site_id}/{p.name}", "folder": p.name, "folder_abs": str(p),
             "as_of": run["as_of"], "stamp": stamp, "option_id": run.get("option_id"),
@@ -286,7 +293,7 @@ def list_runs(site_id: str | None) -> list[dict]:
             "verdicts": {"outright": ans["allowed"]["outright"]["verdict"], "by_rezoning": ans["allowed"]["by_rezoning"]["verdict"],
                          "funded": ans["funded"]["verdict"]},
             "has_diff": (p / "diff.json").exists(), "has_massing": (p / "massing.json").exists(),
-            "revit": revit_summary(p, stamp),
+            "revit": revit_summary(p, stamp), "issued_at": issued_at,
         })
     runs.sort(key=lambda r: r["written"], reverse=True)
     return runs

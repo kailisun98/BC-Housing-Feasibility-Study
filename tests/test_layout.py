@@ -90,8 +90,9 @@ class Stacking(unittest.TestCase):
             root = ET.fromstring(text)
             self.assertTrue(root.tag.endswith("svg"), name)
             # each sheet says which rules it read; the stamp's hash stays in the ledger and off the drawing, as the UI
-            # dropped it (17 Nov 2026)
-            self.assertIn(f"Rules as of {self.lay['as_of']}", text, name)
+            # dropped it (17 Nov 2026); the date reads in words, "3 Nov 2026" (24 Nov 2026)
+            self.assertIn(f"Rules as of {massing.date_words(self.lay['as_of'])}", text, name)
+            self.assertNotIn(f"Rules as of {self.lay['as_of']}", text, name)
             self.assertNotIn(self.lay["stamp"], text, name)
         self.assertIn("front 3.7 m", S["site-plan"])
         self.assertIn("outright 10.7 m", S["elevations"])

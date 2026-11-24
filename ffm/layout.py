@@ -24,7 +24,7 @@ import math
 from pathlib import Path
 from typing import Any
 
-from .massing import MIDRISE_MAX_STOREYS
+from .massing import MIDRISE_MAX_STOREYS, date_words
 from .suggest import ASSUMPTIONS
 
 # Declared placeholders of the layout, not rules: a person can change them and the memo says they were used.
@@ -90,7 +90,7 @@ TONES = {
     "paper": "#ffffff", "ink": "#1f2933", "muted": "#5f6672", "rule": "#e1e5ea", "lot": "#f4f4f2",
     "studio": "#dbe9f8", "one_bed": "#b9d4f0", "two_bed": "#8fb8e3", "three_bed_plus": "#6b9fd4",
     "corridor": "#f4f4f2", "core": "#c9c9c5", "services": "#e2e2df", "amenity": "#f6e7c1", "non_residential": "#f0cf9a",
-    "spare": "#ffffff", "envelope": "#c81e1e", "outright": "#8e8e8e", "benchmark": "#c77d14", "tree": "#9fb07f", "tree_line": "#7f9664",
+    "spare": "#ffffff", "envelope": "#c81e1e", "outright": "#8e8e8e", "benchmark": "#c77d14", "benchmark_text": "#8f5a0e", "tree": "#9fb07f", "tree_line": "#7f9664",
     "accessible": "#245f9c", "other": "#e6dfd0",
     # the architect's own blocks (17 Nov 2026): design space (a lobby, an atrium), commercial space, and a cut-out
     # (open to below, a notch, a courtyard: not floor area), which is how a plate takes a shape other than a rectangle
@@ -1713,8 +1713,9 @@ def _spread(labels: list[tuple[float, str, str]], gap: float = 12.0, top: float 
 
 
 def _stamp_line(L: dict) -> str:
-    # the run's stamp stays in the ledger and the memo's title block; on the drawing it read as machine text
-    return f'Rules as of {L["as_of"]} · drawn from the option and the massing, not a design'
+    # the run's stamp stays in the ledger and the memo's title block; on the drawing it read as machine text, and so
+    # did the ISO date (24 Nov 2026)
+    return f'Rules as of {date_words(L["as_of"])} · drawn from the option and the massing, not a design'
 
 
 def svg_stacking(L: dict) -> str:
@@ -2155,10 +2156,12 @@ def svg_elevations(L: dict, massing: dict) -> str:
     # the labels at the right of an elevation, at their heights
     def right_labels() -> list[tuple[float, str, str]]:
         ls = [(base - Hp * scale + 4, f"{_metres(Hp)} m", TONES["ink"])]
+        # the labels in the darker twin of their line's tone (24 Nov 2026: the line greys read at 3.3:1 as 10 px text);
+        # the lines keep their tones
         if out_h:
-            ls.append((base - out_h * scale + 4, f"outright {_metres(out_h)} m", TONES["outright"]))
+            ls.append((base - out_h * scale + 4, f"outright {_metres(out_h)} m", TONES["muted"]))
         if bench.get("height_m"):
-            ls.append((base - bench["height_m"][1] * scale + 4, f"benchmark {_metres(bench['height_m'][0])}–{_metres(bench['height_m'][1])} m", TONES["benchmark"]))
+            ls.append((base - bench["height_m"][1] * scale + 4, f"benchmark {_metres(bench['height_m'][0])}–{_metres(bench['height_m'][1])} m", TONES["benchmark_text"]))
         return ls
 
     lab_w = max(_tw(t, 10) for _, t, _ in right_labels()) + 20
@@ -2348,7 +2351,9 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
     yards = _find(results, check="district_setbacks")
     for k in ("front", "rear", "side"):
         mn = (yards or {}).get("values", {}).get(f"min_{k}_yard_m") if yards else None
-        rows.append((f"{k.capitalize()} yard", f'{sb.get(k)} m', f'{mn} m minimum' if mn is not None else ("placeholder, not from the schedule" if not yards else "not given"), ("pass" if sb.get(k, 0) + 1e-9 >= mn else "conditional") if mn is not None else "info"))
+        # with no yard rule in the stack the yards are the option's own figures, unchecked: the same Uncertain answer 3
+        # gives coverage.yards (24 Nov 2026; this row read "placeholder · info" beside answer 3's "not checked")
+        rows.append((f"{k.capitalize()} yard", f'{sb.get(k)} m', f'{mn} m minimum' if mn is not None else ("not checked: no yard rule in the rules" if not yards else "not given"), ("pass" if sb.get(k, 0) + 1e-9 >= mn else "conditional") if mn is not None else ("uncertain" if not yards else "info")))
     trees = massing.get("trees") or {}
     rows.append(("Trees", f'{trees.get("after", "?")} after development', f'Schedule C requires {trees.get("required", "?")}', "pass" if trees and (trees.get("shortfall") or 0) == 0 else "conditional") if trees else ("Trees", "no survey on file", "", "uncertain"))
     ans = ledger["summary"]["answers"]["allowed"]
@@ -2362,11 +2367,23 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
     table_w = cols[3] + widest[3]
     width = max(pad + table_w + pad, 680)
     inner = width - 2 * pad
-    # the plan takes the sheet's width, at most 320 px tall
-    scale = max(3.0, min((inner - 60) / bw, 320 / bd))
-    pw, pd = bw * scale, bd * scale
+    # project north (24 Nov 2026, Kai: "the plans should always show project north"; FIG 01 is drawn so, and this sheet
+    # stood street-down beside it): the lot frame turned on the page by the quarter turn nearest north up. rot gives a
+    # lot point's direction on the page (y down); the street's side of the lot faces street_dir on the page.
+    q = project_turn(bearing)
+    cq, sq = round(math.cos(math.radians(q))), round(math.sin(math.radians(q)))
+    rot = lambda x, y: (cq * x + sq * y, sq * x - cq * y)
+    box_c = [rot(x, y) for x, y in ((bb[0], bb[1]), (bb[2], bb[1]), (bb[2], bb[3]), (bb[0], bb[3]))]
+    u0, v0 = min(c[0] for c in box_c), min(c[1] for c in box_c)
+    pw_m, pd_m = max(max(c[0] for c in box_c) - u0, 1.0), max(max(c[1] for c in box_c) - v0, 1.0)
+    street_dir = (-sq, cq)      # (0, 1) the bottom, (0, -1) the top, (-1, 0) the left, (1, 0) the right
+    # the plan takes the sheet's width, at most 320 px tall, with room for the street's name on the side it is on
+    scale = max(3.0, min((inner - 60 - (34 if street_dir[0] else 0)) / pw_m, 320 / pd_m))
+    pw, pd = pw_m * scale, pd_m * scale
     ox = pad + 30 + max(0.0, (inner - 60 - pw) / 2)
-    oy = pad + 24
+    if street_dir[0] < 0:
+        ox = max(ox, pad + 40)
+    oy = pad + 24 + (30 if street_dir[1] < 0 else 0)
     allowed = [ln for a in allowed for ln in _wrap_words(a, max(40, int(inner / (11 * EM_PER_CHAR))))]
     # the caption under the lot, wrapped to the sheet
     trees_barriers = {b.get("tree"): b.get("barrier_m") for b in (trees.get("retained_barriers") or [])}
@@ -2377,7 +2394,7 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
                   f'dotted: the plate box {env["width_m"]} × {env["depth_m"]} m' if polygon_lot else f'Lot {W} × {D} m; dashed red: the setback envelope {env["width_m"]} × {env["depth_m"]} m')
                  + '; blue: the footprint' + (f'; {drawn} protection barrier{"s" if drawn != 1 else ""} (By-law 9958, Schedule A)' if drawn else ('; the retained trees have no surveyed position, so no barriers are drawn' if trees_barriers else "")) + '.')
     cap_lines = _wrap_words(lot_words, max(40, int(inner / (11 * EM_PER_CHAR))))
-    street_y = oy + pd + 30
+    street_y = oy + pd + (30 if street_dir == (0, 1) else 14)
     bar_y = street_y + 16
     cap_y = bar_y + 36
     ty = round(cap_y + 16 * len(cap_lines) + 8, 1)
@@ -2385,9 +2402,9 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
     foot_y = ty + table_h + 14
     height = foot_y + 16 + 16
     out = _svg_open(width, height, "Code site plan")
-    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>')
-    # the street at the bottom, as on FIG 01 and the plans (15 Nov 2026): y runs up the sheet
-    T = lambda x, y: (ox + (x - bb[0]) * scale, oy + (bb[3] - y) * scale)
+    out.append(f'<text x="{pad}" y="{pad - 4}" font-size="14" font-weight="600">Code site plan · metres, {"project north up" if bearing is not None else "street at the bottom"}</text>')
+    # a lot point on the sheet: turned to project north, then scaled from the turned extent's top-left
+    T = lambda x, y: (ox + (rot(x, y)[0] - u0) * scale, oy + (rot(x, y)[1] - v0) * scale)
     pts = lambda ring: " ".join(f"{T(x, y)[0]:.1f},{T(x, y)[1]:.1f}" for x, y in ring)
     lot_ring = lot.get("polygon") or [[0, 0], [W, 0], [W, D], [0, D]]
     env_ring = env.get("polygon") or []
@@ -2398,14 +2415,15 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
         out.append(f'<polygon points="{pts(env["box"]["ring"])}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')    # a turned plate box
     elif polygon_lot and env.get("box"):
         bx = env["box"]
-        out.append(f'<rect x="{T(bx["x"], bx["y"] + bx["d"])[0]:.1f}" y="{T(bx["x"], bx["y"] + bx["d"])[1]:.1f}" width="{bx["w"] * scale:.1f}" height="{bx["d"] * scale:.1f}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
+        box_ring = [[bx["x"], bx["y"]], [bx["x"] + bx["w"], bx["y"]], [bx["x"] + bx["w"], bx["y"] + bx["d"]], [bx["x"], bx["y"] + bx["d"]]]
+        out.append(f'<polygon points="{pts(box_ring)}" fill="none" stroke="{TONES["envelope"]}" stroke-width="0.8" stroke-dasharray="2 2"/>')
     # the footprint as the massing has it: a rectangle, turned where the architect turned the mass
     out.append(f'<polygon points="{pts(pm["footprint"])}" fill="{TONES["two_bed"]}" fill-opacity="0.55" stroke="{TONES["accessible"]}" stroke-width="1.2"/>')
-    fp_x = min(x for x, _ in pm["footprint"]); fp_y = max(y for _, y in pm["footprint"])
-    fx, fy = T(fp_x, fp_y)
+    fp_page = [T(x, y) for x, y in pm["footprint"]]
+    fx, fy = min(p[0] for p in fp_page), min(p[1] for p in fp_page)     # its top-left on the sheet
     fp_words = (f'two parts, {pm["plate_area_m2"]:,.0f} m² a floor, {pm["storeys"]} storeys' if pm.get("parts") else
                 f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m, {pm["storeys"]} storeys' + (f', turned {pm["angle_deg"]:g}°' if pm.get("angle_deg") else ""))
-    fp_room = (max(x for x, _ in pm["footprint"]) - fp_x) * scale
+    fp_room = max(p[0] for p in fp_page) - fx
     if _tw(fp_words, 10) + 8 > fp_room:
         fp_words = _fit([fp_words, f'{pm["plate_width_m"]} × {pm["plate_depth_m"]} m', f'{pm["storeys"]} st.'], fp_room - 4, 10) or ""
     if fp_words:
@@ -2424,11 +2442,17 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
         if lot_h and env_h:
             dims.append(("side", (lot_h[0], my), (env_h[0], my)))
             dims.append(("side", (env_h[-1], my), (lot_h[-1], my)))
-        side_w = _tw(f"side {sb.get('side')} m", 9.5)
-        env_px = (max(ex) - min(ex)) * scale
-        # the side labels: inside the envelope where both fit, else outside the lot where the sheet has room, else one
-        # above the other; never across the lot line
-        side_mode = "inside" if 2 * side_w + 16 <= env_px else ("outside" if min(ox - pad, width - pad - (ox + pw)) >= side_w + 6 else "stagger")
+        # a dimension runs up the sheet (its label beside it) or across it (its label by the side-label rule); street
+        # down, the front and rear run up and the sides across, as before the turn
+        upright = lambda a, b: abs(T(*a)[0] - T(*b)[0]) < abs(T(*a)[1] - T(*b)[1])
+        across = [f"{k} {sb.get(k)} m" for k, a, b in dims if not upright(a, b)]
+        side_w = max((_tw(t, 9.5) for t in across), default=0.0)
+        env_page = [T(x, y)[0] for x, y in env_ring]
+        env_px = max(env_page) - min(env_page)
+        # the labels across: inside the envelope where both fit, else outside the lot where the sheet has room (not on
+        # the street's side, where its name stands), else one above the other; never across the lot line
+        outside_ok = not street_dir[0] and min(ox - pad, width - pad - (ox + pw)) >= side_w + 6
+        side_mode = "inside" if 2 * side_w + 16 <= env_px else ("outside" if outside_ok else "stagger")
         for k, a, b in dims:
             (x1, y1), (x2, y2) = T(*a), T(*b)
             if abs(x1 - x2) + abs(y1 - y2) < 2:
@@ -2436,7 +2460,7 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
             tone = TONES["envelope"]
             out.append(f'<path d="M{x1:.1f} {y1:.1f}L{x2:.1f} {y2:.1f}" stroke="{tone}" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>')
             lab = f"{k} {sb.get(k)} m"
-            if k in ("front", "rear"):
+            if upright(a, b):
                 # beside the line, inside the lot
                 out.append(f'<text x="{x1 + 4:.1f}" y="{(y1 + y2) / 2 + 3.5:.1f}" font-size="9.5" fill="{tone}" stroke="{TONES["paper"]}" stroke-width="2.5" paint-order="stroke">{_esc(lab)}</text>')
                 continue
@@ -2455,14 +2479,25 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
         out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{max(3, 1.5 * scale / 2):.1f}" fill="{TONES["tree"]}" stroke="{TONES["tree_line"]}" stroke-width="0.8"/>')
         if r:
             out.append(f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{float(r) * scale:.1f}" fill="none" stroke="{TONES["tree_line"]}" stroke-width="0.8" stroke-dasharray="3 2"/>')
-    # the street, named at its edge
-    st = f"{street} · street side" if street else "street side"
-    out.append(f'<line x1="{ox:.1f}" y1="{oy + pd + 12:.1f}" x2="{ox + pw:.1f}" y2="{oy + pd + 12:.1f}" stroke="{TONES["muted"]}" stroke-width="0.8" stroke-dasharray="1 3"/>')
-    out.append(f'<text x="{ox + pw / 2:.1f}" y="{street_y:.1f}" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="{TONES["muted"]}">{_esc(st.upper())}</text>')
+    # the street, named at its edge, on whichever side of the sheet the turn put it
+    st = _esc((f"{street} · street side" if street else "street side").upper())
+    street_text = f'font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="{TONES["muted"]}"'
+    rule = f'stroke="{TONES["muted"]}" stroke-width="0.8" stroke-dasharray="1 3"'
+    if street_dir == (0, 1):
+        out.append(f'<line x1="{ox:.1f}" y1="{oy + pd + 12:.1f}" x2="{ox + pw:.1f}" y2="{oy + pd + 12:.1f}" {rule}/>')
+        out.append(f'<text x="{ox + pw / 2:.1f}" y="{street_y:.1f}" {street_text}>{st}</text>')
+    elif street_dir == (0, -1):
+        out.append(f'<line x1="{ox:.1f}" y1="{oy - 12:.1f}" x2="{ox + pw:.1f}" y2="{oy - 12:.1f}" {rule}/>')
+        out.append(f'<text x="{ox + pw / 2:.1f}" y="{oy - 18:.1f}" {street_text}>{st}</text>')
+    else:
+        sx = ox - 12 if street_dir[0] < 0 else ox + pw + 12
+        tx_, turn = (sx - 6, -90) if street_dir[0] < 0 else (sx + 6, 90)
+        out.append(f'<line x1="{sx:.1f}" y1="{oy:.1f}" x2="{sx:.1f}" y2="{oy + pd:.1f}" {rule}/>')
+        out.append(f'<text x="{tx_:.1f}" y="{oy + pd / 2:.1f}" transform="rotate({turn} {tx_:.1f} {oy + pd / 2:.1f})" {street_text}>{st}</text>')
     bar, bwid = _scale_bar(pad, bar_y, scale)
     out += bar
     if bearing is not None:
-        out += _north(pad + bwid + 40, bar_y + 2, bearing)
+        out += _north(pad + bwid + 40, bar_y + 2, bearing - q)   # true north on the turned sheet
     for i, ln in enumerate(cap_lines):
         out.append(f'<text x="{pad}" y="{cap_y + i * 16:.1f}" font-size="11" fill="{TONES["muted"]}">{_esc(ln)}</text>')
     # the table
@@ -2487,6 +2522,17 @@ def svg_site_plan(L: dict, site: dict, massing: dict, ledger: dict, bearing: flo
 
 
 SHEETS = ("stacking", "plans", "elevations", "axon", "site-plan")
+
+
+def project_turn(bearing: float | None) -> int:
+    """The quarter turn, clockwise on the sheet, that brings a street-down drawing nearest north up: 0, 90, 180 or -90,
+    and 0 where the bearing is not known. The page's projectTurn (figures/common.js) is the twin; FIG 01 and the code
+    site plan turn by it. Pure."""
+    if bearing is None:
+        return 0
+    t = ((float(bearing) - 90) % 360 + 540) % 360 - 180
+    q = int(math.floor(t / 90 + 0.5)) * 90
+    return q + 360 if q <= -180 else q
 
 
 def lot_bearing(site: dict, massing: dict) -> float | None:

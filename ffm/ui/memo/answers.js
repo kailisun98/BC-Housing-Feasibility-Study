@@ -48,10 +48,13 @@ export function answerAllowed(L, run = null) {
   // nothing was tested: say why, in the words answer 3 repeats with the person who settles it
   if (o.why) body += `<p class="finding"><b>Not assessed:</b> ${h(o.why)}. The storeys, height and floor area in this memo are the option's own figures, not permitted ones; answer 3 names who reads the schedule.</p>`;
   // each finding cites the rule it came from (A1, its title), so a CD-1 site shows its own by-law's rules (17 Nov 2026)
+  // a Fail here is against the district's own limits, without a rezoning; on an approved scheme it read as "failed"
+  // (24 Nov 2026, critique), so the heading says what the limits are and what replaces them when a rezoning is proposed
+  const outSub = `Outright under ${h(district)} <span class="cont">· the limits without a rezoning${proposes && outLines.some(r => r.status === "fail") ? "; going past them is what the rezoning below is for" : ""}</span>`;
   if (outLines.length) {
-    body += `<p class="path ans-sub">Outright under ${h(district)}</p>
+    body += `<p class="path ans-sub">${outSub}</p>
       <ul class="finding-list rule-list">${outLines.map(r => ruleItem(r, `${leadCont(r.finding)} <span class="cont">(${h(r.title)})</span>`)).join("")}</ul>`;
-  } else if (!o.why) body += `<p class="path ans-sub">Outright under ${h(district)}</p>`;
+  } else if (!o.why) body += `<p class="path ans-sub">${outSub}</p>`;
   if (path) {
     body += `<p class="path ans-sub">${proposes ? "By rezoning" : "Approval route, no rezoning"}: ${h(path)}</p>`;
     if (policy.length) body += `<ul class="finding-list rule-list">${policy.map(r => ruleItem(r, `<span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span>`)).join("")}</ul>`;
@@ -69,8 +72,9 @@ export function answerAllowed(L, run = null) {
 
 /* The funders' answer in words that do not read as money (20 Nov 2026: "Fits the funders: Yes" stood beside a $20.2M
    gap and a cancelled call): the programs' published criteria are met, or not; whether the money closes is answer 4.
-   The verdict sentence takes the engine's own words (summary.answers.funded.words, engine.funders_words: "Meets the
-   criteria of the Community Housing Fund and BC Builds"); a pill or a mark takes the short form. */
+   The verdict sentence takes the engine's own words (summary.answers.funded.words, engine.funders_words: "Passes this
+   screen's eligibility checks for the Community Housing Fund and BC Builds"); a cell or a mark takes the short form
+   below, which keeps the same verb, so the funders' answer has one wording everywhere (24 Nov 2026). */
 export const FUNDED_WORD = { yes: "Passes the screen", "yes, with conditions": "Passes the screen, with conditions", no: "Does not pass the screen", "not yet confirmed": "Screen not yet confirmed", "not assessed": "Not assessed" };
 export function fundedWord(f, long = false) {
   const own = long && f && typeof f.words === "string" && f.words ? f.words : null;
@@ -219,8 +223,9 @@ export const moneyWord = v => MONEY_WORD[v.word] || cap(v.word);
 export function moneyNext(pf) {
   const v = pf.verdict || {}, gap = (pf.gap || {}).value, c = pf.capital || {}, homes = (pf.inputs || {}).units_total;
   // rents that do not cover the running costs: the operating funder comes before the capital (proforma.OPERATING_FUNDER)
-  if (v.operating_shortfall) return "Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or shelter housing, the staffing as well), then enter the project's own rents and running costs and run again. This screen has no operating-subsidy line; the rents and the running cost are placeholders.";
-  if (v.word === "unlikely") return "Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. Enter what is found as Other grants or Equity and run again.";
+  // written for whoever reads the memo, on screen or on paper (24 Nov 2026: "run again" spoke to a board as an operator)
+  if (v.operating_shortfall) return "Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or shelter housing, the staffing as well), then a revised memo with the project's own rents, running costs and subsidy. Until they are entered, the rents and the running cost are placeholders.";
+  if (v.word === "unlikely") return "Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.";
   if (v.word === "unsure" && homes && gap != null && gap > 0 && c.total != null && c.land != null) return "Another source, or firmer figures for the placeholders, would settle it.";
   return "";
 }
@@ -255,7 +260,9 @@ export function moneyWords(pf, run = null, tag = "p") {
   } else if (c.land == null) out.push("Land is not priced: no figure was entered and the owner is not one that leases at a nominal value, so the cost leaves it out until it is entered.");
   if (c.total) {
     const share = g.share_of_capital != null ? Math.round(g.share_of_capital * 100) : null;
-    out.push(`The amber line is this tool's screening line, 15% of the cost (${millionsOf(c.total * SCREEN_SHARE)} here) below the top: a gap that stays above it is one the screen calls close${g.value > 0 && share != null ? `; this gap is ${share}%, ${share > 15 ? "past it, so the project needs more sources before design money is spent" : "inside it"}` : g.value != null && g.value <= 0 ? "; there is no gap" : ""}. It is the screen's own line, not a funder's rule.`);
+    // said by size, not by up and down (24 Nov 2026: "stays above it" read as "more than" beside a verdict that said
+    // the gap was more than the line)
+    out.push(`The amber line is this tool's screening line, drawn 15% of the cost (${millionsOf(c.total * SCREEN_SHARE)} here) down from the top: a gap no larger than that is one the screen calls close${g.value > 0 && share != null ? `; this gap is ${share}% of the cost, ${share > 15 ? "larger, so the project needs more sources before design money is spent" : "within it"}` : g.value != null && g.value <= 0 ? "; there is no gap" : ""}. It is the screen's own line, not a funder's rule.`);
   }
   if (d.supportable != null && d.dcr != null) {
     out.push(`Debt is what the rent can carry: a lender asks that the rent left after running costs cover the yearly mortgage payment ${Number(d.dcr).toFixed(2)} times (CMHC's coverage ratio), so ${money(o.noi)} a year carries ${money(d.supportable)} at ${d.rate_pct}% over ${d.amortization_years} years${ref((line("debt") || {}).rule_id)}.`);
@@ -296,7 +303,7 @@ export function operatingTable(pf) {
   const body = rows.map(r => `<tr class="op-${h(r.kind)}"><th scope="row">${h(r.label)}</th><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : h(r.value < 0 ? `−${money(-r.value)}` : money(r.value))}</td><td class="cont"><span class="measure">${h(r.note)}${r.ph ? ' <span class="ph-tag">placeholder</span>' : ""}${r.warn ? ' <span class="ph-tag">open</span>' : ""}</span></td></tr>`).join("");
   return `<details class="pf-lines op-page" open><summary>What it takes to run, a year <span class="cont">· the rents, the running costs and the subsidy needed</span></summary>
       <table class="plain op-table"><thead><tr><th scope="col">Line</th><th scope="col" class="num">A year</th><th scope="col">Note</th></tr></thead><tbody>${body}</tbody></table>
-      <p class="cont">The rents and the running cost are placeholders until the operator's own are entered at 03 (What it takes to run); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.</p>
+      <p class="cont">The rents and the running cost are placeholders until the operator's own are entered; support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.</p>
     </details>`;
 }
 

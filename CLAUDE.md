@@ -1020,6 +1020,41 @@ lists, and a README that lists what was fixed and what is still open. What a lat
   PDF only), so `edition_status` is `current` and the unit-areas finding raises nothing. 144 rules, five unverified.
   Fingerprints 31193259023b85e0 (23 Oct), 2c0cee962e81cc28 (27 Oct), 5cfd6a34b23f68ab (17 Nov). Kai saves by-law PDFs
   in `02 A2\00 Research`, beside the repo.
+## The tool critique and audit of 24 Nov 2026, and its fixes
+
+`.impeccable/critique/2026-11-24T18-33-25Z__ffm-ui-index-html.md` (26/40, three P1s). Kai chose: trust contradictions
+first, **only issued runs get a number**, everything listed. What a later session must know:
+- **Drafts.** A run made in the tool is a draft ("Draft 14:03") until marked issued; `noteRevisions` (runs.js) numbers
+  committed runs, then runs made here in the order first issued (`issued_at`, the earliest in the folder's
+  `issues.json`, which `server.list_runs` now returns). `isDraft`, `nextRev`, `runName`, `afterIssue` in runs.js. The
+  Issue button reads "Mark issued to the architect / development manager"; the board is no longer offered (it reads the
+  PDF). The web build's runs stay drafts.
+- **Run guards.** `runRefused` (runs.js): the reader never runs; the manager's memo runs again only when stale (Ctrl+Enter
+  and Enter on the aria-disabled Run again said "Nothing has changed since R1"). A "Rules as of" date off the memo's
+  own marks it stale (`DATE_STALE` in files.js; back to the memo's date clears it unless an edit is pending), and the
+  button reads "Run again as of 27 Oct 2026". `guide.optionSeen`: a saved site's first option counts at 02 only once
+  02 was visited.
+- **Stop 02's reading** shows "applies / needs your figures / not here" (`readingMark`), never status pills.
+- **Title block:** the comparison's result and a jump in the Compared-with cell (`compareResult` in side-by-side.js,
+  `changesPhrase` exported from changes.js); the sheet index "In this memo" (`MEMO_INDEX`, `indexMemo`, `wireJumps` in
+  memo/memo.js); the view switch stays while comparing; the Export to Revit panel opens under its button
+  (`placeActions` moves `#export-panel`, the footer hides while empty).
+- **Plans** show in every layout with a "First layout from the rules · not yet checked by the architect" stamp until
+  issued back to the manager (`.layout-stamp`); the `layout-wait` card is gone.
+- **FIG 06 to project north** (`layout.project_turn`, twin of the page's `projectTurn`): the code site plan turns by the
+  quarter turn nearest north, the street named on its side; 998 and Expo now have the street at the top, 375 Glen
+  Drive's first-run on the right. Drawings' foot lines read the date in words (`massing.date_words`). All committed
+  sheets, massing.svg files and memos were redrawn from their own JSON; `375-glen-drive/first-run/massing.svg` kept its
+  geometry as made, only its date changed. Ledgers and fingerprints untouched.
+- Copy: the money's next steps say "a revised memo counts…" (no "run again", no "at 03") in `proforma.MORE_SOURCES` /
+  `OPERATING_FUNDER` and their twins in answers.js; "Proposed" (not "(simulated)"); the 15% line said by size; land
+  tenure asked once, at 02, with one "Not sure"; the CD-1 and Oppenheimer schedule rows show only where they apply
+  (`only` in fields.js); the architect's schedule says "the manager" for "you"; the Reader has its own walkthrough
+  (`READER_TOUR`). One h1 a screen (the wordmark is a `p`).
+- Also: the ledger stacks on a phone; Leaflet waits while a `?run=` link opens; `/api/issues` and `/api/diff` are not
+  asked twice; tree ids and the elevations' limit labels meet contrast; the gap label fits its box; Side by side
+  changes read off the printed figures, in points for percentages; the answers keep a 920px width.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

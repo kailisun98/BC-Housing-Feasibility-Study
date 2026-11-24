@@ -20,8 +20,9 @@ export function changeWord(c, kind = "rules") {
    that moves to or from not applicable is a real change and stays in view. */
 export const naChange = c => [c.from, c.to].filter(Boolean).every(s => s === "not_applicable");
 
-/* A comparison in a few words for the status strip: how many statuses and versions moved, without the rule ids. */
-function changesPhrase(d) {
+/* A comparison in a few words for the status strip and the title block: how many statuses and versions moved, without
+   the rule ids. */
+export function changesPhrase(d) {
   // counted over the rules that apply to either run, as the card lists them; the rest are a count at the end
   const all = d.changes || [], ch = all.filter(c => !naChange(c)), na = all.length - ch.length;
   const tail = na ? `; ${na} more for other districts, policies or programs` : "";
@@ -42,7 +43,7 @@ export function compareSummary(run) {
   if (!d) return "";
   return compareKind(d) === "rules"
     ? `${rev(run.run_id)}, rules as of ${dateWords(d.current_as_of)}, against ${state.compareRun ? rev(state.compareRun) : "an earlier memo"}, rules as of ${dateWords(d.previous_as_of)}: ${changesPhrase(d)}`
-    : `${rev(run.run_id)} against ${state.compareRun ? `${rev(state.compareRun)}, ` : ""}${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a run as of ${d.previous_as_of}`}: ${changesPhrase(d)}`;
+    : `${rev(run.run_id)} against ${state.compareRun ? `${rev(state.compareRun)}, ` : ""}${run.compareLedger ? shortName(optionName(run.compareLedger)) : `a memo as of ${dateWords(d.previous_as_of)}`}: ${changesPhrase(d)}`;
 }
 
 /* The note beside the pickers speaks only when the memo cannot: a comparison waiting for the next run, or a run
@@ -52,7 +53,7 @@ export function setCompareNote(d) {
   const run = state.run;
   let note = "";
   if (!run && state.compareRun) note = "Applies to the next run.";
-  else if (run && d && !run.compareLedger) note = `This run was recorded against an earlier run as of ${d.previous_as_of}; choose it under Compare with… to see the two side by side.`;
+  else if (run && d && !run.compareLedger) note = `This memo was recorded against an earlier one, rules as of ${dateWords(d.previous_as_of)}; choose it under Compare with… to see the two side by side.`;
   $("#compare-note").textContent = note;
 }
 
@@ -72,7 +73,7 @@ export async function attachCause(run) {
     run.compareMassing = prev.massing || null;
     const a = (prev.ledger && prev.ledger.inputs) || {}, b = (run.ledger && run.ledger.inputs) || {};
     const changed = [stable(a.site) !== stable(b.site) && "the site's inputs", stable(a.option) !== stable(b.option) && "the option's inputs"].filter(Boolean);
-    const date = d.previous_as_of !== d.current_as_of ? `the as-of date (${d.previous_as_of} → ${d.current_as_of})` : null;
+    const date = d.previous_as_of !== d.current_as_of ? `the rules date (${dateWords(d.previous_as_of)} → ${dateWords(d.current_as_of)})` : null;
     const files = d.rules_changed ? "the rule files changed" : "same rule files";
     const same = changed.length ? "" : ", same site and option";
     const because = [date, ...changed].filter(Boolean);

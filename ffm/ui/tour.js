@@ -22,20 +22,35 @@ const TOUR = [
     text: "The programs in view, what the site allows before any option, and where to start: Funder-ready, Outright, Benchmark or a saved option, derived from the rules. The building is four figures; click one to make it yours. Every other figure, with the rule it rests on, is behind one fold." },
   { target: "#stage-card", fallback: "#memo", title: "03 Money in, then run", action: "run",
     before: async () => { if (!progress().site) await loadDemo(); if (!progress().option && guide.suggestion) useSuggestion(); if (progress().option) { guide.step = 3; guide.over = !!state.run; renderGuide(); } },
-    text: "Land, equity and other grants are the three figures only the manager knows; everything else the money counts with is a dated, cited assumption. Then one button runs the rules. Here the walkthrough opens the demo case's own memo instead, as Council approved it, so it writes no new revision." },
+    text: "Land, equity and other grants are the three figures only the manager knows; everything else the money counts with is a dated, cited assumption. Then one button runs the rules. A run made here is a draft until it is marked issued. Here the walkthrough opens the demo case's own memo instead, R1, as Council approved it, so it makes no draft." },
   { target: ".answers", fallback: "#memo", title: "The four answers", before: () => { if (guide.over) backToMemo(); },
-    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Does the money work? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item. The route has folded so the memo has the width." },
-  { target: "#memo-actions", fallback: "#step-export", title: "Download PDF, and issue",
-    text: "Download PDF is the memo for the board, laid out for paper. Issue to the architect hands this revision on with your name and a note; they see it in their top bar and issue it back when the plans are drawn." },
+    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Does the money work? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item. Once a memo is in, the route folds to the left edge so the memo has the width." },
+  { target: "#memo-actions", fallback: "#step-export", title: "Download PDF, and mark it issued",
+    text: "Download PDF is the memo for the board, laid out for paper. Mark issued to the architect gives a draft the site's next revision number and records your name and a note; the architect's layout on this machine shows it, and they mark it issued back when the plans are drawn. To reach someone elsewhere, send the link or the PDF." },
   { target: "#view-switch", title: "Summary, Detailed, 3D preview",
     text: "How much of the memo to show: the title block and the answers; the whole memo with the clauses and the ledger; or the drawings, large, with an axonometric you can turn." },
   { target: ".mode", title: "The architect and the reader",
     text: "Switch to Architect and the left column holds the Site and Option schedules, one row per input, each citing the rules that read it; every ledger layer opens, Edit blocks appears on the plans, and Export to Revit leads. Switch to Reader and the memo stands alone in a reading column. That is the whole page." },
 ];
 
+/* The reader's walkthrough: the memo as it is on their screen, without switching them to the manager's layout
+   (24 Nov 2026: the walkthrough moved a reader into the manager's route and described stops they never use). */
+const READER_TOUR = [
+  { target: ".memo-head", fallback: "#memo", title: "The title block",
+    text: "The site, the option, the date the rules were read as of, and the memo's revision: R1, R2 and so on, numbered as they were issued. A comparison with another memo is named here too, with its result and a link to it." },
+  { target: ".answers", fallback: "#memo", title: "The four answers",
+    text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Does the money work? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item." },
+  { target: "#memo-index", fallback: "#memo", title: "In this memo",
+    text: "The memo's parts, as a drawing set lists its sheets: the answers, the drawings, the clauses, the full ledger, the inputs, the sources and the fingerprint that lets anyone reproduce it." },
+  { target: "#memo-actions", fallback: "#memo", title: "Download PDF and Print",
+    text: "The PDF is the memo laid out for paper, with the clauses, the ledger and the sources numbered; Print gives the same pages." },
+  { target: "#view-switch", title: "Summary, Detailed, 3D preview",
+    text: "How much of the memo to show: the title block and the answers; the whole memo; or the drawings, large, with an axonometric you can turn." },
+];
+
 const TOUR_KEY = "ffm.walkthrough.seen";
 
-const tour = { active: false, i: 0, spot: null, card: null, raf: 0, timer: 0, returnTo: null, modeBefore: null, viewBefore: null };
+const tour = { active: false, i: 0, list: TOUR, spot: null, card: null, raf: 0, timer: 0, returnTo: null, modeBefore: null, viewBefore: null };
 
 function tourTarget(step) {
   return document.querySelector(step.target) || (step.fallback ? document.querySelector(step.fallback) : null);
@@ -46,6 +61,8 @@ export function startTour(at = 0) {
   tour.active = true;
   tour.modeBefore = state.mode;
   tour.viewBefore = state.view;
+  // a reader with a memo open is walked through the memo they have; anyone else through the manager's flow
+  tour.list = state.mode === "reader" && state.run ? READER_TOUR : TOUR;
   tour.returnTo = document.activeElement && document.activeElement !== document.body ? document.activeElement : $("#tour-link");
   tour.spot = document.createElement("div");
   tour.spot.className = "tour-spot";
@@ -110,7 +127,7 @@ function tourKeys(e) {
 const TOUR_RUN = "998-e-19th-ave/as-approved";
 
 async function tourNext() {
-  const step = TOUR[tour.i];
+  const step = tour.list[tour.i];
   if (step.action === "run" && !state.run) {
     const btn = $(".tour-next", tour.card);
     if (btn) { btn.disabled = true; btn.textContent = "Opening the memo…"; }
@@ -124,16 +141,16 @@ async function tourNext() {
 async function showTourStep(i) {
   if (!tour.active) return;
   if (i < 0) i = 0;
-  if (i >= TOUR.length) { endTour(); toast("That is the whole page. Start from an address whenever you like."); return; }
+  if (i >= tour.list.length) { const reader = tour.list === READER_TOUR; endTour(); toast(reader ? "That is the memo. Download PDF keeps a copy." : "That is the whole page. Start from an address whenever you like."); return; }
   tour.i = i;
-  const step = TOUR[i];
+  const step = tour.list[i];
   // a stop may set the page up for itself, a demo loaded or a card brought forward, and may wait for it
   if (step.before) { try { await step.before(); } catch (e) { toast(e.message, true); } }
   if (!tour.active || tour.i !== i) return;
   // a step that points into the inputs opens a folded rail, without changing the reader's kept choice
   const aim = tourTarget(step);
   if (aim && aim.closest(".inputs-body") && $(".panes").classList.contains("no-inputs")) showInputs(true, false);
-  const last = i === TOUR.length - 1;
+  const last = i === tour.list.length - 1;
   const primary = step.action === "run" && !state.run ? "Open the memo and continue" : (last ? "Done" : "Next");
   tour.card.innerHTML = `
     <button class="tour-close" type="button" aria-label="Close the walkthrough">×</button>
@@ -142,7 +159,7 @@ async function showTourStep(i) {
     <div class="tour-nav">
       <button class="btn btn-quiet btn-small tour-back" type="button"${i === 0 ? " disabled" : ""}>Back</button>
       <span class="spacer"></span>
-      <span class="counter">${i + 1} of ${TOUR.length} · Esc closes</span>
+      <span class="counter">${i + 1} of ${tour.list.length} · Esc closes</span>
       <button class="btn btn-primary btn-small tour-next" type="button">${h(primary)}</button>
     </div>`;
   $(".tour-close", tour.card).addEventListener("click", endTour);
@@ -162,7 +179,7 @@ async function showTourStep(i) {
 
 function positionTour() {
   if (!tour.active) return;
-  const step = TOUR[tour.i];
+  const step = tour.list[tour.i];
   const el = tourTarget(step);
   if (!el) return;
   const r = el.getBoundingClientRect();

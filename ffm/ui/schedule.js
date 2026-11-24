@@ -76,6 +76,13 @@ export function refreshNeeds(formEl, schema, obj) {
   const walk = fields => {
     for (const f of fields) {
       if (f.row) { walk(f.fields); continue; }
+      // a row for another kind of site (a CD-1's number, the Oppenheimer sub-area) shows only where it applies or
+      // already holds a value; a district typed in the schedule brings it back at once
+      if (f.only) {
+        const v0 = getPath(obj, f.key), shown = f.only(obj || {}) || (v0 != null && v0 !== "");
+        $$(`.sch-row[data-key="${f.key}"]`, formEl).forEach(r => { r.hidden = !shown; const n = r.nextElementSibling; if (!shown && n && n.classList.contains("sch-note")) n.hidden = true; });
+        if (!shown) continue;
+      }
       const need = f.need;
       if (!need || !counts[need]) continue;
       const v = getPath(obj, f.key);
@@ -87,8 +94,13 @@ export function refreshNeeds(formEl, schema, obj) {
   for (const g of schema) walk(g.fields);
   const [r0, r1] = counts.run, [u0, u1] = counts.rule;
   // the Ref column's key, once over the schedule (20 Nov 2026: "A25 A26", "C6" and "drawings" stood unexplained)
-  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i>Needed to run <b>${r0} of ${r1}</b></span><span>Read by a rule <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">· a blank comes back uncertain</span>` : ""}</span><span class="ref-key"><b>Ref</b> the rules that read the input, as the memo numbers them (A3 is the third rule of layer A that applies to this site), or what else it is for: drawings, title, note, file, money, open item. Click one for why.</span>`;
+  legend.innerHTML = `<span><i class="need need-run" aria-hidden="true"></i>Needed to run <b>${r0} of ${r1}</b></span><span>Read by a rule <b>${u0} of ${u1}</b>${u0 < u1 ? ` <span class="cont">· a blank comes back uncertain</span>` : ""}</span><span class="ref-key"><b>Ref</b> the rules that read the input, by their number in the memo, or what else it is for: drawings, title, note, file, money, open item. The memo numbers every rule that applies to this site, layer by layer, so a number missing here belongs to a rule that reads another input. Click one for why.</span>`;
 }
+
+/* Who answers a question, as the schedule's reader is addressed: the asks are written to the manager ("you, or the
+   architect"), so the architect's schedule names the manager instead (24 Nov 2026: it told the architect "you, or the
+   architect"). */
+const whoFor = who => (state.mode === "architect" ? String(who).replace(/\byou\b/g, "the manager") : String(who));
 
 /* One row of a schedule, and the reason under it (folded). */
 function scheduleRow(f, obj, onChange, on) {
@@ -107,7 +119,7 @@ function scheduleRow(f, obj, onChange, on) {
   const row = document.createElement("div");
   row.className = `sch-row${wide ? " wide" : ""}${f.need === "run" ? " needed" : ""}`;
   row.dataset.key = f.key;
-  row.innerHTML = `<div class="sch-item">${asSpan ? `<span id="${id}-label">${h(f.label)}</span>` : `<label for="${id}">${h(f.label)}</label>`}${f.need === "run" ? `<i class="need need-run" aria-hidden="true" title="needed to run"></i><span class="sr-only">(needed to run)</span>` : ""}${f.ask && f.ask.who ? `<span class="sch-who">${h(f.ask.who)}</span>` : ""}</div><div class="sch-val"></div><div class="sch-ref"></div>`;
+  row.innerHTML = `<div class="sch-item">${asSpan ? `<span id="${id}-label">${h(f.label)}</span>` : `<label for="${id}">${h(f.label)}</label>`}${f.need === "run" ? `<i class="need need-run" aria-hidden="true" title="needed to run"></i><span class="sr-only">(needed to run)</span>` : ""}${f.ask && f.ask.who ? `<span class="sch-who">${h(whoFor(f.ask.who))}</span>` : ""}</div><div class="sch-val"></div><div class="sch-ref"></div>`;
   $(".sch-val", row).appendChild(controlFor(f, obj, onChange, id));
   const refs = refsFor(f);
   const note = document.createElement("div");

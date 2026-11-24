@@ -471,6 +471,20 @@ DRAWING_COLOURS = {
 }
 
 
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
+def date_words(iso: Any) -> str:
+    """A date as a reader writes it, "23 Oct 2026", on a drawing's foot line (24 Nov 2026: the foot read the ISO date,
+    machine text, as the page's dates did before 20 Nov). The page's twin is dateWords in memo/memo.js. Pure."""
+    s = str(iso or "")
+    try:
+        y, mo, d = int(s[0:4]), int(s[5:7]), int(s[8:10])
+        return f"{d} {_MONTHS[mo - 1]} {y}"
+    except (ValueError, IndexError):
+        return s
+
+
 def svg(m: dict[str, Any]) -> str:
     """Plan (left) and section (right) of the masses, to scale, with the numbers printed."""
     W, D = m["lot"]["frontage_m"], m["lot"]["depth_m"]
@@ -492,7 +506,7 @@ def svg(m: dict[str, Any]) -> str:
     if m.get("trees"):
         t = m["trees"]
         lines.append(f'Trees: Schedule C requires {t["required"]}, plan leaves {t["after"]} (shortfall {t["shortfall"]}); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart')
-    lines.append(f'Rules as of {m["as_of"]} · drawn from the rules, not a survey')
+    lines.append(f'Rules as of {date_words(m["as_of"])} · drawn from the rules, not a survey')
     height = pad + 24 + max(plan_h, sec_h) + 40 + len(lines) * 16 + 16
     ox, oy = pad, pad + 24
     sx, sy = pad + plan_w + gap, pad + 24 + max(plan_h, sec_h)  # section baseline

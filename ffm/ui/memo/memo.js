@@ -1,16 +1,16 @@
 /* The memo pane: the quiet cards before a run, "No memo is open" for the reader, and the memo itself (title block,
    answers, figures, clauses, ledger, inputs, sources, stamp), with the run tools moved into its title block. */
 
-import { $, $$, fmtNum, h, REV, toast, todayISO } from "../core/util.js";
+import { $, $$, cap, fmtNum, h, REV, scrollBehavior, toast, todayISO } from "../core/util.js";
 import { state, STATIC } from "../core/state.js";
 import { optWord } from "../fields.js";
 import { syncStaleBand } from "../files.js";
-import { byRev, openRun, rev } from "../runs.js";
+import { byRev, isDraft, nextRev, openRun, rev, runName } from "../runs.js";
 import { answerAllowed, answerFunders, answerMoney, answerUnsure, unverifiedLine, wireMoneyFold } from "./answers.js";
 import { renderClauses, UNIT_WORD, withPlans } from "./clauses.js";
 import { renderLedger, wireLedger } from "./ledger.js";
-import { compareFoldLine, renderSideBySide, wireSideBySide } from "./side-by-side.js";
-import { renderChanges } from "./changes.js";
+import { compareFoldLine, compareResult, renderSideBySide, wireSideBySide } from "./side-by-side.js";
+import { changesPhrase, renderChanges } from "./changes.js";
 import { wordsHtml } from "./words.js";
 
 /* A date as a reader writes it, "23 Oct 2026", in the title block, the answers and the paper (20 Nov 2026: ISO dates
@@ -39,7 +39,7 @@ export function briefName(name, site = null) {
 }
 import { renderFigures, wireFigures } from "../figures/cards.js";
 import { foot, renderStage } from "../route-stage.js";
-import { applyModeToMemo } from "../modes.js";
+import { applyModeToMemo, setView } from "../modes.js";
 
 export function renderQuiet() {
   if (state.run) return;  // a run is on screen: leave it
@@ -73,7 +73,7 @@ export function renderQuiet() {
 export function renderNoMemo() {
   placeRunTools(false);
   $(".memo-pane").classList.remove("staging", "has-memo");
-  const runs = byRev(state.runs || []);
+  const runs = byRev(state.runs || []).filter(r => !isDraft(r.run_id));   // the reader is offered issued memos only
   const memo = $("#memo");
   memo.className = "memo landed";
   // a link that names a run is opening one: say so, not "No memo is open" (17 Nov 2026: it flashed while the run loaded)
@@ -84,8 +84,8 @@ export function renderNoMemo() {
   }
   memo.innerHTML = `<div class="card memo-head no-memo">
       <h1>No memo is open</h1>
-      <p class="quiet">A memo opens here from the link the development manager or the architect sends you (it ends in <code>?run=…</code>), or from the PDF they attach. To make one, switch to Manager in the top bar.</p>
-      ${runs.length ? `<p class="stage-memos"><span class="cont">Or open one of ${h(String((state.site && state.site.address) || "this site's").split(",")[0])}'s memos:</span> ${runs.map(r => `<button type="button" class="linkish" data-open-run="${h(r.run_id)}">${h(rev(r.run_id))}</button>`).join(" ")}</p>` : ""}
+      <p class="quiet">A memo opens here from the link the development manager or the architect sends you (it ends in <code>?run=…</code>); a PDF they attach is the same memo on paper. To make one, switch to Manager in the top bar.</p>
+      ${runs.length ? `<p class="stage-memos"><span class="cont">Or open one of ${h(String((state.site && state.site.address) || "this site's").split(",")[0])}'s memos:</span> ${runs.map(r => `<button type="button" class="linkish" data-open-run="${h(r.run_id)}">${h(runName(r))}</button>`).join(`<span class="cont"> · </span>`)}</p>` : ""}
     </div>`;
   $$("[data-open-run]", memo).forEach(b => b.addEventListener("click", () => openRun(b.dataset.openRun).catch(e => toast(e.message, true))));
 }
@@ -109,9 +109,13 @@ export function renderMemo(run) {
   const kind = d ? compareKind(d) : null;
   const B = d && run.compareLedger ? run.compareLedger : null;
   const prevRev = state.compareRun ? rev(state.compareRun) : "an earlier memo";
+  // the comparison's result where the title block names it, with a jump to the card that shows it (24 Nov 2026)
+  const cmpTo = kind === "options" && B ? "side-by-side" : "changes";
+  const cmpWhat = !d ? "" : cmpTo === "side-by-side" ? compareResult(run) : changesPhrase(d);
+  const cmpLine = cmpWhat ? `<span class="cmp-result">${h(cap(cmpWhat))}. <a href="#${cmpTo}" class="jump">${cmpTo === "side-by-side" ? "Side by side" : "What changed"}</a></span>` : "";
   const cmpCell = !d ? "" : kind === "rules"
-    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(prevRev)} <span class="cont">(rules as of ${h(dateWords(d.previous_as_of))})</span></span></div>`
-    : `<div class="cmp-cell"><b>Compared with</b><span><b class="rev-no">${h(prevRev)}</b> ${B ? h(briefName(optionName(B), site)) : "a run"} <span class="cont">(as of ${h(dateWords(d.previous_as_of))})</span></span></div>`;
+    ? `<div class="rev-cell"><b>Revised from</b><span>${REV} ${h(prevRev)} <span class="cont">(rules as of ${h(dateWords(d.previous_as_of))})</span>${cmpLine}</span></div>`
+    : `<div class="cmp-cell"><b>Compared with</b><span><b class="rev-no">${h(prevRev)}</b> ${B ? h(briefName(optionName(B), site)) : "a run"} <span class="cont">(as of ${h(dateWords(d.previous_as_of))})</span>${cmpLine}</span></div>`;
   // the option's short name in the cell, its whole name beneath in a quieter line (20 Nov 2026: 375 Glen Drive's name
   // ran six lines in a 160 px cell); the engine's version leaves the reading path for the fingerprint card
   const fullName = String(opt.name || opt.id || "");
@@ -122,11 +126,12 @@ export function renderMemo(run) {
       <div class="opt-cell${fullName.length > 90 ? " long" : ""}"><b>Option</b><span>${h(shortOpt)}${shortOpt !== fullName ? `<span class="opt-full">${h(fullName)}</span>` : ""}</span></div>
       <div><b>Proponent</b><span>${opt.proponent ? h(opt.proponent) : "<i>not named</i>"}${opt.proponent_type ? ` <span class="cont">· ${h(optWord("option", "proponent_type", opt.proponent_type))}</span>` : ""}</span></div>
       <div><b>Rules as of</b><span>${h(dateWords(L.run.as_of))}</span></div>
-      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b></span></div>
+      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b>${isDraft(run.run_id) ? ` <span class="cont">· not issued; ${STATIC ? "a draft in this tab" : `issuing makes it ${h(nextRev())}`}</span>` : ""}</span></div>
       ${cmpCell}
     </div>
     ${optionFiguresHtml(site, opt, run)}
     <div class="memo-actions" id="memo-actions"></div>
+    <nav class="memo-index" id="memo-index" aria-label="In this memo"></nav>
     <p class="quiet memo-disclaimer">A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</p>
   </div>`);
   // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
@@ -154,9 +159,7 @@ export function renderMemo(run) {
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));
   // the clauses stand on their own so the reader's order can be the paper's: answers, comparison, clauses, massing, ledger
-  // the manager's note on the plans says there is nothing for them to do yet (20 Nov 2026); the reader does not see it
-  // (app.css). The note's words are FIG 03's (figures/cards.js); this only adds the clause where they stand.
-  const figures = renderFigures(run).replace(/(issues this run back to you)(;)/, "$1 (nothing to do yet)$2");
+  const figures = renderFigures(run);
   parts.push(`<div class="memo-body">
     <div class="answers">${answerAllowed(L, run)}${answerFunders(L, run)}${answerUnsure(L, run)}${answerMoney(run)}${unverifiedLine(L)}${wordsHtml(run)}</div>
     ${compare ? `<div class="memo-compare">${compare}</div>` : ""}
@@ -177,6 +180,8 @@ export function renderMemo(run) {
   void memoEl.offsetWidth;  // restart the fade
   memoEl.classList.add("landed");
   placeRunTools(true);
+  indexMemo(memoEl);
+  wireJumps(memoEl);
   if (focused && document.activeElement !== focused) focused.focus({ preventScroll: !!focused.closest("#side-by-side") });
   wireSideBySide(run);
   wireFigures(run);
@@ -185,6 +190,52 @@ export function renderMemo(run) {
   wireMoneyFold();
   setPrintFooter(run);
   syncStaleBand();
+}
+
+/* The memo's sheet index, in its title block, as a drawing set lists its sheets (24 Nov 2026: 11,000 to 19,000 px of
+   memo with no way across it but the scroll bar). Only the parts this memo has; the layouts that leave a part out hide
+   its link (app.css), and a jump opens any fold the part sits in. */
+const MEMO_INDEX = [
+  ["answers", ".memo-body > .answers", "The four answers"],
+  ["compare", ".memo-compare", "The comparison"],
+  ["figures", ".memo-body > .figures", "Drawings"],
+  ["clauses", ".memo-clauses", "Clauses"],
+  ["ledger", ".memo-rest .ledger", "Ledger"],
+  ["inputs", ".memo-rest .inputs-used", "Inputs"],
+  ["sources", ".memo-rest .sources", "Sources"],
+  ["stamp", ".memo-rest .stampbox", "Fingerprint"],
+];
+
+function indexMemo(memoEl) {
+  const nav = $("#memo-index", memoEl);
+  if (!nav) return;
+  const links = [];
+  for (const [k, sel, word] of MEMO_INDEX) {
+    const el = $(sel, memoEl);
+    if (!el) continue;
+    if (!el.id) el.id = `memo-${k}`;
+    links.push(`<li><a href="#${el.id}" class="jump" data-k="${k}">${h(word)}</a></li>`);
+  }
+  nav.innerHTML = `<span class="mi-key" aria-hidden="true">In this memo</span><ol>${links.join("")}</ol>`;
+}
+
+/* A jump inside the memo (the index, the title block's comparison): opens the folds the target sits in, brings the
+   layout that shows it when this one leaves it out, scrolls to it and moves the keyboard there. Wired once on #memo. */
+function wireJumps(memoEl) {
+  if (memoEl.dataset.jumps) return;
+  memoEl.dataset.jumps = "1";
+  memoEl.addEventListener("click", e => {
+    const a = e.target.closest("a.jump[href^='#']");
+    if (!a) return;
+    const t = document.getElementById(a.getAttribute("href").slice(1));
+    if (!t) return;
+    e.preventDefault();
+    for (let d = t.closest("details"); d; d = d.parentElement ? d.parentElement.closest("details") : null) d.open = true;
+    if (!t.getClientRects().length) setView("detailed");
+    t.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
+    if (!t.hasAttribute("tabindex")) t.tabIndex = -1;
+    t.focus({ preventScroll: true });
+  });
 }
 
 /* An option's name as the reader knows it. */
@@ -210,7 +261,7 @@ function optionFiguresHtml(site, opt, run) {
   return `<div class="memo-figures">
     ${cell("Storeys", opt.storeys != null ? h(opt.storeys) : "<i>not given</i>", opt.height_m != null ? `· ${h(opt.height_m)}&nbsp;m` : "")}
     ${cell("Floor area", opt.gfa_m2 != null ? `${h(fmtNum(opt.gfa_m2))}&nbsp;m²` : "<i>not given</i>", fsr ? `· FSR&nbsp;${h(fsr)}` : "")}
-    ${cell("Homes", n ? h(n) : "<i>not given</i>", placed != null ? `<span class="warn-text">·&nbsp;<span class="nw">${h(placed)} fit</span> the plate (answer 3)</span>` : "")}
+    ${cell("Homes", n ? h(n) : "<i>not given</i>", placed != null ? `<span class="warn-text">·&nbsp;<span class="nw">${h(placed)} fit</span> the floors in the first plans (answer 3)</span>` : "")}
     ${mix ? `<div class="mix-cell"><b>Mix</b><span>${mix}</span></div>` : ""}
     ${cell("Rent tiers", tiers ? tierWords(tiers, n) : "<i>not split</i>", "")}
     ${cell("Tenure", h(optWord("option", "tenure", opt.tenure) || "not set"), opt.housing_agreement_years ? `· <span class="nw">${h(opt.housing_agreement_years)}‑year agreement</span>` : "")}
@@ -273,7 +324,7 @@ function setPrintFooter(run) {
   let st = $("#print-page");
   if (!st) { st = document.createElement("style"); st.id = "print-page"; document.head.appendChild(st); }
   const site = (run.ledger && run.ledger.inputs && run.ledger.inputs.site) || {};
-  const text = `First Read · ${site.address || site.id || ""} · rules as of ${run.as_of} · ${rev(run.run_id)}`.replace(/["\\\n]/g, " ");
+  const text = `First Read · ${site.address || site.id || ""} · rules as of ${dateWords(run.as_of)} · ${rev(run.run_id)}`.replace(/["\\\n]/g, " ");
   st.textContent = `@media print { @page { margin: 14mm 14mm 16mm;
     @bottom-left { content: "${text}"; font: 7.5pt "IBM Plex Mono", monospace; color: #444; }
     @bottom-right { content: counter(page) " / " counter(pages); font: 7.5pt "IBM Plex Sans", sans-serif; color: #444; } } }`;
@@ -282,7 +333,7 @@ function setPrintFooter(run) {
 /* The two run pickers. With two runs compared they head the Side by side card's A and B columns, so the choice
    sits above what it changes; otherwise, and whenever the memo is about to be replaced, they sit above the memo.
    In the card their keys name the column; a hidden phrase keeps what each one does in its accessible name. */
-const RUN_TOOLS = [["open", "#tool-open", "This memo", " (open a past run)"], ["compare", "#tool-compare", "Compared with", " (choose the run to compare with)"]];
+const RUN_TOOLS = [["open", "#tool-open", "This memo", " (open another memo)"], ["compare", "#tool-compare", "Compared with", " (choose the memo to compare with)"]];
 
 export function placeRunTools(intoMemo) {
   placeActions(intoMemo);
@@ -296,18 +347,22 @@ export function placeRunTools(intoMemo) {
     if (cell) { cell.prepend(label); eyebrow.textContent = word; hint.textContent = purpose; }
     else { tools.insertBefore(label, $("#compare-note")); eyebrow.textContent = eyebrow.dataset.text; hint.textContent = ""; }
   }
-  tools.hidden = !$(".tool", tools);
+  // the view switch stays when both pickers have moved into the Side by side card (24 Nov 2026: comparing hid
+  // Summary, Detailed and 3D preview with the row they shared)
+  tools.hidden = !$(".tool, #view-switch", tools);
 }
 
 /* The memo's actions, Download PDF first, sit in its title block (16 Nov 2026; before, at the foot of a page some
-   9,000 px long), with the issue form opening under them. Whenever the memo is about to be replaced they go back
-   to the export footer, so they are never thrown away with it. */
+   9,000 px long), with the issue form and the Export to Revit panel opening under them (24 Nov 2026: the Revit panel
+   opened some 17,900 px below its button). Whenever the memo is about to be replaced they go back to the export
+   footer, so they are never thrown away with it; the footer shows only while it holds them. */
 function placeActions(intoMemo) {
-  const bar = $("#export-actions"), issue = $("#issue-panel"), foot = $("#step-export");
+  const bar = $("#export-actions"), issue = $("#issue-panel"), revit = $("#export-panel"), foot = $("#step-export");
   if (!bar || !foot) return;
   const slot = intoMemo ? $("#memo-actions") : null;
-  if (slot) { slot.append(bar, issue); return; }
-  if (bar.parentElement !== foot) { $("h2", foot).after(bar); bar.after(issue); }
+  if (slot) { slot.append(bar, issue, revit); foot.hidden = true; return; }
+  if (bar.parentElement !== foot) { $("h2", foot).after(bar); bar.after(issue); foot.append(revit); }
+  foot.hidden = false;
 }
 
 function renderInputs(site, opt) {
@@ -362,7 +417,7 @@ function renderStamp(run, runId) {
   const files = Object.entries(st.rules_files || {}).map(([f, hsh]) => `<li><code>${h(f)}</code> <span class="hash">${h(hsh.slice(0, 16))}…</span></li>`).join("");
   return `<section class="card section stampbox">
     <h2>Rules fingerprint</h2>
-    <p>This memo, ${h(rev(runId))} on this site, read the rule files below and the versions in force on ${h(dateWords(run.as_of))}, with engine ${h(run.engine_version || "")}. Together they are fingerprinted, so the same inputs under the same fingerprint always give the same memo; change one number in one rule and the fingerprint changes. A site's memos are numbered as revisions, R1, R2 and so on, in the order they were written.</p>
+    <p>This memo, ${h(rev(runId))} on this site, read the rule files below and the versions in force on ${h(dateWords(run.as_of))}, with engine ${h(run.engine_version || "")}. Together they are fingerprinted, so the same inputs under the same fingerprint always give the same memo; change one number in one rule and the fingerprint changes. A site's memos are numbered as revisions, R1, R2 and so on, in the order they were issued; a run not yet issued is a draft, named by the time it was made.</p>
     <p class="hash">Fingerprint ${h(st.stamp)} · rules hash (SHA-256 over all rule files) ${h(st.rules_hash)}</p>
     <ul>${files}</ul>
   </section>`;

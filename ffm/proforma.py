@@ -31,12 +31,14 @@ SCREEN_LINE = f"the {GAP_UNLIKELY_SHARE * 100:.0f}% line (this tool's screening 
 # line is the development manager's cue to look for more sources). The key in proforma.json stays "unlikely", so the
 # committed runs read the same; only the words a person sees change. The tool mirrors these in memo/answers.js.
 VERDICT_WORDS = {"likely": "Likely", "unlikely": "Needs more sources", "unsure": "Unsure"}
+# Written for whoever reads the memo, on screen or on paper (24 Nov 2026: "run again" and "at 03" were the tool's
+# operator talking to a board).
 MORE_SOURCES = ("Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, "
-                "a land contribution or a partner. Enter what is found as Other grants or Equity and run again.")
+                "a land contribution or a partner. A revised memo counts what is found as other grants or equity.")
 CLOSE_GAP = "Another source, or firmer figures for the placeholders, would settle it."
 OPERATING_FUNDER = ("Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or "
-                    "shelter housing, the staffing as well), then enter the project's own rents and running costs and run again. "
-                    "This screen has no operating-subsidy line; the rents and the running cost are placeholders.")
+                    "shelter housing, the staffing as well), then a revised memo with the project's own rents, running costs and "
+                    "subsidy. Until they are entered, the rents and the running cost are placeholders.")
 
 
 def next_step(pf: dict) -> str | None:

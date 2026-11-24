@@ -1,70 +1,70 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="688" height="722" viewBox="0 0 688 722" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Code site plan">
+<svg xmlns="http://www.w3.org/2000/svg" width="714" height="749" viewBox="0 0 714 749" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif" font-size="12" fill="#1f2933" role="img" aria-label="Code site plan">
 <rect width="100%" height="100%" fill="#ffffff"/>
 <defs><marker id="tick" viewBox="0 0 6 6" refX="3" refY="3" markerWidth="6" markerHeight="6" orient="auto"><path d="M3 0V6" stroke="#c81e1e" stroke-width="1.2"/></marker></defs>
-<text x="48" y="44" font-size="14" font-weight="600">Code site plan · metres, street at the bottom</text>
-<polygon points="78.0,333.7 609.9,333.7 609.9,72.0 78.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5"/>
-<polygon points="99.1,307.7 588.8,307.7 588.8,114.2 99.1,114.2" fill="none" stroke="#c81e1e" stroke-width="1.2" stroke-dasharray="6 4"/>
-<polygon points="99.1,307.7 588.8,307.7 588.8,167.9 99.1,167.9" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
-<text x="105.1" y="181.9" font-size="10" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">69.6 × 19.87 m, 6 storeys</text>
-<path d="M343.9 333.7L343.9 307.7" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
-<text x="347.9" y="324.2" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">front 3.7 m</text>
-<path d="M343.9 114.2L343.9 72.0" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
-<text x="347.9" y="96.6" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">rear 6.0 m</text>
-<path d="M78.0 211.0L99.1 211.0" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
-<text x="103.1" y="207.0" font-size="9.5" text-anchor="start" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">side 3.0 m</text>
-<path d="M588.8 211.0L609.9 211.0" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
-<text x="584.8" y="207.0" font-size="9.5" text-anchor="end" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">side 3.0 m</text>
-<line x1="78.0" y1="345.7" x2="609.9" y2="345.7" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="1 3"/>
-<text x="343.9" y="363.7" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E 19TH AVE · STREET SIDE</text>
-<rect x="48.0" y="379.7" width="35.2" height="5" fill="#1f2933"/>
-<rect x="83.2" y="379.7" width="35.2" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
-<text x="48.0" y="395.7" font-size="9.5" text-anchor="middle" fill="#5f6672">0</text>
-<text x="83.2" y="395.7" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
-<text x="118.4" y="395.7" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
-<g transform="rotate(-181.6 169.8 381.7)"><circle cx="169.8" cy="381.7" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="169.8,371.6 174.4,387.8 169.8,383.9 165.1,387.8" fill="#1f2933"/></g>
-<text x="170.3" y="405.7" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
-<text x="48" y="415.7" font-size="11" fill="#5f6672">Lot 75.6 × 37.2 m; dashed red: the setback envelope 69.6 × 27.5 m; blue: the footprint;</text>
-<text x="48" y="431.7" font-size="11" fill="#5f6672">the retained trees have no surveyed position, so no barriers are drawn.</text>
-<text x="48" y="467.7" font-size="12" font-weight="600">What the plan checker reads</text>
-<line x1="48" y1="494.7" x2="639.9" y2="494.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="489.7" font-size="11" fill="#5f6672">Site area</text>
-<text x="178.2" y="489.7" font-size="11">2,810.7 m²</text>
-<line x1="48" y1="512.7" x2="639.9" y2="512.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="507.7" font-size="11" fill="#5f6672">Floor space ratio</text>
-<text x="178.2" y="507.7" font-size="11">2.95 (8,299 m²)</text>
-<text x="328.2" y="507.7" font-size="11" fill="#5f6672">1.2 outright</text>
-<text x="570.6" y="507.7" font-size="10.5" font-weight="600" fill="#c81e1e">fail</text>
-<line x1="48" y1="530.7" x2="639.9" y2="530.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="525.7" font-size="11" fill="#5f6672">Height</text>
-<text x="178.2" y="525.7" font-size="11">22.3 m, 6 storeys</text>
-<text x="328.2" y="525.7" font-size="11" fill="#5f6672">10.7 m outright</text>
-<text x="570.6" y="525.7" font-size="10.5" font-weight="600" fill="#c81e1e">fail</text>
-<line x1="48" y1="548.7" x2="639.9" y2="548.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="543.7" font-size="11" fill="#5f6672">Site coverage</text>
-<text x="178.2" y="543.7" font-size="11">49% (1,383 m²)</text>
-<text x="328.2" y="543.7" font-size="11" fill="#5f6672">no schedule in the stack</text>
-<text x="570.6" y="543.7" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
-<line x1="48" y1="566.7" x2="639.9" y2="566.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="561.7" font-size="11" fill="#5f6672">Front yard</text>
-<text x="178.2" y="561.7" font-size="11">3.7 m</text>
-<text x="328.2" y="561.7" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
-<text x="570.6" y="561.7" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
-<line x1="48" y1="584.7" x2="639.9" y2="584.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="579.7" font-size="11" fill="#5f6672">Rear yard</text>
-<text x="178.2" y="579.7" font-size="11">6.0 m</text>
-<text x="328.2" y="579.7" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
-<text x="570.6" y="579.7" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
-<line x1="48" y1="602.7" x2="639.9" y2="602.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="597.7" font-size="11" fill="#5f6672">Side yard</text>
-<text x="178.2" y="597.7" font-size="11">3.0 m</text>
-<text x="328.2" y="597.7" font-size="11" fill="#5f6672">placeholder, not from the schedule</text>
-<text x="570.6" y="597.7" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
-<line x1="48" y1="620.7" x2="639.9" y2="620.7" stroke="#e1e5ea" stroke-width="0.8"/>
-<text x="48.0" y="615.7" font-size="11" fill="#5f6672">Trees</text>
-<text x="178.2" y="615.7" font-size="11">17 after development</text>
-<text x="328.2" y="615.7" font-size="11" fill="#5f6672">Schedule C requires 20</text>
-<text x="570.6" y="615.7" font-size="10.5" font-weight="600" fill="#9a6b00">conditional</text>
-<text x="48" y="647.7" font-size="11" font-weight="600">Allowed outright: no; by rezoning: yes, with conditions</text>
-<text x="48" y="663.7" font-size="11">Path: CD-1 under the Interim Rezoning Policy for Social Housing</text>
-<text x="48.0" y="689.7" font-size="12" fill="#1f2933">Rules as of 2026-10-23 · drawn from the option and the massing, not a design</text>
+<text x="48" y="44" font-size="14" font-weight="600">Code site plan · metres, project north up</text>
+<polygon points="636.3,102.0 78.0,102.0 78.0,376.7 636.3,376.7" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5"/>
+<polygon points="614.1,129.3 100.2,129.3 100.2,332.4 614.1,332.4" fill="none" stroke="#c81e1e" stroke-width="1.2" stroke-dasharray="6 4"/>
+<polygon points="614.1,129.3 100.2,129.3 100.2,276.1 614.1,276.1" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
+<text x="106.2" y="143.3" font-size="10" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">69.6 × 19.87 m, 6 storeys</text>
+<path d="M357.1 102.0L357.1 129.3" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="361.1" y="119.2" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">front 3.7 m</text>
+<path d="M357.1 332.4L357.1 376.7" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="361.1" y="358.1" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">rear 6.0 m</text>
+<path d="M636.3 230.9L614.1 230.9" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="610.1" y="226.9" font-size="9.5" text-anchor="end" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">side 3.0 m</text>
+<path d="M100.2 230.9L78.0 230.9" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
+<text x="104.2" y="226.9" font-size="9.5" text-anchor="start" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">side 3.0 m</text>
+<line x1="78.0" y1="90.0" x2="636.3" y2="90.0" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="1 3"/>
+<text x="357.1" y="84.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">E 19TH AVE · STREET SIDE</text>
+<rect x="48.0" y="406.7" width="36.9" height="5" fill="#1f2933"/>
+<rect x="84.9" y="406.7" width="36.9" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
+<text x="48.0" y="422.7" font-size="9.5" text-anchor="middle" fill="#5f6672">0</text>
+<text x="84.9" y="422.7" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
+<text x="121.8" y="422.7" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
+<g transform="rotate(-1.6 173.2 408.7)"><circle cx="173.2" cy="408.7" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="173.2,398.6 177.9,414.8 173.2,410.9 168.6,414.8" fill="#1f2933"/></g>
+<text x="172.7" y="392.7" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
+<text x="48" y="442.7" font-size="11" fill="#5f6672">Lot 75.6 × 37.2 m; dashed red: the setback envelope 69.6 × 27.5 m; blue: the footprint; the</text>
+<text x="48" y="458.7" font-size="11" fill="#5f6672">retained trees have no surveyed position, so no barriers are drawn.</text>
+<text x="48" y="494.7" font-size="12" font-weight="600">What the plan checker reads</text>
+<line x1="48" y1="521.7" x2="666.3" y2="521.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="516.7" font-size="11" fill="#5f6672">Site area</text>
+<text x="178.2" y="516.7" font-size="11">2,810.7 m²</text>
+<line x1="48" y1="539.7" x2="666.3" y2="539.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="534.7" font-size="11" fill="#5f6672">Floor space ratio</text>
+<text x="178.2" y="534.7" font-size="11">2.95 (8,299 m²)</text>
+<text x="328.2" y="534.7" font-size="11" fill="#5f6672">1.2 outright</text>
+<text x="597.0" y="534.7" font-size="10.5" font-weight="600" fill="#c81e1e">fail</text>
+<line x1="48" y1="557.7" x2="666.3" y2="557.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="552.7" font-size="11" fill="#5f6672">Height</text>
+<text x="178.2" y="552.7" font-size="11">22.3 m, 6 storeys</text>
+<text x="328.2" y="552.7" font-size="11" fill="#5f6672">10.7 m outright</text>
+<text x="597.0" y="552.7" font-size="10.5" font-weight="600" fill="#c81e1e">fail</text>
+<line x1="48" y1="575.7" x2="666.3" y2="575.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="570.7" font-size="11" fill="#5f6672">Site coverage</text>
+<text x="178.2" y="570.7" font-size="11">49% (1,383 m²)</text>
+<text x="328.2" y="570.7" font-size="11" fill="#5f6672">no schedule in the stack</text>
+<text x="597.0" y="570.7" font-size="10.5" font-weight="600" fill="#5f6672">info</text>
+<line x1="48" y1="593.7" x2="666.3" y2="593.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="588.7" font-size="11" fill="#5f6672">Front yard</text>
+<text x="178.2" y="588.7" font-size="11">3.7 m</text>
+<text x="328.2" y="588.7" font-size="11" fill="#5f6672">not checked: no yard rule in the rules</text>
+<text x="597.0" y="588.7" font-size="10.5" font-weight="600" fill="#a3640c">uncertain</text>
+<line x1="48" y1="611.7" x2="666.3" y2="611.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="606.7" font-size="11" fill="#5f6672">Rear yard</text>
+<text x="178.2" y="606.7" font-size="11">6.0 m</text>
+<text x="328.2" y="606.7" font-size="11" fill="#5f6672">not checked: no yard rule in the rules</text>
+<text x="597.0" y="606.7" font-size="10.5" font-weight="600" fill="#a3640c">uncertain</text>
+<line x1="48" y1="629.7" x2="666.3" y2="629.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="624.7" font-size="11" fill="#5f6672">Side yard</text>
+<text x="178.2" y="624.7" font-size="11">3.0 m</text>
+<text x="328.2" y="624.7" font-size="11" fill="#5f6672">not checked: no yard rule in the rules</text>
+<text x="597.0" y="624.7" font-size="10.5" font-weight="600" fill="#a3640c">uncertain</text>
+<line x1="48" y1="647.7" x2="666.3" y2="647.7" stroke="#e1e5ea" stroke-width="0.8"/>
+<text x="48.0" y="642.7" font-size="11" fill="#5f6672">Trees</text>
+<text x="178.2" y="642.7" font-size="11">17 after development</text>
+<text x="328.2" y="642.7" font-size="11" fill="#5f6672">Schedule C requires 20</text>
+<text x="597.0" y="642.7" font-size="10.5" font-weight="600" fill="#9a6b00">conditional</text>
+<text x="48" y="674.7" font-size="11" font-weight="600">Allowed outright: no; by rezoning: yes, with conditions</text>
+<text x="48" y="690.7" font-size="11">Path: CD-1 under the Interim Rezoning Policy for Social Housing</text>
+<text x="48.0" y="716.7" font-size="12" fill="#1f2933">Rules as of 23 Oct 2026 · drawn from the option and the massing, not a design</text>
 </svg>

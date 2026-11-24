@@ -61,9 +61,9 @@ export function renderLedger(res, changed = new Set()) {
   const row = r => `<tr>
       <td>${refTagOf(r.rule_id)}<span class="rule-title">${h(r.title)}${changed.has(r.rule_id) ? REV : ""}</span><code class="rule-id">${h(r.rule_id)} · <span class="nw">v ${h(r.version_effective_from || "—")}</span></code></td>
       <td class="status">${pill(r.status)}</td>
-      <td>${h(r.finding)}</td>
-      <td class="nums">${h(valuesWords(r.values))}</td>
-      <td class="src">${sourceCell(r.source)}</td>
+      <td data-k="Finding">${h(r.finding)}</td>
+      <td class="nums" data-k="Numbers used">${h(valuesWords(r.values))}</td>
+      <td class="src" data-k="Source">${sourceCell(r.source)}</td>
     </tr>`;
   const blocks = layers.map(L => {
     const counts = {};

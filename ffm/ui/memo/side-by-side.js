@@ -10,7 +10,7 @@ import { $, cap, fmtNum, h, pill, verdictStatus } from "../core/util.js";
 import { state } from "../core/state.js";
 import { rev } from "../runs.js";
 import { briefName, compareKind, dateWords, idBreak, optionName } from "./memo.js";
-import { fundedWord, intakeNote, MONEY_STATUS, moneyPhrase, moneyWord } from "./answers.js";
+import { fundedWord, intakeNote, layoutOpenItems, MONEY_STATUS, moneyPhrase, moneyWord } from "./answers.js";
 import { splitValues } from "./clauses.js";
 import { millionsOf, stackFigure, stackOf } from "./stack.js";
 import { FIG, fitLabels, NS, SVG_OPEN } from "../figures/common.js";
@@ -59,6 +59,17 @@ export function compareFoldLine(run) {
   const rows = ruleRows(s.me.L, s.other.L), differ = rows.filter(x => x.differs).length;
   const gaps = s.left.pf && s.right.pf && s.left.pf.gap.value != null && s.right.pf.gap.value != null ? `; gap ${millionsOf(s.right.pf.gap.value)} against ${millionsOf(s.left.pf.gap.value)}` : "";
   return `<span class="cf-act"><span class="cf-closed">Show the comparison</span><span class="cf-open">Fold the comparison</span></span> <span class="cont">· ${h(s.right.label)} against ${h(s.left.label)}: ${differ ? `${differ} of ${rows.length} rules read differently` : "every rule reads the same"}${h(gaps)}</span>`;
+}
+
+/* The comparison's result in a line, for the title block's Compared-with cell (24 Nov 2026: the result started some
+   4,000 px down the memo at 1366): how many rules read differently, and the two gaps, this memo's first. */
+export function compareResult(run) {
+  const s = sidesOf(run);
+  if (!s) return "";
+  const rows = ruleRows(s.me.L, s.other.L), differ = rows.filter(x => x.differs).length;
+  const gap = side => side.pf && side.pf.gap && side.pf.gap.value != null ? millionsOf(side.pf.gap.value) : null;
+  const gaps = gap(s.me) && gap(s.other) ? `; the gap ${gap(s.me)} here, ${gap(s.other)} in ${s.other.rev}` : "";
+  return `${differ ? `${differ} of ${rows.length} rules read differently` : "every rule reads the same"}${gaps}`;
 }
 
 /* One section across the frontage with both buildings on one ground line and at one scale (D4, 20 Nov 2026): this
@@ -180,24 +191,37 @@ export function renderSideBySide(run) {
   const { left, right, me, other } = sides;
   const kind = d ? compareKind(d) : "options";
   const ans = L => L.summary.answers;
-  const verdictCell = w => `<span class="pill pill-${h(verdictStatus(w) || "na")}">${h(cap(w))}</span>`;
-  const fundCell = L => { const f = ans(L).funded, note = intakeNote(f); return `<span class="pill pill-${h(verdictStatus(f.verdict) || "na")}">${h(fundedWord(f))}</span>${note ? `<div class="cont side-cellnote">${h(note)}</div>` : ""}`; };
-  const moneyCell = pf => (pf ? `<span class="pill pill-${h(MONEY_STATUS[pf.verdict.word] || "uncertain")}">${h(moneyWord(pf.verdict))}</span><div class="cont side-cellnote">${h(moneyPhrase(pf).replace(/^[^:]*:\s*/, ""))}</div>` : `<span class="cont">not computed</span>`);
-  const openCell = L => { const u = ans(L).unsure || []; return u.length ? `<span class="pill pill-${u.some(x => x.status === "fail") ? "fail" : "uncertain"}">${u.length} open</span>` : `<span class="pill pill-pass">Nothing open</span>`; };
+  // a verdict is a word in its status colour, not a status pill: the pills carry the six statuses and nothing else
+  // (24 Nov 2026, critique: "Yes", "No" and "6 open" sat in pills beside the memo's Pass and Fail)
+  const vword = (status, words) => `<span class="vword vw-${h(status || "na")}">${h(words)}</span>`;
+  const verdictCell = w => vword(verdictStatus(w), cap(w));
+  const fundCell = L => { const f = ans(L).funded, note = intakeNote(f); return `${vword(verdictStatus(f.verdict), fundedWord(f))}${note ? `<div class="cont side-cellnote">${h(note)}</div>` : ""}`; };
+  const moneyCell = pf => (pf ? `${vword(MONEY_STATUS[pf.verdict.word] || "uncertain", moneyWord(pf.verdict))}<div class="cont side-cellnote">${h(moneyPhrase(pf).replace(/^[^:]*:\s*/, ""))}</div>` : `<span class="cont">not computed</span>`);
+  // the open items as answer 3 counts them: the rules' and the drawings' (answers.layoutOpenItems), so the two agree
+  const openOf = s => [...(ans(s.L).unsure || []), ...layoutOpenItems({ layout: s.lay })];
+  const openCell = s => { const u = openOf(s); return u.length ? vword(u.some(x => x.status === "fail") ? "fail" : "uncertain", `${u.length} open item${u.length === 1 ? "" : "s"}`) : vword("pass", "Nothing open"); };
   const head = [
     ["Allowed outright", verdictCell(ans(left.L).allowed.outright.verdict), verdictCell(ans(right.L).allowed.outright.verdict)],
     ["By rezoning", verdictCell(ans(left.L).allowed.by_rezoning.verdict), verdictCell(ans(right.L).allowed.by_rezoning.verdict)],
-    // the funders' criteria and the money beside each other, so "meets the criteria" never reads as funded
+    // the funders' criteria and the money beside each other, so passing the screen never reads as funded
     ["Funders' criteria", fundCell(left.L), fundCell(right.L)],
     ...(left.pf || right.pf ? [["The money", moneyCell(left.pf), moneyCell(right.pf)]] : []),
-    ["Open items", openCell(left.L), openCell(right.L)],
+    ["Open items", openCell(left), openCell(right)],
   ];
   // the building and the money, side by side: what a board decides between (15 Nov 2026, from an architect's test);
   // numbers right-aligned under right-aligned headers, the change read right less left
   // money in millions here, so a column of figures fits a phone; answer 4 and the paper carry every dollar
   const numCell = (v, unit = "", digits = 0) => (v == null || Number.isNaN(v) ? "—" : unit === "$" && Math.abs(v) >= 1e6 ? millionsOf(v)
     : `${v < -1e-9 ? "−" : ""}${unit === "$" ? "$" : ""}${digits ? Math.abs(v).toFixed(digits) : fmtNum(Math.round(Math.abs(v)))}${unit && unit !== "$" ? unit : ""}`);
-  const delta = (a, b, unit = "", digits = 0) => (a == null || b == null || Number.isNaN(a - b) ? "" : Math.abs(a - b) < 1e-9 ? `<span class="cont">same</span>` : `${a - b > 0 ? "+" : ""}${numCell(a - b, unit, digits)}`);
+  // the change is read off the figures as printed, so the column adds up (24 Nov 2026: "22%" and "45%" printed a
+  // change of "+24%", from the unrounded shares); a change of percentages is in points
+  const asShown = (v, unit, digits) => (unit === "$" && Math.abs(v) >= 1e6 ? Math.round(v / 1e5) * 1e5 : Math.round(v * 10 ** digits) / 10 ** digits);
+  const delta = (a, b, unit = "", digits = 0) => {
+    if (a == null || b == null || Number.isNaN(a - b)) return "";
+    const dv = asShown(a, unit, digits) - asShown(b, unit, digits);
+    if (Math.abs(dv) < 1e-9) return `<span class="cont">same</span>`;
+    return unit === "%" ? `${dv > 0 ? "+" : "−"}${Math.abs(dv).toFixed(digits)} points` : `${dv > 0 ? "+" : ""}${numCell(dv, unit, digits)}`;
+  };
   const fsr = s => (s.opt.gfa_m2 && s.L.inputs.site.site_area_m2 ? s.opt.gfa_m2 / s.L.inputs.site.site_area_m2 : null);
   const fam = o => (Number((o.units || {}).two_bed) || 0) + (Number((o.units || {}).three_bed_plus) || 0);
   const yards = o => `${(o.setbacks_m || {}).front ?? "—"} / ${(o.setbacks_m || {}).rear ?? "—"} / ${(o.setbacks_m || {}).side ?? "—"} m`;
@@ -254,9 +278,9 @@ export function renderSideBySide(run) {
   const table = list => `<table class="plain side-rules"><colgroup><col class="c-rule"><col class="c-ab"><col class="c-ab"></colgroup>
       <thead><tr><th scope="col">Rule</th><th scope="col">${h(left.label)}</th><th scope="col">${h(right.label)}</th></tr></thead><tbody>${list.map(row).join("")}</tbody></table>`;
   // each run's open items, with the person who resolves them, for the run that still has some
-  const openList = [left, right].filter(s => (ans(s.L).unsure || []).length).map(s => `<details class="side-open">
-      <summary>${h(s.label)}: ${ans(s.L).unsure.length} open item${ans(s.L).unsure.length === 1 ? "" : "s"}</summary>
-      <ul>${ans(s.L).unsure.map(u => `<li>${pill(u.status)} <b>${h(u.title)}</b> <span class="cont">${h(u.action || "")}</span></li>`).join("")}</ul>
+  const openList = [left, right].filter(s => openOf(s).length).map(s => `<details class="side-open">
+      <summary>${h(s.label)}: ${openOf(s).length} open item${openOf(s).length === 1 ? "" : "s"}</summary>
+      <ul>${openOf(s).map(u => `<li>${pill(u.status)} <b>${h(u.title)}</b> <span class="cont">${h(u.action || "")}</span></li>`).join("")}</ul>
     </details>`).join("");
   const pick = s => `<div class="pick" data-slot="${s.slot}"><span class="pick-name">${h(s.label)}${s.isThis ? " <span class=\"cont\">(this memo)</span>" : ""} <span class="cont">(as of ${h(dateWords(s.L.run.as_of))})</span></span></div>`;
   return `<section class="card section side" id="side-by-side" aria-labelledby="side-h">
@@ -272,7 +296,7 @@ export function renderSideBySide(run) {
       <tbody>${head.map(([k, a, b]) => `<tr><th scope="row">${h(k)}</th><td>${a}</td><td>${b}</td></tr>`).join("")}</tbody></table>
     ${moneyTable}
     ${stacks}
-    ${moneyTable ? `<p class="cont side-note">The money rows are each run's pro-forma (answer 4 has every line, its rule and its source); the plate fit is each run's plans by program. "Meets the criteria" is the funders' published criteria, not funding.</p>` : ""}
+    ${moneyTable ? `<p class="cont side-note">The money rows are each run's pro-forma (answer 4 has every line, its rule and its source); the plate fit is each run's plans by program. "Passes the screen" means the funders' published criteria are met, not that the money is found.</p>` : ""}
     ${openList}
     <h3 class="side-sub">${differ.length ? `${differ.length} of ${rows.length} rules read differently` : `All ${rows.length} rules read the same in both`}</h3>
     ${differ.length ? table(differ) : ""}

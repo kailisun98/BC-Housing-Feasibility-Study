@@ -24,13 +24,16 @@ export function syncRunButton() {
   const b = $("#run-btn");
   if (!b) return;
   const p = progress();
+  const asOf = $("#as-of").value || todayISO();
   if (state.mode === "manager") {
     b.hidden = !state.run;
     b.classList.add("btn-again");
-    b.textContent = state.running ? "Running…" : "Run again";
+    // a date moved off the memo's own is said on the button, where the run will use it (24 Nov 2026)
+    const moved = state.run && asOf !== state.run.as_of;
+    b.textContent = state.running ? "Running…" : moved ? `Run again as of ${dateWords(asOf)}` : "Run again";
     const ok = !!(state.runStale && p.site && p.option);
     b.setAttribute("aria-disabled", String(!ok));
-    b.title = ok ? `Run the rules again: ${state.runStale} changed (Ctrl+Enter)` : "Nothing has changed since this run";
+    b.title = ok ? `Run the rules again as of ${dateWords(asOf)}: ${state.runStale} changed (Ctrl+Enter)` : "Nothing has changed since this run";
     return;
   }
   b.hidden = false;
@@ -38,7 +41,17 @@ export function syncRunButton() {
   b.textContent = state.running ? "Running…" : "Run the rules";
   const ok = !!(p.site && state.option);
   b.setAttribute("aria-disabled", String(!ok));
-  b.title = ok ? "Run the rules (Ctrl+Enter)" : (!p.site ? "Choose a site first" : "Choose an option first");
+  b.title = ok ? `Run the rules as of ${dateWords(asOf)} (Ctrl+Enter)` : (!p.site ? "Choose a site first" : "Choose an option first");
+}
+
+/* Why a run asked for now would not run, or null. The reader never runs; the manager's memo runs again only once
+   something has left it out of date (24 Nov 2026: Ctrl+Enter, or Enter on the aria-disabled Run again, made a second
+   revision of the same inputs). The architect may run the same inputs again on purpose. */
+function runRefused() {
+  if (state.mode === "reader") return "The reader's view reads memos; it does not run the rules.";
+  if (state.mode === "manager" && state.run && !state.runStale)
+    return `Nothing has changed since ${rev(state.run.run_id)}: change a figure, an answer or the rules date to run again.`;
+  return null;
 }
 
 export async function loadRuns(siteId = null) {
@@ -50,30 +63,66 @@ export async function loadRuns(siteId = null) {
   renderRoute();
 }
 
-/* A memo's revision on its site, R1, R2 and so on, the way a drawing numbers its issues. The committed runs come
-   first: the base runs, then the runs recorded against another (they carry a diff), each group by its as-of date
-   and folder. Then the runs made here, in the order they were made (their folders are timestamps), so a new run
-   always takes the next number. On 998 E 19th Ave the as-approved memo is R1 and the funder-ready what-if R2. The
-   rules stamp behind a memo appears only as the fingerprint in its Rules fingerprint card. */
+/* A memo's revision on its site, R1, R2 and so on, the way a drawing numbers its issues: only a memo that has gone
+   to someone takes a number (Kai, 24 Nov 2026: every trial run took one, so R7 could be a run nobody saw). The
+   committed runs come first: the base runs, then the runs recorded against another (they carry a diff), each group by
+   its as-of date and folder. Then the runs made here that have been issued, in the order they were first issued, so
+   an issue always takes the next number and never renumbers one before it. A run made here and not issued is a draft,
+   named by the time it was made ("Draft 14:03"); on the web build every run made in the page stays one, as issuing
+   needs the local server. On 998 E 19th Ave the as-approved memo is R1 and the funder-ready what-if R2. The rules
+   stamp behind a memo appears only as the fingerprint in its Rules fingerprint card. */
 const madeHere = r => /^(\d{4}-\d\d-\d\dT|browser-)/.test(r.folder || "");
+
+/* When a run made here was made, from its folder (local time, as the server and the page name them). */
+function madeAt(r) {
+  const f = String(r.folder || "");
+  let m = /^(\d{4}-\d\d-\d\d)T(\d\d)-(\d\d)-(\d\d)/.exec(f);
+  if (m) return { day: m[1], hm: `${m[2]}:${m[3]}`, hms: `${m[2]}:${m[3]}:${m[4]}` };
+  m = /^browser-(\d\d)-(\d\d)-(\d\d)/.exec(f);
+  if (m) return { day: todayISO(), hm: `${m[1]}:${m[2]}`, hms: `${m[1]}:${m[2]}:${m[3]}` };
+  return null;
+}
+
+function draftName(r, taken) {
+  const t = madeAt(r);
+  if (!t) return "Draft";
+  const day = t.day === todayISO() ? "" : `${dateWords(t.day).replace(/ \d{4}$/, "")}, `;
+  const name = `Draft ${day}${t.hm}`;
+  return taken.has(name) ? `Draft ${day}${t.hms}` : name;   // two runs in one minute
+}
 
 function noteRevisions(runs) {
   const list = (runs || []).filter(r => r && r.run_id);
   const committed = list.filter(r => !madeHere(r)).sort((a, b) => (a.has_diff ? 1 : 0) - (b.has_diff ? 1 : 0)
     || String(a.as_of).localeCompare(String(b.as_of)) || String(a.folder).localeCompare(String(b.folder)));
-  const made = list.filter(madeHere).sort((a, b) => String(a.written || a.folder).localeCompare(String(b.written || b.folder)));
-  state.revisions = new Map([...committed, ...made].map((r, i) => [r.run_id, `R${i + 1}`]));
+  const issued = list.filter(r => madeHere(r) && r.issued_at).sort((a, b) => String(a.issued_at).localeCompare(String(b.issued_at))
+    || String(a.folder).localeCompare(String(b.folder)));
+  const drafts = list.filter(r => madeHere(r) && !r.issued_at).sort((a, b) => String(a.folder).localeCompare(String(b.folder)));
+  const named = [...committed, ...issued].map((r, i) => [r.run_id, `R${i + 1}`]);
+  const taken = new Set();
+  const draftNames = drafts.map(r => { const n = draftName(r, taken); taken.add(n); return [r.run_id, n]; });
+  state.revisions = new Map([...named, ...draftNames]);
+  state.revisionCount = named.length;
 }
 
-/* A run as the reader names it: its revision on the site. */
-export const rev = runId => (runId && state.revisions.get(runId)) || "a new revision";
+/* A run as the reader names it: its revision on the site, or its draft name. */
+export const rev = runId => (runId && state.revisions.get(runId)) || "this run";
 
-/* Runs in revision order, R1 first. */
-export const byRev = runs => runs.slice().sort((a, b) => (Number(String(rev(a.run_id)).slice(1)) || 1e9) - (Number(String(rev(b.run_id)).slice(1)) || 1e9));
+/* A run made here and not yet issued. */
+export const isDraft = runId => /^Draft\b/.test(rev(runId));
+
+/* The number the next issue on this site takes. */
+export const nextRev = () => `R${(state.revisionCount || 0) + 1}`;
+
+/* Runs in revision order, R1 first, then the drafts in the order they were made. */
+const revNo = id => { const m = /^R(\d+)$/.exec(rev(id)); return m ? Number(m[1]) : 1e9; };
+export const byRev = runs => runs.slice().sort((a, b) => revNo(a.run_id) - revNo(b.run_id) || String(a.folder).localeCompare(String(b.folder)));
 
 export async function runRules() {
   const btn = $("#run-btn");
   if (state.running) return;   // a second click while a run is in flight made a second revision of the same inputs
+  const refused = runRefused();
+  if (refused) { if (state.mode !== "reader") setStatus(refused, "info"); return; }
   const p = progress();
   if (!p.site || !state.option || (state.mode === "manager" && !p.option)) {
     toast(!p.site ? "Nothing to run yet: choose a site at 01." : "Nothing to run yet: choose the option at 02.", true);
@@ -155,16 +204,25 @@ function enableExports(run) {
   if (state.view === "3d") renderPreview3D();
 }
 
-/* A past run, as a reader picks it: its revision first, then the date, a named folder (as-approved, what-if-…) where
-   there is one, the option, and a timestamped folder last. A narrow picker still shows the first three. */
+/* A past run, as a reader picks it: its revision (or its draft name, which carries when it was made), the option, and
+   the rules date in words. A narrow picker still shows the first two. No folder name: that is the architect's to know,
+   and the status line names it when a run opens in architect mode (24 Nov 2026: pickers read "run 2026-11-24 ·
+   as-approved-rules-2026-10-27 · …", and a committed run's "run" date was only when the file was checked out). */
 function runLabel(r) {
-  const option = r.option_name || r.option_id || "option";
-  const named = r.folder && r.folder !== r.as_of && !/^\d{4}-\d\d-\d\d/.test(r.folder);
-  const stamped = r.folder && r.folder !== r.as_of && !named;
-  // the day it was run leads (a timestamped folder says it; a committed run has none), then the rules date
-  const ranOn = r.written ? String(r.written).slice(0, 10) : (stamped ? r.folder.slice(0, 10) : null);
-  const ranAt = stamped && /T\d\d-\d\d/.test(r.folder) ? ` ${r.folder.slice(11, 16).replace("-", ":")}` : "";
-  return `${rev(r.run_id)} · ${ranOn ? `run ${ranOn}${ranAt} · rules as of ${r.as_of}` : `rules as of ${r.as_of}`} · ${named ? `${r.folder} · ` : ""}${option}${r.revit ? " · Revit" : ""}`;
+  return `${runName(r)} · rules as of ${dateWords(r.as_of)}${r.revit ? " · Revit" : ""}`;
+}
+
+/* A memo named for a link: its revision and its option's name up to the colon ("R1 · As approved by Council, 25 Jul
+   2024"). */
+export const runName = r => `${rev(r.run_id)} · ${String(r.option_name || r.option_id || "option").split(":")[0].trim()}`;
+
+/* After an issue: the run takes its number, and every place that names it says so. */
+export async function afterIssue(run) {
+  await loadRuns(run.run_id.split("/")[0]);
+  showStamp(run);
+  renderMemo(run);
+  fillRunSelects();
+  setCompareNote(run.diff);
 }
 
 /* The address bar names the run on screen (and the run compared), so a memo can be sent as a link. Another run or
@@ -223,7 +281,7 @@ export function fillRunSelects() {
   // the open run is chosen in the list; a blank first entry only while no run, or one the list lacks, is on screen
   const listed = state.runs.some(r => r.run_id === cur);
   const runs = byRev(state.runs);   // R1 first, as the labels read (16 Nov 2026: they listed R4, R2, R1, R3)
-  open.innerHTML = (listed ? "" : `<option value="">${state.run ? "This run" : "Choose a run…"}</option>`) +
+  open.innerHTML = (listed ? "" : `<option value="">${state.run ? "This memo" : "Choose a memo…"}</option>`) +
     runs.map(r => `<option value="${h(r.run_id)}"${r.run_id === cur ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
   cmp.innerHTML = `<option value="">No comparison</option>` +
     runs.filter(r => r.run_id !== cur).map(r => `<option value="${h(r.run_id)}"${r.run_id === state.compareRun ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
@@ -232,14 +290,17 @@ export function fillRunSelects() {
 export async function openRun(runId) {
   if (!runId) return;
   const [site, folder] = runId.split("/");
-  setStatus(`Opening the run ${runId}…`, "busy");
+  setStatus(`Opening ${state.revisions.has(runId) ? rev(runId) : "the memo"}…`, "busy");   // a revision, never the folder
   const run = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
   state.run = run;
   state.runStale = null;
   guide.over = false;
   if (state.mode === "manager") showInputs(false, false);
-  // the date in the top bar is the date of the memo on screen, and so of the next run
+  // the date in the top bar is the date of the memo on screen, and so of the next run; a date that moves is said in
+  // the status line below (24 Nov 2026: it changed under the reader without a word)
+  const wasAsOf = $("#as-of").value;
   $("#as-of").value = run.as_of;
+  const dateMoved = wasAsOf && wasAsOf !== run.as_of;
   enableExports(run);
   await syncInputsTo(run);
   // the run's own site names its revisions, whether or not the inputs followed it (unsaved edits keep them where they are)
@@ -261,7 +322,7 @@ export async function openRun(runId) {
   closeExportPanel();
   // the folder is the architect's to know; the manager and the reader are told the revision and its date
   const where = state.mode === "architect" ? ` · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}` : "";
-  setStatus(`Opened ${rev(run.run_id)}, the memo as of ${dateWords(run.as_of)}${where}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}`, "ok");
+  setStatus(`Opened ${rev(run.run_id)}, the memo as of ${dateWords(run.as_of)}${where}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}${dateMoved && state.mode !== "reader" ? ` · Rules as of now reads ${dateWords(run.as_of)}, this memo's date (it read ${dateWords(wasAsOf)})` : ""}`, "ok");
 }
 
 /* The run a stored comparison (diff.json) was made against. The diff names only that run's date and rules stamp,
@@ -334,12 +395,14 @@ async function syncInputsTo(run) {
   }
 }
 
+const diffCache = new Map();
+
 export async function applyCompare(render = true) {
   const run = state.run;
   const note = $("#compare-note");
   if (!run) {
     note.textContent = state.compareRun ? "Applies to the next run." : "";
-    if (render) setStatus(state.compareRun ? `The next run will be compared with ${state.compareRun}.` : "No comparison.", "info");
+    if (render) setStatus(state.compareRun ? `The next run will be compared with ${rev(state.compareRun)}.` : "No comparison.", "info");
     return;
   }
   // the same run on both sides is no comparison: clear it, so the picker and the memo agree, and say why
@@ -349,8 +412,12 @@ export async function applyCompare(render = true) {
     run.diff = null;
     run.compareLedger = null;
   } else {
-    if (render) setStatus("Comparing the two runs…", "busy");
-    run.diff = await api(`/api/diff?from=${encodeURIComponent(state.compareRun)}&to=${encodeURIComponent(run.run_id)}`);
+    if (render) setStatus("Comparing the two memos…", "busy");
+    // a run's files never change once written, so a pair compared once is not asked for again (24 Nov 2026: one
+    // page load asked /api/diff for the same pair more than once)
+    const key = `${state.compareRun}>${run.run_id}`;
+    if (!diffCache.has(key)) diffCache.set(key, api(`/api/diff?from=${encodeURIComponent(state.compareRun)}&to=${encodeURIComponent(run.run_id)}`).catch(e => { diffCache.delete(key); throw e; }));
+    run.diff = structuredClone(await diffCache.get(key));   // attachCause writes into it
     await attachCause(run);
   }
   setCompareNote(run.diff);

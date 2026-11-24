@@ -50,7 +50,7 @@
 <rect x="139.0" y="237.9" width="4.5" height="3.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="167.4" y="237.9" width="4.5" height="3.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="78.0" y1="72.0" x2="192.5" y2="72.0" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
-<text x="196.5" y="76.0" font-size="10" fill="#8e8e8e">outright 91.0 m</text>
+<text x="196.5" y="76.0" font-size="10" fill="#5f6672">outright 91.0 m</text>
 <text x="196.5" y="239.2" font-size="10" fill="#1f2933">36.6 m</text>
 <text x="328.5" y="62.0" font-size="12" font-weight="600">Side elevation · street at the left</text>
 <line x1="318.5" y1="345.0" x2="414.7" y2="345.0" stroke="#1f2933" stroke-width="1.5"/>
@@ -89,7 +89,7 @@
 <rect x="337.4" y="237.9" width="4.5" height="3.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <rect x="391.4" y="237.9" width="4.5" height="3.7" fill="#8fb8e3" stroke="#5f6672" stroke-width="0.6"/>
 <line x1="318.5" y1="72.0" x2="414.7" y2="72.0" stroke="#8e8e8e" stroke-width="1" stroke-dasharray="5 3"/>
-<text x="418.7" y="76.0" font-size="10" fill="#8e8e8e">outright 91.0 m</text>
+<text x="418.7" y="76.0" font-size="10" fill="#5f6672">outright 91.0 m</text>
 <text x="418.7" y="239.2" font-size="10" fill="#1f2933">36.6 m</text>
 <line x1="74.0" y1="345.0" x2="78.0" y2="345.0" stroke="#5f6672" stroke-width="0.8"/>
 <text x="72.0" y="348.0" font-size="9" text-anchor="end" fill="#5f6672">±0.0</text>
@@ -113,5 +113,5 @@
 <text x="48.0" y="447.0" font-size="12" fill="#1f2933">Windows: one per unit on its side, 1.5 m wide, the unit module as the rhythm; a</text>
 <text x="48.0" y="463.0" font-size="12" fill="#1f2933">placeholder for the elevation study</text>
 <text x="48.0" y="479.0" font-size="12" fill="#1f2933">Floor levels at the left, metres above the ground floor.</text>
-<text x="48.0" y="495.0" font-size="12" fill="#1f2933">Rules as of 2026-10-23 · drawn from the option and the massing, not a design</text>
+<text x="48.0" y="495.0" font-size="12" fill="#1f2933">Rules as of 23 Oct 2026 · drawn from the option and the massing, not a design</text>
 </svg>

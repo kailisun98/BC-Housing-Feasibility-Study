@@ -8,7 +8,7 @@ import { ANSWERS, GUIDE_FIELDS, OPTION_FIELDS, shareFromScreen, SITE_FIELDS } fr
 import { refreshSummary, renderForm } from "./schedule.js";
 import { blankOption, blankSite, loadOptions, markStale, onOptionChange, onSiteChange } from "./files.js";
 import { fillRunSelects, loadRuns, rev } from "./runs.js";
-import { placeRunTools } from "./memo/memo.js";
+import { dateWords, placeRunTools } from "./memo/memo.js";
 import { continueWords, defaultPrograms, focusStage, renderGuide, renderStage } from "./route-stage.js";
 import { setStep } from "./modes.js";
 
@@ -93,7 +93,7 @@ function renderSiteReading(R) {
       <div class="memo-meta">
         <div><b>District</b><span>${h(site.zoning_district || "—")}</span></div>
         <div><b>Lot</b><span>${site.site_area_m2 ? `${h(fmtNum(site.site_area_m2))} m²` : "—"}${site.frontage_m ? ` · ${h(site.frontage_m)} × ${h(site.depth_m)} m` : ""}</span></div>
-        <div><b>Rules as of</b><span>${h(R.as_of)}</span></div>
+        <div><b>Rules as of</b><span>${h(dateWords(R.as_of))}</span></div>
         <div><b>Reading</b><span>the site alone, layers A to C</span></div>
       </div>
       <p class="quiet">What the site allows and asks before any option exists. The option's own answers come with the run.</p>

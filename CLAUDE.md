@@ -708,6 +708,18 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   cut-out; it compiles, and has NOT been run in Revit since: run it on a stepped or turned scheme before relying on it.
   A lane-side step-back meets the cores where they stand on that edge, an overlap for the architect to resolve.
 
+- **Project north, and FIG 01's two switches (24 Nov 2026).** Kai: a plan turned to true north stood 1.6° off the page
+  on 375 Glen Drive and "looks weird"; "the plans should always show project north". `projectTurn(bearing)` in
+  `figures/common.js` is the quarter turn nearest true north: FIG 01's plan, the block editor's canvas and the floor
+  picker's plans are turned by it, so the building stays square to the sheet, and their north arrows show true north
+  tilted by what is left (`northArrow(.., bearing - turn, ..)`). This replaces the true-north-up of 17 Nov. FIG 01's
+  head has two switches, held in `VIEW3D` and read by both its views: **Shadows** (`sunShadows`, `massParts` in
+  `common.js`: the equinox at 10 am, noon and 2 pm, the stepped mass tier by tier, on the ground in plan and in the
+  axonometric; a first reading) and **Program** (the axonometric draws every floor's blocks as boxes in their tones in
+  place of the plain mass, turned with it, the outright mass left out so the colours show; the plan draws the ground
+  floor's blocks; a key under the drawing). `BLOCK_TONE` / `BLOCK_WORD` in `common.js` are the tones and words. The
+  editor's shadows use the same function.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

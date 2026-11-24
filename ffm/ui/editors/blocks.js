@@ -15,7 +15,7 @@ import { markStale, onOptionChange, tidyOption } from "../files.js";
 import { OPTION_FIELDS } from "../fields.js";
 import { egressLine } from "../memo/answers.js";
 import { refreshPlanFloor } from "../figures/cards.js";
-import { HALF, northArrow, siteContext, turnFrame, turnOf, upright } from "../figures/common.js";
+import { HALF, northArrow, projectTurn, siteContext, sunShadows, turnFrame, upright } from "../figures/common.js";
 
 const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"],
   ["design_space", "Design space"], ["commercial", "Commercial"], ["void", "Cut-out"]];
@@ -279,7 +279,7 @@ function contextSvg(m, v, sun) {
   s += `<polygon points="${P(m.lot.polygon)}" fill="#ffffff" stroke="#1f2933" stroke-width="1.2" stroke-dasharray="12 3 2 3 2 3"/>`;
   // the shadows at the equinox, over the ground and the neighbours, under the plate: the longest first
   for (const sh of (sun || []).slice().sort((a, b) => b.len - a.len)) {
-    s += `<polygon points="${P(sh.ring)}" fill="#1f2933" fill-opacity="0.13" stroke="#1f2933" stroke-opacity="0.35" stroke-width="0.6"/>`;
+    s += `<g opacity="0.16">${sh.rings.map(r => `<polygon points="${P(r)}" fill="#1f2933"/>`).join("")}</g>`;
     s += `<text x="${f(v.X(sh.tip[0]))}" y="${f(v.Y(sh.tip[1]))}" font-size="9" text-anchor="middle" fill="#1f2933">${h(sh.label)}</text>`;
   }
   for (const t of ctx.trees) s += `<circle cx="${f(v.X(t.x))}" cy="${f(v.Y(t.y))}" r="${f(Math.max(1.5, t.crown * v.s))}" fill="${t.retained ? HALF.tree : "none"}" fill-opacity="0.4" stroke="${t.retained ? HALF.treeLine : HALF.gone}" stroke-width="0.6"${t.retained ? "" : ` stroke-dasharray="2 2"`}/>`;
@@ -409,14 +409,14 @@ function renderEditor() {
   // north up, as every plan: the canvas is drawn in the lot frame and turned as a whole where the context gives
   // the bearing; the pointer is read back in the turned group's own coordinates (wireEditor)
   const site = editor.massing && editor.massing.lot ? siteContext(state.site, editor.massing) : null;
-  const turn = turnOf(site && site.osm && site.osm.bearing), frame = turnFrame(width, H, turn), U = s => upright(s, turn);
+  const turn = projectTurn(site && site.osm && site.osm.bearing), frame = turnFrame(width, H, turn), U = s => upright(s, turn);
   // the mass turned on the lot (counter-clockwise in the lot frame, so the other way on the canvas, whose y runs
   // down): the plate, its grid and its blocks are one group turned about the plate's centre, over the site
   const ang = editor.angle || 0, UM = s => upright(s, turn - ang);
   // the shadows (where the context gives north), and how far the mass stands from its neighbours and the lot line
   const capH = (L.capacity && L.capacity.height_m) || p.storeys * p.floor_to_floor_m;
   const canSun = !!(site && site.osm && site.osm.bearing != null);
-  const sun = V.ctx && editor.shadows && canSun ? shadowsOf(p, ang, capH, site.osm.bearing, state.site && state.site.osm && state.site.osm.center && state.site.osm.center.lat) : null;
+  const sun = V.ctx && editor.shadows && canSun ? sunShadows([{ ring: massRing(p, ang), top: capH }], site.osm.bearing, site.osm.lat) : null;
   const ringNow = massRing(p, ang);
   const nbGap = site && site.buildings && site.buildings.length ? Math.min(...site.buildings.map(b => ringGap(ringNow, b.polygon))) : null;
   const lotGap = editor.massing && editor.massing.lot && editor.massing.lot.polygon ? ringGap(ringNow, editor.massing.lot.polygon) : null;
@@ -538,8 +538,8 @@ function renderEditor() {
           <rect class="ed-plate-handle ed-plate-w" x="${(px0 + pw + 3).toFixed(1)}" y="${(py0 + pd / 2 - 11).toFixed(1)}" width="8" height="22" rx="2" fill="#1f2933"><title>Drag to widen or narrow the plate</title></rect>
           <rect class="ed-plate-handle ed-plate-d" x="${(px0 + pw / 2 - 11).toFixed(1)}" y="${(py0 - 11).toFixed(1)}" width="22" height="8" rx="2" fill="#1f2933"><title>Drag to deepen or shallow the plate</title></rect>
           <g id="ed-ghost" pointer-events="none"></g>`)}</g></g>
-          <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${turn ? "north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
-          ${turn || (site && site.osm && site.osm.bearing != null) ? northArrow(frame.W - 24, 26, 90, 10) : ""}
+          <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${site && site.osm && site.osm.bearing != null ? "project north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
+          ${site && site.osm && site.osm.bearing != null ? northArrow(frame.W - 24, 26, site.osm.bearing - turn, 10) : ""}
         </svg>
         <div class="ed-status">
           ${floorChecks.length ? `<ul class="finding-list">${floorChecks.map(g => `<li>${pill("fail")}<span>${h(g.note)}</span></li>`).join("")}</ul>` : `<span class="help">Nothing broken on ${h(floorWords(editor.level))}.${problems ? ` ${problems} on other floors (marked ! above).` : ""}</span>`}

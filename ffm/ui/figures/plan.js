@@ -3,7 +3,8 @@
 
 import { fmtNum, h } from "../core/util.js";
 import { bnd, state } from "../core/state.js";
-import { crossingsAtX, FIG, HALF, halo, northArrow, NS, polyEl, scaleBar, sectionCut, SVG_OPEN, turnOf, upright } from "./common.js";
+import { BLOCK_TONE, crossingsAtX, FIG, HALF, halo, massParts, northArrow, NS, polyEl, projectTurn, scaleBar, sectionCut, sunShadows, SVG_OPEN, upright } from "./common.js";
+import { VIEW3D } from "./fig3d.js";
 
 /* The plan frames the lot and about this much around it (20 Nov 2026: it framed the whole 240 m of context, so the lot
    was 150 px of a 440 px drawing and the context as loud as the subject). */
@@ -22,7 +23,7 @@ export function figPlan(m, ctx, fsIn = null) {
   const bW = bx1 - bx0, bD = by1 - by0;
   const fs = fsIn || Math.max(2.2, (Math.max(bW, bD) + 2 * MARGIN) / 38);
   const masses = Object.fromEntries(m.masses.map(x => [x.name, x]));
-  const turn = turnOf(ctx.osm && ctx.osm.bearing);
+  const turn = projectTurn(ctx.osm && ctx.osm.bearing);   // project north: the quarter turn nearest true north
   // with the boundary editor open the plan zooms to the lot, so the handles are a hand's width apart
   const margin = bnd.open ? Math.max(5, fs * 2.8) : MARGIN;
   // the drawing's own coordinates: x along the frontage, y down the page with the street at the bottom (the boundary
@@ -65,7 +66,24 @@ export function figPlan(m, ctx, fsIn = null) {
   // the plate box, dotted: where it stands turned to the lot's longest side (massing: envelope.box.ring) it is drawn turned
   if (m.envelope.box && m.lot.bbox) { const b = m.envelope.box; s += polyEl(P(b.ring || [[b.x, b.y], [b.x + b.w, b.y], [b.x + b.w, b.y + b.d], [b.x, b.y + b.d]]), `fill="none" stroke="${FIG.env}" stroke-width="0.6" stroke-dasharray="1.5 1.5"`); }
   // the proposed footprint, then the outright one drawn over it as a heavy dashed outline, so both read in plan
+  // the shadows at the equinox, where they are asked for and the context gives north: a first reading (common.js)
+  if (VIEW3D.shadows && masses.proposed && ctx.osm && ctx.osm.bearing != null) {
+    for (const sh of sunShadows(massParts(masses.proposed), ctx.osm.bearing, ctx.osm.lat).sort((a, b) => b.len - a.len)) {
+      s += `<g opacity="0.16">${sh.rings.map(r => polyEl(P(r), `fill="#1f2933" stroke="none"`)).join("")}</g>`;
+      s += `<text x="${X(sh.tip[0]).toFixed(2)}" y="${Y(sh.tip[1]).toFixed(2)}" font-size="${(fs * 0.8).toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>${sh.label}</text>`;
+    }
+  }
   if (masses.proposed) s += polyEl(P(masses.proposed.footprint), `fill="${FIG.proposedFill}" stroke="${FIG.proposedStroke}" stroke-width="1.2" fill-opacity="0.5"`);
+  // the program on the ground floor, in its tones, where it is asked for: the layout's blocks, turned with the mass
+  const Lp = VIEW3D.program && masses.proposed && state.run && state.run.layout;
+  if (Lp && Lp.floors && Lp.floors[0] && Math.abs(Lp.plate.width_m - masses.proposed.plate_width_m) < 0.05) {
+    const pl = Lp.plate, a = (pl.angle_deg || 0) * Math.PI / 180, ca = Math.cos(a), sa = Math.sin(a), mx = pl.x + pl.width_m / 2, my = pl.y + pl.depth_m / 2;
+    for (const z of Lp.floors[0].zones) {
+      if (z.block === "spare" || z.block === "void") continue;
+      const ring = [[z.x, z.y], [z.x + z.w, z.y], [z.x + z.w, z.y + z.d], [z.x, z.y + z.d]].map(([x, y]) => [mx + (x - mx) * ca - (y - my) * sa, my + (x - mx) * sa + (y - my) * ca]);
+      s += polyEl(P(ring), `fill="${BLOCK_TONE[z.block] || "#eeeeee"}" stroke="#5f6672" stroke-width="0.5"`);
+    }
+  }
   if (masses.outright) s += polyEl(P(masses.outright.footprint), `fill="${FIG.outrightFill}" fill-opacity="${masses.proposed ? 0.35 : 0.9}" stroke="${FIG.outrightStroke}" stroke-width="2" stroke-dasharray="6 3"`);
   // tree ids only where there is room for them: at the label size, schematic trees along the rear would overprint
   const gap = ctx.trees.reduce((g, tr, i) => Math.min(g, ...ctx.trees.slice(i + 1).map(u => Math.hypot(u.x - tr.x, u.y - tr.y))), Infinity);
@@ -183,7 +201,7 @@ export function figPlan(m, ctx, fsIn = null) {
   if (bnd.open && bnd.ring) s += boundaryHandles(bnd.ring, X, Y, fs);
   let out = head + open + upright(s, turn) + `</g>`;
   out += scaleBar(sbAt[0], sbAt[1], FW, fs);
-  if (ctx.osm && ctx.osm.bearing != null) out += northArrow(FW - fs * 2.2, fs * 2.4, 90, fs);   // the page's up is north
+  if (ctx.osm && ctx.osm.bearing != null) out += northArrow(FW - fs * 2.2, fs * 2.4, ctx.osm.bearing - turn, fs);   // true north, as it stands on a plan drawn to project north
   return out + `</svg>`;
 }
 

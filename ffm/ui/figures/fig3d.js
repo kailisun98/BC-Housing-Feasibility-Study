@@ -1,12 +1,15 @@
 /* FIG 01 in 3D: a dependency-free orbitable axonometric drawn from massing.json. VIEW3D holds the view. */
 
 import { h } from "../core/util.js";
-import { FIG, HALF, halo, NS, SVG_OPEN } from "./common.js";
+import { BLOCK_TONE, FIG, HALF, halo, massParts, NS, sunShadows, SVG_OPEN } from "./common.js";
+import { state } from "../core/state.js";
 
 /* FIG 01 in three dimensions: an orbitable axonometric of the lot, the setback envelope and the two masses, drawn
    from the same massing.json. The camera turns about the lot's centre; azimuth and elevation live in VIEW3D so the
    view survives a re-render. No library: the boxes are projected and painted far to near. */
-export const VIEW3D = { mode: "plan", az: 35, el: 28 };
+/* `shadows` and `program` are FIG 01's two switches, read by the plan as well: the equinox shadows on the ground, and
+   the mass drawn as its program (every floor's blocks in their tones) in place of the plain box. */
+export const VIEW3D = { mode: "plan", az: 35, el: 28, shadows: false, program: false };
 
 /* a height as the section and the captions print it: one decimal, or two where the massing has them (88.45) */
 const heightWords = v => { const r = Math.round(Number(v) * 100) / 100; return Math.abs(r * 10 - Math.round(r * 10)) < 1e-6 ? r.toFixed(1) : r.toFixed(2); };
@@ -67,6 +70,13 @@ export function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   for (const g of ctx.ground) body += poly(g.ring, g.seam ? `fill="${g.fill}" stroke="${g.fill}" stroke-width="0.6" stroke-linejoin="round"` : `fill="${g.fill}" stroke="${HALF.line}" stroke-width="0.8"${g.dash ? ` stroke-dasharray="3 2"` : ""}`);
   body += poly(m.lot.polygon, `fill="#ffffff" stroke="${FIG.lot}" stroke-width="1.2"`);
   body += poly(m.envelope.polygon, `fill="none" stroke="${FIG.env}" stroke-width="1" stroke-dasharray="4 3"`);
+  if (VIEW3D.shadows && masses.proposed && ctx.osm && ctx.osm.bearing != null) {
+    for (const sh of sunShadows(massParts(masses.proposed), ctx.osm.bearing, ctx.osm.lat).sort((u, v) => v.len - u.len)) {
+      body += `<g opacity="0.16">${sh.rings.map(r => poly(r.map(([x, y]) => [x, y, 0]), `fill="#1f2933" stroke="none"`)).join("")}</g>`;
+      const t = proj([sh.tip[0], sh.tip[1], 0]);
+      body += `<text x="${t.x.toFixed(2)}" y="${t.y.toFixed(2)}" font-size="${(fs * 0.8).toFixed(2)}" text-anchor="middle" fill="${FIG.grey}" ${halo(fs)}>${sh.label}</text>`;
+    }
+  }
   // the buildings around, the trees and the masses are painted far to near so a tree behind a mass stays behind it
   const items = [];
   for (const b of ctx.buildings) {
@@ -75,12 +85,27 @@ export function fig3d(m, ctx, az = VIEW3D.az, el = VIEW3D.el, fsIn = null) {
   }
   for (const t of ctx.streetTrees.concat(ctx.osmTrees)) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.35) });
   for (const t of ctx.trees) if (t.retained) items.push({ d: proj([t.x, t.y, 0]).d, s: tree(t, 0.45) });
-  if (masses.outright) items.push({ d: -1e9, s: box(masses.outright.footprint, masses.outright.base_z || 0, (masses.outright.base_z || 0) + masses.outright.height_m, FIG.outrightFill, FIG.outrightStroke, 0.9, null) });
+  // the outright mass stands inside the proposed one and would hide the program's colours: left out of that view
+  if (masses.outright && !(VIEW3D.program && state.run && state.run.layout)) items.push({ d: -1e9, s: box(masses.outright.footprint, masses.outright.base_z || 0, (masses.outright.base_z || 0) + masses.outright.height_m, FIG.outrightFill, FIG.outrightStroke, 0.9, null) });
   if (masses.proposed) {
     const p = masses.proposed;
     const depth = p.footprint.reduce((s, [x, y]) => s + proj([x, y, 0]).d, 0) / p.footprint.length;
     // a stepped mass is its tiers stacked, each with its own outline (massing's `tiers`); the upper ones painted last
-    if (p.tiers && p.tiers.length > 1) p.tiers.forEach((t, k) => items.push({ d: depth - k * 1e-4, s: box(t.footprint, t.base_z, t.base_z + t.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: t.storeys, f2f: p.floor_to_floor_m }) }));
+    // the program in place of the plain box, where it is asked for: every floor's blocks as boxes in their tones,
+    // floor on floor from the ground up, each floor's far blocks first; turned with the mass
+    const Lp = VIEW3D.program && state.run && state.run.layout;
+    if (Lp && Lp.floors && Math.abs(Lp.plate.width_m - p.plate_width_m) < 0.05) {
+      const pl = Lp.plate, t = (pl.angle_deg || 0) * Math.PI / 180, ct = Math.cos(t), st = Math.sin(t), mx = pl.x + pl.width_m / 2, my = pl.y + pl.depth_m / 2, f2f = pl.floor_to_floor_m || p.floor_to_floor_m || 3;
+      let s = "";
+      for (const fl of Lp.floors) {
+        const blocks = fl.zones.filter(z => z.block !== "spare" && z.block !== "void").map(z => {
+          const ring = [[z.x, z.y], [z.x + z.w, z.y], [z.x + z.w, z.y + z.d], [z.x, z.y + z.d]].map(([x, y]) => [mx + (x - mx) * ct - (y - my) * st, my + (x - mx) * st + (y - my) * ct]);
+          return { ring, tone: BLOCK_TONE[z.block] || "#eeeeee", d: ring.reduce((a, q) => a + proj([q[0], q[1], fl.z]).d, 0) / 4 };
+        }).sort((u, v) => v.d - u.d);
+        for (const b of blocks) s += box(b.ring, fl.z, fl.z + f2f, b.tone, "#5f6672", 0.97, null);
+      }
+      items.push({ d: depth, s });
+    } else if (p.tiers && p.tiers.length > 1) p.tiers.forEach((t, k) => items.push({ d: depth - k * 1e-4, s: box(t.footprint, t.base_z, t.base_z + t.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: t.storeys, f2f: p.floor_to_floor_m }) }));
     else items.push({ d: depth, s: box(p.footprint, p.base_z || 0, (p.base_z || 0) + p.height_m, FIG.proposedFill, FIG.proposedStroke, 0.45, { storeys: p.storeys, f2f: p.floor_to_floor_m }) });
   }
   // the outright mass sits inside the proposed one: paint it right before the proposed box

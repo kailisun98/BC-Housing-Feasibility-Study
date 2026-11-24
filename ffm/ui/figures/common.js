@@ -96,6 +96,41 @@ export function turnFrame(w, h, a) {
   return { W, H, open: `<g class="plan-turn" transform="translate(${((W - w) / 2).toFixed(2)} ${((H - h) / 2).toFixed(2)}) rotate(${a.toFixed(2)} ${(w / 2).toFixed(2)} ${(h / 2).toFixed(2)})">` };
 }
 
+/* Project north (24 Nov 2026, Kai: "the plans should always show project north"): a plan turned to true north
+   stands a few degrees off the page, which reads as a mistake. A plan is turned only by the quarter turn nearest
+   true north, so the building stays square to the sheet and north is the page's up to within 45 degrees; the north
+   arrow then shows true north, tilted by what is left (`northArrow(.., bearing - projectTurn(bearing), ..)`). */
+export const projectTurn = bearing => { const q = Math.round(turnOf(bearing) / 90) * 90; return q <= -180 ? q + 360 : q; };
+
+/* The tones of the program's blocks, as the sheets and the block editor draw them. */
+export const BLOCK_TONE = { studio: "#dbe9f8", one_bed: "#b9d4f0", two_bed: "#8fb8e3", three_bed_plus: "#6b9fd4", corridor: "#f4f4f2", core: "#c9c9c5", services: "#e2e2df", amenity: "#f6e7c1", non_residential: "#f0cf9a", other: "#e6dfd0", design_space: "#d9e6d2", commercial: "#f3c9b5" };
+export const BLOCK_WORD = { three_bed_plus: "three-bedroom", two_bed: "two-bedroom", one_bed: "one-bedroom", studio: "studio", non_residential: "non-residential", commercial: "commercial", amenity: "amenity", design_space: "lobby, design space", services: "services", core: "core", corridor: "corridor", other: "other" };
+
+/* A first reading of the shadows, not a shadow study: each part of the mass ({ring, top}: an outline in the lot
+   frame and the height of its top) on flat ground at the equinox at 10 am, noon and 2 pm daylight time (the hours
+   the City asks for), for Vancouver's longitude (the sun's hour angles -50, -20 and +10 degrees) at the site's
+   latitude. Each shadow is the outline swept along the shadow's direction by the height over the tangent of the
+   sun's altitude. `bearing` is the compass bearing of the lot frame's x axis. Pure. */
+export function sunShadows(parts, bearing, lat) {
+  const phi = (lat || 49.26) * Math.PI / 180, beta = bearing * Math.PI / 180;
+  const hull = pts => {
+    const P = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]), cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]), lo = [], up = [];
+    for (const q of P) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+    for (const q of P.slice().reverse()) { while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  };
+  return [["10 am", -50], ["noon", -20], ["2 pm", 10]].map(([label, hd]) => {
+    const Hh = hd * Math.PI / 180, alt = Math.asin(Math.cos(phi) * Math.cos(Hh)), az = Math.atan2(Math.sin(Hh), Math.cos(Hh) * Math.sin(phi)) + Math.PI;
+    const th = az + Math.PI - beta, ux = Math.cos(th), uy = -Math.sin(th);   // a compass direction θ is (cos(θ−β), −sin(θ−β)) in the lot frame
+    const tall = parts.reduce((a, b) => (b.top > a.top ? b : a), parts[0]), len = tall.top / Math.tan(alt);
+    return { label, len, rings: parts.map(pt => { const l = pt.top / Math.tan(alt); return hull(pt.ring.concat(pt.ring.map(([x, y]) => [x + ux * l, y + uy * l]))); }),
+      tip: [tall.ring.reduce((a, q) => a + q[0], 0) / tall.ring.length + ux * len, tall.ring.reduce((a, q) => a + q[1], 0) / tall.ring.length + uy * len] };
+  });
+}
+
+/* The parts of a proposed mass that cast a shadow: its tiers where it steps, else the one box. */
+export const massParts = p => (p.tiers && p.tiers.length > 1 ? p.tiers.map(t => ({ ring: t.footprint, top: t.base_z + t.height_m })) : [{ ring: p.footprint, top: (p.base_z || 0) + p.height_m }]);
+
 export function upright(s, a) {
   if (!a) return s;
   return s.replace(/<text\b([^>]*)>/g, (all, attrs) => {
@@ -253,6 +288,7 @@ function osmContext(site, m, base) {
            // the turned lot's x axis: new = R(θ)·old with θ counter-clockwise (boundary.oriented_ring), so the new x axis
            // is the old one turned θ clockwise, and a bearing counts clockwise from north: the stored bearing plus θ
            // (it was minus, which drew 375 Glen Drive fronted on E Hastings St upside down under a north-up arrow)
+           lat: o.center && typeof o.center.lat === "number" ? o.center.lat : null,
            bearing: o.frame && typeof o.frame.x_axis_bearing_deg === "number" ? (((o.frame.x_axis_bearing_deg + (m.lot.orientation ? m.lot.orientation.rotate_deg : 0)) % 360) + 360) % 360 : null },
   });
 }

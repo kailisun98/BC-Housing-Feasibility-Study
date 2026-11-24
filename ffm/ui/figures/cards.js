@@ -9,7 +9,7 @@ import { refreshSummary } from "../schedule.js";
 import { markStale } from "../files.js";
 import { refOf } from "../memo/memo.js";
 import { egressLine } from "../memo/answers.js";
-import { fitLabels, northArrow, outrightLimit, siteContext, turnFrame, turnOf, upright } from "./common.js";
+import { BLOCK_TONE, BLOCK_WORD, fitLabels, northArrow, outrightLimit, projectTurn, siteContext, turnFrame, upright } from "./common.js";
 import { boundaryTools, figPlan } from "./plan.js";
 import { figSection } from "./section.js";
 import { fig3d, VIEW3D } from "./fig3d.js";
@@ -35,10 +35,14 @@ function figOne(m, ctx, fs = null) {
         <button type="button" class="segbtn" data-view="plan" aria-pressed="${!three}">Plan</button>
         <button type="button" class="segbtn" data-view="3d" aria-pressed="${three}">3D</button>
       </div>
+      ${ctx.osm && ctx.osm.bearing != null ? `<button type="button" class="btn btn-small btn-quiet fig-toggle" id="fig-shadows" aria-pressed="${!!VIEW3D.shadows}" title="The mass's shadow at the equinox, 10 am, noon and 2 pm daylight time, on flat ground: a first reading, not a shadow study">Shadows</button>` : ""}
+      ${state.run && state.run.layout ? `<button type="button" class="btn btn-small btn-quiet fig-toggle" id="fig-program" aria-pressed="${!!VIEW3D.program}" title="Draw the mass as its program: every floor's blocks in their tones in 3D, the ground floor's in plan">Program</button>` : ""}
       ${boundaryTools(m)}
     </div>
     ${massTools(m)}
     <div class="fig-body${three ? " fig3d" : ""}">${three ? fig3d(m, ctx, VIEW3D.az, VIEW3D.el, fs) : figPlan(m, ctx, fs)}</div>
+    ${VIEW3D.program && state.run && state.run.layout ? `<p class="fig-legend">${[...new Set(state.run.layout.floors.flatMap(fl => fl.zones.map(z => z.block)))].filter(k => BLOCK_TONE[k]).map(k => `<span><i style="background:${BLOCK_TONE[k]}"></i>${h(BLOCK_WORD[k] || k)}</span>`).join("")}${three ? "" : `<span class="cont">the ground floor; the 3D view stacks every floor</span>`}</p>` : ""}
+    ${VIEW3D.shadows && ctx.osm && ctx.osm.bearing != null ? `<p class="fig-hint">Shadows at the equinox at 10 am, noon and 2 pm daylight time, from the mass on flat ground: a first reading, not the shadow study the City asks for.</p>` : ""}
     ${three ? `<p class="fig-hint">Drag sideways to turn it; the arrow keys turn and tilt it. A straight axonometric of the same massing numbers, with storey lines every ${h(m.masses[0]?.floor_to_floor_m)} m.</p>` : ""}`;
 }
 
@@ -142,6 +146,10 @@ export function wireFigures(run) {
   const redraw = () => { fig.innerHTML = figOne(m, ctx); wireFigures(run); };
   wireBoundary(fig, run, redraw);
   wireMassTools(fig, run, redraw);
+  for (const [id, key] of [["#fig-shadows", "shadows"], ["#fig-program", "program"]]) {
+    const t = $(id, fig);
+    if (t) t.addEventListener("click", () => { VIEW3D[key] = !VIEW3D[key]; redraw(); const again = $(id, $("#fig-01")); if (again) again.focus(); });
+  }
   $$(".segbtn", fig).forEach(b => b.addEventListener("click", () => {
     if (VIEW3D.mode === b.dataset.view) return;
     VIEW3D.mode = b.dataset.view;
@@ -384,17 +392,19 @@ function floorPlanHtml(L, lv) {
   // the angle the mass itself is turned by, where the context gives a bearing; the labels stay readable
   const ms = (editor.open && editor.massing) || (state.run && state.run.massing);
   const site = ms && ms.lot ? siteContext(state.site, ms) : null, bearing = site && site.osm ? site.osm.bearing : null;
-  const turn = bearing == null ? 0 : turnOf(bearing) - (p.angle_deg || 0), frame = turnFrame(W, H, turn);
+  // project north: the plate square to the page, turned by the quarter turn nearest true north; the arrow is true north
+  const plateBearing = bearing == null ? null : bearing - (p.angle_deg || 0);
+  const turn = plateBearing == null ? 0 : projectTurn(plateBearing), frame = turnFrame(W, H, turn);
   return `<div class="plans-floor-head"><b>${h(fl.name)}</b><span class="cont">${counts ? ` · ${h(counts)}` : " · no units"}${fl.spare_m2 ? ` · ${h(fmtNum(Math.round(fl.spare_m2)))} m² spare` : ""}</span></div>
     ${eg ? `<div class="help">${pill(eg.status)} Exits: ${h(egressLine(eg))}${eg.notes && eg.notes.length ? ` <span class="cont">· ${h(eg.notes[0])}</span>` : ""}</div>` : ""}
-    <svg viewBox="0 0 ${f(frame.W)} ${f(frame.H)}" width="${f(frame.W)}" height="${f(frame.H)}" role="img" aria-label="Plan of ${h(fl.name)}${turn ? ", north up" : ""}" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
+    <svg viewBox="0 0 ${f(frame.W)} ${f(frame.H)}" width="${f(frame.W)}" height="${f(frame.H)}" role="img" aria-label="Plan of ${h(fl.name)}, project north up" font-family="IBM Plex Sans, Helvetica, Arial, sans-serif">
       ${frame.open}${upright(`
       <rect x="${M}" y="${M}" width="${f(p.width_m * scale)}" height="${f(p.depth_m * scale)}" fill="#ffffff" stroke="#1f2933" stroke-width="1.2"/>
       ${zones}
       <rect x="${M}" y="${M}" width="${f(p.width_m * scale)}" height="${f(p.depth_m * scale)}" fill="none" stroke="#1f2933" stroke-width="1.2"/>
       <text x="${f(M + p.width_m * scale / 2)}" y="${f(H - 10)}" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.width_m)} m · street side</text>
       <text x="${M - 12}" y="${f(M + p.depth_m * scale / 2)}" transform="rotate(-90 ${M - 12} ${f(M + p.depth_m * scale / 2)})" font-size="11" text-anchor="middle" fill="#5f6672">${h(p.depth_m)} m</text>`, turn)}</g>
-      ${bearing != null ? northArrow(frame.W - 26, 28, 90, 11) : ""}
+      ${plateBearing != null ? northArrow(frame.W - 26, 28, plateBearing - turn, 11) : ""}
     </svg>`;
 }
 

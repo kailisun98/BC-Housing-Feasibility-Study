@@ -1174,6 +1174,67 @@ class ThePdfCarriesTheAreaScheduleAndTheChecks(unittest.TestCase):
         self.assertLess(js.index("${s.areas ? `<section"), js.index("${words}"))
         self.assertIn("function signedWords(run)", js)
 
+class TheGapsInWhatWasBuilt(unittest.TestCase):
+    """25 Nov 2026: accessible ground-oriented homes, the suggested building type, a multi-floor home in the editor."""
+
+    UI = Path(__file__).resolve().parent.parent / "ffm" / "ui"
+
+    def small(self):
+        s = dict(SITE, frontage_m=15.2, depth_m=36.6, site_area_m2=556.3)
+        for k in ("osm", "parcel", "boundary_m"):
+            s.pop(k, None)
+        return s
+
+    GO = dict(READY, building_type="ground_oriented", storeys=3, height_m=10.0, gfa_m2=900, residential_gfa_m2=900, non_residential_gfa_m2=0,
+              units={"studio": 0, "one_bed": 2, "two_bed": 2, "three_bed_plus": 0}, rent_tiers_units=None, accessible_units=1)
+
+    def _lay(self, o):
+        site = self.small()
+        L = evaluate(site, o, AS_OF)
+        m = massing.build(site, o, L)
+        return layout.solve(site, o, L, m), (site, o, L, m)
+
+    def test_an_accessible_home_is_one_floor_at_grade_with_a_home_over_it(self):
+        lay, _ = self._lay(self.GO)
+        acc = [z for fl in lay["floors"] for z in fl["zones"] if z.get("accessible")]
+        self.assertEqual(len(acc), 1)
+        self.assertEqual((acc[0]["levels"], acc[0]["entry"]), ([0, 0], "at grade"))
+        over = [z for fl in lay["floors"][1:] for z in fl["zones"] if z.get("home") is not None and z["x"] == acc[0]["x"]]
+        self.assertTrue(over and all(z["levels"] == [1, 2] for z in over))
+        self.assertEqual(lay["area_schedule"]["totals"]["homes_total"], lay["units_placed"])
+        self.assertTrue(any("garden flat under a townhouse" in w for w in lay["warnings"]))
+        self.assertEqual(next(i for i in lay["operability"]["items"] if i["key"] == "accessible")["status"], "pass")
+
+    def test_the_editors_placement_reads_a_home_over_several_floors_as_one_home(self):
+        lay, (site, o, L, m) = self._lay(self.GO)
+        zones = layout.zones_of(lay)
+        self.assertTrue(any("home" in z and "levels" in z for z in zones["1"]))
+        again = layout.place_zones(site, o, L, m, zones)
+        self.assertEqual(again["units_placed"], lay["units_placed"])
+        self.assertFalse([g for g in again["geometry"] if g["kind"] in ("no_core", "no_corridor", "no_elevator", "undersized", "narrow")])
+        self.assertEqual(again["plate"]["arrangement"], "ground_oriented")
+        self.assertTrue(again["egress"].get("ground_oriented"))
+
+    def test_the_suggestion_offers_a_building_type_and_never_applies_it(self):
+        from ffm.suggest import suggest, suggest_building_type
+        self.assertEqual(suggest_building_type({"storeys": 3, "units": {"two_bed": 4}})[0], "ground_oriented")
+        self.assertEqual(suggest_building_type({"storeys": 18, "units": {"studio": 150}})[0], "tower")
+        self.assertEqual(suggest_building_type({"storeys": 6, "units": {"studio": 80}})[0], "apartment")
+        self.assertEqual(suggest_building_type({"storeys": 3, "units": {"studio": 8}, "housing_type": "shelter"})[0], "apartment")
+        s = suggest(SITE, ["bch.chf.eligibility"], AS_OF, "funder-ready")
+        self.assertIn(s["building_type_suggested"]["value"], layout.BUILDING_TYPES)
+        self.assertNotIn("building_type", s["option"])
+        self.assertIsNone(suggest(SITE, ["bch.chf.eligibility"], AS_OF, "funder-ready", fixed={"building_type": "tower"})["building_type_suggested"])
+
+    def test_the_page_offers_the_type_and_keeps_a_home_in_step_across_its_floors(self):
+        stage = (self.UI / "route-stage.js").read_text(encoding="utf-8")
+        self.assertIn("function typeOffer()", stage)
+        self.assertIn("data-use-type", stage)
+        ed = (self.UI / "editors" / "blocks.js").read_text(encoding="utf-8")
+        self.assertIn("function syncHomes()", ed)
+        self.assertIn("home: z.home, levels: [...z.levels]", ed)
+        self.assertIn("if (syncHomes())", ed)
+
 
 if __name__ == "__main__":
     unittest.main()

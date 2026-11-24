@@ -63,7 +63,8 @@ function stepAt(level) {
 
 function zonesFromLayout(L) {
   const out = {};
-  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}), ...(z.block === "other" ? { label: z.label } : {}), ...(z.stairs === "scissor" ? { stairs: "scissor" } : {}), ...(z.name ? { name: z.name } : {}), ...(z.step ? { step: true } : {}) }));
+  for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}), ...(z.block === "other" ? { label: z.label } : {}), ...(z.stairs === "scissor" ? { stairs: "scissor" } : {}), ...(z.name ? { name: z.name } : {}), ...(z.step ? { step: true } : {}),
+    ...(z.home != null && z.levels ? { home: z.home, levels: [...z.levels] } : {}) }));
   return out;
 }
 
@@ -195,8 +196,33 @@ function syncCores() {
   return hit;
 }
 
+/* A ground-oriented home runs through its floors (`home`, `levels`, 25 Nov 2026: it was edited floor by floor): a
+   home moved, resized or retyped on the floor in view is the same on every floor it spans, and one removed here is
+   removed from them all. Returns how many floors were changed besides this one. */
+function syncHomes() {
+  const here = editor.zones[String(editor.level)] || [];
+  const ids = new Map(here.filter(z => z.home != null).map(z => [z.home, z]));
+  let changed = 0;
+  for (const [k, zs] of Object.entries(editor.zones)) {
+    if (Number(k) === editor.level) continue;
+    const kept = [];
+    for (const z of zs) {
+      if (z.home == null || !z.levels || editor.level < z.levels[0] || editor.level > z.levels[1]) { kept.push(z); continue; }
+      const src = ids.get(z.home);
+      if (!src) { changed++; continue; }                      // removed on this floor: removed from all of its floors
+      if (src.x !== z.x || src.y !== z.y || src.w !== z.w || src.d !== z.d || src.block !== z.block) {
+        Object.assign(z, { x: src.x, y: src.y, w: src.w, d: src.d, block: src.block }); changed++;
+      }
+      kept.push(z);
+    }
+    editor.zones[k] = kept;
+  }
+  return changed;
+}
+
 /* Every change ends here: the cores follow on every floor when one was touched, the editor redraws, the engine checks. */
 function commit(core) {
+  if (syncHomes()) setStatus("The home runs through its floors: the change is made on each of them.", "info");
   if (core) {
     editor.coreMoved = true;   // from here a suggested plan keeps the cores where the architect stood them
     const L = editor.result || state.run.layout, hit = syncCores();

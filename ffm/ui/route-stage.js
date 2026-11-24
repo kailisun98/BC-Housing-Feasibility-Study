@@ -518,6 +518,16 @@ function askControl(key, labelId) {
 /* The questions a stop asks, as a schedule: the question, the answer, who answers it. Under each question, what the
    answer changes and where to find it (20 Nov 2026: the manager was asked "Inside a former Community Vision area?"
    with no word on why it mattered or where to look); over the table, that Not sure is a fine answer. */
+/* The building type the derivation suggests (25 Nov 2026), offered under the question, never applied unasked. */
+function typeOffer() {
+  const off = guide.suggestion && guide.suggestion.building_type_suggested;
+  const cur = answerValue("building_type");
+  // nothing to offer where it is already the answer, or where it is an apartment building and none is chosen (the default)
+  if (!off || !off.value || cur === off.value || (off.value === "apartment" && !cur)) return "";
+  const why = String(off.why || "").split(": ").slice(1).join(": ") || off.why;
+  return `<p class="help type-offer">Suggested: <b>${h(ansWord("building_type", off.value).split(":")[0])}</b>, as ${h(why)}. <button type="button" class="btn btn-small" data-use-type="${h(off.value)}">Use it</button></p>`;
+}
+
 function askTable(stop) {
   const keys = Object.keys(ANSWERS).filter(k => ANSWERS[k].stop === stop && (!ANSWERS[k].when || ANSWERS[k].when(state.site || {}, answerValue)));
   if (!keys.length) return "";
@@ -527,7 +537,7 @@ function askTable(stop) {
     const where = text ? ` <span class="ask-where">Find it in ${url ? `<a href="${h(url)}" target="_blank" rel="noopener">${h(text)}</a>` : h(text)}.</span>` : "";
     return `<span class="ask-why">${h(a.why || "")}${where}</span>`;
   };
-  const rows = keys.map(k => `<tr><th scope="row"><span id="ask-${h(k)}">${h(ANSWERS[k].label)}</span>${whyOf(ANSWERS[k])}</th><td>${askControl(k, `ask-${k}`)}</td><td class="ask-who">${h(ANSWERS[k].who || "")}</td></tr>`).join("");
+  const rows = keys.map(k => `<tr><th scope="row"><span id="ask-${h(k)}">${h(ANSWERS[k].label)}</span>${whyOf(ANSWERS[k])}</th><td>${askControl(k, `ask-${k}`)}${k === "building_type" ? typeOffer() : ""}</td><td class="ask-who">${h(ANSWERS[k].who || "")}</td></tr>`).join("");
   const lead = stop === 1 ? `<p class="ask-lead">Not sure is a fine answer: the memo carries it as an open item, with the person on the right named to settle it.</p>` : "";
   return `${lead}<table class="ask-table"><thead><tr><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">Who answers</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -994,6 +1004,7 @@ function cardRun() {
 function wireStage(el) {
   const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
   if (guide.step === 2) wireBriefEditor(el, stageOptionNow(), renderStage);
+  $$("[data-use-type]", el).forEach(b => b.addEventListener("click", () => { takeAnswer("building_type", b.dataset.useType); renderGuide(); }));
   on("#stage-back", backToMemo);
   on("#stage-resume", () => resumeDraft(stageDraft || readDraft()).catch(e => toast(e.message, true)));
   on("#stage-discard", () => { discardDraft(); renderStage(); });

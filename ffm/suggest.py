@@ -88,6 +88,29 @@ FIXED_KEYS = ("storeys", "height_m", "gfa_m2")
 DESCRIBES = ("housing_type", "building_type", "podium_storeys", "tower_plate_m2", "beds")
 
 
+# When the suggester proposes ground-oriented homes or a tower (declared placeholders, 25 Nov 2026): at most this many
+# homes on at most WALKUP-height storeys for ground-oriented homes; above this many storeys a tower.
+GROUND_ORIENTED_MAX_HOMES = 12
+TOWER_MIN_STOREYS = 12
+
+
+def suggest_building_type(option: dict) -> tuple[str, str]:
+    """The building type the derived option suggests, and why in words: ground-oriented homes for at most
+    GROUND_ORIENTED_MAX_HOMES homes on at most three storeys (a multiplex, townhouses), a tower from TOWER_MIN_STOREYS
+    storeys, else an apartment building. Shelter and supportive housing stay apartment buildings (a staffed entry)."""
+    storeys = int(option.get("storeys") or 0)
+    homes = sum(int(v or 0) for v in (option.get("units") or {}).values())
+    kind = str(option.get("housing_type") or "").lower()
+    if kind in ("supportive", "shelter", "transitional"):
+        return "apartment", f"an apartment building: {kind} housing runs on one staffed entry"
+    if 0 < storeys <= 3 and 0 < homes <= GROUND_ORIENTED_MAX_HOMES:
+        return "ground_oriented", (f"ground-oriented homes: {homes} homes on {storeys} storeys need no corridor or lift, each its own door "
+                                   f"(at most {GROUND_ORIENTED_MAX_HOMES} homes and 3 storeys, a placeholder)")
+    if storeys >= TOWER_MIN_STOREYS:
+        return "tower", f"a tower: {storeys} storeys (from {TOWER_MIN_STOREYS}, a placeholder) want a tower plate over a podium, not one slab"
+    return "apartment", f"an apartment building: {homes} homes on {storeys} storeys, off a corridor with a lift"
+
+
 def check_fixed(fixed: Any) -> dict[str, Any]:
     """The manager's own figures the derivation carries on from, checked: storeys (a whole number), height_m and gfa_m2
     (positive numbers) and units (a count per bedroom type), each optional. None is {}. Raises ValueError with a plain
@@ -954,6 +977,14 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
         "unit_areas_m2": dict((p_areas or {}).get("min_net_area_m2") or {}), "allowance": allowance,
     }
     label, falls_short = says_what_it_is(candidate, option, fields, p_chf, n)
+    # the building type, suggested from the envelope where the manager did not say one (25 Nov 2026): ground-oriented
+    # homes for a low building of few homes, a tower above the mid-rise height, an apartment building otherwise
+    # offered beside the question, never applied unasked: a person takes it with "Use it" (a tower or ground-oriented
+    # homes changes the plans the rules read)
+    type_offer = None
+    if not (fixed_given or {}).get("building_type"):
+        bt, why = suggest_building_type(option)
+        type_offer = {"value": bt, "why": why}
     # what the manager said of the building travels with the option: the kind of housing, the building type and a
     # tower's podium (24 Nov 2026)
     for k in ("housing_type", "building_type", "podium_storeys", "tower_plate_m2", "beds"):
@@ -966,7 +997,7 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     return {
         "candidate": candidate, "candidate_note": candidate_note, "candidates": cands, "option": option, "fields": fields,
         "unsure": unsure, "assumptions": assumptions, "envelope": rough, "mix": mix,
-        "label": label, "falls_short": falls_short, "floor_area_from_homes": from_homes, "fronts": fronts, "same_building_note": same_note,
+        "label": label, "falls_short": falls_short, "building_type_suggested": type_offer, "floor_area_from_homes": from_homes, "fronts": fronts, "same_building_note": same_note,
         "as_of": on.isoformat(), "stamp": stamp(rules, on, rules_dir),
     }
 

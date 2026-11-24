@@ -1100,6 +1100,11 @@ Built at Kai's request from the second panel's list (`docs/user-tests-2026-11-24
   fields.js (`building_type`, `podium_storeys`, `tower_plate_m2`; a question's `when(site, answerValue)` can read another
   answer). The PDF prints the area schedule, the brief and the checklist as a section after the massing (`paper.js`
   `areasPaper`, `signedWords`). 387 tests.
+- Gaps closed the same day: accessible ground-oriented homes are one-floor homes at grade with a home over them
+  (`left_count` in `_solve_ground_oriented`); `suggest.suggest_building_type` → `building_type_suggested` (offered at stop
+  02 by `typeOffer`, never applied unasked; applying it automatically changed seven tests' towers); `place_zones` /
+  `zones_of` keep `home` / `levels` (a home counted on its entry floor, no corridor/core/lift asked on a ground-oriented
+  plan), and the block editor's `syncHomes` carries a change to a home onto every floor it spans. 391 tests.
 
 ## Rules from the assignment brief (binding)
 

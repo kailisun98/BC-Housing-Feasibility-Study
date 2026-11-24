@@ -147,8 +147,24 @@ Four of the larger requests above, at Kai's request. Every new figure is a decla
   an Operator lane in answer 3 (`engine.operator_items`: figures not signed, subsidy not confirmed, a term shorter than the
   loan, the staffing); the manager can issue to the operator and the operator back.
 
-The PDF (`paper.js`) prints them too, as their own section after the massing (`areasPaper`): the area schedule, the brief and what an operator checks first, with whose the operating figures are. Not done: the block editor still
-draws one floor at a time (a ground-oriented home over several floors is drawn floor by floor); the Revit script does
-not yet build the tower's two tiers as separate masses (it reads `level_z_m`); the building type is not offered as a
-suggestion candidate of its own. Glen Drive as proposed now reads eight open items (the operator's two added).
+The PDF (`paper.js`) prints them too, as their own section after the massing (`areasPaper`): the area schedule, the brief and what an operator checks first, with whose the operating figures are. Not done: the Revit script does not yet build the tower's two tiers as separate
+masses (it reads `level_z_m`). Glen Drive as proposed now reads eight open items (the operator's two added).
+
+## The gaps in what was built, closed (24 Nov 2026, later)
+
+- **Accessible ground-oriented homes are drawn.** `_solve_ground_oriented` places each accessible home first, as a
+  one-floor home at grade on the front row (the smallest type), with a home over it that runs up through the floors
+  above, reached by its own stair (a garden flat under a townhouse). The warning that none were drawn now appears only
+  when the front row's ground floor has no room left for one.
+- **The building type is suggested.** `suggest.suggest_building_type(option)`: ground-oriented for at most
+  `GROUND_ORIENTED_MAX_HOMES` (12) homes on at most three storeys, a tower from `TOWER_MIN_STOREYS` (12), an apartment
+  building otherwise; supportive housing, transitional housing and shelters stay apartment buildings (a staffed entry).
+  Both thresholds are declared placeholders. The suggestion returns it as `building_type_suggested`, offered and never
+  applied unasked. Stop 02 shows it under "What kind of building?" with its reason and a *Use it* button
+  (`typeOffer` in route-stage.js).
+- **A home over several floors is edited as one.** `place_zones` keeps a zone's `home` and `levels`, counts the home
+  once (on its entry floor), checks each floor's share of its area, asks for no corridor, core or lift on a
+  ground-oriented plan, and reads the exits with `_ground_egress`; `zones_of` carries `home` and `levels`. In the block
+  editor (`syncHomes` in editors/blocks.js), moving, resizing or removing a home on one floor does the same on every
+  floor it spans. Checked in the browser: a home moved on the ground floor moved on floors 1 and 2.
 

@@ -556,6 +556,40 @@ def _solve_ground_oriented(site: dict, option: dict, ledger: dict, massing: dict
     queue = [b for b in prog["blocks"] if b["key"] in UNIT_KEYS]
     acc_left = int(option.get("accessible_units") or 0)
     hid = 0
+    left_count = {b["key"]: int(b["count"]) for b in queue}
+    # accessible homes first (25 Nov 2026: none were drawn, an accessible home needs its rooms on one floor at grade):
+    # each a one-floor home on the front row's ground floor, the smallest type there is, with a home over it that runs
+    # up through the floors above (a garden flat under a townhouse), where the storeys allow one
+    lo0, hi0 = tiers[0]
+    if acc_left and hi0 - lo0 > 1:
+        for b in sorted(queue, key=lambda b: b["gross_m2_each"]):
+            while acc_left and left_count[b["key"]]:
+                width = max(w_min, b["gross_m2_each"] / rows[0]["d"])
+                if width > left[(0, 0)] + 0.01:
+                    break
+                x = used_x[(0, 0)]
+                hid += 1
+                floors[0]["zones"].append({"block": b["key"], "label": b["label"], "x": r2(x), "y": r2(rows[0]["y"]), "w": r2(width), "d": r2(rows[0]["d"]),
+                                           "area_m2": round(width * rows[0]["d"], 1), "side": rows[0]["side"], "home": hid, "levels": [0, 0], "entry": "at grade",
+                                           "unit": b["key"], "accessible": True})
+                left_count[b["key"]] -= 1
+                acc_left -= 1
+                # the home over it: the largest type left that fits this width through the floors above
+                over = next((c for c in queue if left_count[c["key"]] and c["gross_m2_each"] / (rows[0]["d"] * (hi0 - 1)) <= width + 0.01), None)
+                for lv in range(1, hi0):
+                    z = {"block": over["key"] if over else "spare", "label": over["label"] if over else "Over the accessible home", "x": r2(x), "y": r2(rows[0]["y"]),
+                         "w": r2(width), "d": r2(rows[0]["d"]), "area_m2": round(width * rows[0]["d"], 1), "side": rows[0]["side"]}
+                    if over:
+                        z.update({"home": hid + 1, "levels": [1, hi0 - 1], "entry": "by its own stair"})
+                        if lv == 1:
+                            z["unit"] = over["key"]
+                    floors[lv]["zones"].append(z)
+                if over:
+                    hid += 1
+                    left_count[over["key"]] -= 1
+                used_x[(0, 0)] += width
+                left[(0, 0)] -= width
+    queue = [dict(b, count=left_count[b["key"]]) for b in queue]
     slots = [(ti, ri) for ti in range(len(tiers)) for ri in range(len(rows))]
     for b in queue:
         for _ in range(int(b["count"])):
@@ -590,8 +624,10 @@ def _solve_ground_oriented(site: dict, option: dict, ledger: dict, massing: dict
                 else:
                     shortfall.append({"block": b["key"], "label": b["label"], "units": 1, "area_m2": b["gross_m2_each"]})
     if int(option.get("accessible_units") or 0) and acc_left:
-        warnings.append(f"{acc_left} of the {int(option.get('accessible_units') or 0)} accessible homes are not drawn: an accessible home needs its rooms on one floor at grade, "
-                        "and the homes here run over more than one floor. A one-floor home at grade (a garden flat under a stacked townhouse) is the architect's to draw.")
+        warnings.append(f"{acc_left} of the {int(option.get('accessible_units') or 0)} accessible homes are not drawn: each is a one-floor home at grade, "
+                        "and the front row's ground floor has no room left for one.")
+    elif int(option.get("accessible_units") or 0):
+        warnings.append("The accessible homes are one-floor homes at grade on the front row, each with a home over it reached by its own stair (a garden flat under a townhouse).")
     # what is left in each row and tier is spare; the courtyard is a cut-out on every floor (open to the sky)
     for (ri, ti), rest in left.items():
         if rest > 0.3:
@@ -614,7 +650,7 @@ def _solve_ground_oriented(site: dict, option: dict, ledger: dict, massing: dict
     L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=False, geometry=[])
     # the corridor-and-core rules do not apply; what applies is that every home has a door of its own
     L["adjacencies"] = [c for c in L["adjacencies"] if c["id"] not in ("core_centre", "units_both_sides", "accessible_core", "amenity_entry")]
-    upper = any(lo > 0 for lo, hi in tiers)
+    upper = any(lo > 0 for lo, hi in tiers) or any(z.get("levels", [0])[0] > 0 for fl in floors for z in fl["zones"] if z.get("home"))
     L["adjacencies"].append({"id": "own_entry", "block": "units", "rule": "every home with a door of its own, no common corridor or lift", "status": "pass" if not upper else "conditional",
                              "note": ("each home's door is at grade and its stair inside it" if not upper else
                                       "the lower homes' doors are at grade; the upper homes are reached by their own stair, whose run and exit the architect draws")})
@@ -1873,6 +1909,7 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
     warnings: list[str] = []
     levels = {int(k): v for k, v in (zones_by_level.items() if isinstance(zones_by_level, dict) else enumerate(zones_by_level))}
     lift_missing: list[int] = []
+    go = building_type(option) == "ground_oriented"
     floors: list[dict] = []
     for lv in range(storeys):
         raw = levels.get(lv) or []
@@ -1893,6 +1930,12 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             if block in UNIT_KEYS:
                 zone["unit"] = block
                 zone["accessible"] = bool(z.get("accessible"))
+                # a ground-oriented home over several floors (25 Nov 2026): one home, counted on its entry floor
+                lv_span = z.get("levels")
+                if z.get("home") is not None and isinstance(lv_span, (list, tuple)) and len(lv_span) == 2:
+                    zone.update({"home": z["home"], "levels": [int(lv_span[0]), int(lv_span[1])], "entry": "at grade" if int(lv_span[0]) == 0 else "by its own stair"})
+                    if lv != int(lv_span[0]):
+                        del zone["unit"]
             if block == "corridor":
                 zone["through"] = "core"
             # the architect's own name for a block (a lobby, an atrium, a café), drawn in place of the block's kind
@@ -1916,6 +1959,9 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             # a unit too small: under its gross area, or (on a structural grid, where a unit takes whole modules)
             # under the BC Housing minimum with its partitions
             floor_m2 = by_key[block]["min_gross_m2_each" if on_grid else "gross_m2_each"] if block in UNIT_KEYS and block in by_key else None
+            if floor_m2 is not None and zone.get("home") is not None:
+                # a home over several floors carries its area across them: this floor holds its share
+                floor_m2 = floor_m2 / (zone["levels"][1] - zone["levels"][0] + 1)
             if floor_m2 is not None and w * d + 0.5 < floor_m2:
                 geometry.append({"kind": "undersized", "level": lv, "block": block, "note": f"a {zone['label'].lower()} on {'the ground floor' if lv == 0 else f'level {lv + 1}'} is {w * d:.0f} m², under its {floor_m2:.0f} m² {'minimum with partitions' if on_grid else 'gross'}"})
         # overlaps: units and uses may not share floor area; the corridor and the core are the circulation and may cross each other only
@@ -1925,13 +1971,13 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                     continue
                 if not (a["x"] + a["w"] <= b["x"] + 0.01 or b["x"] + b["w"] <= a["x"] + 0.01 or a["y"] + a["d"] <= b["y"] + 0.01 or b["y"] + b["d"] <= a["y"] + 0.01):
                     geometry.append({"kind": "overlap", "level": lv, "block": a["block"], "note": f"{a['label']} and {b['label']} overlap on {'the ground floor' if lv == 0 else f'level {lv + 1}'}"})
-        if zones and not any(z["block"] == "corridor" for z in zones) and any(z.get("unit") for z in zones):
+        if not go and zones and not any(z["block"] == "corridor" for z in zones) and any(z.get("unit") for z in zones):
             geometry.append({"kind": "no_corridor", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has units but no corridor"})
-        if zones and not any(z["block"] == "core" for z in zones):
+        if not go and zones and not any(z["block"] == "core" for z in zones):
             geometry.append({"kind": "no_core", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has no core: the stairs and the elevator must land on every floor"})
         # above a walk-up's height the building needs an elevator: a core large enough to hold one beside its stairs
         # on every floor (`elevator_core_m`, declared); a narrower core is read as an exit stair alone
-        if zones and storeys > WALKUP_MAX_STOREYS and not any(z["block"] == "core" and min(z["w"], z["d"]) + 1e-6 >= ELEVATOR_CORE_M for z in zones):
+        if not go and zones and storeys > WALKUP_MAX_STOREYS and not any(z["block"] == "core" and min(z["w"], z["d"]) + 1e-6 >= ELEVATOR_CORE_M for z in zones):
             lift_missing.append(lv)
         used = sum(z["area_m2"] for z in zones if z["block"] not in ("spare", "void"))
         cut = sum(z["area_m2"] for z in zones if z["block"] == "void")
@@ -1980,11 +2026,16 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                      core_m=[c["w"], c["d"]])
     elif any(z["block"] == "core" and z.get("stairs") == "single" for fl in floors for z in fl["zones"]):
         plate.update(arrangement="walkup", double_loaded=False, unit_depth_m=round(D, 2))
+    if go:
+        homes = [z for fl in floors for z in fl["zones"] if z.get("home") is not None]
+        plate.update(arrangement="ground_oriented", double_loaded=False, stacking="homes",
+                     ground_oriented={"rows": len({z["y"] for z in homes}) or 1, "row_depth_m": round(max([z["d"] for z in homes] or [D]), 2), "courtyard_m": 0.0,
+                                      "home_spans": sorted({z["levels"][1] - z["levels"][0] + 1 for z in homes}), "homes": "drawn by hand"})
     if grid_of(option):
         plate["grid"] = grid_of(option)
     # a home drawn narrower than its type's minimum width is a problem to fix, as a home under its area is (23 Nov
     # 2026, Kai); how deep it runs for its width stays a note (`proportions`). A walk-up's through homes are not held to it.
-    if plate.get("arrangement") != "walkup":
+    if plate.get("arrangement") not in ("walkup", "ground_oriented"):
         for fl in floors:
             for z in fl["zones"]:
                 least = UNIT_MIN_WIDTH_M.get(z.get("unit") or "")
@@ -1992,7 +2043,10 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
                     where = "the ground floor" if fl["level"] == 0 else f"level {fl['level'] + 1}"
                     geometry.append({"kind": "narrow", "level": fl["level"], "block": z["block"],
                                      "note": f"a {z['label'].lower()} on {where} is {_wide_deep(z, x0, y0, W, D)[0]:.1f} m wide, under the {least:g} m a {z['label'].lower()} needs along its window wall"})
-    return _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
+    L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
+    if go:
+        L["egress"] = _ground_egress(L["floors"], [])
+    return L
 
 
 def zones_of(L: dict) -> dict[str, list[dict]]:
@@ -2003,6 +2057,7 @@ def zones_of(L: dict) -> dict[str, list[dict]]:
                                  | ({"stairs": z["stairs"]} if z.get("stairs") in ("scissor", "single") else {})
                                  | ({"bay": z["bay"]} if z.get("bay") else {}) | ({"entry": True} if z.get("entry") else {})
                                  | ({"name": z["name"]} if z.get("name") else {}) | ({"step": True} if z.get("step") else {})
+                                 | ({"home": z["home"], "levels": list(z["levels"])} if z.get("home") is not None and z.get("levels") else {})
                                  for z in fl["zones"] if z["block"] != "spare"]
     return out
 

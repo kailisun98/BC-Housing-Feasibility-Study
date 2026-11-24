@@ -1098,7 +1098,8 @@ Built at Kai's request from the second panel's list (`docs/user-tests-2026-11-24
   JS twin of `BRIEF_DEFAULTS`, a test keeps the labels equal), Operator mode in `modes.js` / `index.html` / app.css,
   `ISSUE_ALSO` in issue.js, the Operator lane in `memo/lanes.js`, `ROLES` in server.py, the stop-02 questions in
   fields.js (`building_type`, `podium_storeys`, `tower_plate_m2`; a question's `when(site, answerValue)` can read another
-  answer). 386 tests.
+  answer). The PDF prints the area schedule, the brief and the checklist as a section after the massing (`paper.js`
+  `areasPaper`, `signedWords`). 387 tests.
 
 ## Rules from the assignment brief (binding)
 

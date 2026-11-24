@@ -147,7 +147,7 @@ Four of the larger requests above, at Kai's request. Every new figure is a decla
   an Operator lane in answer 3 (`engine.operator_items`: figures not signed, subsidy not confirmed, a term shorter than the
   loan, the staffing); the manager can issue to the operator and the operator back.
 
-Not done: the PDF (`paper.js`) does not yet print the area schedule or the operability list; the block editor still
+The PDF (`paper.js`) prints them too, as their own section after the massing (`areasPaper`): the area schedule, the brief and what an operator checks first, with whose the operating figures are. Not done: the block editor still
 draws one floor at a time (a ground-oriented home over several floors is drawn floor by floor); the Revit script does
 not yet build the tower's two tiers as separate masses (it reads `level_z_m`); the building type is not offered as a
 suggestion candidate of its own. Glen Drive as proposed now reads eight open items (the operator's two added).

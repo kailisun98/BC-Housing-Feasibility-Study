@@ -1162,6 +1162,18 @@ class TheFourFeatures(unittest.TestCase):
         self.assertIn('"operator"', (self.UI / "server.py").read_text(encoding="utf-8").split("ROLES = ")[1].split("\n")[0])
         self.assertIn("ISSUE_ALSO", (self.UI / "issue.js").read_text(encoding="utf-8"))
 
+class ThePdfCarriesTheAreaScheduleAndTheChecks(unittest.TestCase):
+    """24 Nov 2026 (Kai): the paper memo prints the area schedule, the brief and what an operator checks first."""
+
+    def test_the_paper_has_its_own_numbered_section_for_them(self):
+        js = (Path(__file__).resolve().parent.parent / "ffm" / "ui" / "paper.js").read_text(encoding="utf-8")
+        self.assertIn("function areasPaper(run)", js)
+        self.assertIn("areas: lay.area_schedule || lay.operability ? sn() : null", js)
+        self.assertIn("Area schedule, and what an operator checks", js)
+        self.assertLess(js.index("${s.massing ? `<section"), js.index("${s.areas ? `<section"))     # after the massing, before the words
+        self.assertLess(js.index("${s.areas ? `<section"), js.index("${words}"))
+        self.assertIn("function signedWords(run)", js)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -45,6 +45,45 @@ function paperFit(build, boxW, boxH, mm = 2.3) {
    to reproduce the memo and check its fingerprint. Every rule is referred to by its layer and place (A1, C4…)
    everywhere, so a reader can follow any answer to its clause and its document. One self-contained HTML document:
    the server prints it to PDF, and Print opens it in the browser's print dialog. */
+/* Whose the operating figures are, in a sentence for the paper (24 Nov 2026): signed by the operator, or not yet. */
+function signedWords(run) {
+  const ops = ((((run.ledger || {}).inputs || {}).option || {}).operations) || {};
+  const sg = ops.signed && ops.signed.by ? ops.signed : null;
+  return sg ? `Operating figures signed by ${h(sg.by)}${sg.org ? ` of ${h(sg.org)}` : ""}${sg.on ? `, ${h(dateWords(sg.on))}` : ""}. ` : "";
+}
+
+/* The area schedule, the program brief and what an operator checks first (24 Nov 2026), for the paper: the same figures
+   as the screen's area schedule (memo/operator.js) and the layout's operability list, set as tables that keep together. */
+const AREA_SHORT = { homes: "Homes", circulation: "Circulation", core: "Cores", program: "Program", amenity: "Amenity", services: "Services", non_residential: "Non-res.", spare: "Spare" };
+const UNIT_ABBR = { three_bed_plus: "3B+", two_bed: "2B", one_bed: "1B", studio: "ST" };
+function areasPaper(run) {
+  const lay = run.layout || {}, sch = lay.area_schedule, ob = lay.operability;
+  const out = [];
+  const pct = x => (x == null ? "" : `${Math.round(x * 100)}%`);
+  const n = x => Math.round(x).toLocaleString("en-CA");
+  if (sch) {
+    const used = sch.groups.map(g => g.key).filter(k => sch.totals.m2[k]);
+    const homes = r => Object.entries(r.homes || {}).map(([k, c]) => `${c} ${UNIT_ABBR[k] || k}`).join(", ");
+    const row = (r, total) => `<tr${total ? ' class="total"' : ""}><td>${h(r.name)}</td><td class="num">${r.homes_total}</td><td>${h(homes(r))}</td>${used.map(k => `<td class="num">${n(r.m2[k])}</td>`).join("")}<td class="num">${n(r.gross_m2)}</td><td class="num">${pct(r.efficiency)}</td></tr>`;
+    const tot = { name: "Total", homes_total: sch.totals.homes_total, homes: sch.totals.homes, m2: sch.totals.m2, gross_m2: sch.totals.gross_m2, efficiency: sch.totals.efficiency };
+    out.push(`<p class="lead"><b>Area schedule.</b> ${sch.totals.homes_total} homes in ${n(sch.totals.gross_m2)} m² gross, ${pct(sch.totals.efficiency)} of it homes (net to gross)${sch.flag ? `, under the ${pct(sch.efficiency_floor)} this screen flags` : ""}.</p>
+      <table class="areas"><thead><tr><th>Floor</th><th class="num">Homes</th><th>By type</th>${used.map(k => `<th class="num">${h(AREA_SHORT[k] || k)} m²</th>`).join("")}<th class="num">Gross m²</th><th class="num">Net to gross</th></tr></thead>
+      <tbody>${sch.floors.map(r => row(r, false)).join("")}${row(tot, true)}</tbody></table>
+      <p class="note">${h(sch.note)} The same table is area-schedule.csv beside the run.</p>`);
+  }
+  const brief = (lay.program || []).filter(b => b.brief);
+  if (brief.length) {
+    out.push(`<p class="lead"><b>What the building runs on.</b> The spaces in the program brief beyond the homes, ${brief.some(b => b.source !== "placeholder") ? "as entered" : "the default for this kind of housing, every figure a placeholder until the operator's brief replaces it"}.</p>
+      <table class="brief"><thead><tr><th>Space</th><th class="num">m²</th><th>Where</th></tr></thead><tbody>${brief.map(b => `<tr><td>${h(b.label)}</td><td class="num">${n(b.area_m2)}</td><td>${b.next_to === "entry" ? "beside the entry" : b.where === "upper" ? "upper floors" : "ground floor"}</td></tr>`).join("")}</tbody></table>`);
+  }
+  if (ob) {
+    out.push(`<p class="lead"><b>What an operator checks first, on the plans.</b> ${h(ob.summary)}</p>
+      <table class="checks"><thead><tr><th>Item</th><th>Status</th><th>On these plans</th></tr></thead><tbody>${ob.items.map(i => `<tr><td><b>${h(i.label)}</b></td><td><span class="st st-${i.status === "missing" ? "uncertain" : i.status === "pass" ? "pass" : "info"}">${h(i.status)}</span></td><td>${h(i.note)}</td></tr>`).join("")}</tbody></table>
+      <p class="note">${signedWords(run) || "The operating figures are not yet signed by an operator. "}The thresholds are this screen's placeholders, not an operator's standard.</p>`);
+  }
+  return out.join("\n");
+}
+
 export function paperDocument(run) {
   // the exits as the plans found them, the same on paper as on screen (withPlans)
   const L = run.ledger, res = withPlans(L.results, run), ans = L.summary.answers;
@@ -113,7 +152,9 @@ export function paperDocument(run) {
   const sn = (k => () => ++k)(d ? 3 : 2);
   const pfOk = !!(run.proforma && run.proforma.available);
   const terms = wordsFor(run);
-  const s = { money: pfOk ? sn() : null, clauses: sn(), massing: run.massing || run.massing_note ? sn() : null, words: terms.length ? sn() : null, ledger: sn(), inputs: sn(), sources: sn(), verify: sn() };
+  const lay = run.layout || {};
+  const s = { money: pfOk ? sn() : null, clauses: sn(), massing: run.massing || run.massing_note ? sn() : null, areas: lay.area_schedule || lay.operability ? sn() : null,
+              words: terms.length ? sn() : null, ledger: sn(), inputs: sn(), sources: sn(), verify: sn() };
 
   // 1. the three answers
   const answers = `<table class="answers">
@@ -182,7 +223,7 @@ export function paperDocument(run) {
       ${opRows.map(r => { const strong = r.kind === "result" || r.kind === "ask"; const lab = strong ? `<b>${h(r.label)}</b>` : h(r.label);
         return `<tr><td>${lab}${r.ph ? ' <span class="st st-uncertain">placeholder</span>' : ""}${r.warn ? ' <span class="st st-uncertain">open</span>' : ""}</td><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : (strong ? `<b>${h(opMoney(r.value))}</b>` : h(opMoney(r.value)))}</td><td>${h(r.note || "")}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="note">The rents and the running cost are placeholders until the operator's own are entered; support staffing and an operating subsidy are never assumed. The last line is an illustration on this screen's mortgage terms, not a funder's financing.</p>` : "";
+      <p class="note">${signedWords(run)}${((run.proforma.operating || {}).page || {}).own_figures ? "The rents and the running cost are the operator's own, as entered" : "The rents and the running cost are placeholders until the operator's own are entered"}; support staffing and an operating subsidy are never assumed. The last line is an illustration on this screen's mortgage terms, not a funder's financing.</p>` : "";
   const moneyLines = pfOk ? `${moneyWords(run.proforma, run, "text") ? `<p class="lead">${h(moneyWords(run.proforma, run, "text"))}</p>` : ""}<table class="money"><colgroup><col style="width:6%"><col style="width:22%"><col style="width:16%"><col></colgroup>
       <thead><tr><th>Ref</th><th>Line</th><th>Figure</th><th>How, and from what</th></tr></thead><tbody>
       ${run.proforma.lines.map(ln => { const shown = ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + (ln.unit === "$/yr" ? " a year" : ln.unit === "$/m²" ? " per m²" : "") : (ln.value == null ? "not given" : fmtNum(ln.value));
@@ -322,6 +363,9 @@ export function paperDocument(run) {
     .lead { font-size: 9pt; }
     .op-head { margin-top: 10pt; break-after: avoid; }
     table.op { break-inside: avoid; }
+    table.areas td.num, table.areas th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    table.areas tr.total td, table.areas tr.total th { font-weight: 600; border-top: 1px solid #222; }
+    table.areas, table.checks, table.brief { break-inside: avoid; font-size: 8.5pt; }
     .note { font-size: 7.6pt; color: #3d4752; }
     /* tables: ruled rows, headers that repeat on every page, rows that do not split */
     table { width: 100%; border-collapse: collapse; table-layout: fixed; margin: 0 0 5pt; font-size: 7.6pt; line-height: 1.38; }
@@ -475,6 +519,7 @@ export function paperDocument(run) {
     ${pfOk ? `<section class="sec"><h2><span class="no">${s.money}</span> The money, line by line</h2>${moneyLines}</section>` : ""}
     <section class="sec"><h2><span class="no">${s.clauses}</span> Clauses applied</h2><p class="note">${applied.length} of ${res.length} rules apply. Proposed is what the option puts forward; permitted or required is the clause's own limit; the ask is what stands between them.</p>${clauses}</section>
     ${s.massing ? `<section class="sec"><h2><span class="no">${s.massing}</span> Massing</h2>${figures}</section>` : ""}
+    ${s.areas ? `<section class="sec"><h2><span class="no">${s.areas}</span> Area schedule, and what an operator checks</h2>${areasPaper(run)}</section>` : ""}
     ${words}
     <section class="sec"><h2><span class="no">${s.ledger}</span> The full ledger, by layer</h2><p class="note">Every rule the engine ran, including those that do not apply here, with its finding, every number it used and the section of its source (S numbers, section ${s.sources}).</p>${ledger}</section>
     <section class="sec"><h2><span class="no">${s.inputs}</span> Inputs</h2>${inputs}</section>

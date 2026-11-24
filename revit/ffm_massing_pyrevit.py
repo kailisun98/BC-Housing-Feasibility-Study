@@ -365,12 +365,15 @@ def stage_masses(doc, data, stamp, result):
                                 "storeys": mass.get("storeys"), "plate_area_m2": mass.get("plate_area_m2"), "fsr": mass.get("fsr")})
         if mass.get("name") == "proposed":
             f2f = float(mass.get("floor_to_floor_m", 3.0))
+            # the floors' own levels where massing.json carries them (a taller ground floor counted: 24 Nov 2026, every
+            # plate sat 1.5 m off its level over a 4.5 m retail floor)
+            zs = mass.get("level_z_m") or []
             for k in range(1, int(mass.get("storeys", 1))):
                 plate_ring = mass["footprint"]
                 for tier in (tiers or []):          # the plate of the tier this level stands in
                     if int(tier.get("from_level", 0)) <= k:
                         plate_ring = tier["footprint"]
-                make_extrusion(doc, plate_ring, k * f2f, PLATE_THICKNESS_M,
+                make_extrusion(doc, plate_ring, float(zs[k]) if k < len(zs) else k * f2f, PLATE_THICKNESS_M,
                                "FFM proposed level {0}".format(k + 1), "floor plate | " + stamp)
                 built["plates"] += 1
     result["built"].append({"kind": "floor plates", "count": built["plates"]})

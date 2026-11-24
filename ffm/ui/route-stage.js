@@ -949,12 +949,16 @@ function cardRun() {
   const opsIn = o.operations || {};
   const supported = ["supportive", "transitional", "shelter"].includes(String(o.housing_type || ""));
   const opsHelp = { "operations.rent_market_monthly_cad": "Blank: the CMHC survey's average.",
-    "operations.rent_rgi_monthly_cad": "Blank: a placeholder, 30% of half the fund's income limit.",
-    "operations.rent_deep_monthly_cad": "Blank: the $500 shelter rate. 0 for a shelter.",
+    "operations.rent_rgi_monthly_cad": "Blank: BC Housing's estimate, 30% of 70% of the Housing Income Limit.",
+    "operations.rent_deep_monthly_cad": "Blank: the shelter allowance by bedrooms ($500, $695, $769). 0 for a shelter.",
+    "operations.subsidy_term_years": "Blank: no term, so no loan is sized on the subsidy.",
+    "operations.replacement_reserve_per_unit_year_cad": "Blank: the $600 placeholder.",
+    "operations.vacancy_rate": "Blank: the CMHC market rate, 3.7%.",
+    "operations.subsidy_source": "The funder and the agreement, in a few words.",
     "operations.operating_cost_per_unit_year_cad": "Blank: the placeholder in the assumptions.",
     "operations.support_staffing_cad_year": supported ? "Never assumed. Blank leaves the money answer unsure." : "Blank: none.",
     "operations.operating_subsidy_cad_year": "What the operator has or is seeking. Blank: none." };
-  const opsFields = OPERATING_FIELDS.map(([k, label]) => { const sub = k.split(".")[1], hid = `ops-help-${sub}`; return `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" min="0" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(opsIn[sub] ?? "")}" placeholder="blank" aria-describedby="${hid}"><span class="help" id="${hid}">${h(opsHelp[k] || "")}</span></label>`; }).join("");
+  const opsFields = OPERATING_FIELDS.map(([k, label, type]) => { const sub = k.split(".")[1], hid = `ops-help-${sub}`, text = type === "text"; return `<label class="field"><span class="label">${h(label)}</span><input type="${text ? "text" : "number"}"${text ? "" : ' step="any" min="0" inputmode="decimal"'} class="fin-input" data-key="${h(k)}"${text ? ' data-text="1"' : ""} value="${h(opsIn[sub] ?? "")}" placeholder="blank" aria-describedby="${hid}"><span class="help" id="${hid}">${h(opsHelp[k] || "")}</span></label>`; }).join("");
   const opsFold = `<details class="fold money-fold"${supported || Object.values(opsIn).some(v => v != null && v !== "") ? " open" : ""}><summary>What it takes to run <span class="cont">· ${supported ? "support staffing and who pays for it decide this kind of housing" : "the operator's rents and running costs, if you have them"}</span></summary>
       <div class="fin-rows">${opsFields}</div>
       <p class="field ops-confirm"><label><input type="checkbox" id="ops-confirmed"${opsIn.subsidy_confirmed === true ? " checked" : ""}> The operating subsidy is confirmed, with an agreement in hand</label></p>
@@ -1116,7 +1120,7 @@ function wireStage(el) {
     if (!state.option) return;
     const raw = inp.value.trim();
     state.option.finance = state.option.finance || {};
-    setPath(state.option, inp.dataset.key, raw === "" ? null : Number(raw));
+    setPath(state.option, inp.dataset.key, raw === "" ? null : inp.dataset.text ? raw : Number(raw));
     state.optionDirty = true;
     $("#option-dirty").hidden = false;
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);

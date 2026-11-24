@@ -2,7 +2,7 @@
 
 **Option:** What-if (hypothetical, for the demo): twelve storeys with the full funder data supplied  
 **Proponent:** City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society (municipal housing provider)  
-**Rules as of:** 2026-10-23 · **version stamp:** `31193259023b85e0` · engine 0.1.0  
+**Rules as of:** 2026-10-23 · **version stamp:** `d8114c4301640d47` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -37,7 +37,7 @@ Other programs written for this kind of housing, listed from their own pages and
 ## 4. Does the money work? (feasibility grade)
 **Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
 
-**For the development manager:** Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
+**For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$62,597,262**: hard $46,368,342 (escalated ×1.0292), soft $11,592,086, contingency $4,636,834, land $0.
 - Net operating income **$965,615 a year**: rent $1,887,451 less vacancy $69,836, operating cost $780,000 and reserve $72,000.
@@ -62,7 +62,7 @@ Other programs written for this kind of housing, listed from their own pages and
 | **Subsidy needed if the capital still missing were borrowed** | **$1,822,447** | $1,266 a home a month: the payment on $41,230,182 at 6.19% over 40 years is $2,788,062 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,391,224** | $966 a home a month: 4.55% over 35 years is $2,356,839 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
 
-> The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.
+> The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
 | Line | Figure | From | Note |
 |---|---|---|---|
@@ -82,7 +82,7 @@ Other programs written for this kind of housing, listed from their own pages and
 | Support staffing | not given a year | the option | none entered |
 | Net operating income | $965,615 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
 | Operating subsidy | not given a year | the option | none entered |
-| Community Housing Fund grant | $21,367,080 | `bch.chf.eligibility` | $178,059 per unit × 120; illustrative, at the 2025-26 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied |
+| Community Housing Fund grant | $21,367,080 | `bch.chf.eligibility` | $178,059 per unit × 120; illustrative, at the 2026-27 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied |
 | Equity | $0 | the option | none entered |
 | Supportable debt | $12,981,478 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $877,832 a year in payments |
 | Funding | $34,348,558 | the option | grants + equity + supportable debt |
@@ -156,7 +156,7 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest trave
 `layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.
 
 ## What changed since the previous memo
-Previous stamp `31193259023b85e0` (rules as of 2026-10-23) → current `31193259023b85e0` (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.
+Previous stamp `d8114c4301640d47` (rules as of 2026-10-23) → current `d8114c4301640d47` (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.
 
 | Rule | Change | From | To | Now reads |
 |---|---|---|---|---|
@@ -164,9 +164,12 @@ Previous stamp `31193259023b85e0` (rules as of 2026-10-23) → current `31193259
 | bc.code_basis | finding changed | info | info | 12 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15. |
 | bch.chf.eligibility | finding changed | uncertain | uncertain | Community Housing Fund: whether it meets the criteria cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026). |
 | bch.design_guidelines.unit_areas | finding changed | info | info | BC Housing minimum net unit areas are studio 33, one-bedroom 49, two-bedroom 67, three-bedroom 86 m²; the option averages 80 m² gross per unit, so net areas should be checked at the plan stage. |
-| bch.ihf.program | finding changed | info | info | Would be a program for this housing if it is Indigenous-led, or partnered with an Indigenous housing provider or Nation (not said on the option): affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve). It funds building the homes (the Province's funding programs page: "funding to build and to support the creation of" them). A project enters by BC Housing's request for proposals. No intake is open now (closed: no call is posted on the program page (read 23 Nov 2026)). Its homes are all rent geared to income; this option has 36 market-rent homes, which it would not carry. Its criteria are not tested here. |
+| bch.ihf.program | changed | not_applicable | info | Would be a program for this housing if it is Indigenous-led, or partnered with an Indigenous housing provider or Nation (not said on the option): affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve). It funds building the homes (the Province's funding programs page: "funding to build and to support the creation of" them). A project enters by BC Housing's request for proposals. No intake is open now (closed: no call is posted on the program page (read 23 Nov 2026)). Its homes are all rent geared to income; this option has 36 market-rent homes, which it would not carry. Its criteria are not tested here. |
+| bch.wthf.program | changed | not_applicable | info | Would be a program for this housing if it is for women, gender-diverse people and children leaving violence (not said on the option): housing with supports for women and their children who are at risk of, or have experienced, violence, in four streams: safe homes (stays of about 10 days), transition houses (about 30 days), second-stage housing (up to about 18 months) and long-term rental housing. It funds 1,500 new homes from 2018, and the service agreement each provider runs them under. A project enters by agreement with BC Housing: the framework names no application route, so ask BC Housing. The building is owned by the Provincial Rental Housing Corporation for the buildings and land created under the fund, leased to non-profit societies and co-operatives. Rents: 30% of income in second-stage and long-term rental housing, by BC Housing's rent scale; a resident on income assistance pays the maximum shelter component. Intake: not stated on the program page (read 23 Nov 2026). Its criteria are not tested here. |
+| canada.bch.program | changed | not_applicable | info | A program for this kind of housing (independent rental): a federal Crown corporation that brings financing, land and partnerships to affordable housing; it counts housing as affordable at no more than 30% of a household's before-tax income. It funds flexible financing, land and partnerships; no application terms were read. A project enters not stated on the page read; CMHC's Affordable Housing Fund page directs organizations to it. Intake: not stated on the page read (23 Nov 2026). Its criteria are not tested here. |
 | cov.cd1_324.floor_area | finding changed | pass | pass | Residential floor area 9,600 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 2.46 on 3,908.0 m²). |
 | cov.cd1_324.outright_height | finding changed | pass | pass | Height 36.6 m is within the outright maximum of 91.0 m. |
+| cov.chip.program | finding changed | not_applicable | not_applicable | Not for this option: the program takes non profit society or housing cooperative proponents, and this one is a municipal housing provider. |
 | cov.family_units | changed | uncertain | pass | 48 of 120 units (40.0%) have two or more bedrooms, against a 35.0% minimum. |
 | cov.parking_minimums | finding changed | info | info | No minimum off-street parking applies citywide since June 2024; the option provides 30 vehicle and 220 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage. |
 | cov.social_housing_definition | changed | uncertain | pass | Meets the City's social housing definition: 30.0% of units for households below HILs (minimum 30.0%), owned by a city, secured for 60 years. |
@@ -343,11 +346,11 @@ Previous stamp `31193259023b85e0` (rules as of 2026-10-23) → current `31193259
 - Derived by hand from the as-permitted option for demonstration — https://www.shapeyourcity.ca/1050-expo-blvd
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf`
-- `a_zoning_district.json`: `06448eff1b223640…`
+- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
+- `a_zoning_district.json`: `e2ad71b55ff9d869…`
 - `b_provincial.json`: `4d20170fb18db2b9…`
 - `c_city_policies.json`: `bc93be05c15239f8…`
 - `d_design_standards.json`: `069a3dcad4ef9601…`
 - `e_funding_programs.json`: `286bc77345ddf276…`
 - `f_assumptions.json`: `5d6aad80b4dee51f…`
-- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `31193259023b85e0`
+- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `d8114c4301640d47`

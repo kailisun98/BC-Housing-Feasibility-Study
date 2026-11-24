@@ -4,7 +4,7 @@
   "site_id": "998-e-19th-ave",
   "option_id": "998-e-19th-ave-what-if-funder-ready",
   "as_of": "2026-10-23",
-  "stamp": "31193259023b85e0",
+  "stamp": "d8114c4301640d47",
   "lot": {
     "polygon": [
       [
@@ -86,6 +86,13 @@
       "height_m": 18.3,
       "storeys": 5,
       "floor_to_floor_m": 3.3,
+      "level_z_m": [
+        0.0,
+        3.3,
+        6.6,
+        9.9,
+        13.2
+      ],
       "plate_area_m2": 1400.0,
       "gfa_m2": 7000.0,
       "fsr": 2.49,

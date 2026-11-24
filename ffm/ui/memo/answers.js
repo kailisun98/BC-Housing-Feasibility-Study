@@ -218,14 +218,19 @@ const shortSource = s => { const t = String((s && s.title) || (s && s.url) || ""
    be funded"; a gap past the screen's line is the cue to look for more sources, so it reads Conditional, not Fail).
    The key stays the engine's; proforma.VERDICT_WORDS and proforma.next_step say the same in the memo file. */
 export const MONEY_STATUS = { likely: "pass", unlikely: "conditional", unsure: "uncertain" };
+// checks.HOUSING_WORDS, for the money's next step
+const HOUSING_WORD = { supportive: "supportive housing", transitional: "transitional housing", shelter: "a shelter", independent: "independent rental housing" };
 export const MONEY_WORD = { likely: "Likely", unlikely: "Needs more sources", unsure: "Unsure" };
 export const moneyWord = v => MONEY_WORD[v.word] || cap(v.word);
 export function moneyNext(pf) {
   const v = pf.verdict || {}, gap = (pf.gap || {}).value, c = pf.capital || {}, homes = (pf.inputs || {}).units_total;
   // rents that do not cover the running costs: the operating funder comes before the capital (proforma.OPERATING_FUNDER)
   // written for whoever reads the memo, on screen or on paper (24 Nov 2026: "run again" spoke to a board as an operator)
-  if (v.operating_shortfall) return "Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or shelter housing, the staffing as well), then a revised memo with the project's own rents, running costs and subsidy. Until they are entered, the rents and the running cost are placeholders.";
-  if (v.word === "unlikely") return "Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.";
+  const page = (pf.operating || {}).page || {};
+  if (v.operating_shortfall) return "Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or shelter housing, the staffing as well), then a revised memo with the project's own rents, running costs and subsidy." + (page.own_figures ? "" : " Until they are entered, the rents and the running cost are placeholders.");
+  // supportive, transitional and shelter housing reach capital by a program's own route (proforma.PROGRAM_ROUTE)
+  if (page.housing_type && page.housing_type !== "independent" && (v.word === "unlikely" || v.word === "unsure")) return `For ${HOUSING_WORD[page.housing_type] || page.housing_type}, the capital comes by the program's own route (answer 2 says how a project enters each, and what each pays for): settle that route, who operates the building and the operating agreement first. The gap here is what a society would face outside that route.`;
+  if (v.word === "unlikely") return "Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.";
   if (v.word === "unsure" && homes && gap != null && gap > 0 && c.total != null && c.land != null) return "Another source, or firmer figures for the placeholders, would settle it.";
   return "";
 }
@@ -284,13 +289,19 @@ export function operatingRows(pf) {
     rows.push({ label: `${t.label}, ${t.homes} homes`, value: t.rent_year, note: `${t.rent_month_per_home != null ? `${usd(t.rent_month_per_home)} a month a home` : "no rent figure"} (${FROM_WORD[t.from] || t.from})`, kind: "income", ph: t.from === "placeholder" });
   }
   rows.push({ label: "Vacancy", value: -(p.vacancy || 0), note: "the CMHC survey's rate, on all tiers", kind: "cost" });
-  rows.push({ label: "Operating cost", value: -(p.operating_cost || 0), note: `${usd(p.operating_cost_per_home || 0)} a home a year (${FROM_WORD[p.operating_cost_from] || ""})`, kind: "cost", ph: p.operating_cost_from === "placeholder" });
+  rows.push({ label: "Operating cost", value: p.operating_cost != null ? -p.operating_cost : null, note: p.operating_cost_per_home != null ? `${usd(p.operating_cost_per_home)} a home a year (${FROM_WORD[p.operating_cost_from] || ""})` : "not entered: enter the operator's running cost per bed", kind: "cost", ph: p.operating_cost_from === "placeholder", warn: p.operating_cost == null });
   rows.push({ label: "Replacement reserve", value: -(p.reserve || 0), note: "", kind: "cost" });
   rows.push({ label: "Support staffing", value: p.support_staffing != null ? -p.support_staffing : null, note: p.support_staffing != null ? "entered" : (p.staffing_missing ? "not entered, and this kind of housing runs on it" : ""), kind: "cost", warn: !!p.staffing_missing });
   rows.push({ label: "Left after running costs", value: p.net_before_subsidy, note: "before any operating subsidy or loan payment", kind: "result" });
   if (p.subsidy) rows.push({ label: "Operating subsidy entered", value: p.subsidy, note: `${p.subsidy_source ? `${p.subsidy_source}; ` : ""}${p.subsidy_confirmed ? "confirmed" : "not yet confirmed"}`, kind: "income", warn: !p.subsidy_confirmed });
   rows.push({ label: "Loan payment", value: -(p.debt_service || 0), note: "on the loan the funding counts", kind: "cost" });
-  rows.push({ label: "Subsidy needed to run it", value: p.subsidy_to_run, note: `${p.subsidy_to_run ? `${usd(p.subsidy_to_run_per_home_month)} a home a month over ${homes} homes${p.beds && p.subsidy_to_run_per_bed_month != null ? ` (${usd(p.subsidy_to_run_per_bed_month)} a bed a month over ${p.beds} beds)` : ""}; ` : "none: the rents cover the running costs; "}before any loan payment`, kind: "ask" });
+  if (p.subsidy_to_run == null) rows.push({ label: "Subsidy needed to run it", value: null, note: "not given: the support staffing is not entered, so what running it costs is not known", kind: "ask", warn: true });
+  else {
+    const per = [];
+    if (p.subsidy_to_run_per_home_month != null && homes) per.push(`${usd(p.subsidy_to_run_per_home_month)} a home a month over ${homes} homes`);
+    if (p.beds && p.subsidy_to_run_per_bed_month != null) per.push(`${usd(p.subsidy_to_run_per_bed_month)} a bed a month over ${p.beds} beds`);
+    rows.push({ label: "Subsidy needed to run it", value: p.subsidy_to_run, note: `${p.subsidy_to_run ? (per.length ? per.join("; ") + "; " : "") : "none: the rents cover the running costs; "}before any loan payment`, kind: "ask" });
+  }
   const f = p.if_gap_financed;
   if (f) rows.push({ label: "Subsidy needed if the capital still missing were borrowed", value: f.subsidy_year, note: `${usd(f.per_home_month)} a home a month: the payment on ${usd(f.loan)} at ${f.rate_pct}% over ${f.amortization_years} years is ${usd(f.annual_payment)} a year. An illustration on this screen's mortgage terms, not a funder's financing`, kind: "ask" });
   const t = f && f.on_program_terms;
@@ -303,7 +314,7 @@ export function operatingTable(pf) {
   const body = rows.map(r => `<tr class="op-${h(r.kind)}"><th scope="row">${h(r.label)}</th><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : h(r.value < 0 ? `−${money(-r.value)}` : money(r.value))}</td><td class="cont"><span class="measure">${h(r.note)}${r.ph ? ' <span class="ph-tag">placeholder</span>' : ""}${r.warn ? ' <span class="ph-tag">open</span>' : ""}</span></td></tr>`).join("");
   return `<details class="pf-lines op-page" open><summary>What it takes to run, a year <span class="cont">· the rents, the running costs and the subsidy needed</span></summary>
       <table class="plain op-table"><thead><tr><th scope="col">Line</th><th scope="col" class="num">A year</th><th scope="col">Note</th></tr></thead><tbody>${body}</tbody></table>
-      <p class="cont">The rents and the running cost are placeholders until the operator's own are entered; support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.</p>
+      <p class="cont">${(pf.operating.page || {}).own_figures ? "The rents and the running cost are the operator's own, as entered" : "The rents and the running cost are placeholders until the operator's own are entered"}; support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.</p>
     </details>`;
 }
 

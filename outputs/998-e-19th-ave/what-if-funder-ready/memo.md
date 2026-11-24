@@ -2,7 +2,7 @@
 
 **Option:** What-if (hypothetical, for the demo): five storeys inside the staff benchmark with every funder question answered  
 **Proponent:** Catalyst Community Developments Society (non profit society)  
-**Rules as of:** 2026-10-23 · **version stamp:** `31193259023b85e0` · engine 0.1.0  
+**Rules as of:** 2026-10-23 · **version stamp:** `d8114c4301640d47` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -34,7 +34,7 @@ Other programs written for this kind of housing, listed from their own pages and
 ## 4. Does the money work? (feasibility grade)
 **Needs more sources.** The gap is $20,689,859, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
 
-**For the development manager:** Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
+**For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$45,643,836**: hard $33,810,249 (escalated ×1.0292), soft $8,452,562, contingency $3,381,025, land $0.
 - Net operating income **$690,640 a year**: rent $1,365,981 less vacancy $50,541, operating cost $572,000 and reserve $52,800.
@@ -59,7 +59,7 @@ Other programs written for this kind of housing, listed from their own pages and
 | **Subsidy needed if the capital still missing were borrowed** | **$1,336,301** | $1,265 a home a month: the payment on $29,974,644 at 6.19% over 40 years is $2,026,941 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,022,799** | $969 a home a month: 4.55% over 35 years is $1,713,439 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
 
-> The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.
+> The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
 | Line | Figure | From | Note |
 |---|---|---|---|
@@ -79,7 +79,7 @@ Other programs written for this kind of housing, listed from their own pages and
 | Support staffing | not given a year | the option | none entered |
 | Net operating income | $690,640 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
 | Operating subsidy | not given a year | the option | none entered |
-| Community Housing Fund grant | $15,669,192 | `bch.chf.eligibility` | $178,059 per unit × 88; illustrative, at the 2025-26 provisional rate; no intake is open, so no grant is committed or implied |
+| Community Housing Fund grant | $15,669,192 | `bch.chf.eligibility` | $178,059 per unit × 88; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied |
 | Equity | $0 | the option | none entered |
 | Supportable debt | $9,284,785 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $627,855 a year in payments |
 | Funding | $24,953,977 | the option | grants + equity + supportable debt |
@@ -149,7 +149,7 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 5 floors: 5 pass; farthest travel 
 `layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.
 
 ## What changed since the previous memo
-Previous stamp `31193259023b85e0` (rules as of 2026-10-23) → current `31193259023b85e0` (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.
+Previous stamp `d8114c4301640d47` (rules as of 2026-10-23) → current `d8114c4301640d47` (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.
 
 | Rule | Change | From | To | Now reads |
 |---|---|---|---|---|
@@ -333,11 +333,11 @@ Previous stamp `31193259023b85e0` (rules as of 2026-10-23) → current `31193259
 - Derived by hand from the as-approved option for demonstration — https://council.vancouver.ca/20240625/documents/rr1.pdf
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf`
-- `a_zoning_district.json`: `06448eff1b223640…`
+- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
+- `a_zoning_district.json`: `e2ad71b55ff9d869…`
 - `b_provincial.json`: `4d20170fb18db2b9…`
 - `c_city_policies.json`: `bc93be05c15239f8…`
 - `d_design_standards.json`: `069a3dcad4ef9601…`
 - `e_funding_programs.json`: `286bc77345ddf276…`
 - `f_assumptions.json`: `5d6aad80b4dee51f…`
-- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `31193259023b85e0`
+- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `d8114c4301640d47`

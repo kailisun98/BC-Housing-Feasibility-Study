@@ -1,6 +1,6 @@
 {
-  "previous_stamp": "31193259023b85e0",
-  "current_stamp": "31193259023b85e0",
+  "previous_stamp": "d8114c4301640d47",
+  "current_stamp": "d8114c4301640d47",
   "previous_as_of": "2026-10-23",
   "current_as_of": "2026-10-23",
   "rules_changed": false,
@@ -37,10 +37,30 @@
     },
     {
       "rule_id": "bch.ihf.program",
-      "change": "finding_changed",
-      "from": "info",
+      "change": "changed",
+      "from": "not_applicable",
       "to": "info",
+      "from_version": "2018-01-01",
+      "to_version": "2018-01-01",
       "finding": "Would be a program for this housing if it is Indigenous-led, or partnered with an Indigenous housing provider or Nation (not said on the option): affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve). It funds building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them). A project enters by BC Housing's request for proposals. No intake is open now (closed: no call is posted on the program page (read 23 Nov 2026)). Its homes are all rent geared to income; this option has 36 market-rent homes, which it would not carry. Its criteria are not tested here."
+    },
+    {
+      "rule_id": "bch.wthf.program",
+      "change": "changed",
+      "from": "not_applicable",
+      "to": "info",
+      "from_version": "2018-01-01",
+      "to_version": "2018-01-01",
+      "finding": "Would be a program for this housing if it is for women, gender-diverse people and children leaving violence (not said on the option): housing with supports for women and their children who are at risk of, or have experienced, violence, in four streams: safe homes (stays of about 10 days), transition houses (about 30 days), second-stage housing (up to about 18 months) and long-term rental housing. It funds 1,500 new homes from 2018, and the service agreement each provider runs them under. A project enters by agreement with BC Housing: the framework names no application route, so ask BC Housing. The building is owned by the Provincial Rental Housing Corporation for the buildings and land created under the fund, leased to non-profit societies and co-operatives. Rents: 30% of income in second-stage and long-term rental housing, by BC Housing's rent scale; a resident on income assistance pays the maximum shelter component. Intake: not stated on the program page (read 23 Nov 2026). Its criteria are not tested here."
+    },
+    {
+      "rule_id": "canada.bch.program",
+      "change": "changed",
+      "from": "not_applicable",
+      "to": "info",
+      "from_version": "2025-12-19",
+      "to_version": "2025-12-19",
+      "finding": "A program for this kind of housing (independent rental): a federal Crown corporation that brings financing, land and partnerships to affordable housing; it counts housing as affordable at no more than 30% of a household's before-tax income. It funds flexible financing, land and partnerships; no application terms were read. A project enters not stated on the page read; CMHC's Affordable Housing Fund page directs organizations to it. Intake: not stated on the page read (23 Nov 2026). Its criteria are not tested here."
     },
     {
       "rule_id": "cov.cd1_324.floor_area",
@@ -55,6 +75,13 @@
       "from": "pass",
       "to": "pass",
       "finding": "Height 36.6 m is within the outright maximum of 91.0 m."
+    },
+    {
+      "rule_id": "cov.chip.program",
+      "change": "finding_changed",
+      "from": "not_applicable",
+      "to": "not_applicable",
+      "finding": "Not for this option: the program takes non profit society or housing cooperative proponents, and this one is a municipal housing provider."
     },
     {
       "rule_id": "cov.family_units",

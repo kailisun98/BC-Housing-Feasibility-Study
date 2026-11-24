@@ -65,6 +65,32 @@ def housing_kind(option: Option) -> str:
     return "supportive" if total and supportive >= total else "independent"
 
 
+def housing_parts(option: Option) -> dict[str, int]:
+    """The kinds of housing in a building, with their counts (24 Nov 2026: Glen Drive's 25 supportive homes and 80-bed
+    shelter read as independent rental, so nothing asked who staffs or funds them). The main kind takes the homes not
+    counted elsewhere; supportive homes are `supportive_units`; shelter beds are `beds` beside homes, or the whole of a
+    shelter. A building of one kind returns one entry."""
+    o = option or {}
+    kind = housing_kind(o)
+    total = _units_total(o)
+    sup = int(o.get("supportive_units") or 0)
+    beds = o.get("beds")
+    beds = int(beds) if isinstance(beds, (int, float)) and not isinstance(beds, bool) and beds > 0 else 0
+    parts: dict[str, int] = {}
+    if kind == "shelter":
+        return {"shelter": beds or total}
+    if kind == "supportive":
+        parts["supportive"] = total
+    else:
+        if total - sup > 0:
+            parts[kind] = total - sup
+        if sup:
+            parts["supportive"] = sup
+    if beds and kind != "transitional":
+        parts["shelter"] = beds
+    return parts
+
+
 def proposes_rezoning(option: Option) -> bool:
     """Whether the option states a rezoning: a `rezoning_path` that is not blank and does not begin "none" (a
     development permit under an official development plan, or an outright scheme, is written "none: …")."""
@@ -173,6 +199,30 @@ def _which_sub_area(need: dict) -> Result:
               action="Manager or architect: find the lot on the plan's sub-area map and record its sub-area on the site.")
 
 
+def _rezoning_path(option: Option) -> str | None:
+    """The rezoning the option proposes, as the person wrote it, or None where it proposes none (a blank path, one that
+    begins "none", or an approval route of a development permit or outright). 24 Nov 2026: a path of "none" printed
+    "rezoning is required (none)" beside "By rezoning: not needed"."""
+    return str(option.get("rezoning_path")).strip() if proposes_rezoning(option) and option.get("rezoning_path") else ("a rezoning" if proposes_rezoning(option) else None)
+
+
+def _over_outright(option: Option, subject: str, said: str, vals: dict, what: str) -> Result:
+    """An option over a schedule's outright figure, read against the approval route it states: a rezoning (the outright
+    test fails and the rezoning is named), a development permit or outright (it fails: a permit cannot approve more than
+    the schedule allows), or none stated."""
+    path = _rezoning_path(option)
+    if path:
+        return _r(FAIL, f"{subject} exceeds {said}, so it is not allowed outright; rezoning is required ({path}), where {what} is negotiated.",
+                  vals, action=f"Manager and architect: take the rezoning ({path}) and confirm with City staff the {what} they will support.")
+    route = approval_route(option)
+    if route in ("development_permit", "outright"):
+        return _r(FAIL, f"{subject} exceeds {said}, so it is not allowed outright; the option is to go by {ROUTE_WORDS[route]}, which cannot approve more than the schedule "
+                        f"allows, so it needs a rezoning or a smaller building.", vals,
+                  action=f"Manager: reduce the {what} to the schedule's figure, or change the approval route to a rezoning and name it.")
+    return _r(FAIL, f"{subject} exceeds {said} and no rezoning path is stated.", vals,
+              action=f"Reduce the {what} or state a rezoning path.")
+
+
 def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
     """The FSR a schedule's rule allows this site and option: `max` the most allowed without discretion (None where the
     site meets no row of the schedule's table), `words` how the schedule gets there, `discretionary` what the Director
@@ -238,6 +288,25 @@ def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
         if out["max"] is None or disc > out["max"]:
             out.update({"discretionary": disc, "discretionary_clause": clause})
     return out
+
+
+def _other_front_fsr(site: Site, option: Option, p: Params, fsr: float) -> dict | None:
+    """On a corner lot, what the other street as the front gives (the lot turned, so its width and a narrow-site cap
+    change), where it would allow `fsr` and the front as taken does not. None otherwise."""
+    other = other_front(site)
+    if not other or not p.get("narrow_site"):
+        return None
+    turned = dict(site, front_face={"street": other})
+    try:
+        W2, _ = lot_as_fronted(turned)
+        lim2 = fsr_limit(turned, option, p)
+    except Exception:
+        return None
+    best = max(x for x in (lim2["max"], lim2["discretionary"]) if x is not None) if (lim2["max"] is not None or lim2["discretionary"]) else None
+    if best is None or round(fsr, 2) > best or not W2:
+        return None
+    return {"street": other, "front": front_street(site) or "the street taken", "width_m": round(W2, 1), "max_fsr": best,
+            "clause": lim2["discretionary_clause"] or "the schedule"}
 
 
 def height_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
@@ -323,6 +392,7 @@ def district_outright_fsr(site, option, p) -> Result:
     if cap_units and units > cap_units:
         vals["max_dwelling_units"] = cap_units
         said_cap = f"{units} homes exceed the schedule's {cap_units} for this form ({p.get('dwelling_units_clause') or 'the schedule'})"
+        path = _rezoning_path(option)
         if path:
             return _r(FAIL, f"{said_cap}, so it is not allowed outright; rezoning is required ({path}).",
                       vals, action=f"Manager and architect: take the rezoning ({path}) and confirm with City staff the number of homes they will support.")
@@ -350,11 +420,20 @@ def district_outright_fsr(site, option, p) -> Result:
     # over the outright maximum with a rezoning path stated: the outright test fails, and the finding says the rezoning
     # is required (Kai, 20 Nov 2026: "Mention rezoning is required but fail on outright test"; it read uncertain before).
     # The by-rezoning answer reads the policy rules, not this one, so it does not change.
-    if path:
-        return _r(FAIL, f"{subject} exceeds {said}, so it is not allowed outright; rezoning is required ({path}), where density is negotiated.",
-                  vals, action=f"Manager and architect: take the rezoning ({path}) and confirm with City staff the density they will support.")
-    return _r(FAIL, f"{subject} exceeds {said} and no rezoning path is stated.", vals,
-              action="Reduce the floor area or state a rezoning path.")
+    # the Director's increase this site could have had, and why it stops short here (24 Nov 2026: RM-5B's narrow-site
+    # cap held 1130 Jervis to 2.0 and the finding never said so)
+    if lim["discretionary"] and round(f, 2) > lim["discretionary"]:
+        said += f"; the Director of Planning may allow at most {lim['discretionary']} here ({lim['discretionary_clause']})"
+        vals["max_fsr_discretionary"] = lim["discretionary"]
+    # on a corner lot the front decides the site's width, and so a narrow-site cap: where the other street as the front
+    # would allow this floor area, the answer turns on a choice the City confirms, so it is uncertain, not a fail
+    alt = _other_front_fsr(site, option, p, f)
+    if alt:
+        vals["other_front"] = alt
+        return _r(UNSURE, f"{subject} exceeds {said}, with {alt['front']} as the front. With {alt['street']} as the front the site is {alt['width_m']:g} m wide and "
+                          f"the Director of Planning may allow up to {alt['max_fsr']} ({alt['clause']}), which this floor area is within. Which street is the front is the City's to say.",
+                  vals, action=f"Manager: ask the City which street is the front of this corner lot, then choose it at 01 (the answer changes with it).")
+    return _over_outright(option, subject, said, vals, "density")
 
 
 def district_outright_height(site, option, p) -> Result:
@@ -395,12 +474,7 @@ def district_outright_height(site, option, p) -> Result:
         return _r(COND, f"{what} {verb} the outright maximum of {limit_words}; " + ("for 100% social housing " if lim["discretionary_social"] else "")
                   + f"the Director of Planning may vary it to at most {var} m ({clause}), a discretionary approval, not assumed.",
                   vals, action=f"Architect: ask for the height variance under {clause} with the development permit application.")
-    path = option.get("rezoning_path")
-    if path:
-        return _r(FAIL, f"{what} {verb} the outright maximum of {limit_words}, so it is not allowed outright; rezoning is required ({path}), where height is negotiated.",
-                  vals, action=f"Architect: confirm with City staff the height they will support under the rezoning ({path}).")
-    return _r(FAIL, f"{what} {verb} the outright maximum of {limit_words} and no rezoning path is stated.", vals,
-              action="Reduce the height or state a rezoning path.")
+    return _over_outright(option, what, f"the outright maximum of {limit_words}", vals, "height")
 
 
 def rezoning_policy_social_housing(site, option, p) -> Result:
@@ -695,7 +769,7 @@ def shelter_beds(site, option, p) -> Result:
     applicable to anything but a shelter. With `option.beds`: the floor area the beds alone need and the fewest rooms at
     the recommended four to a room; info, never a verdict, since the guidelines size much more than the sleeping rooms."""
     kind = housing_kind(option)
-    if kind != "shelter":
+    if "shelter" not in housing_parts(option):
         return _r(NA, f"Not for this option: this standard is for a shelter's sleeping rooms, and the option is {KIND_WORDS[kind]}.", {"housing_type": kind})
     per, room = float(p["min_floor_area_per_bed_m2"]), int(p["recommended_max_beds_per_room"])
     beds = option.get("beds")
@@ -953,9 +1027,13 @@ def program_match(site, option, p) -> Result:
     option states (the Indigenous Housing Fund's homes are all rent geared to income), the finding says how they differ."""
     kind = housing_kind(option)
     for_types = p.get("for_housing_types") or list(HOUSING_TYPES)
-    if kind not in for_types:
+    parts = housing_parts(option)
+    hit = [k for k in parts if k in for_types]
+    if not hit:
         return _r(NA, f"Not for this option: the program is for {_or([KIND_WORDS[k] for k in for_types])}, and the option is {KIND_WORDS[kind]}.",
                   {"match": False, "housing_type": kind})
+    if kind not in for_types:      # a part of the building (24 Nov 2026: Glen Drive's supportive homes and shelter beds)
+        kind = hit[0]
     where = str(p.get("municipality") or "").lower()
     town = str((site or {}).get("municipality") or "City of Vancouver").lower()
     if where and where not in town:
@@ -1067,6 +1145,13 @@ def yard_minimums(site: Site, p: Params) -> tuple[dict[str, float | None], dict 
     (`site.context.lane_behind`, with `lane_to_centre_line_m` or LANE_TO_CENTRE_LINE_M). Returns the minimums and the
     reduction applied (None where there is none)."""
     mins = {k: p.get(f"min_{k}_yard_m") for k in ("front", "rear", "side")}
+    # a side yard the schedule sets as a share of a narrow site's width (RT-3, RT-4, RT-5, RT-8: 10% where the site is
+    # 15.0 m wide or less; RT-10: 12.0 m). 24 Nov 2026: RT-5 tested 1.5 m on a 7.6 m lot, where the schedule asks 0.76 m.
+    narrow = p.get("side_yard_narrow")
+    if narrow and mins["side"] is not None:
+        W, _ = lot_as_fronted(site)
+        if W and W <= float(narrow["max_width_m"]) + 1e-9:
+            mins["side"] = round(float(narrow["share"]) * W, 2)
     ctx = site.get("context") or {}
     if not (p.get("rear_yard_lane_reduction") and mins["rear"] is not None and ctx.get("lane_behind") is True):
         return mins, None
@@ -1104,6 +1189,11 @@ def yard_clause(p: Params, which: str) -> str | None:
     return m.group(1) if m else None
 
 
+# The narrowest envelope this screen reads as room for a home (24 Nov 2026, a declared placeholder): a BC Housing
+# studio of 33 m² at about 6 m deep needs about 5.5 m of width; below 5.0 m no home of the minimum areas lays out.
+MIN_ENVELOPE_M = 5.0
+
+
 def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
     """The yards the option keeps (at least the schedule's) leave no plate on the lot as fronted. Uncertain, never a
     fail: the other street as the front of a corner lot, a lane behind, or the Director's variance may leave one (decided
@@ -1119,6 +1209,10 @@ def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
     front = front_street(site)
     # the consequence, in plain words
     why = []
+    if 0 < d_left < MIN_ENVELOPE_M:
+        why.append(f"the front and rear yards leave {d_left:.1f} m of a lot {D:.1f} m deep, less than the {MIN_ENVELOPE_M:g} m a home needs")
+    if 0 < w_left < MIN_ENVELOPE_M:
+        why.append(f"two side yards of {eff['side']:.1f} m leave {w_left:.1f} m of a lot {W:.1f} m wide, less than the {MIN_ENVELOPE_M:g} m a home needs")
     if d_left <= 0:
         rear = f"{eff['rear']:.1f} m" + (f" ({lane['rear_yard_m']:.1f} m less {lane['to_centre_line_m']:g} m to the lane's centre line)" if lane else "")
         if eff["front"] <= 0 or eff["rear"] >= D - 1e-9:
@@ -1136,6 +1230,19 @@ def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
                  "envelope_m": {"width": round(max(0.0, w_left), 2), "depth": round(max(0.0, d_left), 2)}})
     if front:
         vals["front_street"] = front
+    # the option's own yards larger than the schedule asks, where the schedule's would leave room (24 Nov 2026: a 7.6 m
+    # RT-5 lot kept 1.5 m side yards where the schedule asks 10% of the width, 0.76 m)
+    sb = option.get("setbacks_m") or {}
+    wider = [k for k in mins if mins[k] is not None and sb.get(k) is not None and float(sb[k]) > float(mins[k]) + 1e-9]
+    if wider:
+        w_s = W - 2 * float(mins["side"] or 0)
+        d_s = D - float(mins["front"] or 0) - float(mins["rear"] or 0)
+        if w_s >= MIN_ENVELOPE_M and d_s >= MIN_ENVELOPE_M:
+            ways.append(f"The schedule asks less than the option keeps ({'; '.join(f'{k} {mins[k]:g} m against {float(sb[k]):g} m' for k in wider)}): "
+                        f"with its minimums a plate of about {_m(w_s)} × {_m(d_s)} m ({w_s * d_s:,.0f} m²) fits.")
+            tasks.append("set the option's yards to the schedule's minimums")
+            asks.append("set the option's yards to the schedule's minimums, which leave a plate")
+            vals["with_schedule_yards_m"] = {"width": round(w_s, 2), "depth": round(d_s, 2)}
     # the other street as the front: the lot turned a quarter, the same yards (a front yard the schedule fixes, else the
     # most it can ask)
     other = other_front(site)
@@ -1145,7 +1252,7 @@ def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
         w2, d2 = D - 2 * eff["side"], W - float(f_alt) - float(rear_base)
         alt = {"street": other, "frontage_m": round(D, 2), "depth_m": round(W, 2), "front_yard_m": f_alt,
                "envelope_m": {"width": round(max(0.0, w2), 2), "depth": round(max(0.0, d2), 2)}}
-        if w2 > 0 and d2 > 0:
+        if w2 >= MIN_ENVELOPE_M and d2 >= MIN_ENVELOPE_M:
             words = f"With {other} as the front, a plate of about {_m(w2)} × {_m(d2)} m ({w2 * d2:,.0f} m²) fits"
             if mins["front"] is None and p.get("max_front_yard_m") is not None:
                 words += f" behind a front yard of up to {f_alt:g} m"
@@ -1165,7 +1272,7 @@ def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
     ctx = site.get("context") or {}
     if p.get("rear_yard_lane_reduction") and not lane and ctx.get("lane_behind") is None and mins["rear"] is not None:
         d_lane = D - eff["front"] - (float(mins["rear"]) - LANE_TO_CENTRE_LINE_M)   # the schedule's rear yard, reduced
-        if d_lane > 0 and w_left > 0:
+        if d_lane >= MIN_ENVELOPE_M and w_left >= MIN_ENVELOPE_M:
             ways.append(f"If a lane runs behind the lot, a plate of about {_m(w_left)} × {_m(d_lane)} m fits.")
             tasks.append("say whether a lane runs behind the lot")
             asks.append("say whether a lane runs behind the lot")
@@ -1232,7 +1339,7 @@ def district_setbacks(site, option, p) -> Result:
     short = [f"{k} {sb[k]} m against a {mins[k]} m minimum" for k in mins if mins[k] is not None and sb.get(k) is not None and sb[k] + 1e-9 < mins[k]]
     W, D = lot_as_fronted(site)
     eff = {k: max(float(sb.get(k) or 0), float(mins[k] or 0)) for k in mins}
-    if W > 0 and D > 0 and (D - eff["front"] - eff["rear"] <= 0 or W - 2 * eff["side"] <= 0):
+    if W > 0 and D > 0 and (D - eff["front"] - eff["rear"] < MIN_ENVELOPE_M or W - 2 * eff["side"] < MIN_ENVELOPE_M):
         return _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals)
     if short:
         var = p.get("affordable_variance")

@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-11-17",
-      "rules_hash": "65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf",
+      "rules_hash": "b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d",
       "rules_files": {
-        "a_zoning_district.json": "06448eff1b2236406458bb430dc13dc5b06a2e01191441b65a684293af9015af",
+        "a_zoning_district.json": "e2ad71b55ff9d869f06db60f635eb489874e2db990ae43007ff75196f31c5c9c",
         "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
         "d_design_standards.json": "069a3dcad4ef9601cad46e5b86ae8e166f4dd98c1ec7b053bcef30377bf36343",
         "e_funding_programs.json": "286bc77345ddf276f0eb1c1ef178b9daa1d1c4e00b9ddf4ee9d5d46a1d2ee1ad",
         "f_assumptions.json": "5d6aad80b4dee51fbd2be7d89faa97528c8448e8b34bfbda22fbd758b30f3a3d"
       },
-      "stamp": "5cfd6a34b23f68ab",
+      "stamp": "c0cd775dd41c5779",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -4301,11 +4301,25 @@
       },
       "version_effective_from": "2017-01-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for supportive housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (supportive housing): modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports. It funds nothing new: the program page says all its homes are completed and operational. A project enters it does not: the program is complete. No intake is open now (closed: all homes under the program are completed and operational (program page, read 23 Nov 2026)). Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": true,
+        "asks": [],
+        "housing_type": "supportive",
+        "for_housing_types": [
+          "supportive"
+        ],
+        "what": "modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports",
+        "funds": "nothing new: the program page says all its homes are completed and operational",
+        "how_a_project_enters": "it does not: the program is complete",
+        "intake": {
+          "open": false,
+          "note": "no intake is open now (closed: all homes under the program are completed and operational (program page, read 23 Nov 2026))",
+          "more": null,
+          "status": "closed: all homes under the program are completed and operational (program page, read 23 Nov 2026)"
+        }
       },
       "action": ""
     },
@@ -4332,11 +4346,27 @@
       },
       "version_effective_from": "2018-01-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for supportive housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (supportive housing): subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved. It funds the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule. A project enters through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more). The building is owned by the Provincial Rental Housing Corporation, the Province's land-holding company, in full; a non-profit operates the building. Rents: rent geared to income for every home; a resident on income assistance pays the maximum shelter component, and some projects set a flat rent. Intake: not stated on the program page (read 23 Nov 2026). Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "supportive",
+        "for_housing_types": [
+          "supportive"
+        ],
+        "what": "subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved",
+        "funds": "the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule",
+        "how_a_project_enters": "through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more)",
+        "intake": {
+          "open": null,
+          "note": "intake: not stated on the program page (read 23 Nov 2026)",
+          "more": null,
+          "status": "not stated on the program page (read 23 Nov 2026)"
+        },
+        "owner": "the Provincial Rental Housing Corporation, the Province's land-holding company, in full; a non-profit operates the building",
+        "rents": "rent geared to income for every home; a resident on income assistance pays the maximum shelter component, and some projects set a flat rent"
       },
       "action": ""
     },
@@ -4451,11 +4481,28 @@
       },
       "version_effective_from": "2026-04-17",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for a shelter, transitional housing or supportive housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (supportive housing): capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion. It funds capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs. A project enters through the region's Community Entity, by its calls for proposals. Intake: by call for proposals from the Community Entity; none was read here. Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "supportive",
+        "for_housing_types": [
+          "shelter",
+          "transitional",
+          "supportive"
+        ],
+        "what": "capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion",
+        "funds": "capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs",
+        "how_a_project_enters": "through the region's Community Entity, by its calls for proposals",
+        "intake": {
+          "open": null,
+          "note": "intake: by call for proposals from the Community Entity; none was read here",
+          "more": null,
+          "status": "by call for proposals from the Community Entity; none was read here"
+        },
+        "community_entity_unverified": "for Greater Vancouver the Community Entity was reported as Lu'ma Native Housing Society with Vancity Community Foundation (a search summary of their pages; confirm with them)"
       },
       "action": ""
     },
@@ -4788,8 +4835,8 @@
       "conditional": 0,
       "uncertain": 2,
       "pass": 5,
-      "info": 19,
-      "not_applicable": 118
+      "info": 22,
+      "not_applicable": 115
     },
     "answers": {
       "allowed": {
@@ -4844,6 +4891,30 @@
             "funds": "building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them)"
           },
           {
+            "rule_id": "bch.rrh.program",
+            "program": "Rapid Response to Homelessness",
+            "if": [],
+            "open": false,
+            "intake": "no intake is open now (closed: all homes under the program are completed and operational (program page, read 23 Nov 2026))",
+            "enters": "it does not: the program is complete",
+            "differs": null,
+            "ended": true,
+            "what": "modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports",
+            "funds": "nothing new: the program page says all its homes are completed and operational"
+          },
+          {
+            "rule_id": "bch.shf.program",
+            "program": "the Supportive Housing Fund",
+            "if": [],
+            "open": null,
+            "intake": "intake: not stated on the program page (read 23 Nov 2026)",
+            "enters": "through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more)",
+            "differs": null,
+            "ended": false,
+            "what": "subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved",
+            "funds": "the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule"
+          },
+          {
             "rule_id": "bch.wthf.program",
             "program": "the Women's Transition Housing Fund",
             "if": [
@@ -4870,6 +4941,18 @@
             "funds": "flexible financing, land and partnerships; no application terms were read"
           },
           {
+            "rule_id": "canada.reaching_home.capital",
+            "program": "Reaching Home",
+            "if": [],
+            "open": null,
+            "intake": "intake: by call for proposals from the Community Entity; none was read here",
+            "enters": "through the region's Community Entity, by its calls for proposals",
+            "differs": null,
+            "ended": false,
+            "what": "capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion",
+            "funds": "capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs"
+          },
+          {
             "rule_id": "cov.chip.program",
             "program": "the City of Vancouver Community Housing Incentive Program",
             "if": [],
@@ -4882,7 +4965,7 @@
             "funds": "a capital grant, funded by the Empty Homes Tax"
           }
         ],
-        "scope": "This screen tests the criteria of the Community Housing Fund. Also written for this housing, listed and not tested: Build Canada Homes and the City of Vancouver Community Housing Incentive Program. Would be, depending on an answer not given: the Indigenous Housing Fund and the Women's Transition Housing Fund. A program not in the rules may fit as well."
+        "scope": "This screen tests the criteria of the Community Housing Fund. Also written for this housing, listed and not tested: the Supportive Housing Fund, Build Canada Homes, Reaching Home and the City of Vancouver Community Housing Incentive Program. Would be, depending on an answer not given: the Indigenous Housing Fund and the Women's Transition Housing Fund. A program not in the rules may fit as well."
       },
       "unsure": [
         {
@@ -4900,6 +4983,21 @@
           "finding": "The setbacks on the site plan (front 3.0, rear 3.0, side 3.0 m) are the option's own figures; no rule in the stack tested them against CD-1 (819)'s minimum yards.",
           "action": "Architect: read the yard clauses in CD-1 (819)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator.",
           "contact": "the City of Vancouver's Development and Building Services Centre, a project facilitator"
+        },
+        {
+          "rule_id": "coverage.funders_parts",
+          "title": "Parts of the building the funders answer does not test",
+          "status": "uncertain",
+          "finding": "The building has 25 supportive housing homes beside its independent homes. The funders answer tests the programs written for independent rental; the programs for the rest are listed in answer 2 and not tested, and those parts run on staffing and an operating agreement of their own.",
+          "action": "Manager: settle who funds and operates the 25 supportive housing homes (BC Housing's development staff for the programs, the operator for the staffing), and enter their staffing and subsidy in the option's operating figures."
+        },
+        {
+          "rule_id": "coverage.operator",
+          "title": "Who operates the homes",
+          "status": "uncertain",
+          "finding": "The option has 25 supportive housing homes and names no operator; the operator's experience with the people housed, its staffing and its budget are what a funder reads first.",
+          "action": "Manager: name the operator, and get its operating budget (rents, staffing, the subsidy it needs) into the option's operating figures. Ask: the operating society's executive director and board.",
+          "contact": "the operating society's executive director and board"
         },
         {
           "rule_id": "cov.trees.replacement",

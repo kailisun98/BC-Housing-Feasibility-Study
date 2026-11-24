@@ -4,7 +4,7 @@
   "site_id": "375-glen-drive",
   "option_id": "375-glen-drive-as-proposed",
   "as_of": "2026-11-17",
-  "stamp": "5cfd6a34b23f68ab",
+  "stamp": "c0cd775dd41c5779",
   "lot": {
     "polygon": [
       [
@@ -140,6 +140,23 @@
       "height_m": 51.0,
       "storeys": 15,
       "floor_to_floor_m": 3.05,
+      "level_z_m": [
+        0.0,
+        3.05,
+        6.1,
+        9.15,
+        12.2,
+        15.25,
+        18.3,
+        21.35,
+        24.4,
+        27.45,
+        30.5,
+        33.55,
+        36.6,
+        39.65,
+        42.7
+      ],
       "plate_area_m2": 981.9,
       "gfa_m2": 14729.0,
       "fsr": 6.901,

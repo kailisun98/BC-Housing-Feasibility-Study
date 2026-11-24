@@ -75,6 +75,10 @@
       "reserve": 72000,
       "support_staffing": null,
       "staffing_missing": false,
+      "staffed_parts": {},
+      "subsidy_term_years": null,
+      "subsidy_lends": false,
+      "own_figures": false,
       "net_before_subsidy": 965615,
       "subsidy": null,
       "subsidy_confirmed": false,
@@ -112,7 +116,7 @@
         "illustrative": true,
         "confirmed": false,
         "intake_open": false,
-        "note": "$178,059 per unit × 120 (2025-26 provisional rate, from a call that did not proceed); counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied"
+        "note": "$178,059 per unit × 120 (2026-27 provisional rate, from the 2025 call's slides; that call did not proceed); counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied"
       }
     ],
     "not_counted": [],
@@ -292,7 +296,7 @@
       "value": 21367080,
       "unit": "$",
       "rule_id": "bch.chf.eligibility",
-      "note": "$178,059 per unit × 120; illustrative, at the 2025-26 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied",
+      "note": "$178,059 per unit × 120; illustrative, at the 2026-27 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied",
       "placeholder": false
     },
     {
@@ -333,5 +337,5 @@
     }
   ],
   "as_of": "2026-10-23",
-  "stamp": "31193259023b85e0"
+  "stamp": "d8114c4301640d47"
 }

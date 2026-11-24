@@ -125,6 +125,11 @@
             "affordable_variance": {
               "clause": "s.3.1.2.21",
               "needs": "open to a multiple dwelling with at least 25% of its units owned or leased by a government or non-profit and secured for low income or disability, s.3.1.1.2"
+            },
+            "side_yard_narrow": {
+              "max_width_m": 15.0,
+              "share": 0.1,
+              "clause": "s.3.1.2.6"
             }
           },
           "source": {
@@ -1938,7 +1943,12 @@
             "rear_yard_lane_reduction": "s.3.1.2.11",
             "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less (s.3.1.2.4).",
             "rear_yard_note": "10.7 m, less the distance from the rear property line to the ultimate centre line of a lane behind (s.3.1.2.11).",
-            "front_yard_note": "7.3 m; the Director of Planning may decrease it having regard to the adjacent front yards (s.3.1.2.9)."
+            "front_yard_note": "7.3 m; the Director of Planning may decrease it having regard to the adjacent front yards (s.3.1.2.9).",
+            "side_yard_narrow": {
+              "max_width_m": 15.0,
+              "share": 0.1,
+              "clause": "s.3.1.2.4"
+            }
           },
           "source": {
             "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
@@ -2025,7 +2035,12 @@
             "rear_yard_lane_reduction": "s.3.1.2.11",
             "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less (s.3.1.2.5).",
             "rear_yard_note": "10.7 m where the average site depth does not exceed 36.6 m, 30% of the site depth beyond that (s.3.1.2.6; only the 10.7 m is tested), less the distance to a lane's ultimate centre line (s.3.1.2.11).",
-            "building_depth_note": "Maximum building depth 45% of the site depth (s.3.1.2.8), not tested."
+            "building_depth_note": "Maximum building depth 45% of the site depth (s.3.1.2.8), not tested.",
+            "side_yard_narrow": {
+              "max_width_m": 15.0,
+              "share": 0.1,
+              "clause": "s.3.1.2.5"
+            }
           },
           "source": {
             "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
@@ -2192,7 +2207,12 @@
             "max_site_coverage": 0.45,
             "side_yard_note": "1.5 m where the site is wider than 15.0 m; 10% of the site width where it is 15.0 m or less (s.3.1.2.5).",
             "front_yard_note": "The minimum front yard is the average of the front yards of the 2 adjacent sites (s.3.1.2.4, 3.1.2.11); no fixed minimum, so the front is not tested.",
-            "rear_yard_note": "The schedule sets no minimum rear yard; the building may be no deeper than 35% of the site depth (s.3.1.2.7), not tested."
+            "rear_yard_note": "The schedule sets no minimum rear yard; the building may be no deeper than 35% of the site depth (s.3.1.2.7), not tested.",
+            "side_yard_narrow": {
+              "max_width_m": 15.0,
+              "share": 0.1,
+              "clause": "s.3.1.2.5"
+            }
           },
           "source": {
             "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
@@ -2276,7 +2296,12 @@
             "max_site_coverage": 0.45,
             "side_yard_note": "1.2 m where the site is wider than 12.0 m; 10% of the site width where it is 12.0 m or less (s.3.1.2.4).",
             "front_yard_note": "The average of the front yards of the 2 adjacent sites; 4.9 m on a site wider than 18.3 m with more than 1 principal building (s.3.1.2.3). No fixed minimum, so the front is not tested.",
-            "building_depth_note": "With 1 principal building the building may be no deeper than 40% of the site depth (s.3.1.2.8), not tested."
+            "building_depth_note": "With 1 principal building the building may be no deeper than 40% of the site depth (s.3.1.2.8), not tested.",
+            "side_yard_narrow": {
+              "max_width_m": 12.0,
+              "share": 0.1,
+              "clause": "s.3.1.2.4"
+            }
           },
           "source": {
             "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",

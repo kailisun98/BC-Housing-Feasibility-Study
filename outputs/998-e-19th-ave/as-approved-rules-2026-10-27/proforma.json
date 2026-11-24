@@ -71,6 +71,10 @@
       "reserve": 63000,
       "support_staffing": null,
       "staffing_missing": false,
+      "staffed_parts": {},
+      "subsidy_term_years": null,
+      "subsidy_lends": false,
+      "own_figures": false,
       "net_before_subsidy": 1756547,
       "subsidy": null,
       "subsidy_confirmed": false,
@@ -81,10 +85,10 @@
       "subsidy_to_run": 0,
       "subsidy_to_run_per_home_month": 0,
       "if_gap_financed": {
-        "loan": 35417832,
-        "annual_payment": 2395020,
-        "subsidy_year": 638473,
-        "per_home_month": 507,
+        "loan": 54114027,
+        "annual_payment": 3659292,
+        "subsidy_year": 1902745,
+        "per_home_month": 1510,
         "rate_pct": 6.19,
         "amortization_years": 40,
         "on_program_terms": {
@@ -92,26 +96,23 @@
           "rule_id": "bc.bcbuilds.eligibility",
           "rate_pct": 4.55,
           "amortization_years": 35,
-          "annual_payment": 2024588,
-          "subsidy_year": 268041,
-          "per_home_month": 213
+          "annual_payment": 3093318,
+          "subsidy_year": 1336771,
+          "per_home_month": 1061
         }
       }
     }
   },
   "funding": {
-    "grants": [
+    "grants": [],
+    "not_counted": [
       {
         "program": "bch.chf.eligibility",
-        "label": "Community Housing Fund grant (illustrative)",
+        "label": "Community Housing Fund grant",
         "value": 18696195,
-        "illustrative": true,
-        "confirmed": false,
-        "intake_open": false,
-        "note": "$178,059 per unit × 105 (2025-26 provisional rate, from a call that did not proceed); counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied"
+        "why": "the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2)"
       }
     ],
-    "not_counted": [],
     "equity": 0.0,
     "debt": {
       "supportable": 23614563,
@@ -120,16 +121,17 @@
       "dcr": 1.1,
       "annual_service": 1596861
     },
-    "total": 42310758
+    "total": 23614563
   },
   "gap": {
-    "value": 11803269,
-    "share_of_capital": 0.218
+    "value": 30499464,
+    "share_of_capital": 0.564
   },
   "verdict": {
     "word": "unlikely",
     "why": [
-      "the gap is $11,803,269, 22% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
+      "the gap is $30,499,464, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
+      "no Community Housing Fund grant is counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2)",
       "placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve"
     ],
     "unsure": [
@@ -286,10 +288,10 @@
     {
       "key": "grant_chf",
       "label": "Community Housing Fund grant",
-      "value": 18696195,
+      "value": 0,
       "unit": "$",
       "rule_id": "bch.chf.eligibility",
-      "note": "$178,059 per unit × 105; illustrative, at the 2025-26 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied",
+      "note": "not counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2); $178,059 per unit × 105 = $18,696,195 is what the 2026-27 provisional rate would give if it did",
       "placeholder": false
     },
     {
@@ -313,7 +315,7 @@
     {
       "key": "funding",
       "label": "Funding",
-      "value": 42310758,
+      "value": 23614563,
       "unit": "$",
       "rule_id": null,
       "note": "grants + equity + supportable debt",
@@ -322,7 +324,7 @@
     {
       "key": "gap",
       "label": "Gap",
-      "value": 11803269,
+      "value": 30499464,
       "unit": "$",
       "rule_id": null,
       "note": "capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources",
@@ -330,5 +332,5 @@
     }
   ],
   "as_of": "2026-10-27",
-  "stamp": "2c0cee962e81cc28"
+  "stamp": "9da6dabc8def1912"
 }

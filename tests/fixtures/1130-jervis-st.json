@@ -1,0 +1,341 @@
+{
+  "id": "1130-jervis-st",
+  "address": "1130 Jervis St, Vancouver, BC",
+  "municipality": "City of Vancouver",
+  "zoning_district": "RM-5B",
+  "site_area_m2": 803.6,
+  "frontage_m": 39.9,
+  "depth_m": 20.1,
+  "in_former_community_vision_area": false,
+  "in_transit_oriented_area": false,
+  "toa_tier": null,
+  "frequent_bus_stop_within_400m": null,
+  "has_water_and_sewer": true,
+  "owner_type": "church",
+  "owner": null,
+  "land_tenure_plan": null,
+  "existing_trees_on_site": [],
+  "street_trees": {
+    "count": null,
+    "street": "Jervis St"
+  },
+  "context": {
+    "street": {
+      "name": "Jervis St"
+    },
+    "lane_behind": true
+  },
+  "notes": "TEST FIXTURE (24 Nov 2026): the City open-data lookup of a public address, used by the second simulated panel; the lookup chose Pendrell St as the front. The surrounding buildings and trees are dropped; the streets and the context frame are kept.",
+  "parcel": {
+    "polygon_lonlat": [
+      [
+        -123.13385916894296,
+        49.282866299578615
+      ],
+      [
+        -123.13347351157908,
+        49.28312174996275
+      ],
+      [
+        -123.13367020616063,
+        49.28324898424951
+      ],
+      [
+        -123.13405587722367,
+        49.28299352420348
+      ],
+      [
+        -123.13385916894296,
+        49.282866299578615
+      ]
+    ],
+    "civic_number": "1130",
+    "streetname": "JERVIS ST",
+    "site_id": "015741028",
+    "metrics": {
+      "area_m2": 803.6,
+      "frontage_m": 39.9,
+      "depth_m": 20.1,
+      "frontage_from": "the side parallel to the street",
+      "frontage_bearing_deg": 45.4,
+      "vertices": 4,
+      "rectangular": true,
+      "bounding_rectangle_area_m2": 803.8,
+      "center": {
+        "lat": 49.283058,
+        "lon": -123.133765
+      },
+      "local_m": [
+        [
+          -6.87,
+          -21.28
+        ],
+        [
+          21.19,
+          7.13
+        ],
+        [
+          6.87,
+          21.28
+        ],
+        [
+          -21.19,
+          -7.13
+        ]
+      ]
+    },
+    "shape": {
+      "class": "rectangle",
+      "note": "A rectangle, 804 m2, 39.9 x 20.1 m bounding rectangle.",
+      "rectangularity": 1.0,
+      "vertices": 4,
+      "confidence": 1.0,
+      "alternative": null
+    },
+    "street": {
+      "bearing_deg": 45.8,
+      "name": "Jervis St",
+      "matched_by_name": true,
+      "distance_m": 40.5,
+      "cross_street": {
+        "name": "Pendrell St",
+        "distance_m": 29.9,
+        "bearing_deg": 135.3
+      }
+    },
+    "source": {
+      "title": "City of Vancouver Open Data: property parcel polygons",
+      "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"
+    }
+  },
+  "lookup": {
+    "center": {
+      "lat": 49.2830473763031,
+      "lon": -123.13377043516029
+    },
+    "geocoded_as": "1130 Jervis St, Vancouver, BC (City of Vancouver property address, West End)",
+    "typed": "1130 Jervis St, Vancouver, BC",
+    "civic_typed": 1130,
+    "civic_found": 1130,
+    "civic_mismatch": false,
+    "outside_vancouver": false,
+    "zoning_record": {
+      "object_id": "533873",
+      "zoning_classification": "Residential",
+      "zoning_category": "RM",
+      "zoning_district": "RM-5B",
+      "cd_1_number": null
+    }
+  },
+  "sources": [
+    {
+      "title": "City of Vancouver Open Data: property addresses",
+      "url": "https://opendata.vancouver.ca/explore/dataset/property-addresses/"
+    },
+    {
+      "title": "City of Vancouver Open Data: zoning districts and labels",
+      "url": "https://opendata.vancouver.ca/explore/dataset/zoning-districts-and-labels/"
+    },
+    {
+      "title": "City of Vancouver Open Data: property parcel polygons",
+      "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"
+    },
+    {
+      "title": "City of Vancouver Open Data: public streets, building footprints 2009, public trees (Open Government Licence – Vancouver)",
+      "url": "https://opendata.vancouver.ca/explore/"
+    }
+  ],
+  "front_face": {
+    "street": "Pendrell St"
+  },
+  "front_street": "Pendrell St",
+  "osm": {
+    "source": "City of Vancouver Open Data: public streets, building footprints 2009, public trees",
+    "attribution": "Contains information licensed under the Open Government Licence – Vancouver (streets, building footprints 2009, public trees)",
+    "licence_url": "https://opendata.vancouver.ca/pages/licence/",
+    "fetched_at": "2026-11-24T20:11:57Z",
+    "center": {
+      "lat": 49.283058,
+      "lon": -123.133765,
+      "geocoded_as": "1130 Jervis St, Vancouver, BC (City of Vancouver property address, West End)"
+    },
+    "radius_m": 120.0,
+    "frame": {
+      "origin": "front-left lot corner: the lot's centre starts on the centre point, then the frame is nudged so the front street and any cross street sit half a right-of-way outside the lot lines (see snapped_m)",
+      "x_axis_bearing_deg": 224.3,
+      "front_street": "Jervis St",
+      "front_street_way": 1000002,
+      "front_street_matched_by_name": true,
+      "snapped_m": {
+        "x": 0.1,
+        "y": -20.3,
+        "cross_street": {
+          "name": "Pendrell St",
+          "side": "left"
+        }
+      }
+    },
+    "counts": {
+      "roads": 9,
+      "buildings": 45,
+      "trees": 88,
+      "buildings_on_site_omitted": 1
+    },
+    "buildings_on_site_omitted": [
+      {
+        "id": 2000037,
+        "name": null,
+        "building": "yes",
+        "height_m": 8.8
+      }
+    ],
+    "roads": [
+      {
+        "id": 1000000,
+        "name": "Jervis St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            44.7,
+            -10.0
+          ],
+          [
+            99.3,
+            -10.5
+          ]
+        ]
+      },
+      {
+        "id": 1000001,
+        "name": "Davie St",
+        "highway": "primary",
+        "width_m": 18.0,
+        "points": [
+          [
+            99.3,
+            -10.5
+          ],
+          [
+            98.7,
+            -150.6
+          ]
+        ]
+      },
+      {
+        "id": 1000002,
+        "name": "Jervis St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -10.1,
+            -10.0
+          ],
+          [
+            44.7,
+            -10.0
+          ]
+        ]
+      },
+      {
+        "id": 1000003,
+        "name": "Pendrell St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -9.5,
+            150.8
+          ],
+          [
+            -10.1,
+            -10.0
+          ]
+        ]
+      },
+      {
+        "id": 1000004,
+        "name": "Jervis St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -119.8,
+            -8.5
+          ],
+          [
+            -65.1,
+            -9.0
+          ]
+        ]
+      },
+      {
+        "id": 1000005,
+        "name": "Jervis St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            99.3,
+            -10.5
+          ],
+          [
+            155.6,
+            -10.7
+          ]
+        ]
+      },
+      {
+        "id": 1000006,
+        "name": "Pendrell St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -10.1,
+            -10.0
+          ],
+          [
+            -10.9,
+            -149.7
+          ]
+        ]
+      },
+      {
+        "id": 1000007,
+        "name": "Davie St",
+        "highway": "primary",
+        "width_m": 18.0,
+        "points": [
+          [
+            100.1,
+            149.9
+          ],
+          [
+            99.3,
+            -10.5
+          ]
+        ]
+      },
+      {
+        "id": 1000008,
+        "name": "Jervis St",
+        "highway": "residential",
+        "width_m": 11.0,
+        "points": [
+          [
+            -65.1,
+            -9.0
+          ],
+          [
+            -10.1,
+            -10.0
+          ]
+        ]
+      }
+    ],
+    "query": "City of Vancouver Open Data within 120 m: 9 streets, 46 buildings, 88 trees"
+  },
+  "keep_existing_buildings": true
+}

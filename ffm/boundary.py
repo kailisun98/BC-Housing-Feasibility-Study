@@ -460,9 +460,24 @@ def inset(ring: list, sb: dict | None) -> list[list[float]] | None:
     out = corners(lines)
     if signed_area(out) <= 1.0 or not is_simple(out):
         return None
-    if any(not point_in(p, pts) for p in out):
+    # a corner on the lot line counts as inside (24 Nov 2026: a zero front or side yard, a street-wall building, put the
+    # corners exactly on the ring, the test called them outside, and the massing fell back to an equivalent rectangle
+    # larger than the lot)
+    if any(not (point_in(p, pts) or _on_edge(p, pts)) for p in out):
         return None
     return [[round(x, 2), round(y, 2)] for x, y in out]
+
+
+def _on_edge(p: Point, pts: list, tol: float = 0.01) -> bool:
+    """Whether a point lies on one of the polygon's edges, within `tol` metres."""
+    for i in range(len(pts)):
+        a, b = pts[i], pts[(i + 1) % len(pts)]
+        dx, dy = b[0] - a[0], b[1] - a[1]
+        L2 = dx * dx + dy * dy
+        t = max(0.0, min(1.0, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L2)) if L2 else 0.0
+        if math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy)) <= tol:
+            return True
+    return False
 
 
 def largest_rect(poly: list, step: float = 0.5, exclude: dict | None = None) -> dict[str, float] | None:

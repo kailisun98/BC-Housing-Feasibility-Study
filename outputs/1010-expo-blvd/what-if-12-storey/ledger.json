@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-10-23",
-      "rules_hash": "65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf",
+      "rules_hash": "b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d",
       "rules_files": {
-        "a_zoning_district.json": "06448eff1b2236406458bb430dc13dc5b06a2e01191441b65a684293af9015af",
+        "a_zoning_district.json": "e2ad71b55ff9d869f06db60f635eb489874e2db990ae43007ff75196f31c5c9c",
         "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
         "d_design_standards.json": "069a3dcad4ef9601cad46e5b86ae8e166f4dd98c1ec7b053bcef30377bf36343",
         "e_funding_programs.json": "286bc77345ddf276f0eb1c1ef178b9daa1d1c4e00b9ddf4ee9d5d46a1d2ee1ad",
         "f_assumptions.json": "5d6aad80b4dee51fbd2be7d89faa97528c8448e8b34bfbda22fbd758b30f3a3d"
       },
-      "stamp": "31193259023b85e0",
+      "stamp": "d8114c4301640d47",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",

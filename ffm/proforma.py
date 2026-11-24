@@ -33,12 +33,21 @@ SCREEN_LINE = f"the {GAP_UNLIKELY_SHARE * 100:.0f}% line (this tool's screening 
 VERDICT_WORDS = {"likely": "Likely", "unlikely": "Needs more sources", "unsure": "Unsure"}
 # Written for whoever reads the memo, on screen or on paper (24 Nov 2026: "run again" and "at 03" were the tool's
 # operator talking to a board).
-MORE_SOURCES = ("Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, "
-                "a land contribution or a partner. A revised memo counts what is found as other grants or equity.")
+# No program is named here (24 Nov 2026: this named CMHC's Affordable Housing Fund, closed on 19 Dec 2025 by the tool's
+# own rule); answer 2 lists the programs with whether each is taking proposals.
+MORE_SOURCES = ("Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal "
+                "grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found "
+                "as other grants or equity.")
+# Supportive, transitional and shelter housing reach capital by a program's own route, not by a gap a society fills
+# (24 Nov 2026: answer 2 said the Supportive Housing Fund pays the capital and the Province owns the building, while
+# answer 4 showed a 100% gap and sent the manager looking for grants).
+PROGRAM_ROUTE = ("For {what}, the capital comes by the program's own route (answer 2 says how a project enters each, and what each pays for): "
+                 "settle that route, who operates the building and the operating agreement first. The gap here is what a society would face outside that route.")
 CLOSE_GAP = "Another source, or firmer figures for the placeholders, would settle it."
 OPERATING_FUNDER = ("Find who pays to run it before the capital: an operating agreement or subsidy (for supportive, transitional or "
                     "shelter housing, the staffing as well), then a revised memo with the project's own rents, running costs and "
-                    "subsidy. Until they are entered, the rents and the running cost are placeholders.")
+                    "subsidy.")
+PLACEHOLDERS_LEFT = " Until they are entered, the rents and the running cost are placeholders."
 
 
 def next_step(pf: dict) -> str | None:
@@ -48,8 +57,13 @@ def next_step(pf: dict) -> str | None:
     v = (pf or {}).get("verdict") or {}
     gap, cap = ((pf or {}).get("gap") or {}).get("value"), (pf or {}).get("capital") or {}
     homes = ((pf or {}).get("inputs") or {}).get("units_total")
+    page = ((pf or {}).get("operating") or {}).get("page") or {}
     if v.get("operating_shortfall"):
-        return OPERATING_FUNDER
+        return OPERATING_FUNDER + ("" if page.get("own_figures") else PLACEHOLDERS_LEFT)
+    kind = page.get("housing_type")
+    if kind and kind != "independent" and v.get("word") in ("unlikely", "unsure"):
+        from .checks import HOUSING_WORDS
+        return PROGRAM_ROUTE.format(what=HOUSING_WORDS.get(kind, kind))
     if v.get("word") == "unlikely":
         return MORE_SOURCES
     if v.get("word") == "unsure" and homes and gap is not None and gap > 0 and cap.get("total") is not None and cap.get("land") is not None:
@@ -296,36 +310,64 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
                f"${hil_deep_month.get('three_bed_plus', 0):,.0f} for three, 30% of the deep-subsidy income limit") if hil_deep_month
               else f"the shelter rate, ${rents.get('deep_subsidy_rent_monthly_cad')} a month"), False)
     gross = sum(v for v in rev.values() if v) if n else None
-    vac = float(rents.get("vacancy_rate") or 0)
+    # a shelter counted in beds, with no homes (24 Nov 2026: a 60-bed shelter's $2.4M staffing and $2.9M subsidy were
+    # dropped because the page counted homes only): its places are its beds, it collects no rent, and its running cost
+    # is the operator's per bed where entered, else not estimated
+    beds_in = option.get("beds")
+    beds_n = int(beds_in) if isinstance(beds_in, (int, float)) and not isinstance(beds_in, bool) and beds_in > 0 else 0
+    beds_only = not n and beds_n > 0
+    places = n or beds_n
+    if beds_only:
+        gross = 0
+    # vacancy and the reserve are the operator's to set (24 Nov 2026, the operator's review)
+    own_vac = entered("vacancy_rate")
+    vac = own_vac if own_vac is not None else float(rents.get("vacancy_rate") or 0)
     vacancy = round(gross * vac) if gross is not None else None      # a rent of $0 (a shelter) is a figure, not a blank
     own_opx = entered("operating_cost_per_unit_year_cad")
     per_opx = own_opx if own_opx is not None else float(ops.get("operating_cost_per_unit_year_cad") or 0)
-    opx = round(n * per_opx) if n else None
-    reserve = round(n * float(ops.get("replacement_reserve_per_unit_year_cad") or 0)) if n else None
+    opx = round(n * per_opx) if n else (round(beds_n * own_opx) if beds_only and own_opx is not None else None)
+    own_res = entered("replacement_reserve_per_unit_year_cad")
+    per_res = own_res if own_res is not None else float(ops.get("replacement_reserve_per_unit_year_cad") or 0)
+    reserve = round(n * per_res) if n else None
     # support staffing: the cost that decides whether supportive, transitional or shelter housing can open. Entered or
     # absent, never assumed; where that kind of housing has none entered, the verdict below cannot read "likely".
-    staffing = round(entered("support_staffing_cad_year")) if entered("support_staffing_cad_year") is not None and n else None
-    from .checks import housing_kind, HOUSING_WORDS
+    staffing = round(entered("support_staffing_cad_year")) if entered("support_staffing_cad_year") is not None and places else None
+    from .checks import housing_kind, housing_parts, HOUSING_WORDS
     kind = housing_kind(option)
-    staffing_missing = bool(n) and kind != "independent" and staffing is None
-    noi = round(gross - vacancy - opx - reserve - (staffing or 0) + (nr_income or 0)) if gross is not None else None
+    # every part of the building that runs on staffing, not only the main kind (24 Nov 2026: Glen Drive's 25 supportive
+    # homes and 80-bed shelter read as independent rental needing no subsidy)
+    parts = housing_parts(option)
+    staffed = {k: c for k, c in parts.items() if k != "independent"}
+    staffed_words = HOUSING_WORDS[kind] if kind != "independent" else " and ".join(
+        f"the {c} {'shelter beds' if k == 'shelter' else HOUSING_WORDS[k] + ' homes'}" for k, c in staffed.items())
+    staffing_missing = bool(places) and bool(staffed) and staffing is None
+    noi = round(gross - (vacancy or 0) - (opx or 0) - (reserve or 0) - (staffing or 0) + (nr_income or 0)) if gross is not None else None
     if nr_income:
         line("nonres_income", "Income from the floors that are not homes", round(nr_income), "$/yr", None, "entered: rent or a contribution to running costs from the non-residential space (the option's finance block)", False)
     # an operating subsidy, as the manager has it: counted toward what a lender would lend against only once confirmed
-    subsidy = round(entered("operating_subsidy_cad_year")) if entered("operating_subsidy_cad_year") is not None and n else None
+    subsidy = round(entered("operating_subsidy_cad_year")) if entered("operating_subsidy_cad_year") is not None and places else None
     subsidy_confirmed = bool(subsidy) and opsin.get("subsidy_confirmed") is True
-    line("vacancy", "Vacancy", vacancy, "$/yr", "f.rents", f"{vac * 100:.1f}% of gross rent, the CMHC survey's rate", False)
+    # the subsidy's term (24 Nov 2026, the operator's review: a confirmed 3-year agreement was borrowed against for 40
+    # years and the money read "likely"): a loan is sized on it only where the term covers the amortization
+    term = entered("subsidy_term_years")
+    line("vacancy", "Vacancy", vacancy, "$/yr", None if own_vac is not None else "f.rents",
+         f"entered: {vac * 100:.1f}% of gross rent" if own_vac is not None else f"{vac * 100:.1f}% of gross rent, the CMHC survey's rate", False)
     line("opex", "Operating cost", opx, "$/yr", None if own_opx is not None else "f.operating",
          f"entered: ${per_opx:,.0f} per home a year (the option's operating figures)" if own_opx is not None else f"${ops.get('operating_cost_per_unit_year_cad'):,} per unit",
          own_opx is None and is_placeholder("f.operating"))
-    line("reserve", "Replacement reserve", reserve, "$/yr", "f.operating", f"${ops.get('replacement_reserve_per_unit_year_cad'):,} per unit", is_placeholder("f.operating"))
+    line("reserve", "Replacement reserve", reserve, "$/yr", None if own_res is not None else "f.operating",
+         f"entered: ${per_res:,.0f} per home a year" if own_res is not None else f"${ops.get('replacement_reserve_per_unit_year_cad'):,} per unit",
+         own_res is None and is_placeholder("f.operating"))
     line("staffing", "Support staffing", staffing, "$/yr", None,
          "entered in the option's operating figures" if staffing is not None else
-         (f"not entered: {HOUSING_WORDS[kind]} runs on staffing this screen does not estimate" if staffing_missing else "none entered"), False)
+         (f"not entered: {staffed_words} run on staffing this screen does not estimate" if staffing_missing else "none entered"), False)
     line("noi", "Net operating income", noi, "$/yr", None, "gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy", False)
     line("subsidy", "Operating subsidy", subsidy, "$/yr", None,
          (f"entered{': ' + str(opsin.get('subsidy_source')) if opsin.get('subsidy_source') else ''}; "
-          + ("confirmed, so a lender's loan is sized with it" if subsidy_confirmed else "not yet confirmed, so no loan is sized on it")) if subsidy else "none entered", False)
+          + (("confirmed" + (f" for {term:g} years" if term is not None else ", for a term not entered")
+              + (", so a lender's loan is sized with it" if term is not None and term >= int(P("f.mortgage").get("amortization_years") or 40)
+                 else ", shorter than the loan's amortization, so no loan is sized on it")) if subsidy_confirmed
+             else "not yet confirmed, so no loan is sized on it")) if subsidy else "none entered", False)
 
     # ---------------- funding
     grants: list[dict] = []
@@ -342,21 +384,25 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         chf_res = E.get("bch.chf.eligibility") or {}
         chf_status = chf_res.get("status")
         intake_open = ((chf_res.get("values") or {}).get("intake") or {}).get("open")
-        if chf_status in ("fail", "not_applicable"):
+        fy = (chf_res.get("values") or {}).get("grant_fiscal_year") or "2025-26"
+        if chf_status in ("fail", "not_applicable") or not tiers:
+            # no rent tiers: the fund's mix is untested, and an option that answers less must not read rosier than one
+            # that answers more (24 Nov 2026: a 5-home option without tiers counted $890,295; with them it failed the mix)
             reason = ("the option does not meet the fund's criteria (answer 2)" if chf_status == "fail"
-                      else "the fund is not the program for this kind of housing (answer 2)")
+                      else "the fund is not the program for this kind of housing (answer 2)" if chf_status == "not_applicable"
+                      else "the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2)")
             not_counted.append({"program": "bch.chf.eligibility", "label": "Community Housing Fund grant", "value": g, "why": reason})
             line("grant_chf", "Community Housing Fund grant", 0, "$", "bch.chf.eligibility",
-                 f"not counted: {reason}; ${per:,.0f} per unit × {n} = ${g:,.0f} is what the 2025-26 provisional rate would give if it did", False)
+                 f"not counted: {reason}; ${per:,.0f} per unit × {n} = ${g:,.0f} is what the {fy} provisional rate would give if it did", False)
         else:
             chf_grant = {"value": g, "confirmed": chf_status == "pass", "intake_open": intake_open}
             cond = "" if chf_status == "pass" else "; counted on the condition that the criteria still to confirm are met (answer 2)"
             closed = "; no intake is open, so no grant is committed or implied" if intake_open is False else ""
             grants.append({"program": "bch.chf.eligibility", "label": "Community Housing Fund grant (illustrative)", "value": g,
                            "illustrative": True, "confirmed": chf_status == "pass", "intake_open": intake_open,
-                           "note": f"${per:,.0f} per unit × {n} (2025-26 provisional rate, from a call that did not proceed){cond}{closed}"})
+                           "note": f"${per:,.0f} per unit × {n} ({fy} provisional rate, from the 2025 call's slides; that call did not proceed){cond}{closed}"})
             line("grant_chf", "Community Housing Fund grant", g, "$", "bch.chf.eligibility",
-                 f"${per:,.0f} per unit × {n}; illustrative, at the 2025-26 provisional rate{cond}{closed}", False)
+                 f"${per:,.0f} per unit × {n}; illustrative, at the {fy} provisional rate{cond}{closed}", False)
     if nr_funding:
         grants.append({"program": None, "label": "Money for the floors that are not homes (entered)", "value": nr_funding, "note": "a capital campaign, a grant or a partner's contribution (the option's finance block)"})
         line("nonres_funding", "Money for the floors that are not homes", nr_funding, "$", None, "entered: a capital campaign, a grant or a partner's contribution toward the non-residential space", False)
@@ -370,7 +416,8 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     mtg = P("f.mortgage")
     rate, years, dcr = float(mtg.get("rate_pct") or 0), int(mtg.get("amortization_years") or 40), float(mtg.get("debt_coverage_ratio") or 1.1)
     k = mortgage_constant(rate, years)
-    noi_for_debt = (noi + (subsidy if subsidy_confirmed else 0)) if noi is not None else None
+    subsidy_lends = subsidy_confirmed and term is not None and term >= years
+    noi_for_debt = (noi + (subsidy if subsidy_lends else 0)) if noi is not None else None
     debt = round(max(0.0, noi_for_debt) / dcr / k) if noi_for_debt is not None and k else None
     service = round(debt * k) if debt else None
     # the debt in plain words (20 Nov 2026): what the coverage ratio and the amortization mean, not only their figures
@@ -391,6 +438,11 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         word = "unsure"
         why.append("no floor area, so no capital cost")
         unsure.insert(0, "floor area and unit count")
+    elif beds_only:
+        word = "unsure"
+        why.append(f"a shelter of {beds_n} beds collects no rent to set against the ${capital:,.0f} capital cost; who pays to build it is the program's question "
+                   "(answer 2), and the operating page shows what running it takes")
+        unsure.insert(0, "who pays the capital cost (a shelter program funds running a shelter; building it is a separate question for BC Housing or the City)")
     elif not n:
         # no homes entered: no rent, no debt and no grant can be counted, so the gap is the whole capital cost and
         # says nothing about the funders (17 Nov 2026: Expo as permitted read a 100% gap as a verdict)
@@ -430,9 +482,12 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     # F's mortgage terms. A funder's own financing terms differ; the figure is this screen's arithmetic, per home per
     # month, so two options can be compared.
     after_subsidy = (noi + (subsidy or 0)) if noi is not None else None
-    to_run = max(0, -noi) if noi is not None else None
+    # with the staffing a supportive or shelter part runs on not entered, the subsidy it needs is not known: withheld,
+    # never printed as a figure (24 Nov 2026: "$110 a home a month" stood beside "a funder compares this figure")
+    to_run = (max(0, -noi) if noi is not None else None) if not staffing_missing else None
     financed = None
-    if noi is not None and gap is not None and gap > 0 and k and n:
+    # the whole capital gap borrowed is no ask for housing whose program pays the capital (supportive, shelter)
+    if noi is not None and gap is not None and gap > 0 and k and n and not staffed:
         loan = (debt or 0) + max(0, gap)
         pay = round(loan * k)
         need = max(0, pay - noi)
@@ -460,7 +515,9 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
                    "from": tier_from[t]} for t in TIER_KEYS] if n else [],
         "gross": gross, "vacancy": vacancy, "operating_cost": opx, "operating_cost_per_home": round(per_opx) if n else None,
         "operating_cost_from": "entered" if own_opx is not None else ("placeholder" if is_placeholder("f.operating") else "rule"),
-        "reserve": reserve, "support_staffing": staffing, "staffing_missing": staffing_missing,
+        "reserve": reserve, "support_staffing": staffing, "staffing_missing": staffing_missing, "staffed_parts": staffed if kind == "independent" else {},
+        "subsidy_term_years": term, "subsidy_lends": subsidy_lends,
+        "own_figures": all(t["from"] == "entered" for t in ([] if beds_only else [{"from": tier_from[x]} for x in TIER_KEYS if tier_homes[x]])) and own_opx is not None,
         "net_before_subsidy": noi, "subsidy": subsidy, "subsidy_confirmed": subsidy_confirmed, "subsidy_source": opsin.get("subsidy_source") or None,
         "net_after_subsidy": after_subsidy, "debt_service": service,
         "after_debt_service": (noi_for_debt - (service or 0)) if noi_for_debt is not None else None,
@@ -474,7 +531,7 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         page["subsidy_to_run_per_bed_month"] = round(to_run / beds / 12) if to_run is not None else None
     # Rents and subsidy that do not cover the running costs: no capital stack makes that building likely (a shelter
     # entered as built read "Likely, $12.6M to spare" over a net operating income of -$52,880 a year).
-    operating_shortfall = -after_subsidy if (after_subsidy is not None and after_subsidy < 0 and n) else None
+    operating_shortfall = -after_subsidy if (after_subsidy is not None and after_subsidy < 0 and places) else None
     if operating_shortfall:
         word = "unlikely"
         why.insert(0, f"the rents do not cover the running costs: the building is ${operating_shortfall:,.0f} a year short before any loan payment"
@@ -485,9 +542,17 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         why.append(f"the running costs are covered only with an operating subsidy of ${subsidy:,.0f} a year that is not yet confirmed")
         if word == "likely":
             word = "unsure"
+    elif subsidy and subsidy_confirmed and noi is not None and noi < 0 and not subsidy_lends:
+        # the building runs only while an agreement shorter than the loan is renewed: said, and never "likely"
+        why.append(f"the running costs are met by a ${subsidy:,.0f} a year operating subsidy "
+                   + (f"for {term:g} years" if term is not None else "for a term not entered")
+                   + f", shorter than the {years}-year loan: no loan is sized on it, and the building depends on its renewal")
+        unsure.append("the operating agreement's term and renewal (who funds the running costs after it ends)")
+        if word == "likely":
+            word = "unsure"
     if staffing_missing:
-        unsure.append(f"support staffing and who pays for it ({HOUSING_WORDS[kind]} runs on an operating agreement; none is entered)")
-        why.append(f"no support staffing is entered for {HOUSING_WORDS[kind]}, so the running costs here are the building's alone")
+        unsure.append(f"support staffing and who pays for it ({staffed_words} run on an operating agreement; none is entered)")
+        why.append(f"no support staffing is entered for {staffed_words}, so the running costs here are the building's alone and the subsidy it needs is not known")
         if word == "likely":
             word = "unsure"
     for x in not_counted:
@@ -635,8 +700,9 @@ def operating_rows(pf: dict) -> list[dict]:
         per = f"${t['rent_month_per_home']:,.0f} a month a home" if t.get("rent_month_per_home") is not None else "no rent figure"
         rows.append({"label": f"{t['label']}, {t['homes']:g} homes", "value": t["rent_year"], "note": f"{per} ({FROM_WORDS[t['from']]})", "kind": "income"})
     rows.append({"label": "Vacancy", "value": -(p["vacancy"] or 0), "note": "the CMHC survey's rate, on all tiers", "kind": "cost"})
-    rows.append({"label": "Operating cost", "value": -(p["operating_cost"] or 0),
-                 "note": f"${p['operating_cost_per_home']:,.0f} a home a year ({FROM_WORDS[p['operating_cost_from']]})", "kind": "cost"})
+    rows.append({"label": "Operating cost", "value": -p["operating_cost"] if p["operating_cost"] is not None else None,
+                 "note": (f"${p['operating_cost_per_home']:,.0f} a home a year ({FROM_WORDS[p['operating_cost_from']]})" if p.get("operating_cost_per_home") is not None
+                          else "not entered: enter the operator's running cost per bed"), "kind": "cost"})
     rows.append({"label": "Replacement reserve", "value": -(p["reserve"] or 0), "note": "", "kind": "cost"})
     rows.append({"label": "Support staffing", "value": -p["support_staffing"] if p["support_staffing"] is not None else None,
                  "note": "entered" if p["support_staffing"] is not None else ("not entered, and this kind of housing runs on it" if p["staffing_missing"] else ""), "kind": "cost"})
@@ -645,11 +711,18 @@ def operating_rows(pf: dict) -> list[dict]:
         rows.append({"label": "Operating subsidy entered", "value": p["subsidy"],
                      "note": (f"{p['subsidy_source']}; " if p.get("subsidy_source") else "") + ("confirmed" if p["subsidy_confirmed"] else "not yet confirmed"), "kind": "income"})
     rows.append({"label": "Loan payment", "value": -(p["debt_service"] or 0), "note": "on the loan the funding counts (the capital figures above)", "kind": "cost"})
-    rows.append({"label": "Subsidy needed to run it", "value": p["subsidy_to_run"],
-                 "note": (f"${p['subsidy_to_run_per_home_month']:,.0f} a home a month over {homes} homes"
-                          + (f" (${p['subsidy_to_run_per_bed_month']:,.0f} a bed a month over {p['beds']} beds)" if p.get("beds") and p.get("subsidy_to_run_per_bed_month") is not None else "") + "; "
-                          if p["subsidy_to_run"] else "none: the rents cover the running costs; ")
-                         + "before any loan payment", "kind": "ask"})
+    if p["subsidy_to_run"] is None:
+        rows.append({"label": "Subsidy needed to run it", "value": None,
+                     "note": "not given: the support staffing is not entered, so what running it costs is not known", "kind": "ask"})
+    else:
+        per = []
+        if p.get("subsidy_to_run_per_home_month") is not None and homes:
+            per.append(f"${p['subsidy_to_run_per_home_month']:,.0f} a home a month over {homes} homes")
+        if p.get("beds") and p.get("subsidy_to_run_per_bed_month") is not None:
+            per.append(f"${p['subsidy_to_run_per_bed_month']:,.0f} a bed a month over {p['beds']} beds")
+        rows.append({"label": "Subsidy needed to run it", "value": p["subsidy_to_run"],
+                     "note": ("; ".join(per) + "; " if p["subsidy_to_run"] and per else "none: the rents cover the running costs; " if not p["subsidy_to_run"] else "")
+                             + "before any loan payment", "kind": "ask"})
     f = p.get("if_gap_financed")
     if f:
         rows.append({"label": "Subsidy needed if the capital still missing were borrowed", "value": f["subsidy_year"],
@@ -670,11 +743,13 @@ def operating_markdown(pf: dict) -> list[str]:
     L = ["### What it takes to run, a year", "", "| | A year | |", "|---|---:|---|"]
     for r in rows:
         bold = "**" if r["kind"] in ("result", "ask") else ""
-        shown = _money(r["value"]) if r["value"] is not None else ("not entered" if "runs on it" in r["note"] else "none")
+        shown = _money(r["value"]) if r["value"] is not None else ("not entered" if ("runs on it" in r["note"] or r["note"].startswith("not ")) else "none")
         L.append(f"| {bold}{r['label']}{bold} | {bold}{shown}{bold} | {r['note']} |")
     L.append("")
-    L.append("> The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); "
-             "support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.")
+    own = (((pf or {}).get("operating") or {}).get("page") or {}).get("own_figures")
+    L.append("> " + ("The rents and the running cost are the operator's own, as entered" if own else
+                     "The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures)")
+             + "; support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.")
     L.append("")
     return L
 

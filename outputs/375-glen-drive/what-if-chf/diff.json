@@ -1,6 +1,6 @@
 {
-  "previous_stamp": "5cfd6a34b23f68ab",
-  "current_stamp": "5cfd6a34b23f68ab",
+  "previous_stamp": "c0cd775dd41c5779",
+  "current_stamp": "c0cd775dd41c5779",
   "previous_as_of": "2026-11-17",
   "current_as_of": "2026-11-17",
   "rules_changed": false,
@@ -15,11 +15,38 @@
       "finding": "Community Housing Fund: passes the eligibility items this screen checks: unit mix matches 30/50/20 within tolerance; site control (council resolution) meets the readiness bar; construction must be able to start within 18 months of award. Not assessed here: need and demand, the operator's capacity, the fund's rated criteria and the budget. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026)."
     },
     {
+      "rule_id": "bch.esp.program",
+      "change": "changed",
+      "from": "info",
+      "to": "not_applicable",
+      "from_version": "2019-01-01",
+      "to_version": "2019-01-01",
+      "finding": "Not for this option: the program is for a shelter, and the option is independent rental."
+    },
+    {
+      "rule_id": "bch.hearth.program",
+      "change": "changed",
+      "from": "info",
+      "to": "not_applicable",
+      "from_version": "2023-01-01",
+      "to_version": "2023-01-01",
+      "finding": "Not for this option: the program is for a shelter or transitional housing, and the option is independent rental."
+    },
+    {
       "rule_id": "bch.ihf.program",
       "change": "finding_changed",
       "from": "info",
       "to": "info",
       "finding": "Would be a program for this housing if it is Indigenous-led, or partnered with an Indigenous housing provider or Nation (not said on the option): affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve). It funds building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them). A project enters by BC Housing's request for proposals. No intake is open now (closed: no call is posted on the program page (read 23 Nov 2026)). Its homes are all rent geared to income; this option has 33 market-rent homes, which it would not carry. Its criteria are not tested here."
+    },
+    {
+      "rule_id": "bch.shelter.bed_space",
+      "change": "changed",
+      "from": "info",
+      "to": "not_applicable",
+      "from_version": "2017-09-01",
+      "to_version": "2017-09-01",
+      "finding": "Not for this option: this standard is for a shelter's sleeping rooms, and the option is independent rental."
     },
     {
       "rule_id": "cov.cd1_819.outright_fsr",

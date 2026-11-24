@@ -347,10 +347,18 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         h = float(parapet)
     elif parapet and parapet > h:
         h = float(parapet)   # the stated height, drawn as stated
+    elif parapet and h > parapet + 0.05 and storeys_given:
+        # the storeys need more height than the option states (24 Nov 2026: 12 × 3.3 m drawn 39.6 m against the 37.0 m the
+        # rules tested, silently, and the taller mass went to Revit)
+        warnings.append(f"The mass is drawn {h:.1f} m tall ({storeys} storeys at {f2f:g} m" + (f" over a {f2f + g_extra:g} m ground floor" if g_extra else "")
+                        + f"), {h - float(parapet):.1f} m above the option's height of {parapet} m, which is the height the rules tested. "
+                          "Lower the floor to floor, the storeys, or raise the stated height so the two agree.")
     masses.append({
         "name": "proposed", "label": (f"Proposed: {storeys} storeys, FSR {gfa / area:.2f}" if gfa else f"Proposed: {storeys} storeys") if storeys_given else "Proposed: storeys not given, drawn at one storey as a placeholder",
         "footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "at_street_corner": "right" if at_right else "left",
         "base_z": 0.0, "height_m": round(h, 2), "storeys": storeys, "floor_to_floor_m": f2f,
+        # the level of each floor, a taller ground floor counted, so Revit's plates stand where layout.json's levels are
+        "level_z_m": [0.0] + [round(f2f + g_extra + (k - 1) * f2f, 2) for k in range(1, int(storeys or 1))],
         "plate_area_m2": round(plate, 1), "gfa_m2": round(plate * storeys, 1), "fsr": round(plate * storeys / area, 3),
         "derived_from": ["option.gfa_m2", "option.storeys", "option.setbacks_m", "option.floor_to_floor_m"]
                         + (["option.massing.width_m", "option.massing.depth_m"] if given else [])

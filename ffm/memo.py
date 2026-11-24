@@ -151,7 +151,9 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
              + (f" Not assessed: {o['why']}; the envelope is the option's own figure, not a permitted one." if o.get("why") else ""))
     L.append("")
     from .checks import proposes_rezoning
-    if bz.get("verdict") == "not needed":
+    if bz.get("verdict") == "needed":
+        L.append(f"**By rezoning: needed.** {bz['why'][:1].upper() + bz['why'][1:]}.")
+    elif bz.get("verdict") == "not needed":
         L.append(f"**By rezoning: not needed.** {bz['why'][:1].upper() + bz['why'][1:]}.")
         L.append("")
     elif (ans["allowed"].get("rezoning_path") or ans["allowed"].get("approval_route")) and not proposes_rezoning(opt):

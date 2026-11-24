@@ -77,7 +77,7 @@ class RentsThatDoNotCoverTheRunningCosts(unittest.TestCase):
         self.assertEqual(pf["verdict"]["word"], "unlikely")
         self.assertEqual(pf["verdict"]["operating_shortfall"], -pf["operating"]["noi"])
         self.assertIn("the rents do not cover the running costs", pf["verdict"]["why"][0])
-        self.assertEqual(proforma.next_step(pf), proforma.OPERATING_FUNDER)
+        self.assertTrue(proforma.next_step(pf).startswith(proforma.OPERATING_FUNDER))
         md = "\n".join(proforma.markdown(pf))
         self.assertIn("- Surplus **$", md)
         self.assertNotIn("$-", md.split("| Line |")[0])
@@ -274,7 +274,7 @@ class TheOperatingPage(unittest.TestCase):
         self.assertEqual(sought["funding"]["debt"]["supportable"], 0)
         self.assertEqual(sought["verdict"]["word"], "unsure")
         self.assertTrue(any("not yet confirmed" in w for w in sought["verdict"]["why"]))
-        confirmed, _ = self.shelter(subsidy_confirmed=True, **ops)
+        confirmed, _ = self.shelter(subsidy_confirmed=True, subsidy_term_years=40, **ops)      # a term that covers the loan (24 Nov 2026)
         self.assertGreater(confirmed["funding"]["debt"]["supportable"], 0)
         self.assertEqual(confirmed["verdict"]["word"], "likely")
         self.assertIsNone(confirmed["verdict"]["operating_shortfall"])
@@ -407,7 +407,7 @@ class TheRestOfTheOpenList(unittest.TestCase):
         self.assertIn("on BC Builds' published take-out terms", "\n".join(proforma.operating_markdown(pf)))
 
     def test_beds_give_a_figure_a_bed(self):
-        o = dict(all_deep(READY), housing_type="shelter", beds=160, operations={"rent_deep_monthly_cad": 0})
+        o = dict(all_deep(READY), housing_type="shelter", beds=160, operations={"rent_deep_monthly_cad": 0, "support_staffing_cad_year": 2_000_000})
         p = proforma.build(SITE, o, evaluate(SITE, o, AS_OF))["operating"]["page"]
         self.assertEqual(p["subsidy_to_run_per_bed_month"], round(p["subsidy_to_run"] / 160 / 12))
 
@@ -628,7 +628,9 @@ class WhatTheReviewsRaisedAndWasLeft(unittest.TestCase):
     """23 Nov 2026, last pass: the items of the simulated reviews that no source document was needed for."""
 
     def test_an_approval_route_by_permit_reads_no_rezoning_rules(self):
-        o = dict(READY, approval_route="development_permit", units={"studio": 50, "one_bed": 38, "two_bed": 0, "three_bed_plus": 0})
+        # within RM-1's outright figures (a permit cannot approve more than the schedule allows; 24 Nov 2026)
+        o = dict(READY, approval_route="development_permit", storeys=3, height_m=9.9, gfa_m2=3300, residential_gfa_m2=3300, non_residential_gfa_m2=0,
+                 units={"studio": 20, "one_bed": 18, "two_bed": 0, "three_bed_plus": 0})
         L = evaluate(SITE, o, AS_OF)
         self.assertEqual(by_id(L, "cov.family_units")["status"], "not_applicable")
         self.assertEqual(by_id(L, "cov.irp.social_housing_rezoning")["status"], "not_applicable")
@@ -895,6 +897,126 @@ class TheSchedulesKaiSaved(unittest.TestCase):
         for r in read:
             src = r.version_on(self.ON).source
             self.assertTrue(src["verified"] and "page" in src["read_from"], r.id)
+
+class TheSecondPanelsDefects(unittest.TestCase):
+    """24 Nov 2026: the defects four simulated reviewers (three architects and an operator) found, re-run and fixed."""
+
+    FIX = Path(__file__).resolve().parent / "fixtures"
+
+    def _pf(self, site, option):
+        L = evaluate(site, option, AS_OF)
+        return proforma.build(site, option, L, massing.build(site, option, L)), L
+
+    def test_a_short_subsidy_is_never_borrowed_against(self):
+        ops = {"support_staffing_cad_year": 1_150_000, "operating_cost_per_unit_year_cad": 9800, "operating_subsidy_cad_year": 1_500_000, "subsidy_confirmed": True}
+        o = dict(READY, housing_type="supportive", supportive_units=88, finance={"land_cost_cad": 0, "other_grants_cad": 60_000_000})
+        short, _ = self._pf(SITE, dict(o, operations=dict(ops, subsidy_term_years=3)))
+        self.assertEqual(short["operating"]["page"]["subsidy_lends"], False)
+        self.assertNotEqual(short["verdict"]["word"], "likely")
+        self.assertTrue(any("depends on its renewal" in w for w in short["verdict"]["why"]))
+        self.assertIn("shorter than the loan's amortization", next(x for x in short["lines"] if x["key"] == "subsidy")["note"])
+        unknown, _ = self._pf(SITE, dict(o, operations=ops))                      # no term entered: no loan on it either
+        self.assertFalse(unknown["operating"]["page"]["subsidy_lends"])
+        long, _ = self._pf(SITE, dict(o, operations=dict(ops, subsidy_term_years=40)))
+        self.assertTrue(long["operating"]["page"]["subsidy_lends"])
+        self.assertGreater(long["funding"]["debt"]["supportable"], short["funding"]["debt"]["supportable"] or 0)
+
+    def test_supportive_homes_and_shelter_beds_in_a_rental_building_are_seen(self):
+        o = dict(READY, supportive_units=25, beds=80)
+        pf, L = self._pf(SITE, o)
+        page = pf["operating"]["page"]
+        self.assertEqual(page["housing_type"], "independent")
+        self.assertTrue(page["staffing_missing"])
+        self.assertEqual(page["staffed_parts"], {"supportive": 25, "shelter": 80})
+        self.assertIsNone(page["subsidy_to_run"])                                # withheld, not printed
+        self.assertIn("coverage.funders_parts", open_ids(L))
+        self.assertEqual(by_id(L, "bch.shelter.bed_space")["status"], "info")
+        self.assertNotEqual(by_id(L, "bch.shf.program")["status"], "not_applicable")
+        self.assertIn("not given: the support staffing is not entered", "\n".join(proforma.operating_markdown(pf)))
+
+    def test_a_shelter_counted_in_beds_keeps_the_operators_figures(self):
+        o = dict(READY, housing_type="shelter", beds=60, units={k: 0 for k in READY["units"]}, rent_tiers_units=None,
+                 operations={"support_staffing_cad_year": 2_400_000, "operating_subsidy_cad_year": 2_900_000, "operating_cost_per_unit_year_cad": 4000})
+        pf, _ = self._pf(SITE, o)
+        page = pf["operating"]["page"]
+        self.assertEqual((page["support_staffing"], page["subsidy"], page["operating_cost"]), (2_400_000, 2_900_000, 240_000))
+        self.assertEqual(page["subsidy_to_run_per_bed_month"], round(2_640_000 / 60 / 12))
+        self.assertIsNone(page["subsidy_to_run_per_home_month"])
+        self.assertNotIn("the unit mix", " ".join(pf["verdict"]["unsure"]))
+
+    def test_no_grant_is_counted_without_rent_tiers_and_no_closed_fund_is_named(self):
+        pf, _ = self._pf(SITE, dict(READY, rent_tiers_units=None))
+        self.assertEqual(sum(g["value"] for g in pf["funding"]["grants"] if g.get("program") == "bch.chf.eligibility"), 0)
+        self.assertIn("rent tiers are not entered", pf["funding"]["not_counted"][0]["why"])
+        self.assertNotIn("Affordable Housing Fund", proforma.MORE_SOURCES)
+        self.assertNotIn("Affordable Housing Fund", (self.UI / "memo" / "answers.js").read_text(encoding="utf-8").split("export function moneyNext")[1].split("\n}\n")[0])
+        grant = next(x for x in self._pf(SITE, READY)[0]["lines"] if x["key"] == "grant_chf")
+        self.assertIn("2026-27 provisional rate", grant["note"])
+
+    UI = Path(__file__).resolve().parent.parent / "ffm" / "ui"
+
+    def test_supportive_housing_is_sent_to_its_programs_route_not_to_grants(self):
+        o = dict(READY, housing_type="supportive", supportive_units=88, operations={"support_staffing_cad_year": 10_000})
+        pf, _ = self._pf(SITE, o)
+        self.assertTrue(proforma.next_step(pf).startswith("For supportive housing, the capital comes by the program's own route"))
+        self.assertIsNone(pf["operating"]["page"]["if_gap_financed"])
+
+    def test_a_permit_route_over_the_limits_needs_a_rezoning_and_never_prints_none(self):
+        o = dict(READY, approval_route="development_permit", rezoning_path="none")
+        L = evaluate(SITE, o, AS_OF)
+        fsr = by_id(L, "cov.rm1.outright_fsr")
+        self.assertEqual(fsr["status"], "fail")
+        self.assertNotIn("(none)", fsr["finding"])
+        self.assertIn("cannot approve more than the schedule allows", fsr["finding"])
+        self.assertEqual(L["summary"]["answers"]["allowed"]["by_rezoning"]["verdict"], "needed")
+        self.assertIn("**By rezoning: needed.**", memo.markdown(L))
+
+    def test_a_corner_lot_whose_front_decides_the_density_is_uncertain_and_says_why(self):
+        site = load_json(self.FIX / "1130-jervis-st.json")
+        o = dict(READY, housing_type="transitional", storeys=6, height_m=18.3, gfa_m2=2200, residential_gfa_m2=2200, non_residential_gfa_m2=0,
+                 units={"studio": 0, "one_bed": 12, "two_bed": 12, "three_bed_plus": 0}, approval_route="development_permit", rezoning_path="none")
+        r = by_id(evaluate(site, o, AS_OF), "cov.rm5b.outright_fsr")
+        self.assertEqual(r["status"], "uncertain")
+        self.assertIn("at most 2.0", r["finding"])
+        self.assertIn("With Jervis St as the front", r["finding"])
+        self.assertTrue(r["action"].startswith("Manager: ask the City which street is the front"))
+
+    def test_a_lot_too_narrow_for_a_home_is_not_allowed_outright(self):
+        site = _bare(id="narrow", zoning_district="RM-11", frontage_m=7.6, depth_m=37.2, site_area_m2=282.7)
+        o = dict(READY, storeys=4, height_m=13.2, gfa_m2=213, residential_gfa_m2=213, non_residential_gfa_m2=0, units={"studio": 2, "one_bed": 0, "two_bed": 0, "three_bed_plus": 0},
+                 setbacks_m={"front": 3.7, "rear": 6.1, "side": 2.1}, rezoning_path=None, approval_route=None)
+        L = evaluate(site, o, AS_OF)
+        self.assertEqual(by_id(L, "cov.rm11.setbacks")["status"], "uncertain")
+        self.assertIn("less than the 5 m a home needs", by_id(L, "cov.rm11.setbacks")["finding"])
+        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "not yet confirmed")
+
+    def test_a_narrow_rt_lots_side_yard_is_a_share_of_its_width(self):
+        from ffm.checks import yard_minimums
+        from ffm.rules_loader import load_rules, RULES_DIR
+        p = next(r for r in load_rules(RULES_DIR) if r.id == "cov.rt5.setbacks").version_on(AS_OF).params
+        self.assertEqual(yard_minimums(_bare(id="x", frontage_m=7.6, depth_m=30.5), p)[0]["side"], 0.76)
+        self.assertEqual(yard_minimums(_bare(id="x", frontage_m=20.0, depth_m=30.5), p)[0]["side"], 1.5)
+
+    def test_a_transit_tier_caps_the_derived_density(self):
+        from ffm.suggest import suggest
+        site = _bare(id="toa", zoning_district="CD-1", frontage_m=40.2, depth_m=32.0, site_area_m2=1287.7, in_transit_oriented_area=True, toa_tier="1")
+        o = suggest(site, ["bch.chf.eligibility"], AS_OF, "funder-ready")["option"]
+        self.assertLessEqual(round(o["gfa_m2"] / 1287.7, 2), 5.0)
+
+    def test_a_zero_yard_envelope_stays_inside_the_lot(self):
+        from ffm import boundary
+        ring = [[0, 0], [40, 0], [40, 32], [0, 32]]
+        env = boundary.inset(ring, {"front": 0, "rear": 6, "side": 0})
+        self.assertIsNotNone(env)
+        self.assertAlmostEqual(boundary.area(env), 40 * 26, delta=1)
+
+    def test_a_mass_taller_than_the_height_tested_says_so(self):
+        o = dict(READY, storeys=12, height_m=37.0, floor_to_floor_m=3.3)
+        m = massing.build(SITE, o, evaluate(SITE, o, AS_OF))
+        self.assertTrue(any("above the option's height of 37.0 m" in w for w in m["warnings"]))
+        g = dict(READY, ground_floor_height_m=4.5)
+        prop = massing.build(SITE, g, evaluate(SITE, g, AS_OF))["masses"][0]
+        self.assertEqual(prop["level_z_m"][:3], [0.0, 4.5, 4.5 + READY["floor_to_floor_m"]])
 
 
 if __name__ == "__main__":

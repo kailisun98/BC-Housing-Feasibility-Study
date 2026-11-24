@@ -46,6 +46,10 @@
       "reserve": null,
       "support_staffing": null,
       "staffing_missing": false,
+      "staffed_parts": {},
+      "subsidy_term_years": null,
+      "subsidy_lends": false,
+      "own_figures": false,
       "net_before_subsidy": null,
       "subsidy": null,
       "subsidy_confirmed": false,
@@ -270,5 +274,5 @@
     }
   ],
   "as_of": "2026-10-23",
-  "stamp": "31193259023b85e0"
+  "stamp": "d8114c4301640d47"
 }

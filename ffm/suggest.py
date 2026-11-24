@@ -194,6 +194,12 @@ def envelope_for(site: dict, rules: list[Rule], on: date, sb: dict[str, float], 
         basis = "toa"
         storeys_from = f"the Province's minimum allowable height in a tier {tier} transit-oriented area, {storeys} storeys (bc.toa.minimum_density); a floor the City must allow, not a cap"
         rule_ids = ["bc.toa.minimum_density"]
+        # the tier's density with it (24 Nov 2026: a tier-1 CD-1 site was derived at 20 storeys and FSR 11.19, the plate
+        # times the storeys, where the tier protects 5.0): above the tier's FSR is a rezoning's negotiation, not a figure
+        # this screen derives
+        t_fsr = (p_toa.get("tiers_fsr") or {}).get(str(tier).strip())
+        if t_fsr:
+            fsr_cap = (float(t_fsr), "bc.toa.minimum_density", area)
     elif p_irp and site.get("in_former_community_vision_area") is True:
         hi = p_irp["benchmark_height_m_high"]
         storeys = min(int(math.floor(hi / f2f)), wood_max)

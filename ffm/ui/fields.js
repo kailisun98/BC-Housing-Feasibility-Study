@@ -231,7 +231,7 @@ const FIELDS = [
     info: "The funders whose fit decides the memo's second answer. Programs left unticked are still run and listed in the ledger as information." },
   { on: "option", key: "rent_tiers_units.market", group: "Funding", rowOf: "tiers", label: "Market units", type: "number", int: true, need: "rule",
     reads: ["chf_fit"], figure: { g: "homes", n: 9, kind: "int" },
-    info: "The Community Housing Fund's mix: 30% of units at market-ish rents for low to moderate incomes (2025 limits $85,870 under two bedrooms, $138,770 two bedrooms and up), 50% rent-geared-to-income, 20% deep subsidy, each within 2 points. Blank tiers leave the fund's check uncertain." },
+    info: "The Community Housing Fund's mix: 30% of units at market-ish rents for low to moderate incomes (2026 limits $90,560 under two bedrooms, $146,270 two bedrooms and up), 50% rent-geared-to-income, 20% deep subsidy, each within 2 points. Blank tiers leave the fund's check uncertain." },
   { on: "option", key: "rent_tiers_units.rgi", group: "Funding", rowOf: "tiers", label: "RGI units", type: "number", int: true, need: "rule",
     reads: ["chf_fit"], figure: { g: "homes", n: 10, kind: "int" },
     info: "Rent-geared-to-income units: 50% of the total under the Community Housing Fund's 30/50/20 mix." },
@@ -295,9 +295,9 @@ const FIELDS = [
   { on: "option", key: "operations.rent_market_monthly_cad", group: "Operating", rowOf: "op1", label: "Market rent ($ a home a month)", type: "number", need: "rule", ref: "money", ops: true,
     info: "The average rent of the market-tier homes. Blank uses the CMHC survey's figures in layer F." },
   { on: "option", key: "operations.rent_rgi_monthly_cad", group: "Operating", rowOf: "op1", label: "Income-geared rent ($ a home a month)", type: "number", need: "rule", ref: "money", ops: true,
-    info: "The average rent the income-geared homes will pay, from the operator's tenant profile. Blank uses a placeholder: 30% of half the Community Housing Fund's income limit, which is high for people on income assistance." },
+    info: "The average rent the income-geared homes will pay, from the operator's tenant profile. Blank uses BC Housing's own estimate: 30% of an income of 70% of the Housing Income Limit ($1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three, in Vancouver)." },
   { on: "option", key: "operations.rent_deep_monthly_cad", group: "Operating", rowOf: "op1", label: "Deep-subsidy rent ($ a home a month)", type: "number", need: "rule", ref: "money", ops: true,
-    info: "Blank uses the $500 shelter rate. Enter 0 for a shelter that charges no rent." },
+    info: "Blank uses the income assistance shelter allowance by bedrooms ($500 for one bedroom or less, $695 for two) and 30% of the deep-subsidy income limit for three ($769). Enter 0 for a shelter that charges no rent." },
   { on: "option", key: "operations.operating_cost_per_unit_year_cad", group: "Operating", rowOf: "op2", label: "Operating cost ($ a home a year)", type: "number", need: "rule", ref: "money", ops: true,
     info: "Maintenance, utilities, insurance, administration: the building's own running cost. Blank uses the layer F placeholder." },
   { on: "option", key: "operations.support_staffing_cad_year", group: "Operating", rowOf: "op2", label: "Support staffing ($ a year)", type: "number", need: "rule", ref: "money", ops: true,
@@ -306,7 +306,13 @@ const FIELDS = [
     info: "An operating agreement or subsidy the operator has or is seeking. It is set against the running costs; a loan is sized on it only once it is marked confirmed." },
   { on: "option", key: "operations.subsidy_confirmed", group: "Operating", rowOf: "op3", label: "The subsidy is confirmed", type: TRI, need: "rule", ref: "money",
     info: "Yes only with an agreement in hand. Until then the subsidy is shown as sought and the money answer cannot read Likely on it." },
-  { on: "option", key: "operations.subsidy_source", group: "Operating", label: "Who pays the subsidy", type: "text", need: "rule", ref: "money",
+  { on: "option", key: "operations.subsidy_term_years", group: "Operating", rowOf: "op3", label: "Its term (years)", type: "number", need: "rule", ref: "money", ops: true,
+    info: "How long the operating agreement runs. A loan is sized on the subsidy only where the term covers the loan's amortization (40 years here); a 3 to 5 year agreement is renewed, so the building depends on that renewal and the money answer says so." },
+  { on: "option", key: "operations.replacement_reserve_per_unit_year_cad", group: "Operating", rowOf: "op4", label: "Replacement reserve ($ a home a year)", type: "number", need: "rule", ref: "money", ops: true,
+    info: "The operator's contribution to the capital replacement reserve. Blank uses the declared placeholder ($600 a home)." },
+  { on: "option", key: "operations.vacancy_rate", group: "Operating", rowOf: "op4", label: "Vacancy and bad debt (a share, 0.02 = 2%)", type: "number", need: "rule", ref: "money", ops: true,
+    info: "The share of gross rent lost to vacancy and arrears. Blank uses the CMHC survey's market vacancy rate (3.7%), which is high for rent-geared-to-income homes with a waitlist." },
+  { on: "option", key: "operations.subsidy_source", group: "Operating", label: "Who pays the subsidy", type: "text", need: "rule", ref: "money", ops: true,
     info: "The funder and the agreement, in a few words; it prints beside the figure." },
   { on: "option", key: "rezoning_path", group: "Rezoning path", label: "Rezoning path", type: "text", need: "rule",
     reads: ["district_outright_fsr", "district_outright_height"], help: "Empty means outright only.", figure: { g: "envelope", n: 1, kind: "text" },
@@ -370,7 +376,7 @@ export const GUIDE_FIELDS = FIELDS.filter(f => f.figure).sort((a, b) => a.figure
 
 /* The three money figures only the manager knows: [key, label]. */
 export const FINANCE_FIELDS = FIELDS.filter(f => f.money).map(f => [f.key, f.label]);
-export const OPERATING_FIELDS = FIELDS.filter(f => f.ops).map(f => [f.key, f.label]);
+export const OPERATING_FIELDS = FIELDS.filter(f => f.ops).map(f => [f.key, f.label, f.type]);
 
 /* What the rules leave to a person, asked in the flow: the site's at stop 1, the option's at stop 2. */
 /* (20 Nov 2026) `why`: what the answer changes, in a few words; `where`: [where to find it, its public URL if any];

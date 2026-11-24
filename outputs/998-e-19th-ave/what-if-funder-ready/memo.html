@@ -12,7 +12,7 @@
     </style></head><body><h1>First Read memo: 998 E 19th Ave, Vancouver, BC V5V 1K7</h1>
 <p><strong>Option:</strong> What-if (hypothetical, for the demo): five storeys inside the staff benchmark with every funder question answered</p>
 <p><strong>Proponent:</strong> Catalyst Community Developments Society (non profit society)</p>
-<p><strong>Rules as of:</strong> 2026-10-23 · <strong>version stamp:</strong> <code>31193259023b85e0</code> · engine 0.1.0</p>
+<p><strong>Rules as of:</strong> 2026-10-23 · <strong>version stamp:</strong> <code>d8114c4301640d47</code> · engine 0.1.0</p>
 <blockquote>
 <p>Deterministic output of the rule stack listed under <em>Sources</em>. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</p>
 </blockquote>
@@ -41,7 +41,7 @@
 </tbody></table>
 <h2>4. Does the money work? (feasibility grade)</h2>
 <p><strong>Needs more sources.</strong> The gap is $20,689,859, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.</p>
-<p><strong>For the development manager:</strong> Look for more sources as well: other grants (CMHC's Affordable Housing Fund among them), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.</p>
+<p><strong>For the development manager:</strong> Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.</p>
 <ul>
 <li>Capital cost <strong>$45,643,836</strong>: hard $33,810,249 (escalated ×1.0292), soft $8,452,562, contingency $3,381,025, land $0.</li>
 <li>Net operating income <strong>$690,640 a year</strong>: rent $1,365,981 less vacancy $50,541, operating cost $572,000 and reserve $52,800.</li>
@@ -65,7 +65,7 @@
 <tr><td><strong>The same, on BC Builds' published take-out terms</strong></td><td><strong>$1,022,799</strong></td><td>$969 a home a month: 4.55% over 35 years is $1,713,439 a year. The program's page gives the rate; whether this project gets that loan is the program's to say</td></tr>
 </tbody></table>
 <blockquote>
-<p>The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month.</p>
+<p>The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.</p>
 </blockquote>
 <table><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>
 <tr><td>Hard cost base</td><td>$4,693 per m²</td><td><code>f.hard_cost_base</code></td><td>average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 1,100 m² that is not homes, priced as if it were</td></tr>
@@ -84,7 +84,7 @@
 <tr><td>Support staffing</td><td>not given a year</td><td>the option</td><td>none entered</td></tr>
 <tr><td>Net operating income</td><td>$690,640 a year</td><td>the option</td><td>gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy</td></tr>
 <tr><td>Operating subsidy</td><td>not given a year</td><td>the option</td><td>none entered</td></tr>
-<tr><td>Community Housing Fund grant</td><td>$15,669,192</td><td><code>bch.chf.eligibility</code></td><td>$178,059 per unit × 88; illustrative, at the 2025-26 provisional rate; no intake is open, so no grant is committed or implied</td></tr>
+<tr><td>Community Housing Fund grant</td><td>$15,669,192</td><td><code>bch.chf.eligibility</code></td><td>$178,059 per unit × 88; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied</td></tr>
 <tr><td>Equity</td><td>$0</td><td>the option</td><td>none entered</td></tr>
 <tr><td>Supportable debt</td><td>$9,284,785</td><td><code>f.mortgage</code></td><td>the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $627,855 a year in payments</td></tr>
 <tr><td>Funding</td><td>$24,953,977</td><td>the option</td><td>grants + equity + supportable debt</td></tr>
@@ -723,7 +723,7 @@
 </svg><figcaption>Code site plan, derived from the option; to scale.</figcaption></figure>
 <p><code>layout.json</code> carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under <code>assumptions</code>.</p>
 <h2>What changed since the previous memo</h2>
-<p>Previous stamp <code>31193259023b85e0</code> (rules as of 2026-10-23) → current <code>31193259023b85e0</code> (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.</p>
+<p>Previous stamp <code>d8114c4301640d47</code> (rules as of 2026-10-23) → current <code>d8114c4301640d47</code> (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.</p>
 <table><thead><tr><th>Rule</th><th>Change</th><th>From</th><th>To</th><th>Now reads</th></tr></thead><tbody>
 <tr><td>bc.bcbuilds.eligibility</td><td>changed</td><td><span class="pill" style="background:#a3640c">uncertain</span></td><td><span class="pill" style="background:#2f7d4a">pass</span></td><td>BC Builds: passes the published items this screen checks: non-residential space is 15.7% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. BC Builds works opportunity by opportunity; middle-income rents and the team's capacity are not assessed here.</td></tr>
 <tr><td>bc.code_basis</td><td>finding changed</td><td><span class="pill" style="background:#2a6fb8">info</span></td><td><span class="pill" style="background:#2a6fb8">info</span></td><td>5 storeys puts the building under Part 3 of the BC Building Code 2024 and the Vancouver Building By-law 2025; wood frame is standard to 6 storeys and encapsulated mass timber is permitted to 18 under the VBBL; seismic changes apply to permits from 2026-09-15.</td></tr>
@@ -895,12 +895,12 @@
 </ul>
 <h2>Version stamp</h2>
 <ul>
-<li>Rules hash (SHA-256 over all rule files): <code>65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf</code></li>
-<li><code>a_zoning_district.json</code>: <code>06448eff1b223640…</code></li>
+<li>Rules hash (SHA-256 over all rule files): <code>b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d</code></li>
+<li><code>a_zoning_district.json</code>: <code>e2ad71b55ff9d869…</code></li>
 <li><code>b_provincial.json</code>: <code>4d20170fb18db2b9…</code></li>
 <li><code>c_city_policies.json</code>: <code>bc93be05c15239f8…</code></li>
 <li><code>d_design_standards.json</code>: <code>069a3dcad4ef9601…</code></li>
 <li><code>e_funding_programs.json</code>: <code>286bc77345ddf276…</code></li>
 <li><code>f_assumptions.json</code>: <code>5d6aad80b4dee51f…</code></li>
-<li>Stamp (hash of rules hash + rule versions in force on 2026-10-23): <code>31193259023b85e0</code></li>
+<li>Stamp (hash of rules hash + rule versions in force on 2026-10-23): <code>d8114c4301640d47</code></li>
 </ul></body></html>

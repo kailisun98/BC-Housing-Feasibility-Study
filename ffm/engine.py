@@ -244,6 +244,13 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     if no_rezoning_needed:
         by_rezoning = {"verdict": "not needed", "fail": [], "conditional": [], "uncertain": [],
                        "why": "the option is allowed outright and proposes no rezoning"}
+    elif route in ("development_permit", "outright") and not outside and outright["verdict"] == "no":
+        # the option says a permit, but it exceeds what the schedule allows outright: a permit cannot approve that
+        # (24 Nov 2026: "rezoning is required (none)" stood beside "By rezoning: not needed")
+        no_rezoning_needed = True
+        by_rezoning = {"verdict": "needed", "fail": [], "conditional": [], "uncertain": [],
+                       "why": f"the option is to go by {ROUTE_WORDS[route]}, but it exceeds what the schedule allows outright, which a permit cannot approve: "
+                              "it needs a rezoning or a smaller building"}
     elif route in ("development_permit", "outright") and not outside:
         # a person said the option goes by permit (a site already rezoned to its CD-1, a building under an official
         # development plan): there is no rezoning to answer for, whatever the rules could test of the district
@@ -291,13 +298,26 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
                                        else f"The option is {what}; the programs whose criteria the rules test are written for independent rental."),
                            "action": (f"Manager: ask BC Housing's development staff which of these is taking proposals for {what} and how a project enters it, and settle who funds its operation (staffing and support) before the capital."
                                       if named else f"Manager: ask BC Housing which program is open for {what}, and settle who funds its operation before the capital.")})
+    # Parts of the building that run on staffing beside independent homes (24 Nov 2026: Glen Drive's 25 supportive homes
+    # and 80-bed shelter): the funders answer tests the independent homes' programs only, and says so.
+    from .checks import housing_parts
+    parts = housing_parts(option)
+    staffed = {k: c for k, c in parts.items() if k != "independent"}
+    said = ""
+    if kind == "independent" and staffed:
+        said = _and([f"{c} {'shelter beds' if k == 'shelter' else HOUSING_WORDS[k] + ' homes'}" for k, c in staffed.items()])
+        extra_open.append({"rule_id": "coverage.funders_parts", "title": "Parts of the building the funders answer does not test", "status": "uncertain",
+                           "finding": f"The building has {said} beside its independent homes. The funders answer tests the programs written for independent rental; "
+                                      f"the programs for the rest are listed in answer 2 and not tested, and those parts run on staffing and an operating agreement of their own.",
+                           "action": f"Manager: settle who funds and operates the {said} (BC Housing's development staff for the programs, the operator for the staffing), "
+                                     "and enter their staffing and subsidy in the option's operating figures."})
     # Who runs the building (23 Nov 2026: a funder-side reader asks it first, and no memo said): an open item where the
     # housing runs on its operator (supportive, transitional, a shelter) and none is named; and, where the operator is
     # not the proponent, the agreement between them until the land tenure is chosen.
     operator, proponent = str(option.get("operator") or "").strip(), str(option.get("proponent") or "").strip()
-    if kind != "independent" and not operator:
+    if (kind != "independent" or staffed) and not operator:
         extra_open.append({"rule_id": "coverage.operator", "title": "Who operates the homes", "status": "uncertain",
-                           "finding": f"The option is {HOUSING_WORDS[kind]} and names no operator; the operator's experience with the people housed, its staffing and its budget are what a funder reads first.",
+                           "finding": f"The option {'is ' + HOUSING_WORDS[kind] if kind != 'independent' else 'has ' + said} and names no operator; the operator's experience with the people housed, its staffing and its budget are what a funder reads first.",
                            "action": "Manager: name the operator, and get its operating budget (rents, staffing, the subsidy it needs) into the option's operating figures."})
     elif operator and proponent and operator.lower() != proponent.lower() and not str(option.get("land_tenure") or "").strip():
         extra_open.append({"rule_id": "coverage.operator_agreement", "title": "The agreement between the owner and the operator", "status": "uncertain",

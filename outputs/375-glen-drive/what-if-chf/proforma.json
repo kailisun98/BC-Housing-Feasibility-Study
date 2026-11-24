@@ -74,7 +74,13 @@
       "operating_cost_from": "placeholder",
       "reserve": 66000,
       "support_staffing": null,
-      "staffing_missing": false,
+      "staffing_missing": true,
+      "staffed_parts": {
+        "supportive": 25
+      },
+      "subsidy_term_years": null,
+      "subsidy_lends": false,
+      "own_figures": false,
       "net_before_subsidy": 854671,
       "subsidy": null,
       "subsidy_confirmed": false,
@@ -82,16 +88,9 @@
       "net_after_subsidy": 854671,
       "debt_service": 776974,
       "after_debt_service": 77697,
-      "subsidy_to_run": 0,
-      "subsidy_to_run_per_home_month": 0,
-      "if_gap_financed": {
-        "loan": 51337791,
-        "annual_payment": 3471557,
-        "subsidy_year": 2616886,
-        "per_home_month": 1982,
-        "rate_pct": 6.19,
-        "amortization_years": 40
-      }
+      "subsidy_to_run": null,
+      "subsidy_to_run_per_home_month": null,
+      "if_gap_financed": null
     }
   },
   "funding": {
@@ -103,7 +102,7 @@
         "illustrative": true,
         "confirmed": true,
         "intake_open": false,
-        "note": "$178,059 per unit × 110 (2025-26 provisional rate, from a call that did not proceed); no intake is open, so no grant is committed or implied"
+        "note": "$178,059 per unit × 110 (2026-27 provisional rate, from the 2025 call's slides; that call did not proceed); no intake is open, so no grant is committed or implied"
       }
     ],
     "not_counted": [],
@@ -125,10 +124,12 @@
     "word": "unlikely",
     "why": [
       "the gap is $39,847,815, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
+      "no support staffing is entered for the 25 supportive housing homes, so the running costs here are the building's alone and the subsidy it needs is not known",
       "placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve"
     ],
     "unsure": [
-      "a hard cost for this building (15 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre"
+      "a hard cost for this building (15 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre",
+      "support staffing and who pays for it (the 25 supportive housing homes run on an operating agreement; none is entered)"
     ],
     "operating_shortfall": null
   },
@@ -256,7 +257,7 @@
       "value": null,
       "unit": "$/yr",
       "rule_id": null,
-      "note": "none entered",
+      "note": "not entered: the 25 supportive housing homes run on staffing this screen does not estimate",
       "placeholder": false
     },
     {
@@ -283,7 +284,7 @@
       "value": 19586490,
       "unit": "$",
       "rule_id": "bch.chf.eligibility",
-      "note": "$178,059 per unit × 110; illustrative, at the 2025-26 provisional rate; no intake is open, so no grant is committed or implied",
+      "note": "$178,059 per unit × 110; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied",
       "placeholder": false
     },
     {
@@ -324,5 +325,5 @@
     }
   ],
   "as_of": "2026-11-17",
-  "stamp": "5cfd6a34b23f68ab"
+  "stamp": "c0cd775dd41c5779"
 }

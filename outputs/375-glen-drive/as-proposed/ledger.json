@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-11-17",
-      "rules_hash": "65b045d97f7beab178d66c0fb2679c53c72b4a9a0b302e9b9639976792428caf",
+      "rules_hash": "b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d",
       "rules_files": {
-        "a_zoning_district.json": "06448eff1b2236406458bb430dc13dc5b06a2e01191441b65a684293af9015af",
+        "a_zoning_district.json": "e2ad71b55ff9d869f06db60f635eb489874e2db990ae43007ff75196f31c5c9c",
         "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
         "d_design_standards.json": "069a3dcad4ef9601cad46e5b86ae8e166f4dd98c1ec7b053bcef30377bf36343",
         "e_funding_programs.json": "286bc77345ddf276f0eb1c1ef178b9daa1d1c4e00b9ddf4ee9d5d46a1d2ee1ad",
         "f_assumptions.json": "5d6aad80b4dee51fbd2be7d89faa97528c8448e8b34bfbda22fbd758b30f3a3d"
       },
-      "stamp": "5cfd6a34b23f68ab",
+      "stamp": "c0cd775dd41c5779",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -4039,12 +4039,16 @@
       },
       "version_effective_from": "2017-09-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: this standard is for a shelter's sleeping rooms, and the option is independent rental.",
+      "status": "info",
+      "finding": "80 beds need at least 368 m² of sleeping floor (4.6 m² a bed space) in at least 20 rooms of no more than 4 beds, by BC Housing's Shelter Design Guidelines; washrooms, dining, staff and program space come on top and are not sized here.",
       "values": {
-        "housing_type": "independent"
+        "min_floor_area_per_bed_m2": 4.6,
+        "recommended_max_beds_per_room": 4,
+        "beds": 80,
+        "sleeping_area_min_m2": 368.0,
+        "rooms_min": 20
       },
-      "action": ""
+      "action": "Architect: size the sleeping rooms from the bed count, then the rest of the shelter from the same guidelines."
     },
     {
       "rule_id": "bc.bcbuilds.eligibility",
@@ -4181,11 +4185,26 @@
       },
       "version_effective_from": "2019-01-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for a shelter, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (a shelter): year-round, temporary (winter included) and extreme-weather shelters for anyone homeless or at risk of homelessness; a bed, meals, showers, laundry and support staff, free of charge; year-round shelters staffed 24 hours a day. It funds running a shelter, not building one: BC Housing pays the provider's eligible program costs (program staff, direct program expenses, property management and administration) on an operating budget negotiated with each provider. A project enters by a support services agreement with BC Housing; the framework names no open application, and extreme-weather shelters sit under a separate framework. Rents: none: funded services are free to the people who use them. Intake: not stated on the page read (23 Nov 2026). Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "shelter",
+        "for_housing_types": [
+          "shelter"
+        ],
+        "what": "year-round, temporary (winter included) and extreme-weather shelters for anyone homeless or at risk of homelessness; a bed, meals, showers, laundry and support staff, free of charge; year-round shelters staffed 24 hours a day",
+        "funds": "running a shelter, not building one: BC Housing pays the provider's eligible program costs (program staff, direct program expenses, property management and administration) on an operating budget negotiated with each provider",
+        "how_a_project_enters": "by a support services agreement with BC Housing; the framework names no open application, and extreme-weather shelters sit under a separate framework",
+        "intake": {
+          "open": null,
+          "note": "intake: not stated on the page read (23 Nov 2026)",
+          "more": null,
+          "status": "not stated on the page read (23 Nov 2026)"
+        },
+        "rents": "none: funded services are free to the people who use them"
       },
       "action": ""
     },
@@ -4210,11 +4229,27 @@
       },
       "version_effective_from": "2023-01-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for a shelter or transitional housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (a shelter): new shelter and temporary housing spaces for people who are unsheltered or living in encampments. It funds the operating cost of shelter and temporary housing sites in the communities the Province picks: program staff, direct program and support services, property management and administration, on a budget negotiated each year under agreements of up to three years. A project enters not by application: the Ministry of Housing, with BC Housing, picks priority communities and may sign a memorandum of understanding with the municipality; BC Housing then manages the procurement and chooses the non-profit operator. Ask the City whether it has one. Rents: at a temporary housing site a fixed rent at the maximum shelter component of income assistance, or a rent geared to income under the operator agreement; at a shelter site none. Intake: not an application program: communities are selected by the Province. Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "shelter",
+        "for_housing_types": [
+          "shelter",
+          "transitional"
+        ],
+        "what": "new shelter and temporary housing spaces for people who are unsheltered or living in encampments",
+        "funds": "the operating cost of shelter and temporary housing sites in the communities the Province picks: program staff, direct program and support services, property management and administration, on a budget negotiated each year under agreements of up to three years",
+        "how_a_project_enters": "not by application: the Ministry of Housing, with BC Housing, picks priority communities and may sign a memorandum of understanding with the municipality; BC Housing then manages the procurement and chooses the non-profit operator. Ask the City whether it has one",
+        "intake": {
+          "open": null,
+          "note": "intake: not an application program: communities are selected by the Province",
+          "more": null,
+          "status": "not an application program: communities are selected by the Province"
+        },
+        "rents": "at a temporary housing site a fixed rent at the maximum shelter component of income assistance, or a rent geared to income under the operator agreement; at a shelter site none"
       },
       "action": ""
     },
@@ -4304,11 +4339,25 @@
       },
       "version_effective_from": "2017-01-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for supportive housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (supportive housing): modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports. It funds nothing new: the program page says all its homes are completed and operational. A project enters it does not: the program is complete. No intake is open now (closed: all homes under the program are completed and operational (program page, read 23 Nov 2026)). Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": true,
+        "asks": [],
+        "housing_type": "supportive",
+        "for_housing_types": [
+          "supportive"
+        ],
+        "what": "modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports",
+        "funds": "nothing new: the program page says all its homes are completed and operational",
+        "how_a_project_enters": "it does not: the program is complete",
+        "intake": {
+          "open": false,
+          "note": "no intake is open now (closed: all homes under the program are completed and operational (program page, read 23 Nov 2026))",
+          "more": null,
+          "status": "closed: all homes under the program are completed and operational (program page, read 23 Nov 2026)"
+        }
       },
       "action": ""
     },
@@ -4335,11 +4384,27 @@
       },
       "version_effective_from": "2018-01-01",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for supportive housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (supportive housing): subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved. It funds the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule. A project enters through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more). The building is owned by the Provincial Rental Housing Corporation, the Province's land-holding company, in full; a non-profit operates the building. Rents: rent geared to income for every home; a resident on income assistance pays the maximum shelter component, and some projects set a flat rent. Intake: not stated on the program page (read 23 Nov 2026). Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "supportive",
+        "for_housing_types": [
+          "supportive"
+        ],
+        "what": "subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved",
+        "funds": "the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule",
+        "how_a_project_enters": "through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more)",
+        "intake": {
+          "open": null,
+          "note": "intake: not stated on the program page (read 23 Nov 2026)",
+          "more": null,
+          "status": "not stated on the program page (read 23 Nov 2026)"
+        },
+        "owner": "the Provincial Rental Housing Corporation, the Province's land-holding company, in full; a non-profit operates the building",
+        "rents": "rent geared to income for every home; a resident on income assistance pays the maximum shelter component, and some projects set a flat rent"
       },
       "action": ""
     },
@@ -4454,11 +4519,28 @@
       },
       "version_effective_from": "2026-04-17",
       "version_effective_to": null,
-      "status": "not_applicable",
-      "finding": "Not for this option: the program is for a shelter, transitional housing or supportive housing, and the option is independent rental.",
+      "status": "info",
+      "finding": "A program for this kind of housing (supportive housing): capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion. It funds capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs. A project enters through the region's Community Entity, by its calls for proposals. Intake: by call for proposals from the Community Entity; none was read here. Its criteria are not tested here.",
       "values": {
-        "match": false,
-        "housing_type": "independent"
+        "match": true,
+        "ended": false,
+        "asks": [],
+        "housing_type": "supportive",
+        "for_housing_types": [
+          "shelter",
+          "transitional",
+          "supportive"
+        ],
+        "what": "capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion",
+        "funds": "capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs",
+        "how_a_project_enters": "through the region's Community Entity, by its calls for proposals",
+        "intake": {
+          "open": null,
+          "note": "intake: by call for proposals from the Community Entity; none was read here",
+          "more": null,
+          "status": "by call for proposals from the Community Entity; none was read here"
+        },
+        "community_entity_unverified": "for Greater Vancouver the Community Entity was reported as Lu'ma Native Housing Society with Vancity Community Foundation (a search summary of their pages; confirm with them)"
       },
       "action": ""
     },
@@ -4791,8 +4873,8 @@
       "conditional": 0,
       "uncertain": 2,
       "pass": 4,
-      "info": 19,
-      "not_applicable": 118
+      "info": 25,
+      "not_applicable": 112
     },
     "answers": {
       "allowed": {
@@ -4833,6 +4915,30 @@
         ],
         "matches": [
           {
+            "rule_id": "bch.esp.program",
+            "program": "the Emergency Shelter Program",
+            "if": [],
+            "open": null,
+            "intake": "intake: not stated on the page read (23 Nov 2026)",
+            "enters": "by a support services agreement with BC Housing; the framework names no open application, and extreme-weather shelters sit under a separate framework",
+            "differs": null,
+            "ended": false,
+            "what": "year-round, temporary (winter included) and extreme-weather shelters for anyone homeless or at risk of homelessness; a bed, meals, showers, laundry and support staff, free of charge; year-round shelters staffed 24 hours a day",
+            "funds": "running a shelter, not building one: BC Housing pays the provider's eligible program costs (program staff, direct program expenses, property management and administration) on an operating budget negotiated with each provider"
+          },
+          {
+            "rule_id": "bch.hearth.program",
+            "program": "HEARTH",
+            "if": [],
+            "open": null,
+            "intake": "intake: not an application program: communities are selected by the Province",
+            "enters": "not by application: the Ministry of Housing, with BC Housing, picks priority communities and may sign a memorandum of understanding with the municipality; BC Housing then manages the procurement and chooses the non-profit operator. Ask the City whether it has one",
+            "differs": null,
+            "ended": false,
+            "what": "new shelter and temporary housing spaces for people who are unsheltered or living in encampments",
+            "funds": "the operating cost of shelter and temporary housing sites in the communities the Province picks: program staff, direct program and support services, property management and administration, on a budget negotiated each year under agreements of up to three years"
+          },
+          {
             "rule_id": "bch.ihf.program",
             "program": "the Indigenous Housing Fund",
             "if": [
@@ -4847,6 +4953,30 @@
             "ended": false,
             "what": "affordable rental homes for Indigenous families, Elders, individuals and people with disabilities, on and off reserve; every home rent geared to income (fixed rents may be considered on reserve)",
             "funds": "building the homes (the Province's funding programs page: \"funding to build and to support the creation of\" them)"
+          },
+          {
+            "rule_id": "bch.rrh.program",
+            "program": "Rapid Response to Homelessness",
+            "if": [],
+            "open": false,
+            "intake": "no intake is open now (closed: all homes under the program are completed and operational (program page, read 23 Nov 2026))",
+            "enters": "it does not: the program is complete",
+            "differs": null,
+            "ended": true,
+            "what": "modular supportive housing for people who are homeless or at risk, with 24/7 on-site staff and supports",
+            "funds": "nothing new: the program page says all its homes are completed and operational"
+          },
+          {
+            "rule_id": "bch.shf.program",
+            "program": "the Supportive Housing Fund",
+            "if": [],
+            "open": null,
+            "intake": "intake: not stated on the program page (read 23 Nov 2026)",
+            "enters": "through BC Housing rather than by a society's grant application: BC Housing works with municipalities and other landowners to secure a site, procures and builds the housing, and signs an operator agreement with a non-profit (three to five years, with an option for five more)",
+            "differs": null,
+            "ended": false,
+            "what": "subsidized housing with 24/7 on-site support services for people experiencing or at risk of homelessness, with a household income at or below the Housing Income Limits; adults first, families and youth where approved",
+            "funds": "the whole capital cost, and afterwards an operating subsidy (approved expenses less revenue) and a support-services subsidy set by the approved staff schedule"
           },
           {
             "rule_id": "bch.wthf.program",
@@ -4875,6 +5005,18 @@
             "funds": "flexible financing, land and partnerships; no application terms were read"
           },
           {
+            "rule_id": "canada.reaching_home.capital",
+            "program": "Reaching Home",
+            "if": [],
+            "open": null,
+            "intake": "intake: by call for proposals from the Community Entity; none was read here",
+            "enters": "through the region's Community Entity, by its calls for proposals",
+            "differs": null,
+            "ended": false,
+            "what": "capital for emergency shelters, transitional housing and supportive housing that serve only people experiencing or at imminent risk of homelessness, paired with wrap-around services; planning must show financial sustainability and services for at least five years after completion",
+            "funds": "capital, alongside other funders: it cannot duplicate or displace other funding or exceed 100% of eligible costs"
+          },
+          {
             "rule_id": "cov.chip.program",
             "program": "the City of Vancouver Community Housing Incentive Program",
             "if": [],
@@ -4887,7 +5029,7 @@
             "funds": "a capital grant, funded by the Empty Homes Tax"
           }
         ],
-        "scope": "This screen tests the criteria of the Community Housing Fund. Also written for this housing, listed and not tested: Build Canada Homes and the City of Vancouver Community Housing Incentive Program. Would be, depending on an answer not given: the Indigenous Housing Fund and the Women's Transition Housing Fund. A program not in the rules may fit as well."
+        "scope": "This screen tests the criteria of the Community Housing Fund. Also written for this housing, listed and not tested: the Emergency Shelter Program, HEARTH, the Supportive Housing Fund, Build Canada Homes, Reaching Home and the City of Vancouver Community Housing Incentive Program. Would be, depending on an answer not given: the Indigenous Housing Fund and the Women's Transition Housing Fund. A program not in the rules may fit as well."
       },
       "unsure": [
         {
@@ -4905,6 +5047,21 @@
           "finding": "The setbacks on the site plan (front 3.0, rear 3.0, side 3.0 m) are the option's own figures; no rule in the stack tested them against CD-1 (819)'s minimum yards.",
           "action": "Architect: read the yard clauses in CD-1 (819)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator.",
           "contact": "the City of Vancouver's Development and Building Services Centre, a project facilitator"
+        },
+        {
+          "rule_id": "coverage.funders_parts",
+          "title": "Parts of the building the funders answer does not test",
+          "status": "uncertain",
+          "finding": "The building has 25 supportive housing homes and 80 shelter beds beside its independent homes. The funders answer tests the programs written for independent rental; the programs for the rest are listed in answer 2 and not tested, and those parts run on staffing and an operating agreement of their own.",
+          "action": "Manager: settle who funds and operates the 25 supportive housing homes and 80 shelter beds (BC Housing's development staff for the programs, the operator for the staffing), and enter their staffing and subsidy in the option's operating figures."
+        },
+        {
+          "rule_id": "coverage.operator",
+          "title": "Who operates the homes",
+          "status": "uncertain",
+          "finding": "The option has 25 supportive housing homes and 80 shelter beds and names no operator; the operator's experience with the people housed, its staffing and its budget are what a funder reads first.",
+          "action": "Manager: name the operator, and get its operating budget (rents, staffing, the subsidy it needs) into the option's operating figures. Ask: the operating society's executive director and board.",
+          "contact": "the operating society's executive director and board"
         },
         {
           "rule_id": "cov.trees.replacement",
@@ -6970,7 +7127,7 @@
         "rear": 3.0,
         "side": 3.0
       },
-      "notes": "From the referral report: a 15-storey wing on the lane (110 social housing homes, 25 of them supportive) and a 13-storey wing on Glen Drive (53 secured market rental homes); 14,729 m2 at FSR 6.90 on 2,134.4 m2; height to 51.0 m at the parapet above the rooftop amenity; 10 ft floor to floor; 59 vehicle and 308 bicycle spaces; about 36 trees proposed; an 80-bed shelter and a 423 m2 social enterprise; a Housing Agreement for the longer of 99 years and the life of the building; the social housing owned by BC Housing. Unit mix: the 25 supportive homes are 21 studios and 4 one-bedrooms (report); the 85 other social homes 15/35/30/5 and the 53 market rentals 15/33/5 (the application as reported by Daily Hive); the report confirms 35 two-bedroom and 5 three-bedroom homes in all. Rents: a third of the 110 social homes at the shelter rate (including all 25 supportive), a third geared to income up to HILs, a third at the low end of market; entered as 37/37/36, the rounding is assumed, and the 53 market rentals are added to the market tier. Assumptions, not from the report: the floor area is not split between residential and the shelter, so both are left blank; the setbacks are placeholders for the massing; the 15 storeys are drawn as one block although the Glen Drive wing is 13; the Community Housing Fund is the nearest program in the rule stack (the report says the partners were still seeking senior government contributions); tenure is entered as social housing although 53 of the 163 homes are market rental. The building permit (BP-2021-05332, full construction 18 Oct 2023) differs: 16 storeys (15 under the Zoning and Development By-law), 25 supportive + 87 affordable + 56 market rental + 2 townhouses = 170 homes, $55,000,000.",
+      "notes": "From the referral report: a 15-storey wing on the lane (110 social housing homes, 25 of them supportive) and a 13-storey wing on Glen Drive (53 secured market rental homes); 14,729 m2 at FSR 6.90 on 2,134.4 m2; height to 51.0 m at the parapet above the rooftop amenity; 10 ft floor to floor; 59 vehicle and 308 bicycle spaces; about 36 trees proposed; an 80-bed shelter and a 423 m2 social enterprise; a Housing Agreement for the longer of 99 years and the life of the building; the social housing owned by BC Housing. Unit mix: the 25 supportive homes are 21 studios and 4 one-bedrooms (report); the 85 other social homes 15/35/30/5 and the 53 market rentals 15/33/5 (the application as reported by Daily Hive); the report confirms 35 two-bedroom and 5 three-bedroom homes in all. Rents: a third of the 110 social homes at the shelter rate (including all 25 supportive), a third geared to income up to HILs, a third at the low end of market; entered as 37/37/36, the rounding is assumed, and the 53 market rentals are added to the market tier. Assumptions, not from the report: the floor area is not split between residential and the shelter, so both are left blank; the setbacks are placeholders for the massing; the 15 storeys are drawn as one block although the Glen Drive wing is 13; the Community Housing Fund is the nearest program in the rule stack (the report says the partners were still seeking senior government contributions); tenure is entered as social housing although 53 of the 163 homes are market rental. The building permit (BP-2021-05332, full construction 18 Oct 2023) differs: 16 storeys (15 under the Zoning and Development By-law), 25 supportive + 87 affordable + 56 market rental + 2 townhouses = 170 homes, $55,000,000. Beds (24 Nov 2026): the 80-bed shelter the referral report names is entered as beds, so the memo reads it as a shelter part of the building; its floor area is still not split out.",
       "sources": [
         {
           "title": "City of Vancouver referral report, CD-1 Rezoning: 1015 East Hastings Street (5 Jan 2021), read from the PDF Kai saved on 17 Nov 2026",
@@ -6990,7 +7147,8 @@
         }
       ],
       "land_tenure_plan": "99-year ground lease at a nominal rate from the City to BC Housing (conditionally approved by Council in 2017)",
-      "supportive_units": 25
+      "supportive_units": 25,
+      "beds": 80
     }
   }
 }

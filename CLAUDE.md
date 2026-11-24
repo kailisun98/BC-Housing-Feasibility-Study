@@ -1055,6 +1055,31 @@ first, **only issued runs get a number**, everything listed. What a later sessio
   asked twice; tree ids and the elevations' limit labels meet contrast; the gap label fits its box; Side by side
   changes read off the printed figures, in points for percentages; the answers keep a 920px width.
 
+## The second simulated panel (24 Nov 2026) and its fixes
+
+`docs/user-tests-2026-11-24/`: three architects (small lots, towers, supportive housing) and a non-profit operator, AI
+role-plays (never to be quoted or credited). Its README ranks the thirteen defects they found, all re-run and fixed the
+same day, and lists what is still open. What a later session must know:
+- `checks.housing_parts(option)`: the kinds of housing in a building with their counts (supportive homes from
+  `supportive_units`, shelter beds from `beds`). `program_match`, `shelter_beds`, the proforma's staffing test and
+  `engine.summarise` (`coverage.funders_parts`) read it; `housing_kind` still names the main kind.
+- `checks._over_outright`: over an outright limit, the finding follows the approval route (rezoning / a permit that
+  cannot approve it / none stated); a permit route over the limits makes `by_rezoning.verdict` "needed".
+- `checks._other_front_fsr`: on a corner lot where the other front would allow the floor area (a narrow-site cap), the
+  density answer is uncertain and asks the City which street is the front.
+- `checks.MIN_ENVELOPE_M` (5.0 m, a declared placeholder): a narrower or shallower envelope is no envelope.
+- `side_yard_narrow` {max_width_m, share, clause} on the RT setback rules; `yard_minimums` applies it.
+- `proforma`: `operations.subsidy_term_years` (a loan on the subsidy only where the term covers the amortization);
+  `operations.replacement_reserve_per_unit_year_cad` and `vacancy_rate`; a beds-only shelter counted per bed; the
+  subsidy needed withheld where staffing is missing; no CHF grant without rent tiers; `PROGRAM_ROUTE` for supportive,
+  transitional and shelter housing; `own_figures` on the page. The page's twins are in `memo/answers.js`.
+- `boundary.inset` counts a corner on the lot line as inside (`_on_edge`). `massing` warns when the storeys need more
+  height than stated, and the proposed mass carries `level_z_m`, which the Revit script uses for its plates.
+- `suggest.envelope_for` caps a TOA tier's floor area at the tier's FSR.
+- `options/375-glen-drive-as-proposed.json` carries `beds: 80` (the referral report's shelter). R1 at 998 E 19th Ave
+  reads a 56% gap now (no rent tiers, so no grant). Fingerprints d8114c4301640d47 (23 Oct), 9da6dabc8def1912 (27 Oct),
+  c0cd775dd41c5779 (17 Nov); 373 tests. `tests/fixtures/1130-jervis-st.json` is a public lookup kept for the corner test.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

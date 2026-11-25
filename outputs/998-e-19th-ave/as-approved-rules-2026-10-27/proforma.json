@@ -121,7 +121,32 @@
       "dcr": 1.1,
       "annual_service": 1596861
     },
-    "total": 23614563
+    "total": 23614563,
+    "sources": [
+      {
+        "label": "Mortgage the net income carries",
+        "kind": "loan",
+        "value": 23614563,
+        "status": "sized",
+        "counted": true
+      },
+      {
+        "label": "Community Housing Fund grant",
+        "kind": "grant",
+        "value": 18696195,
+        "status": "not counted",
+        "counted": false
+      },
+      {
+        "label": "Still to find",
+        "kind": "gap",
+        "value": 30499464,
+        "status": "to find",
+        "counted": false
+      }
+    ],
+    "uncommitted": 0,
+    "land_contribution": null
   },
   "gap": {
     "value": 30499464,

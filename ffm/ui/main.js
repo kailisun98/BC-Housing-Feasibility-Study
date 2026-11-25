@@ -33,6 +33,7 @@ async function init() {
   // the paper memo is fetched the first time it is asked for (core/lazy.js)
   $("#print-btn").addEventListener("click", () => { if (state.run) loadPaper().then(p => p.printPaper(p.paperDocument(state.run))).catch(err => toast(err.message, true)); });
   $("#pdf-btn").addEventListener("click", () => loadPaper().then(p => p.exportPdf()).catch(err => toast(err.message, true)));
+  $("#pdf-short-btn").addEventListener("click", () => loadPaper().then(p => p.exportPdf(true)).catch(err => toast(err.message, true)));
   $("#save-site").addEventListener("click", () => saveAs("site"));
   $("#save-option").addEventListener("click", () => saveAs("option"));
   $$("[data-save]").forEach(b => b.addEventListener("click", () => saveNow(b.dataset.save)));

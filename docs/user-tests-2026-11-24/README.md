@@ -168,3 +168,38 @@ masses (it reads `level_z_m`). Glen Drive as proposed now reads eight open items
   editor (`syncHomes` in editors/blocks.js), moving, resizing or removing a home on one floor does the same on every
   floor it spans. Checked in the browser: a home moved on the ground floor moved on floors 1 and 2.
 
+## The memo as an ask (24 Nov 2026, piece 1 of the plan in `00 Research\First Read - wish list and plan.docx`)
+
+Asked for by all four reviewers of the first panel (a front sheet, named capital sources) and by the second (three
+verdicts, a short memo, Sources that list only what applies).
+
+- **The front sheet.** Every memo opens on "The ask": who is housed (homes, beds, tenure, rent tiers), who operates (and
+  whether the operating figures are signed), which program, the amount (the capital cost, what is asked of whom with its
+  status, what is still to find), the decision wanted (`option.decision_sought`, asked at 03 as "What are you asking
+  for?"), the answers in one line, and the top three open items, failures first. `memo.front_sheet` /
+  `front_markdown` in the engine; `memo/front.js` (`frontOf`, `frontHtml`) on the page, first in the sheet index; the
+  first thing after the title block on paper. It adds no figure of its own.
+- **Three verdicts in answer 1.** `engine.routes` → `summary.answers.allowed.routes`: outright (the district's limits as
+  written), by the Director's discretion (possible, not needed, none in the schedule, no; a discretionary approval is
+  never assumed), by rezoning (as before). The `outright` and `by_rezoning` keys are unchanged. A building within the
+  Director's discretion now reads "Not outright: within what the Director of Planning may allow", not "Outright, with
+  conditions". Under answer 1 on screen, as three rows on paper, as one line in memo.md.
+- **Capital sources with a status.** `option.finance.sources` [{name, kind, amount_cad, status}] (grant, equity, loan,
+  land, other; committed, applied, assumed), rows at 03 under "Land, equity and other grants". Each is counted in the
+  funding; a stack that closes only with sources not yet committed reads Unsure and says how much rests on them.
+  `finance.land_value_cad`: above the land figure, the difference is the land owner's contribution, listed in kind and
+  not counted. `proforma.funding.sources` is the contributions ledger (every source with its status: committed,
+  applied, assumed, illustrative, entered, sized, in kind, not counted, to find), shown as "Where the money comes from"
+  in answer 4, in memo.md and on paper.
+- **A short memo.** `memo-short.md` beside every run, and "Short PDF" under More formats: the ask, the answers, the open
+  items, the money and the sources; the clauses, drawings, ledger, inputs and reproduction notes stay in the full memo.
+  On 998 E 19th Ave funder-ready: 25 KB against 68 KB as Markdown, 79 KB against 286 KB as paper HTML.
+- **Sources** in memo.md list only the sources of the rules that apply here (the paper already did).
+
+Checked in the browser on 998 E 19th Ave funder-ready: the front sheet, the three verdicts and the sources table on
+screen and at phone width; a source, a land value and the decision entered at 03 and run (the CHIP grant shown as
+applied for, the land owner's $6.0M in kind, still to find $18.7M); the short paper in a frame. No console errors.
+Not checked: a PDF printed through the server's Edge (the paper HTML is the same one the PDF prints). The seven committed
+runs were regenerated: every answer, gap and fingerprint is unchanged; ledgers gain `routes`, pro-formas the
+contributions ledger, and each run a memo-short.md. 409 tests (`tests/test_memo_as_an_ask.py`).
+

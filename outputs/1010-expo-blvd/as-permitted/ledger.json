@@ -4722,7 +4722,32 @@
           ]
         },
         "rezoning_path": "False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program",
-        "approval_route": null
+        "approval_route": null,
+        "routes": {
+          "outright": {
+            "label": "Outright",
+            "verdict": "yes",
+            "why": null,
+            "rules": []
+          },
+          "discretion": {
+            "label": "By the Director's discretion",
+            "verdict": "not needed",
+            "why": "within the outright limits",
+            "rules": []
+          },
+          "rezoning": {
+            "label": "By rezoning",
+            "verdict": "not yet confirmed",
+            "why": null,
+            "rules": [
+              "bc.toa.minimum_density",
+              "cov.family_units",
+              "cov.social_housing_definition",
+              "cov.trees.replacement"
+            ]
+          }
+        }
       },
       "funded": {
         "verdict": "not yet confirmed",

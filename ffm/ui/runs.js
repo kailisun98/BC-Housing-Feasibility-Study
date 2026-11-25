@@ -197,6 +197,7 @@ function enableExports(run) {
   set("#dl-massing", "massing", `${stem}_massing.json`);
   $("#print-btn").disabled = !on;
   $("#pdf-btn").disabled = !on;
+  $("#pdf-short-btn").disabled = !on;
   $("#revit-btn").disabled = !(on && run.massing);
   $("#issue-btn").disabled = !on || !!STATIC;
   if (!on) closeIssuePanel();

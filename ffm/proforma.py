@@ -71,6 +71,71 @@ def next_step(pf: dict) -> str | None:
     return None
 
 
+# Capital sources a person names, each with its kind and status (25 Nov 2026): `option.finance.sources`
+# [{name, kind, amount_cad, status}]. The words are the memo's; the page's memo/answers.js has the same tables.
+SOURCE_KINDS = ("grant", "equity", "loan", "land", "other")
+SOURCE_STATUSES = ("committed", "applied", "assumed")
+SOURCE_KIND_WORDS = {"grant": "a grant", "equity": "equity", "loan": "a loan", "land": "land or a contribution in kind", "other": "another source"}
+SOURCE_STATUS_WORDS = {"committed": "committed", "applied": "applied for, not committed", "assumed": "assumed, not yet asked for"}
+
+
+def named_sources(fin: dict) -> list[dict]:
+    """The named capital sources with an amount, each {name, kind, amount, status}: a kind or status not in the lists
+    reads "other" and "assumed" (a source nobody has said is committed is not). Pure."""
+    out = []
+    for s in (fin or {}).get("sources") or []:
+        if not isinstance(s, dict):
+            continue
+        try:
+            amount = float(s.get("amount_cad"))
+        except (TypeError, ValueError):
+            continue
+        if amount <= 0:
+            continue
+        kind = str(s.get("kind") or "other").lower()
+        status = str(s.get("status") or "assumed").lower()
+        out.append({"name": str(s.get("name") or "").strip() or "A source not named", "kind": kind if kind in SOURCE_KINDS else "other",
+                    "amount": round(amount), "status": status if status in SOURCE_STATUSES else "assumed"})
+    return out
+
+
+def _and_words(names: list[str]) -> str:
+    return names[0] if len(names) == 1 else ", ".join(names[:-1]) + " and " + names[-1] if names else ""
+
+
+def contributions(grants: list[dict], not_counted: list[dict], equity: float, fin: dict, debt: float | None,
+                  land_gift: float | None, gap: float | None) -> list[dict]:
+    """The contributions ledger (25 Nov 2026, a funder-side reader: "each line confirmed or sought"): every source the
+    money counts, with its status, then what is shown and not counted, and what is still to find. Each row {label, kind,
+    value, status, counted}. `status` is committed, applied, assumed, illustrative (a program's grant at its provisional
+    rate, nobody has offered it), entered (a figure typed with no status), sized (the loan this screen sizes on the net
+    income), in kind, not counted, or to find. Pure."""
+    rows: list[dict] = []
+    for g in grants:
+        if g.get("named"):
+            rows.append({"label": g["label"], "kind": g.get("kind") or "other", "value": g["value"], "status": g["status"], "counted": True})
+        elif g.get("illustrative"):
+            rows.append({"label": g["label"].replace(" (illustrative)", ""), "kind": "grant", "value": g["value"], "status": "illustrative", "counted": True})
+        else:
+            rows.append({"label": g["label"].replace(" (entered)", ""), "kind": "grant", "value": g["value"], "status": "entered", "counted": True})
+    if equity:
+        rows.append({"label": "Equity", "kind": "equity", "value": round(equity), "status": "entered", "counted": True})
+    if debt:
+        rows.append({"label": "Mortgage the net income carries", "kind": "loan", "value": debt, "status": "sized", "counted": True})
+    if land_gift:
+        rows.append({"label": "The land owner's contribution", "kind": "land", "value": land_gift, "status": "in kind", "counted": False})
+    for x in not_counted:
+        rows.append({"label": x["label"], "kind": "grant", "value": x["value"], "status": "not counted", "counted": False})
+    if gap is not None and gap > 0:
+        rows.append({"label": "Still to find", "kind": "gap", "value": gap, "status": "to find", "counted": False})
+    return rows
+
+
+CONTRIBUTION_STATUS_WORDS = {"committed": "committed", "applied": "applied for", "assumed": "assumed", "illustrative": "illustrative: nobody has offered it",
+                             "entered": "entered, status not given", "sized": "sized by this screen", "in kind": "in kind",
+                             "not counted": "not counted", "to find": "to find"}
+
+
 def _refs(ledger: dict) -> dict[str, str]:
     """The memo's references (A1 … F7), as engine.memo_refs and the page's memoRefs (ffm/ui/memo/memo.js) number them,
     so a line note's "F3" is the row the reader finds."""
@@ -412,6 +477,23 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         line("grant_other", "Other grants", float(other), "$", None, "entered in the option's finance block", False)
     equity = float(fin.get("equity_cad") or 0)
     line("equity", "Equity", equity, "$", None, "entered in the option's finance block" if fin.get("equity_cad") is not None else "none entered", False)
+    # capital sources named with their status (25 Nov 2026, both panels: "named capital sources, each committed, applied
+    # for or assumed"): each is counted in the funding and listed in the contributions ledger with its status; a stack
+    # that covers the cost only with sources not yet committed is never "likely"
+    named = named_sources(fin)
+    for i, s in enumerate(named):
+        grants.append({"program": None, "label": s["name"], "value": s["amount"], "kind": s["kind"], "status": s["status"], "named": True,
+                       "note": f"{SOURCE_KIND_WORDS[s['kind']]}, {SOURCE_STATUS_WORDS[s['status']]}"})
+        line(f"source_{i + 1}", s["name"], s["amount"], "$", None, f"named source: {SOURCE_KIND_WORDS[s['kind']]}, {SOURCE_STATUS_WORDS[s['status']]}", False)
+    uncommitted = sum(s["amount"] for s in named if s["status"] != "committed")
+    # the land owner's contribution: the land's value less what the project pays for it, a contribution in kind (not
+    # funding: the capital cost already carries the land at its price)
+    land_value = fin.get("land_value_cad")
+    land_gift = None
+    if land_value is not None and land_cost is not None and float(land_value) > land_cost:
+        land_gift = round(float(land_value) - land_cost)
+        line("land_contribution", "The land owner's contribution", land_gift, "$", None,
+             f"in kind: the land is valued at ${float(land_value):,.0f} and comes in at ${land_cost:,.0f}; not funding, since the capital cost already carries the land at its price", False)
 
     mtg = P("f.mortgage")
     rate, years, dcr = float(mtg.get("rate_pct") or 0), int(mtg.get("amortization_years") or 40), float(mtg.get("debt_coverage_ratio") or 1.1)
@@ -475,6 +557,15 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         because = "a fund with no open intake" if chf_grant["intake_open"] is False else "a fund whose criteria are not yet confirmed"
         why[-1] = (f"the funding covers the capital cost only with an illustrative Community Housing Fund grant of ${chf_grant['value']:,.0f}, from {because}; "
                    f"without it the gap is ${gap + chf_grant['value']:,.0f}")
+    # named sources not yet committed: a stack that covers the cost only with them is "unsure", and says how much rests on them
+    if uncommitted and gap is not None and gap <= 0 and gap + uncommitted > 0 and word in ("likely", "unsure"):
+        said = (f"the funding covers the capital cost only with ${uncommitted:,.0f} from named sources not yet committed "
+                f"({_and_words([s['name'] for s in named if s['status'] != 'committed'])}); without them the gap is ${gap + uncommitted:,.0f}")
+        if word == "likely":
+            why[-1] = said
+        else:   # already unsure on an illustrative grant: both are said
+            why.append(said)
+        word = "unsure"
     # Rents that do not cover the running costs: no capital stack makes that building likely (23 Nov 2026: a shelter
     # entered as built read "Likely, $12.6M to spare" over a net operating income of -$52,880 a year).
     # The operating page (23 Nov 2026): what runs the building each year, the subsidy it needs to break even before any
@@ -569,7 +660,8 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         "capital": {"hard": hard, "escalation": factor, "soft": soft_cost, "contingency": contingency, "land": land_cost, "total": capital},
         "operating": {"revenue": rev, "gross": gross, "vacancy": vacancy, "operating_cost": opx, "reserve": reserve, "support_staffing": staffing,
                       "noi": noi, "subsidy": subsidy, "page": page},
-        "funding": {"grants": grants, "not_counted": not_counted, "equity": equity, "debt": {"supportable": debt, "rate_pct": rate, "amortization_years": years, "dcr": dcr, "annual_service": service}, "total": funding},
+        "funding": {"grants": grants, "not_counted": not_counted, "equity": equity, "debt": {"supportable": debt, "rate_pct": rate, "amortization_years": years, "dcr": dcr, "annual_service": service}, "total": funding,
+                    "sources": contributions(grants, not_counted, equity, fin, debt, land_gift, gap), "uncommitted": uncommitted, "land_contribution": land_gift},
         "gap": {"value": gap, "share_of_capital": gap_share},
         "verdict": {"word": word, "why": why, "unsure": unsure, "operating_shortfall": operating_shortfall},
         "lines": lines,
@@ -629,8 +721,9 @@ def _chf_limits(ledger: dict) -> dict[str, float]:
     return {}
 
 
-def markdown(pf: dict) -> list[str]:
-    """The memo's pro-forma section: four lines, the verdict, then every line with its source."""
+def markdown(pf: dict, short: bool = False) -> list[str]:
+    """The memo's pro-forma section: four lines, the verdict, where the money comes from, the operating table, then
+    every line with its source (left out of the short memo)."""
     L: list[str] = []
     if not pf or not pf.get("available"):
         L.append("## 4. Does the money work?")
@@ -661,7 +754,10 @@ def markdown(pf: dict) -> list[str]:
     if v["unsure"]:
         L.append("- Left to a person: " + "; ".join(v["unsure"]) + ".")
     L.append("")
+    L.extend(sources_markdown(pf))
     L.extend(operating_markdown(pf))
+    if short:
+        return L
     L.append("| Line | Figure | From | Note |")
     L.append("|---|---|---|---|")
     for ln in pf["lines"]:
@@ -676,6 +772,19 @@ def markdown(pf: dict) -> list[str]:
         L.append(f"| {ln['label']} | {shown} | {src}{' (placeholder)' if ln['placeholder'] else ''} | {ln['note']} |")
     L.append("")
     L.append("> A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.")
+    L.append("")
+    return L
+
+
+def sources_markdown(pf: dict) -> list[str]:
+    """Where the money comes from, each source with its status (the contributions ledger), for memo.md."""
+    rows = ((pf or {}).get("funding") or {}).get("sources")
+    if not rows:
+        return []
+    L = ["**Where the money comes from**, each source with its status:", "", "| Source | Amount | Status |", "|---|---|---|"]
+    for r in rows:
+        out = not r["counted"] and r["status"] not in ("not counted", "to find")
+        L.append(f"| {r['label']} | {_money(r['value'])} | {CONTRIBUTION_STATUS_WORDS.get(r['status'], r['status'])}{' (not in the funding total)' if out else ''} |")
     L.append("")
     return L
 

@@ -4855,7 +4855,29 @@
           ]
         },
         "rezoning_path": "CD-1 (819) as enacted; a smaller building inside it",
-        "approval_route": null
+        "approval_route": null,
+        "routes": {
+          "outright": {
+            "label": "Outright",
+            "verdict": "yes",
+            "why": null,
+            "rules": []
+          },
+          "discretion": {
+            "label": "By the Director's discretion",
+            "verdict": "not needed",
+            "why": "within the outright limits",
+            "rules": []
+          },
+          "rezoning": {
+            "label": "By rezoning",
+            "verdict": "not yet confirmed",
+            "why": null,
+            "rules": [
+              "cov.trees.replacement"
+            ]
+          }
+        }
       },
       "funded": {
         "verdict": "yes",

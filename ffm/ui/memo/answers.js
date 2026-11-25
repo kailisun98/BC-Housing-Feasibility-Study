@@ -10,6 +10,7 @@ import { districtOf } from "../fields.js";
 import { millionsOf, SCREEN_SHARE, stackFigure, stackOf } from "./stack.js";
 import { fewWords, lanesHtml, todoOf, whoOf } from "./lanes.js";
 import { envelopeFigure } from "../figures/envelope.js";
+import { routesHtml } from "./front.js";
 
 /* The outright answer as a reader says it (20 Nov 2026): where the option is over the district's own FSR or height,
    the engine reads that as fail, "not allowed outright; rezoning is required" (it read uncertain before), and the
@@ -40,7 +41,10 @@ export function answerAllowed(L, run = null) {
   const route = ans.allowed.approval_route || "";
   const proposes = route === "rezoning" || (!["development_permit", "outright"].includes(route) && !!path && !/^(none|no rezoning|not a rezoning)/i.test(String(path).trim()));
   const notNeeded = bz.verdict === "not needed";
-  let verdict = proposes ? h(outrightWords(o, outLines)) : `<em>${h(outrightWords(o, outLines))}</em>`;
+  // within the Director's discretion is not outright (25 Nov 2026): the three verdicts under this line say which
+  const discretion = ((ans.allowed.routes || {}).discretion || {}).verdict === "possible";
+  const outSaid = discretion ? "Not outright: within what the Director of Planning may allow." : outrightWords(o, outLines);
+  let verdict = proposes ? h(outSaid) : `<em>${h(outSaid)}</em>`;
   if (proposes) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
   else if (notNeeded) verdict += " No rezoning needed.";
   const district = districtOf(site) || "the district";
@@ -65,6 +69,7 @@ export function answerAllowed(L, run = null) {
   return `<section class="card answer" data-verdict="${h(status)}">
     <h2><span class="badge">1</span> Is it allowed?</h2>
     <p class="verdict">${verdict}</p>
+    ${routesHtml(ans.allowed)}
     ${drawing}
     ${body}
   </section>`;
@@ -318,6 +323,24 @@ export function operatingTable(pf) {
     </details>`;
 }
 
+/* Where the money comes from, each source with its status (25 Nov 2026): the contributions ledger the engine writes in
+   proforma.funding.sources; the words are proforma.CONTRIBUTION_STATUS_WORDS. */
+export const CONTRIBUTION_WORD = { committed: "committed", applied: "applied for", assumed: "assumed", illustrative: "illustrative: nobody has offered it",
+  entered: "entered, status not given", sized: "sized by this screen", "in kind": "in kind", "not counted": "not counted", "to find": "to find" };
+// a row outside the funding total says so, unless its status already does
+export const outOfTotal = r => !r.counted && !["not counted", "to find"].includes(r.status);
+const CONTRIBUTION_ST = { committed: "pass", applied: "conditional", assumed: "uncertain", illustrative: "uncertain", entered: "info", sized: "info", "in kind": "info", "not counted": "na", "to find": "fail" };
+export function sourcesTable(pf) {
+  const rows = ((pf || {}).funding || {}).sources || [];
+  if (!rows.length) return "";
+  return `<details class="pf-lines src-page" open><summary>Where the money comes from <span class="cont">· each source with its status</span></summary>
+      <table class="plain src-table"><thead><tr><th scope="col">Source</th><th scope="col" class="num">Amount</th><th scope="col">Status</th></tr></thead><tbody>
+      ${rows.map(r => `<tr class="src-${h(r.kind)}${r.counted ? "" : " src-out"}"><th scope="row">${h(r.label)}</th><td class="num">${h(money(r.value))}</td><td><span class="src-st" data-st="${h(CONTRIBUTION_ST[r.status] || "")}">${h(CONTRIBUTION_WORD[r.status] || r.status)}</span>${outOfTotal(r) ? ' <span class="cont">· not in the funding total</span>' : ""}</td></tr>`).join("")}
+      </tbody></table>
+      <p class="cont">Name a source and its status at 03 ("Capital sources"); a stack that closes only with sources not yet committed reads Unsure.</p>
+    </details>`;
+}
+
 export function answerMoney(run) {
   const pf = run.proforma;
   if (!pf) return "";
@@ -352,6 +375,7 @@ export function answerMoney(run) {
     ${moneyWords(pf, run)}
     ${v.unsure && v.unsure.length ? `<p class="path">Left to a person: ${h(v.unsure.join("; "))}.</p>` : ""}
     ${v.why.length > 1 ? `<p class="path">${h(v.why.slice(1).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))}</p>` : ""}
+    ${sourcesTable(pf)}
     ${operatingTable(pf)}
     <details class="pf-lines"><summary>Every line, where it came from, and its source <span class="cont">(${(pf.lines || []).length} lines)</span></summary>
       <table class="plain"><thead><tr><th>Line</th><th>Figure</th><th>From</th><th>Note</th></tr></thead><tbody>${rows}</tbody></table>

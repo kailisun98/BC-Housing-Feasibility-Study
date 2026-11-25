@@ -4893,7 +4893,29 @@
           ]
         },
         "rezoning_path": "M-1 to CD-1 (819) under the Downtown Eastside Plan",
-        "approval_route": null
+        "approval_route": null,
+        "routes": {
+          "outright": {
+            "label": "Outright",
+            "verdict": "yes",
+            "why": null,
+            "rules": []
+          },
+          "discretion": {
+            "label": "By the Director's discretion",
+            "verdict": "not needed",
+            "why": "within the outright limits",
+            "rules": []
+          },
+          "rezoning": {
+            "label": "By rezoning",
+            "verdict": "not yet confirmed",
+            "why": null,
+            "rules": [
+              "cov.trees.replacement"
+            ]
+          }
+        }
       },
       "funded": {
         "verdict": "no",

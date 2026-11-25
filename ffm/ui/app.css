@@ -1698,3 +1698,43 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .brief-table td { vertical-align: middle; padding: 3px 6px; }
 @media (pointer: coarse) { .brief-table input, .brief-table select { min-height: 44px; } }
 .operator-desk h2 .cont { display: block; font-size: 13px; margin-top: 2px; }
+
+/* The front sheet, shaped as an ask; answer 1's three verdicts; where the money comes from; the sources at 03 (25 Nov 2026) */
+.memo-ask h2 { font: 600 12px/1.4 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+.ask-dl { margin: 0; display: grid; }
+.ask-dl > div { display: grid; grid-template-columns: 168px minmax(0, 1fr); gap: 2px 16px; padding: 8px 0; border-top: 1px solid var(--line); }
+.ask-dl > div:first-child { border-top: 0; }
+.ask-dl dt { font: 600 11px/1.5 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding-top: 2px; }
+.ask-dl dd { margin: 0; font-size: 14px; line-height: 1.5; max-width: 72ch; }
+.ask-verdicts, .routes { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.ask-k { font-size: 12px; color: var(--muted); }
+.ask-verdicts b, .routes b { font-weight: 600; }
+[data-st="pass"] > b, b[data-st="pass"] { color: var(--s-pass-text); }
+[data-st="conditional"] > b, b[data-st="conditional"] { color: var(--s-conditional-text); }
+[data-st="fail"] > b, b[data-st="fail"] { color: var(--s-fail-text); }
+[data-st="uncertain"] > b, b[data-st="uncertain"] { color: var(--s-uncertain-text); }
+.ask-open { margin: 0; padding: 0 0 0 1.4em; display: grid; gap: 3px; }
+.ask-open li { font-size: 13.5px; }
+.routes { margin: 2px 0 12px; flex-direction: column; gap: 3px; }
+.routes li { font-size: 13px; line-height: 1.45; }
+.routes .cont { color: var(--muted); }
+.src-table th[scope="row"] { text-align: left; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: inherit; color: inherit; }
+.src-table th.num, .src-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.src-table tr.src-out th, .src-table tr.src-out td.num { color: var(--muted); }
+.src-st { font-weight: 600; }
+.src-st[data-st="pass"] { color: var(--s-pass-text); } .src-st[data-st="conditional"] { color: var(--s-conditional-text); }
+.src-st[data-st="uncertain"] { color: var(--s-uncertain-text); } .src-st[data-st="fail"] { color: var(--s-fail-text); }
+.src-editor { margin-top: 12px; display: grid; gap: 6px; justify-items: start; }
+.src-edit { width: 100%; }
+.src-edit input, .src-edit select { width: 100%; min-width: 0; min-height: 36px; }
+.src-edit td { padding: 3px 6px 3px 0; vertical-align: middle; }
+.src-edit td:nth-child(1) { width: 34%; } .src-edit td:nth-child(3) { width: 20%; }
+.ask-decision input { width: 100%; }
+@media (max-width: 640px) {
+  .ask-dl > div { grid-template-columns: minmax(0, 1fr); }
+  .src-edit thead { display: none; }
+  .src-edit tr { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+  .src-edit td { width: auto !important; padding: 0; }
+}
+@media print { .memo-ask { break-inside: avoid; } }
+.memo-ask { max-width: 920px; }

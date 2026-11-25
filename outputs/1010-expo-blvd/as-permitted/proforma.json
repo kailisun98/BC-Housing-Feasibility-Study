@@ -73,7 +73,18 @@
       "dcr": 1.1,
       "annual_service": null
     },
-    "total": 0
+    "total": 0,
+    "sources": [
+      {
+        "label": "Still to find",
+        "kind": "gap",
+        "value": 151374523,
+        "status": "to find",
+        "counted": false
+      }
+    ],
+    "uncommitted": 0,
+    "land_contribution": null
   },
   "gap": {
     "value": 151374523,

@@ -4818,7 +4818,30 @@
           "uncertain": []
         },
         "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing",
-        "approval_route": null
+        "approval_route": null,
+        "routes": {
+          "outright": {
+            "label": "Outright",
+            "verdict": "no",
+            "why": null,
+            "rules": [
+              "cov.rm1.outright_fsr",
+              "cov.rm1.outright_height"
+            ]
+          },
+          "discretion": {
+            "label": "By the Director's discretion",
+            "verdict": "none in the schedule",
+            "why": "the schedule gives the Director no increase for this",
+            "rules": []
+          },
+          "rezoning": {
+            "label": "By rezoning",
+            "verdict": "yes",
+            "why": null,
+            "rules": []
+          }
+        }
       },
       "funded": {
         "verdict": "yes",

@@ -111,8 +111,111 @@ def layout_open_items(lay: dict | None) -> list[dict]:
     return out
 
 
+OPEN_RANK = {"fail": 0, "uncertain": 1, "conditional": 2}
+TIER_WORDS = {"market": "at market rent", "rgi": "rent geared to income", "deep_subsidy": "deep subsidy"}
+
+
+def _cad(x) -> str:
+    """Dollars as a board reads them: $45.7M, $890,295."""
+    if x is None:
+        return "not computed"
+    x = float(x)
+    return f"${x / 1e6:,.1f}M" if abs(x) >= 1e6 else f"${x:,.0f}"
+
+
+def front_sheet(ledger: dict, proforma: dict | None = None, layout: dict | None = None) -> dict:
+    """The memo's front sheet, shaped as an ask (25 Nov 2026; all four first-panel reviewers: "who is housed, who
+    operates, which program, the amount, the top three risks"). Read from the ledger, the pro-forma and the layout alone,
+    so it adds no figure of its own. The page's memo/front.js is its twin. Pure.
+
+    {housed, operator, programs, money: {capital, asked: [{label, value, status}], to_find, share, surplus, verdict} or
+    None, decision, verdicts: [{label, verdict}], open_items: [{title, status, action}], open_total}"""
+    from .checks import housing_kind, HOUSING_WORDS
+    from .engine import program_name
+    opt, site = ledger["inputs"]["option"], ledger["inputs"]["site"]
+    ans = ledger["summary"]["answers"]
+    kind = housing_kind(opt)
+    units = opt.get("units") or {}
+    homes = sum(int(v or 0) for v in units.values() if isinstance(v, (int, float)))
+    beds = opt.get("beds") if isinstance(opt.get("beds"), (int, float)) and not isinstance(opt.get("beds"), bool) and opt.get("beds") > 0 else None
+    what = "independent rental" if kind == "independent" else HOUSING_WORDS[kind]
+    head = (f"{homes} home{'s' if homes != 1 else ''}" if homes else "") + (f"{' and ' if homes else ''}{int(beds)} beds" if beds else "")
+    housed = f"{head or 'No homes entered'}, {what}"
+    tenure = str(opt.get("tenure") or "").replace("_", " ")
+    if tenure:
+        housed += f" ({tenure})"
+    sup = int(opt.get("supportive_units") or 0)
+    if sup and kind == "independent":
+        housed += f", {sup} of them supportive homes"
+    tiers = opt.get("rent_tiers_units") or {}
+    if any(tiers.get(k) for k in TIER_WORDS):
+        housed += ": " + ", ".join(f"{int(tiers[k])} {w}" for k, w in TIER_WORDS.items() if tiers.get(k))
+    signed = (opt.get("operations") or {}).get("signed") if isinstance((opt.get("operations") or {}).get("signed"), dict) else None
+    op = str(opt.get("operator") or "").strip()
+    operator = (op or "Not named") + ("; the operating figures are signed by " + signed["by"] if signed and signed.get("by")
+                                      else "; the operating figures are not signed by an operator" if op else "")
+    targets = opt.get("target_programs") or []
+    res = ledger.get("results") or []
+    named = [program_name(r) for r in res if r.get("layer") == "E" and r["rule_id"] in targets]
+    fd = ans.get("funded") or {}
+    if named:
+        programs = ", ".join(named) + (f". {fd['words']}" if fd.get("words") else "")
+    else:
+        doors = [m["program"] for m in fd.get("matches") or [] if not m.get("ended") and not m.get("if")]
+        programs = ("None targeted; written for this kind of housing and not tested: " + ", ".join(doors)) if doors else "None targeted"
+    money = None
+    if proforma and proforma.get("available"):
+        rows = (proforma.get("funding") or {}).get("sources") or []
+        asked = [{"label": r["label"], "value": r["value"], "status": r["status"]} for r in rows
+                 if r["counted"] and r["status"] in ("illustrative", "applied", "assumed")]
+        gap = (proforma.get("gap") or {}).get("value")
+        money = {"capital": (proforma.get("capital") or {}).get("total"), "asked": asked,
+                 "to_find": gap if gap is not None and gap > 0 else 0 if gap is not None else None,
+                 "share": (proforma.get("gap") or {}).get("share_of_capital"),
+                 "surplus": -gap if gap is not None and gap < 0 else None,
+                 "verdict": proforma["verdict"]["word"]}
+    routes = (ans.get("allowed") or {}).get("routes") or {}
+    verdicts = [{"label": v["label"], "verdict": v["verdict"]} for v in routes.values()] or [
+        {"label": "Outright", "verdict": ans["allowed"]["outright"]["verdict"]}, {"label": "By rezoning", "verdict": ans["allowed"]["by_rezoning"]["verdict"]}]
+    verdicts.append({"label": "The funders' criteria", "verdict": fd.get("words") or fd.get("verdict")})
+    if money:
+        from .proforma import VERDICT_WORDS
+        verdicts.append({"label": "The money", "verdict": VERDICT_WORDS.get(money["verdict"], money["verdict"])})
+    items = list(ans.get("unsure") or []) + layout_open_items(layout)
+    ranked = sorted(range(len(items)), key=lambda i: (OPEN_RANK.get(items[i].get("status"), 3), i))
+    top = [{"title": items[i]["title"], "status": items[i]["status"], "action": items[i].get("action") or ""} for i in ranked[:3]]
+    return {"housed": housed, "operator": operator, "programs": programs, "money": money,
+            "decision": str(opt.get("decision_sought") or "").strip() or None,
+            "verdicts": verdicts, "open_items": top, "open_total": len(items)}
+
+
+def front_markdown(fs: dict) -> list[str]:
+    """The front sheet for memo.md: a table a board reads first."""
+    m = fs["money"]
+    if m:
+        ask = "; ".join(f"{a['label']}, {_cad(a['value'])} ({a['status']})" for a in m["asked"]) or "nothing from a program"
+        amount = (f"Capital cost {_cad(m['capital'])}. Asked: {ask}. "
+                  + (f"Still to find: {_cad(m['to_find'])} ({m['share'] * 100:.0f}% of the cost)." if m.get("to_find") else
+                     f"The sources counted cover it, {_cad(m['surplus'])} to spare." if m.get("surplus") else "The sources counted cover it."))
+    else:
+        amount = "Not computed."
+    L = ["## The ask", "", "| | |", "|---|---|",
+         f"| Who is housed | {fs['housed']} |", f"| Who operates | {fs['operator']} |", f"| Which program | {fs['programs']} |",
+         f"| The amount | {amount} |", f"| The decision wanted | {fs['decision'] or 'not stated'} |",
+         "| The answers | " + " · ".join(f"{v['label']}: {v['verdict']}" for v in fs["verdicts"]) + " |"]
+    if fs["open_items"]:
+        L.append(f"| The top {len(fs['open_items'])} of {fs['open_total']} open items | "
+                 + " ".join(f"{i + 1}. {u['title']} ({STATUS_WORD.get(u['status'], u['status']).lower()})." for i, u in enumerate(fs["open_items"])) + " |")
+    L.append("")
+    return L
+
+
 def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None, title: str | None = None,
-             revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None, massing_error: str | None = None) -> str:
+             revit: dict | None = None, proforma: dict | None = None, layout: dict | None = None, massing_error: str | None = None,
+             short: bool = False) -> str:
+    """The memo. `short` (25 Nov 2026, the second panel's small-lot architect) keeps the front sheet, the answers, the
+    money's summary and the sources the rules that apply cite, and leaves the massing, the layout, the full ledger and
+    the stamp's file hashes to the full memo."""
     run, res, summ = ledger["run"], ledger["results"], ledger["summary"]
     site, opt = ledger["inputs"]["site"], ledger["inputs"]["option"]
     ans = summ["answers"]
@@ -148,10 +251,20 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     unplaced = (f" The first layout places {layout.get('units_placed')} of {layout.get('units_total')} homes on the plates as drawn (answer 3); this answer counts all {layout.get('units_total')}."
                 if layout and layout.get("units_total") and (layout.get("units_placed") or 0) < layout["units_total"] else "")
     L.append("")
+    # the front sheet, shaped as an ask (25 Nov 2026)
+    L.extend(front_markdown(front_sheet(ledger, proforma, layout)))
+    if short:
+        L.append("*The short memo: the full memo (memo.md) adds the massing, the layout, every rule in force and the version stamp's files.*")
+        L.append("")
 
     # ---------------- the three answers
     L.append("## 1. Is it allowed?")
     o, bz = ans["allowed"]["outright"], ans["allowed"]["by_rezoning"]
+    # three verdicts, so the Director's discretion is never printed as "outright" (25 Nov 2026)
+    rts = ans["allowed"].get("routes")
+    if rts:
+        L.append(" · ".join(f"**{v['label']}: {v['verdict']}**" + (f" ({v['why']})" if v.get("why") and v["verdict"] not in ("not assessed",) else "") for v in rts.values()))
+        L.append("")
     out_lines = [r for r in res if counts_outright(r) and r["status"] != "not_applicable"]
     L.append(f"**Outright, under {district_of(site) or 'the district'}: {o['verdict']}.** " + " ".join(f"{r['finding']} ({r['rule_id']})" for r in out_lines)
              + (f" Not assessed: {o['why']}; the envelope is the option's own figure, not a permitted one." if o.get("why") else ""))
@@ -218,10 +331,10 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     # ---------------- the pro-forma, feasibility grade (layer F and layer E)
     if proforma:
         from . import proforma as _pf
-        L.extend(_pf.markdown(proforma))
+        L.extend(_pf.markdown(proforma, short=short))
 
     # ---------------- massing
-    if massing:
+    if massing and not short:
         L.append("## Massing derived from the rules")
         for mm in massing["masses"]:
             L.append(f"- **{mm['label']}** — plate {mm['plate_area_m2']:,.0f} m² × {mm['storeys']} storeys = {mm['gfa_m2']:,.0f} m² "
@@ -239,12 +352,12 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
         L.append("")
 
     # ---------------------------------------------------------------- the architect's first layout, from the option
-    if layout:
+    if layout and not short:
         from . import layout as _layout
         L.extend(_layout.markdown(layout))
 
     # ---------------- Revit, when the script has run on this exact stamp
-    if revit:
+    if revit and not short:
         L.append("## Built in Revit")
         L.append(f"Mode: {revit.get('mode', '—')}. Stages: " + ", ".join(f"{k} {v}" for k, v in (revit.get("stages") or {}).items()) + ".")
         for b in revit.get("built", []):
@@ -282,7 +395,7 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
         L.append("")
 
     # ---------------- change log
-    if diff:
+    if diff and not short:
         L.append("## What changed since the previous memo")
         L.append(f"Previous stamp `{diff.get('previous_stamp')}` (rules as of {diff.get('previous_as_of')}) → current `{diff.get('current_stamp')}` (as of {diff.get('current_as_of')}). "
                  + ("The rule files themselves changed." if diff.get("rules_changed") else "The rule files are unchanged; differences come from the as-of date or the inputs."))
@@ -306,15 +419,16 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     # the rules that apply to this site, as the page and the paper list them; one written for another district or not in
     # force on the date is counted in a line, not printed (23 Nov 2026: 60-odd "Not applicable: written for C-2
     # districts" rows made the memo 95 KB and buried the 20 that applied). ledger.json keeps every one.
-    L.append("## Full ledger")
     elsewhere = [r for r in res if not takes_ref(r)]
-    if elsewhere:
+    if not short:
+        L.append("## Full ledger")
+    if elsewhere and not short:
         L.append("")
         L.append(f"{len(res) - len(elsewhere)} of the {len(res)} rules in force apply to this site and are listed. The other {len(elsewhere)} are written for other districts "
                  "or are not in force on this date; `ledger.json` lists them with their reasons.")
     cur_layer = None
     for r in res:
-        if not takes_ref(r):
+        if not takes_ref(r) or short:
             continue
         if r["layer"] != cur_layer:
             cur_layer = r["layer"]
@@ -347,8 +461,11 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
         L.append(f"- Option notes: {opt['notes']}")
     L.append("")
     L.append("## Sources")
+    # the sources of the rules that apply here (25 Nov 2026, the second panel: every schedule in the stack was listed)
     seen = set()
     for r in res:
+        if not takes_ref(r):
+            continue
         s = r.get("source") or {}
         key = (s.get("title"), s.get("url"))
         if key in seen or not any(key):
@@ -368,7 +485,7 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     L.append("")
     L.append("## Version stamp")
     L.append(f"- Rules hash (SHA-256 over all rule files): `{run['stamp']['rules_hash']}`")
-    for f, h in run["stamp"]["rules_files"].items():
+    for f, h in ({} if short else run["stamp"]["rules_files"]).items():
         L.append(f"- `{f}`: `{h[:16]}…`")
     L.append(f"- Stamp (hash of rules hash + rule versions in force on {run['as_of']}): `{run['stamp']['stamp']}`")
     L.append("")
@@ -528,5 +645,8 @@ def write(ledger: dict, out_dir: Path, massing: dict | None = None, diff: dict |
     pm = out_dir / "memo.md"
     ph = out_dir / "memo.html"
     pm.write_text(md, encoding="utf-8")
+    # the short memo beside it, for every run: a board reads the ask and the answers (25 Nov 2026)
+    (out_dir / "memo-short.md").write_text(markdown(ledger, massing, diff, revit=revit, proforma=proforma, layout=layout,
+                                                    massing_error=massing_error, short=True), encoding="utf-8")
     ph.write_text(html_page(md, svg_text, svgs), encoding="utf-8")
     return pm, ph

@@ -13,6 +13,7 @@ import { renderLedger, wireLedger } from "./ledger.js";
 import { compareFoldLine, compareResult, renderSideBySide, wireSideBySide } from "./side-by-side.js";
 import { changesPhrase, renderChanges } from "./changes.js";
 import { wordsHtml } from "./words.js";
+import { frontHtml } from "./front.js";
 
 /* A date as a reader writes it, "23 Oct 2026", in the title block, the answers and the paper (20 Nov 2026: ISO dates
    read as machine text); a time, where there is one and it is asked for, follows: "18 Nov 2026, 14:03". The machine's
@@ -164,6 +165,8 @@ export function renderMemo(run) {
   // the operator's desk leads the operator's layout; the area schedule follows the drawings in every layout (24 Nov 2026)
   const desk = operatorDesk(run);
   if (desk) parts.push(desk);
+  // the front sheet, shaped as an ask, before the answers in every layout (25 Nov 2026)
+  parts.push(frontHtml(run));
   parts.push(`<div class="memo-body">
     <div class="answers">${answerAllowed(L, run)}${answerFunders(L, run)}${answerUnsure(L, run)}${answerMoney(run)}${unverifiedLine(L)}${wordsHtml(run)}</div>
     ${compare ? `<div class="memo-compare">${compare}</div>` : ""}
@@ -203,6 +206,7 @@ export function renderMemo(run) {
    memo with no way across it but the scroll bar). Only the parts this memo has; the layouts that leave a part out hide
    its link (app.css), and a jump opens any fold the part sits in. */
 const MEMO_INDEX = [
+  ["ask", ".memo-ask", "The ask"],
   ["answers", ".memo-body > .answers", "The four answers"],
   ["compare", ".memo-compare", "The comparison"],
   ["figures", ".memo-body > .figures", "Drawings"],

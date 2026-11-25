@@ -1106,6 +1106,22 @@ Built at Kai's request from the second panel's list (`docs/user-tests-2026-11-24
   `zones_of` keep `home` / `levels` (a home counted on its entry floor, no corridor/core/lift asked on a ground-oriented
   plan), and the block editor's `syncHomes` carries a change to a home onto every floor it spans. 391 tests.
 
+## The memo as an ask (24 Nov 2026, piece 1 of Kai's plan)
+
+The plan is `02 A2\00 Research\First Read - wish list and plan.docx` (six pieces; 2 is the site before an option).
+`docs/user-tests-2026-11-24/README.md`, last section, has the detail.
+- `engine.routes` / `by_discretion`: `allowed.routes` {outright, discretion, rezoning}, each {label, verdict, why, rules}.
+  Discretion verdicts: possible, not needed, none in the schedule, no, not yet confirmed, not assessed. The old keys stay.
+- `proforma`: `named_sources(fin)` reads `finance.sources`; `contributions(...)` → `funding.sources` (the contributions
+  ledger), `funding.uncommitted`, `funding.land_contribution` (from `finance.land_value_cad`); `SOURCE_*` and
+  `CONTRIBUTION_STATUS_WORDS` (twin `CONTRIBUTION_WORD` in memo/answers.js, a test keeps them equal); `sources_markdown`;
+  `markdown(pf, short)`.
+- `memo.front_sheet` / `front_markdown` (twin: `memo/front.js` `frontOf`, `frontHtml`, `routesHtml`, `amountWords`,
+  `routeStatus`); `memo.markdown(..., short=True)`; `write` adds `memo-short.md`; Sources limited by `takes_ref`.
+- Page: the front sheet before the answers (`.memo-ask`, first in `MEMO_INDEX`); `sourcesTable` in answer 4;
+  `sourcesEditor` and the "What are you asking for?" field at 03 (route-stage.js); `finance.land_value_cad` and
+  `decision_sought` in FIELDS; `paperDocument(run, {short})`, `exportPdf(short)`, `#pdf-short-btn`. 409 tests.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

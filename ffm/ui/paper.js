@@ -6,7 +6,8 @@ import { state, STATIC } from "./core/state.js";
 import { optWord } from "./fields.js";
 import { rev } from "./runs.js";
 import { briefName, compareKind, dateWords, idBreak, memoRefs, optionName, takesRef } from "./memo/memo.js";
-import { fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, operatingRows, outrightWords, unverifiedRules } from "./memo/answers.js";
+import { amountWords, frontOf, routeStatus } from "./memo/front.js";
+import { CONTRIBUTION_WORD, outOfTotal, fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, operatingRows, outrightWords, unverifiedRules } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
 import { sidesOf, tradeOff } from "./memo/side-by-side.js";
 import { changeWord, naChange } from "./memo/changes.js";
@@ -84,7 +85,10 @@ function areasPaper(run) {
   return out.join("\n");
 }
 
-export function paperDocument(run) {
+/* `short` (25 Nov 2026, the small-lot architect of the second panel): the front sheet, the answers, the open items, the
+   money and the sources of the rules that apply; the clauses, the drawings, the ledger, the inputs and the
+   reproduction notes are the full memo's. */
+export function paperDocument(run, { short = false } = {}) {
   // the exits as the plans found them, the same on paper as on screen (withPlans)
   const L = run.ledger, res = withPlans(L.results, run), ans = L.summary.answers;
   const site = L.inputs.site || {}, opt = L.inputs.option || {};
@@ -139,8 +143,13 @@ export function paperDocument(run) {
   const unsure = [...(ans.unsure || []), ...layoutOpenItems(run).map(u => ({ ...u, rule_id: u.rule_id || "layout", finding: "" }))];   // the drawings' open items join the rules'
   // the outright answer in the words the screen uses
   const outLines = res.filter(r => isOutrightLimit(r) && r.status !== "not_applicable");
-  const outWords = outrightWords(ans.allowed.outright, outLines).replace(/\.$/, "");
-  const outMark = `<span class="st st-${h(verdictStatus(ans.allowed.outright.verdict) || "na")}">${h(outWords.split(":")[0])}</span>${outWords.includes(":") ? `<div class="note">${h(outWords.split(":").slice(1).join(":").trim())}</div>` : ""}`;
+  const routes = ans.allowed.routes || null;
+  const outWords = (routes && routes.discretion.verdict === "possible" ? "Not outright: within what the Director of Planning may allow, below"
+    : outrightWords(ans.allowed.outright, outLines)).replace(/\.$/, "");
+  const rmark = w => `<span class="st st-${h(routeStatus(w) || "na")}">${h(cap(w || "—"))}</span>`;
+  // on paper the outright row says the district's limits as written, so the Director's discretion is never read as outright
+  const outV = routes ? routes.outright.verdict : ans.allowed.outright.verdict;
+  const outMark = `<span class="st st-${h((routes ? routeStatus(outV) : verdictStatus(outV)) || "na")}">${h(outWords.split(":")[0])}</span>${outWords.includes(":") ? `<div class="note">${h(outWords.split(":").slice(1).join(":").trim())}</div>` : ""}`;
   const f = ans.funded, intake = intakeNote(f);
   const fundMark = `<span class="st st-${h(verdictStatus(f.verdict) || "na")}">${h(fundedWord(f))}</span>`;
   const fmtVal = x => (x === null || x === undefined ? "—" : typeof x === "boolean" ? (x ? "yes" : "no")
@@ -153,8 +162,10 @@ export function paperDocument(run) {
   const pfOk = !!(run.proforma && run.proforma.available);
   const terms = wordsFor(run);
   const lay = run.layout || {};
-  const s = { money: pfOk ? sn() : null, clauses: sn(), massing: run.massing || run.massing_note ? sn() : null, areas: lay.area_schedule || lay.operability ? sn() : null,
-              words: terms.length ? sn() : null, ledger: sn(), inputs: sn(), sources: sn(), verify: sn() };
+  const s = { money: pfOk ? sn() : null, clauses: short ? null : sn(), massing: !short && (run.massing || run.massing_note) ? sn() : null,
+              areas: !short && (lay.area_schedule || lay.operability) ? sn() : null,
+              words: terms.length ? sn() : null, ledger: short ? null : sn(), inputs: short ? null : sn(), sources: sn(), verify: short ? null : sn() };
+  const ledgerAt = s.ledger ? `section ${s.ledger}` : "the full memo";
 
   // 1. the three answers
   const answers = `<table class="answers">
@@ -162,6 +173,7 @@ export function paperDocument(run) {
       <thead><tr><th>Question</th><th>Answer</th><th>Decided by</th></tr></thead>
       <tbody>
         <tr><th scope="row">Is it allowed outright?</th><td>${outMark}</td><td>${decidedBy(ans.allowed.outright, true)}</td></tr>
+        ${routes ? `<tr><th scope="row">By the Director's discretion?</th><td>${rmark(routes.discretion.verdict)}</td><td>${routes.discretion.rules.length ? `<ul class="refs">${routes.discretion.rules.map(id => `<li>${refTag(id)} ${h(titleOf[id] || id)} <span class="muted">(a discretionary approval, never assumed)</span></li>`).join("")}</ul>` : `<span class="muted">${h(cap(routes.discretion.why || ""))}.</span>`}</td></tr>` : ""}
         <tr><th scope="row">Is it allowed by rezoning?</th><td>${vmark(ans.allowed.by_rezoning.verdict)}</td><td>${decidedBy(ans.allowed.by_rezoning)}${ans.allowed.rezoning_path ? `<p class="note">Path: ${h(ans.allowed.rezoning_path)}.</p>` : ""}</td></tr>
         <tr><th scope="row">Does it fit the funders?</th><td>${fundMark}</td><td>${intake ? `<p class="note intake">${h(intake)}</p>` : ""}${decidedBy(ans.funded)}${pfOk ? `<p class="note">The criteria are not the money: ${h(moneyPhrase(run.proforma))} (below).</p>` : ""}</td></tr>
         <tr><th scope="row">What is still unsure?</th><td>${unsure.length ? `<span class="st st-${unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${unsure.length} open item${unsure.length === 1 ? "" : "s"}</span>` : `<span class="st st-pass">Nothing open</span>`}</td><td>${unsure.length ? `Each with the person who resolves it, in section 2: ${h(unsure.map(itemName).join("; "))}.` : `<span class="muted">Every rule that applies is settled.</span>`}</td></tr>
@@ -216,6 +228,13 @@ export function paperDocument(run) {
   // what it takes to run, a year (23 Nov 2026): the operating page on paper, as answer 4 shows it on screen; the funder's
   // officer reads the subsidy a home a month here. Rows from memo/answers.js operatingRows, the twin of proforma.operating_rows.
   const opRows = pfOk ? operatingRows(run.proforma) : [];
+  // where the money comes from, each source with its status (25 Nov 2026), as answer 4 shows it
+  const srcRows = pfOk ? ((run.proforma.funding || {}).sources || []) : [];
+  const srcPaper = srcRows.length ? `<p class="lead op-head"><b>Where the money comes from.</b> Each source with its status; a stack that closes only with sources not yet committed reads Unsure.</p>
+      <table class="money op"><colgroup><col style="width:44%"><col style="width:18%"><col></colgroup>
+      <thead><tr><th>Source</th><th>Amount</th><th>Status</th></tr></thead><tbody>
+      ${srcRows.map(r => `<tr><td>${r.counted ? `<b>${h(r.label)}</b>` : h(r.label)}</td><td class="num">${h(money(r.value))}</td><td>${h(CONTRIBUTION_WORD[r.status] || r.status)}${outOfTotal(r) ? ' <span class="muted">· not in the funding total</span>' : ""}</td></tr>`).join("")}
+      </tbody></table>` : "";
   const opMoney = x => (x < 0 ? `−${money(-x)}` : money(x));
   const opTable = opRows.length ? `<p class="lead op-head"><b>What it takes to run, a year.</b> The rents, the running costs, what is left, and the subsidy needed.</p>
       <table class="money op"><colgroup><col style="width:34%"><col style="width:16%"><col></colgroup>
@@ -229,7 +248,7 @@ export function paperDocument(run) {
       ${run.proforma.lines.map(ln => { const shown = ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + (ln.unit === "$/yr" ? " a year" : ln.unit === "$/m²" ? " per m²" : "") : (ln.value == null ? "not given" : fmtNum(ln.value));
         return `<tr><td>${ln.rule_id ? refTag(ln.rule_id) : '<span class="muted">option</span>'}</td><td><b>${h(ln.label)}</b>${ln.placeholder ? ' <span class="st st-uncertain">placeholder</span>' : ""}</td><td class="num">${h(shown)}</td><td>${h(ln.note || "")}${ln.rule_id ? ` <span class="muted">(${h(ref(ln.rule_id))}: ${h(titleOf[ln.rule_id] || ln.rule_id)})</span>` : ""}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="note">Capital cost ${h(money(run.proforma.capital.total))}, less funding ${h(money(run.proforma.funding.total))}, gives the gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the capital cost)` : ""}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; each rule's source is in section ${s.ledger}.</p>${opTable}` : "";
+      <p class="note">Capital cost ${h(money(run.proforma.capital.total))}, less funding ${h(money(run.proforma.funding.total))}, gives the gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the capital cost)` : ""}. ${h(run.proforma.verdict.why.map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index; rents from the CMHC survey; debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; each rule's source is in ${ledgerAt}.</p>${srcPaper}${opTable}` : "";
 
   // 4. every clause that applies, in reference order
   const applied = res.filter(r => r.status !== "not_applicable");
@@ -388,6 +407,8 @@ export function paperDocument(run) {
     .nums { font-family: "IBM Plex Mono", Consolas, monospace; font-size: 6.6pt; line-height: 1.35; }
     .nums .k { color: #5f6672; }
     .kv th { width: 30%; font-weight: 500; color: #3d4752; }
+    .sec.ask { margin-top: 6pt; } .sec.ask h2 { font-size: 10pt; }
+    table.kv.ask { font-size: 8.4pt; break-inside: avoid; } table.kv.ask th { width: 22%; }
     .sources { margin: 0; padding: 0; list-style: none; font-size: 7.6pt; }
     .sources li { display: grid; grid-template-columns: 18pt 1fr; padding: 3pt 0; border-bottom: 0.4pt solid #d5dae0; break-inside: avoid; }
     .url { font-size: 6.8pt; overflow-wrap: anywhere; }
@@ -504,6 +525,17 @@ export function paperDocument(run) {
   const p1figs = stackP1 || env ? `<div class="p1-figs${stackP1 && env ? " two" : ""}">${stackP1}${env}</div>` : "";
   const unv = unverifiedRules(L);
   const unvLine = unv.length ? `<p class="unv-line"><span class="unv">UNVERIFIED</span>${unv.length === 1 ? "1 rule in this memo is" : `${unv.length} rules in this memo are`} not yet checked against ${unv.length === 1 ? "its" : "their"} source (marked UNVERIFIED in the ledger): ${h(unv.map(r => `${ref(r.rule_id)} ${fewWords(r.title)}`).join("; "))}.</p>` : "";
+  // the front sheet, shaped as an ask (25 Nov 2026): the first thing on page one, after the title block
+  const fs = frontOf(run);
+  const askPaper = `<section class="sec ask"><h2>The ask</h2><table class="kv ask"><tbody>
+      <tr><th scope="row">Who is housed</th><td>${h(fs.housed)}</td></tr>
+      <tr><th scope="row">Who operates</th><td>${h(fs.operator)}</td></tr>
+      <tr><th scope="row">Which program</th><td>${h(fs.programs)}</td></tr>
+      <tr><th scope="row">The amount</th><td>${h(amountWords(fs.money))}</td></tr>
+      <tr><th scope="row">The decision wanted</th><td>${fs.decision ? h(fs.decision) : '<span class="muted">not stated</span>'}</td></tr>
+      <tr><th scope="row">The answers</th><td>${fs.verdicts.map(v => `${h(v.label)}: <b>${h(cap(String(v.verdict || "")))}</b>`).join(" · ")}</td></tr>
+      ${fs.open_items.length ? `<tr><th scope="row">The top ${fs.open_items.length} of ${fs.open_total} open items</th><td>${fs.open_items.map((u, i) => `${i + 1}. ${h(u.title)} ${mark(u.status)}`).join("<br>")}</td></tr>` : ""}
+    </tbody></table></section>`;
   const words = s.words ? `<section class="sec words"><h2><span class="no">${s.words}</span> Words in this memo</h2><dl>${terms.map(([t, w]) => `<div><dt>${h(t)}</dt><dd>${h(w)}</dd></div>`).join("")}</dl></section>` : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${h(`First Read memo ${revA} · ${address}`)}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -512,30 +544,31 @@ export function paperDocument(run) {
     <h1>${h(address)}</h1>
     <p class="sub">First Read memo · ${h(revA)}${ran ? ` · run ${h(ran)}` : ""} · printed ${h(printed)}</p>
     ${titleBlock}
-    <p class="howto"><b class="disclaimer">A feasibility screen, not legal, planning or funding advice; an independent student tool, not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</b> Rules are named by layer and place (A1, C4…) throughout.${s.words ? ` Section ${s.words} explains the words;` : ""} section ${s.ledger} gives each rule's finding, numbers and source; section ${s.verify} says how to reproduce the memo.</p>
+    <p class="howto"><b class="disclaimer">A feasibility screen, not legal, planning or funding advice; an independent student tool, not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</b> Rules are named by layer and place (A1, C4…) throughout.${s.words ? ` Section ${s.words} explains the words;` : ""} ${short ? "this is the short memo: the full memo adds the clauses, the drawings, every rule with its numbers, the inputs and how to reproduce it." : `section ${s.ledger} gives each rule's finding, numbers and source; section ${s.verify} says how to reproduce the memo.`}</p>
+    ${askPaper}
     <section class="sec"><h2><span class="no">1</span> The four answers</h2>${answers}${unvLine}${p1figs}</section>
     <section class="sec"><h2><span class="no">2</span> Open items and who resolves them</h2>${open}</section>
     ${compare}
     ${pfOk ? `<section class="sec"><h2><span class="no">${s.money}</span> The money, line by line</h2>${moneyLines}</section>` : ""}
-    <section class="sec"><h2><span class="no">${s.clauses}</span> Clauses applied</h2><p class="note">${applied.length} of ${res.length} rules apply. Proposed is what the option puts forward; permitted or required is the clause's own limit; the ask is what stands between them.</p>${clauses}</section>
+    ${s.clauses ? `<section class="sec"><h2><span class="no">${s.clauses}</span> Clauses applied</h2><p class="note">${applied.length} of ${res.length} rules apply. Proposed is what the option puts forward; permitted or required is the clause's own limit; the ask is what stands between them.</p>${clauses}</section>` : ""}
     ${s.massing ? `<section class="sec"><h2><span class="no">${s.massing}</span> Massing</h2>${figures}</section>` : ""}
     ${s.areas ? `<section class="sec"><h2><span class="no">${s.areas}</span> Area schedule, and what an operator checks</h2>${areasPaper(run)}</section>` : ""}
     ${words}
-    <section class="sec"><h2><span class="no">${s.ledger}</span> The full ledger, by layer</h2><p class="note">Every rule the engine ran, including those that do not apply here, with its finding, every number it used and the section of its source (S numbers, section ${s.sources}).</p>${ledger}</section>
-    <section class="sec"><h2><span class="no">${s.inputs}</span> Inputs</h2>${inputs}</section>
+    ${s.ledger ? `<section class="sec"><h2><span class="no">${s.ledger}</span> The full ledger, by layer</h2><p class="note">Every rule the engine ran, including those that do not apply here, with its finding, every number it used and the section of its source (S numbers, section ${s.sources}).</p>${ledger}</section>` : ""}
+    ${s.inputs ? `<section class="sec"><h2><span class="no">${s.inputs}</span> Inputs</h2>${inputs}</section>` : ""}
     <section class="sec"><h2><span class="no">${s.sources}</span> Sources</h2>${srcList}</section>
-    <section class="sec"><h2><span class="no">${s.verify}</span> Reproduce and verify, for the architect</h2>${verify}</section>
+    ${s.verify ? `<section class="sec"><h2><span class="no">${s.verify}</span> Reproduce and verify, for the architect</h2>${verify}</section>` : ""}
   </body></html>`;
 }
 
 /* Download PDF: the server prints the paper memo with a headless Edge or Chrome and the browser saves the file.
    Where there is no server (the web version) or no such browser, the paper memo opens in the print dialog, where
    Save as PDF gives the same document. */
-export async function exportPdf() {
+export async function exportPdf(short = false) {
   const run = state.run;
   if (!run) return;
-  const html = paperDocument(run);
-  const name = `${run.run_id.replace("/", "_")}_${rev(run.run_id)}_memo.pdf`;
+  const html = paperDocument(run, { short });
+  const name = `${run.run_id.replace("/", "_")}_${rev(run.run_id)}_memo${short ? "-short" : ""}.pdf`;
   if (!STATIC) {
     setStatus("Laying out the PDF…", "busy");
     try {
@@ -544,7 +577,7 @@ export async function exportPdf() {
         const url = URL.createObjectURL(await r.blob());
         const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 60000);
-        setStatus(`Saved ${name}: ${rev(run.run_id)}, its answers, open items, clauses, massing, full ledger, inputs and sources.`, "ok");
+        setStatus(short ? `Saved ${name}: ${rev(run.run_id)}'s ask, answers, open items, money and sources.` : `Saved ${name}: ${rev(run.run_id)}, its answers, open items, clauses, massing, full ledger, inputs and sources.`, "ok");
         return;
       }
     } catch (e) { /* no server answer: print instead */ }

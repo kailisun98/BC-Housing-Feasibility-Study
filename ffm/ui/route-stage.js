@@ -939,6 +939,24 @@ function leftToPerson(S, fromSaved) {
 
 // ---- 03 run
 
+/* Capital sources named with their status (25 Nov 2026): option.finance.sources [{name, kind, amount_cad, status}], read
+   by proforma.named_sources. One row each; a row with no amount is kept here and not counted. */
+const SOURCE_KINDS = [["grant", "Grant"], ["equity", "Equity"], ["loan", "Loan"], ["land", "Land or in kind"], ["other", "Other"]];
+const SOURCE_STATUSES = [["committed", "Committed"], ["applied", "Applied for"], ["assumed", "Assumed"]];
+function sourcesEditor(fin) {
+  const rows = Array.isArray(fin.sources) ? fin.sources : [];
+  const sel = (name, opts, v, i, label) => `<select data-src="${i}" data-f="${name}" aria-label="${h(label)}">${opts.map(([k, w]) => `<option value="${k}"${(v || (name === "status" ? "assumed" : "grant")) === k ? " selected" : ""}>${h(w)}</option>`).join("")}</select>`;
+  const row = (s, i) => `<tr><td><input type="text" data-src="${i}" data-f="name" value="${h(s.name || "")}" placeholder="who gives it" aria-label="Source ${i + 1}: name"></td>
+      <td>${sel("kind", SOURCE_KINDS, s.kind, i, `Source ${i + 1}: kind`)}</td>
+      <td><input type="number" min="0" step="any" inputmode="decimal" data-src="${i}" data-f="amount_cad" value="${h(s.amount_cad ?? "")}" placeholder="$" aria-label="Source ${i + 1}: amount in dollars"></td>
+      <td>${sel("status", SOURCE_STATUSES, s.status, i, `Source ${i + 1}: status`)}</td>
+      <td><button type="button" class="btn btn-quiet btn-small" data-src-remove="${i}" aria-label="Remove source ${i + 1}">Remove</button></td></tr>`;
+  return `<div class="src-editor"><p class="label">Capital sources, each with its status</p>
+      ${rows.length ? `<table class="plain src-edit"><thead><tr><th scope="col">Source</th><th scope="col">Kind</th><th scope="col">Amount ($)</th><th scope="col">Status</th><th><span class="sr-only">Remove</span></th></tr></thead><tbody>${rows.map(row).join("")}</tbody></table>` : ""}
+      <button type="button" class="btn btn-small" id="src-add">Add a source</button>
+      <p class="help">A City grant, a foundation, a partner's loan, the society's reserves. Each is counted in the funding and listed with its status; a stack that closes only with sources not yet committed reads Unsure.</p></div>`;
+}
+
 function cardRun() {
   const site = state.site || {};
   const o = state.option || {};
@@ -956,12 +974,16 @@ function cardRun() {
     "finance.non_residential_cost_per_m2_cad": "Community space or shops. Blank: priced like the homes.",
     "finance.non_residential_income_cad_year": "Rent or a contribution. Blank: none.",
     "finance.non_residential_funding_cad": "A capital campaign or a partner. Blank: none.",
-    "finance.other_grants_cad": "Beyond the Community Housing Fund's grant, which the tool counts itself when the fund is targeted." };
+    "finance.other_grants_cad": "Beyond the Community Housing Fund's grant, which the tool counts itself when the fund is targeted. Better: name each below with its status.",
+    "finance.land_value_cad": "An assessed or appraised value. Over the land figure, the difference is the owner's contribution, in kind." };
   const fields = FINANCE_FIELDS.map(([k, label]) => { const hid = `fin-help-${k.split(".")[1]}`; return `<label class="field"><span class="label">${h(label)}</span><input type="number" step="any" inputmode="decimal" class="fin-input" data-key="${h(k)}" value="${h(getPath(fin, k.split(".")[1]) ?? "")}" placeholder="${k.endsWith("land_cost_cad") ? (nominal ? "blank: nominal" : "blank: unsure") : "blank: none"}" aria-describedby="${hid}"><span class="help" id="${hid}">${h(finHelp[k] || "")}</span></label>`; }).join("");
   const money = `<details class="fold money-fold"${nominal && !Object.values(fin).some(v => v != null) ? "" : " open"}><summary>Land, equity and other grants <span class="cont">${nominal ? `· the land counts at a nominal value: the owner is ${h(ownerIs)}` : "· only you know these"}</span></summary>
       <div class="fin-rows">${fields}</div>
       <p class="help">${nominal ? "A blank land figure carries the land at a nominal value on a long lease." : (site.owner_type ? "Enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Name the owner at 01, or enter a land price here.")}</p>
+      ${sourcesEditor(fin)}
     </details>`;
+  // what the memo asks of its reader (25 Nov 2026): the front sheet's last line
+  const decision = `<label class="field ask-decision"><span class="label">What are you asking for?</span><input type="text" class="fin-input" data-key="decision_sought" data-text="1" value="${h(o.decision_sought || "")}" placeholder="e.g. the board's approval to spend on pre-development" aria-describedby="ask-decision-help"><span class="help" id="ask-decision-help">The memo's front sheet prints it as the decision wanted. Blank: not stated.</span></label>`;
   // what it takes to run: the operator's own figures, each over a placeholder; staffing and a subsidy are never assumed
   // (23 Nov 2026). The same inputs as the money above: a blank is a normal answer and says what the tool uses instead.
   const opsIn = o.operations || {};
@@ -986,6 +1008,7 @@ function cardRun() {
   const short3 = guide.suggestion && guide.suggestionUsed && !state.optionId ? fallsShort(guide.suggestion) : [];
   const dl = `<dl class="stage-dl">
       <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p>${short3.length ? `<p class="dd-line fig4-short"><span class="cont">It falls short:</span> ${h(short3.join("; "))}.</p>` : ""}</dd></div>
+      <div><dt>The ask</dt><dd>${decision}</dd></div>
       <div><dt>Money in</dt><dd>${money}${opsFold}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
       <div><dt>Rules as of</dt><dd><p class="dd-line">${h(dateWords($("#as-of").value || todayISO()))} <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
     </dl>`;
@@ -1146,6 +1169,29 @@ function wireStage(el) {
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
     markStale("the money in");
     saveDraft();
+  }));
+  // the capital sources: a field edits its row in place; add and remove redraw the card
+  const srcChanged = redraw => {
+    state.optionDirty = true;
+    $("#option-dirty").hidden = false;
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    markStale("the money in");
+    saveDraft();
+    if (redraw) { renderStage(); const b = $("#src-add"); if (b) b.focus(); }
+  };
+  const srcList = () => { state.option.finance = state.option.finance || {}; if (!Array.isArray(state.option.finance.sources)) state.option.finance.sources = []; return state.option.finance.sources; };
+  $$("[data-src]", el).forEach(c => c.addEventListener(c.tagName === "SELECT" ? "change" : "input", () => {
+    if (!state.option) return;
+    const list = srcList(), i = Number(c.dataset.src), f = c.dataset.f;
+    list[i] = list[i] || {};
+    list[i][f] = f === "amount_cad" ? (c.value.trim() === "" ? null : Number(c.value)) : c.value;
+    srcChanged(false);
+  }));
+  on("#src-add", () => { if (!state.option) return; srcList().push({ name: "", kind: "grant", amount_cad: null, status: "assumed" }); srcChanged(true); });
+  $$("[data-src-remove]", el).forEach(b => b.addEventListener("click", () => {
+    if (!state.option) return;
+    srcList().splice(Number(b.dataset.srcRemove), 1);
+    srcChanged(true);
   }));
   const conf = $("#ops-confirmed", el);
   if (conf) conf.addEventListener("change", () => {

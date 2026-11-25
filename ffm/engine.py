@@ -292,6 +292,7 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         by_rezoning = {"verdict": "not needed", "fail": [], "conditional": [], "uncertain": [],
                        "why": f"the option is approved by {ROUTE_WORDS[route]}, not by a rezoning"}
     allowed = {"outright": outright, "by_rezoning": by_rezoning, "rezoning_path": option.get("rezoning_path"), "approval_route": route}
+    allowed["routes"] = routes(allowed, outright_rules)
 
     # Question 2: does it fit the funders? Layer E rules the option targets.
     targets = set(option.get("target_programs") or [])
@@ -484,6 +485,53 @@ def funders_words(funded: dict, e: list[dict]) -> dict[str, Any]:
             note = f"{name}: {note}"
         intake.append({"rule_id": r["rule_id"], "program": name, "open": rec["open"], "note": note, "more": rec.get("more"), "status": rec["status"]})
     return {"words": words, "intake": intake}
+
+
+def by_discretion(r: dict) -> bool:
+    """An outright limit the option exceeds within what the Director of Planning may allow: conditional, with the
+    discretionary figure in its values (checks.district_outright_fsr / _height)."""
+    v = r.get("values") or {}
+    return r.get("status") == COND and ("max_fsr_discretionary" in v or "max_height_m_variance" in v)
+
+
+ROUTE_LABELS = {"outright": "Outright", "discretion": "By the Director's discretion", "rezoning": "By rezoning"}
+
+
+def routes(allowed: dict, outright_rules: list[dict]) -> dict[str, dict]:
+    """Answer 1 as three verdicts (25 Nov 2026, the second panel: "Outright" was printed over the Director's
+    discretion): outright, the district's limits as written; by the Director's discretion, the increases the schedule
+    lets the Director of Planning allow, never assumed; by rezoning, as `by_rezoning`. Each {label, verdict, why, rules}.
+    The keys `outright` and `by_rezoning` are unchanged; this reads them. Pure."""
+    o, bz = allowed["outright"], allowed["by_rezoning"]
+    tested = [r for r in outright_rules if r.get("status") != NA]
+    disc = [r for r in tested if by_discretion(r)]
+    others = [r for r in tested if r not in disc]
+    rest = _verdict(others)["verdict"]
+    if o["verdict"] == "not assessed":
+        out = {"verdict": "not assessed", "why": o.get("why")}
+        dsc = {"verdict": "not assessed", "why": o.get("why")}
+    elif disc:
+        out = {"verdict": "no", "why": "over the schedule's outright limits"}
+        if rest == "no":
+            dsc = {"verdict": "no", "why": "another limit is exceeded beyond what the Director may allow"}
+        elif rest == "not yet confirmed":
+            dsc = {"verdict": "not yet confirmed", "why": "another limit is not yet confirmed"}
+        else:
+            dsc = {"verdict": "possible", "why": "within what the Director of Planning may allow; a discretionary approval, never assumed"}
+    else:
+        out = {"verdict": o["verdict"], "why": o.get("why")}
+        if o["verdict"] in ("yes", "yes, with conditions"):
+            dsc = {"verdict": "not needed", "why": "within the outright limits"}
+        elif o["verdict"] == "no":
+            over = any("max_fsr_discretionary" in (r.get("values") or {}) or "max_height_m_variance" in (r.get("values") or {}) for r in others if r.get("status") == FAIL)
+            dsc = ({"verdict": "no", "why": "over what the Director may allow too"} if over
+                   else {"verdict": "none in the schedule", "why": "the schedule gives the Director no increase for this"})
+        else:
+            dsc = {"verdict": o["verdict"], "why": "the outright limits are not yet confirmed"}
+    rz = {"verdict": bz["verdict"], "why": bz.get("why")}
+    out["rules"], dsc["rules"] = [r["rule_id"] for r in others if r.get("status") in (FAIL, UNSURE, COND)], [r["rule_id"] for r in disc]
+    rz["rules"] = list(bz.get("fail") or []) + list(bz.get("conditional") or []) + list(bz.get("uncertain") or [])
+    return {k: {"label": ROUTE_LABELS[k], **v} for k, v in (("outright", out), ("discretion", dsc), ("rezoning", rz))}
 
 
 def _verdict(rs: list[dict]) -> dict[str, Any]:

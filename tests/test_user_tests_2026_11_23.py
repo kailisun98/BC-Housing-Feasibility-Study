@@ -1168,7 +1168,7 @@ class ThePdfCarriesTheAreaScheduleAndTheChecks(unittest.TestCase):
     def test_the_paper_has_its_own_numbered_section_for_them(self):
         js = (Path(__file__).resolve().parent.parent / "ffm" / "ui" / "paper.js").read_text(encoding="utf-8")
         self.assertIn("function areasPaper(run)", js)
-        self.assertIn("areas: lay.area_schedule || lay.operability ? sn() : null", js)
+        self.assertIn("areas: !short && (lay.area_schedule || lay.operability) ? sn() : null", js)
         self.assertIn("Area schedule, and what an operator checks", js)
         self.assertLess(js.index("${s.massing ? `<section"), js.index("${s.areas ? `<section"))     # after the massing, before the words
         self.assertLess(js.index("${s.areas ? `<section"), js.index("${words}"))

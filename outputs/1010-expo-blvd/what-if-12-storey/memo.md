@@ -6,7 +6,21 @@
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
+## The ask
+
+| | |
+|---|---|
+| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy |
+| Who operates | Not named |
+| Which program | BC Builds, the Community Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
+| The amount | Capital cost $62.6M. Asked: Community Housing Fund grant, $21.4M (illustrative). Still to find: $28.2M (45% of the cost). |
+| The decision wanted | not stated |
+| The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Needs more sources |
+| The top 3 of 5 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. Transit-oriented area minimum allowable height and density (uncertain). 3. Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu (uncertain). |
+
 ## 1. Is it allowed?
+**Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not yet confirmed**
+
 **Outright, under CD-1 (324): yes.** Residential floor area 9,600 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 2.46 on 3,908.0 m²). (cov.cd1_324.floor_area) Height 36.6 m is within the outright maximum of 91.0 m. (cov.cd1_324.outright_height)
 
 **By rezoning (False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program): not yet confirmed.**
@@ -44,6 +58,14 @@ Other programs written for this kind of housing, listed from their own pages and
 - Funding **$34,348,558**: grants $21,367,080, equity $0, supportable debt $12,981,478 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
 - Gap **$28,248,704** (45% of the capital cost).
 - Left to a person: a hard cost for this building (12 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre.
+
+**Where the money comes from**, each source with its status:
+
+| Source | Amount | Status |
+|---|---|---|
+| Community Housing Fund grant | $21,367,080 | illustrative: nobody has offered it |
+| Mortgage the net income carries | $12,981,478 | sized by this screen |
+| Still to find | $28,248,704 | to find |
 
 ### What it takes to run, a year
 
@@ -294,47 +316,9 @@ Previous stamp `d8114c4301640d47` (rules as of 2026-10-23) → current `d8114c43
 - Option notes: Hypothetical option written to show the engine reacting on a CD-1 site: a 12-storey, 120-unit version of the tower with a stated bedroom mix (40% two-bed-plus, 10% three-bed-plus), a 30/50/20 rent-tier split, 30% of units below HILs, a 60-year housing agreement, 6 accessible units, 43 replacement trees to meet Schedule C on the paved lot, and a stated land tenure. None of these figures come from the City, BC Housing or the operator.
 
 ## Sources
-- City of Vancouver Zoning and Development By-law, C-2 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-C-2.pdf
-- City of Vancouver Zoning and Development By-law, C-2A District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2a.pdf
-- City of Vancouver Zoning and Development By-law, C-2B District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2b.pdf
-- City of Vancouver Zoning and Development By-law, C-2C District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c.pdf
-- City of Vancouver Zoning and Development By-law, C-2C1 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c1.pdf
 - City of Vancouver CD-1 (324) By-law No. 7248, 800-1100 Pacific Boulevard (consolidated to By-law No. 14009, 23 Apr 2024) — https://cd1-bylaws.vancouver.ca/cd-1(324).pdf
-- City of Vancouver referral report, CD-1 Rezoning: 1015 East Hastings Street (report dated 5 Jan 2021, Council 19 Jan 2021), Appendix A: draft CD-1 by-law provisions — https://council.vancouver.ca/20210119/documents/rr5.pdf *(verify: Read on 17 Nov 2026 from the draft provisions in the referral report (rr5.pdf, saved by hand), not from the enacted by-law, which can differ; the City's CD-1 index (https://cd1-bylaws.vancouver.ca/index.htm) lists CD-1 (819) as 1015 East Hastings Street with no PDF posted, and https://cd1-bylaws.vancouver.ca/cd-1(819).PDF returns 404, so ask the City (rezoning@vancouver.ca) for the enacted by-law and confirm every figure against it before relying on it)*
-- City of Vancouver, Downtown-Eastside/Oppenheimer Official Development Plan (consolidation dated May 2026) — https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf
-- City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf
 - Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026) — https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf *(verify: Map 1 of the policy decides whether a site is inside a former Community Vision area; outside it the Affordable Housing Policies (1989) apply.)*
-- City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf
 - City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide) — https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx
-- City of Vancouver Zoning and Development By-law, R1-1 District Schedule (consolidation dated June 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-r1-1.pdf
-- City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule — https://council.vancouver.ca/20240625/documents/rr1.pdf *(verify: Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law before the user sessions: https://bylaws.vancouver.ca/zoning/zoning-by-law-consolidated.pdf)*
-- City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule — https://council.vancouver.ca/20240625/documents/rr1.pdf *(verify: Confirm against the RM-1 district schedule in the consolidated Zoning and Development By-law.)*
-- City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf
-- City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf
-- City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf
-- City of Vancouver Zoning and Development By-law, RM-3 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf
-- City of Vancouver Zoning and Development By-law, RM-3A District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf
-- City of Vancouver Zoning and Development By-law, RM-4 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf
-- City of Vancouver Zoning and Development By-law, RM-5, RM-5A, RM-5B, RM-5C and RM-5D Districts Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-5-all-districts.pdf
-- City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf
-- City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf
-- City of Vancouver Zoning and Development By-law, RM-7 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf
-- City of Vancouver Zoning and Development By-law, RM-7A District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf
-- City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf
-- City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf
-- City of Vancouver Zoning and Development By-law, RM-9 and RM-9B Districts Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf
-- City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf
-- City of Vancouver Zoning and Development By-law, RR-1 District Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-1.pdf
-- City of Vancouver Zoning and Development By-law, RR-2A and RR-2B Districts Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-2a-2b.pdf
-- City of Vancouver Zoning and Development By-law, RR-3A, RR-3B and RR-3C Districts Schedule (consolidation dated October 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-3a-3b-3c.pdf
-- City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf
-- City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf
-- City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf
-- City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf
-- City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf
-- City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf
-- City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026) — https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf
-- Province of BC, Small-Scale Multi-Unit Housing overview webinar (22 Jan 2024) and SSMUH Provincial Policy Manual — https://www2.gov.bc.ca/assets/gov/housing-and-tenancy/tools-for-government/local-governments-and-housing/webinars/lghi_webinar_2024-01-22_ssmuh-overview.pdf
 - Province of BC webinar (Bill 47 transit-oriented areas); City of Vancouver release, June 2024 — https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx *(verify: Tier storey figures are the Province's SkyTrain-station tiers as commonly reported; confirm against the Transit-Oriented Areas Designation Regulation before the user sessions.)*
 - City of Vancouver, Policy: Below-Market Rental Housing for Rezonings — https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf
 - 998 E 19th Ave referral report: CAC exempt under the policy's social housing exemption; DCL exempt as church and social housing (estimated value $3,075,715 at 30 Sep 2023 rates) — https://council.vancouver.ca/20240625/documents/rr1.pdf *(verify: Current DCL rates and exemptions: City of Vancouver DCL bulletin (not yet opened in this project).)*

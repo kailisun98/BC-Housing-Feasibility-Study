@@ -165,9 +165,17 @@ class ThePage(unittest.TestCase):
 
     def test_the_paper_has_the_ask_and_a_short_version(self):
         js = self.read("paper.js")
-        self.assertIn("export function paperDocument(run, { short = false } = {})", js)
+        self.assertIn("export function paperDocument(run, { short = false, board = false, decision = null } = {})", js)
         self.assertIn("${askPaper}", js)
         self.assertIn("exportPdf(true)", self.read("main.js"))
+
+    def test_the_board_memo_is_its_own_two_pages(self):
+        # 26 Nov 2026: a two-page board memo beside the short and the full one; the decision first, the sources it cites
+        js = self.read("paper.js")
+        self.assertIn("The decision wanted</h2>", js)
+        self.assertIn("Sources for these pages", js)
+        self.assertIn('exportPdf("board"', self.read("main.js"))
+        self.assertIn('id="pdf-board-btn"', self.read("index.html"))
 
     def test_stop_03_asks_for_the_sources_and_the_decision(self):
         js = self.read("route-stage.js")

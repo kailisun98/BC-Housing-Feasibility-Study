@@ -138,9 +138,12 @@ export function answerFunders(L, run = null) {
   // the homes the first layout does not place are counted by the funders' checks all the same: said beside the verdict
   const lay = run && run.layout;
   if (lay && lay.units_total && (lay.units_placed || 0) < lay.units_total) body = `<p class="finding intake-note">${leadCont(`The first layout places ${lay.units_placed} of ${lay.units_total} homes on the plates as drawn (answer 3); this answer counts all ${lay.units_total}.`)}</p>` + body;
+  // the verdict in the screen's few words at the verdict's size, the engine's sentence under it at reading size (26 Nov
+  // 2026, the 24 Nov critique: a 20-word hedge set at 24 px)
   return `<section class="card answer" data-verdict="${h(verdictStatus(ans.funded.verdict))}">
     <h2><span class="badge">2</span> Does it fit the funders?</h2>
-    <p class="verdict"><em>${h(fundedWord(ans.funded, true))}.</em></p>
+    <p class="verdict"><em>${h(fundedWord(ans.funded))}.</em></p>
+    ${fundedWord(ans.funded, true) !== fundedWord(ans.funded) ? `<p class="finding verdict-words">${h(fundedWord(ans.funded, true).replace(/\.$/, ""))}.</p>` : ""}
     ${body}
   </section>`;
 }

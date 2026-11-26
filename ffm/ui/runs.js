@@ -10,12 +10,12 @@ import { refreshSummary, renderForm, syncCards } from "./schedule.js";
 import {
   blankOption, blankSite, loadOptions, onOptionChange, onSiteChange, selectOption, selectSite, tidyOption
 } from "./files.js";
-import { dateWords, renderMemo } from "./memo/memo.js";
+import { briefName, dateWords, renderMemo } from "./memo/memo.js";
 import { attachCause, compareSummary, setCompareNote } from "./memo/changes.js";
 import { renderPreview3D } from "./figures/cards.js";
 import { closeExportPanel } from "./revit.js";
 import { backToMemo, progress, renderGuide, renderRoute, renderStage, stageShown } from "./route-stage.js";
-import { closeIssuePanel } from "./issue.js";
+import { closeIssuePanel, myName } from "./issue.js";
 import { setMode, setStep, showInputs } from "./modes.js";
 
 /* The top bar's Run. The architect's is the one loud button. The manager runs from the card at 03, so theirs waits
@@ -28,12 +28,13 @@ export function syncRunButton() {
   if (state.mode === "manager" || state.mode === "operator") {
     b.hidden = !state.run;
     b.classList.add("btn-again");
-    // a date moved off the memo's own is said on the button, where the run will use it (24 Nov 2026)
-    const moved = state.run && asOf !== state.run.as_of;
+    // a date off the memo's own is said on the button, where the run will use it, and makes the run worth asking for
+    // (24 Nov 2026; since 26 Nov the date is no longer reset when a memo opens, nor does it mark the memo out of date)
+    const moved = dateMovedFrom(state.run);
     b.textContent = state.running ? "Running…" : moved ? `Run again as of ${dateWords(asOf)}` : "Run again";
-    const ok = !!(state.runStale && p.site && p.option);
+    const ok = !!((state.runStale || moved) && p.site && p.option);
     b.setAttribute("aria-disabled", String(!ok));
-    b.title = ok ? `Run the rules again as of ${dateWords(asOf)}: ${state.runStale} changed (Ctrl+Enter)` : "Nothing has changed since this run";
+    b.title = ok ? `Run the rules again as of ${dateWords(asOf)}${state.runStale ? `: ${state.runStale} changed` : ""} (Ctrl+Enter)` : "Nothing has changed since this run";
     return;
   }
   b.hidden = false;
@@ -49,10 +50,13 @@ export function syncRunButton() {
    revision of the same inputs). The architect may run the same inputs again on purpose. */
 function runRefused() {
   if (state.mode === "reader") return "The reader's view reads memos; it does not run the rules.";
-  if ((state.mode === "manager" || state.mode === "operator") && state.run && !state.runStale)
+  if ((state.mode === "manager" || state.mode === "operator") && state.run && !state.runStale && !dateMovedFrom(state.run))
     return `Nothing has changed since ${rev(state.run.run_id)}: change a figure, an answer or the rules date to run again.`;
   return null;
 }
+
+/* Whether the next run would read the rules on another date than the memo on screen. */
+export const dateMovedFrom = run => !!run && ($("#as-of").value || todayISO()) !== run.as_of;
 
 export async function loadRuns(siteId = null) {
   const sid = siteId || state.siteId || (state.site && state.site.id);
@@ -135,7 +139,7 @@ export async function runRules() {
   setStatus("Running the rules…", "busy");
   try {
     if (STATIC && !engine) { setStatus("Loading the rules engine in your browser…", "busy"); await loadEngine(); }
-    const body = { site: state.site, option: tidyOption(state.option), as_of: $("#as-of").value || todayISO(), previous_run: state.compareRun || null };
+    const body = { site: state.site, option: tidyOption(state.option), as_of: $("#as-of").value || todayISO(), previous_run: state.compareRun || null, made_by: myName() || null };
     const t0 = performance.now();
     const run = await postJSON("/api/run", body);
     state.run = run;
@@ -197,6 +201,8 @@ function enableExports(run) {
   set("#dl-massing", "massing", `${stem}_massing.json`);
   $("#print-btn").disabled = !on;
   $("#pdf-btn").disabled = !on;
+  $("#pdf-board-btn").disabled = !on;
+  if (!on || !$("#board-panel").hidden) { $("#board-panel").hidden = true; $("#board-panel").innerHTML = ""; $("#pdf-board-btn").setAttribute("aria-expanded", "false"); }
   $("#pdf-short-btn").disabled = !on;
   $("#revit-btn").disabled = !(on && run.massing);
   $("#issue-btn").disabled = !on || !!STATIC;
@@ -215,7 +221,7 @@ function runLabel(r) {
 
 /* A memo named for a link: its revision and its option's name up to the colon ("R1 · As approved by Council, 25 Jul
    2024"). */
-export const runName = r => `${rev(r.run_id)} · ${String(r.option_name || r.option_id || "option").split(":")[0].trim()}`;
+export const runName = r => `${rev(r.run_id)}${isDraft(r.run_id) && r.made_by ? ` (${r.made_by}'s)` : ""} · ${briefName(r.option_name || r.option_id || "option", state.site)}`;   // a draft says whose (26 Nov 2026); the option named short, as the title block names it
 
 /* After an issue: the run takes its number, and every place that names it says so. */
 export async function afterIssue(run) {
@@ -255,8 +261,7 @@ export async function followHistory() {
   try {
     if (mode && mode !== state.mode && ["manager", "architect", "reader"].includes(mode)) setMode(mode, false, false);
     if (run && (!state.run || state.run.run_id !== run)) {
-      state.compareRun = cmp && cmp !== run ? cmp : null;
-      await openRun(run);
+      await openRun(run, { compare: cmp });
     } else if (run && (state.compareRun || null) !== cmp) {
       state.compareRun = cmp;
       fillRunSelects();
@@ -288,8 +293,13 @@ export function fillRunSelects() {
     runs.filter(r => r.run_id !== cur).map(r => `<option value="${h(r.run_id)}"${r.run_id === state.compareRun ? " selected" : ""}>${h(runLabel(r))}</option>`).join("");
 }
 
-export async function openRun(runId) {
+/* `compare`: the run to compare with, as the caller asks. A link or Back names one; the This memo picker in the Side by
+   side card keeps the one chosen; opening a memo any other way shows it alone (26 Nov 2026, the third panel: a stored
+   diff made the page pick its own partner, once another person's draft). */
+export async function openRun(runId, { compare = null } = {}) {
   if (!runId) return;
+  const selfCompared = !!compare && compare === runId;
+  state.compareRun = compare && !selfCompared ? compare : null;
   const [site, folder] = runId.split("/");
   setStatus(`Opening ${state.revisions.has(runId) ? rev(runId) : "the memo"}…`, "busy");   // a revision, never the folder
   const run = await api(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}`);
@@ -297,11 +307,10 @@ export async function openRun(runId) {
   state.runStale = null;
   guide.over = false;
   if (state.mode === "manager" || state.mode === "operator") showInputs(false, false);
-  // the date in the top bar is the date of the memo on screen, and so of the next run; a date that moves is said in
-  // the status line below (24 Nov 2026: it changed under the reader without a word)
-  const wasAsOf = $("#as-of").value;
-  $("#as-of").value = run.as_of;
-  const dateMoved = wasAsOf && wasAsOf !== run.as_of;
+  // the date in the top bar is the next run's and stays as it was set; the memo's own date is in its title block, which
+  // says when the two differ (Kai, 26 Nov 2026: opening a memo reset it, so a run started after read old rules)
+  const asOf = $("#as-of").value || todayISO();
+  const dateMoved = asOf !== run.as_of;
   enableExports(run);
   await syncInputsTo(run);
   // the manager's route stands on the run's option, as it was run: 02 shows it, it is not derived again (25 Nov 2026:
@@ -316,12 +325,10 @@ export async function openRun(runId) {
   if (!state.revisions.has(run.run_id)) await loadRuns(runSite);
   if (state.compareRun && !state.compareRun.startsWith(runSite + "/")) state.compareRun = null;   // a comparison never crosses sites
   showStamp(run);   // after the inputs follow the run, so its site's runs, and their revisions, are loaded
-  // a run cannot be compared with itself; a run recorded against an earlier one opens compared with it, when the
-  // list can tell which run that was
-  const selfCompared = state.compareRun === runId;
-  if (selfCompared) state.compareRun = null;
-  if (!state.compareRun && run.diff) state.compareRun = recordedAgainst(run);
+  // a run recorded against an earlier one opens alone; the note beside the pickers offers that comparison
+  if (run.storedDiff === undefined) run.storedDiff = run.diff || null;
   if (state.compareRun) await applyCompare(false);
+  else { run.diff = null; run.compareLedger = null; }
   renderMemo(run);
   fillRunSelects();
   setCompareNote(run.diff);
@@ -330,21 +337,23 @@ export async function openRun(runId) {
   closeExportPanel();
   // the folder is the architect's to know; the manager and the reader are told the revision and its date
   const where = state.mode === "architect" ? ` · ${run.in_browser ? "kept in this browser tab" : `outputs/${run.run_id}/`}` : "";
-  setStatus(`Opened ${rev(run.run_id)}, the memo as of ${dateWords(run.as_of)}${where}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}${dateMoved && state.mode !== "reader" ? ` · Rules as of now reads ${dateWords(run.as_of)}, this memo's date (it read ${dateWords(wasAsOf)})` : ""}`, "ok");
+  setStatus(`Opened ${rev(run.run_id)}, the memo as of ${dateWords(run.as_of)}${where}${run.diff ? ` · ${compareSummary(run)}` : ""}${selfCompared ? " · A and B were the same run, so the comparison was cleared" : ""}${dateMoved && state.mode !== "reader" ? ` · the next run reads the rules as of ${dateWords(asOf)}` : ""}`, "ok");
 }
 
 /* The run a stored comparison (diff.json) was made against. The diff names only that run's date and rules stamp,
    and several runs can share both, so: the runs with that date and stamp, narrowed to one option (this run's own
    option first, as in a change of rules), then the named folder among them. Same option, date and rules give the
-   same memo, so any of them is the run compared. Ambiguous between options: none, and the note says so. */
-function recordedAgainst(run) {
-  const d = run.diff;
+   same memo, so any of them is the run compared, an issued one before a draft. Ambiguous between options: none, and
+   the note says so. Offered beside the pickers, never applied by itself (26 Nov 2026). */
+export function recordedAgainst(run) {
+  const d = run && (run.storedDiff || run.diff);
+  if (!d) return null;
   const hits = state.runs.filter(r => r.run_id !== run.run_id && r.as_of === d.previous_as_of && r.stamp === d.previous_stamp);
   const own = run.ledger && run.ledger.run && run.ledger.run.option_id;
   const options = [...new Set(hits.map(r => r.option_id))];
   const pick = options.length === 1 ? hits : hits.filter(r => r.option_id === own);
   if (!pick.length || new Set(pick.map(r => r.option_id)).size !== 1) return null;
-  return (pick.find(r => !/^\d{4}-\d\d-\d\d/.test(r.folder || "")) || pick[0]).run_id;
+  return (pick.find(r => !/^\d{4}-\d\d-\d\d/.test(r.folder || "")) || pick.find(r => !isDraft(r.run_id)) || pick[0]).run_id;
 }
 
 /* An opened run shows its own site and option in the inputs, unless the reader has unsaved edits there. */

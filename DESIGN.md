@@ -615,7 +615,7 @@ here, including opening a past run, a comparison and reading the Revit result; t
   decides; a press sets `data-theme` on `<html>` and is kept (`ffm.theme`), applied in the head before the first
   paint. The drawings stay on white paper either way.
 - **The memo's actions:** in its title block, under the option's figures: Download PDF (Ink), Issue to
-  the architect, Print, More formats; the architect's row leads with Export to Revit; the issue form
+  the architect, Print, More formats; the architect's row leads with Build it in Revit (Export to Revit until 26 Nov 2026); the issue form
   opens under the row. The export footer keeps the note and the Revit panel and shows only with a memo.
 
 ### Title block
@@ -698,13 +698,36 @@ A run made in the tool is a **draft**, named by the time it was made ("Draft 14:
 title block's Revision cell says "not issued; issuing makes it R4". **Mark issued to the architect** (or to the
 manager) gives it the site's next number, in the order memos were first issued, so no number moves once given.
 Committed runs keep R1, R2…. The reader is offered issued memos only. The pickers and the stop 01 list name each
-memo by revision and option ("R1 · As approved by Council, 25 Jul 2024 · rules as of 23 Oct 2026"), never a folder.
-A "Rules as of" date that differs from the memo's own leaves the memo out of date, as an edit does: the band says so
-and Run again reads "Run again as of 27 Oct 2026"; the date put back, the memo is current again.
+memo by revision and option ("R1 · As approved by Council, 25 Jul 2024 · rules as of 23 Oct 2026"), never a folder;
+a draft says whose it is ("Draft 21:09 (Sam's)").
+
+### The flow, after the third panel (26 Nov 2026, Kai's choices)
+- **The rules date belongs to the next run.** Opening a memo leaves the top bar's "Rules as of" as it was. Where it
+  differs from the memo's own, the title block's Rules as of cell adds "· the next run reads 25 Nov 2026" (not for the
+  reader, not on paper) and Run again goes live as "Run again as of 25 Nov 2026"; no out-of-date band, Issue stays
+  available. (This replaces the 24 Nov rule that a moved date marked the memo out of date.)
+- **A comparison is chosen, never assumed.** A memo opens alone unless a link, Back or the This memo picker inside
+  the Side by side card names its partner; a memo recorded against another says so beside the pickers with "Compare
+  with it".
+- **Options have names.** A derived option is named by its candidate and figures ("Funder-ready · 6 storeys · 99
+  homes"), and stop 03 opens on "The option's name", which the memo, the lists and the comparison use.
+- **A name per browser.** "Your name" in the top bar (a dashed pill until given; a small form under it): kept in this
+  browser only, not a login. Issues are sent from it and may be addressed to a person ("Their name"); the chip shows
+  what is addressed to this name, or, addressed to no one, says "issued to the architect", never "to you". The title
+  block and the paper's Revision cell say "Issued by Sam (the development manager) to Kai (the architect), 25 Nov
+  2026, 21:09"; a run made here records its maker.
+- **The board memo.** "Board PDF, two pages", beside Download PDF: the decision wanted set large, who is housed and
+  operates, the programs and the amount; the four answers with at most three deciding rules each and the money drawn;
+  the top five open items with who resolves each; and only the sources those pages cite, one line each with the site
+  they are on. Where the memo states no decision, the download asks for one first; what is typed prints on that PDF
+  and is kept in the option for the next run. Printed by headless Edge, every committed memo is two letter pages.
 
 ### Answer cards
 The signature component. The answers keep a 920px reading width (the architect's two columns from 1600px excepted),
-so a wash ends with its words instead of running the pane's width. A heading set as the site's key (a mono "01" then the question in 11px tracked
+so a wash ends with its words instead of running the pane's width. A verdict is the screen's few words at 24px
+(answer 2: "Screen not yet confirmed."); where the engine says more, its sentence follows at reading size (26 Nov
+2026: the engine's 20-word sentence had been set as the verdict). On a first visit the manager opens on Summary;
+the architect and the reader on Detailed; a choice made is kept. A heading set as the site's key (a mono "01" then the question in 11px tracked
 caps), the verdict at 24px 400, light and large the way the site sets its headlines, with the operative
 words in the status text colour, then findings in lead-and-continuation prose or a pill-led list;
 the third card holds a table of open items with a Who / what column in Muted. Wash and tone come
@@ -780,7 +803,7 @@ The tool's top bar carries a three-way pill, Manager · Architect · Reader, aft
 `docs/user-flows.md` as three layouts of the same page. The pressed segment is paper on the ink bar. Manager
 (the default): the memo first, the inputs beside it as summaries, Download PDF leads the export bar.
 Architect: the Site and Option forms open, every ledger layer open but F (it opens with the money), the four answers
-in two columns from 1600px with the drawings full width under them (two sheets to a row from 1800px), Export to Revit
+in two columns from 1600px with the drawings full width under them (two sheets to a row from 1800px), Build it in Revit
 leads the actions (first in the DOM, so the tab order matches). Reader: the rail, the steps, the date, Run, the run pickers and
 the Revit buttons are gone; the memo alone sits in a 980px reading column at 14px with Download PDF and
 Print. The status strip says which layout is on; the page title says who it is for; a link can carry

@@ -217,16 +217,11 @@ export async function saveNow(kind, given = null) {
 }
 
 /* An edit to the site, the option or the money after a run leaves the answers on screen out of date: a band over the
-   memo says so, and Issue waits for a new run. runRules and openRun clear it. */
-export const DATE_STALE = "the rules date";
-
+   memo says so, and Issue waits for a new run. runRules and openRun clear it. The rules date is not an edit: a date
+   off the memo's own is said in its title block and on Run again (26 Nov 2026). */
 export function markStale(what) {
-  if (!state.run) return;
-  const why = what || "the inputs";
-  // a memo out of date only by its rules date is current again when the date goes back (main.js), so an edit made
-  // meanwhile is added to the reason, never lost under it
-  if (state.runStale && !(state.runStale === DATE_STALE && why !== DATE_STALE)) { syncStaleBand(); return; }
-  state.runStale = state.runStale === DATE_STALE ? `${why} and ${DATE_STALE}` : why;
+  if (!state.run || state.runStale) { if (state.run) syncStaleBand(); return; }
+  state.runStale = what || "the inputs";
   syncStaleBand();
   // the status line says so once, at the change that left the memo out of date (20 Nov 2026: a three-state answer
   // after a run changed nothing on screen but the band); a caller with more to say writes after this

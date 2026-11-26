@@ -28,9 +28,50 @@ function seenIssues() { try { return new Set(JSON.parse(localStorage.getItem(ISS
 
 function markIssueSeen(id) { const s = seenIssues(); s.add(id); try { localStorage.setItem(ISSUES_SEEN_KEY, JSON.stringify([...s].slice(-200))); } catch (e) { /* fine */ } }
 
+/* The person at this browser, by the name they gave (26 Nov 2026, Kai: "a name per browser"): kept in this browser
+   only, never a login. An issue is sent from it and may be addressed to another person's; the top-bar chip shows
+   what was addressed to it, and a run made here records it as its maker. The key is the issue form's, so a name given
+   there before carries over. */
 function issueName() { try { return localStorage.getItem(ISSUE_NAME_KEY) || ""; } catch (e) { return guide.issueName || ""; } }
 
-function setIssueName(n) { try { localStorage.setItem(ISSUE_NAME_KEY, n); } catch (e) { guide.issueName = n; } }
+function setIssueName(n) { try { if (n) localStorage.setItem(ISSUE_NAME_KEY, n); else localStorage.removeItem(ISSUE_NAME_KEY); } catch (e) { guide.issueName = n; } syncMe(); }
+
+export const myName = () => issueName().trim();
+
+const sameName = (a, b) => !!a && !!b && String(a).trim().toLowerCase() === String(b).trim().toLowerCase();
+
+/* The top bar's name button and its small form. */
+export function syncMe() {
+  const b = $("#me-btn");
+  if (!b) return;
+  const n = myName();
+  b.textContent = n || "Your name";
+  b.classList.toggle("unset", !n);
+  b.title = n ? `You are ${n} in this browser: issues addressed to ${n} show here. Click to change.` : "Give your name: issues are sent from it, and those addressed to it show here. Kept in this browser only.";
+}
+
+export function wireMe() {
+  const b = $("#me-btn"), panel = $("#me-panel");
+  if (!b || !panel) return;
+  syncMe();
+  const close = (focusBack = false) => { panel.hidden = true; b.setAttribute("aria-expanded", "false"); if (focusBack) b.focus(); };
+  b.addEventListener("click", () => {
+    if (!panel.hidden) { close(); return; }
+    panel.innerHTML = `<form class="me-form">
+        <label class="field"><span class="label">Your name</span><input type="text" name="me" value="${h(myName())}" autocomplete="name" maxlength="80" placeholder="as your colleagues know you"></label>
+        <div class="form-actions"><button type="submit" class="btn btn-primary btn-small">Keep it</button>${myName() ? `<button type="button" class="btn btn-quiet btn-small" data-me-clear>Forget it</button>` : ""}</div>
+        <p class="help">Kept in this browser only; it is not a login. Issues you send carry it, issues addressed to it show in this bar, and runs you make are marked with it.</p>
+      </form>`;
+    panel.hidden = false;
+    b.setAttribute("aria-expanded", "true");
+    const form = $("form", panel), inp = $("input", form);
+    inp.focus(); inp.select();
+    form.addEventListener("submit", e => { e.preventDefault(); setIssueName(inp.value.trim()); close(true); setStatus(myName() ? `You are ${myName()} in this browser.` : "No name is kept in this browser.", "ok"); showMine(); });
+    const clr = $("[data-me-clear]", form);
+    if (clr) clr.addEventListener("click", () => { setIssueName(""); close(true); setStatus("No name is kept in this browser.", "info"); showMine(); });
+    form.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); close(true); } });
+  });
+}
 
 /* The issue form: the sender's name (kept for next time), who it goes to, a note. Rendered where the button was
    pressed: inside the guide's stop 7 for the manager, under the export bar for anyone. */
@@ -45,13 +86,23 @@ function issueFormHtml(scope) {
   return `<form class="issue-panel" data-issue="${h(scope)}" aria-label="${h(label)} to ${h(ISSUE_WORD[to])}">
     ${(ISSUE_ALSO[state.mode] || []).length ? "" : `<input type="hidden" name="to" value="${h(to)}">`}
     <div class="issue-row">
-      <label class="field"><span class="label">Your name</span><input type="text" name="name" value="${h(issueName())}" placeholder="so they know who sent it" autocomplete="name" maxlength="80"></label>
+      <label class="field"><span class="label">From</span><input type="text" name="name" value="${h(myName())}" placeholder="your name" autocomplete="name" maxlength="80"></label>
       ${(ISSUE_ALSO[state.mode] || []).length ? `<label class="field"><span class="label">To</span><select name="to">${[to, ...ISSUE_ALSO[state.mode]].map(t => `<option value="${h(t)}">${h(cap(ISSUE_WORD[t]))}</option>`).join("")}</select></label>`
         : `<p class="field"><span class="label">To</span><span>${h(cap(ISSUE_WORD[to]))}</span></p>`}
+      <label class="field"><span class="label">Their name</span><input type="text" name="to_name" list="issue-names" placeholder="who should open it" autocomplete="off" maxlength="80"></label>
+      <datalist id="issue-names">${knownNames().map(n => `<option value="${h(n)}">`).join("")}</datalist>
     </div>
     <label class="field"><span class="label">A note</span><textarea name="note" rows="2" maxlength="600" placeholder="What changed, and what you want checked"></textarea></label>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">${h(label)}</button><button class="btn btn-quiet btn-small" type="button" data-issue-cancel>Not now</button><span class="help">${draft ? `The draft becomes ${h(nextRev())}. ` : ""}Recorded on this machine: ${h(ISSUE_WORD[to])}'s layout here shows it, with your note under the memo's title. To reach someone elsewhere, send the link or the PDF; for the board, Download PDF.</span></div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">${h(label)}</button><button class="btn btn-quiet btn-small" type="button" data-issue-cancel>Not now</button><span class="help">${draft ? `The draft becomes ${h(nextRev())}. ` : ""}Recorded on this machine: it shows in the top bar of the browser that gives their name (or, with no name, in ${h(ISSUE_WORD[to])}'s layout), with your note under the memo's title. To reach someone elsewhere, send the link or the PDF; for the board, Download PDF.</span></div>
   </form>`;
+}
+
+/* The names seen on issues, senders and receivers, for the Their name list; this browser's own left out. */
+function knownNames() {
+  const me = myName();
+  const seen = new Map();
+  for (const i of state.issues || []) for (const n of [i.name, i.to_name]) { const t = String(n || "").trim(); if (t && !sameName(t, me)) seen.set(t.toLowerCase(), t); }
+  return [...seen.values()].sort();
 }
 
 function wireIssueForm(form, onClose) {
@@ -88,13 +139,14 @@ async function sendIssue(form) {
   const fd = new FormData(form);
   const to = String(fd.get("to") || ISSUE_TO[state.mode] || "");
   const name = String(fd.get("name") || "").trim();
+  const toName = String(fd.get("to_name") || "").trim();
   const note = String(fd.get("note") || "").trim();
   if (!to) return false;
   const [site, folder] = run.run_id.split("/");
   const btn = $("button[type=submit]", form); if (btn) btn.disabled = true;
   try {
-    const it = await postJSON(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}/issue`, { by: state.mode, to, note, name });
-    if (name) setIssueName(name);
+    const it = await postJSON(`/api/runs/${encodeURIComponent(site)}/${encodeURIComponent(folder)}/issue`, { by: state.mode, to, note, name, to_name: toName });
+    if (name && !sameName(name, myName())) setIssueName(name);
     run.issued = it;
     run.issues = [...(run.issues || []), it];
     const memoEl = $("#memo"); if (memoEl) memoEl.dataset.issuedManager = run.issues.some(i => i.to === "manager") ? "1" : "";
@@ -105,7 +157,7 @@ async function sendIssue(form) {
     await afterIssue(run);   // a draft takes its number now, and the title block, the top bar and the pickers say it
     renderGuide();
     const now = rev(run.run_id);
-    setStatus(`${was !== now ? `${was} is now ${now}, issued` : `Issued ${now}`} to ${ISSUE_WORD[to]}, ${dateWords(it.issued_at, true)}${name ? `, as ${name}` : ""}. ${cap(ISSUE_WORD[to])}'s layout on this machine shows it; send the link or the PDF to reach them elsewhere.`, "ok");
+    setStatus(`${was !== now ? `${was} is now ${now}, issued` : `Issued ${now}`} to ${toName ? `${toName} (${ISSUE_WORD[to]})` : ISSUE_WORD[to]}, ${dateWords(it.issued_at, true)}${name ? `, from ${name}` : ""}. ${toName ? `${toName}'s top bar shows it on this machine` : `${cap(ISSUE_WORD[to])}'s layout on this machine shows it`}; send the link or the PDF to reach them elsewhere.`, "ok");
     return true;
   } catch (e) {
     toast(`Could not record the issue: ${e.message}. Nothing changed; try again, or send the link or the PDF.`, true);
@@ -144,11 +196,19 @@ export async function pollIssues() {
   return issuesAsk;
 }
 
+/* What the chip offers this browser: an issue addressed to its name; one addressed to no name, to the layout on
+   screen, said as such ("issued to the architect", never "to you"); never one this browser's name sent (26 Nov 2026,
+   the third panel: "issued to you" reached whoever opened the page). */
 function showMine() {
-  const seen = seenIssues();
-  const mine = (state.issues || []).filter(i => i.to === state.mode && i.by !== state.mode && !seen.has(i.id));
+  const seen = seenIssues(), me = myName();
+  const forMe = i => (i.to_name ? sameName(i.to_name, me) : i.to === state.mode);
+  const fromMe = i => (me ? sameName(i.name, me) : i.by === state.mode);
+  const mine = (state.issues || []).filter(i => forMe(i) && !fromMe(i) && !seen.has(i.id));
   showIssueChip(mine[0] || null, mine.length);
 }
+
+/* Who sent an issue, in words: their name and role, or the role alone. */
+const senderWords = i => (i.name ? `${i.name} (the ${i.by})` : `the ${i.by}`);
 
 function showIssueChip(issue, count) {
   const chip = $("#issue-chip");
@@ -156,12 +216,13 @@ function showIssueChip(issue, count) {
   const ago = (() => { const s = Math.max(0, (Date.now() - new Date(issue.issued_at).getTime()) / 1000); return s < 90 ? "just now" : s < 3600 ? `${Math.round(s / 60)} min ago` : s < 86400 ? `${Math.round(s / 3600)} h ago` : `${Math.round(s / 86400)} d ago`; })();
   chip.hidden = false;
   const siteName = (state.sites.find(s => s.id === issue.site) || {}).address || issue.site || "";
-  chip.innerHTML = `<span class="dot"></span>${siteName ? h(String(siteName).split(",")[0]) + " · " : ""}${h(state.revisions.get(issue.run_id) || "a run")} issued to you by the ${h(issue.by)} · ${h(ago)}${count > 1 ? ` · +${count - 1}` : ""}`;
+  const toWhom = issue.to_name ? "you" : (ISSUE_WORD[issue.to] || `the ${issue.to}`);
+  chip.innerHTML = `<span class="dot"></span>${siteName ? h(String(siteName).split(",")[0]) + " · " : ""}${h(state.revisions.get(issue.run_id) || "a run")} issued to ${h(toWhom)} by ${h(senderWords(issue))} · ${h(ago)}${count > 1 ? ` · +${count - 1}` : ""}`;
   chip.title = issue.note ? `"${issue.note}" · click to open` : "Click to open the run";
   chip.onclick = async () => {
     markIssueSeen(issue.id);
     chip.hidden = true;
-    try { await openRun(issue.run_id); setStatus(`Opened ${rev(issue.run_id)}, issued by the ${issue.by}${issue.note ? `: "${issue.note}"` : ""}.`, "ok"); }
+    try { await openRun(issue.run_id); setStatus(`Opened ${rev(issue.run_id)}, issued by ${senderWords(issue)}${issue.note ? `: "${issue.note}"` : ""}.`, "ok"); }
     catch (e) { toast(e.message, true); }
     pollIssues();
   };

@@ -325,6 +325,12 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .memo-meta > div:last-child { border-right: 0; margin-right: 0; }
 .memo-meta b { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; font-weight: 600; }
 .memo-meta .cont { color: var(--muted); }
+/* who issued the memo, to whom, when (26 Nov 2026) */
+.memo-meta .issued-by { display: block; font-size: 12px; margin-top: 2px; }
+/* the next run's rules date beside the memo's own (26 Nov 2026); the reader runs nothing */
+.memo-meta .next-asof { display: block; font-size: 12px; }
+.memo-meta .next-asof:empty, [data-mode="reader"] .memo-meta .next-asof { display: none; }
+@media print { .memo-meta .next-asof { display: none; } }
 /* the revision is a value, not a key: "Draft 14:03" in its own case (24 Nov 2026) */
 .memo-meta b.rev-no { font-size: 12.5px; color: var(--ink); letter-spacing: 0; text-transform: none; }
 .memo-meta code { font: 600 11.5px/1.3 var(--mono); }
@@ -795,6 +801,12 @@ table.plain td.status { white-space: nowrap; }
 .more-formats > summary::-webkit-details-marker { display: none; }
 .more-formats[open] > summary { background: var(--field); }
 .more-formats > .action-bar { padding-top: 6px; }
+.more-formats > .formats-note { margin: 8px 0 0; font-size: 12px; color: var(--muted); max-width: 72ch; }
+/* the saved option's figures at 02, and the board memo's decision prompt (26 Nov 2026) */
+.saved-figures .fin-rows { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px 12px; }
+.saved-figures .sf-row input { width: 100%; }
+.board-form { max-width: 560px; }
+.answer .verdict-words { margin: -6px 0 10px; }
 .export-panel { margin-top: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 12px; }
 /* (20 Nov 2026) what Revit receives, in one line under the panel's heading */
 .export-panel .export-gets { margin: -6px 0 0; font-size: 12.5px; max-width: 80ch; }
@@ -1031,6 +1043,19 @@ table.plain td.status { white-space: nowrap; }
 .issue-panel .form-actions { margin-top: 0; }
 .issue-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 9px; border-radius: 999px; border: 1px solid var(--b-amber-night); background: color-mix(in srgb, var(--b-amber-night) 18%, transparent); color: #ffe3a6; font: 500 12px/1 var(--sans); cursor: pointer; white-space: nowrap; transition: background-color var(--t-fast); }
 .issue-chip:hover { background: color-mix(in srgb, var(--b-amber-night) 32%, transparent); color: #fff; }
+/* the person at this browser: a quiet pill on the ink bar, its small form dropping under it (26 Nov 2026) */
+.me { position: relative; }
+.me-btn { font: 500 12px/1 var(--sans); color: var(--on-chrome); padding: 6px 12px; min-height: 28px; border: 1px solid var(--chrome-line); border-radius: 999px; background: transparent; cursor: pointer; white-space: nowrap; max-width: 180px; overflow: hidden; text-overflow: ellipsis; transition: background-color var(--t-fast); }
+.me-btn.unset { color: var(--on-chrome-muted); border-style: dashed; }
+.me-btn:hover { background: rgba(255, 255, 255, .08); }
+.me-panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(320px, calc(100vw - 32px)); padding: 12px; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-panel); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.me-panel .field { display: flex; flex-direction: column; gap: 4px; }
+.me-panel .label { font-size: 12px; color: var(--muted); font-weight: 500; }
+.me-panel input { width: 100%; border: 1px solid var(--line); background: var(--field); color: var(--ink); border-radius: 4px; padding: 6px 8px; font-size: 13px; }
+.me-panel .help { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+.me-panel .form-actions { margin-top: 8px; }
+@media (pointer: coarse) { .me-btn { min-height: 44px; } }
+@media print { .me { display: none; } }
 .issue-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--b-amber-night); box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-amber-night) 30%, transparent); }
 @media (max-width: 760px) { .issue-chip { white-space: normal; text-align: left; } }
 [data-mode="reader"] #issue-btn, [data-mode="reader"] #issue-panel, [data-mode="reader"] #guide { display: none !important; }

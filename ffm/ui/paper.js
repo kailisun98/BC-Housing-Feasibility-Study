@@ -4,8 +4,8 @@
 import { cap, fmtNum, h, setStatus, STATUS_WORD, todayISO, verdictStatus } from "./core/util.js";
 import { state, STATIC } from "./core/state.js";
 import { optWord } from "./fields.js";
-import { rev } from "./runs.js";
-import { briefName, compareKind, dateWords, idBreak, memoRefs, optionName, takesRef } from "./memo/memo.js";
+import { isDraft, rev } from "./runs.js";
+import { briefName, compareKind, dateWords, idBreak, issuedWords, memoRefs, optionName, takesRef } from "./memo/memo.js";
 import { amountWords, frontOf, routeStatus } from "./memo/front.js";
 import { CONTRIBUTION_WORD, outOfTotal, fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, operatingRows, outrightWords, unverifiedRules } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
@@ -85,10 +85,26 @@ function areasPaper(run) {
   return out.join("\n");
 }
 
+/* The board memo's own rules over the paper memo's: the decision set large, the page kept to two. */
+const BOARD_CSS = `
+    body { font-size: 8.1pt; line-height: 1.38; }
+    .board-ask .decision { font-size: 12pt; line-height: 1.3; font-weight: 500; margin: 0 0 4pt; }
+    .board-ask .decision .muted { font-size: 9pt; font-weight: 400; }
+    .sec { break-inside: auto; }
+    table.open td, table.open th { padding-top: 2pt; padding-bottom: 2pt; }`;
+
+/* Who issued the memo, to whom and when, under its revision on paper (26 Nov 2026), as the screen's title block says. */
+function issuedPaper(run) {
+  const list = (run.issues || []).slice().sort((a, b) => String(a.issued_at).localeCompare(String(b.issued_at)));
+  if (!list.length) return isDraft(run.run_id) ? `<br><span class="muted">a draft, not issued</span>` : "";
+  const first = list[0], last = list[list.length - 1];
+  return `<br><span class="muted">${h(cap(issuedWords(first)))}${last !== first ? `; last ${h(issuedWords(last))}` : ""}</span>`;
+}
+
 /* `short` (25 Nov 2026, the small-lot architect of the second panel): the front sheet, the answers, the open items, the
    money and the sources of the rules that apply; the clauses, the drawings, the ledger, the inputs and the
    reproduction notes are the full memo's. */
-export function paperDocument(run, { short = false } = {}) {
+export function paperDocument(run, { short = false, board = false, decision = null } = {}) {
   // the exits as the plans found them, the same on paper as on screen (withPlans)
   const L = run.ledger, res = withPlans(L.results, run), ans = L.summary.answers;
   const site = L.inputs.site || {}, opt = L.inputs.option || {};
@@ -146,7 +162,9 @@ export function paperDocument(run, { short = false } = {}) {
     // rezoning says who approved it and when
     if (!items.length && o.verdict === "approved") return `<span class="muted">${h(cap(o.why || "approved"))}.</span>`;
     if (!items.length && o.verdict === "not assessed") return `<span class="muted">Not assessed: ${h(o.why || "the rules hold nothing to test here")}.</span>`;
-    return items.length ? `<ul class="refs">${items.join("")}</ul>` : `<span class="muted">No rule stands in the way.</span>`;
+    // the board memo names three, the full memo every one (26 Nov 2026: the board memo keeps to two pages)
+    const shown = board && items.length > 3 ? [...items.slice(0, 3), `<li class="muted">and ${items.length - 3} more, in the full memo</li>`] : items;
+    return items.length ? `<ul class="refs">${shown.join("")}</ul>` : `<span class="muted">No rule stands in the way.</span>`;
   };
   const unsure = [...(ans.unsure || []), ...layoutOpenItems(run).map(u => ({ ...u, rule_id: u.rule_id || "layout", finding: "" }))];   // the drawings' open items join the rules'
   // the outright answer in the words the screen uses
@@ -185,8 +203,8 @@ export function paperDocument(run, { short = false } = {}) {
         ${routes ? `<tr><th scope="row">By the Director's discretion?</th><td>${rmark(routes.discretion.verdict)}</td><td>${routes.discretion.rules.length ? `<ul class="refs">${routes.discretion.rules.map(id => `<li>${refTag(id)} ${h(titleOf[id] || id)} <span class="muted">(a discretionary approval, never assumed)</span></li>`).join("")}</ul>` : `<span class="muted">${h(cap(routes.discretion.why || ""))}.</span>`}</td></tr>` : ""}
         <tr><th scope="row">Is it allowed by rezoning?</th><td>${vmark(ans.allowed.by_rezoning.verdict)}</td><td>${decidedBy(ans.allowed.by_rezoning)}${ans.allowed.rezoning_path ? `<p class="note">Path: ${h(ans.allowed.rezoning_path)}.</p>` : ""}</td></tr>
         <tr><th scope="row">Does it fit the funders?</th><td>${fundMark}</td><td>${intake ? `<p class="note intake">${h(intake)}</p>` : ""}${decidedBy(ans.funded)}${pfOk ? `<p class="note">The criteria are not the money: ${h(moneyPhrase(run.proforma))} (below).</p>` : ""}</td></tr>
-        <tr><th scope="row">What is still unsure?</th><td>${unsure.length ? `<span class="st st-${unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${unsure.length} open item${unsure.length === 1 ? "" : "s"}</span>` : `<span class="st st-pass">Nothing open</span>`}</td><td>${unsure.length ? `Each with the person who resolves it, in section 2: ${h(unsure.map(itemName).join("; "))}.` : `<span class="muted">Every rule that applies is settled.</span>`}</td></tr>
-        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(moneyWord(run.proforma.verdict))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the cost, against this tool's 15% screening line)` : ""}. ${h((run.proforma.verdict.why || []).slice(run.proforma.gap.share_of_capital != null ? 1 : 0, run.proforma.gap.share_of_capital != null ? 1 : 2).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Drawn below; every line and its source in section ${s.money}.${moneyNext(run.proforma) ? `<p class="note">For the development manager: ${h(moneyNext(run.proforma))}</p>` : ""}</td></tr>` : ""}
+        ${board ? "" : `<tr><th scope="row">What is still unsure?</th><td>${unsure.length ? `<span class="st st-${unsure.some(u => u.status === "fail") ? "fail" : "uncertain"}">${unsure.length} open item${unsure.length === 1 ? "" : "s"}</span>` : `<span class="st st-pass">Nothing open</span>`}</td><td>${unsure.length ? `Each with the person who resolves it, in section 2: ${h(unsure.map(itemName).join("; "))}.` : `<span class="muted">Every rule that applies is settled.</span>`}</td></tr>`}
+        ${run.proforma && run.proforma.available ? `<tr><th scope="row">Does the money work? <span class="muted">(feasibility grade)</span></th><td><span class="st st-${MONEY_STATUS[run.proforma.verdict.word] || "uncertain"}">${h(moneyWord(run.proforma.verdict))}</span></td><td>Capital cost ${h(money(run.proforma.capital.total))}; funding ${h(money(run.proforma.funding.total))}; gap ${h(money(run.proforma.gap.value))}${run.proforma.gap.share_of_capital != null ? ` (${h(Math.round(run.proforma.gap.share_of_capital * 100))}% of the cost, against this tool's 15% screening line)` : ""}. ${h((run.proforma.verdict.why || []).slice(run.proforma.gap.share_of_capital != null ? 1 : 0, run.proforma.gap.share_of_capital != null ? 1 : 2).map(w => w[0].toUpperCase() + w.slice(1) + ".").join(" "))} Drawn below; every line and its source in ${board ? "the full memo" : `section ${s.money}`}.${moneyNext(run.proforma) ? `<p class="note">For the development manager: ${h(moneyNext(run.proforma))}</p>` : ""}</td></tr>` : ""}
       </tbody></table>`;
 
   // 2. open items
@@ -518,11 +536,11 @@ export function paperDocument(run, { short = false } = {}) {
   const optFull = String(opt.name || opt.id || "—"), optShort = briefName(optFull, site);
   const titleBlock = `<div class="tb">
       <div style="grid-column: span 2"><b>Option</b>${h(optShort)}${optShort !== optFull ? `<div class="muted" style="font-size:7.2pt">${h(optFull)}</div>` : ""}</div>
-      <div><b>Revision</b><span class="big">${h(revA)}</span></div>
+      <div><b>Revision</b><span class="big">${h(revA)}</span>${issuedPaper(run)}</div>
       <div><b>Rules as of</b><span class="big">${h(asOf)}</span></div>
       <div><b>Proponent</b>${h(opt.proponent || "—")}${opt.proponent_type ? ` <span class="muted">(${h(optWord("option", "proponent_type", opt.proponent_type))})</span>` : ""}</div>
       <div><b>Site</b>${h(site.zoning_district || "—")} · ${h(fmtNum(site.site_area_m2 ?? "—"))} m² · ${h(site.frontage_m ?? "—")} × ${h(site.depth_m ?? "—")} m</div>
-      <div><b>${d ? (kind === "rules" ? "Revised from" : "Compared with") : "Run"}</b>${d ? `${h(revB)}${B ? ` · ${h(briefName(optionName(B), site))}` : ""}` : h(ran || "not recorded")}<br><span class="muted">printed ${h(printed)}</span></div>
+      <div><b>${d && !board ? (kind === "rules" ? "Revised from" : "Compared with") : "Run"}</b>${d && !board ? `${h(revB)}${B ? ` · ${h(briefName(optionName(B), site))}` : ""}` : h(ran || "not recorded")}<br><span class="muted">printed ${h(printed)}</span></div>
       <div><b>Fingerprint</b><span class="mono">${h(st.stamp)}</span><br><span class="muted">engine ${h(L.run.engine_version)}</span></div>
     </div>`;
   // the first page: the answers with the money drawn beside them, and the outright-against-proposed drawing where the
@@ -546,6 +564,51 @@ export function paperDocument(run, { short = false } = {}) {
       ${fs.open_items.length ? `<tr><th scope="row">The top ${fs.open_items.length} of ${fs.open_total} open items</th><td>${fs.open_items.map((u, i) => `${i + 1}. ${h(u.title)} ${mark(u.status)}`).join("<br>")}</td></tr>` : ""}
     </tbody></table></section>`;
   const words = s.words ? `<section class="sec words"><h2><span class="no">${s.words}</span> Words in this memo</h2><dl>${terms.map(([t, w]) => `<div><dt>${h(t)}</dt><dd>${h(w)}</dd></div>`).join("")}</dl></section>` : "";
+  const head = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${h(`First Read ${board ? "board memo" : "memo"} ${revA} · ${address}`)}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>${css}${board ? BOARD_CSS : ""}</style></head><body>`;
+  if (board) {
+    // the board memo (26 Nov 2026, Kai): two pages a board reads before it votes. The decision first, then the four
+    // answers with the money drawn, the five open items that matter most with who resolves each, and only the sources
+    // those pages cite; the full memo keeps everything else
+    const decisionText = String(decision || fs.decision || "").trim();
+    const RANKS = { fail: 0, uncertain: 1, conditional: 2 };
+    const top5 = unsure.map((u, i) => [u, i]).sort((a, b) => (RANKS[a[0].status] ?? 3) - (RANKS[b[0].status] ?? 3) || a[1] - b[1]).slice(0, 5).map(([u]) => u);
+    const cited = new Set();
+    // the rules these pages name: the three each answer shows (as decidedBy), the discretion's, the five open items'
+    const citeFrom = o => ["fail", "conditional", "uncertain"].flatMap(k => (o && o[k]) || []).slice(0, 3).forEach(id => cited.add(id));
+    citeFrom(ans.allowed.outright); citeFrom(ans.allowed.by_rezoning); citeFrom(ans.funded);
+    if (routes) (routes.discretion.rules || []).forEach(id => cited.add(id));
+    top5.forEach(u => { if (u.rule_id) cited.add(u.rule_id); });
+    const boardSources = sources.filter(x => x.cites.some(id => cited.has(id)));
+    // each source in a line: its title, section, the refs it stands behind here and the site it is on (the full memo
+    // prints the addresses)
+    const host = u => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (e) { return ""; } };
+    const boardSrc = boardSources.length ? `<ol class="sources">${boardSources.map((x, i) => `<li><b class="ref">S${i + 1}</b> <span>${h(x.title || x.url)}${x.section ? `<span class="muted">, ${h(x.section)}</span>` : ""} <span class="muted">· for ${x.cites.filter(id => cited.has(id)).map(ref).join(", ")}${x.url && host(x.url) ? ` · ${h(host(x.url))}` : ""}</span></span></li>`).join("")}</ol>` : `<p class="note">No rule on these pages rests on a source the memo cites.</p>`;
+    const openTop = top5.length ? `<table class="open">
+        <colgroup><col style="width:6%"><col style="width:34%"><col style="width:13%"><col></colgroup>
+        <thead><tr><th>Ref</th><th>Item</th><th>Status</th><th>Who resolves it</th></tr></thead>
+        <tbody>${top5.map(u => `<tr><td>${refCell(u.rule_id)}</td><td><b>${h(u.title)}</b></td><td>${mark(u.status)}</td><td>${h(u.action || "—")}</td></tr>`).join("")}</tbody></table>${unsure.length > top5.length ? `<p class="note">${unsure.length - top5.length} more in the full memo, each with who resolves it.</p>` : ""}`
+      : `<p>Nothing is open: every rule that applies is settled for this option.</p>`;
+    return `${head}
+    <h1>${h(address)}</h1>
+    <p class="sub">First Read board memo · ${h(revA)} · rules as of ${h(asOf)} · printed ${h(printed)}</p>
+    ${titleBlock}
+    <section class="sec ask board-ask"><h2>The decision wanted</h2>
+      <p class="decision">${decisionText ? h(decisionText) : '<span class="muted">Not stated by the development manager.</span>'}</p>
+      <table class="kv ask"><tbody>
+        <tr><th scope="row">Who is housed</th><td>${h(fs.housed)}</td></tr>
+        <tr><th scope="row">Who operates</th><td>${h(fs.operator)}</td></tr>
+        <tr><th scope="row">Which program</th><td>${h(fs.programs)}</td></tr>
+        <tr><th scope="row">The amount</th><td>${h(amountWords(fs.money))}</td></tr>
+      </tbody></table></section>
+    <section class="sec"><h2><span class="no">1</span> The four answers</h2>${answers}${unvLine}${stackP1 ? `<div class="p1-figs">${stackP1}</div>` : ""}</section>
+    <section class="sec"><h2><span class="no">2</span> ${top5.length ? `The top ${top5.length} of ${unsure.length} open items` : "Open items"}</h2>${openTop}</section>
+    <section class="sec"><h2><span class="no">3</span> Sources for these pages</h2>${boardSrc}
+      <p class="note"><b>A feasibility screen, not legal, planning or funding advice; an independent student tool, not affiliated with BC Housing, the Province, CMHC or the City of Vancouver.</b> The full memo, ${h(revA)}, has the clauses, the drawings, every rule with its numbers and source, the money line by line and how to reproduce it.</p></section>
+  </body></html>`;
+  }
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${h(`First Read memo ${revA} · ${address}`)}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -573,11 +636,14 @@ export function paperDocument(run, { short = false } = {}) {
 /* Download PDF: the server prints the paper memo with a headless Edge or Chrome and the browser saves the file.
    Where there is no server (the web version) or no such browser, the paper memo opens in the print dialog, where
    Save as PDF gives the same document. */
-export async function exportPdf(short = false) {
+/* `mode`: false the full memo, true the short one, "board" the two-page board memo (with `decision` where one was
+   typed at the download). */
+export async function exportPdf(mode = false, { decision = null } = {}) {
   const run = state.run;
   if (!run) return;
-  const html = paperDocument(run, { short });
-  const name = `${run.run_id.replace("/", "_")}_${rev(run.run_id)}_memo${short ? "-short" : ""}.pdf`;
+  const board = mode === "board", short = mode === true;
+  const html = paperDocument(run, { short, board, decision });
+  const name = `${run.run_id.replace("/", "_")}_${rev(run.run_id)}_${board ? "board-memo" : `memo${short ? "-short" : ""}`}.pdf`;
   if (!STATIC) {
     setStatus("Laying out the PDF…", "busy");
     try {
@@ -586,7 +652,8 @@ export async function exportPdf(short = false) {
         const url = URL.createObjectURL(await r.blob());
         const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(url), 60000);
-        setStatus(short ? `Saved ${name}: ${rev(run.run_id)}'s ask, answers, open items, money and sources.` : `Saved ${name}: ${rev(run.run_id)}, its answers, open items, clauses, massing, full ledger, inputs and sources.`, "ok");
+        setStatus(board ? `Saved ${name}: the decision wanted, the four answers, the top open items and the sources they cite, for the board.`
+          : short ? `Saved ${name}: ${rev(run.run_id)}'s ask, answers, open items, money and sources.` : `Saved ${name}: ${rev(run.run_id)}, its answers, open items, clauses, massing, full ledger, inputs and sources.`, "ok");
         return;
       }
     } catch (e) { /* no server answer: print instead */ }

@@ -144,6 +144,16 @@ export function suggestionName(S) {
 /* The suggestion in one word for the route's line ("Outright" from "Outright: 3 storeys, 4 homes"). */
 export const suggestionWord = S => String(suggestionName(S)).split(":")[0];
 
+/* A derived option's name: the candidate, then the figures that tell it apart ("Funder-ready · 6 storeys · 99 homes"),
+   with what the manager typed or left blank said after. Short enough for the title block and a run picker. Pure. */
+export function defaultOptionName(opt, S, chosen = 0, blank = []) {
+  const cand = (((S && S.candidates) || []).find(x => x.id === S.candidate) || {}).title || cap(String((S && S.candidate) || "suggested"));
+  const homes = Object.values(opt.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
+  const bits = [String(cand).split(":")[0].trim(), opt.storeys != null ? `${opt.storeys} storeys` : null, homes ? `${homes} homes` : null].filter(Boolean);
+  const tail = blank.length ? ` (${blank.join(", ").toLowerCase()} not given)` : chosen ? ` (${chosen === 1 ? "one figure" : `${chosen} figures`} of the manager's)` : "";
+  return `${bits.join(" · ")}${tail}`;
+}
+
 /* What the suggestion falls short of, as plain lines: the engine's `falls_short` (a list of sentences or of records
    with a why), empty without one. */
 export function fallsShort(S) {
@@ -237,11 +247,9 @@ function useSuggestionNow({ live = false } = {}) {
   // the name is a name: the candidate and how much of it is the manager's; the figures typed are listed in the notes
   // (17 Nov 2026: the name ran "…; rezoning path, storeys, height (m), floor area (m²), studios… entered by the
   // manager" across ten lines of the title block and cut off every run picker)
-  // named for what it is: the engine's label where it gives one ("4 homes sized to the outright envelope"), else the
-  // candidate (20 Nov 2026)
-  const base = S.label || S.suggestion_label ? cap(suggestionName(S)) : `${cap(guide.candidate)} option`;
-  if (blank.length) opt.name = `${base}, ${blank.join(", ").toLowerCase()} not given`;
-  else if (chosen) opt.name = `${base} with ${chosen === 1 ? "one figure" : `${chosen} figures`} of the manager's`;
+  // named so two options can be told apart in a list (25 Nov 2026, the third panel: every run read "Suggested,
+  // funder-ready", printed twice in the title block); the manager can rename it at 03
+  opt.name = defaultOptionName(opt, S, chosen, blank);
   state.optionId = null;
   state.option = opt;
   state.optionDirty = true;

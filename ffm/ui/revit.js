@@ -1,4 +1,5 @@
-/* Export to Revit: the two lines that build sheet FFM-01 for the memo on screen, and Check Revit result. */
+/* Build it in Revit (named "Export to Revit" until 26 Nov 2026, when the 24 Nov critique found it read as a download):
+   the two lines that build sheet FFM-01 for the memo on screen, and Check Revit result. */
 
 import { $, $$, copyText, fmtNum, h, setStatus } from "./core/util.js";
 import { state, STATIC } from "./core/state.js";
@@ -36,7 +37,7 @@ export function renderExportPanel(run) {
   const f = run.files || {};
   const panel = $("#export-panel");
   panel.innerHTML = `
-    <h3>Export to Revit</h3>
+    <h3>Build it in Revit</h3>
     <p class="export-gets">${h(revitGets(run))}</p>
     <div class="block">
       <span class="eyebrow">This run's massing.json</span>

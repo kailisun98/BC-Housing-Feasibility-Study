@@ -1207,6 +1207,35 @@ must know:
     at 01 replaces the lookup's corner sentence in `site.notes`; the site promises no "two pages".
 - Not done: the money still counts homes the plans do not place (answer 3 says so). Fingerprints unchanged; 461 tests.
 
+## The flow after the third panel, and the 24 Nov critique's leftovers (26 Nov 2026)
+
+Kai's choices (asked): a name per browser, a two-page board PDF, the rules date kept when a memo opens. What a later
+session must know:
+- **Rules date.** `openRun` no longer sets `#as-of`; `dateMovedFrom(run)` (runs.js) is true where the top bar's date
+  differs from the memo's: Run again is live and says the date (`syncRunButton`, `runRefused`, stop 03's button), the
+  title block's Rules as of cell says "· the next run reads …" (`#memo-next-asof`, `syncNextAsOf` in memo/memo.js). The
+  24 Nov `DATE_STALE` is gone: a moved date is not an edit, so no band and Issue stays available.
+- **Comparisons.** `openRun(runId, { compare })`: only a link, Back, or the This memo picker inside the Side by side
+  card passes one; otherwise a memo opens alone. `recordedAgainst` (exported) no longer applies itself: the note beside
+  the pickers offers "Compare with it" (`setCompareNote`, `run.storedDiff` keeps the run's diff.json).
+- **Names.** `defaultOptionName` (guide.js): "Funder-ready · 6 storeys · 99 homes"; stop 03's "The option's name"
+  (`data-key="name"`, `data-what` names the change for `markStale`). `runName` uses `briefName`.
+- **Identity.** `myName()` / `wireMe` / `syncMe` in issue.js (key `ffm.issue.name`, the issue form's, so an old name
+  carries over); `#me-btn` / `#me-panel` in the top bar. Issues carry `to_name` (server `add_issue`); `showMine` shows an
+  issue addressed to this name, or one addressed to no one as "issued to the architect"; `issuedWords` (memo/memo.js)
+  for the title block and `issuedPaper` (paper.js). A run made here writes `made.json` {made_by} (server `do_run`,
+  `_made_by`; `list_runs` and `run_payload` carry `made_by`); a draft says whose it is.
+- **Board PDF.** `paperDocument(run, { board, decision })` and `exportPdf("board", { decision })`; `BOARD_CSS`;
+  `#pdf-board-btn`, `#board-panel` (moved with the actions by `placeActions`), `boardPdf` in main.js asks for the
+  decision when the memo states none. Checked with the server's headless Edge: 998 R1, Glen Drive and Expo's 12-storey
+  what-if each print on 2 letter pages. `tests/test_memo_as_an_ask.py` checks it is there.
+- **24 Nov leftovers.** First visit: the manager opens on Summary (`firstView` in main.js); answer 2's verdict is
+  `fundedWord` short, the engine's sentence under it (`.verdict-words`); stop 02's rule reading folds to its count;
+  a saved option's 21 figures are editable at 02 (`savedFigures`, inputs with `data-share` for percentages) instead of
+  sending the manager to Architect; "Export to Revit" is "Build it in Revit…"; the formats note sits inside More formats.
+- Not done: stop 02 is still a long card (programs, the lot, the rules, the start, the building, the questions, the
+  brief); identity is a name, not a login, and runs made on the web build stay unnamed drafts in the tab.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

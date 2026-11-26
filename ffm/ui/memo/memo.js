@@ -42,6 +42,7 @@ export function briefName(name, site = null) {
 import { renderFigures, wireFigures } from "../figures/cards.js";
 import { foot, renderStage } from "../route-stage.js";
 import { applyModeToMemo, setView } from "../modes.js";
+import { myName } from "../issue.js";
 
 export function renderQuiet() {
   if (state.run) return;  // a run is on screen: leave it
@@ -127,8 +128,8 @@ export function renderMemo(run) {
     <div class="memo-meta">
       <div class="opt-cell${fullName.length > 90 ? " long" : ""}"><b>Option</b><span>${h(shortOpt)}${shortOpt !== fullName ? `<span class="opt-full">${h(fullName)}</span>` : ""}</span></div>
       <div><b>Proponent</b><span>${opt.proponent ? h(opt.proponent) : "<i>not named</i>"}${opt.proponent_type ? ` <span class="cont">· ${h(optWord("option", "proponent_type", opt.proponent_type))}</span>` : ""}</span></div>
-      <div><b>Rules as of</b><span>${h(dateWords(L.run.as_of))}</span></div>
-      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b>${isDraft(run.run_id) ? ` <span class="cont">· not issued; ${STATIC ? "a draft in this tab" : `issuing makes it ${h(nextRev())}`}</span>` : ""}</span></div>
+      <div><b>Rules as of</b><span>${h(dateWords(L.run.as_of))}<span class="cont next-asof" id="memo-next-asof">${nextAsOfWords(L.run.as_of)}</span></span></div>
+      <div><b>Revision</b><span><b class="rev-no">${h(rev(run.run_id))}</b>${isDraft(run.run_id) ? ` <span class="cont">· not issued; ${STATIC ? "a draft in this tab" : `issuing makes it ${h(nextRev())}`}${run.made_by ? `; made by ${h(run.made_by)}` : ""}</span>` : ""}${issuedLine(run)}</span></div>
       ${cmpCell}
     </div>
     ${optionFiguresHtml(site, opt, run)}
@@ -137,7 +138,9 @@ export function renderMemo(run) {
     <p class="quiet memo-disclaimer">A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</p>
   </div>`);
   // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
-  const note = (run.issues || []).filter(i => i.to === state.mode).slice(-1)[0];
+  // the note addressed to this browser's name, else to the layout on screen where it named no one (26 Nov 2026)
+  const me = myName().toLowerCase();
+  const note = (run.issues || []).filter(i => (i.to_name ? me && String(i.to_name).trim().toLowerCase() === me : i.to === state.mode)).slice(-1)[0];
   if (note) parts.push(`<div class="card issue-note"><b>From ${note.name ? `${h(note.name)} (the ${h(note.by)})` : `the ${h(note.by)}`}, ${h(dateWords(note.issued_at, true))}:</b> ${note.note ? h(note.note) : "<i>no note</i>"}</div>`);
 
   // 2. the four answers come first in every layout (20 Nov 2026: a manager read ~1,200 px of comparison tables before
@@ -248,6 +251,36 @@ function wireJumps(memoEl) {
     if (!t.hasAttribute("tabindex")) t.tabIndex = -1;
     t.focus({ preventScroll: true });
   });
+}
+
+/* Who issued the memo, to whom and when: the first issue, which gave it its number, and the latest where there is
+   another (26 Nov 2026, the third panel: the title block and the paper had no issued-by). The paper prints the same. */
+const ROLE_WORD = { architect: "the architect", manager: "the development manager", operator: "the operator", reader: "the board" };
+
+export function issuedWords(i) {
+  if (!i) return "";
+  const from = i.name ? `${i.name} (${ROLE_WORD[i.by] || i.by})` : (ROLE_WORD[i.by] || i.by);
+  const to = i.to_name ? `${i.to_name} (${ROLE_WORD[i.to] || i.to})` : (ROLE_WORD[i.to] || i.to);
+  return `issued by ${from} to ${to}, ${dateWords(i.issued_at, true)}`;
+}
+
+function issuedLine(run) {
+  const list = (run.issues || []).slice().sort((a, b) => String(a.issued_at).localeCompare(String(b.issued_at)));
+  if (!list.length) return "";
+  const first = list[0], last = list[list.length - 1];
+  return `<span class="cont issued-by">${h(cap(issuedWords(first)))}${last !== first ? `; last ${h(issuedWords(last))}` : ""}</span>`;
+}
+
+/* Beside the memo's own rules date, the next run's where the top bar's differs (26 Nov 2026, Kai: opening a memo no
+   longer resets the top bar's date). The reader runs nothing, so the line is not theirs (app.css hides it). */
+const nextAsOfWords = memoAsOf => {
+  const next = $("#as-of").value || todayISO();
+  return next !== memoAsOf ? ` · the next run reads ${h(dateWords(next))}` : "";
+};
+
+export function syncNextAsOf() {
+  const el = $("#memo-next-asof");
+  if (el && state.run) el.innerHTML = nextAsOfWords(state.run.as_of);
 }
 
 /* An option's name as the reader knows it. */
@@ -369,11 +402,11 @@ export function placeRunTools(intoMemo) {
    opened some 17,900 px below its button). Whenever the memo is about to be replaced they go back to the export
    footer, so they are never thrown away with it; the footer shows only while it holds them. */
 function placeActions(intoMemo) {
-  const bar = $("#export-actions"), issue = $("#issue-panel"), revit = $("#export-panel"), foot = $("#step-export");
+  const bar = $("#export-actions"), issue = $("#issue-panel"), board = $("#board-panel"), revit = $("#export-panel"), foot = $("#step-export");
   if (!bar || !foot) return;
   const slot = intoMemo ? $("#memo-actions") : null;
-  if (slot) { slot.append(bar, issue, revit); foot.hidden = true; return; }
-  if (bar.parentElement !== foot) { $("h2", foot).after(bar); bar.after(issue); foot.append(revit); }
+  if (slot) { slot.append(bar, issue, board, revit); foot.hidden = true; return; }
+  if (bar.parentElement !== foot) { $("h2", foot).after(bar); bar.after(issue); issue.after(board); foot.append(revit); }
   foot.hidden = false;
 }
 

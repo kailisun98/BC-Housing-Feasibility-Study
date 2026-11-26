@@ -25,7 +25,7 @@ import {
   discardDraft, loadDemo, markStale, onOptionChange, onSiteChange, readDraft, resumeDraft, saveDraft, saveNow,
   selectOption, selectSite
 } from "./files.js";
-import { byRev, openRun, rev, runName, runRules, syncRunButton } from "./runs.js";
+import { byRev, dateMovedFrom, openRun, rev, runName, runRules, syncRunButton } from "./runs.js";
 import { dateWords, placeRunTools, renderMemo } from "./memo/memo.js";
 import { money } from "./memo/answers.js";
 import { tok } from "./figures/common.js";
@@ -670,8 +670,11 @@ function cardOption() {
   const candWhy = cands.filter(c => c.available === false).map(c => `<li><b>${h(c.title)}</b>: ${h(c.why)}.</li>`).join("");
   // the rules that apply here, without verdicts (24 Nov 2026, critique: the probe's "Pass" and "Uncertain" stood where
   // the memo then said Fail and Conditional for the same option); the verdicts come with the run, on the option's figures
+  // folded to its count (26 Nov 2026, the 24 Nov critique: stop 02 held some 22 controls on a card that asks one thing)
+  const needs = R ? R.results.filter(r => r.status === "uncertain").length : 0;
+  const applies = R ? R.results.filter(r => r.status !== "not_applicable").length : 0;
   const reading = guide.busy.read ? `<p class="help">Reading the rules that apply to this site…</p>`
-    : R ? `<ul class="reading-list">${R.results.map(r => `<li>${readingMark(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">Which rules apply here. Their verdicts come with the run, on the option's figures.</p>` : `<p class="help">Not read yet.</p>`;
+    : R ? `<details class="fold reading-fold"><summary>${applies} rule${applies === 1 ? "" : "s"} apply here${needs ? ` <span class="cont">· ${needs} need${needs === 1 ? "s" : ""} the option's figures</span>` : ""}</summary><ul class="reading-list">${R.results.map(r => `<li>${readingMark(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">Their verdicts come with the run, on the option's figures.</p></details>` : `<p class="help">Not read yet.</p>`;
   const dl = `<dl class="stage-dl">
       <div><dt>For</dt><dd>
         <div class="chips" role="group" aria-label="The programs in view">${progs.map(r => `<label class="chip"><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
@@ -854,7 +857,7 @@ function figureBlock(o, S) {
   const homesLine = ownHomes && homes && o.gfa_m2 ? `<p class="help fig4-note">Your ${h(homes)} homes in ${h(fmtNum(o.gfa_m2))}&nbsp;m² of floor area: about ${h(fmtNum(Math.round(o.gfa_m2 / homes)))}&nbsp;m² a home, corridors and cores included. Change FSR or the storeys to size the building to them.</p>` : "";
   const sketch = sectionSketch(o, S);
   const wrap = inner => `<div class="fig4-wrap"><div class="fig4-main">${inner}</div>${sketch}</div>`;
-  if (!S) return wrap(block + heightLine + floorLine) + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's. Every other field is in the Option schedule: switch to Architect in the top bar.</p>`;
+  if (!S) return wrap(block + heightLine + floorLine) + `<p class="help">${h(o.name || o.id || "The saved option")}: its figures are its file's; change any of them here.</p>${savedFigures(o)}`;
   // what the suggestion is, in the engine's words where it gives them, and what it falls short of (20 Nov 2026: a
   // 4-home outright-sized option read "Suggested, funder-ready")
   const short2 = fallsShort(S);
@@ -942,6 +945,25 @@ const shareShown = (k, v) => (typeof v === "number" ? shareToScreen(k, v) : v);
 
 /* A row's label in a status sentence. */
 const rowLabel = k => { const r = GUIDE_FIELDS.find(([x]) => x === k); return r ? r[1] : (fieldOf("option", k) || {}).label || k; };
+
+/* A saved option's every figure, typed over in place, behind one fold (26 Nov 2026, the 24 Nov critique: a manager
+   who wanted to change a fifth figure was sent to the Architect layout). Grouped as All figures groups a suggestion's;
+   an edit writes the option, as the money at 03 does. */
+function savedFigures(o) {
+  const GROUPS = [
+    ["The envelope", k => ["rezoning_path", "storeys", "height_m", "gfa_m2"].includes(k)],
+    ["The homes", k => k.startsWith("units.") || k.startsWith("rent_tiers_units.") || k === "accessible_units"],
+    ["The funders' terms", k => ["share_below_hils", "housing_agreement_years", "below_market_unit_share", "below_market_discount"].includes(k)],
+    ["Drawing assumptions", k => ["replacement_trees_proposed", "floor_to_floor_m"].includes(k) || k.startsWith("setbacks_m.")],
+  ];
+  const row = ([k, label, kind]) => {
+    const v = getPath(o, k), text = kind === "text", share = isShare(k);
+    return `<label class="field sf-row"><span class="label">${h(label)}${share ? " (%)" : ""}</span><input type="${text ? "text" : "number"}" class="fin-input" data-key="${h(k)}" data-what="the option"${text ? ' data-text="1"' : ` step="${kind === "int" ? 1 : "any"}" inputmode="decimal"`}${share ? ' data-share="1"' : ""} value="${h(v == null ? "" : shareShown(k, v))}" placeholder="blank"></label>`;
+  };
+  const groups = GROUPS.map(([title, test]) => { const fs = GUIDE_FIELDS.filter(([k]) => test(k)); return fs.length ? `<div class="sg-group"><h4 class="sg-head">${h(title)}</h4><div class="fin-rows">${fs.map(row).join("")}</div></div>` : ""; }).join("");
+  const n = GUIDE_FIELDS.filter(([k]) => GROUPS.some(([, t]) => t(k))).length;
+  return `<details class="fold all-figures saved-figures"><summary>All ${n} of the option's figures</summary><div class="sg-rows">${groups}</div></details>`;
+}
 
 /* The suggestion's every figure, each Suggested | Mine with what it rests on: behind one fold. */
 function allFigures(S) {
@@ -1033,8 +1055,10 @@ function cardRun() {
       <p class="help">${nominal ? "A blank land figure carries the land at a nominal value on a long lease." : (site.owner_type ? "Enter the assessed value or the agreed price; a blank leaves the money answer unsure." : "Name the owner at 01, or enter a land price here.")}</p>
       ${sourcesEditor(fin)}
     </details>`;
+  // the option's name, the manager's to give (26 Nov 2026: the third panel could not tell their runs apart)
+  const nameField = `<label class="field ask-name"><span class="label">The option's name</span><input type="text" class="fin-input" data-key="name" data-text="1" data-what="the option's name" value="${h(o.name || "")}" placeholder="e.g. Five storeys, family homes over the hall" maxlength="90" aria-describedby="ask-name-help"><span class="help" id="ask-name-help">How the memo, the run lists and the comparison name this option.</span></label>`;
   // what the memo asks of its reader (25 Nov 2026): the front sheet's last line
-  const decision = `<label class="field ask-decision"><span class="label">What are you asking for?</span><input type="text" class="fin-input" data-key="decision_sought" data-text="1" value="${h(o.decision_sought || "")}" placeholder="e.g. the board's approval to spend on pre-development" aria-describedby="ask-decision-help"><span class="help" id="ask-decision-help">The memo's front sheet prints it as the decision wanted. Blank: not stated.</span></label>`;
+  const decision = `<label class="field ask-decision"><span class="label">What are you asking for?</span><input type="text" class="fin-input" data-key="decision_sought" data-text="1" data-what="the decision wanted" value="${h(o.decision_sought || "")}" placeholder="e.g. the board's approval to spend on pre-development" aria-describedby="ask-decision-help"><span class="help" id="ask-decision-help">The memo's front sheet prints it as the decision wanted. Blank: not stated.</span></label>`;
   // what it takes to run: the operator's own figures, each over a placeholder; staffing and a subsidy are never assumed
   // (23 Nov 2026). The same inputs as the money above: a blank is a normal answer and says what the tool uses instead.
   const opsIn = o.operations || {};
@@ -1059,7 +1083,7 @@ function cardRun() {
   // what the suggestion falls short of travels with it to the run (20 Nov 2026)
   const short3 = guide.suggestion && guide.suggestionUsed && !state.optionId ? fallsShort(guide.suggestion) : [];
   const dl = `<dl class="stage-dl">
-      <div><dt>The option</dt><dd><p class="dd-line">${optionSummary(o, state.site)}</p>${short3.length ? `<p class="dd-line fig4-short"><span class="cont">It falls short:</span> ${h(short3.join("; "))}.</p>` : ""}</dd></div>
+      <div><dt>The option</dt><dd>${nameField}<p class="dd-line">${optionSummary(o, state.site)}</p>${short3.length ? `<p class="dd-line fig4-short"><span class="cont">It falls short:</span> ${h(short3.join("; "))}.</p>` : ""}</dd></div>
       <div><dt>The ask</dt><dd>${decision}</dd></div>
       <div><dt>Money in</dt><dd>${money}${opsFold}<details class="fold"><summary>The assumptions the money counts with</summary>${stageMoney()}</details></dd></div>
       <div><dt>Rules as of</dt><dd><p class="dd-line">${h(dateWords($("#as-of").value || todayISO()))} <span class="cont">· the date in the top bar; the rules in force that day are read</span></p></dd></div>
@@ -1067,10 +1091,11 @@ function cardRun() {
   const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-back-2">Back to the option</button>`;
   // the shortcut is labelled as one (20 Nov 2026: a bare "Ctrl+Enter" beside the button read as stray text); over a
   // memo nothing has changed since, the run waits and says why (runs.js refuses it too)
-  const fresh = !!(state.run && !state.runStale);
+  const moved = dateMovedFrom(state.run);
+  const fresh = !!(state.run && !state.runStale && !moved);
   const main = fresh
     ? `<span class="kbd-help" id="run-kbd">Nothing has changed since ${h(rev(state.run.run_id))}</span><button type="button" class="btn btn-primary" id="guide-run" aria-disabled="true" aria-describedby="run-kbd">Run again</button>`
-    : `<span class="kbd-help" id="run-kbd">Shortcut <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span><button type="button" class="btn btn-primary" id="guide-run" aria-keyshortcuts="Control+Enter" aria-describedby="run-kbd"${busy ? " disabled" : ""}>${busy ? "Running…" : state.run ? "Run again" : "Run the rules"}</button>`;
+    : `<span class="kbd-help" id="run-kbd">Shortcut <kbd>Ctrl</kbd>+<kbd>Enter</kbd></span><button type="button" class="btn btn-primary" id="guide-run" aria-keyshortcuts="Control+Enter" aria-describedby="run-kbd"${busy ? " disabled" : ""}>${busy ? "Running…" : state.run ? (moved ? `Run again as of ${h(dateWords($("#as-of").value || todayISO()))}` : "Run again") : "Run the rules"}</button>`;
   return stageCard(3, "Money in, then run", dl, foot(quiet, main));
 }
 
@@ -1224,11 +1249,13 @@ function wireStage(el) {
     if (!state.option) return;
     const raw = inp.value.trim();
     state.option.finance = state.option.finance || {};
-    setPath(state.option, inp.dataset.key, raw === "" ? null : inp.dataset.text ? raw : Number(raw));
+    if (raw !== "" && !inp.dataset.text && !Number.isFinite(Number(raw))) return;   // a half-typed number waits
+    setPath(state.option, inp.dataset.key, raw === "" ? null : inp.dataset.text ? raw : inp.dataset.share ? shareFromScreen(inp.dataset.key, Number(raw)) : Number(raw));
     state.optionDirty = true;
     $("#option-dirty").hidden = false;
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
-    markStale("the money in");
+    markStale(inp.dataset.what || "the money in");
+    if (inp.dataset.key === "name" || inp.dataset.what === "the option") renderRoute();   // the route's 02 row names and sums the option
     saveDraft();
   }));
   // the capital sources: a field edits its row in place; add and remove redraw the card

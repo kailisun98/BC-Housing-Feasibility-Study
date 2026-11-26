@@ -1,10 +1,10 @@
 /* What changed between two runs (engine diff.json): a change of rules (a revision) or two options under the same
    rules, rule by rule. */
 
-import { $, h, pill, REV } from "../core/util.js";
+import { $, h, pill, REV, setStatus } from "../core/util.js";
 import { state } from "../core/state.js";
 import { api } from "../core/api.js";
-import { rev } from "../runs.js";
+import { applyCompare, fillRunSelects, recordedAgainst, rev, runName } from "../runs.js";
 import { compareKind, dateWords, idBreak, optionName } from "./memo.js";
 
 /* The engine's words for a change (engine.diff), as a reader would say them. Between two options read under the same
@@ -51,10 +51,18 @@ export function compareSummary(run) {
    card says it, so the note stays empty. */
 export function setCompareNote(d) {
   const run = state.run;
+  const el = $("#compare-note");
   let note = "";
+  // a memo recorded against an earlier one opens alone, and the note offers that comparison (26 Nov 2026: the page
+  // used to apply it by itself)
+  const stored = run && !run.compareLedger ? (run.storedDiff || d) : null;
+  const against = stored ? recordedAgainst(run) : null;
   if (!run && state.compareRun) note = "Applies to the next run.";
-  else if (run && d && !run.compareLedger) note = `This memo was recorded against an earlier one, rules as of ${dateWords(d.previous_as_of)}; choose it under Compare with… to see the two side by side.`;
-  $("#compare-note").textContent = note;
+  else if (against) note = `This memo was recorded against ${h(runName(state.runs.find(r => r.run_id === against) || { run_id: against }))}. <button type="button" class="linkish" id="compare-recorded">Compare with it</button>`;
+  else if (stored) note = `This memo was recorded against an earlier one, rules as of ${h(dateWords(stored.previous_as_of))}; choose it under Compare with… to see the two side by side.`;
+  el.innerHTML = note;
+  const b = $("#compare-recorded", el);
+  if (b) b.addEventListener("click", () => { state.compareRun = against; fillRunSelects(); applyCompare().catch(e => setStatus(e.message, "error")); });
 }
 
 /* Why two stamps differ, as precisely as the two ledgers allow: the rule files, the as-of date, the site's or the

@@ -3,20 +3,20 @@
    This is the entry point (index.html loads it as a module): it wires the page and decides what opens first.
    CLAUDE.md, "The page as ES modules", says where each part lives. */
 
-import { $, $$, fmtNum, scrollBehavior, setPath, setStatus, toast, todayISO } from "./core/util.js";
+import { $, $$, fmtNum, h, scrollBehavior, setPath, setStatus, toast, todayISO } from "./core/util.js";
 import { guide, PRELOAD_OPTION, PRELOAD_SITE, state, STATIC } from "./core/state.js";
 import { api } from "./core/api.js";
 import { checkForNewerBuild, loadEngine } from "./core/engine.js";
 import { OPTION_FIELDS } from "./fields.js";
 import { renderForm, setRailTab, syncCards } from "./schedule.js";
-import { DATE_STALE, loadSites, markStale, onOptionChange, saveAs, saveNow, selectOption, selectSite, syncStaleBand } from "./files.js";
+import { loadSites, onOptionChange, saveAs, saveNow, selectOption, selectSite } from "./files.js";
 import { applyCompare, fillRunSelects, followHistory, loadRuns, openRun, rev, runRules, syncRunButton } from "./runs.js";
-import { dateWords, renderNoMemo, renderQuiet } from "./memo/memo.js";
+import { dateWords, renderNoMemo, renderQuiet, syncNextAsOf } from "./memo/memo.js";
 import { closeExportPanel, renderExportPanel } from "./revit.js";
 import { offerTour, startTour } from "./tour.js";
 import { enterOption, renderGuide, renderStage, stageShown } from "./route-stage.js";
 import { renderClaude } from "./claude.js";
-import { closeIssuePanel, issueButtonLabel, openIssuePanel, startIssuePolling } from "./issue.js";
+import { closeIssuePanel, issueButtonLabel, openIssuePanel, startIssuePolling, wireMe } from "./issue.js";
 import {
   firstOpenStep, initialMode, initTheme, MODES, placeModeThumb, RAIL_KEY, setMode, setStep, setView, showInputs, VIEW_KEY,
   watchSteps
@@ -34,6 +34,7 @@ async function init() {
   $("#print-btn").addEventListener("click", () => { if (state.run) loadPaper().then(p => p.printPaper(p.paperDocument(state.run))).catch(err => toast(err.message, true)); });
   $("#pdf-btn").addEventListener("click", () => loadPaper().then(p => p.exportPdf()).catch(err => toast(err.message, true)));
   $("#pdf-short-btn").addEventListener("click", () => loadPaper().then(p => p.exportPdf(true)).catch(err => toast(err.message, true)));
+  $("#pdf-board-btn").addEventListener("click", boardPdf);
   $("#save-site").addEventListener("click", () => saveAs("site"));
   $("#save-option").addEventListener("click", () => saveAs("option"));
   $$("[data-save]").forEach(b => b.addEventListener("click", () => saveNow(b.dataset.save)));
@@ -75,20 +76,18 @@ async function init() {
   if ("ResizeObserver" in window) new ResizeObserver(() => placeModeThumb()).observe($(".topbar"));
   let thumbFrame = 0;
   window.addEventListener("resize", () => { if (!thumbFrame) thumbFrame = requestAnimationFrame(() => { thumbFrame = 0; placeModeThumb(); }); });
-  // a rules date off the memo's own leaves the memo out of date, as an edit does: the band says so, Run again goes live
-  // and names the date, Issue waits; back to the memo's date with nothing else changed, the memo is current again
-  // (24 Nov 2026: the date changed and the page still offered the old memo as current)
+  // the top bar's date is the next run's: the memo on screen keeps its own, its title block says when they differ, and
+  // Run again goes live and names the date (24 Nov 2026; since 26 Nov, Kai, no band and Issue stays available: the
+  // memo is still what it was, read on its own date)
   $("#as-of").addEventListener("change", () => {
     const asOf = $("#as-of").value || todayISO();
     if (!state.run) { renderQuiet(); syncRunButton(); return; }
     const r = rev(state.run.run_id);
+    syncNextAsOf();
     if (asOf !== state.run.as_of) {
-      markStale(DATE_STALE);
-      setStatus(`The next run reads the rules as of ${dateWords(asOf)}; ${r} on screen is as of ${dateWords(state.run.as_of)}.${state.mode === "reader" ? "" : ` ${state.mode === "manager" ? "Run again, in the top bar," : "Run the rules"} reads them.`}`, "busy");
-    } else if (state.runStale === DATE_STALE) {
-      state.runStale = null;
-      syncStaleBand();
-      setStatus(`Rules as of is back to ${dateWords(asOf)}, ${r}'s own date: the memo on screen is current.`, "ok");
+      setStatus(`The next run reads the rules as of ${dateWords(asOf)}; ${r} on screen read them as of ${dateWords(state.run.as_of)}.${state.mode === "reader" ? "" : ` ${state.mode === "architect" ? "Run the rules" : "Run again, in the top bar,"} reads them on the new date.`}`, "info");
+    } else {
+      setStatus(`The next run reads the rules as of ${dateWords(asOf)}, ${r}'s own date.`, "info");
     }
     syncRunButton();
     if (stageShown()) renderStage();
@@ -109,7 +108,7 @@ async function init() {
     if (!panel.hidden) { closeExportPanel(); return; }
     renderExportPanel(state.run);
     setStep(4);
-    setStatus(`Export to Revit: the two lines that build sheet FFM-01 for this memo, ${rev(state.run.run_id)}.`, "info");
+    setStatus(`Build it in Revit: the two lines that build sheet FFM-01 for this memo, ${rev(state.run.run_id)}, on a machine with Revit.`, "info");
     // the panel opens under the button now (memo.js placeActions); the keyboard goes to its heading
     panel.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
     const head = $("h3", panel);
@@ -121,9 +120,14 @@ async function init() {
   window.addEventListener("afterprint", () => $$("details[data-print-opened]").forEach(d => { d.open = false; delete d.dataset.printOpened; }));
   $("#tour-link").addEventListener("click", e => { e.preventDefault(); $("#tour-link").classList.remove("unseen"); startTour(0); });
   $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the four answers and the figures." : "Detailed: the whole memo.", "info"); }));
-  try { setView(localStorage.getItem(VIEW_KEY) || "detailed", false); } catch (e) { setView("detailed", false); }
+  // a first visit opens the manager on Summary, the title block and the four answers on one screen; the architect, who
+  // works in the clauses and the ledger, and the reader, who has no view switch, on Detailed. A choice made is kept.
+  // (26 Nov 2026, the 24 Nov critique: every layout opened on some 11,000 px of memo)
+  const firstView = state.mode === "manager" ? "summary" : "detailed";
+  try { setView(localStorage.getItem(VIEW_KEY) || firstView, false); } catch (e) { setView(firstView, false); }
   $("#issue-btn").addEventListener("click", () => { if ($("#issue-panel").hidden) openIssuePanel(); else closeIssuePanel(); });
-  $("#open-run").addEventListener("change", e => openRun(e.target.value).catch(err => toast(err.message, true)));
+  // the This memo picker in the Side by side card keeps the comparison chosen; above the memo it opens one alone
+  $("#open-run").addEventListener("change", e => openRun(e.target.value, { compare: e.target.closest("#side-by-side") ? state.compareRun : null }).catch(err => toast(err.message, true)));
   $("#compare-run").addEventListener("change", e => { state.compareRun = e.target.value || null; applyCompare().catch(err => toast(err.message, true)); });
   document.addEventListener("keydown", e => {
     if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); runRules(); }
@@ -170,11 +174,45 @@ async function init() {
   offerTour();
   renderGuide();
   issueButtonLabel();
+  wireMe();
   startIssuePolling();
   if (STATIC) loadEngine().catch(() => { /* the chip says why; past runs still open */ });
   await followLink();
   // Back and Forward open the run and the comparison each entry names (runs.js pushes one per run or comparison)
   window.addEventListener("popstate", () => { followHistory(); });
+}
+
+/* Board PDF, two pages (26 Nov 2026, Kai): straight to the download where the memo states the decision wanted; where
+   it does not, a line under the actions asks for it first. What is typed is printed on this PDF and kept in the option
+   for the next run; the memo on screen is not changed, so it is not marked out of date. */
+function boardPdf() {
+  const run = state.run, panel = $("#board-panel"), btn = $("#pdf-board-btn");
+  if (!run) return;
+  const download = decision => loadPaper().then(p => p.exportPdf("board", { decision })).catch(err => toast(err.message, true));
+  const close = (focusBack = false) => { panel.hidden = true; panel.innerHTML = ""; btn.setAttribute("aria-expanded", "false"); if (focusBack) btn.focus(); };
+  if (!panel.hidden) { close(); return; }
+  const stated = String(((run.ledger.inputs || {}).option || {}).decision_sought || "").trim();
+  if (stated) { download(null); return; }
+  const kept = String((state.option || {}).decision_sought || "").trim();
+  panel.innerHTML = `<form class="issue-panel board-form" aria-label="The decision the board is asked for">
+      <label class="field"><span class="label">What should the board decide?</span><input type="text" name="decision" value="${h(kept)}" maxlength="200" placeholder="e.g. approve $250,000 for pre-development design"></label>
+      <div class="form-actions"><button type="submit" class="btn btn-primary btn-small">Add it and download</button><button type="button" class="btn btn-quiet btn-small" data-board-skip>Download without it</button><button type="button" class="btn btn-quiet btn-small" data-board-cancel>Not now</button></div>
+      <p class="help">${h(rev(run.run_id))} states no decision. What you type is printed on this PDF and kept in the option for the next run; ${h(rev(run.run_id))} itself does not change.</p>
+    </form>`;
+  panel.hidden = false;
+  btn.setAttribute("aria-expanded", "true");
+  const form = $("form", panel), inp = $("input", form);
+  inp.focus();
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const text = inp.value.trim();
+    if (text && state.option) { state.option.decision_sought = text; state.optionDirty = true; $("#option-dirty").hidden = false; }
+    close();
+    download(text || null);
+  });
+  $("[data-board-skip]", form).addEventListener("click", () => { close(); download(null); });
+  $("[data-board-cancel]", form).addEventListener("click", () => close(true));
+  form.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); close(true); } });
 }
 
 // ?tour=1 starts the walkthrough; ?run=<site>/<folder>&compare=<site>/<folder> opens a past run and compares it
@@ -184,8 +222,7 @@ async function followLink() {
   const run = q.get("run"), cmp = q.get("compare");
   if (run) {
     try {
-      await openRun(run);
-      if (cmp && cmp !== run) { state.compareRun = cmp; fillRunSelects(); await applyCompare(); }
+      await openRun(run, { compare: cmp || null });
       $("#step-run").scrollIntoView({ block: "start" });
     } catch (e) {
       toast(`Could not open run ${run}: ${e.message}`, true);

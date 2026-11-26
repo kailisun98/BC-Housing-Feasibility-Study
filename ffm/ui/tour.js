@@ -30,7 +30,7 @@ const TOUR = [
   { target: "#view-switch", title: "Summary, Detailed, 3D preview",
     text: "How much of the memo to show: the title block and the answers; the whole memo with the clauses and the ledger; or the drawings, large, with an axonometric you can turn." },
   { target: ".mode", title: "The architect, the reader and the operator",
-    text: "Switch to Architect and the left column holds the Site and Option schedules, one row per input, each citing the rules that read it; every ledger layer opens, Edit blocks appears on the plans, and Export to Revit leads. Switch to Reader and the memo stands alone in a reading column. Switch to Operator and the memo opens on the operating figures to enter and sign; the manager can mark a memo issued to the operator. That is the whole page." },
+    text: "Switch to Architect and the left column holds the Site and Option schedules, one row per input, each citing the rules that read it; every ledger layer opens, Edit blocks appears on the plans, and Build it in Revit leads. Switch to Reader and the memo stands alone in a reading column. Switch to Operator and the memo opens on the operating figures to enter and sign; the manager can mark a memo issued to the operator. That is the whole page." },
 ];
 
 /* The operator's walkthrough (25 Nov 2026, the third panel: the operator had none): the desk, the signature, the

@@ -293,7 +293,7 @@ def list_runs(site_id: str | None) -> list[dict]:
             "verdicts": {"outright": ans["allowed"]["outright"]["verdict"], "by_rezoning": ans["allowed"]["by_rezoning"]["verdict"],
                          "funded": ans["funded"]["verdict"]},
             "has_diff": (p / "diff.json").exists(), "has_massing": (p / "massing.json").exists(),
-            "revit": revit_summary(p, stamp), "issued_at": issued_at,
+            "revit": revit_summary(p, stamp), "issued_at": issued_at, "made_by": _made_by(p),
         })
     runs.sort(key=lambda r: r["written"], reverse=True)
     return runs
@@ -317,7 +317,7 @@ def run_payload(out: Path, site_id: str, ledger: dict, m: dict | None, svg: str 
             issues = []
     return {"run_id": f"{site_id}/{out.name}", "folder": out.name, "folder_abs": str(out),
             "as_of": ledger["run"]["as_of"], "stamp": stamp, "ledger": ledger, "massing": m, "svg": svg, "diff": d, "proforma": pf,
-            "layout": lay, "sheets": sheets, "issues": issues,
+            "layout": lay, "sheets": sheets, "issues": issues, "made_by": _made_by(out),
             "massing_note": massing_note, "revit": revit_summary(out, stamp),
             "files": {"massing_json": str(out / "massing.json") if m else None, "ledger_json": str(out / "ledger.json"),
                       "script": str(ROOT / "revit" / "ffm_massing_pyrevit.py")}}
@@ -377,7 +377,20 @@ def do_run(body: Any) -> dict:
     pfm = proforma.build(site, option, ledger, m)
     (out / "proforma.json").write_text(json.dumps(pfm, indent=2, ensure_ascii=False), encoding="utf-8")
     memo.write(ledger, out, m, d, svg, proforma=pfm)
+    # who made it, as the page's own name for its person says (26 Nov 2026): a name kept in one browser, not a login,
+    # so a run list can say whose draft is whose
+    made_by = str(body.get("made_by") or "").strip()[:80]
+    if made_by:
+        (out / "made.json").write_text(json.dumps({"made_by": made_by}, ensure_ascii=False), encoding="utf-8")
     return run_payload(out, site_id, ledger, m, svg, d, massing_note, pfm)
+
+
+def _made_by(folder: Path) -> str | None:
+    f = folder / "made.json"
+    try:
+        return (_read(f).get("made_by") or None) if f.exists() else None
+    except Exception:
+        return None
 
 
 # ---------------------------------------------------------------- Claude proposes (only with a key on this machine)
@@ -601,9 +614,11 @@ def add_issue(site_id: str, folder: str, body: Any) -> dict:
         raise ApiError(400, f"by and to must be one of {', '.join(ROLES)}.")
     f = out / "issues.json"
     items = _read(f) if f.exists() else []
-    # the sender's name travels with the note (16 Nov 2026), so the chip and the memo say who, not only which role
+    # the sender's name travels with the note (16 Nov 2026), so the chip and the memo say who, not only which role; and
+    # the person it is for (26 Nov 2026), so "issued to you" means that person and not whoever opens the page
     item = {"id": datetime.now().strftime("%Y%m%dT%H%M%S%f"), "issued_at": datetime.now().isoformat(timespec="seconds"),
-            "by": by, "to": to, "name": str(body.get("name") or "").strip()[:80], "note": str(body.get("note") or "")[:600]}
+            "by": by, "to": to, "name": str(body.get("name") or "").strip()[:80], "to_name": str(body.get("to_name") or "").strip()[:80],
+            "note": str(body.get("note") or "")[:600]}
     items.append(item)
     f.write_text(json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8")
     return {**item, "run_id": f"{site_id}/{folder}", "folder": folder}

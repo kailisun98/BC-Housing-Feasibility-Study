@@ -89,7 +89,7 @@ export function showInputs(show, remember = true) {
 /* Who is reading. The three flows in docs/user-flows.md each lay the same page out differently; the switch in the
    top bar picks one, ?mode= in a link from the site picks it for a visitor, and the choice is kept for the next visit.
      manager   the route of three stops on the left, one card at a time on the stage, then the memo with Download PDF
-     architect the Site and Option schedules on the left; every ledger layer open; Export to Revit leads
+     architect the Site and Option schedules on the left; every ledger layer open; Build it in Revit leads
      reader    no inputs, no run controls: the memo alone in a reading column, Download PDF and Print
    The engine and the memo are the same in every mode; only what is shown first changes (app.css does the rest). */
 const MODE_KEY = "ffm.mode";

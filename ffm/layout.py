@@ -1569,12 +1569,19 @@ def _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, war
 UNIT_DEPTH_MAX_M = 10.0
 
 
-def _wide_deep(z: dict, x0: float, y0: float, W: float, D: float, tol: float = 0.06) -> tuple[float, float]:
+def _wide_deep(z: dict, x0: float, y0: float, W: float, D: float, tol: float = 0.06, voids: list[dict] | tuple = ()) -> tuple[float, float]:
     """A home's width along its window wall and its depth from it: the wall is the street or lane side of the plate
     where the home stands on one (width along x), else a side of the plate (width along y), else its longer side; a
     home from the street side through to the lane side is lit at both ends and reads half its depth."""
     along_x = z["y"] <= y0 + tol or z["y"] + z["d"] >= y0 + D - tol
     along_y = z["x"] <= x0 + tol or z["x"] + z["w"] >= x0 + W - tol
+    # a cut-out is open air: a home that stands on one (a step-back along the street, a courtyard) has its window
+    # wall there (25 Nov 2026: behind a 2 m step-back a home 19.5 m long read as "5.4 m wide" off the side of the plate)
+    for v in voids:
+        if min(z["x"] + z["w"], v["x"] + v["w"]) - max(z["x"], v["x"]) > 0.5 and (abs(v["y"] + v["d"] - z["y"]) <= tol or abs(z["y"] + z["d"] - v["y"]) <= tol):
+            along_x = True
+        elif min(z["y"] + z["d"], v["y"] + v["d"]) - max(z["y"], v["y"]) > 0.5 and (abs(v["x"] + v["w"] - z["x"]) <= tol or abs(z["x"] + z["w"] - v["x"]) <= tol):
+            along_y = True
     wide, deep = (z["w"], z["d"]) if along_x or not along_y else (z["d"], z["w"])
     if along_x and z["y"] <= y0 + tol and z["y"] + z["d"] >= y0 + D - tol:
         deep = deep / 2
@@ -1597,7 +1604,7 @@ def proportions(floors: list[dict], plate: dict) -> dict[str, Any]:
         for z in fl["zones"]:
             if not z.get("unit"):
                 continue
-            wide, deep = _wide_deep(z, x0, y0, W, D)
+            wide, deep = _wide_deep(z, x0, y0, W, D, voids=[v for v in fl["zones"] if v["block"] == "void"])
             least = UNIT_MIN_WIDTH_M.get(z["unit"])
             if least and wide + 0.05 < least:
                 narrow.append((z["unit"], wide, least))
@@ -2115,12 +2122,13 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
     # 2026, Kai); how deep it runs for its width stays a note (`proportions`). A walk-up's through homes are not held to it.
     if plate.get("arrangement") not in ("walkup", "ground_oriented"):
         for fl in floors:
+            cuts = [v for v in fl["zones"] if v["block"] == "void"]
             for z in fl["zones"]:
                 least = UNIT_MIN_WIDTH_M.get(z.get("unit") or "")
-                if least and _wide_deep(z, x0, y0, W, D)[0] + 0.05 < least:
+                if least and _wide_deep(z, x0, y0, W, D, voids=cuts)[0] + 0.05 < least:
                     where = "the ground floor" if fl["level"] == 0 else f"level {fl['level'] + 1}"
                     geometry.append({"kind": "narrow", "level": fl["level"], "block": z["block"],
-                                     "note": f"a {z['label'].lower()} on {where} is {_wide_deep(z, x0, y0, W, D)[0]:.1f} m wide, under the {least:g} m a {z['label'].lower()} needs along its window wall"})
+                                     "note": f"a {z['label'].lower()} on {where} is {_wide_deep(z, x0, y0, W, D, voids=cuts)[0]:.1f} m wide, under the {least:g} m a {z['label'].lower()} needs along its window wall"})
     L = _assemble(site, option, ledger, massing, prog, plate, floors, shortfall, warnings, edited=True, geometry=geometry)
     if go:
         L["egress"] = _ground_egress(L["floors"], [])

@@ -739,6 +739,8 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   two rectangles; homes and structure are not touched. The two 375 Glen Drive runs that held such rooms
   (`as-proposed`, `what-if-chf`) were regenerated: only their layout, plans, axon and memo.html changed.
 
+- **Block editor, third architects' run (25 Nov 2026, 1010 Expo Blvd 12-storey point tower).** A program block dropped on any white area takes that free place (`gapAt` / `fitGap` / `bestGap` in `ffm/ui/editors/blocks.js`; its width runs along the plate edge or cut-out the place stands on), and a new block is never laid over another: with no place that holds it, it stays in the program and the editor says so. Blocks are labelled w × d; a point tower's program rows say "sized to its bay". A third plate handle (round, at the plate's front-left corner) moves the plate inside the plate box; it is carried as `massing.anchor: front-left` with `dx_m` / `dy_m` (`editor.shift`, in undo and the kept options), and an anchor picked in the editor zeroes the shift. The street side of the plate is named; grid lines are numbered from the left of the page. A step-back's edge is a window wall for the width and proportion checks (`_wide_deep(..., voids)` in `ffm/layout.py`), and a home a step-back would refit past 2.5:1 goes back to the program. The plate message gives one FSR (net of cut-outs) and says when a new plate size changed the building type and what that cost in homes. Not verified in the browser: moving a plate that is also turned (`angle_deg`), and a tower with a podium.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

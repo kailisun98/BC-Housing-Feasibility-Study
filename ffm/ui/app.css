@@ -685,7 +685,9 @@ table.plain td.status { white-space: nowrap; }
 .ed-wide .ed-program { max-height: calc(100vh - var(--bars-h, 88px) - 24px); overflow-y: auto; }
 .ed-step-row .field.inline input[type=number] { width: 60px; flex: none; }
 .ed-step-row .field.inline select { width: auto; flex: none; }
-.ed-step-row .field.inline { flex: none; width: auto; }.ed-selbar .ed-kind { font-weight: 600; }
+.ed-step-row .field.inline { flex: none; width: auto; }.ed-selbar { min-height: 66px; align-content: flex-start; }
+.ed-canvas .ed-plate-m { cursor: move; }
+.ed-selbar .ed-kind { font-weight: 600; }
 .ed-bar select, .ed-selbar select { width: auto; flex: none; }
 .ed-selbar .field.inline { flex-direction: row; }
 .ed-levels { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }

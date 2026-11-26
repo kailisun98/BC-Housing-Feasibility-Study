@@ -279,6 +279,14 @@ class Editor(unittest.TestCase):
                 if z.get("unit"):
                     self.assertGreaterEqual(z["w"] + 0.02, max(layout.UNIT_MIN_WIDTH_M[z["unit"]], strip / layout.UNIT_DEPTH_RATIO_MAX), z)
         self.assertEqual(lay["proportions"]["status"], "pass")
+
+    def test_a_cut_out_is_a_window_wall(self):
+        # a home behind a step-back along the street, at the side of the plate: its window wall is the step-back's
+        # edge (width along x), not the side of the plate, which read a 19.5 m home as 5.4 m wide
+        home = {"x": 0.0, "y": 2.0, "w": 19.5, "d": 5.4}
+        self.assertEqual(layout._wide_deep(home, 0.0, 0.0, 60.0, 20.0), (5.4, 19.5))
+        cut = [{"x": 0.0, "y": 0.0, "w": 60.0, "d": 2.0, "block": "void"}]
+        self.assertEqual(layout._wide_deep(home, 0.0, 0.0, 60.0, 20.0, voids=cut), (19.5, 5.4))
         # a home narrowed by hand is counted and said, never a failure
         z = json.loads(json.dumps(self.zones))
         unit = next(u for u in z["1"] if u["block"] == "two_bed")

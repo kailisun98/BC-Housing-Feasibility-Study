@@ -138,6 +138,7 @@ export function openEditor(resume) {
   const ms = state.option && state.option.massing;
   editor.plate = ms && ms.width_m > 0 && ms.depth_m > 0 ? { w: Number(ms.width_m), d: Number(ms.depth_m) } : null;
   editor.angle = Number(ms && ms.angle_deg) || 0;
+  editor.shift = null;    // and how far from that corner of the plate box (the move handle)
   editor.anchor = null;   // where the plate stands in the plate box, where the editor moved it (Fit the plate to the turn)
   editor.massing = run.massing || null;
   try { editor.context = localStorage.getItem("ffm.ed.context") !== "0"; } catch (e) { editor.context = true; }
@@ -178,7 +179,7 @@ export function closeEditor() {
 /* ---------------------------------------------------------------- undo, and the cores that stand on every floor */
 
 function snapshot() {
-  (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0, s: editor.steps || null, n: editor.anchor || null }));
+  (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0, s: editor.steps || null, n: editor.anchor || null, m: editor.shift || null }));
   if (editor.history.length > 60) editor.history.shift();
 }
 
@@ -186,7 +187,7 @@ function undo() {
   const s = (editor.history || []).pop();
   if (!s) return;
   const was = JSON.parse(s);
-  editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.angle = was.t || 0; editor.steps = was.s || null; editor.anchor = was.n || null; editor.sel = null; editor.dirty = true;
+  editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.angle = was.t || 0; editor.steps = was.s || null; editor.anchor = was.n || null; editor.shift = was.m || null; editor.sel = null; editor.dirty = true;
   renderEditor(); scheduleCheck();
   say("Undone.", "info");
 }
@@ -235,6 +236,7 @@ function syncHomes() {
 
 /* Every change ends here: the cores follow on every floor when one was touched, the editor redraws, the engine checks. */
 function commit(core) {
+  editor.msg = null;   // what was said before this change is no longer about the plate; a caller says its own after
   if (syncHomes()) say("The home runs through its floors: the change is made on each of them.", "info");
   if (core) {
     editor.coreMoved = true;   // from here a suggested plan keeps the cores where the architect stood them
@@ -342,7 +344,7 @@ function zoneInner(z, r) {
   return `<rect x="${f(r.x)}" y="${f(r.y)}" width="${f(r.w)}" height="${f(r.d)}" fill="${ZONE_TONE[z.block] || "#eee"}" stroke="#5f6672" stroke-width="0.8"${z.block === "void" ? ` stroke-dasharray="5 3"` : ""}/>
     ${z.accessible ? `<circle cx="${f(r.x + 7)}" cy="${f(r.y + 7)}" r="3.2" fill="#245f9c"/>` : ""}
     ${r.w > 26 && r.d > 14 ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + (two ? -1.5 : 4))}" font-size="11" font-weight="500" text-anchor="middle" fill="#1f2933">${h(zoneShort(z))}</text>` : ""}
-    ${two ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + 12)}" font-size="11" text-anchor="middle" fill="#5f6672">${h(z.w)} m</text>` : ""}`;
+    ${two ? `<text x="${f(r.x + r.w / 2)}" y="${f(r.y + r.d / 2 + 12)}" font-size="11" text-anchor="middle" fill="#5f6672">${h(z.w)} × ${h(z.d)}</text>` : ""}`;
 }
 
 /* The selected block's ring and its three handles, drawn over every block (20 Nov 2026: the selected block was moved to
@@ -362,7 +364,7 @@ function selOverlay(i, z, V) {
 /* the line above the plate: what is selected and what can be done with it */
 function selBarHtml(L, zs) {
   const sel = editor.sel != null ? zs[editor.sel] : null;
-  if (!sel) return `<span class="help">Drag a block from the program onto the plate (or press Enter on its row). On the plate: drag to move, pull an edge to resize; or Tab to a block and the arrows move it, Delete removes it, Ctrl+Z undoes.</span>`;
+  if (!sel) return `<span class="help">Drag a block from the program onto the plate, into any free place. Drag to move, pull an edge to resize; Delete removes, Ctrl+Z undoes.</span>`;
   const prog = (L.program || []).find(b => b.key === sel.block);
   const gross = prog && prog.gross_m2_each, least = (prog && prog.min_gross_m2_each) || gross, a = sel.w * sel.d;
   const over = !gross ? "" : (a > gross * 1.15 ? ` <span class="warn-text">· ${fmtNum(Math.round(a - gross))} m² over the ${fmtNum(Math.round(gross))} m² the program carries</span>` : (a + 0.5 < least ? ` <span class="warn-text">· ${fmtNum(Math.round(least - a))} m² under its ${fmtNum(Math.round(least))} m² minimum</span>` : ""));
@@ -399,7 +401,7 @@ function programHtml(L, tr, zs, B) {
     const pct = r.need > 0 ? Math.min(100, r.placed / r.need * 100) : 100;
     if (r.unit) {
       const count = r.short ? `<b>${r.left}</b> to place` : (r.over ? `<b>${-r.left}</b> over` : "placed");
-      return row(r.key, r.label, ZONE_TONE[r.key], `${fmtNum(Math.round(r.each))} m² · ${B.strip ? `${unitW(r.each, r.min, B.strip, r.minW)} m wide = ${fmtNum(Math.round(unitW(r.each, r.min, B.strip, r.minW) * B.strip))} m²` : "?"} · ${r.placed} of ${r.need}`, count, cls, pct,
+      return row(r.key, r.label, ZONE_TONE[r.key], `${fmtNum(Math.round(r.each))} m² · ${L.plate.arrangement === "point" ? "sized to its bay" : B.strip ? `${unitW(r.each, r.min, B.strip, r.minW)} m wide = ${fmtNum(Math.round(unitW(r.each, r.min, B.strip, r.minW) * B.strip))} m²` : "?"} · ${r.placed} of ${r.need}`, count, cls, pct,
         `${r.label}: ${r.placed} of ${r.need} placed${r.short ? `, ${r.left} to place` : ""}. Enter adds one to this floor.`);
     }
     const count = r.below ? `${fmtNum(r.below)} m² below grade` : r.short ? `<b>${fmtNum(r.left)} m²</b> to place` : (r.over ? `<b>${fmtNum(-r.left)} m²</b> over` : "placed");
@@ -473,11 +475,15 @@ function renderEditor() {
   // the grid: a line at every bay, a fainter one at every module, the bays' distances along the street side, centred
   // 12 px off the plate's edge so they read clear of the wall whichever way the plan is turned (20 Nov 2026: on a plan
   // turned north up they sat on the wall line, and the depth handle covered the middle one)
+  // grid lines are numbered 1, 2, 3 from the left of the page (25 Nov 2026: metres from the plate's own left read
+  // right to left on a plan turned half round), and the street side of the plate is named
+  const reversed = Math.cos((turn - ang) * Math.PI / 180) < 0, nBays = Math.floor(p.width_m / editor.bay + 1e-6);
+  const streetName = (site && site.osm && site.osm.frontStreet) || (editor.massing && editor.massing.lot && editor.massing.lot.front_face && editor.massing.lot.front_face.street) || "";
   let grid = "", ticks = "";
   for (let k = 0; k * m <= p.width_m + 1e-6; k++) {
     const x = (px0 + k * m * scale).toFixed(1), bay = k % editor.divide === 0;
     grid += `<line x1="${x}" y1="${py0.toFixed(1)}" x2="${x}" y2="${(py0 + pd).toFixed(1)}" stroke="${bay ? "#aab4c0" : "#cfd6de"}" stroke-width="${bay ? 0.8 : 0.5}"${bay ? "" : ` stroke-dasharray="2 3"`}/>`;
-    if (bay && editor.bay * scale >= 26) ticks += `<text x="${x}" y="${(py0 + pd + 12 + 3.9).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672">${r2(k * m)}</text>`;
+    if (bay && editor.bay * scale >= 26) ticks += `<text x="${x}" y="${(py0 + pd + 12 + 3.9).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672">${(reversed ? nBays - k / editor.divide : k / editor.divide) + 1}</text>`;
   }
   // the grid across the plate as well: a line at every bay from the street face, and a column where the bays meet
   for (let j = 1; j * editor.bay < p.depth_m - 0.05; j++) {
@@ -591,6 +597,8 @@ function renderEditor() {
           ${svgZones}
           <g pointer-events="none">${columns}</g>
           <rect class="ed-plate-handle ed-plate-w" x="${(px0 + pw + 3).toFixed(1)}" y="${(py0 + pd / 2 - 11).toFixed(1)}" width="8" height="22" rx="2" fill="#1f2933"><title>Drag to widen or narrow the plate</title></rect>
+          <text x="${(px0 + pw / 2).toFixed(1)}" y="${(py0 + pd + 34).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">street side${streetName ? ` · ${h(streetName)}` : ""}</text>
+          <rect class="ed-plate-handle ed-plate-m" x="${(px0 - 14).toFixed(1)}" y="${(py0 + pd + 4).toFixed(1)}" width="11" height="11" rx="5.5" fill="#1f2933"><title>Drag to move the plate inside what the setbacks leave</title></rect>
           <rect class="ed-plate-handle ed-plate-d" x="${(px0 + pw / 2 - 11).toFixed(1)}" y="${(py0 - 11).toFixed(1)}" width="22" height="8" rx="2" fill="#1f2933"><title>Drag to deepen or shallow the plate</title></rect>
           <g id="ed-ghost" pointer-events="none"></g>`)}</g></g>
           <text x="${(frame.W / 2).toFixed(1)}" y="${(frame.H - 6).toFixed(1)}" font-size="11" text-anchor="middle" fill="#5f6672" paint-order="stroke" stroke="#ffffff" stroke-width="3">${site && site.osm && site.osm.bearing != null ? "project north up" : "street at the bottom"} · plate ${h(p.width_m)} × ${h(p.depth_m)} m · walls on the ${h(r2(m))} m module of a ${h(editor.bay)} m bay${V.ctx ? " · property line dash-dot, setbacks red" : ""}</text>
@@ -699,15 +707,69 @@ function freeSpot(zones, z, p, B) {
 
 /* Where a block dragged from the program lands under the pointer: in the strip the pointer is over, on the
    module, at the free place nearest the pointer (where there is none, under the pointer, and it shows red). */
+/* The empty rectangle round a point on a floor: out to the nearest blocks and the plate's edges, sideways first,
+   then across. Null on a block or off the plate. Pure. */
+function gapAt(pt, zs, p) {
+  const [x, y] = pt;
+  if (x <= p.x || y <= p.y || x >= p.x + p.width_m || y >= p.y + p.depth_m) return null;
+  if (zs.some(o => x > o.x && x < o.x + o.w && y > o.y && y < o.y + o.d)) return null;
+  let x0 = p.x, x1 = p.x + p.width_m, y0 = p.y, y1 = p.y + p.depth_m;
+  for (const o of zs) if (y > o.y && y < o.y + o.d) { if (o.x + o.w <= x) x0 = Math.max(x0, o.x + o.w); else if (o.x >= x) x1 = Math.min(x1, o.x); }
+  for (const o of zs) if (o.x < x1 - 0.01 && o.x + o.w > x0 + 0.01) { if (o.y + o.d <= y) y0 = Math.max(y0, o.y + o.d); else if (o.y >= y) y1 = Math.min(y1, o.y); }
+  return { x: r2(x0), y: r2(y0), w: r2(x1 - x0), d: r2(y1 - y0) };
+}
+
+/* A new block stood in a free place (25 Nov 2026: on a point tower a home dropped on the empty bay beside the core
+   jumped to the lane row and landed on another; the editor knew only the street and lane strips). Its width runs
+   along its window wall: the plate's street or lane edge, or a cut-out, where the place stands on one; else the side
+   of the plate. It takes the place's depth from that wall, and as much length as its area needs there. False where
+   the place is too small for it. */
+function fitGap(z, gap, pt, zs, p) {
+  const tol = 0.06, fit = z._fit || {}, voids = zs.filter(o => o.block === "void");
+  const onX = gap.y <= p.y + tol || gap.y + gap.d >= p.y + p.depth_m - tol || voids.some(v => Math.abs(v.y + v.d - gap.y) < tol || Math.abs(gap.y + gap.d - v.y) < tol);
+  const onY = gap.x <= p.x + tol || gap.x + gap.w >= p.x + p.width_m - tol;
+  const alongX = onX || !onY, deep = alongX ? gap.d : gap.w, room = alongX ? gap.w : gap.d;
+  const len = fit.each ? unitW(fit.each, fit.min, deep, fit.minW) : (fit.area ? ceilM(fit.area / deep) : (alongX ? z.w : z.d));
+  if (len > room + 0.01 && room < len * 0.85) return false;
+  const run = r2(Math.min(len, room)), m = mod();
+  if (alongX) {
+    const x = Math.max(gap.x, Math.min(gap.x + gap.w - run, gap.x + Math.round((pt[0] - run / 2 - gap.x) / m) * m));
+    Object.assign(z, { x: r2(x), y: gap.y, w: run, d: gap.d });
+  } else {
+    const y = Math.max(gap.y, Math.min(gap.y + gap.d - run, gap.y + Math.round((pt[1] - run / 2 - gap.y) * 2) / 2));
+    Object.assign(z, { x: gap.x, y: r2(y), w: gap.w, d: run });
+  }
+  return true;
+}
+
+/* The largest free place on a floor, looked for a metre at a time. Null on a full floor. */
+function bestGap(zs, p) {
+  let best = null;
+  for (let y = p.y + 0.5; y < p.y + p.depth_m; y += 1) for (let x = p.x + 0.5; x < p.x + p.width_m; x += 1) {
+    const g = gapAt([x, y], zs, p);
+    if (g && Math.min(g.w, g.d) >= 2.4 && (!best || g.w * g.d > best.w * best.d)) best = g;
+  }
+  return best;
+}
+
 function placeAt(z, pt, zs, p, B) {
   if (z.block === "corridor") { z.x = p.x; z.y = Math.min(B.corr, r2(p.y + p.depth_m - z.d)); return; }
+  // a free place under the pointer takes the block, whatever strip or bay it is; else the strip's nearest free place
+  const gap = z.block !== "core" ? gapAt(pt, zs, p) : null;
+  if (gap && Math.min(gap.w, gap.d) >= 2 && fitGap(z, gap, pt, zs, p)) return;
   const lane = z.block !== "core" && B.rear != null && pt[1] > B.corr + CORR / 2;
   if (z.block !== "core") fitBand(z, lane ? B.rearD : B.frontD, B);
   const y = z.block === "core" ? p.y : (lane ? B.rear : B.front);
   const want = pt[0] - z.w / 2;
   const xs = moduleXs(z, p).sort((a, b) => Math.abs(a - want) - Math.abs(b - want));
   const clear = clearOf(z, zs.filter(o => o.block !== "corridor"));
-  z.x = xs.find(x => clear(x, y)) ?? xs[0] ?? p.x;
+  const free = xs.find(x => clear(x, y));
+  if (free == null && z.block !== "core") {
+    // the strip is full: the largest free place on the floor takes it, where it fits, before it lands on another block
+    const g = bestGap(zs.filter(o => o !== z), p);
+    if (g && fitGap(z, g, [g.x + g.w / 2, g.y + g.d / 2], zs, p)) return;
+  }
+  z.x = free ?? xs[0] ?? p.x;
   z.y = r2(Math.min(y, p.y + p.depth_m - z.d));
 }
 
@@ -869,6 +931,9 @@ function rebuildSteps() {
           if (d < 2.5) { gone.add(z); continue; }
           const pr = isUnit(z.block) ? (L.program || []).find(b => b.key === z.block) : null;
           const w = pr ? unitW(pr.gross_m2_each, pr.min_gross_m2_each, d, pr.min_width_m) : r2(z.w * z.d / d);
+          // a home that would be more than DEPTH_RATIO times as long as it is deep is no home (25 Nov 2026: a
+          // three-bedroom 19.5 m long and 5.4 m deep): it goes back to the program
+          if (pr && w / d > DEPTH_RATIO) { gone.add(z); continue; }
           let x = Math.max(z.x, cursor);
           for (let n = 0, hit; n < 8 && (hit = cores.find(c => !(x + w <= c.x + 0.01 || c.x + c.w <= x + 0.01 || y + d <= c.y + 0.01 || c.y + c.d <= y + 0.01))); n++) x = hit.x + hit.w;
           if (x + w > p.x + W - rt + 0.01) { gone.add(z); continue; }
@@ -923,6 +988,10 @@ function wireEditor(box, ctx) {
   const svg = $(".ed-canvas", box);
   // the pointer in the canvas's own coordinates, inside the group that turns the plan north up
   const turned = $(".ed-mass-turn", svg);
+  const ang = editor.angle || 0;
+  // the plate box the plate may stand in: the largest rectangle the setbacks leave
+  const envM = editor.massing && editor.massing.envelope, envXs = envM && envM.polygon ? envM.polygon.map(q => q[0]) : [p.x, p.x + p.width_m], envYs = envM && envM.polygon ? envM.polygon.map(q => q[1]) : [p.y, p.y + p.depth_m];
+  const boxM = (envM && envM.box) || { x: Math.min(...envXs), y: Math.min(...envYs), w: Math.max(...envXs) - Math.min(...envXs), d: Math.max(...envYs) - Math.min(...envYs) };
   const loc = e => { const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(turned.getScreenCTM().inverse()); return [pt.x, pt.y]; };
   const m = mod();
 
@@ -978,7 +1047,12 @@ function wireEditor(box, ctx) {
   // a block added without a drag lands in the first free place on this floor
   const addBlock = (kind, label) => {
     const z = newBlock(kind, label, L, p, B);
-    const spot = freeSpot(zs, z, p, B);
+    let spot = freeSpot(zs, z, p, B);
+    // no room in the strips: the largest free place on the floor, where the block fits it (a tower's side bay)
+    if (!spot) {
+      const gap = bestGap(zs, p);
+      if (gap && fitGap(z, gap, [gap.x + gap.w / 2, gap.y + gap.d / 2], zs, p)) spot = [z.x, z.y];
+    }
     // no free place: nothing is added (before 23 Nov 2026 the block was dropped on the front-left corner, on top of
     // what stood there, and a cut-out dropped that way came off the floor area while the home under it still counted)
     if (!spot) {
@@ -1022,7 +1096,8 @@ function wireEditor(box, ctx) {
       placeAt(pal.z, pt, zs, p, B);
       const r = rectOf(pal.z, V), hit = !clearOf(pal.z, zs.filter(o => o.block !== "corridor" && pal.z.block !== "corridor"))(pal.z.x, pal.z.y);
       ghost.innerHTML = U(`<rect x="${r.x.toFixed(1)}" y="${r.y.toFixed(1)}" width="${r.w.toFixed(1)}" height="${r.d.toFixed(1)}" fill="${ZONE_TONE[kind] || "#eee"}" fill-opacity="0.75" stroke="${hit ? "#c81e1e" : "#245f9c"}" stroke-width="1.6" stroke-dasharray="5 3"/>
-        <text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(zoneShort(pal.z))} · ${pal.z.w} m</text>`);
+        <text x="${(r.x + r.w / 2).toFixed(1)}" y="${(r.y + r.d / 2 + 3.5).toFixed(1)}" font-size="9.5" text-anchor="middle" fill="#1f2933">${h(zoneShort(pal.z))} · ${pal.z.w} × ${pal.z.d}</text>`);
+      pal.hit = hit;
     });
     const done = e => {
       if (!pal) return;
@@ -1030,7 +1105,9 @@ function wireEditor(box, ctx) {
       row.classList.remove("dragging"); box.classList.remove("ed-dragging"); editor.dragging = false;
       if (!q.started) { if (e.type === "pointerup") addBlock(kind, label); return; }
       ghost.innerHTML = "";
-      if (q.over && e.type === "pointerup") { snapshot(); zs.push(q.z); editor.sel = zs.length - 1; commit(kind === "core"); }
+      // a new block is never laid over another (25 Nov 2026): with no free place that holds it, it stays in the program
+      if (q.over && e.type === "pointerup" && q.hit) { say(`No free place on this floor holds ${label.toLowerCase()} at its size: the white areas are too small for it. Remove or shrink a block first, or try another floor.`, "busy"); if (editor.pendingRender) renderEditor(); }
+      else if (q.over && e.type === "pointerup") { snapshot(); zs.push(q.z); editor.sel = zs.length - 1; commit(kind === "core"); }
       else if (editor.pendingRender) renderEditor();
     };
     row.addEventListener("pointerup", done);
@@ -1070,7 +1147,7 @@ function wireEditor(box, ctx) {
   const keepBtn = $("#ed-keep", box);
   if (keepBtn) keepBtn.addEventListener("click", () => {
     const mine = variantsHere(), name = "ABCDEF"[mine.length] || String(mine.length + 1);
-    editor.variants.push({ key: variantKey(), name, sum: summaryOf(L), state: JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0, s: editor.steps || null, n: editor.anchor || null }) });
+    editor.variants.push({ key: variantKey(), name, sum: summaryOf(L), state: JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0, s: editor.steps || null, n: editor.anchor || null, m: editor.shift || null }) });
     renderEditor();
     say(`Kept as option ${name}. Change the plate, the turn, the steps or the plan and keep another; the table compares them, and Restore brings one back onto the plate.`, "ok");
   });
@@ -1078,7 +1155,7 @@ function wireEditor(box, ctx) {
     const v = variantsHere()[Number(b.dataset.varRestore)]; if (!v) return;
     snapshot();
     const was = JSON.parse(v.state);
-    editor.zones = was.z; editor.added = was.a; editor.plate = was.p; editor.angle = was.t; editor.steps = was.s; editor.anchor = was.n; editor.sel = null; editor.dirty = true;
+    editor.zones = was.z; editor.added = was.a; editor.plate = was.p; editor.angle = was.t; editor.steps = was.s; editor.anchor = was.n; editor.shift = was.m || null; editor.sel = null; editor.dirty = true;
     if (!editor.zones[String(editor.level)]) editor.level = 0;
     renderEditor(); scheduleCheck();
     say(`Option ${v.name} is back on the plate; Undo returns to what was there. Apply makes it the option's.`, "info");
@@ -1189,7 +1266,7 @@ function wireEditor(box, ctx) {
   svg.addEventListener("pointerdown", e => {
     if (e.button) return;
     if (e.target.classList.contains("ed-plate-handle")) {
-      drag = { plate: e.target.classList.contains("ed-plate-w") ? "w" : "d", x0: e.clientX, y0: e.clientY, p0: loc(e), w: p.width_m, d: p.depth_m, moved: false };
+      drag = { plate: e.target.classList.contains("ed-plate-m") ? "m" : e.target.classList.contains("ed-plate-w") ? "w" : "d", x0: e.clientX, y0: e.clientY, p0: loc(e), w: p.width_m, d: p.depth_m, moved: false };
       svg.setPointerCapture(e.pointerId); e.preventDefault(); return;
     }
     const g = e.target.closest(".ed-zone, .ed-selover");   // a block, or the selected one's handles over it
@@ -1206,6 +1283,16 @@ function wireEditor(box, ctx) {
     if (drag.plate) {
       // the plate as it would be, dashed, from its front-left corner, with its size and floor area
       drag.moved = true; editor.dragging = true;
+      if (drag.plate === "m") {
+        // the plate moved inside the plate box, in 0.5 m steps; the pointer is read in the plate's own turned frame
+        const a = ang * Math.PI / 180, lx = (at[0] - drag.p0[0]) / scale, ly = -(at[1] - drag.p0[1]) / scale;
+        const nx = Math.max(boxM.x, Math.min(boxM.x + boxM.w - p.width_m, Math.round((p.x + lx * Math.cos(a) - ly * Math.sin(a)) * 2) / 2));
+        const ny = Math.max(boxM.y, Math.min(boxM.y + boxM.d - p.depth_m, Math.round((p.y + lx * Math.sin(a) + ly * Math.cos(a)) * 2) / 2));
+        drag.to = [r2(nx), r2(ny)];
+        const ox = (nx - p.x) * Math.cos(a) + (ny - p.y) * Math.sin(a), oy = -(nx - p.x) * Math.sin(a) + (ny - p.y) * Math.cos(a);
+        ghost.innerHTML = `<rect x="${(V.X(p.x) + ox * scale).toFixed(1)}" y="${(V.Y(p.y + p.depth_m) - oy * scale).toFixed(1)}" width="${(p.width_m * scale).toFixed(1)}" height="${(p.depth_m * scale).toFixed(1)}" fill="#245f9c" fill-opacity="0.08" stroke="#245f9c" stroke-width="1.6" stroke-dasharray="6 3"/>`;
+        return;
+      }
       if (drag.plate === "w") drag.w = fitW(p.width_m + (at[0] - drag.p0[0]) / scale);
       else drag.d = fitD(p.depth_m - (at[1] - drag.p0[1]) / scale);
       const x = V.X(p.x), y = V.Y(p.y + drag.d);
@@ -1245,6 +1332,7 @@ function wireEditor(box, ctx) {
     svg.classList.remove("dragging"); editor.dragging = false;
     if (d.plate) {
       ghost.innerHTML = "";
+      if (d.plate === "m") { if (d.moved && e.type === "pointerup" && d.to && (d.to[0] !== p.x || d.to[1] !== p.y)) movePlate(d.to[0], d.to[1], boxM); else if (editor.pendingRender) renderEditor(); return; }
       if (d.moved && e.type === "pointerup" && (d.w !== p.width_m || d.d !== p.depth_m)) setPlate(d.w, d.d);
       else if (editor.pendingRender) renderEditor();
       return;
@@ -1324,7 +1412,7 @@ function optionFor(extra) {
 /* The plate the architect set, on an option: its width and depth for the massing (`massing.width_m`, `depth_m`),
    and the floor area that plate gives at the option's storeys, so the rules and the FSR read the plate drawn. */
 function withPlate(opt) {
-  if (editor.anchor) opt.massing = Object.assign({}, opt.massing || {}, { anchor: editor.anchor });
+  if (editor.anchor) opt.massing = Object.assign({}, opt.massing || {}, { anchor: editor.anchor }, editor.shift ? { dx_m: editor.shift.dx, dy_m: editor.shift.dy } : { dx_m: 0, dy_m: 0 });
   if (editor.steps || (opt.massing && opt.massing.steps)) { opt.massing = Object.assign({}, opt.massing || {}, { steps: editor.steps || [] }); if (!editor.steps) delete opt.massing.steps; }
   if (editor.angle || (opt.massing && opt.massing.angle_deg)) opt.massing = Object.assign({}, opt.massing || {}, { angle_deg: editor.angle || 0 });
   const pl = editor.plate;
@@ -1350,9 +1438,31 @@ function oversOf(cap) {
 
 /* A new plate (or, with null, the plate the floor area and the storeys give again): the program is laid out on
    it afresh, the cut-outs that still fit kept; Undo brings back the plate and the blocks as they were. */
-async function setPlate(w, d, anchor) {
+/* The plate moved to stand with its front-left corner at (x, y) in the lot, inside the plate box: every block moves
+   with it (the blocks are kept in the lot's own coordinates), and the option will carry it as the front-left anchor
+   and a shift (`massing.anchor`, `dx_m`, `dy_m`), as FIG 01's Place the mass does. */
+async function movePlate(x, y, box) {
+  const L = editor.result || state.run.layout, p = L.plate, dx = r2(x - p.x), dy = r2(y - p.y);
+  if (!dx && !dy) return;
   snapshot();
-  if (anchor) editor.anchor = anchor;
+  for (const zs of Object.values(editor.zones)) for (const z of zs) {
+    z.x = r2(z.x + dx); z.y = r2(z.y + dy);
+    if (z.pre) { z.pre[0] = r2(z.pre[0] + dx); z.pre[1] = r2(z.pre[1] + dy); }
+    if (z.full) z.full[0] = r2(z.full[0] + dx);
+  }
+  editor.anchor = "front-left"; editor.shift = { dx: r2(x - box.x), dy: r2(y - box.y) };
+  editor.dirty = true; editor.sel = null;
+  clearTimeout(editor.timer);
+  await checkPlacement();
+  say(`The plate is moved ${[dx ? `${Math.abs(dx)} m ${dx > 0 ? "along" : "back along"} the frontage` : "", dy ? `${Math.abs(dy)} m ${dy > 0 ? "into the lot" : "toward the street"}` : ""].filter(Boolean).join(" and ")}; its blocks moved with it. It stands ${editor.shift.dx} m from the left and ${editor.shift.dy} m from the front of what the setbacks leave. Apply writes it into the option.`, "info");
+}
+
+const ARRANGEMENT = { point: "a point tower, homes round a central core", double: "a slab with a corridor down its middle", single: "a slab with homes on one side of a corridor", walkup: "a walk-up off one stair", wings: "two wings" };
+
+async function setPlate(w, d, anchor) {
+  const was = editor.result ? { kind: editor.result.plate.arrangement, homes: programTracker(editor.result, editor.zones) } : null;
+  snapshot();
+  if (anchor) { editor.anchor = anchor; editor.shift = null; }
   editor.plate = w == null ? null : { w, d };
   // a level added in the editor carries a plate of floor area: the plate as set, or (Auto) the plate there was
   // before one was set (23 Nov 2026: Auto after a set plate and an added level left the floor area on the set plate)
@@ -1361,7 +1471,14 @@ async function setPlate(w, d, anchor) {
   await suggestPlan(false, true);
   // the homes on the plates now, after the step-backs have taken theirs off (25 Nov 2026: the message counted before that)
   const L = editor.result, c = L.capacity || {}, trk = programTracker(L, editor.zones), left = trk.unitsLeft, onPlate = trk.unitsNeed - trk.unitsLeft;
-  say(`The plate is ${L.plate.width_m} × ${L.plate.depth_m} m, ${fmtNum(Math.round(L.plate.width_m * L.plate.depth_m))} m² a floor${w == null ? ", as the floor area and the storeys give it" : ""}${c.fsr != null ? `: FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)}` : ""}` : ""}. The program is laid out on it again: ${onPlate} of ${trk.unitsNeed} homes placed${left > 0 ? `, ${left} left to place` : ""}. ${oversOf(c).length ? `Over a limit: ${oversOf(c).join("; ")}. ` : ""}Undo brings back the plate as it was; Apply writes it into the option.`, left > 0 || oversOf(c).length ? "busy" : "ok");
+  // one FSR, the one net of the cut-outs on the plates now (25 Nov 2026: the message and the bar read two figures)
+  const cutNow = Object.values(editor.zones).flat().filter(z => z.block === "void").reduce((t, z) => t + z.w * z.d, 0);
+  if (c.fsr != null && c.site_area_m2) c.fsr = Math.round((c.gfa_m2 + (c.void_m2 || 0) - cutNow) / c.site_area_m2 * 1000) / 1000;
+  // a plate that changes what kind of building the engine lays out, said with what it did to the homes
+  const kind = L.plate.arrangement, changed = was && was.kind && kind && was.kind !== kind;
+  const before = was ? was.homes.unitsNeed - was.homes.unitsLeft : null;
+  const turnNote = changed ? ` At this size the engine lays it out as ${ARRANGEMENT[kind] || kind}, where it was ${ARRANGEMENT[was.kind] || was.kind}${before != null && onPlate < before ? `: that holds ${before - onPlate} fewer homes here (${before} before). Undo, or a plate nearer square, keeps the tower` : ""}.` : (before != null && onPlate < before ? ` That is ${before - onPlate} fewer than before (${before}): deeper or wider strips make each home larger, by its minimum width and proportion.` : "");
+  say(`The plate is ${L.plate.width_m} × ${L.plate.depth_m} m, ${fmtNum(Math.round(L.plate.width_m * L.plate.depth_m))} m² a floor${w == null ? ", as the floor area and the storeys give it" : ""}${c.fsr != null ? `: FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)}` : ""}` : ""}. The program is laid out on it again: ${onPlate} of ${trk.unitsNeed} homes placed${left > 0 ? `, ${left} left to place` : ""}.${turnNote} ${oversOf(c).length ? `Over a limit: ${oversOf(c).join("; ")}. ` : ""}Undo brings back the plate as it was; Apply writes it into the option.`, left > 0 || oversOf(c).length ? "busy" : "ok");
 }
 
 /* The levels added in the editor, on an option: a storey each, and (where the option states them) a plate more of
@@ -1504,7 +1621,11 @@ function applyEditor() {
   const cut = Object.entries(editor.zones).filter(([k]) => Number(k) < storeys).reduce((t, [, zs]) => t + zs.filter(z => z.block === "void").reduce((a, z) => a + z.w * z.d, 0), 0);
   if (cut > 0 && !editor.plate) editor.plate = { w: Lr.plate.width_m, d: Lr.plate.depth_m };
   // the angle the mass is turned by, where it changed
-  if (editor.anchor && (state.option.massing || {}).anchor !== editor.anchor) { state.option.massing = Object.assign({}, state.option.massing || {}, { anchor: editor.anchor }); markStale("the option"); }
+  if (editor.anchor) {
+    const was = JSON.stringify(state.option.massing || {});
+    state.option.massing = Object.assign({}, state.option.massing || {}, { anchor: editor.anchor }, editor.shift ? { dx_m: editor.shift.dx, dy_m: editor.shift.dy } : { dx_m: 0, dy_m: 0 });
+    if (JSON.stringify(state.option.massing) !== was) markStale("the option");
+  }
   const wasAngle = Number((state.option.massing || {}).angle_deg) || 0, nowAngle = editor.angle || 0;
   if (nowAngle !== wasAngle) {
     state.option.massing = Object.assign({}, state.option.massing || {}, { angle_deg: nowAngle });

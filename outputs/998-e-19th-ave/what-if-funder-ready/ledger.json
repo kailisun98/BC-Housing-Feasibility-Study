@@ -5958,7 +5958,8 @@
           "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. Ask: the City of Vancouver's heritage planners (the Heritage Register and designations).",
           "contact": "the City of Vancouver's heritage planners (the Heritage Register and designations)"
         }
-      ]
+      ],
+      "decided": []
     }
   },
   "inputs": {

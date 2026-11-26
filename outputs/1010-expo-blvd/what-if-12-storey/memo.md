@@ -10,10 +10,10 @@
 
 | | |
 |---|---|
-| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy; 101 of the 120 fit the first plans |
+| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy; 98 of the 120 fit the first plans |
 | Who operates | BC Indigenous Housing Society; the operating figures are not signed by an operator |
 | Which program | BC Builds, the Community Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
-| The amount | Capital cost $62.6M. Asked: Community Housing Fund grant, $21.4M (illustrative). Still to find: $28.2M (45% of the cost). |
+| The amount | Capital cost $62.6M. Asked: Community Housing Fund grant, $17.4M (illustrative). Still to find: $34.2M (55% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Needs more sources |
 | The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. The agreement between the owner and the operator (uncertain). 3. Transit-oriented area minimum allowable height and density (uncertain). |
@@ -28,7 +28,7 @@
 - *Uncertain* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 43 trees on a 3,908 m² site; no tree survey is on file.
 
 ## 2. Does it fit the funders?
-**Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The first layout places 101 of 120 homes on the plates as drawn (answer 3); this answer counts all 120.
+**Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The first layout places 98 of 120 homes on the plates as drawn (answer 3); this answer counts all 120.
 - *Pass* — BC Builds: eligibility and below-market requirement: BC Builds: passes the published items this screen checks: non-residential space is 0.0% of area, under the 30% cap; ground must break within 12 to 18 months of the conditional land contribution letter. BC Builds works opportunity by opportunity; middle-income rents and the team's capacity are not assessed here.
 - *Uncertain* — BC Housing Community Housing Fund: eligibility and unit mix: Community Housing Fund: whether it meets the criteria cannot be confirmed without the land tenure (lease of at least 60 years at nominal value, or ownership). Unit mix matches 30/50/20 within tolerance; site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).
 
@@ -47,43 +47,43 @@ Other programs written for this kind of housing, listed from their own pages and
 | Transit-oriented area minimum allowable height and density | Uncertain | Manager: check the City's transit-oriented areas map for this address and record the tier at 01. Ask: the City of Vancouver's planning staff, or the Province's transit-oriented areas map. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
-| Homes that do not fit the plates | Conditional | Architect: 101 of 120 homes fit the plates on 12 floors at the unit sizes assumed; did not fit: 11 one-bedroom, 8 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 120. |
+| Homes that do not fit the plates | Conditional | Architect: 98 of 120 homes fit the plates on 12 floors at the unit sizes assumed; did not fit: 6 one-bedroom, 16 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks count all 120; the money counts the 98 placed. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $34,248,720, 55% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve. It counts the 98 homes the first plans place, of the 120 entered; the floor area and its cost are the option's.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$62,597,262**: hard $46,368,342 (escalated ×1.0292), soft $11,592,086, contingency $4,636,834, land $0.
-- Net operating income **$965,615 a year**: rent $1,887,451 less vacancy $69,836, operating cost $780,000 and reserve $72,000.
-- Funding **$34,348,558**: grants $21,367,080, equity $0, supportable debt $12,981,478 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
-- Gap **$28,248,704** (45% of the capital cost).
+- Net operating income **$810,694 a year**: rent $1,564,376 less vacancy $57,882, operating cost $637,000 and reserve $58,800.
+- Funding **$28,348,542**: grants $17,449,782, equity $0, supportable debt $10,898,760 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
+- Gap **$34,248,720** (55% of the capital cost).
 - Left to a person: a hard cost for this building (12 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre.
 
 **Where the money comes from**, each source with its status:
 
 | Source | Amount | Status |
 |---|---|---|
-| Community Housing Fund grant | $21,367,080 | illustrative: nobody has offered it |
-| Mortgage the net income carries | $12,981,478 | sized by this screen |
-| Still to find | $28,248,704 | to find |
+| Community Housing Fund grant | $17,449,782 | illustrative: nobody has offered it |
+| Mortgage the net income carries | $10,898,760 | sized by this screen |
+| Still to find | $34,248,720 | to find |
 
 ### What it takes to run, a year
 
 | | A year | |
 |---|---:|---|
-| Market rent, 36 homes | $899,856 | $2,083 a month a home (the rules' figure) |
-| Rent geared to income, 60 homes | $819,000 | $1,138 a month a home (the rules' figure) |
-| Deep subsidy, 24 homes | $168,595 | $585 a month a home (the rules' figure) |
-| Vacancy | -$69,836 | 3.7%, the CMHC survey's rate, on all tiers |
-| Operating cost | -$780,000 | $6,500 a home a year (placeholder) |
-| Replacement reserve | -$72,000 |  |
+| Market rent, 29 homes | $734,259 | $2,110 a month a home (the rules' figure) |
+| Rent geared to income, 49 homes | $685,020 | $1,165 a month a home (the rules' figure) |
+| Deep subsidy, 20 homes | $145,097 | $605 a month a home (the rules' figure) |
+| Vacancy | -$57,882 | 3.7%, the CMHC survey's rate, on all tiers |
+| Operating cost | -$637,000 | $6,500 a home a year (placeholder) |
+| Replacement reserve | -$58,800 |  |
 | Support staffing | none |  |
-| **Left after running costs** | **$965,615** | before any operating subsidy or loan payment |
-| Loan payment | -$877,832 | on the mortgage the funding counts (the capital figures above) |
+| **Left after running costs** | **$810,694** | before any operating subsidy or loan payment |
+| Loan payment | -$736,995 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
-| **Subsidy needed if the capital still missing were borrowed** | **$1,822,447** | $1,266 a home a month: the payment on $41,230,182 at 6.19% over 40 years is $2,788,062 a year. An illustration on this screen's mortgage terms, not a funder's financing |
-| **The same, on BC Builds' published take-out terms** | **$1,391,224** | $966 a home a month: 4.55% over 35 years is $2,356,839 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
+| **Subsidy needed if the capital still missing were borrowed** | **$2,242,263** | $1,907 a home a month: the payment on $45,147,480 at 6.19% over 40 years is $3,052,957 a year. An illustration on this screen's mortgage terms, not a funder's financing |
+| **The same, on BC Builds' published take-out terms** | **$1,770,069** | $1,505 a home a month: 4.55% over 35 years is $2,580,763 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
@@ -96,20 +96,21 @@ Other programs written for this kind of housing, listed from their own pages and
 | Contingency | $4,636,834 | `f.soft_costs` (placeholder) | 10% of hard cost |
 | Land | $0 | `f.land` | nominal: the owner is a municipality, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer (F3) |
 | Capital cost | $62,597,262 | the option | hard + soft + contingency + land |
-| Market rent | $899,856 a year | `f.rents` | CMHC October 2025, 36 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
-| Rent-geared-to-income | $819,000 a year | `f.rgi_rents` | 30% of an income of 70% of the Housing Income Limit (Vancouver), the way BC Housing's call documents estimate it: $1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three; an estimate, so enter the operator's own rent when there is one |
-| Deep-subsidy rent | $168,595 a year | `f.rgi_rents` | the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit |
-| Vacancy | $69,836 a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
-| Operating cost | $780,000 a year | `f.operating` (placeholder) | $6,500 per unit |
-| Replacement reserve | $72,000 a year | `f.operating` (placeholder) | $600 per unit |
+| Market rent | $734,259 a year | `f.rents` | CMHC October 2025, 29 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
+| Rent-geared-to-income | $685,020 a year | `f.rgi_rents` | 30% of an income of 70% of the Housing Income Limit (Vancouver), the way BC Housing's call documents estimate it: $1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three; an estimate, so enter the operator's own rent when there is one |
+| Deep-subsidy rent | $145,097 a year | `f.rgi_rents` | the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit |
+| Vacancy | $57,882 a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
+| Operating cost | $637,000 a year | `f.operating` (placeholder) | $6,500 per unit |
+| Replacement reserve | $58,800 a year | `f.operating` (placeholder) | $600 per unit |
 | Support staffing | not given a year | the option | none entered |
-| Net operating income | $965,615 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
+| Net operating income | $810,694 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
 | Operating subsidy | not given a year | the option | none entered |
-| Community Housing Fund grant | $21,367,080 | `bch.chf.eligibility` | $178,059 per unit × 120; illustrative, at the 2026-27 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied |
+| Community Housing Fund grant | $17,449,782 | `bch.chf.eligibility` | $178,059 per unit × 98; illustrative, at the 2026-27 provisional rate; counted on the condition that the criteria still to confirm are met (answer 2); no intake is open, so no grant is committed or implied |
 | Equity | $0 | the option | none entered |
-| Supportable debt | $12,981,478 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $877,832 a year in payments |
-| Funding | $34,348,558 | the option | grants + equity + supportable debt |
-| Gap | $28,248,704 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
+| Supportable debt | $10,898,760 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $736,995 a year in payments |
+| Funding | $28,348,542 | the option | grants + equity + supportable debt |
+| Gap | $34,248,720 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
+| Homes counted | 98 | the option | the 98 homes the first plans place, of the 120 the option enters (answer 3 names the rest); the rents, running costs, grant and debt count these |
 
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
@@ -123,7 +124,7 @@ Other programs written for this kind of housing, listed from their own pages and
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
 
 ## Layouts derived from the option
-12 floors of 31.61 × 25.31 m (800 m² each); a point tower, the homes round a corridor ringing the core, 7.35 m deep in front and behind and 10.5 m beside; 101 of 120 units placed.
+12 floors of 31.61 × 25.31 m (800 m² each); a point tower, the homes round a corridor ringing the core, 7.35 m deep in front and behind and 9.21 m beside; 98 of 120 units placed.
 
 | Block | Count | Area | From |
 |---|---|---|---|
@@ -140,59 +141,59 @@ Adjacency rules, in plain words, read back from the plates:
 - *info* — non residential: on the ground floor, facing the street. No non-residential space in the option
 - *pass* — amenity: on the ground floor, next to the entry. On the ground floor beside the core, where the entry is
 - *conditional* — services: on the ground floor, away from the street. On the ground floor but facing the street: the lane side has no room left beside the core
-- *pass* — core: at the centre of every floor, the corridor through it. One 7 × 7 m core at the centre of every floor holding a scissor stair, the corridor round it and the homes round that
-- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 11 one-bedroom (640 m²) did not fit, 8 studio (314 m²) did not fit: more storeys, a larger plate or a smaller program
-- *pass* — three bed plus: from the lowest residential floor up, stacked in the same bays. Three-bedroom homes stacked in 2 bays, levels 1 to 12
-- *pass* — accessible: next to the core, on the lowest residential floor. 6 accessible units from the ground floor (2 there) to level 2, nearest the core
+- *pass* — core: at the centre of every floor, the corridor through it. One 9.6 × 7 m core at the centre of every floor holding a scissor stair, the corridor round it and the homes round that
+- *conditional* — units: on both sides of the corridor, above whatever the ground floor gives to other uses. Units on both sides of the corridor; 6 one-bedroom (349 m²) did not fit, 16 studio (627 m²) did not fit: more storeys, a larger plate or a smaller program
+- *pass* — three bed plus: from the lowest residential floor up, stacked in the same bays. Three-bedroom units on levels 2 to 4
+- *pass* — accessible: next to the core, on the lowest residential floor. 6 accessible units from level 2 (4 there) to level 3, nearest the core
 
-Did not fit on the plates: One-bedroom × 11 (640 m²); Studio × 8 (314 m²). More storeys, a larger plate or a smaller program.
-- Note: Daylight (a placeholder for the architect's study, not a rule): 35 homes run 10.5 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.
+Did not fit on the plates: One-bedroom × 6 (349 m²); Studio × 16 (627 m²). More storeys, a larger plate or a smaller program.
+- Note: The homes are placed floor by floor, not stacked in bays: stacked, the plates held 79 homes against 98.
 - Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
-- Note: The homes are 66% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.
+- Note: The homes are 65% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.
 
 ### Egress
 
-Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest travel 9.2 m, limit 45 m; the core's two exits are a scissor stair, its doors on the core's opposite faces, 14.0 m apart as smoke would go round the core (3.4.2.3.(3)); the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings. Read against `bcbc.exits` (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; `sprinklered: false` on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.
+Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest travel 8.0 m, limit 45 m; the core's two exits are a scissor stair, its doors on the core's opposite faces, 16.6 m apart as smoke would go round the core (3.4.2.3.(3)); the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings. Read against `bcbc.exits` (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; `sprinklered: false` on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.
 
-- *pass* — Ground floor: 2 exits, 2 required · travel 8.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 2: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 3: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 4: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 5: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 6: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 7: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 8: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 9: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 10: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 11: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 12: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Ground floor: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 2: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 3: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 4: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 5: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 6: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 7: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 8: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 9: 2 exits, 2 required · travel 7.3 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 10: 2 exits, 2 required · travel 8.0 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 11: 2 exits, 2 required · travel 8.0 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 12: 2 exits, 2 required · travel 8.0 m, limit 45 m · separation 16.6 m, at least 9 m · dead end 1.8 m, limit 6 m.
 
 ### Area schedule
 
 | Floor | Homes | Homes m² | Circulation m² | Cores m² | Amenity m² | Services m² | Spare m² | Gross m² | Efficiency |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Ground floor | 2 | 168 | 88 | 49 | 180 | 260 | 41 | 800 | 21% |
-| Level 2 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 3 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 4 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 5 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 6 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 7 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 8 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 9 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
-| Level 10 | 9 | 554 | 63 | 49 | 0 | 0 | 89 | 800 | 69% |
-| Level 11 | 9 | 495 | 63 | 49 | 0 | 0 | 153 | 800 | 62% |
-| Level 12 | 9 | 495 | 63 | 49 | 0 | 0 | 153 | 800 | 62% |
-| **Total** | 101 | 6,308 | 786 | 588 | 180 | 260 | 975 | 9,601 | 66% |
+| Ground floor | 2 | 147 | 98 | 67 | 180 | 260 | 36 | 800 | 18% |
+| Level 2 | 6 | 526 | 73 | 67 | 0 | 0 | 92 | 800 | 66% |
+| Level 3 | 6 | 526 | 73 | 67 | 0 | 0 | 92 | 800 | 66% |
+| Level 4 | 6 | 526 | 73 | 67 | 0 | 0 | 92 | 800 | 66% |
+| Level 5 | 8 | 550 | 73 | 67 | 0 | 0 | 66 | 800 | 69% |
+| Level 6 | 8 | 550 | 73 | 67 | 0 | 0 | 66 | 800 | 69% |
+| Level 7 | 8 | 550 | 73 | 67 | 0 | 0 | 66 | 800 | 69% |
+| Level 8 | 8 | 550 | 73 | 67 | 0 | 0 | 66 | 800 | 69% |
+| Level 9 | 10 | 583 | 73 | 67 | 0 | 0 | 30 | 800 | 73% |
+| Level 10 | 12 | 576 | 73 | 67 | 0 | 0 | 37 | 800 | 72% |
+| Level 11 | 12 | 576 | 73 | 67 | 0 | 0 | 37 | 800 | 72% |
+| Level 12 | 12 | 576 | 73 | 67 | 0 | 0 | 37 | 800 | 72% |
+| **Total** | 98 | 6,237 | 899 | 806 | 180 | 260 | 720 | 9,601 | 65% |
 
 Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). **Flagged.** The same table is `area-schedule.csv` beside this memo.
 
 ### What an operator checks first
 
-- *missing* — Elevators: 2 elevators for 120 homes on 12 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one.
+- *pass* — Elevators: 2 elevators for 120 homes on 12 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor with room for 2 beside the stairs.
 - *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
-- *pass* — Garbage, recycling and services: 260 m² of services for 101 homes
-- *pass* — Accessible homes: 6 accessible homes drawn, 6 wanted (BC Housing's 5% of 101)
+- *pass* — Garbage, recycling and services: 260 m² of services for 98 homes
+- *pass* — Accessible homes: 6 accessible homes drawn, 5 wanted (BC Housing's 5% of 98)
 - *info* — Shared indoor space: 180 m² of amenity or dining, 1.8 m² a home
 
 ![Stacking diagram](stacking.svg)

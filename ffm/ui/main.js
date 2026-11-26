@@ -10,7 +10,7 @@ import { checkForNewerBuild, loadEngine } from "./core/engine.js";
 import { OPTION_FIELDS } from "./fields.js";
 import { renderForm, setRailTab, syncCards } from "./schedule.js";
 import { loadSites, onOptionChange, saveAs, saveNow, selectOption, selectSite } from "./files.js";
-import { applyCompare, fillRunSelects, followHistory, loadRuns, openRun, rev, runRules, syncRunButton } from "./runs.js";
+import { applyCompare, fillRunSelects, followHistory, isDraft, loadRuns, nextRev, openRun, rev, runRules, syncRunButton } from "./runs.js";
 import { dateWords, renderNoMemo, renderQuiet, syncNextAsOf } from "./memo/memo.js";
 import { closeExportPanel, renderExportPanel } from "./revit.js";
 import { offerTour, startTour } from "./tour.js";
@@ -18,8 +18,7 @@ import { enterOption, renderGuide, renderStage, stageShown } from "./route-stage
 import { renderClaude } from "./claude.js";
 import { closeIssuePanel, issueButtonLabel, openIssuePanel, startIssuePolling, wireMe } from "./issue.js";
 import {
-  firstOpenStep, initialMode, initTheme, MODES, placeModeThumb, RAIL_KEY, setMode, setStep, setView, showInputs, VIEW_KEY,
-  watchSteps
+  firstOpenStep, initialMode, initTheme, MODES, placeModeThumb, RAIL_KEY, setMode, setStep, showInputs, watchSteps
 } from "./modes.js";
 import { loadPaper } from "./core/lazy.js";
 
@@ -74,6 +73,12 @@ async function init() {
   // wraps it without a window resize, which once left the thumb under the wrong reader)
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeModeThumb);
   if ("ResizeObserver" in window) new ResizeObserver(() => placeModeThumb()).observe($(".topbar"));
+  // the bars' real height, for everything that sticks under them (the memo's tabs) and every jump's landing (26 Nov 2026:
+  // a fixed 88 px, where the bar wraps to 119 px at 1366, landed the area schedule's heading under the bars)
+  const bars = $(".bars");
+  const barsH = () => { const hh = Math.round(bars.getBoundingClientRect().height); if (hh > 0) document.documentElement.style.setProperty("--bars-h", `${hh}px`); };
+  if (bars && "ResizeObserver" in window) new ResizeObserver(barsH).observe(bars);
+  if (bars) barsH();
   let thumbFrame = 0;
   window.addEventListener("resize", () => { if (!thumbFrame) thumbFrame = requestAnimationFrame(() => { thumbFrame = 0; placeModeThumb(); }); });
   // the top bar's date is the next run's: the memo on screen keeps its own, its title block says when they differ, and
@@ -119,13 +124,10 @@ async function init() {
   window.addEventListener("beforeprint", () => $$(".ledger details:not([open]), .rule-sec-fold:not([open])").forEach(d => { d.open = true; d.dataset.printOpened = "1"; }));
   window.addEventListener("afterprint", () => $$("details[data-print-opened]").forEach(d => { d.open = false; delete d.dataset.printOpened; }));
   $("#tour-link").addEventListener("click", e => { e.preventDefault(); $("#tour-link").classList.remove("unseen"); startTour(0); });
-  $$("#view-switch .segbtn").forEach(b => b.addEventListener("click", () => { setView(b.dataset.view); setStatus(b.dataset.view === "3d" ? "3D preview: the site plan with its dimensions, the section and the axonometric." : b.dataset.view === "summary" ? "Summary: the title block, the four answers and the figures." : "Detailed: the whole memo.", "info"); }));
-  // a first visit opens the manager on Summary, the title block and the four answers on one screen; the architect, who
-  // works in the clauses and the ledger, and the reader, who has no view switch, on Detailed. A choice made is kept.
-  // (26 Nov 2026, the 24 Nov critique: every layout opened on some 11,000 px of memo)
-  const firstView = state.mode === "manager" ? "summary" : "detailed";
-  try { setView(localStorage.getItem(VIEW_KEY) || firstView, false); } catch (e) { setView(firstView, false); }
-  $("#issue-btn").addEventListener("click", () => { if ($("#issue-panel").hidden) openIssuePanel(); else closeIssuePanel(); });
+  // the Summary | Detailed | 3D preview switch is gone (26 Nov 2026): the memo is in tabs (memo/tabs.js), the Answers
+  // tab is the old Summary, and FIG 01's own Plan | 3D switch is the 3D view, full width in the Drawings tab
+  try { localStorage.removeItem("ffm.view"); } catch (e) { /* fine */ }
+  $("#issue-btn").addEventListener("click", () => { if ($("#issue-pop").hidden) openIssuePanel(); else closeIssuePanel(); });
   // the This memo picker in the Side by side card keeps the comparison chosen; above the memo it opens one alone
   $("#open-run").addEventListener("change", e => openRun(e.target.value, { compare: e.target.closest("#side-by-side") ? state.compareRun : null }).catch(err => toast(err.message, true)));
   $("#compare-run").addEventListener("change", e => { state.compareRun = e.target.value || null; applyCompare().catch(err => toast(err.message, true)); });
@@ -192,13 +194,19 @@ function boardPdf() {
   const close = (focusBack = false) => { panel.hidden = true; panel.innerHTML = ""; btn.setAttribute("aria-expanded", "false"); if (focusBack) btn.focus(); };
   if (!panel.hidden) { close(); return; }
   const stated = String(((run.ledger.inputs || {}).option || {}).decision_sought || "").trim();
-  if (stated) { download(null); return; }
+  // a draft prints as one, not as a revision: said, never blocking (26 Nov 2026)
+  const draft = isDraft(run.run_id) && !STATIC;
+  const draftLine = draft ? `A draft: the board PDF prints ${rev(run.run_id)}, not issued. Mark it issued first to print it as ${nextRev()}.` : "";
+  if (stated) { download(null); if (draft) setStatus(`${draftLine} (Mark issued, in the top bar.)`, "info"); return; }
   const kept = String((state.option || {}).decision_sought || "").trim();
   panel.innerHTML = `<form class="issue-panel board-form" aria-label="The decision the board is asked for">
+      ${draft ? `<p class="board-draft">${h(draftLine)} <button type="button" class="btn btn-quiet btn-small" data-board-issue>Mark issued first</button></p>` : ""}
       <label class="field"><span class="label">What should the board decide?</span><input type="text" name="decision" value="${h(kept)}" maxlength="200" placeholder="e.g. approve $250,000 for pre-development design"></label>
       <div class="form-actions"><button type="submit" class="btn btn-primary btn-small">Add it and download</button><button type="button" class="btn btn-quiet btn-small" data-board-skip>Download without it</button><button type="button" class="btn btn-quiet btn-small" data-board-cancel>Not now</button></div>
       <p class="help">${h(rev(run.run_id))} states no decision. What you type is printed on this PDF and kept in the option for the next run; ${h(rev(run.run_id))} itself does not change.</p>
     </form>`;
+  const toIssue = $("[data-board-issue]", panel);
+  if (toIssue) toIssue.addEventListener("click", () => { close(); openIssuePanel(); });
   panel.hidden = false;
   btn.setAttribute("aria-expanded", "true");
   const form = $("form", panel), inp = $("input", form);

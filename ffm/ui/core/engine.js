@@ -68,7 +68,7 @@ def ffm_run(site_json, option_json, as_of, previous_json):
         except ValueError as e:
             note = (note + " " if note else "") + "Layout skipped: " + str(e)
     d = engine.diff(json.loads(previous_json), L) if previous_json else None
-    pf = proforma.build(site, option, L, m)
+    pf = proforma.build(site, option, L, m, lay)
     md = memo.markdown(L, m, d, proforma=pf, layout=lay)
     return json.dumps({"ledger": L, "massing": m, "svg": svg, "diff": d, "massing_note": note, "proforma": pf, "layout": lay, "sheets": sheets,
                        "memo_md": md, "memo_html": memo.html_page(md, svg, {k + ".svg": v for k, v in (sheets or {}).items()})})

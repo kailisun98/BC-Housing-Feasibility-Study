@@ -3,18 +3,20 @@
   "available": true,
   "inputs": {
     "units": {
-      "studio": 24,
-      "one_bed": 32,
+      "studio": 1,
+      "one_bed": 26,
       "two_bed": 24,
       "three_bed_plus": 8
     },
-    "units_total": 88,
+    "units_total": 59,
+    "units_entered": 88,
+    "homes_basis": "placed",
     "gfa_m2": 7000.0,
     "gfa_from": "the option",
     "rent_tiers_units": {
-      "market": 26,
-      "rgi": 44,
-      "deep_subsidy": 18
+      "market": 17,
+      "rgi": 30,
+      "deep_subsidy": 12
     },
     "finance": {}
   },
@@ -28,16 +30,16 @@
   },
   "operating": {
     "revenue": {
-      "market": 646492,
-      "rgi": 594720,
-      "deep_subsidy": 124769
+      "market": 433645,
+      "rgi": 425197,
+      "deep_subsidy": 88675
     },
-    "gross": 1365981,
-    "vacancy": 50541,
-    "operating_cost": 572000,
-    "reserve": 52800,
+    "gross": 947517,
+    "vacancy": 35058,
+    "operating_cost": 383500,
+    "reserve": 35400,
     "support_staffing": null,
-    "noi": 690640,
+    "noi": 493559,
     "subsidy": null,
     "page": {
       "housing_type": "independent",
@@ -45,57 +47,57 @@
         {
           "key": "market",
           "label": "Market rent",
-          "homes": 26,
-          "rent_year": 646492,
-          "rent_month_per_home": 2072,
+          "homes": 17,
+          "rent_year": 433645,
+          "rent_month_per_home": 2126,
           "from": "rule"
         },
         {
           "key": "rgi",
           "label": "Rent geared to income",
-          "homes": 44,
-          "rent_year": 594720,
-          "rent_month_per_home": 1126,
+          "homes": 30,
+          "rent_year": 425197,
+          "rent_month_per_home": 1181,
           "from": "rule"
         },
         {
           "key": "deep_subsidy",
           "label": "Deep subsidy",
-          "homes": 18,
-          "rent_year": 124769,
-          "rent_month_per_home": 578,
+          "homes": 12,
+          "rent_year": 88675,
+          "rent_month_per_home": 616,
           "from": "rule"
         }
       ],
-      "gross": 1365981,
-      "vacancy": 50541,
-      "operating_cost": 572000,
+      "gross": 947517,
+      "vacancy": 35058,
+      "operating_cost": 383500,
       "operating_cost_per_home": 6500,
       "operating_cost_from": "placeholder",
       "beds_operating_cost": null,
       "beds_cost_per_bed": null,
       "beds_cost_from": null,
-      "reserve": 52800,
+      "reserve": 35400,
       "support_staffing": null,
       "staffing_missing": false,
       "staffed_parts": {},
       "subsidy_term_years": null,
       "subsidy_lends": false,
       "own_figures": false,
-      "net_before_subsidy": 690640,
+      "net_before_subsidy": 493559,
       "subsidy": null,
       "subsidy_confirmed": false,
       "subsidy_source": null,
-      "net_after_subsidy": 690640,
-      "debt_service": 627855,
-      "after_debt_service": 62785,
+      "net_after_subsidy": 493559,
+      "debt_service": 448690,
+      "after_debt_service": 44869,
       "subsidy_to_run": 0,
       "subsidy_to_run_per_home_month": 0,
       "if_gap_financed": {
-        "loan": 29974644,
-        "annual_payment": 2026941,
-        "subsidy_year": 1336301,
-        "per_home_month": 1265,
+        "loan": 35138355,
+        "annual_payment": 2376121,
+        "subsidy_year": 1882562,
+        "per_home_month": 2659,
         "rate_pct": 6.19,
         "amortization_years": 40,
         "on_program_terms": {
@@ -103,9 +105,9 @@
           "rule_id": "bc.bcbuilds.eligibility",
           "rate_pct": 4.55,
           "amortization_years": 35,
-          "annual_payment": 1713439,
-          "subsidy_year": 1022799,
-          "per_home_month": 969
+          "annual_payment": 2008612,
+          "subsidy_year": 1515053,
+          "per_home_month": 2140
         }
       },
       "vacancy_rate": 0.037,
@@ -119,42 +121,42 @@
       {
         "program": "bch.chf.eligibility",
         "label": "Community Housing Fund grant (illustrative)",
-        "value": 15669192,
+        "value": 10505481,
         "illustrative": true,
         "confirmed": true,
         "intake_open": false,
-        "note": "$178,059 per unit × 88 (2026-27 provisional rate, from the 2025 call's slides; that call did not proceed); no intake is open, so no grant is committed or implied"
+        "note": "$178,059 per unit × 59 (2026-27 provisional rate, from the 2025 call's slides; that call did not proceed); no intake is open, so no grant is committed or implied"
       }
     ],
     "not_counted": [],
     "equity": 0.0,
     "debt": {
-      "supportable": 9284785,
+      "supportable": 6635279,
       "rate_pct": 6.19,
       "amortization_years": 40,
       "dcr": 1.1,
-      "annual_service": 627855
+      "annual_service": 448690
     },
-    "total": 24953977,
+    "total": 17140760,
     "sources": [
       {
         "label": "Community Housing Fund grant",
         "kind": "grant",
-        "value": 15669192,
+        "value": 10505481,
         "status": "illustrative",
         "counted": true
       },
       {
         "label": "Mortgage the net income carries",
         "kind": "loan",
-        "value": 9284785,
+        "value": 6635279,
         "status": "sized",
         "counted": true
       },
       {
         "label": "Still to find",
         "kind": "gap",
-        "value": 20689859,
+        "value": 28503076,
         "status": "to find",
         "counted": false
       }
@@ -163,14 +165,15 @@
     "land_contribution": null
   },
   "gap": {
-    "value": 20689859,
-    "share_of_capital": 0.453
+    "value": 28503076,
+    "share_of_capital": 0.624
   },
   "verdict": {
     "word": "unlikely",
     "why": [
-      "the gap is $20,689,859, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
-      "placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve"
+      "the gap is $28,503,076, 62% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
+      "placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve",
+      "it counts the 59 homes the first plans place, of the 88 entered; the floor area and its cost are the option's"
     ],
     "unsure": [
       "a hard cost for this building (1,100 m² that is not homes, priced as if it were): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre"
@@ -244,16 +247,16 @@
     {
       "key": "rev_market",
       "label": "Market rent",
-      "value": 646492,
+      "value": 433645,
       "unit": "$/yr",
       "rule_id": "f.rents",
-      "note": "CMHC October 2025, 26 units; some unit types priced at the CMHC all-units average: the table has no figure for them",
+      "note": "CMHC October 2025, 17 units; some unit types priced at the CMHC all-units average: the table has no figure for them",
       "placeholder": false
     },
     {
       "key": "rev_rgi",
       "label": "Rent-geared-to-income",
-      "value": 594720,
+      "value": 425197,
       "unit": "$/yr",
       "rule_id": "f.rgi_rents",
       "note": "30% of an income of 70% of the Housing Income Limit (Vancouver), the way BC Housing's call documents estimate it: $1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three; an estimate, so enter the operator's own rent when there is one",
@@ -262,7 +265,7 @@
     {
       "key": "rev_deep",
       "label": "Deep-subsidy rent",
-      "value": 124769,
+      "value": 88675,
       "unit": "$/yr",
       "rule_id": "f.rgi_rents",
       "note": "the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit",
@@ -271,7 +274,7 @@
     {
       "key": "vacancy",
       "label": "Vacancy",
-      "value": 50541,
+      "value": 35058,
       "unit": "$/yr",
       "rule_id": "f.rents",
       "note": "3.7% of gross rent, the CMHC survey's rate",
@@ -280,7 +283,7 @@
     {
       "key": "opex",
       "label": "Operating cost",
-      "value": 572000,
+      "value": 383500,
       "unit": "$/yr",
       "rule_id": "f.operating",
       "note": "$6,500 per unit",
@@ -289,7 +292,7 @@
     {
       "key": "reserve",
       "label": "Replacement reserve",
-      "value": 52800,
+      "value": 35400,
       "unit": "$/yr",
       "rule_id": "f.operating",
       "note": "$600 per unit",
@@ -307,7 +310,7 @@
     {
       "key": "noi",
       "label": "Net operating income",
-      "value": 690640,
+      "value": 493559,
       "unit": "$/yr",
       "rule_id": null,
       "note": "gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy",
@@ -325,10 +328,10 @@
     {
       "key": "grant_chf",
       "label": "Community Housing Fund grant",
-      "value": 15669192,
+      "value": 10505481,
       "unit": "$",
       "rule_id": "bch.chf.eligibility",
-      "note": "$178,059 per unit × 88; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied",
+      "note": "$178,059 per unit × 59; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied",
       "placeholder": false
     },
     {
@@ -343,16 +346,16 @@
     {
       "key": "debt",
       "label": "Supportable debt",
-      "value": 9284785,
+      "value": 6635279,
       "unit": "$",
       "rule_id": "f.mortgage",
-      "note": "the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $627,855 a year in payments",
+      "note": "the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $448,690 a year in payments",
       "placeholder": false
     },
     {
       "key": "funding",
       "label": "Funding",
-      "value": 24953977,
+      "value": 17140760,
       "unit": "$",
       "rule_id": null,
       "note": "grants + equity + supportable debt",
@@ -361,10 +364,19 @@
     {
       "key": "gap",
       "label": "Gap",
-      "value": 20689859,
+      "value": 28503076,
       "unit": "$",
       "rule_id": null,
       "note": "capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources",
+      "placeholder": false
+    },
+    {
+      "key": "homes",
+      "label": "Homes counted",
+      "value": 59,
+      "unit": "homes",
+      "rule_id": null,
+      "note": "the 59 homes the first plans place, of the 88 the option enters (answer 3 names the rest); the rents, running costs, grant and debt count these",
       "placeholder": false
     }
   ],

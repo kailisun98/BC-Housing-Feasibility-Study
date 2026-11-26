@@ -87,6 +87,15 @@ Other programs written for this kind of housing, listed from their own pages and
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
+#### By part of the building
+
+| Part | Places | Rent | Vacancy | Running cost | Reserve | Staffing | Subsidy | Left a year |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Independent homes | 85 homes | $1,076,889 | -$39,845 | -$552,500 | -$51,000 | — | — | $433,544 |
+| Supportive homes | 25 homes | $169,623 | -$6,276 | -$162,500 | -$15,000 | not entered | — | -$14,153 |
+
+> Each part's own running cost, staffing and subsidy where the operator entered them; the rents by tier. What a part leaves a year is what it needs, or gives, before any loan payment.
+
 | Line | Figure | From | Note |
 |---|---|---|---|
 | Hard cost base | $4,693 per m² | `f.hard_cost_base` (placeholder) | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 15 storeys, above the six a wood frame reaches; a placeholder until a cost consultant's rate for this building is entered |
@@ -201,7 +210,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 
 ### What an operator checks first
 
-- *missing* — Elevators: 2 elevators for 110 homes on 15 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one.
+- *pass* — Elevators: 2 elevators for 110 homes on 15 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor with room for 2 beside the stairs.
 - *pass* — Desk: a staffed front desk by the entry drawn
 - *pass* — Staff office: a staff office drawn
 - *pass* — Desk sees the entry: the desk is beside the entry

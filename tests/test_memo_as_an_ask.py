@@ -155,7 +155,8 @@ class ThePage(unittest.TestCase):
         front = self.read("memo/front.js")
         for word in ("Who is housed", "Who operates", "Which program", "The amount", "The decision wanted"):
             self.assertIn(word, front)
-        self.assertIn("parts.push(frontHtml(run))", self.read("memo/memo.js"))
+        # (26 Nov 2026) the ask leads the Answers tab's grid, beside the answers where the tab is wide
+        self.assertIn('<div class="answers-grid">${frontHtml(run)}<div class="answers">', self.read("memo/memo.js"))
         self.assertIn('["ask", ".memo-ask", "The ask"]', self.read("memo/memo.js"))
 
     def test_the_contribution_words_match(self):

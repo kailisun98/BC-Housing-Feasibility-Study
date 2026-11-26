@@ -1236,6 +1236,55 @@ session must know:
 - Not done: stop 02 is still a long card (programs, the lot, the rules, the start, the building, the questions, the
   brief); identity is a name, not a login, and runs made on the web build stay unnamed drafts in the tab.
 
+## The panels' flow items, the memo in tabs, Issue on top (26 Nov 2026)
+
+Kai: "fix the items from the panels defects and flow items, especially the long card… too much scrolling… create tabs…
+Issue button should also be more visible on top", laid out by a UX designer's brief (AI, Opus) the same day; Kai chose
+**the money counts the placed homes only**. `docs/user-tests-2026-11-25/README.md`, last section, has the figures.
+- **Engine.** `proforma.build(..., layout=None)` and `placed_units(layout)`: where the first plans place fewer homes than
+  entered, the money counts the placed ones (`inputs.homes_basis` "placed", a "homes" line); cli, server and the page's
+  engine shim pass the layout. `layout.lift_room(core)` (`lift_shaft_m` 2.6, an assumption): a core holds 1 + one lift
+  per 2.6 m past 7 m; `_solve` and `_point_geometry` grow the core for the lifts `lifts_needed` asks, so the committed
+  apartment runs' elevators pass. A budget per part of a mixed building: `operations.parts.<supportive|shelter|…>`
+  {operating_cost_cad_year, staffing_cad_year, operating_subsidy_cad_year, subsidy_confirmed} → `page["parts"]`, drawn by
+  `parts_markdown` and the page's twin `partsTable` (`PART_COLUMNS`). What is already decided: `option.permit_issued_on`,
+  `land_agreement_signed_on` (`checks.permit_issued_on`, `land_signed_on`, `_date_words`); `engine.summarise` returns
+  `decided` and a permit drops `PERMIT_SETTLES`; the front sheet has an "Already decided" row (`memo.front_sheet`,
+  `memo/front.js`). `tests/test_panel3_flow.py`.
+- **The memo in tabs** (`memo/tabs.js`: `TABS`, `renderTabs`, `selectTab`, `tabOf`, `whenShown`, `currentTab`): renderMemo
+  draws `#memo-tabs` after the title block and `section.memo-panel#panel-<id>[data-tab]` for operating (Operator only),
+  answers (`.answers-grid`: the ask, then the answers; the disclaimer at its foot), comparison (while comparing),
+  drawings (figures + `.memo-areas`), clauses, ledger, inputs (inputs, sources, fingerprint). `.memo-body` and
+  `.memo-rest` are gone. The Reader has no strip (`tabbed()`), every panel shows and `display: contents` keeps the paper's
+  CSS order. A jump (`wireJumps`) selects its panel; `?tab=` is written by replaceState; `refitFigures` (figures/cards.js)
+  refits FIG 01/02 when Drawings is shown, and Massing and plans and a resumed editor select Drawings first. **Retired:**
+  `#view-switch`, `setView`, `VIEW_KEY`, `state.view`, `renderPreview3D` and the 3D preview page (FIG 01's Plan | 3D is
+  the 3D view). `--bars-h` is measured (main.js), `--tabs-h` 41px, `--memo-max` 1600px; container queries on the panels
+  replace the 920px caps, the 460px figure column and the architect's 1600/1800px rules.
+- **Issue on top** (`#issue-top` in `.topbar-controls`, `#issue-pop`): `syncIssueButton()` in issue.js is the one place
+  its state is set (called by renderMemo, syncRunButton, setMode; `issueButtonLabel` is its alias): hidden with no memo or
+  in the Reader; aria-disabled with a reason on the web build, while running, and while stale ("Run again first: …", a
+  press opens the reason with Run the rules again); a draft has the amber dot; "again" only after an issue. The title
+  block's actions no longer hold it; `placeActions` no longer moves an issue panel. The Board PDF panel says when the
+  memo is a draft ("Mark issued first").
+- **Stop 02** (`cardOption`): For (`#stage-for`, one sentence: the kind of housing, Indigenous-led / leaving violence,
+  the programs; opened, those questions, the chips and the terms), Start from (`CAND_ORDER`, `lotLine`), The building
+  (`building_type`, `podium_storeys`, then `figureBlock`), Questions (`#stage-questions`, `askRows` without a Who column),
+  What it runs on; `stageAside(R)` holds `lotTakes` and the rules reading (beside the card from 1600px via
+  `.memo.stage-on[data-stage="2"]`'s grid, folded under it below; `WIDE_STAGE`). The folds keep their state in
+  `guide.forOpen`, `questionsOpen`, `asideOpen`. `.stage-foot` sticks at every width. Route row 02: `optionPending()`.
+- **Cheap fixes**: the bar is one row at 1366 (`.wordmark em` and `#mode-key` hidden under 1500px); the issue chip capped
+  at 260px with its whole text as its name; answer 2's other programs fold behind their count (`doors-fold`); answer 4's
+  operating table opens for the Operator only; `followHistory` restores any of `MODES`; one formats note; the operator
+  desk's `h3` follows the Key Rule. `tests/test_memo_tabs.py`.
+- **After the designer's review of the build** (same evening): the engine's sheets are never two to a row (they are
+  drawn at their own 640 to ~1,000 px and two-up shrank their 9 px labels to 6.9 px); only FIG 01 | FIG 02 pair, in a
+  grid (`.figures`), sheets centred. `.wordmark em` / `#mode-key` hide under 1720 px. `scrollUnderBars(el)` (cards.js,
+  used by blocks.js too) lands a jump under the bars and the strip. The ask is sticky at any height. The Issue popover
+  is a `role="dialog"` with a name, keeps typed text on an outside click (`hideIssuePanel`; Not now, Esc and a send
+  clear it), and one Esc handler (`wirePop`). Inputs and sources sit in `.inputs-grid`; Side by side's children take a
+  1,120 px measure; the operator desk's signing (`.op-signing`) heads the right column.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

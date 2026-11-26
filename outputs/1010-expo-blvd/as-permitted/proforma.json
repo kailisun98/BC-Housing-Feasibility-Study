@@ -9,6 +9,8 @@
       "three_bed_plus": 0
     },
     "units_total": 0,
+    "units_entered": 0,
+    "homes_basis": "entered",
     "gfa_m2": 23215.0,
     "gfa_from": "the option",
     "rent_tiers_units": null,

@@ -67,8 +67,10 @@ site (home) ──► the case ──► tool: memo on screen (R1)
    7. *Issue*: a note, and the architect sees the revision in their top bar.
    In manager mode the four step links give way to the guide's own progress line ("Stop 6 of 7 · Run the
    rules · 4 done"), so one progress system is on screen.
-4. **Three views** of the result: Summary (title block, answers, figures), Detailed (the whole memo),
-   3D preview (the site plan with dimensions, the section, the axonometric, large).
+4. **The memo in tabs** (since 26 Nov 2026; before, a Summary | Detailed | 3D preview switch over one long page):
+   Answers (the ask beside the four answers), Comparison while two memos are compared, Drawings and areas (FIG 01's
+   own Plan | 3D switch is the 3D view), Clauses, Ledger, Inputs and sources, under a strip that stays in reach. The
+   reader keeps the long page, as on paper.
 5. **Open items.** The third answer is a table: item, status, who resolves it. This is the to-do list.
 6. **Export.** *Download PDF* is the one button that matters here; everything else is quieter.
 

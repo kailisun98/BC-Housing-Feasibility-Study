@@ -5943,7 +5943,8 @@
           "action": "Manager: supply what is missing (land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies.",
           "contact": "BC Housing, a development manager in Development and Asset Strategies"
         }
-      ]
+      ],
+      "decided": []
     }
   },
   "inputs": {

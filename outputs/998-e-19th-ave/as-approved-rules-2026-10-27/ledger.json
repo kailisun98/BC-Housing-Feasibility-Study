@@ -5981,6 +5981,13 @@
           "action": "Manager: supply what is missing (rent-tier split; accessible unit count; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies.",
           "contact": "BC Housing, a development manager in Development and Asset Strategies"
         }
+      ],
+      "decided": [
+        {
+          "what": "rezoning",
+          "on": "25 Jul 2024",
+          "words": "Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024"
+        }
       ]
     }
   },

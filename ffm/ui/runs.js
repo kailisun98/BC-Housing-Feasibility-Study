@@ -12,17 +12,17 @@ import {
 } from "./files.js";
 import { briefName, dateWords, renderMemo } from "./memo/memo.js";
 import { attachCause, compareSummary, setCompareNote } from "./memo/changes.js";
-import { renderPreview3D } from "./figures/cards.js";
 import { closeExportPanel } from "./revit.js";
 import { backToMemo, progress, renderGuide, renderRoute, renderStage, stageShown } from "./route-stage.js";
-import { closeIssuePanel, myName } from "./issue.js";
-import { setMode, setStep, showInputs } from "./modes.js";
+import { myName, syncIssueButton } from "./issue.js";
+import { MODES, setMode, setStep, showInputs } from "./modes.js";
 
 /* The top bar's Run. The architect's is the one loud button. The manager runs from the card at 03, so theirs waits
    until there is a memo, then reads Run again, quiet, live only once an edit has left the memo out of date. */
 export function syncRunButton() {
   const b = $("#run-btn");
   if (!b) return;
+  syncIssueButton();   // Issue waits on the same things Run again answers: a run in flight, a memo out of date
   const p = progress();
   const asOf = $("#as-of").value || todayISO();
   if (state.mode === "manager" || state.mode === "operator") {
@@ -205,10 +205,8 @@ function enableExports(run) {
   if (!on || !$("#board-panel").hidden) { $("#board-panel").hidden = true; $("#board-panel").innerHTML = ""; $("#pdf-board-btn").setAttribute("aria-expanded", "false"); }
   $("#pdf-short-btn").disabled = !on;
   $("#revit-btn").disabled = !(on && run.massing);
-  $("#issue-btn").disabled = !on || !!STATIC;
-  if (!on) closeIssuePanel();
+  syncIssueButton();
   renderGuide();
-  if (state.view === "3d") renderPreview3D();
 }
 
 /* A past run, as a reader picks it: its revision (or its draft name, which carries when it was made), the option, and
@@ -259,7 +257,7 @@ export async function followHistory() {
   const run = q.get("run"), cmp = q.get("compare") || null, mode = q.get("mode");
   restoring = true;
   try {
-    if (mode && mode !== state.mode && ["manager", "architect", "reader"].includes(mode)) setMode(mode, false, false);
+    if (mode && mode !== state.mode && MODES[mode]) setMode(mode, false, false);   // every layout, the operator's too (26 Nov 2026)
     if (run && (!state.run || state.run.run_id !== run)) {
       await openRun(run, { compare: cmp });
     } else if (run && (state.compareRun || null) !== cmp) {

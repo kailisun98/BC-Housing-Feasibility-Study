@@ -17,8 +17,7 @@ export const state = {
   compareRun: null,     // run_id to diff against on the next run
   step: 1,              // the step the reader is on, for the step bar
   revisions: new Map(), // run_id -> "R1", "R2"…: the memo's revision on its site
-  mode: "manager",      // who is reading: manager, architect, reader (setMode)
-  view: "detailed",     // how much of the memo: summary, detailed, 3d (setView)
+  mode: "manager",      // who is reading: manager, architect, reader, operator (setMode); the memo's tab is memo/tabs.js's
   issues: [],           // the site's issue notes, from the local server
 };
 

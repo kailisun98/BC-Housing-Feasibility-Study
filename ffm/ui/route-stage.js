@@ -16,7 +16,7 @@ import {
 import { guide, state } from "./core/state.js";
 import { loadScript } from "./core/engine.js";
 import {
-  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, isShare, OPERATING_FIELDS, OPTION_FIELDS,
+  ANSWERS, appliesHere, cd1Of, cornerStreets, districtOf, fieldOf, FINANCE_FIELDS, GUIDE_FIELDS, hasPart, isShare, OPERATING_FIELDS, OPTION_FIELDS,
   optWord, shareFromScreen, shareToScreen, SITE_FIELDS
 } from "./fields.js";
 import { renderClaude } from "./claude.js";
@@ -207,9 +207,26 @@ function siteLine(s) {
 function optionLine(o) {
   if (!o) return "";
   const homes = Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
-  const bits = [o.storeys != null ? `${o.storeys} storeys` : "", homes ? `${homes} homes` : "",
-    guide.suggestion && !state.optionId ? suggestionWord(guide.suggestion) : (o.name ? String(o.name).split(/[;,:]/)[0] : "")];
+  // the option's name first, then its figures: "Funder-ready · 6 storeys · 98 homes" (26 Nov 2026)
+  const bits = [guide.suggestion && !state.optionId ? suggestionWord(guide.suggestion) : (o.name ? String(o.name).split(/[;,:·]/)[0].trim() : ""),
+    o.storeys != null ? `${o.storeys} storeys` : "", homes ? `${homes} homes` : ""];
   return bits.filter(Boolean).join(" · ") || "an option";
+}
+
+/* Row 02 before an option is decided (26 Nov 2026: it fell back to "What goes on the site" with a suggestion on the
+   card): the derivation under way, the suggestion as it stands, or the figure Continue waits for. "" before 01 is
+   done, so the row keeps its own words. */
+function optionPending() {
+  if (!progress().site) return "";
+  if (guide.busy.suggest) return `Deriving the ${guide.candidate || "funder-ready"} option…`;
+  const S = guide.suggestion;
+  if (!S || guide.suggestionUsed) return "";
+  const o = stageOptionNow();
+  if (!o) return "";
+  const probs = figureProblems(o, S);
+  if (probs.length) return { text: `Waits for ${probs[0].split(" (")[0]}`, warn: true };
+  const homes = Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
+  return `Suggested: ${[suggestionWord(S), o.storeys != null ? `${o.storeys} storeys` : "", homes ? `${homes} homes` : ""].filter(Boolean).join(" · ")}`;
 }
 
 export function renderRoute() {
@@ -221,13 +238,14 @@ export function renderRoute() {
   const cur = stageShown() ? (guide.step || 1) : 0;
   const done = { 1: p.site, 2: p.option, 3: p.run };
   const open = { 1: true, 2: p.site, 3: p.site && p.option };
-  const sum = { 1: p.site ? siteLine(state.site) : "", 2: p.option ? optionLine(state.option) : "", 3: p.run ? `${rev(state.run.run_id)} · rules as of ${dateWords(state.run.as_of)}` : "" };
+  const sum = { 1: p.site ? siteLine(state.site) : "", 2: p.option ? optionLine(state.option) : optionPending(), 3: p.run ? `${rev(state.run.run_id)} · rules as of ${dateWords(state.run.as_of)}` : "" };
   const rows = GUIDE_STOPS.map(s => {
     const here = cur === s.n;
+    const line = sum[s.n] && typeof sum[s.n] === "object" ? sum[s.n] : { text: sum[s.n] || s.what };
     return `<li><button type="button" class="route-row${here ? " current" : ""}${done[s.n] ? " done" : ""}" data-stop="${s.n}"${here ? ' aria-current="step"' : ""}${open[s.n] ? "" : " disabled"}>
       <span class="route-n">${done[s.n] && !here ? `${CHECK_SVG}<span class="sr-only">done:</span>` : `0${s.n}`}</span>
       <span class="route-t">${h(s.title)}</span>
-      <span class="route-s">${h(sum[s.n] || s.what)}</span>
+      <span class="route-s${line.warn ? " route-wait" : ""}">${h(line.text)}</span>
     </button></li>`;
   }).join("");
   const tail = state.run
@@ -656,6 +674,46 @@ function stageOptionNow() {
   return state.option || (S && S.option) || null;
 }
 
+/* Stop 02, laid out by a UX designer's brief (26 Nov 2026: the card ran 2,125 px with 79 controls, the building ~600 px
+   down under reference material and Continue at its foot). The card shows the decision and states every default in
+   words; what only refines it opens on request; nothing needed to go on sits below the fold (the foot sticks). What
+   the lot and the rules allow before any option is reference: beside the card on a wide screen, folded under it
+   otherwise. The candidates keep one order. */
+const CAND_ORDER = ["funder-ready", "outright", "benchmark"];
+const FOR_KEYS = ["housing_type", "beds", "indigenous_led", "women_leaving_violence"];
+const BUILDING_KEYS = ["building_type", "podium_storeys"];
+const WIDE_STAGE = typeof matchMedia === "function" ? matchMedia("(min-width: 1600px)") : null;
+
+/* A list in words: "A", "A and B", "A, B and C". */
+const andList = xs => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+
+/* The questions a stop asks, among those whose `when` holds, by a filter on their keys. */
+const stopKeys = (stop, keep) => Object.keys(ANSWERS).filter(k => ANSWERS[k].stop === stop && (!ANSWERS[k].when || ANSWERS[k].when(state.site || {}, answerValue)) && keep(k));
+
+/* Questions as two columns, the question and its answer; who answers it, where that is not the manager, said after the
+   question in a muted aside ("(or the architect)", "(with the land owner)"). */
+function askRows(keys) {
+  if (!keys.length) return "";
+  const rows = keys.map(k => {
+    const a = ANSWERS[k];
+    const who = String(a.who || "you").replace(/^you,?\s*/, "").trim();
+    const [text, url] = a.where || [];
+    const where = text ? ` <span class="ask-where">Find it in ${url ? `<a href="${h(url)}" target="_blank" rel="noopener">${h(text)}</a>` : h(text)}.</span>` : "";
+    const why = a.why || where ? `<span class="ask-why">${h(a.why || "")}${where}</span>` : "";
+    return `<tr><th scope="row"><span id="ask-${h(k)}">${h(a.label)}</span>${who ? ` <span class="ask-who-note">(${h(who)})</span>` : ""}${why}</th><td>${askControl(k, `ask-${k}`)}${k === "building_type" ? typeOffer() : ""}</td></tr>`;
+  }).join("");
+  return `<table class="ask-table ask-two"><tbody>${rows}</tbody></table>`;
+}
+
+/* What the lot takes, in one line under the candidates: the plate and the outright building. */
+function lotLine(lot) {
+  if (!lot) return "";
+  const p = lot.plate || {}, y = lot.yield || {};
+  const plate = p.area_m2 ? `The lot takes a ${fmtNum(p.width_m)} × ${fmtNum(p.depth_m)} m plate` : "The yards leave no plate on this lot as fronted";
+  const build = y.storeys ? ` · ${y.outright ? "outright" : "roughly"} ${y.storeys} storeys, ${fmtNum(y.gfa_m2)} m²${y.homes != null ? `, about ${y.homes} homes` : ""}` : "";
+  return `<p class="help lot-line">${h(plate + build)}.</p>`;
+}
+
 function cardOption() {
   const site = state.site || {};
   const S = guide.suggestion;
@@ -665,32 +723,47 @@ function cardOption() {
   const R = guide.reading;
   const o = stageOptionNow();
   const savedOpts = (state.options || []).filter(x => x.for_site);
-  const cands = S ? S.candidates : [{ id: "funder-ready", title: "Funder-ready", what: "the envelope the site gets, with the funder questions answered" }, { id: "outright", title: "Outright", what: "what the district allows as of right" }, { id: "benchmark", title: "Benchmark", what: "the staff benchmark under the rezoning policy" }];
+  const base = S ? S.candidates : [{ id: "funder-ready", title: "Funder-ready", what: "the envelope the site gets, with the funder questions answered" }, { id: "outright", title: "Outright", what: "what the district allows as of right" }, { id: "benchmark", title: "Benchmark", what: "the staff benchmark under the rezoning policy" }];
+  // one order, always (26 Nov 2026: it turned to Outright · Benchmark · Funder-ready once an option was derived)
+  const cands = base.slice().sort((a, b) => (CAND_ORDER.indexOf(a.id) + 99) % 99 - (CAND_ORDER.indexOf(b.id) + 99) % 99);
   const fromSaved = !!(state.optionId && !(S && !guide.suggestionUsed));
   const candWhy = cands.filter(c => c.available === false).map(c => `<li><b>${h(c.title)}</b>: ${h(c.why)}.</li>`).join("");
-  // the rules that apply here, without verdicts (24 Nov 2026, critique: the probe's "Pass" and "Uncertain" stood where
-  // the memo then said Fail and Conditional for the same option); the verdicts come with the run, on the option's figures
-  // folded to its count (26 Nov 2026, the 24 Nov critique: stop 02 held some 22 controls on a card that asks one thing)
-  const needs = R ? R.results.filter(r => r.status === "uncertain").length : 0;
-  const applies = R ? R.results.filter(r => r.status !== "not_applicable").length : 0;
-  const reading = guide.busy.read ? `<p class="help">Reading the rules that apply to this site…</p>`
-    : R ? `<details class="fold reading-fold"><summary>${applies} rule${applies === 1 ? "" : "s"} apply here${needs ? ` <span class="cont">· ${needs} need${needs === 1 ? "s" : ""} the option's figures</span>` : ""}</summary><ul class="reading-list">${R.results.map(r => `<li>${readingMark(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">Their verdicts come with the run, on the option's figures.</p></details>` : `<p class="help">Not read yet.</p>`;
+
+  // For: one sentence, the values already in it; opened, the kind of housing, the programs and their terms
+  const kindV = answerValue("housing_type");
+  const kindW = kindV ? ansWord("housing_type", kindV).split(":")[0].trim() : "";
+  const also = [answerValue("indigenous_led") === true ? "Indigenous-led" : "", answerValue("women_leaving_violence") === true ? "for women and children leaving violence" : ""].filter(Boolean);
+  const progNames = progs.filter(r => chosen.has(r.id)).map(r => String(r.title).split(":")[0].trim());
+  const forLine = `${kindW ? h(kindW) : `<span class="cont">(not said)</span>`}${also.length ? ` · ${h(also.join(" · "))}` : ""} · ${progNames.length ? `tested against ${h(andList(progNames))}` : `<span class="cont">no program chosen</span>`}`;
+  const forFold = `<details class="fold for-fold" id="stage-for"${guide.forOpen ? " open" : ""}><summary><span class="for-line">${forLine}</span> <span class="fold-act">Change</span></summary>
+      ${askRows(stopKeys(2, k => FOR_KEYS.includes(k)))}
+      <div class="chips" role="group" aria-label="The programs in view">${progs.map(r => `<label class="chip"><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
+      <details class="fold"><summary>Their published terms</summary>${stagePrograms([...chosen])}</details>
+    </details>`;
+
+  // the questions the memo carries, behind their count (the building's own questions lead The building instead)
+  const qKeys = stopKeys(2, k => !FOR_KEYS.includes(k) && !BUILDING_KEYS.includes(k));
+  const said = v => !(v === null || v === undefined || v === "");
+  const answered = qKeys.filter(k => said(answerValue(k))).length;
+  const left = leftToPerson(S, fromSaved);
+  const questions = qKeys.length || left ? `<details class="fold ask-fold" id="stage-questions"${guide.questionsOpen ? " open" : ""}><summary>Questions the memo carries <span class="cont">· ${answered} answered, ${qKeys.length - answered} not sure</span></summary>
+      <p class="ask-lead">Not sure is a fine answer: the memo carries it as an open item, with the person named to settle it.</p>
+      ${askRows(qKeys)}${left}
+    </details>` : "";
+
+  const typeRows = askRows(stopKeys(2, k => BUILDING_KEYS.includes(k)));
   const dl = `<dl class="stage-dl">
-      <div><dt>For</dt><dd>
-        <div class="chips" role="group" aria-label="The programs in view">${progs.map(r => `<label class="chip"><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
-        <details class="fold"><summary>Their published terms</summary>${stagePrograms([...chosen])}</details>
-      </dd></div>
-      ${R && R.lot ? `<div><dt>What the lot takes</dt><dd>${lotTakes(R.lot)}</dd></div>` : ""}
-      <div><dt>What the rules ask here</dt><dd>${reading}</dd></div>
+      <div><dt>For</dt><dd>${forFold}</dd></div>
       <div><dt>Start from</dt><dd>
         <div class="start-row">
           <div class="seg cands" role="group" aria-label="Start from">${cands.map(c => `<button class="segbtn" type="button" data-cand="${h(c.id)}" aria-pressed="${!fromSaved && guide.candidate === c.id}"${c.available === false ? ` disabled title="${h(c.why)}"` : ` title="${h(c.what)}"`}>${h(c.title)}</button>`).join("")}</div>
           ${savedOpts.length ? `<label class="addr-saved"><span class="cont">or a saved option</span><select id="guide-saved-option"><option value="">choose…</option>${savedOpts.map(x => `<option value="${h(x.id)}"${fromSaved && state.optionId === x.id ? " selected" : ""}>${h(x.name || x.id)}</option>`).join("")}</select></label>` : ""}
         </div>
+        ${R && R.lot ? lotLine(R.lot) : ""}
         ${candWhy ? `<ul class="help cand-why">${candWhy}</ul>` : ""}${S && S.candidate_note && !fromSaved ? `<p class="help warn-text">${h(S.candidate_note)}</p>` : ""}${S && S.same_building_note && !fromSaved ? `<p class="help">${h(S.same_building_note)}.</p>` : ""}
       </dd></div>
-      <div><dt>The building</dt><dd>${guide.busy.suggest ? `<p class="help">Deriving the ${h(guide.candidate)} option from the rules…</p>` : (o ? figureBlock(o, fromSaved ? null : S) : `<p class="help">Choose where to start.</p>`)}</dd></div>
-      <div><dt>Left to you</dt><dd>${askTable(2)}${leftToPerson(S, fromSaved)}</dd></div>
+      <div><dt>The building</dt><dd>${typeRows}${guide.busy.suggest ? `<p class="help">Deriving the ${h(guide.candidate)} option from the rules…</p>` : (o ? figureBlock(o, fromSaved ? null : S) : `<p class="help">Choose where to start.</p>`)}</dd></div>
+      ${questions ? `<div><dt>Questions</dt><dd>${questions}</dd></div>` : ""}
       <div><dt>What it runs on</dt><dd>${briefEditor(o)}</dd></div>
     </dl>`;
   // a building the figures cannot make waits here: Continue stays off and says which figure to change (17 Nov 2026:
@@ -702,8 +775,32 @@ function cardOption() {
   const main = `${blocked}<button type="button" class="btn btn-primary" id="guide-next-2"${ready ? "" : " disabled"}${probs.length ? ' aria-describedby="stage-block"' : ""}>${guide.confirmUse ? "Replace the edited option →" : "Continue to the run →"}</button>`;
   const lot = [site.zoning_district, site.site_area_m2 ? `${fmtNum(site.site_area_m2)} m²` : "", site.frontage_m != null ? `${fmtNum(site.frontage_m)} × ${fmtNum(site.depth_m)} m` : ""].filter(Boolean).join(" · ");
   const context = `<p class="stage-context">${h(lot)}${districtWords(site)}</p>`;
-  return stageCard(2, "What goes on it?", context + dl, foot(quiet, main));
+  return stageCard(2, "What goes on it?", context + dl, foot(quiet, main)) + stageAside(R);
 }
+
+/* What the lot and the rules allow before any option: reference, beside the card on a wide screen (open), under it
+   otherwise (folded). The rules that apply are listed without verdicts (24 Nov 2026, critique: the probe's "Pass" and
+   "Uncertain" stood where the memo then said Fail and Conditional); the verdicts come with the run. */
+function stageAside(R) {
+  const needs = R ? R.results.filter(r => r.status === "uncertain").length : 0;
+  const applies = R ? R.results.filter(r => r.status !== "not_applicable").length : 0;
+  const reading = guide.busy.read ? `<p class="help">Reading the rules that apply to this site…</p>`
+    : R ? `<details class="fold reading-fold"><summary>${applies} rule${applies === 1 ? "" : "s"} apply here${needs ? ` <span class="cont">· ${needs} need${needs === 1 ? "s" : ""} the option's figures</span>` : ""}</summary><ul class="reading-list">${R.results.map(r => `<li>${readingMark(r.status)} <span>${h(r.title)}</span></li>`).join("")}</ul><p class="help">Their verdicts come with the run, on the option's figures.</p></details>` : `<p class="help">Not read yet.</p>`;
+  const open = guide.asideOpen != null ? guide.asideOpen : !!(WIDE_STAGE && WIDE_STAGE.matches);
+  return `<details class="card stage-aside" id="stage-aside"${open ? " open" : ""}><summary>What the lot and the rules allow <span class="cont">· before any option</span></summary>
+      <div class="aside-body">
+        ${R && R.lot ? `<h3 class="aside-h">What the lot takes</h3>${lotTakes(R.lot)}` : ""}
+        <h3 class="aside-h">What the rules ask here</h3>${reading}
+      </div>
+    </details>`;
+}
+
+// the aside follows the window across 1600 px, unless the manager opened or closed it by hand
+if (WIDE_STAGE && WIDE_STAGE.addEventListener) WIDE_STAGE.addEventListener("change", () => {
+  guide.asideOpen = null;
+  const a = document.getElementById("stage-aside");
+  if (a) a.open = WIDE_STAGE.matches;
+});
 
 /* What the lot takes before any option (25 Nov 2026, both panels): the plate the yards leave, the building the schedule
    allows outright with the homes it holds, the provincial small-scale minimum beside it, and what the use table says of
@@ -962,7 +1059,7 @@ function savedFigures(o) {
   };
   const groups = GROUPS.map(([title, test]) => { const fs = GUIDE_FIELDS.filter(([k]) => test(k)); return fs.length ? `<div class="sg-group"><h4 class="sg-head">${h(title)}</h4><div class="fin-rows">${fs.map(row).join("")}</div></div>` : ""; }).join("");
   const n = GUIDE_FIELDS.filter(([k]) => GROUPS.some(([, t]) => t(k))).length;
-  return `<details class="fold all-figures saved-figures"><summary>All ${n} of the option's figures</summary><div class="sg-rows">${groups}</div></details>`;
+  return `<details class="fold all-figures saved-figures"><summary>All ${n} of the option's figures <span class="cont">· the mix, rent tiers, accessible homes, the funders' terms, setbacks, floor to floor</span></summary><div class="sg-rows">${groups}</div></details>`;
 }
 
 /* The suggestion's every figure, each Suggested | Mine with what it rests on: behind one fold. */
@@ -998,7 +1095,7 @@ function allFigures(S) {
     const fields = GUIDE_FIELDS.filter(([k]) => test(k) && (S.fields[k] || CORE.has(k)));
     return fields.length ? `<div class="sg-group"><h4 class="sg-head">${h(title)}</h4>${fields.map(rowOf).join("")}</div>` : "";
   }).join("");
-  return `<details class="fold all-figures" id="all-figures"${guide.allOpen ? " open" : ""}><summary>All ${n} figures, and what each rests on</summary><div class="sg-rows">${rows}</div></details>`;
+  return `<details class="fold all-figures" id="all-figures"${guide.allOpen ? " open" : ""}><summary>All ${n} figures <span class="cont">· the mix, rent tiers, accessible homes, the funders' terms, setbacks, floor to floor, each with what it rests on</span></summary><div class="sg-rows">${rows}</div></details>`;
 }
 
 /* What the suggestion leaves to a person that no question above settles: one quiet line each. */
@@ -1074,10 +1171,12 @@ function cardRun() {
     "operations.operating_cost_per_unit_year_cad": "Blank: the placeholder in the assumptions.",
     "operations.support_staffing_cad_year": supported ? "Never assumed. Blank leaves the money answer unsure." : "Blank: none.",
     "operations.operating_subsidy_cad_year": "What the operator has or is seeking. Blank: none." };
-  const opsFields = OPERATING_FIELDS.map(([k, label, type]) => { const sub = k.split(".")[1], hid = `ops-help-${sub}`, text = type === "text"; return `<label class="field"><span class="label">${h(label)}</span><input type="${text ? "text" : "number"}"${text ? "" : ' step="any" min="0" inputmode="decimal"'} class="fin-input" data-key="${h(k)}"${text ? ' data-text="1"' : ""} value="${h(opsIn[sub] ?? "")}" placeholder="blank" aria-describedby="${hid}"><span class="help" id="${hid}">${h(opsHelp[k] || "")}</span></label>`; }).join("");
+  // the figures of a part of a mixed building show only where the option has that part (26 Nov 2026), read by their path
+  const opsFields = OPERATING_FIELDS.filter(([, , , part]) => !part || hasPart(o, part)).map(([k, label, type]) => { const hid = `ops-help-${k.replace(/\W/g, "-")}`, text = type === "text"; return `<label class="field"><span class="label">${h(label)}</span><input type="${text ? "text" : "number"}"${text ? "" : ' step="any" min="0" inputmode="decimal"'} class="fin-input" data-key="${h(k)}"${text ? ' data-text="1"' : ""} value="${h(getPath(o, k) ?? "")}" placeholder="blank" aria-describedby="${hid}"><span class="help" id="${hid}">${h(opsHelp[k] || "")}</span></label>`; }).join("");
+  const partConfirm = ["supportive", "shelter"].filter(p => hasPart(o, p)).map(p => `<p class="field ops-confirm"><label><input type="checkbox" class="ops-part-confirmed" data-key="operations.parts.${p}.subsidy_confirmed"${getPath(o, `operations.parts.${p}.subsidy_confirmed`) === true ? " checked" : ""}> The ${p === "shelter" ? "shelter's" : "supportive homes'"} own subsidy is confirmed</label></p>`).join("");
   const opsFold = `<details class="fold money-fold"${supported || Object.values(opsIn).some(v => v != null && v !== "") ? " open" : ""}><summary>What it takes to run <span class="cont">· ${supported ? "support staffing and who pays for it decide this kind of housing" : "the operator's rents and running costs, if you have them"}</span></summary>
       <div class="fin-rows">${opsFields}</div>
-      <p class="field ops-confirm"><label><input type="checkbox" id="ops-confirmed"${opsIn.subsidy_confirmed === true ? " checked" : ""}> The operating subsidy is confirmed, with an agreement in hand</label></p>
+      <p class="field ops-confirm"><label><input type="checkbox" id="ops-confirmed"${opsIn.subsidy_confirmed === true ? " checked" : ""}> The operating subsidy is confirmed, with an agreement in hand</label></p>${partConfirm}
       <p class="help">The memo prints an operating table from these and the subsidy needed a home a month. A subsidy not yet confirmed is shown as sought.</p>
     </details>`;
   // what the suggestion falls short of travels with it to the run (20 Nov 2026)
@@ -1206,6 +1305,11 @@ function wireStage(el) {
   $$(".mix-share", el).forEach(inp => inp.addEventListener("input", () => { const p = $("#guide-mix-preset", el); if (p) p.value = ""; }));
   const all = $("#all-figures", el);
   if (all) all.addEventListener("toggle", () => { guide.allOpen = all.open; });
+  // the card's folds keep their state across its re-renders (a chip, an answer, a figure redraws the card)
+  for (const [id, key] of [["#stage-for", "forOpen"], ["#stage-questions", "questionsOpen"], ["#stage-aside", "asideOpen"]]) {
+    const d = $(id, el);
+    if (d) d.addEventListener("toggle", () => { guide[key] = d.open; });
+  }
   $$(".sg-row", el).forEach(row => {
     const key = row.dataset.key;
     $$(".sg-pick .segbtn", row).forEach(b => b.addEventListener("click", () => {
@@ -1281,6 +1385,15 @@ function wireStage(el) {
     if (!state.option) return;
     srcList().splice(Number(b.dataset.srcRemove), 1);
     srcChanged("add");
+  }));
+  $$(".ops-part-confirmed", el).forEach(cb => cb.addEventListener("change", () => {
+    if (!state.option) return;
+    setPath(state.option, cb.dataset.key, cb.checked ? true : null);
+    state.optionDirty = true;
+    $("#option-dirty").hidden = false;
+    renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
+    markStale("the money in");
+    saveDraft();
   }));
   const conf = $("#ops-confirmed", el);
   if (conf) conf.addEventListener("change", () => {

@@ -130,8 +130,10 @@ export function answerFunders(L, run = null) {
   if (others.length) body += `<p class="path" style="margin-top:12px">Not targeted, listed in the ledger: ${others.map(r => h(r.title)).join("; ")}.</p>`;
   if (doors.length) {
     const up = s => String(s || "").charAt(0).toUpperCase() + String(s || "").slice(1);
-    body += `<p class="path ans-sub">Other programs written for this kind of housing · listed from their own pages, not tested</p>
-      <ul class="finding-list door-list">${doors.map(m => `<li><span class="fl-marks">${refTagOf(m.rule_id).trim()}${m.open === false ? ' <span class="ph-tag">no intake open</span>' : ""}</span><span><span class="title">${h(up(m.program))}${m.if && m.if.length ? ` <span class="cont">· if the housing is ${h(m.if.join(" and "))}</span>` : ""}:</span> <span class="cont">${h(m.what || "")}. A project enters ${h(m.enters || "in a way its page does not state")}.${m.intake ? ` ${h(up(String(m.intake).replace(/\.$/, "")))}.` : ""}${m.differs ? ` Its homes are all rent geared to income; this option has ${h(m.differs.market_units)} at market rent.` : ""}</span></span></li>`).join("")}</ul>`;
+    // folded behind its count (26 Nov 2026: 890 px open in answer 2 on 375 Glen Drive); the paper prints it in full
+    body += `<details class="pf-lines doors-fold"><summary>Other programs written for this kind of housing <span class="cont">· ${doors.length} listed from their own pages, not tested</span></summary>
+      <ul class="finding-list door-list">${doors.map(m => `<li><span class="fl-marks">${refTagOf(m.rule_id).trim()}${m.open === false ? ' <span class="ph-tag">no intake open</span>' : ""}</span><span><span class="title">${h(up(m.program))}${m.if && m.if.length ? ` <span class="cont">· if the housing is ${h(m.if.join(" and "))}</span>` : ""}:</span> <span class="cont">${h(m.what || "")}. A project enters ${h(m.enters || "in a way its page does not state")}.${m.intake ? ` ${h(up(String(m.intake).replace(/\.$/, "")))}.` : ""}${m.differs ? ` Its homes are all rent geared to income; this option has ${h(m.differs.market_units)} at market rent.` : ""}</span></span></li>`).join("")}</ul>
+    </details>`;
   }
   // what the answer covers, in the engine's words: a short list of programs is a limit of the tool, not of the project
   if (ans.funded.scope) body += `<p class="path funders-scope">${h(ans.funded.scope)}</p>`;
@@ -168,7 +170,7 @@ export function layoutOpenItems(run) {
   if (short.length && lay.units_total) {
     const words = short.map(s => `${s.units ? s.units + " " : ""}${String(s.label || "").toLowerCase()}`).join(", ");
     out.push({ title: "Homes that do not fit the plate", status: "conditional",
-      action: `Architect: ${lay.units_placed} of ${lay.units_total} homes fit the plate on ${(lay.floors || []).length} floors; did not fit: ${words}. More storeys, a larger plate or a smaller program. The money and the funders' checks count all ${lay.units_total}.` });
+      action: `Architect: ${lay.units_placed} of ${lay.units_total} homes fit the plate on ${(lay.floors || []).length} floors; did not fit: ${words}. More storeys, a larger plate or a smaller program. The funders' checks count all ${lay.units_total}; the money counts the ${lay.units_placed} placed.` });
   }
   // the floor area the rules test against the floor area the plans draw (25 Nov 2026; twin of memo.layout_open_items)
   const tot = lay.totals || {}, tested = Number(tot.gfa_tested_m2), drawn = ((lay.area_schedule || {}).totals || {}).gross_m2;
@@ -357,10 +359,26 @@ export function operatingTable(pf) {
   const rows = operatingRows(pf);
   if (!rows.length) return "";
   const body = rows.map(r => `<tr class="op-${h(r.kind)}"><th scope="row">${h(r.label)}</th><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : h(r.value < 0 ? `−${money(-r.value)}` : money(r.value))}</td><td class="cont"><span class="measure">${h(r.note)}${r.ph ? ' <span class="ph-tag">placeholder</span>' : ""}${r.warn ? ' <span class="ph-tag">open</span>' : ""}</span></td></tr>`).join("");
-  return `<details class="pf-lines op-page" open><summary>What it takes to run, a year <span class="cont">· the rents, the running costs and the subsidy needed</span></summary>
+  // open for the operator, whose figures these are; folded for the others (26 Nov 2026: 433 px open in answer 4)
+  return `<details class="pf-lines op-page"${state.mode === "operator" ? " open" : ""}><summary>What it takes to run, a year <span class="cont">· the rents, the running costs and the subsidy needed</span></summary>
       <table class="plain op-table"><thead><tr><th scope="col">Line</th><th scope="col" class="num">A year</th><th scope="col">Note</th></tr></thead><tbody>${body}</tbody></table>
       <p class="cont">${(pf.operating.page || {}).own_figures ? "The rents and the running cost are the operator's own, as entered" : "The rents and the running cost are placeholders until the operator's own are entered"}; support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.</p>
+      ${partsTable(pf)}
     </details>`;
+}
+
+/* The operating page by part of a mixed building (26 Nov 2026): the engine's own rows (proforma page.parts), drawn as
+   proforma.parts_markdown draws them, so the two cannot disagree. */
+export const PART_COLUMNS = [["rent", "Rent"], ["vacancy", "Vacancy"], ["cost", "Running cost"], ["reserve", "Reserve"], ["staffing", "Staffing"], ["subsidy", "Subsidy"], ["net", "Left a year"]];
+export function partsTable(pf) {
+  const rows = (((pf || {}).operating || {}).page || {}).parts || [];
+  if (!rows.length) return "";
+  const cell = (r, k) => (r[k] == null ? (k === "staffing" && r.staffing_missing ? '<span class="ph-tag">not entered</span>' : "—")
+    : h(["vacancy", "cost", "reserve", "staffing"].includes(k) ? `−${money(r[k])}` : r[k] < 0 ? `−${money(-r[k])}` : money(r[k])));
+  return `<h4 class="op-parts-h">By part of the building</h4>
+    <div class="table-scroll"><table class="plain op-parts"><thead><tr><th scope="col">Part</th><th scope="col" class="num">Places</th>${PART_COLUMNS.map(([, w]) => `<th scope="col" class="num">${h(w)}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(r => `<tr><th scope="row">${h(r.label)}</th><td class="num">${r.places != null ? `${h(fmtNum(r.places))} ${h(r.unit || "")}` : ""}</td>${PART_COLUMNS.map(([k]) => `<td class="num${k === "net" ? " op-net" : ""}">${cell(r, k)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
+    <p class="cont">Each part's own running cost, staffing and subsidy where the operator entered them; the rents by tier. What a part leaves a year is what it needs, or gives, before any loan payment.</p>`;
 }
 
 /* Where the money comes from, each source with its status (25 Nov 2026): the contributions ledger the engine writes in

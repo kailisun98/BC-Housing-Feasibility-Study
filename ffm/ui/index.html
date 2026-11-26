@@ -46,6 +46,12 @@
       <span class="eyebrow">Revision</span>
       <b id="stamp-text" title="The memo on screen, numbered among this site's memos"></b>
     </div>
+    <!-- issuing sits beside the revision it numbers, in reach from every tab (26 Nov 2026); its form drops under it -->
+    <div class="issue-top" id="issue-top" hidden>
+      <button id="issue-btn" class="issue-btn" type="button" aria-expanded="false" aria-controls="issue-pop" aria-describedby="issue-why">Mark issued to the architect</button>
+      <span id="issue-why" class="sr-only"></span>
+      <div id="issue-pop" class="issue-pop" hidden></div>
+    </div>
     <!-- the person at this browser, by name, not a login (26 Nov 2026) -->
     <div class="me">
       <button id="me-btn" class="me-btn unset" type="button" aria-expanded="false" aria-controls="me-panel">Your name</button>
@@ -136,11 +142,6 @@
         <select id="compare-run"><option value="">No comparison</option></select>
       </label>
       <span id="compare-note" class="tool-note"></span>
-      <div class="view-switch seg" id="view-switch" role="group" aria-label="How much of the memo to show">
-        <button class="segbtn" type="button" data-view="summary" aria-pressed="false" title="The title block, the four answers and the massing">Summary</button>
-        <button class="segbtn" type="button" data-view="detailed" aria-pressed="true" title="The whole memo: clauses, ledger, inputs, sources">Detailed</button>
-        <button class="segbtn" type="button" data-view="3d" aria-pressed="false" title="The site plan with dimensions, the section and the axonometric, large">3D preview</button>
-      </div>
     </div>
     <div id="memo" class="memo"></div>
 
@@ -150,7 +151,6 @@
         <button id="open-editor-btn" class="btn" type="button" title="Go to the plans and open the block editor: the plate, the program, step-backs, the turn, shadows">Massing and plans</button>
         <button id="pdf-btn" class="btn" type="button" disabled>Download PDF</button>
         <button id="pdf-board-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="board-panel">Board PDF, two pages</button>
-        <button id="issue-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="issue-panel">Mark issued to the architect</button>
         <button id="print-btn" class="btn btn-quiet" type="button" disabled>Print</button>
         <button id="revit-btn" class="btn btn-quiet" type="button" disabled aria-expanded="false" aria-controls="export-panel" title="The two PowerShell lines that build this memo's masses and sheet FFM-01 in Revit, and a check of the result">Build it in Revit…</button>
         <details class="more-formats"><summary class="btn btn-quiet">More formats</summary>
@@ -165,9 +165,7 @@
           <p class="export-note formats-note">Download PDF is the memo to send for review: every answer names the rules that decide it, every rule its numbers and source, and the last section says how to reproduce it; Print gives the same pages. The board PDF is two pages: the decision wanted, the four answers, the top open items and the sources they cite. The short PDF adds the money line by line. The HTML memo opens in any browser; the Markdown is the same text for a repository or a wiki.</p>
         </details>
       </div>
-      <div id="issue-panel" hidden></div>
       <div id="board-panel" hidden></div>
-      <p class="export-note">The PDF is the one to send for review: every answer names the rules that decide it, every rule its numbers and its source, and the last section says how to reproduce the memo. Print gives the same pages; the short PDF is the ask, the answers, the open items, the money and the sources, for a board or a small site. The HTML memo opens in any browser; the Markdown is the same text for a repository or a wiki.</p>
       <div id="export-panel" class="export-panel" hidden></div>
     </footer>
   </section>

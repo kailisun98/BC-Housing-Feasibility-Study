@@ -6139,7 +6139,8 @@
           "action": "Manager: change what fails, or ask BC Housing which program fits the scheme as it is (answer 2 lists the other programs in the rules written for this housing; their criteria are not tested here, and a program not in the rules may fit as well). Ask: BC Housing, a development manager in Development and Asset Strategies.",
           "contact": "BC Housing, a development manager in Development and Asset Strategies"
         }
-      ]
+      ],
+      "decided": []
     }
   },
   "inputs": {

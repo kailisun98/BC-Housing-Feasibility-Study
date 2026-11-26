@@ -6,10 +6,13 @@ import { loadDemo } from "./files.js";
 import { openRun } from "./runs.js";
 import { backToMemo, enterOption, progress, renderGuide } from "./route-stage.js";
 import { useSuggestion } from "./guide.js";
-import { setMode, setView, showInputs } from "./modes.js";
+import { setMode, showInputs } from "./modes.js";
+import { currentTab, selectTab } from "./memo/tabs.js";
+
+const toTab = id => () => { selectTab(id, { scroll: false }); };
 
 /* The walkthrough follows the development manager's flow (docs/user-flows.md, flow 1) from the top bar to an issued
-   run, then shows the other two readers. A step's `before` sets the page up for it (a mode, a guide stop, a view) and
+   run, then shows the other two readers. A step's `before` sets the page up for it (a mode, a guide stop, a tab) and
    `action: "run"` runs the rules when the reader presses Next; the mode the reader started in comes back at the end. */
 const TOUR = [
   { target: ".mode", title: "For the manager, the architect, a reader or the operator", before: () => setMode("manager", false, false),
@@ -23,12 +26,12 @@ const TOUR = [
   { target: "#stage-card", fallback: "#memo", title: "03 Money in, then run", action: "run",
     before: async () => { if (!progress().site) await loadDemo(); if (!progress().option && guide.suggestion) useSuggestion(); if (progress().option) { guide.step = 3; guide.over = !!state.run; renderGuide(); } },
     text: "Land, equity and other grants are the three figures only the manager knows; everything else the money counts with is a dated, cited assumption. Then one button runs the rules. A run made here is a draft until it is marked issued. Here the walkthrough opens the demo case's own memo instead, R1, as Council approved it, so it makes no draft." },
-  { target: ".answers", fallback: "#memo", title: "The four answers", before: () => { if (guide.over) backToMemo(); },
+  { target: ".answers", fallback: "#memo", title: "The four answers", before: () => { if (guide.over) backToMemo(); selectTab("answers", { scroll: false }); },
     text: "Is it allowed? Does it fit the funders? What is still unsure, and who resolves it? Does the money work? Every finding prints the numbers it used and links the clause it came from; the third answer names a person for each open item. Once a memo is in, the route folds to the left edge so the memo has the width." },
   { target: "#memo-actions", fallback: "#step-export", title: "Download PDF, and mark it issued",
-    text: "Download PDF is the memo for the board, laid out for paper. Mark issued to the architect gives a draft the site's next revision number and records your name and a note; the architect's layout on this machine shows it, and they mark it issued back when the plans are drawn. To reach someone elsewhere, send the link or the PDF." },
-  { target: "#view-switch", title: "Summary, Detailed, 3D preview",
-    text: "How much of the memo to show: the title block and the answers; the whole memo with the clauses and the ledger; or the drawings, large, with an axonometric you can turn." },
+    text: "Download PDF is the memo for the board, laid out for paper. Mark issued to the architect, in the top bar beside the revision, gives a draft the site's next revision number and records your name and a note; the architect's layout on this machine shows it, and they mark it issued back when the plans are drawn. To reach someone elsewhere, send the link or the PDF." },
+  { target: "#memo-tabs", fallback: "#memo", title: "The memo, one part at a time",
+    text: "Answers, Drawings and areas, Clauses, Ledger, Inputs and sources: each part is a tab under a strip that stays in reach as you scroll, and the comparison is a tab of its own while two memos are compared. The arrow keys move between them, and the link names the tab, so it can be sent." },
   { target: ".mode", title: "The architect, the reader and the operator",
     text: "Switch to Architect and the left column holds the Site and Option schedules, one row per input, each citing the rules that read it; every ledger layer opens, Edit blocks appears on the plans, and Build it in Revit leads. Switch to Reader and the memo stands alone in a reading column. Switch to Operator and the memo opens on the operating figures to enter and sign; the manager can mark a memo issued to the operator. That is the whole page." },
 ];
@@ -36,14 +39,14 @@ const TOUR = [
 /* The operator's walkthrough (25 Nov 2026, the third panel: the operator had none): the desk, the signature, the
    checklist on the plans, then the memo, without leaving Operator mode. */
 const OPERATOR_TOUR = [
-  { target: "#operator-desk", fallback: "#memo", title: "The operator's figures",
+  { target: "#operator-desk", fallback: "#memo", title: "The operator's figures", before: toTab("operating"),
     text: "What it takes to run the building for the years after it opens: rents by tier, vacancy, the running cost a home and a bed, support staffing, the operating subsidy and its term. Each figure you enter stands over the screen's placeholder; blank keeps the placeholder, and the memo says which it used." },
-  { target: "#op-sign", fallback: "#operator-desk", title: "Sign them as yours",
+  { target: "#op-sign", fallback: "#operator-desk", title: "Sign them as yours", before: toTab("operating"),
     text: "Your name and organization go on the memo beside the figures once you Run again. Change a figure after signing and the signature is withdrawn at once, so the memo never reads an edited figure as signed." },
-  { target: "#operator-desk h3", fallback: "#operator-desk", title: "What an operator checks on the plans",
+  { target: "#operator-desk h3", fallback: "#operator-desk", title: "What an operator checks on the plans", before: toTab("operating"),
     text: "The area schedule, then a checklist read off the first plans: the elevators, a desk that sees the entry, laundry, the services room and the accessible homes. The plans are the tool's first layout, not the architect's, so a missing item is a question for the architect." },
-  { target: ".answers", fallback: "#memo", title: "Then the memo",
-    text: "The four answers, as every reader has them; the money's operating page reads your figures once you Run again. Mark it issued back to the development manager when the figures are yours." },
+  { target: ".answers", fallback: "#memo", title: "Then the memo", before: toTab("answers"),
+    text: "The four answers, as every reader has them, in the Answers tab; the money's operating page reads your figures once you Run again. Mark it issued back to the development manager when the figures are yours." },
 ];
 
 /* The reader's walkthrough: the memo as it is on their screen, without switching them to the manager's layout
@@ -57,13 +60,11 @@ const READER_TOUR = [
     text: "The memo's parts, as a drawing set lists its sheets: the answers, the drawings, the clauses, the full ledger, the inputs, the sources and the fingerprint that lets anyone reproduce it." },
   { target: "#memo-actions", fallback: "#memo", title: "Download PDF and Print",
     text: "The PDF is the memo laid out for paper, with the clauses, the ledger and the sources numbered; Print gives the same pages." },
-  { target: "#view-switch", title: "Summary, Detailed, 3D preview",
-    text: "How much of the memo to show: the title block and the answers; the whole memo; or the drawings, large, with an axonometric you can turn." },
 ];
 
 const TOUR_KEY = "ffm.walkthrough.seen";
 
-const tour = { active: false, i: 0, list: TOUR, spot: null, card: null, raf: 0, timer: 0, returnTo: null, modeBefore: null, viewBefore: null };
+const tour = { active: false, i: 0, list: TOUR, spot: null, card: null, raf: 0, timer: 0, returnTo: null, modeBefore: null, tabBefore: null };
 
 function tourTarget(step) {
   return document.querySelector(step.target) || (step.fallback ? document.querySelector(step.fallback) : null);
@@ -73,7 +74,7 @@ export function startTour(at = 0) {
   if (tour.active) endTour();
   tour.active = true;
   tour.modeBefore = state.mode;
-  tour.viewBefore = state.view;
+  tour.tabBefore = currentTab();
   // a reader with a memo open is walked through the memo they have; anyone else through the manager's flow
   tour.list = state.mode === "reader" && state.run ? READER_TOUR : state.mode === "operator" && state.run ? OPERATOR_TOUR : TOUR;
   tour.returnTo = document.activeElement && document.activeElement !== document.body ? document.activeElement : $("#tour-link");
@@ -102,10 +103,10 @@ function endTour() {
   window.removeEventListener("resize", positionTourSoon);
   window.removeEventListener("scroll", positionTourSoon);
   document.removeEventListener("keydown", tourKeys);
-  // the page goes back to the layout and the view the reader had before the walkthrough set them up
-  if (tour.viewBefore && tour.viewBefore !== state.view) setView(tour.viewBefore, false);
+  // the page goes back to the layout and the tab the reader had before the walkthrough set them up
   if (tour.modeBefore && tour.modeBefore !== state.mode) setMode(tour.modeBefore, false, false);
-  tour.modeBefore = tour.viewBefore = null;
+  if (tour.tabBefore && tour.tabBefore !== currentTab()) selectTab(tour.tabBefore, { scroll: false });
+  tour.modeBefore = tour.tabBefore = null;
   try { localStorage.setItem(TOUR_KEY, "1"); } catch (e) { /* private window: fine */ }
   // the link that started it no longer names it, so a reload does not start it again (20 Nov 2026)
   try {

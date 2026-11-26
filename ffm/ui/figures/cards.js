@@ -1,6 +1,6 @@
 /* The memo's figure cards: FIG 01 (plan | 3D, the mass placement, the boundary editor's button), FIG 02, the
-   architect's sheets (plans by program, stacking, elevations, code site plan), the Revit sheet, and the 3D
-   preview. The block editor and the boundary editor load on first use (core/lazy.js). */
+   architect's sheets (plans by program, stacking, elevations, code site plan) and the Revit sheet, in the memo's
+   Drawings tab. The block editor and the boundary editor load on first use (core/lazy.js). */
 
 import { $, $$, fmtNum, h, pill, setStatus, toast, todayISO } from "../core/util.js";
 import { bnd, editor, state } from "../core/state.js";
@@ -15,6 +15,7 @@ import { figSection } from "./section.js";
 import { fig3d, VIEW3D } from "./fig3d.js";
 import { applyModeToMemo } from "../modes.js";
 import { loadBlocks, loadBoundary, loaded } from "../core/lazy.js";
+import { selectTab } from "../memo/tabs.js";
 
 /* The figures and the sheets, redrawn from a run whose massing changed under them (the boundary editor). */
 export function rerenderFigures(run) {
@@ -132,10 +133,25 @@ function wireMassTools(fig, run, redraw) {
 }
 
 let figWatch = null;   // the ResizeObserver that refits the drawings' labels when their cards change width
+let refit = null;      // the memo on screen's fit, for refitFigures
+
+/* Brings an element's top just under the bars and the memo's tab strip, where every jump lands (26 Nov 2026: a fixed
+   120 px left the plans' head under the strip). */
+export function scrollUnderBars(el) {
+  if (!el || !el.getClientRects().length) return;
+  const css = getComputedStyle(document.documentElement), px = k => parseFloat(css.getPropertyValue(k)) || 0;
+  const y = el.getBoundingClientRect().top + scrollY - (px("--bars-h") + px("--tabs-h") + 8);
+  scrollTo({ top: Math.max(0, y), behavior: "auto" });
+}
+
+/* The drawings measure their labels against their card's width, which is 0 while the Drawings tab is hidden (26 Nov
+   2026, memo/tabs.js): the tab calls this when it is shown. */
+export function refitFigures() { if (refit && $("#fig-01")) refit(); }
 
 export function wireFigures(run) {
   wireSheets();
   const fig = $("#fig-01");
+  refit = null;
   if (!fig || !run.massing) return;
   const m = run.massing;
   const ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
@@ -203,8 +219,10 @@ export function wireFigures(run) {
     });
   }
 
+  refit = fit;
   fit();
-  // refit when the cards change width: a window resize, the inputs hidden or shown, the wide two-column layout
+  // refit when the cards change width: a window resize, the inputs hidden or shown, the wide two-column layout, the
+  // Drawings tab shown
   if (figWatch) figWatch.disconnect();
   const figures = $(".figures");
   if (figures && "ResizeObserver" in window) {
@@ -463,13 +481,16 @@ function wireSheets() {
   if (go) go.onclick = () => {
     const fig = $('.figure.sheet[data-sheet="plans"]');
     if (!fig) { toast("Run the rules first: the plans are drawn from a run.", true); return; }
-    const y = fig.getBoundingClientRect().top + scrollY - 120;
-    scrollTo({ top: Math.max(0, y), behavior: "auto" });
-    loadBlocks().then(b => { if (!editor.open) b.openEditor(); }).catch(e => toast(`Could not load the block editor: ${e.message}`, true));
+    selectTab("drawings", { scroll: false });   // the plans are in the Drawings tab (26 Nov 2026)
+    scrollUnderBars(fig);
+    // then to the editor's own toolbar, once it is open (it moves the keyboard into itself, which scrolls)
+    loadBlocks().then(b => { if (!editor.open) b.openEditor(); requestAnimationFrame(() => scrollUnderBars($("#sheet-editor"))); })
+      .catch(e => toast(`Could not load the block editor: ${e.message}`, true));
   };
   refreshPlanFloor();
   if (editor.resume) {
     const back = editor.resume; editor.resume = null;
+    selectTab("drawings", { scroll: false });
     loadBlocks().then(b => { if (!editor.open && $("#sheet-editor")) b.openEditor(back); }).catch(() => {});
   }
   const eb = $("#edit-blocks");
@@ -504,34 +525,8 @@ function figSheet(run, n = 3) {
   </figure>`;
 }
 
-/* The 3D preview: the site plan with its dimension strings, the section, and the axonometric, each at full width,
-   drawn by the same functions as the memo's figures from the same massing.json. */
-export function renderPreview3D() {
-  let box = $("#preview3d");
-  const run = state.run;
-  const memo = $("#memo");
-  if (!box) { box = document.createElement("div"); box.id = "preview3d"; box.className = "preview3d"; memo.parentNode.insertBefore(box, memo); }
-  if (!run || !run.massing) { box.innerHTML = `<div class="card figure"><p class="help">Run the rules, or open a run with a massing, to preview it.</p></div>`; return; }
-  const m = run.massing, ctx = siteContext(run.ledger && run.ledger.inputs && run.ledger.inputs.site, m);
-  const [prop, outr] = [m.masses.find(x => x.name === "proposed"), m.masses.find(x => x.name === "outright")];
-  box.innerHTML = `
-    <figure class="figure p3-plan"><div class="fig-head"><span class="eyebrow">Site plan · dimensions in metres</span></div><div class="fig-body"></div><figcaption>Lot ${h(m.lot.frontage_m)} × ${h(m.lot.depth_m)} m, ${h(fmtNum(m.lot.area_m2))} m²; setback envelope ${h(m.envelope.width_m)} × ${h(m.envelope.depth_m)} m. ${prop ? massLine(prop) : ""}</figcaption></figure>
-    <figure class="figure p3-section"><div class="fig-head"><span class="eyebrow">Section A–A · through the lot</span></div><div class="fig-section"></div><figcaption>${outr ? massLine(outr) : ""}</figcaption></figure>
-    <figure class="figure p3-axon"><div class="fig-head"><span class="eyebrow">Axonometric · drag to turn</span></div><div class="fig-body fig3d"></div><figcaption>The proposed mass over the outright envelope, from the same numbers as the plan and the section.</figcaption></figure>`;
-  fitLabels($(".p3-plan .fig-body", box), fs => figPlan(m, ctx, fs));
-  fitLabels($(".p3-section .fig-section", box), fs => figSection(m, fs, ctx));
-  const fs3 = fitLabels($(".p3-axon .fig-body", box), fs => fig3d(m, ctx, 35, 28, fs));
-  // a light orbit for the preview's axon: a drag turns it, as in the memo
-  const svg = $(".p3-axon svg", box);
-  if (svg) {
-    let az = 35, el = 28, drag = null;
-    const turn = (dx, dy) => { az = (az + dx) % 360; el = Math.max(8, Math.min(80, el + dy)); const fresh = document.createElement("div"); fresh.innerHTML = fig3d(m, ctx, az, el, fs3); svg.innerHTML = fresh.firstElementChild.innerHTML; svg.setAttribute("viewBox", fresh.firstElementChild.getAttribute("viewBox")); };
-    const boxH = Math.round(svg.getBoundingClientRect().height); if (boxH > 0) { svg.style.width = "100%"; svg.style.height = `${boxH}px`; }
-    svg.addEventListener("pointerdown", e => { if (e.button > 0) return; drag = { x: e.clientX, y: e.clientY }; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
-    svg.addEventListener("pointermove", e => { if (!drag) return; turn((e.clientX - drag.x) * 0.5, (e.clientY - drag.y) * 0.4); drag = { x: e.clientX, y: e.clientY }; });
-    for (const ev of ["pointerup", "pointercancel", "lostpointercapture"]) svg.addEventListener(ev, () => { drag = null; });
-  }
-}
+/* The 3D preview page (Summary | Detailed | 3D preview) was retired on 26 Nov 2026 with the memo's tabs: FIG 01's own
+   Plan | 3D switch, at full width in the Drawings tab, is the 3D view. */
 
 /* A lot's corners as a hand counts them: the simplified corners where the massing records them, else the ring less the
    point that closes it (17 Nov 2026: a rectangle was captioned with 5 corners). Pure. */

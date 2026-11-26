@@ -156,6 +156,9 @@ async function staticRun(body) {
     option_name: (L.inputs.option || {}).name, written: new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 19),
     verdicts: { outright: ans.allowed.outright.verdict, by_rezoning: ans.allowed.by_rezoning.verdict, funded: ans.funded.verdict },
     has_diff: !!out.diff, has_massing: !!out.massing, revit: null };
+  // whose draft it is, as a run made through the server says (26 Nov 2026: the web build's drafts stayed unnamed)
+  const madeBy = String((body && body.made_by) || "").trim().slice(0, 80);
+  if (madeBy) { payload.made_by = madeBy; summary.made_by = madeBy; }
   browserRuns.set(runId, { payload, summary });
   return payload;
 }

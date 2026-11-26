@@ -361,9 +361,11 @@ def do_run(body: Any) -> dict:
         svg = ps.read_text(encoding="utf-8")
     except ValueError as e:
         massing_note = str(e)
+    lay = None
     if m is not None:
         try:
-            layout.write(layout.solve(site, option, ledger, m), site, m, ledger, out)
+            lay = layout.solve(site, option, ledger, m)
+            layout.write(lay, site, m, ledger, out)
         except ValueError as e:
             massing_note = (massing_note + " " if massing_note else "") + f"Layout skipped: {e}"
 
@@ -374,9 +376,11 @@ def do_run(body: Any) -> dict:
         d = engine.diff(_read(_run_folder(ps_id, pf) / "ledger.json"), ledger)
         (out / "diff.json").write_text(json.dumps(d, indent=2, ensure_ascii=False), encoding="utf-8")
 
-    pfm = proforma.build(site, option, ledger, m)
+    # the money counts the homes the first plans place (25 Nov 2026); the memo carries the plans' open items, as the
+    # command line's does
+    pfm = proforma.build(site, option, ledger, m, lay)
     (out / "proforma.json").write_text(json.dumps(pfm, indent=2, ensure_ascii=False), encoding="utf-8")
-    memo.write(ledger, out, m, d, svg, proforma=pfm)
+    memo.write(ledger, out, m, d, svg, proforma=pfm, layout=lay, massing_error=massing_note if m is None else None)
     # who made it, as the page's own name for its person says (26 Nov 2026): a name kept in one browser, not a login,
     # so a run list can say whose draft is whose
     made_by = str(body.get("made_by") or "").strip()[:80]

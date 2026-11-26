@@ -6067,7 +6067,8 @@
           "action": "Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit.",
           "contact": "a certified arborist, then the City staff who review trees with the development permit"
         }
-      ]
+      ],
+      "decided": []
     }
   },
   "inputs": {

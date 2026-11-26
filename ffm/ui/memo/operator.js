@@ -9,9 +9,9 @@
    The area schedule (a tower architect's and a cost consultant's first table): homes by type and floor, the floor area
    by use, net to gross, from the layout the run carries; a CSV of the same. Pure HTML out, wired once drawn. */
 
-import { $, $$, h, setPath, setStatus, toast, todayISO } from "../core/util.js";
+import { $, $$, getPath, h, setPath, setStatus, toast, todayISO } from "../core/util.js";
 import { state } from "../core/state.js";
-import { OPERATING_FIELDS } from "../fields.js";
+import { hasPart, OPERATING_FIELDS } from "../fields.js";
 import { markStale, saveDraft } from "../files.js";
 import { briefEditor, wireBriefEditor } from "../brief.js";
 import { renderMemo } from "./memo.js";
@@ -35,6 +35,11 @@ const HELP = {
   "operations.vacancy_rate": "A percent (2) or a share (0.02), both 2%; at most 50%. Blank: the CMHC market rate, 3.7%.",
   "operations.operating_cost_per_bed_year_cad": "Beds beside homes. Blank: each bed costed as a home, and the memo says so.",
   "operations.subsidy_source": "The funder and the agreement, in a few words.",
+  "operations.parts.supportive.operating_cost_cad_year": "Blank: costed as the other homes.",
+  "operations.parts.supportive.staffing_cad_year": "That part's own staffing. Never assumed.",
+  "operations.parts.supportive.operating_subsidy_cad_year": "That part's own agreement.",
+  "operations.parts.shelter.staffing_cad_year": "That part's own staffing. Never assumed.",
+  "operations.parts.shelter.operating_subsidy_cad_year": "That part's own agreement.",
 };
 
 export function operatorDesk(run) {
@@ -44,26 +49,40 @@ export function operatorDesk(run) {
   const signed = ops.signed && ops.signed.by ? ops.signed : null;
   const kind = String(opt.housing_type || "independent");
   const ob = (run.layout || {}).operability;
-  const fields = OPERATING_FIELDS.map(([k, label, type]) => {
-    const sub = k.split(".")[1], id = `op-${sub}`, text = type === "text";
-    return `<label class="field"><span class="label">${h(label)}</span><input id="${id}" type="${text ? "text" : "number"}"${text ? "" : ' step="any" min="0" inputmode="decimal"'} data-op="${h(k)}"${text ? ' data-text="1"' : ""} value="${h(ops[sub] ?? "")}" placeholder="blank"><span class="help">${h(HELP[k] || "")}</span></label>`;
+  // a part of a mixed building has its own figures where the option has that part (26 Nov 2026), read by their path
+  const fields = OPERATING_FIELDS.filter(([, , , part]) => !part || hasPart(opt, part)).map(([k, label, type]) => {
+    const id = `op-${k.split(".").slice(1).join("-")}`, text = type === "text";
+    return `<label class="field"><span class="label">${h(label)}</span><input id="${id}" type="${text ? "text" : "number"}"${text ? "" : ' step="any" min="0" inputmode="decimal"'} data-op="${h(k)}"${text ? ' data-text="1"' : ""} value="${h(getPath(opt, k) ?? "")}" placeholder="blank"><span class="help">${h(HELP[k] || "")}</span></label>`;
   }).join("");
+  const partConfirm = ["supportive", "shelter"].filter(p => hasPart(opt, p)).map(p => `<p class="field"><label><input type="checkbox" class="op-part-confirmed" data-op="operations.parts.${p}.subsidy_confirmed" data-check="1"${getPath(opt, `operations.parts.${p}.subsidy_confirmed`) === true ? " checked" : ""}> The ${p === "shelter" ? "shelter's" : "supportive homes'"} own subsidy is confirmed</label></p>`).join("");
   const items = ob ? `<ul class="op-checks">${ob.items.map(i => `<li data-status="${h(i.status)}"><b>${h(i.label)}</b> <span class="pill-mini">${h(i.status)}</span> <span class="cont">${h(i.note)}</span></li>`).join("")}</ul>` : `<p class="cont">No layout in this run.</p>`;
+  // two columns where the tab is wide (26 Nov 2026, app.css): the figures on the left; on the right what confirms and
+  // signs them, in the first screen (a review the same evening: Sign these figures stood at 1,574 px, under 585 px of
+  // empty right column), then what it runs on and the checks read off the plans, with the way to the plans themselves
   return `<section class="card operator-desk" id="operator-desk" aria-labelledby="op-desk-h">
     <h2 id="op-desk-h">The operator's figures <span class="cont">· ${signed ? `signed by ${h(signed.by)}${signed.org ? ` of ${h(signed.org)}` : ""}, ${h(signed.on || "")}` : "not yet signed: the memo reads them as the manager's or the screen's placeholders"}</span></h2>
-    <p class="cont">What it takes to run ${h(opt.name ? "this building" : "the building")} for the years after it opens: enter the building's own figures, sign them as yours, then Run again; the memo then says whose they are. ${kind !== "independent" ? "Support staffing is never assumed for this kind of housing." : ""}</p>
-    <div class="op-fields">${fields}</div>
-    <p class="field"><label><input type="checkbox" id="op-confirmed"${ops.subsidy_confirmed === true ? " checked" : ""}> The operating subsidy is confirmed, with an agreement in hand</label></p>
-    <div class="op-sign">
-      <label class="field"><span class="label">Your name</span><input type="text" id="op-name" value="${h((signed && signed.by) || kept(NAME_KEY))}" autocomplete="name" maxlength="80"></label>
-      <label class="field"><span class="label">Organization</span><input type="text" id="op-org" value="${h((signed && signed.org) || kept(ORG_KEY) || opt.operator || "")}" maxlength="120"></label>
-      <button type="button" class="btn btn-primary btn-small" id="op-sign">${signed ? "Sign again" : "Sign these figures"}</button>
-      ${signed ? `<button type="button" class="btn btn-quiet btn-small" id="op-unsign">Withdraw the signature</button>` : ""}
+    <div class="op-cols">
+      <div class="op-col">
+        <p class="cont">What it takes to run ${h(opt.name ? "this building" : "the building")} for the years after it opens: enter the building's own figures, sign them as yours, then Run again; the memo then says whose they are. ${kind !== "independent" ? "Support staffing is never assumed for this kind of housing." : ""}</p>
+        <div class="op-fields">${fields}</div>
+      </div>
+      <div class="op-col">
+        <div class="op-signing">
+          <p class="field"><label><input type="checkbox" id="op-confirmed"${ops.subsidy_confirmed === true ? " checked" : ""}> The operating subsidy is confirmed, with an agreement in hand</label></p>${partConfirm}
+          <div class="op-sign">
+            <label class="field"><span class="label">Your name</span><input type="text" id="op-name" value="${h((signed && signed.by) || kept(NAME_KEY))}" autocomplete="name" maxlength="80"></label>
+            <label class="field"><span class="label">Organization</span><input type="text" id="op-org" value="${h((signed && signed.org) || kept(ORG_KEY) || opt.operator || "")}" maxlength="120"></label>
+            <button type="button" class="btn btn-primary btn-small" id="op-sign">${signed ? "Sign again" : "Sign these figures"}</button>
+            ${signed ? `<button type="button" class="btn btn-quiet btn-small" id="op-unsign">Withdraw the signature</button>` : ""}
+          </div>
+        </div>
+        <h3>The spaces it runs on</h3>
+        ${briefEditor(opt)}
+        <h3>What an operator checks first, on the plans</h3>
+        ${items}
+        ${ob ? `<p class="op-plans"><a href="#panel-drawings" class="jump">See the plans</a> <span class="cont">· the drawings and the area schedule</span></p>` : ""}
+      </div>
     </div>
-    <h3>The spaces it runs on</h3>
-    ${briefEditor(opt)}
-    <h3>What an operator checks first, on the plans</h3>
-    ${items}
   </section>`;
 }
 
@@ -83,7 +102,7 @@ export function wireOperatorDesk() {
     if (!state.option) return;
     const raw = inp.value.trim();
     state.option.operations = state.option.operations || {};
-    setPath(state.option, inp.dataset.op, raw === "" ? null : inp.dataset.text ? raw : Number(raw));
+    setPath(state.option, inp.dataset.op, inp.dataset.check ? (inp.checked ? true : null) : raw === "" ? null : inp.dataset.text ? raw : Number(raw));
     // a figure changed after signing is no longer the signed figure, and the desk says so at once (25 Nov 2026: the
     // heading kept "signed by" until the next run, which then came back unsigned without a word)
     const wasSigned = state.option.operations.signed;

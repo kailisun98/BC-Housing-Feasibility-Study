@@ -26,7 +26,10 @@
   --focus: 2px solid var(--blue);
   --topbar-h: 52px;
   --strip-h: 36px;
-  --bars-h: 88px;    /* the top bar and the status line together, for scroll margins (16 Nov 2026: the step bar went) */
+  --bars-h: 88px;    /* the top bar and the status line together, for scroll margins (16 Nov 2026: the step bar went);
+                        measured by main.js since 26 Nov 2026 (the bar wraps at 1366 px and was 119 px) */
+  --tabs-h: 41px;    /* the memo's tab strip, stuck under the bars (26 Nov 2026) */
+  --memo-max: 1600px; /* the memo's widest: every block in it ends at the same right edge (26 Nov 2026) */
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -85,6 +88,9 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .wordmark a:hover { color: #fff; }
 .wordmark .fr-mark { width: 22px; height: 22px; }
 .wordmark em { font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--on-chrome-muted); margin-left: 10px; letter-spacing: 0; }
+/* one row of bar (26 Nov 2026: the subtitle and "For the" wrapped it to 119 px at 1366, and back at 1500 to 1660,
+   where they need about 1,662 px) */
+@media (max-width: 1719.98px) { .wordmark em, #mode-key { display: none; } }
 .topbar-controls { display: flex; align-items: center; gap: 8px 12px; flex-wrap: wrap; justify-content: flex-end; margin-left: auto; }
 .topbar .eyebrow { color: var(--on-chrome-muted); }
 .asof { display: flex; align-items: center; gap: 8px; }
@@ -306,6 +312,11 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .tool-note code { color: var(--ink); }
 
 .memo { display: flex; flex-direction: column; gap: 12px; }
+/* one width for the memo and the row above it (26 Nov 2026, the wide-screen critique: at 2000 px the ask and the answers
+   stopped at 920 px, FIG 01 stood in a 460 px column at the right, and 526 px of nothing lay between): the memo is as
+   wide as the pane up to --memo-max, centred for the manager and the operator, beside the rail for the architect */
+.memo, .memo-tools { width: 100%; max-width: var(--memo-max); margin-inline: auto; }
+[data-mode="architect"] .memo, [data-mode="architect"] .memo-tools { margin-inline: 0 auto; }
 /* a memo lands: the page fades in at once, and the three answers follow one another, 60ms apart, as the list they are */
 .memo.landed { animation: land 150ms ease-out; }
 .memo.landed .answers > .answer { animation: land-answer .32s cubic-bezier(.16, 1, .3, 1) both; }
@@ -358,15 +369,64 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .memo-index li { counter-increment: sheet; }
 .memo-index li::before { content: counter(sheet, decimal-leading-zero) " "; font: 500 11px/1 var(--mono); color: var(--muted); }
 .memo-index:empty { display: none; }
-.memo-pane[data-view="summary"] .memo-index li:has(a:is([data-k="clauses"], [data-k="ledger"], [data-k="inputs"], [data-k="sources"], [data-k="stamp"])) { display: none; }
-.memo-pane[data-view="3d"] .memo-index { display: none; }
-/* a jump lands its target below the sticky bars */
-.memo-body > *, .memo-rest > .card { scroll-margin-top: calc(var(--bars-h) + 8px); }
-@media (max-width: 760px) { .memo-body > *, .memo-rest > .card { scroll-margin-top: 8px; } }
+/* the sheet index is the Reader's, who reads the long page; the other layouts move through the memo by its tabs, and
+   read the disclaimer at the foot of the answers (26 Nov 2026) */
+html:not([data-mode="reader"]) .memo-index, html:not([data-mode="reader"]) .head-disclaimer, [data-mode="reader"] .panel-disclaimer { display: none; }
+.panel-disclaimer { margin: 4px 2px 0; font-size: 12px; color: var(--muted); max-width: 72ch; }
+/* a jump lands its target below the sticky bars and the tab strip */
+.memo-panel, .memo-panel > *, .memo-panel .card, .memo-panel .figure { scroll-margin-top: calc(var(--bars-h) + var(--tabs-h) + 8px); }
+[data-mode="reader"] { --tabs-h: 0px; }
+@media (max-width: 760px) { .memo-panel, .memo-panel > *, .memo-panel .card, .memo-panel .figure { scroll-margin-top: calc(var(--tabs-h) + 8px); } }
 
-/* the answers keep a reading width: on a wide memo the wash ran 1,270 px across with the words in its left 60%
-   (24 Nov 2026); the drawings beside them, where they sit beside, already narrow the column */
-.answers { display: flex; flex-direction: column; gap: 12px; max-width: 920px; }
+/* ------------------------------------------------------------------ the memo's tabs (26 Nov 2026, memo/tabs.js)
+   Manager, Architect and Operator read one part at a time under a strip that sticks under the bars; it reads as a
+   sheet index (a mono number, the part's name, the selected one underlined in ink as the title block is ruled), not as
+   a segmented switch. The Reader has no strip: every panel shows, in the paper's order. */
+.memo-tabs { position: sticky; top: var(--bars-h); z-index: 4; display: flex; align-items: stretch; gap: 0 22px; margin: 0; padding: 0 2px;
+  background: var(--page); border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.memo-tabs::-webkit-scrollbar { display: none; }
+.memo-tabs[hidden] { display: none; }
+.memo-tab { appearance: none; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin: 0 0 -1px; padding: 0 1px;
+  background: none; border: 0; border-bottom: 2px solid transparent; font: 500 13px/1 var(--sans); color: var(--muted); cursor: pointer; white-space: nowrap;
+  transition: color var(--t-fast), border-color var(--t-fast); }
+.memo-tab .mt-n { font: 500 11px/1 var(--mono); color: var(--muted); }
+.memo-tab:hover { color: var(--ink); }
+.memo-tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+.memo-tab:focus-visible { outline: 2px solid var(--blue); outline-offset: -3px; border-radius: 3px; }
+@media (pointer: coarse) { .memo-tab { min-height: 44px; } }
+@media (max-width: 760px) { .memo-tabs { top: 0; } }
+@media (prefers-reduced-motion: reduce) { .memo-tab { transition: none; } }
+/* the panels: one shows at a time; the others are hidden="until-found" (find in page still reaches them, and a match
+   selects the tab) or plain hidden where the browser lacks it */
+.memo-panels { display: block; min-width: 0; }
+.memo-panel { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.memo-panel[hidden]:not([hidden="until-found"]) { display: none; }
+.memo-panel:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; border-radius: 4px; }
+.memo-panel.panel-in { animation: land 150ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .memo-panel.panel-in { animation: none; } }
+
+/* Answers: the ask beside the four answers where the tab is wide enough for both at a reading width, the summary
+   sticking beside what it summarises on a tall window; one column, the ask first, under 1100 px. The answers stay one
+   column (no newspaper columns: answer 3 began at the foot of the first) */
+#panel-answers { container: answers / inline-size; }
+.answers-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; }
+.memo-ask { container: ask / inline-size; }
+@container answers (max-width: 1099.98px) { .answers-grid > .answers, .answers-grid > .memo-ask { max-width: 920px; } }
+@container answers (min-width: 1100px) {
+  .answers-grid { grid-template-columns: minmax(680px, 880px) minmax(380px, 1fr); }
+  .answers-grid > .answers { grid-column: 1; grid-row: 1; }
+  .answers-grid > .memo-ask { grid-column: 2; grid-row: 1; }
+}
+/* sticky at every window height, scrolling in itself where it is taller than the window (a review the same evening:
+   on a 768 px window the ask's column stood empty beside answers 2 to 4 for 2,732 px) */
+@container answers (min-width: 1100px) {
+  .answers-grid > .memo-ask { position: sticky; top: calc(var(--bars-h) + var(--tabs-h) + 12px); max-height: calc(100vh - var(--bars-h) - var(--tabs-h) - 24px); overflow-y: auto; overscroll-behavior: contain; }
+}
+/* a narrow ask reads key over value */
+@container ask (max-width: 520px) { .memo-ask .ask-dl > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } }
+
+/* the answers' own column; its width comes from the grid above */
+.answers { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .answer { --tone: var(--muted); --wash: var(--panel); --wash-text: var(--muted); background: var(--wash); padding: 12px 14px; }
 .answer[data-verdict="pass"] { --tone: var(--s-pass-text); --wash: var(--s-pass-wash); }
 .answer[data-verdict="conditional"] { --tone: var(--s-conditional-text); --wash: var(--s-conditional-wash); }
@@ -444,6 +504,13 @@ details.sg-group[open] > summary.sg-head::before { content: "▾ "; }
 /* the operating page (23 Nov 2026): what is left and the subsidy needed carry the weight; the lines above them are plain */
 .op-table th[scope="row"] { text-align: left; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: inherit; color: inherit; }
 .op-table th.num { text-align: right; }
+/* the operating page by part of a mixed building (26 Nov 2026) */
+.op-parts-h { margin: 14px 0 6px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.op-parts { min-width: 640px; }
+.op-parts th[scope="row"] { text-align: left; font-weight: 400; text-transform: none; letter-spacing: 0; font-size: inherit; color: inherit; white-space: nowrap; }
+.op-parts th.num, .op-parts td.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.op-parts td.op-net { font-weight: 600; color: var(--ink); }
+.ask-decided { margin: 0; padding: 0 0 0 1.1em; display: grid; gap: 3px; }
 .op-table tr.op-result th, .op-table tr.op-result td.num, .op-table tr.op-ask th, .op-table tr.op-ask td.num { font-weight: 600; color: var(--ink); }
 .op-table tr.op-result td, .op-table tr.op-result th { border-top: 1px solid var(--line-strong, var(--line)); }
 .ops-confirm label { display: flex; gap: 8px; align-items: baseline; font-size: 13px; }
@@ -523,19 +590,37 @@ table.plain td.status { white-space: nowrap; }
 .stampbox .hash { font: 11px var(--mono); color: var(--muted); word-break: break-all; }
 .stampbox li { font-size: 12px; }
 
-/* ------------------------------------------------------------------ figures: drawings on white paper, beside the answers when wide */
-/* the clauses have their own area, after the figures and before the ledger, in the DOM's order (17 Nov 2026: the grid
-   named no area for them, so they fell to an implicit row under Sources and the stamp) */
-/* (20 Nov 2026) the comparison follows the four answers in every layout ("compare"), no longer above them */
-.memo-body { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "compare" "figures" "clauses" "rest"; gap: 12px; }
-.memo-body > .answers { grid-area: answers; }
-.memo-body > .memo-compare { grid-area: compare; min-width: 0; }
-.memo-body > .figures { grid-area: figures; }
-.memo-body > .memo-clauses { grid-area: clauses; min-width: 0; }
-.memo-body > .memo-rest { grid-area: rest; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-/* wide: the figures beside the answers, then the clauses, the ledger and the rest across the full width */
-@media (min-width: 1600px) { .memo-body { grid-template-columns: minmax(0, 1fr) 460px; grid-template-areas: "answers figures" "compare compare" "clauses clauses" "rest rest"; align-items: start; } }
-.figures { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+/* ------------------------------------------------------------------ figures: drawings on white paper, in the Drawings tab */
+/* (26 Nov 2026) the 460 px column beside the answers at 1600 px is gone with the tabs: the drawings have their own tab
+   at the memo's full width, in rows (a review the same evening: CSS columns left 227 to 582 px holes and drew the
+   engine's sheets under their own width, their 9 px labels at 6.9 px). FIG 01 and FIG 02, which set their own labels
+   at 11.5 px for any width, pair from a 1240 px tab; the engine's sheets are drawn at their own size (640 to about
+   1,000 px, by run), so each takes a row, centred on its sheet, and is never shrunk while the tab holds it. The area
+   schedule follows at full width. */
+#panel-drawings { container: drawings / inline-size; }
+.figures { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; min-width: 0; }
+.figure.sheet .sheet-body svg { margin-inline: auto; }
+@container drawings (min-width: 1240px) {
+  .figures { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+  .figures > .figure.sheet, .figures > :not(.figure) { grid-column: 1 / -1; }
+}
+.memo-compare, .memo-clauses { min-width: 0; }
+/* Inputs and sources: the sources beside the inputs and the fingerprint where the tab is wide (a review the same
+   evening: at 2000 px the text stopped at 72ch in 1,530 px cards) */
+#panel-inputs { container: inputs / inline-size; }
+.inputs-grid { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+@container inputs (min-width: 1240px) {
+  .inputs-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(360px, 1fr); align-items: start; }
+  .inputs-grid > .sources { grid-column: 1; grid-row: 1 / span 2; }
+  .inputs-grid > .inputs-used { grid-column: 2; grid-row: 1; }
+  .inputs-grid > .stampbox { grid-column: 2; grid-row: 2; }
+}
+[data-mode="reader"] .inputs-grid { display: contents; }
+/* Side by side keeps A and B within reach of each other: its pickers, tables and drawing take a 1,120 px measure,
+   the same for each so the columns stay aligned (at 2000 px they were 675 px apart in a 1,500 px table) */
+#side-by-side > * { max-width: 1120px; }
+/* the Comparison tab is the comparison: its fold's line repeats the tab, so it shows only on the Reader's long page */
+html:not([data-mode="reader"]) #panel-comparison .compare-fold > summary { display: none; }
 /* a drawing's card is white paper in both themes, and the words on it take the paper's own ink (17 Nov 2026: at night
    the sheet titles, notes and the exits fold stayed night ink on white, 1.2:1) */
 .figure { padding: 10px 12px 10px; background: var(--c-paper); margin: 0; color: var(--c-drawink); color-scheme: light;
@@ -1020,18 +1105,6 @@ table.plain td.status { white-space: nowrap; }
 .reading-findings .finding { margin: 2px 0 0; }
 .reading-findings .who { margin: 2px 0 0; font-size: 12px; }
 
-/* ------------------------------------------------------------------ the view: summary, detailed, 3D preview */
-.view-switch { margin-left: auto; align-self: center; }
-.memo-pane[data-view="summary"] .memo-rest, .memo-pane[data-view="summary"] #changes { display: none; }
-.memo-pane[data-view="3d"] .memo-body > .answers, .memo-pane[data-view="3d"] .memo-rest, .memo-pane[data-view="3d"] .memo-body > .figures, .memo-pane[data-view="3d"] #side-by-side, .memo-pane[data-view="3d"] #changes { display: none; }
-.preview3d { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin: 0 0 12px; }
-.preview3d .figure { padding: 10px 12px; background: var(--c-paper); border: 1px solid var(--line); border-radius: var(--r-panel); box-shadow: var(--shadow); margin: 0; }
-.preview3d .p3-axon { grid-column: 1 / -1; }
-.preview3d .fig-body svg, .preview3d .fig-section svg { max-height: 560px; }
-.preview3d .p3-axon svg { max-height: 640px; cursor: grab; touch-action: pan-y; user-select: none; }
-.preview3d figcaption { font-size: 12px; color: var(--c-drawmuted); margin-top: 8px; line-height: 1.45; }
-@media (max-width: 1100px) { .preview3d { grid-template-columns: 1fr; } }
-
 /* ------------------------------------------------------------------ issuing, and the chip that says a run was issued to you */
 /* the issue form opens where the button was pressed (the guide's stop 7 or the export bar), never somewhere else
    on the page (16 Nov 2026: it used to scroll the reader to the foot of the page) */
@@ -1058,7 +1131,31 @@ table.plain td.status { white-space: nowrap; }
 @media print { .me { display: none; } }
 .issue-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--b-amber-night); box-shadow: 0 0 0 3px color-mix(in srgb, var(--b-amber-night) 30%, transparent); }
 @media (max-width: 760px) { .issue-chip { white-space: normal; text-align: left; } }
-[data-mode="reader"] #issue-btn, [data-mode="reader"] #issue-panel, [data-mode="reader"] #guide { display: none !important; }
+/* the chip never wraps the bar (26 Nov 2026): capped under 1500 px, the whole text in its title and its name */
+.issue-chip .chip-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 761px) and (max-width: 1499.98px) { .issue-chip { max-width: 260px; } }
+[data-mode="reader"] #issue-top, [data-mode="reader"] #guide { display: none !important; }
+/* Issue in the top bar (26 Nov 2026): an outline pill on the ink bar, as Run again is; a draft carries the amber dot
+   (amber already means pending); where it cannot issue it stays reachable, dashed, and a press says why */
+.issue-top { position: relative; }
+.issue-btn { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 6px 14px; border: 1px solid var(--chrome-line); border-radius: 999px; background: transparent;
+  color: var(--on-chrome); font: 500 12.5px/1 var(--sans); white-space: nowrap; cursor: pointer; transition: background-color var(--t-fast); }
+.issue-btn:hover:not([aria-disabled="true"]) { background: rgba(255, 255, 255, .08); color: #fff; }
+.issue-btn.draft::before { content: ""; flex: 0 0 auto; width: 6px; height: 6px; border-radius: 50%; background: var(--b-amber-night); }
+.issue-btn[aria-disabled="true"] { color: var(--on-chrome-muted); border-style: dashed; cursor: help; }
+.issue-btn:focus-visible { outline: 2px solid var(--b-signal); outline-offset: 2px; }
+.issue-pop { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(560px, calc(100vw - 32px)); padding: 12px; background: var(--panel); color: var(--ink);
+  border: 1px solid var(--line); border-radius: var(--r-panel); box-shadow: 0 10px 30px rgba(0, 0, 0, .25); color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .issue-pop { color-scheme: dark; } }
+:root[data-theme="dark"] .issue-pop { color-scheme: dark; }
+.issue-pop .issue-panel { margin: 0; padding: 0; border: 0; background: transparent; max-width: none; }
+.issue-pop .help { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+.issue-send { margin: 0; font-size: 12.5px; color: var(--muted); }
+.issue-why-line { margin: 0 0 8px; font-size: 13px; line-height: 1.45; }
+.issue-pop .form-actions { margin-top: 0; }
+.board-draft { margin: 0; font-size: 12.5px; color: var(--muted); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+@media (pointer: coarse) { .issue-btn { min-height: 44px; } }
+@media print { .issue-top { display: none !important; } }
 [data-mode="architect"] #guide { display: none !important; }
 
 /* ------------------------------------------------------------------ who is reading: the three flows as three layouts
@@ -1068,28 +1165,10 @@ table.plain td.status { white-space: nowrap; }
 /* the architect's Revit leads: moved first in the DOM by modes.js, so the keyboard meets it first too (24 Nov 2026: a
    CSS order put it first on screen and last in the tab order) */
 [data-mode="architect"] #export-actions #revit-btn { background: var(--ink); color: var(--panel); border-color: transparent; }
-/* the architect reads the four answers, then the drawings at full width, two sheets to a row, the plans (and the
-   block editor on them) across the whole width; the ledger follows */
-[data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "compare" "figures" "clauses" "rest"; }
+/* the architect's sheets draw at their full height where the Drawings tab is wide (the two-column rule for the
+   drawings, and the answers' layout, are the panels' own container queries since 26 Nov 2026) */
 @media (min-width: 1100px) {
   [data-mode="architect"] .figure.sheet .sheet-body svg { max-height: none; }
-}
-/* the sheets two to a column only where a column is wide enough to read them: from 1100 px two columns shrank them to
-   416 px and their 11 px labels to 4 to 6 px (17 Nov 2026). The columns fill rather than leave a row-high band. */
-@media (min-width: 1800px) {
-  [data-mode="architect"] .figures { display: block; columns: 2; column-gap: 12px; }
-  [data-mode="architect"] .figures > * { break-inside: avoid; margin-bottom: 12px; }
-  [data-mode="architect"] .figure.sheet[data-sheet="plans"] { column-span: all; }
-}
-@media (min-width: 1600px) {
-  [data-mode="architect"] .memo-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: "answers" "compare" "figures" "clauses" "rest"; }
-  /* the unverified line and the words fold run across both columns, under the four answers (20 Nov 2026) */
-  [data-mode="architect"] .memo-body > .answers > .unverified-line, [data-mode="architect"] .memo-body > .answers > .words { column-span: all; }
-  /* two columns that fill: a grid left a card-sized hole under a short answer (16 Nov 2026), so the answers flow
-     down one column and into the next instead */
-  [data-mode="architect"] .memo-body > .answers { display: block; columns: 2; column-gap: 12px; max-width: none; }
-  [data-mode="architect"] .memo-body > .answers > .answer { break-inside: avoid; margin-bottom: 12px; }
-  [data-mode="architect"] .memo-body > .answers > .answer:last-child { margin-bottom: 0; }
 }
 [data-mode="reader"] { --bars-h: 88px; }
 [data-mode="reader"] .asof, [data-mode="reader"] #run-btn, [data-mode="reader"] #engine-chip,
@@ -1100,8 +1179,10 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .panes, [data-mode="reader"] .panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
 [data-mode="reader"] .memo-pane { width: min(100%, 980px); margin-inline: auto; padding: 24px 24px 64px; }
 [data-mode="reader"] .memo { gap: 16px; }
-/* the reader's order is the paper's: the answers, the comparison, the clauses, the massing, then the ledger (15 Nov 2026) */
-[data-mode="reader"] .memo-body { display: contents; }
+/* the reader's order is the paper's: the answers, the comparison, the clauses, the massing, then the ledger (15 Nov 2026).
+   The tabs' panels and the answers' grid take no box of their own here (26 Nov 2026), so the parts are the memo's own
+   items and the order rules place them */
+[data-mode="reader"] .memo-panels, [data-mode="reader"] .memo-panel, [data-mode="reader"] .answers-grid { display: contents; }
 [data-mode="reader"] .memo > .memo-head { order: 0; }
 [data-mode="reader"] .memo > .issue-note, [data-mode="reader"] .memo > .stale-band { order: 1; }
 [data-mode="reader"] .memo .answers { order: 2; }
@@ -1109,9 +1190,9 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .memo .memo-clauses { order: 5; }
 [data-mode="reader"] .memo .figures { order: 6; }
 /* the front sheet before the answers, the area schedule after the drawings (25 Nov 2026: it stood before answer 1) */
-[data-mode="reader"] .memo > .memo-ask { order: 1; }
+[data-mode="reader"] .memo .memo-ask { order: 1; }
 [data-mode="reader"] .memo .memo-areas { order: 6; }
-[data-mode="reader"] .memo .memo-rest { order: 7; }
+[data-mode="reader"] #panel-ledger > *, [data-mode="reader"] #panel-inputs .inputs-grid > * { order: 7; }
 /* a reference chip on the theme's own group fill (17 Nov 2026: `--panel-2` was never defined, so the chip kept a light
    fallback under night ink, 1.06:1) */
 .ref { font: 600 11px/1 var(--mono); color: var(--ink); background: var(--group); border-radius: 3px; padding: 2px 5px; margin-right: 4px; white-space: nowrap; }
@@ -1151,6 +1232,8 @@ table.plain td.status { white-space: nowrap; }
 .route-t { grid-area: t; font-weight: 600; font-size: 13px; }
 .route-s { grid-area: s; font-size: 12px; color: var(--muted); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .route-row.done:not(.current) .route-s { color: var(--ink); }
+/* row 02 while Continue waits on a figure (26 Nov 2026) */
+.route-s.route-wait { color: var(--s-uncertain-text); }
 .route-memo { grid-template-areas: "n t"; margin-top: 4px; border-top: 1px solid var(--line); border-radius: 0 0 6px 6px; padding-top: 11px; }
 .route-memo .route-n { font-weight: 600; color: var(--ink); }
 .route-then { margin: 4px 0 0; padding: 10px 6px 0 44px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); line-height: 1.45; }
@@ -1158,7 +1241,7 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="manager"] .rail-toggle { margin-bottom: 2px; }
 
 /* the stage: a head, one card, and on a blank page the memo's title block in outline */
-.memo.stage-on { max-width: 900px; gap: 14px; }
+.memo.stage-on { max-width: 900px; margin-inline: 0; gap: 14px; }
 .stage-head { padding: 6px 2px 0; }
 .stage-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 14px; }
 .stage-title .btn { margin-left: auto; }
@@ -1214,6 +1297,40 @@ table.plain td.status { white-space: nowrap; }
 .ask-table tbody th .ask-why { display: block; margin-top: 2px; font-size: 12px; font-weight: 400; color: var(--muted); line-height: 1.4; max-width: 52ch; }
 .ask-table .ask-why a { color: var(--blue); }
 .ask-lead { margin: 0; font-size: 12.5px; color: var(--muted); max-width: 70ch; }
+
+/* ------------------------------------------------------------------ stop 02 laid out again (26 Nov 2026, a UX
+   designer's brief): the decision first, every default in words, the rest on request, Continue always in reach */
+/* the questions as two columns, who answers said after the question where it is not the manager */
+.ask-table.ask-two tbody th { width: 52%; }
+.ask-who-note { font-weight: 400; color: var(--muted); font-size: 12px; }
+/* For: one sentence that opens */
+.for-fold > summary { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-size: 13.5px; font-weight: 400; line-height: 1.45; }
+.for-fold > summary::before { align-self: center; }
+.for-fold .for-line { color: var(--ink); }
+.fold-act { font-size: 12.5px; color: var(--blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.for-fold[open] > summary .fold-act { display: none; }
+.for-fold[open] { display: flex; flex-direction: column; gap: 10px; }
+.lot-line { margin: 0; font-size: 12.5px; color: var(--muted); }
+.ask-fold[open] { display: flex; flex-direction: column; gap: 10px; }
+/* Continue in reach at every width: the card's foot sticks to the window's foot */
+.stage-foot { position: sticky; bottom: 0; z-index: 2; margin: 18px -20px -16px; padding: 12px 20px; background: var(--panel); border-top: 1px solid var(--line); border-radius: 0 0 var(--r-panel) var(--r-panel); }
+/* what the lot and the rules allow: beside the card from 1600 px, open; under it, folded, below */
+.stage-aside { padding: 12px 16px; }
+.stage-aside > summary { cursor: pointer; list-style: none; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; font: 600 11px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stage-aside > summary::-webkit-details-marker { display: none; }
+.stage-aside > summary::before { content: ""; width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); transition: transform .15s ease-out; align-self: center; margin-right: 4px; }
+.stage-aside[open] > summary::before { transform: rotate(45deg); }
+.stage-aside > summary .cont { text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 12px; }
+.stage-aside .aside-body { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; font-size: 12.5px; }
+.stage-aside .aside-h { font: 600 11px/1.4 var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 6px 0 0; }
+.stage-aside .dd-line { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .stage-aside > summary::before { transition: none; } }
+@media (min-width: 1600px) {
+  .memo.stage-on[data-stage="2"] { max-width: 1400px; display: grid; grid-template-columns: minmax(0, 900px) minmax(340px, 480px); gap: 14px; align-items: start; }
+  .memo.stage-on[data-stage="2"] > .stage-head { grid-column: 1 / -1; }
+  .memo.stage-on[data-stage="2"] > .stage-card { grid-column: 1; }
+  .memo.stage-on[data-stage="2"] > .stage-aside { grid-column: 2; grid-row: 2; position: sticky; top: calc(var(--bars-h) + 8px); max-height: calc(100vh - var(--bars-h) - 16px); overflow-y: auto; overscroll-behavior: contain; }
+}
 .field-err { margin: -6px 0 0; font-size: 12.5px; font-weight: 500; color: var(--s-fail-text); }
 .addr-row input[aria-invalid="true"] { border-color: var(--s-fail); }
 /* 02 and 03: keys beside their content, the way the memo's title block sets them */
@@ -1313,7 +1430,7 @@ button.fig4-v:hover::after { background: var(--ink); }
   .stage-card { padding: 14px 14px 0; }
   .stage-card h2 { font-size: 17px; margin-bottom: 12px; }
   /* the card's one filled button stays under the thumb */
-  .stage-foot { position: sticky; bottom: 0; z-index: 2; margin: 16px -14px 0; padding: 10px 14px; background: var(--panel); border-top: 1px solid var(--line); border-radius: 0 0 var(--r-panel) var(--r-panel); flex-wrap: nowrap; }
+  .stage-foot { margin: 16px -14px 0; padding: 10px 14px; flex-wrap: nowrap; }
   .foot-quiet { flex: 0 1 auto; min-width: 0; }
   .foot-quiet .btn { white-space: normal; text-align: left; }
   .kbd-help { display: none; }
@@ -1442,7 +1559,13 @@ button.fig4-v:hover::after { background: var(--ink); }
   .card { border: 0; padding: 0 0 10pt; break-inside: avoid; box-shadow: none; }
   .ledger, .sources { break-inside: auto; }
   .memo-meta > div { border-right: 0; margin-right: 0; padding-right: 12px; flex-basis: 30%; }
-  .memo-body { display: block; }
+  /* the browser's own print of the page prints every part, in the DOM's order (the PDFs go through paper.js) */
+  .memo-tabs, .panel-disclaimer { display: none !important; }
+  .memo-panels, .memo-panel, .answers-grid, .inputs-grid { display: block !important; content-visibility: visible !important; }
+  .memo-panel + .memo-panel, .answers-grid > * + *, .inputs-grid > * + * { margin-top: 10pt; }
+  .figures { display: block !important; }
+  .figures > * + * { margin-top: 10pt; }
+  html:not([data-mode="reader"]) .head-disclaimer { display: block; }
   .figure { break-inside: avoid; }
   .figure .fig-body svg, .figure .fig-section svg { max-height: 120mm; }
   /* closed layers print open: the arithmetic and the clauses are the point of the memo (app.js also opens them on beforeprint) */
@@ -1518,9 +1641,6 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .clauses .rule-sec-fold > summary::-webkit-details-marker { display: none; }
 .clauses .rule-sec-fold > summary::after { content: " more"; color: var(--blue); }
 .clauses .rule-sec-fold[open] > summary { display: none; }
-/* Summary is the title block, the four answers and the massing: the clauses and the architect's sheets wait for
-   Detailed (17 Nov 2026: Summary ran 8,400 px against Detailed's 10,300) */
-.memo-pane[data-view="summary"] .memo-clauses, .memo-pane[data-view="summary"] .figure.sheet, .memo-pane[data-view="summary"] .sheet-hint { display: none; }
 /* the note that holds Continue back sits beside it */
 .foot-main .stage-block { margin: 0; max-width: 46ch; font-size: 12px; text-align: right; }
 .stage-foot:has(.stage-block) { flex-wrap: wrap; }
@@ -1537,8 +1657,8 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .ledger .rule-sec-fold[open] > summary { display: none; }
 /* prose in the answers keeps a reading measure, tables keep the card's width (17 Nov 2026: findings ran about 190
    characters a line at 1366 px) */
-.memo-body .answer p:not(.verdict), .memo-body .answer li, .memo-body .answer .finding { max-width: 82ch; }
-.memo-body .answer .also-uncertain { margin-top: 10px; font-size: 12px; }
+.memo-panels .answer p:not(.verdict), .memo-panels .answer li, .memo-panels .answer .finding { max-width: 82ch; }
+.memo-panels .answer .also-uncertain { margin-top: 10px; font-size: 12px; }
 
 /* ------------------------------------------------------------------ (20 Nov 2026) the memo after the six-reviewer
    critique: the answers first, the money and the open items drawn, the words a board reader asked about */
@@ -1588,7 +1708,6 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 .compare-fold[open] .cf-open { display: inline; }
 .compare-fold[open] > summary { margin-bottom: 12px; }
 .compare-fold > .card + .card { margin-top: 12px; }
-.memo-pane[data-view="3d"] .memo-compare { display: none; }
 /* the money drawn: the capital stack (memo/stack.js) beside the four figures, on white paper in both themes, in the
    drawing's own tones; its words are HTML at the drawing label size */
 .money-draw { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 12px 20px; align-items: start; margin: 0 0 12px; }
@@ -1720,10 +1839,23 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
 [data-mode="operator"] #dl-massing, [data-mode="operator"] #revit-btn, [data-mode="operator"] .ledger .tools, [data-mode="operator"] #edit-blocks,
 [data-mode="operator"] #sheet-editor, [data-mode="operator"] .bnd-tools, [data-mode="operator"] .mass-tools, [data-mode="operator"] #guide, [data-mode="operator"] #rail-tabs { display: none !important; }
 [data-mode="operator"] .panes, [data-mode="operator"] .panes.no-inputs { grid-template-columns: minmax(0, 1fr); }
-[data-mode="operator"] .memo-pane { width: min(100%, 1080px); margin-inline: auto; padding: 24px 24px 64px; }
+/* (26 Nov 2026) the pane's 1080 px cap is gone: the memo's own --memo-max centres it, as the manager's is; at 1600 px
+   and over the answers were 560 px wide in the operator's 1,032 px column */
+[data-mode="operator"] .memo-pane { padding: 24px 24px 64px; }
 .operator-desk { display: grid; gap: 12px; }
 .operator-desk h2 { font-size: 20px; font-weight: 400; margin: 0; }
-.operator-desk h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; margin: 8px 0 0; color: var(--muted); }
+/* a key, by the Key Rule: 11 px, 600, tracked caps (it was 13 px) */
+.operator-desk h3 { font: 600 11px/1.4 var(--sans); text-transform: uppercase; letter-spacing: .06em; margin: 8px 0 0; color: var(--muted); }
+.op-cols { display: grid; gap: 12px; }
+.op-col { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.op-col > h3:first-child { margin-top: 0; }
+.op-plans { margin: 0; font-size: 12.5px; }
+.op-signing { display: grid; gap: 8px; }
+.op-signing .field { margin: 0; }
+@container operating (min-width: 1100px) { .op-signing { padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--r-panel); background: var(--field); } }
+/* the figures and the signature on the left, what the building runs on and the plans' checks on the right */
+#panel-operating { container: operating / inline-size; }
+@container operating (min-width: 1100px) { .op-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 32px; align-items: start; } }
 .op-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px 14px; }
 .op-fields input, .op-sign input { width: 100%; min-height: 34px; }
 .op-sign { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end; }
@@ -1783,4 +1915,3 @@ html:not(.settled) .seg-thumb, html:not(.settled) .panes { transition: none; }
   .src-edit td { width: auto !important; padding: 0; }
 }
 @media print { .memo-ask { break-inside: avoid; } }
-.memo-ask { max-width: 920px; }

@@ -1,12 +1,11 @@
-/* How the page is laid out for who is reading (manager, architect, reader), the left column folding, the Summary |
-   Detailed | 3D view of the memo, and the step a reader is working in. */
+/* How the page is laid out for who is reading (manager, architect, reader, operator), the left column folding, and the
+   step a reader is working in. The memo's tabs are memo/tabs.js. */
 
 import { $, $$, setStatus } from "./core/util.js";
 import { editor, guide, state } from "./core/state.js";
 import { syncCards } from "./schedule.js";
 import { renderClaude } from "./claude.js";
 import { renderMemo, renderQuiet } from "./memo/memo.js";
-import { renderPreview3D } from "./figures/cards.js";
 import { closeExportPanel } from "./revit.js";
 import { renderGuide } from "./route-stage.js";
 import { closeIssuePanel, issueButtonLabel, pollIssues } from "./issue.js";
@@ -62,17 +61,6 @@ export function watchSteps() {
   for (const id of Object.keys(STEP_OF)) { const el = document.getElementById(id); if (el) io.observe(el); }
 }
 
-export const VIEW_KEY = "ffm.view";
-
-export function setView(v, remember = true) {
-  if (!["summary", "detailed", "3d"].includes(v)) v = "detailed";
-  state.view = v;
-  $(".memo-pane").dataset.view = v;
-  $$("#view-switch .segbtn").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.view === v)));
-  if (v === "3d") renderPreview3D(); else { const p = $("#preview3d"); if (p) p.remove(); }
-  if (remember) { try { localStorage.setItem(VIEW_KEY, v); } catch (e) { /* fine */ } }
-}
-
 /* The left column folds to a strip with its own arrow and opens again on another click. The reader's own choice is
    kept for their next visit, where the browser allows it; the manager's folds by itself once a memo is on screen. */
 export const RAIL_KEY = "ffm.inputs.collapsed";
@@ -123,7 +111,6 @@ export function setMode(mode, remember = true, announce = true) {
   if (mode === "reader" || mode === "operator") {
     showInputs(false, false);
     closeExportPanel();
-    if (state.view !== "detailed") setView("detailed", false);   // the reader has no view switch: never land them in the 3D view with the answers hidden
   } else {
     // the manager's route folds once a memo is on screen; the architect works from the schedules beside it
     showInputs(!(mode === "manager" && state.run), false);

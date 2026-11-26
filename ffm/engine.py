@@ -395,6 +395,20 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         # fail on an option that targeted the Community Housing Fund alone)
         and not (r["layer"] == "E" and targets and r["rule_id"] not in targets)
     ]
+    # What is already decided on the site (26 Nov 2026; the 25 Nov panel: "an enacted rezoning, a permit, a land
+    # agreement have no place, so approved schemes read as proposals"): each said with its date, and a development permit
+    # issued settles what the permit decides, so those items leave the open list
+    from .checks import permit_issued_on, land_signed_on
+    decided = []
+    if rezoning_approved_on(option) and proposes_rezoning(option):
+        decided.append({"what": "rezoning", "on": rezoning_approved_on(option), "words": f"Council approved the rezoning ({option.get('rezoning_path')}) on {rezoning_approved_on(option)}"})
+    if permit_issued_on(option):
+        decided.append({"what": "permit", "on": permit_issued_on(option), "words": f"The development permit was issued on {permit_issued_on(option)}; it settled the yards, the trees and what stays on the lot"})
+        unsure = [u for u in unsure if u["rule_id"] not in PERMIT_SETTLES]
+    if land_signed_on(option):
+        tenure = {"owned": "ownership", "lease_60_plus": "a lease of 60 years or more at a nominal rent", "lease_shorter": "a shorter lease",
+                  "air_space_parcel": "an air-space parcel or strata lot"}.get(str(option.get("land_tenure") or ""), "the land agreement")
+        decided.append({"what": "land", "on": land_signed_on(option), "words": f"The land is held by {tenure}, signed on {land_signed_on(option)}"})
     # who to ask, by organisation and role (23 Nov 2026: every item named "Manager" or "Architect" and nobody outside
     # the project). The role is the kind of person who settles the item; no name or phone number is invented.
     for u in unsure:
@@ -402,7 +416,11 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
         if who:
             u["contact"] = who
             u["action"] = (u["action"].rstrip() + (" " if u["action"] else "") + f"Ask: {who}.").strip()
-    return {"counts": counts, "answers": {"allowed": allowed, "funded": funded, "unsure": unsure}}
+    return {"counts": counts, "answers": {"allowed": allowed, "funded": funded, "unsure": unsure, "decided": decided}}
+
+
+# what an issued development permit settles, so its items leave the open list (26 Nov 2026)
+PERMIT_SETTLES = ("cov.trees.replacement", "coverage.yards", "coverage.heritage", "coverage.existing_buildings")
 
 
 CONTACTS = {      # by coverage item or check: the organisation and the role that settles it

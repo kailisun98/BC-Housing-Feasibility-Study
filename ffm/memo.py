@@ -95,7 +95,7 @@ def layout_open_items(lay: dict | None) -> list[dict]:
         words = ", ".join((f"{s['units']} " if s.get("units") else "") + str(s.get("label") or "").lower() for s in short)
         out.append({"title": "Homes that do not fit the plates", "status": "conditional",
                     "action": f"Architect: {placed} of {total} homes fit the plates on {len(lay.get('floors') or [])} floors at the unit sizes assumed; did not fit: {words}. "
-                              f"More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all {total}."})
+                              f"More storeys, a larger plate, smaller homes or a smaller program. The funders' checks count all {total}; the money counts the {placed} placed."})
     # the floor area the rules test against the floor area the plans draw (25 Nov 2026: 340 m² tested, 307 m² drawn)
     tot = lay.get("totals") or {}
     tested, drawn = tot.get("gfa_tested_m2"), ((lay.get("area_schedule") or {}).get("totals") or {}).get("gross_m2")
@@ -209,8 +209,13 @@ def front_sheet(ledger: dict, proforma: dict | None = None, layout: dict | None 
     items = list(ans.get("unsure") or []) + layout_open_items(layout)
     ranked = sorted(range(len(items)), key=lambda i: (OPEN_RANK.get(items[i].get("status"), 3), i))
     top = [{"title": items[i]["title"], "status": items[i]["status"], "action": items[i].get("action") or ""} for i in ranked[:3]]
+    # what is already decided (26 Nov 2026): the engine's list, and the capital committed
+    decided = [d["words"] for d in ans.get("decided") or []]
+    committed = [r for r in ((proforma or {}).get("funding") or {}).get("sources") or [] if r.get("status") == "committed" and r.get("value")]
+    if committed:
+        decided.append("Committed: " + ", ".join(f"{r['label']} {_cad(r['value'])}" for r in committed))
     return {"housed": housed, "operator": operator, "programs": programs, "money": money,
-            "decision": str(opt.get("decision_sought") or "").strip() or None,
+            "decision": str(opt.get("decision_sought") or "").strip() or None, "decided": decided,
             "verdicts": verdicts, "open_items": top, "open_total": len(items)}
 
 
@@ -227,6 +232,7 @@ def front_markdown(fs: dict) -> list[str]:
     L = ["## The ask", "", "| | |", "|---|---|",
          f"| Who is housed | {fs['housed']} |", f"| Who operates | {fs['operator']} |", f"| Which program | {fs['programs']} |",
          f"| The amount | {amount} |", f"| The decision wanted | {fs['decision'] or 'not stated'} |",
+         *([f"| Already decided | {'. '.join(fs['decided'])}. |"] if fs.get("decided") else []),
          "| The answers | " + " · ".join(f"{v['label']}: {v['verdict']}" for v in fs["verdicts"]) + " |"]
     if fs["open_items"]:
         L.append(f"| The top {len(fs['open_items'])} of {fs['open_total']} open items | "

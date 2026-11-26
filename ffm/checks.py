@@ -140,15 +140,30 @@ RENTAL_TENURES = ("social_housing", "secured_market_rental")
 NON_PROFIT_OWNERS = ("non_profit_society", "non_profit", "government", "co_op", "cooperative", "municipality", "province")
 
 
-def rezoning_approved_on(option: Option) -> str | None:
-    """The date Council approved the rezoning the option names (`rezoning_approved_on`, an ISO date), in words, or None
-    where it is a proposal. Pure."""
-    v = str((option or {}).get("rezoning_approved_on") or "").strip()
+def _date_words(v: Any) -> str | None:
+    """An ISO date in words ("25 Jul 2024"), other text as typed, or None for a blank. Pure."""
+    v = str(v or "").strip()
     m = re.match(r"^(\d{4})-(\d\d)-(\d\d)", v)
     if not m:
         return v or None
     months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
     return f"{int(m.group(3))} {months[int(m.group(2)) - 1]} {m.group(1)}"
+
+
+def rezoning_approved_on(option: Option) -> str | None:
+    """The date Council approved the rezoning the option names (`rezoning_approved_on`, an ISO date), in words, or None
+    where it is a proposal. Pure."""
+    return _date_words((option or {}).get("rezoning_approved_on"))
+
+
+def permit_issued_on(option: Option) -> str | None:
+    """The date the development permit was issued (`permit_issued_on`), in words, or None. Pure."""
+    return _date_words((option or {}).get("permit_issued_on"))
+
+
+def land_signed_on(option: Option) -> str | None:
+    """The date the land agreement was signed (`land_agreement_signed_on`), in words, or None. Pure."""
+    return _date_words((option or {}).get("land_agreement_signed_on"))
 
 
 def operator_of(option: Option) -> str:

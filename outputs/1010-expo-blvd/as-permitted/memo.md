@@ -15,8 +15,9 @@
 | Which program | the Community Housing Fund, the CMHC Affordable Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $151.4M. Asked: nothing from a program. Still to find: $151.4M (100% of the cost). |
 | The decision wanted | not stated |
+| Already decided | The development permit was issued on 5 Feb 2025; it settled the yards, the trees and what stays on the lot. |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not needed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Unsure |
-| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. The agreement between the owner and the operator (uncertain). 3. Transit-oriented area minimum allowable height and density (uncertain). |
+| The top 3 of 4 open items | 1. The agreement between the owner and the operator (uncertain). 2. Transit-oriented area minimum allowable height and density (uncertain). 3. Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755) (uncertain). |
 
 ## 1. Is it allowed?
 **Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not needed** (the option is allowed outright and proposes no rezoning)
@@ -35,11 +36,9 @@
 ## 3. What is still unsure, and who resolves it?
 | Item | Status | Who / what |
 |---|---|---|
-| Yards not checked: no CD-1 (324) yard rule in the rules | Uncertain | Architect: read the yard clauses in CD-1 (324)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
 | The agreement between the owner and the operator | Uncertain | Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it. Ask: the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes. |
 | Transit-oriented area minimum allowable height and density | Uncertain | Manager: check the City's transit-oriented areas map for this address and record the tier at 01. Ask: the City of Vancouver's planning staff, or the Province's transit-oriented areas map. |
 | Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755) | Uncertain | Manager: supply share of units for households below the Housing Income Limits, housing agreement term. Ask: the City of Vancouver's housing policy staff, who draft the Housing Agreement. |
-| Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (rent-tier split; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 
 ## 4. Does the money work? (feasibility grade)

@@ -3531,6 +3531,11 @@
       "note": "one bay across the plate at its centre for two stairs, the elevator and risers"
     },
     {
+      "key": "lift_shaft_m",
+      "value": 2.6,
+      "note": "an elevator shaft with its walls: a core holds one elevator beside its stairs, and one more for each 2.6 m it runs longer than the core bay (its depth across the corridor counts, so a 7 m core 11 m deep holds two)"
+    },
+    {
       "key": "services_base_m2",
       "value": 40.0,
       "note": "mechanical, electrical, garbage and recycling on the ground floor"

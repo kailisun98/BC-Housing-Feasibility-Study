@@ -32,6 +32,7 @@ LAYOUT_ASSUMPTIONS = {
     "partition_allowance": (1.08, "gross unit area over net: walls and the entry, 8% at this stage (the net areas already carry the suggestion's 10% design allowance)"),
     "corridor_width_m": (1.8, "a double-loaded corridor, the wider of the two usual widths"),
     "core_bay_m": (7.0, "one bay across the plate at its centre for two stairs, the elevator and risers"),
+    "lift_shaft_m": (2.6, "an elevator shaft with its walls: a core holds one elevator beside its stairs, and one more for each 2.6 m it runs longer than the core bay (its depth across the corridor counts, so a 7 m core 11 m deep holds two)"),
     "services_base_m2": (40.0, "mechanical, electrical, garbage and recycling on the ground floor"),
     "bicycle_m2_per_space": (1.0, "a bicycle space with its aisle share"),
     "amenity_m2_per_unit": (1.5, "indoor amenity, at least 40 m²; a placeholder until the operator's brief"),
@@ -246,6 +247,21 @@ def _point_geometry(option: dict, massing: dict) -> dict | None:
         return None
     corr, _ = LAYOUT_ASSUMPTIONS["corridor_width_m"]
     cw = cd = LAYOUT_ASSUMPTIONS["core_bay_m"][0]
+    # the elevators the homes want (26 Nov 2026): the core runs a shaft longer along the plate's longer side (else the
+    # other) for each one its square holds too few of (`lift_room`), where the homes round it keep their least depth;
+    # where neither side has the room the square stays, and the operator's checklist says the elevators it lacks
+    homes = sum(int(v or 0) for v in (option.get("units") or {}).values() if isinstance(v, (int, float)) and not isinstance(v, bool))
+    beds_in = option.get("beds") if isinstance(option.get("beds"), (int, float)) and not isinstance(option.get("beds"), bool) else 0
+    short = lifts_needed(homes, storeys, beds=int(beds_in or 0))["lifts"] - lift_room({"w": cw, "d": cd})
+    if short > 0:
+        shaft, _ = LAYOUT_ASSUMPTIONS["lift_shaft_m"]
+        least = LAYOUT_ASSUMPTIONS["min_home_depth_m"][0]
+        longer = round(cw + short * shaft, 2)
+        for along_x in ((True, False) if W >= D else (False, True)):
+            span = W if along_x else D
+            if (span - longer - 2 * corr) / 2 >= least - 1e-9:
+                cw, cd = (longer, cd) if along_x else (cw, longer)
+                break
     iw, idp = cw + 2 * corr, cd + 2 * corr                 # the core and its ring
     ux, uy = (W - iw) / 2, (D - idp) / 2                   # the homes' depth beside it, and in front and behind
     if min(ux, uy) < LAYOUT_ASSUMPTIONS["min_home_depth_m"][0] - 1e-9:
@@ -917,16 +933,16 @@ def operability(L: dict, option: dict) -> dict[str, Any]:
     go = p.get("arrangement") == "ground_oriented"
     beds_n = option.get("beds") if isinstance(option.get("beds"), (int, float)) and not isinstance(option.get("beds"), bool) else 0
     lift = lifts_needed(int(L.get("units_total") or 0), int(p["storeys"]), ground_oriented=go, beds=int(beds_n or 0))
-    cores = [z for fl in L["floors"][:1] for z in fl["zones"] if z["block"] == "core" and min(z["w"], z["d"]) >= ELEVATOR_CORE_M - 1e-6]
+    cores = [z for fl in L["floors"][:1] for z in fl["zones"] if z["block"] == "core" and lift_room(z)]
     # the plans draw cores, not elevator shafts (25 Nov 2026: "4 elevators" passed in a 7 × 7 m core that draws a scissor
-    # stair and no lift): a core at least ELEVATOR_CORE_M each way is read as room for one elevator beside its stairs, and
-    # the count wanted is held against that room, never passed on the count alone
-    room = len(cores)
+    # stair and no lift): each core's room is read by its size (`lift_room`), and the count wanted is held against that
+    # room, never passed on the count alone
+    room = sum(lift_room(z) for z in cores)
     status = "info" if not lift["lifts"] else ("pass" if room >= lift["lifts"] else "missing")
     items = [{"key": "lifts", "label": "Elevators", "status": status,
               "note": lift["words"] + ("" if not lift["lifts"] else
-                                       (f"; the plans draw no elevator shafts: {room} core{'s' if room != 1 else ''} on the ground floor large enough for one each"
-                                        + ("" if room >= lift["lifts"] else f", so room for {room} of the {lift['lifts']}: a larger core or another one")
+                                       (f"; the plans draw no elevator shafts: {len(cores)} core{'s' if len(cores) != 1 else ''} on the ground floor with room for {room} beside the stairs"
+                                        + ("" if room >= lift["lifts"] else f", {lift['lifts']} wanted: a longer core or another one")
                                         if room else "; no core on the ground floor is large enough to hold an elevator")) + "."}]
     staffed = kind != "independent" or any(k != "independent" for k in parts)
     for want, words in (("desk", "a staffed front desk by the entry"), ("staff office", "a staff office")):
@@ -1236,6 +1252,20 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
                 cw = min(W, q(want)) if grid else min(W, round(want + 0.005, 2))
                 cx = x0 + (round(max(0.0, (W - cw) / 2) / mod) * mod if grid else (W - cw) / 2)
                 cores = [{"x": cx, "y": core_y, "w": cw, "d": core_d, **({"stairs": "scissor"} if scissor else {})}]
+        # the elevators the homes want, in the core (26 Nov 2026): where its size holds fewer (`lift_room`), it runs a
+        # shaft longer along the corridor for each one short, as far as the plate allows
+        beds_in = option.get("beds") if isinstance(option.get("beds"), (int, float)) and not isinstance(option.get("beds"), bool) else 0
+        want_lifts = lifts_needed(int(prog.get("units_total") or 0), storeys, beds=int(beds_in or 0))["lifts"]
+        main = max(cores, key=lambda c: c["w"] * c["d"])
+        short = want_lifts - sum(lift_room(c) for c in cores)
+        if short > 0 and lift_room(main):
+            shaft, _ = LAYOUT_ASSUMPTIONS["lift_shaft_m"]
+            grow = min(W - main["w"], short * shaft)
+            nw = q(main["w"] + grow) if grid else round(main["w"] + grow, 2)
+            nw = min(W, nw)
+            if nw > main["w"] + 1e-6:
+                main["x"] = x0 + (round(max(0.0, (W - nw) / 2) / mod) * mod if grid else (W - nw) / 2)
+                main["w"] = nw
     def band_runs(side: str, y: float) -> list[dict]:
         """The runs one strip offers: the lengths of it the cores leave free, each filled outward from a core. A run
         lies along x (`edge` where it is filled from, `at` the strip's y, `depth` the strip's): see _run_rect."""
@@ -2063,6 +2093,18 @@ def egress_line(f: dict) -> str:
 # A declared placeholder: the least a core measures, each way, to hold an elevator and its lobby beside the stairs.
 # The solver's own cores are a core bay (7 m) wide; its end stairs are a stair's width and read as stairs alone.
 ELEVATOR_CORE_M = 5.0
+
+
+def lift_room(core: dict) -> int:
+    """How many elevators a core holds beside its stairs, by the declared `lift_shaft_m`: none in a core narrower than
+    ELEVATOR_CORE_M either way, else one, and one more for each shaft's length it runs past the core bay (26 Nov 2026:
+    "one elevator a core" read "missing" on every six-storey run, whose 7 × 11 m core holds two). Pure."""
+    w, d = float(core.get("w") or 0), float(core.get("d") or 0)
+    if min(w, d) < ELEVATOR_CORE_M - 1e-6:
+        return 0
+    bay, _ = LAYOUT_ASSUMPTIONS["core_bay_m"]
+    shaft, _ = LAYOUT_ASSUMPTIONS["lift_shaft_m"]
+    return 1 + max(0, int((max(w, d) - bay) / shaft + 1e-6))
 
 # `design_space` (a lobby, an atrium), `commercial` and `void` (a cut-out: open to below, a notch, a courtyard) are
 # the architect's own: no program asks for them, so they are measured and drawn but never short; a void is not

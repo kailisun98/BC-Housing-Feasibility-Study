@@ -1,7 +1,7 @@
 /* Issuing a run to the architect or the board, and the chip in the top bar for an issue addressed to the reader
    (polled from the local server while the tab is visible). */
 
-import { $, cap, h, setStatus, toast } from "./core/util.js";
+import { $, cap, copyText, h, setStatus, toast } from "./core/util.js";
 import { guide, state, STATIC } from "./core/state.js";
 import { api, postJSON } from "./core/api.js";
 import { afterIssue, isDraft, nextRev, openRun, rev } from "./runs.js";
@@ -78,9 +78,10 @@ export function wireMe() {
 function issueFormHtml(scope) {
   const to = ISSUE_TO[state.mode];
   if (!to || !state.run) return "";
-  // a draft takes the site's next revision number as it goes (runs.js noteRevisions); an issued memo keeps its own
+  // a draft takes the site's next revision number as it goes (runs.js noteRevisions); an issued memo keeps its own, and
+  // is issued "again" only where it has been issued before (26 Nov 2026: a committed R2 never issued said "again")
   const draft = isDraft(state.run.run_id);
-  const label = draft ? `Mark issued as ${nextRev()}` : `Mark ${rev(state.run.run_id)} issued again`;
+  const label = draft ? `Mark issued as ${nextRev()}` : `Mark ${rev(state.run.run_id)} issued${(state.run.issues || []).length ? " again" : ""}`;
   // what it does, said plainly (24 Nov 2026: "They see it in their top bar" promised a delivery; nothing leaves this
   // machine, and the board was offered a top bar it does not have)
   return `<form class="issue-panel" data-issue="${h(scope)}" aria-label="${h(label)} to ${h(ISSUE_WORD[to])}">
@@ -93,7 +94,9 @@ function issueFormHtml(scope) {
       <datalist id="issue-names">${knownNames().map(n => `<option value="${h(n)}">`).join("")}</datalist>
     </div>
     <label class="field"><span class="label">A note</span><textarea name="note" rows="2" maxlength="600" placeholder="What changed, and what you want checked"></textarea></label>
-    <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">${h(label)}</button><button class="btn btn-quiet btn-small" type="button" data-issue-cancel>Not now</button><span class="help">${draft ? `The draft becomes ${h(nextRev())}. ` : ""}Recorded on this machine: it shows in the top bar of the browser that gives their name (or, with no name, in ${h(ISSUE_WORD[to])}'s layout), with your note under the memo's title. To reach someone elsewhere, send the link or the PDF; for the board, Download PDF.</span></div>
+    <div class="form-actions"><button class="btn btn-primary btn-small" type="submit">${h(label)}</button><button class="btn btn-quiet btn-small" type="button" data-issue-cancel>Not now</button></div>
+    <p class="help">${draft ? `The draft becomes ${h(nextRev())}. ` : ""}Recorded on this machine: it shows in the top bar of the browser that gives their name (or, with no name, in ${h(ISSUE_WORD[to])}'s layout), with your note under the memo's title.</p>
+    <p class="issue-send">To send it: <button type="button" class="linkish" data-issue-pdf>Download PDF</button> · <button type="button" class="linkish" data-issue-link>Copy the link</button></p>
   </form>`;
 }
 
@@ -108,28 +111,127 @@ function knownNames() {
 function wireIssueForm(form, onClose) {
   form.addEventListener("submit", e => { e.preventDefault(); sendIssue(form).then(ok => { if (ok && onClose) onClose(); }); });
   const c = $("[data-issue-cancel]", form); if (c) c.addEventListener("click", () => onClose && onClose(true));
+  const pdf = $("[data-issue-pdf]", form); if (pdf) pdf.addEventListener("click", () => { const b = $("#pdf-btn"); if (b && !b.disabled) b.click(); });
+  const link = $("[data-issue-link]", form);
+  if (link) link.addEventListener("click", () => copyText(location.href).then(() => setStatus(`Copied the link to ${rev(state.run.run_id)}: it opens this memo on this machine's First Read.`, "ok")).catch(() => toast("Could not copy: copy the address bar instead.", true)));
   // Esc closes it, as Not now does, and the keyboard goes back to the button that opened it (20 Nov 2026)
   form.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); if (onClose) onClose(true); } });
   const first = $("input[name=name]", form);
   if (first) (first.value ? $("textarea", form) : first).focus({ preventScroll: true });
 }
 
-/* the export bar's copy of the form; the guide renders its own at stop 7 */
+/* Issue, in the top bar beside the Revision it numbers (26 Nov 2026, a UX designer's brief: it sat fourth in the
+   title block's action row, out of reach once the memo scrolled, and disabled with its reason in a title no keyboard or
+   touch reached). Its form drops under it as the name form does: the keyboard goes to the first empty field, Esc and
+   Not now close it and give the keyboard back, a click outside closes it. Where it cannot issue it says why, in the
+   same place: the button stays reachable (aria-disabled), and a press opens the reason. */
+const BTN_WORD = { architect: "the architect", manager: "the manager", operator: "the operator" };
+
+/* What the button can do now: null where it is hidden, else {ok, why, note}. */
+function issueState() {
+  const to = ISSUE_TO[state.mode];
+  if (!to || !state.run) return null;
+  const r = rev(state.run.run_id);
+  if (STATIC) return { ok: false, why: "Issuing is recorded on the machine running First Read; on the web, send the link or the PDF." };
+  if (state.running) return { ok: false, why: "Running the rules…" };
+  if (state.runStale) return { ok: false, why: `Run again first: ${state.runStale} changed after ${r}.`, stale: true };
+  if (isDraft(state.run.run_id)) return { ok: true, draft: true, note: `Makes it ${nextRev()}.` };
+  const mine = (state.run.issues || []).filter(i => i.by === state.mode).sort((a, b) => String(a.issued_at).localeCompare(String(b.issued_at))).slice(-1)[0];
+  if (mine) return { ok: true, note: `Last issued to ${mine.to_name ? `${mine.to_name} (${ISSUE_WORD[mine.to] || mine.to})` : ISSUE_WORD[mine.to] || mine.to}, ${dateWords(mine.issued_at, true)}.` };
+  return { ok: true, note: `${r}, not yet issued from this layout.` };
+}
+
+/* The one place the button's state is set: called by renderMemo, syncRunButton (so a run starting and ending, and the
+   memo going stale, reach it), setMode and an issue. */
+export function syncIssueButton() {
+  const wrap = $("#issue-top"), btn = $("#issue-btn");
+  if (!wrap || !btn) return;
+  const to = ISSUE_TO[state.mode];
+  const s = issueState();
+  wrap.hidden = !s;
+  if (!s) { closeIssuePanel(); return; }
+  btn.textContent = `Mark issued to ${BTN_WORD[to] || ISSUE_WORD[to]}`;
+  btn.setAttribute("aria-disabled", String(!s.ok));
+  btn.classList.toggle("draft", !!s.draft);
+  const why = s.ok ? s.note : s.why;
+  $("#issue-why").textContent = why || "";
+  btn.title = why || "";
+  // a reason on screen goes stale with the state: an open reason is redrawn, an open form that can no longer send closes
+  const pop = $("#issue-pop");
+  if (!pop.hidden && pop.dataset.kind === "why") showWhy(s);
+  else if (!pop.hidden && !s.ok) closeIssuePanel();
+}
+
+/* Kept for the callers that named it before the button moved (modes.js, main.js). */
+export const issueButtonLabel = syncIssueButton;
+
+function showWhy(s) {
+  const pop = $("#issue-pop");
+  pop.dataset.kind = "why";
+  pop.setAttribute("aria-label", "Why it cannot be marked issued now");
+  pop.innerHTML = `<p class="issue-why-line">${h(s.why)}</p>${s.stale ? `<div class="form-actions"><button type="button" class="btn btn-primary btn-small" data-issue-run>Run the rules again</button><button type="button" class="btn btn-quiet btn-small" data-issue-cancel>Not now</button></div>` : `<div class="form-actions"><button type="button" class="btn btn-quiet btn-small" data-issue-cancel>Close</button></div>`}`;
+  const run = $("[data-issue-run]", pop);
+  if (run) run.addEventListener("click", () => { closeIssuePanel(); const b = $("#run-btn"); if (b) b.click(); });
+  $("[data-issue-cancel]", pop).addEventListener("click", () => closeIssuePanel(true));
+  ($("button", pop) || pop).focus({ preventScroll: true });
+}
+
+/* A click outside, or the keyboard leaving it, puts the popover away and keeps what was typed (a review the same
+   evening: a note typed, a click elsewhere, and the note was gone); Not now, Esc and a sent issue clear it. */
+function outsideClose(e) {
+  const wrap = $("#issue-top");
+  if (wrap && !wrap.contains(e.target)) hideIssuePanel();
+}
+
+function hideIssuePanel() {
+  const pop = $("#issue-pop"), btn = $("#issue-btn");
+  if (!pop || pop.hidden) return;
+  pop.hidden = true;
+  btn.setAttribute("aria-expanded", "false");
+  document.removeEventListener("pointerdown", outsideClose, true);
+}
+
+/* The popover's own keys and focus, wired once: Esc closes whichever it holds (the form's own handler closes the form
+   first), and Tab past its last control puts it away. */
+function wirePop(pop) {
+  if (pop.dataset.wired) return;
+  pop.dataset.wired = "1";
+  pop.addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); closeIssuePanel(true); } });
+  $("#issue-top").addEventListener("focusout", e => { if (e.relatedTarget && !$("#issue-top").contains(e.relatedTarget)) hideIssuePanel(); });
+}
+
 export function openIssuePanel() {
-  const panel = $("#issue-panel");
-  if (!state.run || STATIC) return;
-  panel.innerHTML = issueFormHtml("bar");
-  panel.hidden = false;
-  $("#issue-btn").setAttribute("aria-expanded", "true");
-  wireIssueForm($("form", panel), closeIssuePanel);
+  const pop = $("#issue-pop"), btn = $("#issue-btn");
+  const s = issueState();
+  if (!s) return;
+  wirePop(pop);
+  pop.setAttribute("role", "dialog");
+  pop.hidden = false;
+  btn.setAttribute("aria-expanded", "true");
+  if (!s.ok) showWhy(s);
+  else if (pop.dataset.kind === "form" && pop.dataset.run === state.run.run_id && $("form", pop)) {
+    // the form put away by a click outside comes back as it was left
+    const first = $("textarea", pop) || $("input", pop);
+    if (first) first.focus({ preventScroll: true });
+  } else {
+    pop.dataset.kind = "form";
+    pop.dataset.run = state.run.run_id;
+    pop.innerHTML = issueFormHtml("bar");
+    const form = $("form", pop);
+    pop.setAttribute("aria-label", form ? form.getAttribute("aria-label") : "Mark issued");
+    wireIssueForm(form, closeIssuePanel);
+  }
+  document.addEventListener("pointerdown", outsideClose, true);
 }
 
 export function closeIssuePanel(focusBack = false) {
-  const panel = $("#issue-panel");
-  const had = !panel.hidden;
-  panel.hidden = true; panel.innerHTML = "";
-  $("#issue-btn").setAttribute("aria-expanded", "false");
-  if (focusBack === true && had) $("#issue-btn").focus();
+  const pop = $("#issue-pop"), btn = $("#issue-btn");
+  if (!pop || !btn) return;
+  const had = !pop.hidden;
+  pop.hidden = true; pop.innerHTML = ""; delete pop.dataset.kind; delete pop.dataset.run;
+  btn.setAttribute("aria-expanded", "false");
+  document.removeEventListener("pointerdown", outsideClose, true);
+  if (focusBack === true && had) btn.focus();
 }
 
 /* Records the issue on the run; true when it went. The page does not scroll: the sender stays where they pressed. */
@@ -164,14 +266,6 @@ async function sendIssue(form) {
     if (btn) btn.disabled = false;
     return false;
   }
-}
-
-export function issueButtonLabel() {
-  const to = ISSUE_TO[state.mode];
-  const btn = $("#issue-btn");
-  btn.hidden = !to;
-  btn.textContent = to ? `Mark issued to ${ISSUE_WORD[to]}` : "Mark issued";
-  if (!to) closeIssuePanel();
 }
 
 /* Every 15 s the page asks the local server for the site's issue notes; a new one addressed to this reader becomes a
@@ -217,8 +311,11 @@ function showIssueChip(issue, count) {
   chip.hidden = false;
   const siteName = (state.sites.find(s => s.id === issue.site) || {}).address || issue.site || "";
   const toWhom = issue.to_name ? "you" : (ISSUE_WORD[issue.to] || `the ${issue.to}`);
-  chip.innerHTML = `<span class="dot"></span>${siteName ? h(String(siteName).split(",")[0]) + " · " : ""}${h(state.revisions.get(issue.run_id) || "a run")} issued to ${h(toWhom)} by ${h(senderWords(issue))} · ${h(ago)}${count > 1 ? ` · +${count - 1}` : ""}`;
-  chip.title = issue.note ? `"${issue.note}" · click to open` : "Click to open the run";
+  const words = `${siteName ? String(siteName).split(",")[0] + " · " : ""}${state.revisions.get(issue.run_id) || "a run"} issued to ${toWhom} by ${senderWords(issue)} · ${ago}${count > 1 ? ` · +${count - 1}` : ""}`;
+  // the text is cut to the chip's width under 1500 px (app.css), so the whole of it is the chip's name and title
+  chip.innerHTML = `<span class="dot"></span><span class="chip-text">${h(words)}</span>`;
+  chip.setAttribute("aria-label", `${words}. Open it`);
+  chip.title = `${words}${issue.note ? ` · "${issue.note}"` : ""} · click to open`;
   chip.onclick = async () => {
     markIssueSeen(issue.id);
     chip.hidden = true;

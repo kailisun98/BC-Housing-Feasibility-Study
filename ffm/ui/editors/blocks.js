@@ -15,7 +15,7 @@ import { refreshSummary, renderForm } from "../schedule.js";
 import { markStale, onOptionChange, tidyOption } from "../files.js";
 import { OPTION_FIELDS } from "../fields.js";
 import { egressLine } from "../memo/answers.js";
-import { refreshPlanFloor } from "../figures/cards.js";
+import { refreshPlanFloor, scrollUnderBars } from "../figures/cards.js";
 import { HALF, northArrow, projectTurn, siteContext, sunShadows, turnFrame, upright } from "../figures/common.js";
 
 const EDIT_BLOCKS = [["studio", "Studio"], ["one_bed", "One-bedroom"], ["two_bed", "Two-bedroom"], ["three_bed_plus", "Three-bedroom+"], ["non_residential", "Non-residential"], ["amenity", "Amenity"], ["services", "Services, bicycles"], ["core", "Core"], ["corridor", "Corridor"],
@@ -153,7 +153,8 @@ export function openEditor(resume) {
   editor.sel = null;
   if (resume && resume.level != null && run.layout.floors[resume.level]) editor.level = resume.level;   // back on the floor it was on
   // and back in view: a run redraws the memo and takes the page to its top, a dozen screens above the editor (25 Nov 2026)
-  if (resume) setTimeout(() => { const el = $("#sheet-editor"); if (el && editor.open) { const y = el.getBoundingClientRect().top + scrollY - 130; scrollTo({ top: Math.max(0, y), behavior: "auto" }); } }, 450);
+  // (26 Nov 2026) under the bars and the memo's tab strip, as every jump lands
+  if (resume) setTimeout(() => { const el = $("#sheet-editor"); if (el && editor.open) scrollUnderBars(el); }, 450);
   else editor.msg = null;
   const fig = $('.figure.sheet[data-sheet="plans"]');
   $$(".sheet-body", fig).forEach(x => { x.hidden = true; });

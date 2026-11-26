@@ -180,6 +180,19 @@ const FIELDS = [
       options: [["", "Not sure"], ["rezoning", "By rezoning"], ["development_permit", "By development permit (already zoned for it, or under an official development plan)"], ["outright", "Outright"]],
       why: "The family-unit requirement and the rezoning policy are read in rezonings only. A site already rezoned to its CD-1, or a building under an area's official development plan, goes by permit." },
     info: "By rezoning: the rezoning rules are read. By development permit or outright: they are not, and answer 1 says no rezoning is needed. Not sure leaves them read wherever a rezoning path is written." },
+  // what is already decided on the site (26 Nov 2026): a permit issued settles the yards, the trees and what stays
+  { on: "option", key: "permit_issued_on", group: "Rezoning path", label: "Development permit issued on", type: "text", need: "rule",
+    help: "A date, 2025-02-05. Blank: not yet issued.",
+    ask: { stop: 2, q: "Has the development permit been issued? The date, if so", who: "you", placeholder: "2025-02-05",
+      when: (site, val) => !!val && val("approval_route") === "development_permit",
+      why: "An issued permit settles the yards, the trees and what stays on the lot: they leave the open items, and the front sheet says it is decided." },
+    info: "The date the City issued the development permit. The memo's front sheet lists it as already decided, and the items a permit settles (the yards, the trees, the buildings that stay, heritage) leave the open items." },
+  { on: "option", key: "land_agreement_signed_on", group: "Funding", label: "Land agreement signed on", type: "text", need: "rule",
+    help: "A date. Blank: not yet signed.",
+    ask: { stop: 2, q: "Is the land agreement signed? The date, if so", who: "you", placeholder: "2026-03-31",
+      when: (site, val) => !!val && !!val("land_tenure"),
+      why: "A signed lease or transfer is decided, not assumed: the front sheet says so beside how the land is held." },
+    info: "The date the lease, the transfer or the air-space parcel agreement was signed. The front sheet lists it as already decided." },
   // (25 Nov 2026, the funder-side reader: "As approved by Council, 25 Jul 2024" was told to take the rezoning)
   { on: "option", key: "rezoning_approved_on", group: "Rezoning path", label: "Rezoning approved by Council on", type: "text", need: "rule",
     reads: ["district_outright_fsr", "district_outright_height", "family_unit_share", "rezoning_policy_social_housing"],
@@ -339,6 +352,22 @@ const FIELDS = [
     info: "The share of gross rent lost to vacancy and arrears, as a percent (2) or a share (0.02): both read as 2%; at most 50%. Blank uses the CMHC survey's market vacancy rate (3.7%), which is high for rent-geared-to-income homes with a waitlist." },
   { on: "option", key: "operations.operating_cost_per_bed_year_cad", group: "Operating", rowOf: "op4", label: "Running cost a bed a year, beds beside homes ($)", type: "number", need: "rule", ref: "money", ops: true,
     info: "For shelter beds in a building that also has homes: the operator's running cost a bed. Blank costs each bed as a home and says so; a shelter with no homes uses the operating cost above, a bed a year." },
+  // a budget per part of a mixed building (26 Nov 2026; the 25 Nov panel: a shelter, supportive homes and rental homes on
+  // one budget): each staffed part's own figures, shown only where the option has that part beside its homes
+  { on: "option", key: "operations.parts.supportive.operating_cost_cad_year", group: "Operating", label: "Supportive homes: running cost ($ a home a year)", type: "number", need: "rule", ref: "money", ops: true, part: "supportive", only: o => hasPart(o, "supportive"),
+    info: "The supportive homes' own running cost a home; blank costs them as the other homes." },
+  { on: "option", key: "operations.parts.supportive.staffing_cad_year", group: "Operating", label: "Supportive homes: support staffing ($ a year)", type: "number", need: "rule", ref: "money", ops: true, part: "supportive", only: o => hasPart(o, "supportive"),
+    info: "The staffing the supportive homes run on, for that part alone. Never assumed." },
+  { on: "option", key: "operations.parts.supportive.operating_subsidy_cad_year", group: "Operating", label: "Supportive homes: operating subsidy ($ a year)", type: "number", need: "rule", ref: "money", ops: true, part: "supportive", only: o => hasPart(o, "supportive"),
+    info: "The subsidy for the supportive homes, from their own agreement." },
+  { on: "option", key: "operations.parts.supportive.subsidy_confirmed", group: "Operating", label: "Supportive homes: their subsidy is confirmed", type: TRI, need: "rule", ref: "money", part: "supportive", only: o => hasPart(o, "supportive"),
+    info: "Ticked where the supportive homes' subsidy agreement is in hand." },
+  { on: "option", key: "operations.parts.shelter.staffing_cad_year", group: "Operating", label: "Shelter beds: support staffing ($ a year)", type: "number", need: "rule", ref: "money", ops: true, part: "shelter", only: o => hasPart(o, "shelter"),
+    info: "The staffing the shelter runs on, for that part alone. Never assumed." },
+  { on: "option", key: "operations.parts.shelter.operating_subsidy_cad_year", group: "Operating", label: "Shelter beds: operating subsidy ($ a year)", type: "number", need: "rule", ref: "money", ops: true, part: "shelter", only: o => hasPart(o, "shelter"),
+    info: "The subsidy for the shelter, from its own agreement (BC Housing's Emergency Shelter Program pays a shelter's running costs)." },
+  { on: "option", key: "operations.parts.shelter.subsidy_confirmed", group: "Operating", label: "Shelter beds: their subsidy is confirmed", type: TRI, need: "rule", ref: "money", part: "shelter", only: o => hasPart(o, "shelter"),
+    info: "Ticked where the shelter's agreement is in hand." },
   { on: "option", key: "operations.subsidy_source", group: "Operating", label: "Who pays the subsidy", type: "text", need: "rule", ref: "money", ops: true,
     info: "The funder and the agreement, in a few words; it prints beside the figure." },
   { on: "option", key: "rezoning_path", group: "Rezoning path", label: "Rezoning path", type: "text", need: "rule",
@@ -403,7 +432,17 @@ export const GUIDE_FIELDS = FIELDS.filter(f => f.figure).sort((a, b) => a.figure
 
 /* The three money figures only the manager knows: [key, label]. */
 export const FINANCE_FIELDS = FIELDS.filter(f => f.money).map(f => [f.key, f.label]);
-export const OPERATING_FIELDS = FIELDS.filter(f => f.ops).map(f => [f.key, f.label, f.type]);
+export const OPERATING_FIELDS = FIELDS.filter(f => f.ops).map(f => [f.key, f.label, f.type, f.part || null]);
+
+/* Whether an option has a part of a mixed building beside its homes (26 Nov 2026): supportive homes among independent
+   ones, or shelter beds beside homes. The per-part operating figures show only then (proforma's `split`). Pure. */
+export function hasPart(option, part) {
+  const o = option || {}, homes = Object.values(o.units || {}).reduce((t, v) => t + (Number(v) || 0), 0);
+  const kind = String(o.housing_type || "independent");
+  if (part === "supportive") return kind === "independent" && Number(o.supportive_units) > 0 && homes > Number(o.supportive_units);
+  if (part === "shelter") return Number(o.beds) > 0 && homes > 0;
+  return false;
+}
 
 /* What the rules leave to a person, asked in the flow: the site's at stop 1, the option's at stop 2. */
 /* (20 Nov 2026) `why`: what the answer changes, in a few words; `where`: [where to find it, its public URL if any];

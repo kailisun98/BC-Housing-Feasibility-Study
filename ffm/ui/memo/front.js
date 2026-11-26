@@ -84,7 +84,11 @@ export function frontOf(run) {
   const items = [...(ans.unsure || []), ...layoutOpenItems(run)];
   const top = items.map((u, i) => [u, i]).sort((a, b) => (RANK[a[0].status] ?? 3) - (RANK[b[0].status] ?? 3) || a[1] - b[1]).slice(0, 3)
     .map(([u]) => ({ title: u.title, status: u.status, action: u.action || "" }));
-  return { housed, operator, programs, money, decision: String(o.decision_sought || "").trim() || null, verdicts, open_items: top, open_total: items.length };
+  // what is already decided (26 Nov 2026; twin of memo.front_sheet): the engine's list, and the capital committed
+  const decided = (ans.decided || []).map(d => d.words);
+  const committed = ((pf && pf.funding) || {}).sources ? pf.funding.sources.filter(r => r.status === "committed" && r.value) : [];
+  if (committed.length) decided.push("Committed: " + committed.map(r => `${r.label} ${cad(r.value)}`).join(", "));
+  return { housed, operator, programs, money, decision: String(o.decision_sought || "").trim() || null, decided, verdicts, open_items: top, open_total: items.length };
 }
 
 /* A route's verdict as a status, for its mark. */
@@ -113,6 +117,7 @@ export function frontHtml(run) {
       ${row("Which program", h(f.programs))}
       ${row("The amount", h(amountWords(f.money)))}
       ${row("The decision wanted", f.decision ? h(f.decision) : `<i>not stated</i>${state.mode === "manager" ? ` <span class="cont">· at 03, "What are you asking for?"</span>` : ""}`)}
+      ${f.decided.length ? row("Already decided", `<ul class="ask-decided">${f.decided.map(d => `<li>${h(d)}</li>`).join("")}</ul>`) : ""}
       ${row("The answers", `<ul class="ask-verdicts">${marks}</ul>`)}
       ${row(f.open_items.length ? `The top ${f.open_items.length} of ${f.open_total} open items` : "Open items", open)}
     </dl>

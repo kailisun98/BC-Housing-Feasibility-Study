@@ -89,6 +89,15 @@ Other programs written for this kind of housing, listed from their own pages and
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
+#### By part of the building
+
+| Part | Places | Rent | Vacancy | Running cost | Reserve | Staffing | Subsidy | Left a year |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Independent homes | 85 homes | $1,076,889 | -$39,845 | -$552,500 | -$51,000 | — | — | $433,544 |
+| Supportive homes | 25 homes | $169,623 | -$6,276 | -$162,500 | -$15,000 | not entered | — | -$14,153 |
+
+> Each part's own running cost, staffing and subsidy where the operator entered them; the rents by tier. What a part leaves a year is what it needs, or gives, before any loan payment.
+
 
 ## Words in this memo
 - **FSR**: floor space ratio: the building's floor area divided by the site's area. FSR 3.0 on a 1,000 m² lot is 3,000 m² of floor.

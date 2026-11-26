@@ -722,6 +722,38 @@ a draft says whose it is ("Draft 21:09 (Sam's)").
   they are on. Where the memo states no decision, the download asks for one first; what is typed prints on that PDF
   and is kept in the option for the next run. Printed by headless Edge, every committed memo is two letter pages.
 
+### The memo in tabs, Issue on top, stop 02 (26 Nov 2026, Kai: "too much scrolling")
+A UX designer's brief the same day, built and checked at 1366 and 2000 px. (This replaces "the title block's index"
+above for every layout but the Reader's, and retires the Summary | Detailed | 3D preview switch.)
+- **Tabs, a sheet index.** Under the title block, a strip of the memo's parts: Operating figures (the Operator's, first),
+  Answers, Comparison (while two memos are compared), Drawings and areas, Clauses, Ledger, Inputs and sources. Each tab
+  is a mono 11px number in Muted and a 13px 500 label; the selected one Ink with a 2px Ink underline, as the title block
+  is ruled; the rest Muted, Ink on hover; 40px tall, 44px on a coarse pointer; the Blue focus ring. The strip sticks under
+  the bars (at the top below 760px, where the bars do not stick) and scrolls sideways when narrow. One panel shows at a
+  time; the others are hidden until found, so the browser's find still reaches them. The WAI-ARIA tabs pattern: arrows,
+  Home and End, the selected tab the only tab stop. The link keeps the tab (`?tab=`, left out for the layout's default);
+  each tab keeps its own scroll for the session; a jump opens the tab its target is in. The panel fades in at 150ms.
+- **The Reader keeps the long page**, with "In this memo" and the disclaimer in the title block; the panels take no box
+  there, so the paper's order holds.
+- **One right edge.** The memo and the row above it are as wide as the pane up to 1600px, centred for the manager and
+  the operator, beside the rail for the architect. Inside a tab, widths come from what it holds (container queries):
+  the ask beside the four answers once the Answers tab is 1100px wide (880px of answers, the ask the rest, sticky at any
+  window height, scrolling in itself; its keys go over their values under 520px); FIG 01 and FIG 02 side by side from 1240px
+  (they set their labels at 11.5px for any width), the engine's sheets a row each at their own size, centred on their
+  sheet, never shrunk below it (two to a row drew their 9px labels at 6.9px); Inputs and sources with the sources
+  beside the inputs and the fingerprint from 1240px; Side by side's columns within a 1,120px measure; the operator's
+  desk in two columns from 1100px, the signing on the right in the first screen. No 920px caps, no 460px figure column.
+- **Issue in the top bar**, beside the Revision it numbers: an outline pill on the ink bar as Run again is, "Mark issued
+  to the architect / the manager"; a draft wears a 6px Amber dot; where it cannot issue (out of date, a run under way,
+  the web build) it stays reachable, dashed, and a press says why, with Run the rules again where that is the answer.
+  Its form drops under it as the name form does; its foot offers "To send it: Download PDF · Copy the link".
+- **Stop 02 shows the decision first.** For is one sentence that opens ("Independent rental · tested against BC
+  Housing Community Housing Fund and BC Builds  Change"); Start from in one order (Funder-ready, Outright, Benchmark) with
+  the lot's line under it; The building leads with its type, then the four figures and the section; the questions the
+  memo carries fold behind their count; the foot, with Continue, sticks to the window. What the lot and the rules allow
+  before any option is reference: beside the card from 1600px (open, sticky), folded under it below. Route row 02 names
+  the suggestion ("Suggested: Funder-ready · 6 storeys · 98 homes") or what Continue waits for, in Uncertain Text.
+
 ### Answer cards
 The signature component. The answers keep a 920px reading width (the architect's two columns from 1600px excepted),
 so a wash ends with its words instead of running the pane's width. A verdict is the screen's few words at 24px

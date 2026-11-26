@@ -5795,14 +5795,6 @@
       },
       "unsure": [
         {
-          "rule_id": "coverage.yards",
-          "title": "Yards not checked: no CD-1 (324) yard rule in the rules",
-          "status": "uncertain",
-          "finding": "The setbacks on the site plan (front 3.0, rear 3.0, side 3.0 m) are the option's own figures; no rule in the stack tested them against CD-1 (324)'s minimum yards.",
-          "action": "Architect: read the yard clauses in CD-1 (324)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator.",
-          "contact": "the City of Vancouver's Development and Building Services Centre, a project facilitator"
-        },
-        {
           "rule_id": "coverage.operator_agreement",
           "title": "The agreement between the owner and the operator",
           "status": "uncertain",
@@ -5827,20 +5819,19 @@
           "contact": "the City of Vancouver's housing policy staff, who draft the Housing Agreement"
         },
         {
-          "rule_id": "cov.trees.replacement",
-          "title": "Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu",
-          "status": "uncertain",
-          "finding": "Schedule C requires 43 trees on a 3,908 m² site; no tree survey is on file.",
-          "action": "Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit.",
-          "contact": "a certified arborist, then the City staff who review trees with the development permit"
-        },
-        {
           "rule_id": "bch.chf.eligibility",
           "title": "BC Housing Community Housing Fund: eligibility and unit mix",
           "status": "uncertain",
           "finding": "Community Housing Fund: whether it meets the criteria cannot be confirmed without the rent-tier split (market / rent-geared-to-income / deep subsidy units); land tenure (lease of at least 60 years at nominal value, or ownership). Site control (finalized) meets the readiness bar; construction must be able to start within 18 months of award. Its 2025 call did not proceed (February 2026), so no intake is open now; the program page says it will post when next seeking proposals (as of 22 Sep 2026).",
           "action": "Manager: supply what is missing (rent-tier split; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies.",
           "contact": "BC Housing, a development manager in Development and Asset Strategies"
+        }
+      ],
+      "decided": [
+        {
+          "what": "permit",
+          "on": "5 Feb 2025",
+          "words": "The development permit was issued on 5 Feb 2025; it settled the yards, the trees and what stays on the lot"
         }
       ]
     }
@@ -14785,6 +14776,7 @@
       "tenure": "social_housing",
       "rezoning_path": "False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program",
       "approval_route": "development_permit",
+      "permit_issued_on": "2025-02-05",
       "storeys": 29,
       "height_m": 88.4,
       "gfa_m2": 23215.0,

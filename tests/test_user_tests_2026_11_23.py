@@ -299,8 +299,10 @@ class TheOperatingPage(unittest.TestCase):
 
     def test_with_nothing_entered_the_figures_are_as_before(self):
         L = evaluate(SITE, READY, date(2026, 10, 23))      # the committed run's own date
-        pf = proforma.build(SITE, READY, L)
-        committed = load_json(ROOT / "outputs" / "998-e-19th-ave" / "what-if-funder-ready" / "proforma.json")
+        run = ROOT / "outputs" / "998-e-19th-ave" / "what-if-funder-ready"
+        # the money counts the homes the run's own plans place (26 Nov 2026), so the run's layout goes in
+        pf = proforma.build(SITE, READY, L, load_json(run / "massing.json"), load_json(run / "layout.json"))
+        committed = load_json(run / "proforma.json")
         for key in ("capital", "gap"):
             self.assertEqual(pf[key], committed[key])
         self.assertEqual(pf["operating"]["noi"], committed["operating"]["noi"])

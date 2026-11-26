@@ -2,7 +2,7 @@
    memo, and the unsaved draft kept in sessionStorage. */
 
 import { $, h, setStatus, toast } from "./core/util.js";
-import { guide, PRELOAD_OPTION, PRELOAD_SITE, state, STATIC } from "./core/state.js";
+import { guide, PRELOAD_OPTION, PRELOAD_SITE, state } from "./core/state.js";
 import { api, postJSON } from "./core/api.js";
 import { OPTION_FIELDS, SITE_FIELDS } from "./fields.js";
 import {
@@ -235,16 +235,13 @@ export function syncStaleBand() {
   let band = $("#stale-band", memo);
   const stale = !!(state.run && state.runStale);
   syncRunButton();   // the manager's Run again is live exactly while the memo is out of date
-  if (!stale) { if (band) band.remove(); $("#issue-btn").disabled = !state.run || !!STATIC; $("#issue-btn").title = ""; return; }
-  $("#issue-btn").disabled = true;
-  $("#issue-btn").title = "The inputs changed after this run: run the rules again before issuing it.";
+  // the top bar's Issue reads the same state (syncRunButton calls syncIssueButton): it says "Run again first" while stale
+  if (!stale) { if (band) band.remove(); return; }
   // a card brought over the memo (the manager's route) holds the pane: the band waits for the memo, which draws it
   if (memo.classList.contains("stage-on")) return;
   if (!band) { band = document.createElement("div"); band.id = "stale-band"; band.className = "card stale-band"; band.setAttribute("role", "status"); memo.prepend(band); }
   band.innerHTML = `<b>${h(state.runStale[0].toUpperCase() + state.runStale.slice(1))} changed after ${h(rev(state.run.run_id))}.</b> The answers and the drawings below are ${h(rev(state.run.run_id))}'s. <button type="button" class="btn btn-primary btn-small" id="stale-run">Run the rules again</button>`;
   $("#stale-run", band).addEventListener("click", runRules);
-  $("#issue-btn").disabled = true;
-  $("#issue-btn").title = "The inputs changed after this run: run the rules again before issuing it.";
 }
 
 /* The guide's state and the unsaved site and option are kept in this tab's session storage, so a refresh offers to

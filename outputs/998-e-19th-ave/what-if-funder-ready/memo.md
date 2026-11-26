@@ -13,7 +13,7 @@
 | Who is housed | 88 homes, independent rental (social housing): 26 at market rent, 44 rent geared to income, 18 deep subsidy; 59 of the 88 fit the first plans |
 | Who operates | Not named |
 | Which program | BC Builds, the Community Housing Fund. Passes this screen's eligibility checks for BC Builds and the Community Housing Fund, each read on its own |
-| The amount | Capital cost $45.6M. Asked: Community Housing Fund grant, $15.7M (illustrative). Still to find: $20.7M (45% of the cost). |
+| The amount | Capital cost $45.6M. Asked: Community Housing Fund grant, $10.5M (illustrative). Still to find: $28.5M (62% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: no · By the Director's discretion: none in the schedule · By rezoning: yes · The funders' criteria: Passes this screen's eligibility checks for BC Builds and the Community Housing Fund, each read on its own · The money: Needs more sources |
 | The top 3 of 3 open items | 1. Yards not checked: no RM-1 yard rule in the rules (uncertain). 2. Heritage register and designation (uncertain). 3. Homes that do not fit the plates (conditional). |
@@ -43,43 +43,43 @@ Other programs written for this kind of housing, listed from their own pages and
 |---|---|---|
 | Yards not checked: no RM-1 yard rule in the rules | Uncertain | Architect: read the yard clauses in the RM-1 schedule and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
 | Heritage register and designation | Uncertain | Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. Ask: the City of Vancouver's heritage planners (the Heritage Register and designations). |
-| Homes that do not fit the plates | Conditional | Architect: 59 of 88 homes fit the plates on 5 floors at the unit sizes assumed; did not fit: 6 one-bedroom, 23 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 88. |
+| Homes that do not fit the plates | Conditional | Architect: 59 of 88 homes fit the plates on 5 floors at the unit sizes assumed; did not fit: 6 one-bedroom, 23 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks count all 88; the money counts the 59 placed. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $20,689,859, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $28,503,076, 62% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve. It counts the 59 homes the first plans place, of the 88 entered; the floor area and its cost are the option's.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$45,643,836**: hard $33,810,249 (escalated ×1.0292), soft $8,452,562, contingency $3,381,025, land $0.
-- Net operating income **$690,640 a year**: rent $1,365,981 less vacancy $50,541, operating cost $572,000 and reserve $52,800.
-- Funding **$24,953,977**: grants $15,669,192, equity $0, supportable debt $9,284,785 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
-- Gap **$20,689,859** (45% of the capital cost).
+- Net operating income **$493,559 a year**: rent $947,517 less vacancy $35,058, operating cost $383,500 and reserve $35,400.
+- Funding **$17,140,760**: grants $10,505,481, equity $0, supportable debt $6,635,279 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
+- Gap **$28,503,076** (62% of the capital cost).
 - Left to a person: a hard cost for this building (1,100 m² that is not homes, priced as if it were): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre.
 
 **Where the money comes from**, each source with its status:
 
 | Source | Amount | Status |
 |---|---|---|
-| Community Housing Fund grant | $15,669,192 | illustrative: nobody has offered it |
-| Mortgage the net income carries | $9,284,785 | sized by this screen |
-| Still to find | $20,689,859 | to find |
+| Community Housing Fund grant | $10,505,481 | illustrative: nobody has offered it |
+| Mortgage the net income carries | $6,635,279 | sized by this screen |
+| Still to find | $28,503,076 | to find |
 
 ### What it takes to run, a year
 
 | | A year | |
 |---|---:|---|
-| Market rent, 26 homes | $646,492 | $2,072 a month a home (the rules' figure) |
-| Rent geared to income, 44 homes | $594,720 | $1,126 a month a home (the rules' figure) |
-| Deep subsidy, 18 homes | $124,769 | $578 a month a home (the rules' figure) |
-| Vacancy | -$50,541 | 3.7%, the CMHC survey's rate, on all tiers |
-| Operating cost | -$572,000 | $6,500 a home a year (placeholder) |
-| Replacement reserve | -$52,800 |  |
+| Market rent, 17 homes | $433,645 | $2,126 a month a home (the rules' figure) |
+| Rent geared to income, 30 homes | $425,197 | $1,181 a month a home (the rules' figure) |
+| Deep subsidy, 12 homes | $88,675 | $616 a month a home (the rules' figure) |
+| Vacancy | -$35,058 | 3.7%, the CMHC survey's rate, on all tiers |
+| Operating cost | -$383,500 | $6,500 a home a year (placeholder) |
+| Replacement reserve | -$35,400 |  |
 | Support staffing | none |  |
-| **Left after running costs** | **$690,640** | before any operating subsidy or loan payment |
-| Loan payment | -$627,855 | on the mortgage the funding counts (the capital figures above) |
+| **Left after running costs** | **$493,559** | before any operating subsidy or loan payment |
+| Loan payment | -$448,690 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
-| **Subsidy needed if the capital still missing were borrowed** | **$1,336,301** | $1,265 a home a month: the payment on $29,974,644 at 6.19% over 40 years is $2,026,941 a year. An illustration on this screen's mortgage terms, not a funder's financing |
-| **The same, on BC Builds' published take-out terms** | **$1,022,799** | $969 a home a month: 4.55% over 35 years is $1,713,439 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
+| **Subsidy needed if the capital still missing were borrowed** | **$1,882,562** | $2,659 a home a month: the payment on $35,138,355 at 6.19% over 40 years is $2,376,121 a year. An illustration on this screen's mortgage terms, not a funder's financing |
+| **The same, on BC Builds' published take-out terms** | **$1,515,053** | $2,140 a home a month: 4.55% over 35 years is $2,008,612 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
@@ -92,20 +92,21 @@ Other programs written for this kind of housing, listed from their own pages and
 | Contingency | $3,381,025 | `f.soft_costs` (placeholder) | 10% of hard cost |
 | Land | $0 | `f.land` | nominal: the owner is a church, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer (F3) |
 | Capital cost | $45,643,836 | the option | hard + soft + contingency + land |
-| Market rent | $646,492 a year | `f.rents` | CMHC October 2025, 26 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
-| Rent-geared-to-income | $594,720 a year | `f.rgi_rents` | 30% of an income of 70% of the Housing Income Limit (Vancouver), the way BC Housing's call documents estimate it: $1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three; an estimate, so enter the operator's own rent when there is one |
-| Deep-subsidy rent | $124,769 a year | `f.rgi_rents` | the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit |
-| Vacancy | $50,541 a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
-| Operating cost | $572,000 a year | `f.operating` (placeholder) | $6,500 per unit |
-| Replacement reserve | $52,800 a year | `f.operating` (placeholder) | $600 per unit |
+| Market rent | $433,645 a year | `f.rents` | CMHC October 2025, 17 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
+| Rent-geared-to-income | $425,197 a year | `f.rgi_rents` | 30% of an income of 70% of the Housing Income Limit (Vancouver), the way BC Housing's call documents estimate it: $1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three; an estimate, so enter the operator's own rent when there is one |
+| Deep-subsidy rent | $88,675 a year | `f.rgi_rents` | the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit |
+| Vacancy | $35,058 a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
+| Operating cost | $383,500 a year | `f.operating` (placeholder) | $6,500 per unit |
+| Replacement reserve | $35,400 a year | `f.operating` (placeholder) | $600 per unit |
 | Support staffing | not given a year | the option | none entered |
-| Net operating income | $690,640 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
+| Net operating income | $493,559 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
 | Operating subsidy | not given a year | the option | none entered |
-| Community Housing Fund grant | $15,669,192 | `bch.chf.eligibility` | $178,059 per unit × 88; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied |
+| Community Housing Fund grant | $10,505,481 | `bch.chf.eligibility` | $178,059 per unit × 59; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied |
 | Equity | $0 | the option | none entered |
-| Supportable debt | $9,284,785 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $627,855 a year in payments |
-| Funding | $24,953,977 | the option | grants + equity + supportable debt |
-| Gap | $20,689,859 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
+| Supportable debt | $6,635,279 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $448,690 a year in payments |
+| Funding | $17,140,760 | the option | grants + equity + supportable debt |
+| Gap | $28,503,076 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
+| Homes counted | 59 | the option | the 59 homes the first plans place, of the 88 the option enters (answer 3 names the rest); the rents, running costs, grant and debt count these |
 
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
@@ -174,7 +175,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 
 ### What an operator checks first
 
-- *missing* — Elevators: 2 elevators for 88 homes on 5 storeys: one per 70 places (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one.
+- *pass* — Elevators: 2 elevators for 88 homes on 5 storeys: one per 70 places (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor with room for 2 beside the stairs.
 - *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
 - *missing* — Garbage, recycling and services: 0 m² of services for 59 homes; about 18 m² (0.3 m² a home, a placeholder) is what a garbage and recycling room for this many homes takes
 - *pass* — Accessible homes: 5 accessible homes drawn, 3 wanted (BC Housing's 5% of 59)

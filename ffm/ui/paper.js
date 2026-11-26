@@ -7,7 +7,7 @@ import { optWord } from "./fields.js";
 import { isDraft, rev } from "./runs.js";
 import { briefName, compareKind, dateWords, idBreak, issuedWords, memoRefs, optionName, takesRef } from "./memo/memo.js";
 import { amountWords, frontOf, routeStatus } from "./memo/front.js";
-import { CONTRIBUTION_WORD, outOfTotal, fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, operatingRows, outrightWords, unverifiedRules } from "./memo/answers.js";
+import { CONTRIBUTION_WORD, outOfTotal, fundedWord, intakeNote, isOutrightLimit, layoutOpenItems, money, MONEY_STATUS, moneyNext, moneyPhrase, moneyWord, moneyWords, operatingRows, outrightWords, partsTable, unverifiedRules } from "./memo/answers.js";
 import { splitValues, withPlans } from "./memo/clauses.js";
 import { sidesOf, tradeOff } from "./memo/side-by-side.js";
 import { changeWord, naChange } from "./memo/changes.js";
@@ -269,7 +269,7 @@ export function paperDocument(run, { short = false, board = false, decision = nu
       ${opRows.map(r => { const strong = r.kind === "result" || r.kind === "ask"; const lab = strong ? `<b>${h(r.label)}</b>` : h(r.label);
         return `<tr><td>${lab}${r.ph ? ' <span class="st st-uncertain">placeholder</span>' : ""}${r.warn ? ' <span class="st st-uncertain">open</span>' : ""}</td><td class="num">${r.value == null ? (r.warn ? "not entered" : "none") : (strong ? `<b>${h(opMoney(r.value))}</b>` : h(opMoney(r.value)))}</td><td>${h(r.note || "")}</td></tr>`; }).join("")}
       </tbody></table>
-      <p class="note">${signedWords(run)}${((run.proforma.operating || {}).page || {}).own_figures ? "The rents and the running cost are the operator's own, as entered" : "The rents and the running cost are placeholders until the operator's own are entered"}; support staffing and an operating subsidy are never assumed. The last line is an illustration on this screen's mortgage terms, not a funder's financing.</p>` : "";
+      <p class="note">${signedWords(run)}${((run.proforma.operating || {}).page || {}).own_figures ? "The rents and the running cost are the operator's own, as entered" : "The rents and the running cost are placeholders until the operator's own are entered"}; support staffing and an operating subsidy are never assumed. The last line is an illustration on this screen's mortgage terms, not a funder's financing.</p>${partsTable(run.proforma)}` : "";
   const moneyLines = pfOk ? `${moneyWords(run.proforma, run, "text") ? `<p class="lead">${h(moneyWords(run.proforma, run, "text"))}</p>` : ""}<table class="money"><colgroup><col style="width:6%"><col style="width:22%"><col style="width:16%"><col></colgroup>
       <thead><tr><th>Ref</th><th>Line</th><th>Figure</th><th>How, and from what</th></tr></thead><tbody>
       ${run.proforma.lines.map(ln => { const shown = ln.unit === "×" ? (ln.value == null ? "not given" : `×${ln.value}`) : ln.unit && ln.unit.startsWith("$") ? money(ln.value) + (ln.unit === "$/yr" ? " a year" : ln.unit === "$/m²" ? " per m²" : "") : (ln.value == null ? "not given" : fmtNum(ln.value));

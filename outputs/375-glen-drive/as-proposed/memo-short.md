@@ -13,7 +13,7 @@
 | Who is housed | 163 homes and 80 beds, independent rental (social housing), 25 of them supportive homes: 89 at market rent, 37 rent geared to income, 37 deep subsidy; 134 of the 163 fit the first plans |
 | Who operates | Not named |
 | Which program | the Community Housing Fund. Does not pass this screen's eligibility checks for the Community Housing Fund |
-| The amount | Capital cost $96.2M. Asked: nothing from a program. Still to find: $87.0M (90% of the cost). |
+| The amount | Capital cost $96.2M. Asked: nothing from a program. Still to find: $90.7M (94% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Does not pass this screen's eligibility checks for the Community Housing Fund · The money: Needs more sources |
 | The top 3 of 9 open items | 1. BC Housing Community Housing Fund: eligibility and unit mix (fail). 2. District schedule figures entered unverified (CD-1 (819)) (uncertain). 3. Yards not checked: no CD-1 (819) yard rule in the rules (uncertain). |
@@ -55,44 +55,54 @@ Other programs written for this kind of housing, listed from their own pages and
 | The staffing model and its cost | Uncertain | Operator: give the staffing model (who is on site, by shift) and its yearly cost. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Fail | Manager: change what fails, or ask BC Housing which program fits the scheme as it is (answer 2 lists the other programs in the rules written for this housing; their criteria are not tested here, and a program not in the rules may fit as well). Ask: BC Housing, a development manager in Development and Asset Strategies. |
-| Homes that do not fit the plates | Conditional | Architect: 134 of 163 homes fit the plates on 15 floors at the unit sizes assumed; did not fit: 29 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 163. |
+| Homes that do not fit the plates | Conditional | Architect: 134 of 163 homes fit the plates on 15 floors at the unit sizes assumed; did not fit: 29 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks count all 163; the money counts the 134 placed. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $87,035,329, 90% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes and the 80 shelter beds, so the running costs here are the building's alone and the subsidy it needs is not known. No Community Housing Fund grant is counted: the option does not meet the fund's criteria (answer 2). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $90,665,785, 94% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes and the 80 shelter beds, so the running costs here are the building's alone and the subsidy it needs is not known. No Community Housing Fund grant is counted: the option does not meet the fund's criteria (answer 2). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve. It counts the 134 homes the first plans place, of the 163 entered; the floor area and its cost are the option's.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$96,218,453**: hard $71,272,928 (escalated ×1.0311), soft $17,818,232, contingency $7,127,293, land $0.
-- Net operating income **$683,078 a year**: rent $2,463,529 less vacancy $91,151, operating cost $1,579,500 and reserve $109,800.
-- Funding **$9,183,124**: grants $0, equity $0, supportable debt $9,183,124 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
-- Gap **$87,035,329** (90% of the capital cost).
-- Not counted: Community Housing Fund grant ($29,023,617 at the provisional rate), because the option does not meet the fund's criteria (answer 2).
+- Net operating income **$413,030 a year**: rent $1,969,294 less vacancy $72,864, operating cost $1,391,000 and reserve $92,400.
+- Funding **$5,552,668**: grants $0, equity $0, supportable debt $5,552,668 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
+- Gap **$90,665,785** (94% of the capital cost).
+- Not counted: Community Housing Fund grant ($23,859,906 at the provisional rate), because the option does not meet the fund's criteria (answer 2).
 - Left to a person: a hard cost for this building (15 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre; support staffing and who pays for it (the 25 supportive housing homes and the 80 shelter beds run on an operating agreement; none is entered).
 
 **Where the money comes from**, each source with its status:
 
 | Source | Amount | Status |
 |---|---|---|
-| Mortgage the net income carries | $9,183,124 | sized by this screen |
-| Community Housing Fund grant | $29,023,617 | not counted |
-| Still to find | $87,035,329 | to find |
+| Mortgage the net income carries | $5,552,668 | sized by this screen |
+| Community Housing Fund grant | $23,859,906 | not counted |
+| Still to find | $90,665,785 | to find |
 
 ### What it takes to run, a year
 
 | | A year | |
 |---|---:|---|
-| Market rent, 64 homes | $1,573,547 | $2,049 a month a home (the rules' figure) |
-| Rent geared to income, 37 homes | $480,691 | $1,083 a month a home (the rules' figure) |
-| Deep subsidy, 62 homes | $409,291 | $550 a month a home (the rules' figure) |
-| Vacancy | -$91,151 | 3.7%, the CMHC survey's rate, on all tiers |
-| Operating cost | -$1,579,500 | $6,500 a home a year (placeholder); and 80 beds at $6,500 a bed a year (a home’s figure) |
-| Replacement reserve | -$109,800 | with 20 sleeping rooms of four beds, each held like a home |
+| Market rent, 48 homes | $1,190,867 | $2,067 a month a home (the rules' figure) |
+| Rent geared to income, 31 homes | $408,187 | $1,097 a month a home (the rules' figure) |
+| Deep subsidy, 55 homes | $370,240 | $561 a month a home (the rules' figure) |
+| Vacancy | -$72,864 | 3.7%, the CMHC survey's rate, on all tiers |
+| Operating cost | -$1,391,000 | $6,500 a home a year (placeholder); and 80 beds at $6,500 a bed a year (a home’s figure) |
+| Replacement reserve | -$92,400 | with 20 sleeping rooms of four beds, each held like a home |
 | Support staffing | not entered | not entered, and this kind of housing runs on it |
-| **Left after running costs** | **$683,078** | before any operating subsidy or loan payment |
-| Loan payment | -$620,980 | on the mortgage the funding counts (the capital figures above) |
+| **Left after running costs** | **$413,030** | before any operating subsidy or loan payment |
+| Loan payment | -$375,482 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **not entered** | not given: the support staffing is not entered, so what running it costs is not known |
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
+
+#### By part of the building
+
+| Part | Places | Rent | Vacancy | Running cost | Reserve | Staffing | Subsidy | Left a year |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Independent homes | 109 homes | $1,801,003 | -$66,637 | -$708,500 | -$65,400 | — | — | $960,466 |
+| Supportive homes | 25 homes | $168,291 | -$6,227 | -$162,500 | -$15,000 | not entered | — | -$15,436 |
+| Shelter beds | 80 beds | $0 | $0 | -$520,000 | -$12,000 | not entered | — | -$532,000 |
+
+> Each part's own running cost, staffing and subsidy where the operator entered them; the rents by tier. What a part leaves a year is what it needs, or gives, before any loan payment.
 
 
 ## Words in this memo

@@ -69,20 +69,35 @@ class SlimTower(unittest.TestCase):
         cls.L = evaluate(SITE, cls.o, ON)
         cls.m = massing.build(SITE, cls.o, cls.L)
         cls.lay = layout.solve(SITE, cls.o, cls.L, cls.m)
+        # the point tower's own case (26 Nov 2026): its core now runs a shaft longer to hold the two elevators a 19-storey
+        # tower wants (`lift_room`), which costs it the 21.8 × 21 m plate above (48 homes against the corridor's 55); on a
+        # 25 × 21 m plate it still places more than the corridor would
+        base = suggest.suggest(SITE, PROGRAMS, ON, "funder-ready", fixed={"storeys": 19, "height_m": 61.6, "gfa_m2": round(25 * 21.0 * 19)})["option"]
+        cls.co = dict(base, units={k: v + (10 if k == "studio" else 0) for k, v in base["units"].items()})
+        cls.cL = evaluate(SITE, cls.co, ON)
+        cls.cm = massing.build(SITE, cls.co, cls.cL)
+        cls.clay = layout.solve(SITE, cls.co, cls.cL, cls.cm)
+
+    def test_the_slim_plate_holds_its_elevators_in_a_scissor_core(self):
+        core = next(z for z in self.lay["floors"][1]["zones"] if z["block"] == "core")
+        self.assertEqual(core.get("stairs"), "scissor")
+        self.assertGreaterEqual(layout.lift_room(core), 2)
+        self.assertEqual(next(i for i in self.lay["operability"]["items"] if i["key"] == "lifts")["status"], "pass")
 
     def test_a_compact_tower_is_a_point_tower_its_homes_round_the_core(self):
-        p, eg = self.lay["plate"], self.lay["egress"]
+        p, eg = self.clay["plate"], self.clay["egress"]
         self.assertEqual(p["arrangement"], "point")
         self.assertGreaterEqual(min(p["unit_depth_m"], p["side_depth_m"]), layout.LAYOUT_ASSUMPTIONS["min_home_depth_m"][0])
-        for fl in self.lay["floors"]:
+        for fl in self.clay["floors"]:
             cores = [z for z in fl["zones"] if z["block"] == "core"]
             self.assertEqual(len(cores), 1, fl["name"])
             self.assertEqual(cores[0].get("stairs"), "scissor", fl["name"])
+            self.assertEqual(layout.lift_room(cores[0]), 2, fl["name"])                              # two elevators
             self.assertEqual(sum(1 for z in fl["zones"] if z["block"] == "corridor"), 4, fl["name"])   # the ring
-        typical = self.lay["floors"][len(self.lay["floors"]) // 2]
+        typical = self.clay["floors"][len(self.clay["floors"]) // 2]
         self.assertEqual({z["side"] for z in typical["zones"] if z.get("unit")}, {"front", "rear", "left", "right"})
-        self.assertEqual(self.lay["units_placed"], sum(self.o["units"].values()))
-        # the doors on opposite faces: smoke goes round the 7 × 7 m core, 14 m, against 9
+        self.assertEqual(self.clay["units_placed"], sum(self.co["units"].values()))
+        # the doors on opposite faces: smoke goes round the 9.6 × 7 m core, 16.6 m, against 9
         self.assertEqual(eg["status"], "pass", eg["summary"])
         self.assertTrue(eg["scissor_stair"])
         self.assertIn("opposite faces", eg["summary"])
@@ -91,14 +106,14 @@ class SlimTower(unittest.TestCase):
         for f in eg["floors"]:
             self.assertAlmostEqual(f["separation_m"], c["w"] + c["d"], places=1)
             self.assertLessEqual(f["dead_end_m"], f["dead_end_limit_m"] + 1e-6, f["notes"])
-        self.assertIn("A point tower", layout.svg_plans(self.lay))
+        self.assertIn("A point tower", layout.svg_plans(self.clay))
 
     def test_it_places_more_homes_than_the_corridor_would(self):
-        slab = layout._solve(SITE, self.o, self.L, self.m, layout.blocks(self.o, self.L), None)
-        self.assertGreater(self.lay["units_placed"], slab["units_placed"])
+        slab = layout._solve(SITE, self.co, self.cL, self.cm, layout.blocks(self.co, self.cL), None)
+        self.assertGreater(self.clay["units_placed"], slab["units_placed"])
 
     def test_the_block_editor_keeps_the_point_tower(self):
-        again = layout.place_zones(SITE, self.o, self.L, self.m, layout.zones_of(self.lay))
+        again = layout.place_zones(SITE, self.co, self.cL, self.cm, layout.zones_of(self.clay))
         self.assertEqual(again["plate"]["arrangement"], "point")
         self.assertTrue(again["egress"]["scissor_stair"])
         self.assertEqual(again["egress"]["status"], "pass", again["egress"]["summary"])

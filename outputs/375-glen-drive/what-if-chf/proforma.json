@@ -9,6 +9,8 @@
       "three_bed_plus": 5
     },
     "units_total": 110,
+    "units_entered": 110,
+    "homes_basis": "entered",
     "gfa_m2": 10857.0,
     "gfa_from": "the option",
     "rent_tiers_units": {
@@ -97,7 +99,37 @@
       "vacancy_rate": 0.037,
       "vacancy_from": "rule",
       "named_loan_service": null,
-      "nonres_income": null
+      "nonres_income": null,
+      "parts": [
+        {
+          "key": "independent",
+          "label": "Independent homes",
+          "places": 85,
+          "unit": "homes",
+          "rent": 1076889,
+          "vacancy": 39845,
+          "cost": 552500,
+          "reserve": 51000,
+          "staffing": null,
+          "subsidy": null,
+          "staffing_missing": false,
+          "net": 433544
+        },
+        {
+          "key": "supportive",
+          "label": "Supportive homes",
+          "places": 25,
+          "unit": "homes",
+          "rent": 169623,
+          "vacancy": 6276,
+          "cost": 162500,
+          "reserve": 15000,
+          "staffing": null,
+          "subsidy": null,
+          "staffing_missing": true,
+          "net": -14153
+        }
+      ]
     }
   },
   "funding": {

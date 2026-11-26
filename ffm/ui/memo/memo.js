@@ -39,10 +39,14 @@ export function briefName(name, site = null) {
   if (s.length > 40 && s.includes(" (")) s = s.split(" (")[0].trim();
   return s;
 }
-import { renderFigures, wireFigures } from "../figures/cards.js";
+import { refitFigures, renderFigures, wireFigures } from "../figures/cards.js";
 import { foot, renderStage } from "../route-stage.js";
-import { applyModeToMemo, setView } from "../modes.js";
-import { myName } from "../issue.js";
+import { applyModeToMemo } from "../modes.js";
+import { myName, syncIssueButton } from "../issue.js";
+import { renderTabs, selectTab, tabbed, tabOf, whenShown } from "./tabs.js";
+
+// the drawings measure their labels against their card's width, which is 0 in a hidden tab: refit when shown
+whenShown("drawings", () => requestAnimationFrame(() => refitFigures()));
 
 export function renderQuiet() {
   if (state.run) return;  // a run is on screen: leave it
@@ -101,6 +105,9 @@ function quietCard(eyebrow, title, line) {
   </section>`;
 }
 
+/* The memo's disclaimer: in the Reader's title block, and at the foot of the answers where the memo is in tabs. */
+const DISCLAIMER = "A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.";
+
 export function renderMemo(run) {
   const L = run.ledger, res = L.results, ans = L.summary.answers;
   const site = L.inputs.site, opt = L.inputs.option;
@@ -135,7 +142,7 @@ export function renderMemo(run) {
     ${optionFiguresHtml(site, opt, run)}
     <div class="memo-actions" id="memo-actions"></div>
     <nav class="memo-index" id="memo-index" aria-label="In this memo"></nav>
-    <p class="quiet memo-disclaimer">A feasibility screen, not legal, planning or funding advice. Deterministic output of the rule stack listed under Sources: same inputs and rule set, same memo; every number links to the document it came from. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.</p>
+    <p class="quiet memo-disclaimer head-disclaimer">${DISCLAIMER}</p>
   </div>`);
   // a run handed to this reader carries the sender's note, where the reader can see it (15 Nov 2026)
   // the note addressed to this browser's name, else to the layout on screen where it named no one (26 Nov 2026)
@@ -163,20 +170,25 @@ export function renderMemo(run) {
   rest.push(renderInputs(site, opt));
   rest.push(renderSources(res, site, opt));
   rest.push(renderStamp(L.run, run.run_id));
-  // the clauses stand on their own so the reader's order can be the paper's: answers, comparison, clauses, massing, ledger
+  // The memo in parts, each a tab's panel (26 Nov 2026, a UX designer's brief: 19,400 px of memo for the architect, the
+  // ledger 10,800 px down): the operator's figures (the Operator's first), the answers with the ask beside them, the
+  // comparison while two runs are compared, the drawings with the area schedule, the clauses, the ledger, the inputs
+  // with the sources and the fingerprint. The Reader reads them in one column, in the paper's order (app.css).
   const figures = renderFigures(run);
-  // the operator's desk leads the operator's layout; the area schedule follows the drawings in every layout (24 Nov 2026)
   const desk = operatorDesk(run);
-  if (desk) parts.push(desk);
-  // the front sheet, shaped as an ask, before the answers in every layout (25 Nov 2026)
-  parts.push(frontHtml(run));
-  parts.push(`<div class="memo-body">
-    <div class="answers">${answerAllowed(L, run)}${answerFunders(L, run)}${answerUnsure(L, run)}${answerMoney(run)}${unverifiedLine(L)}${wordsHtml(run)}</div>
-    ${compare ? `<div class="memo-compare">${compare}</div>` : ""}
-    ${figures}
-    ${areaScheduleHtml(run) ? `<div class="memo-areas">${areaScheduleHtml(run)}</div>` : ""}
-    <div class="memo-clauses">${renderClauses(res, L, changed, run)}</div>
-    <div class="memo-rest">${rest.join("\n")}</div>
+  const areas = areaScheduleHtml(run);
+  parts.push(`<div class="memo-tabs" id="memo-tabs" role="tablist" aria-label="The memo's parts" hidden></div>`);
+  parts.push(`<div class="memo-panels">
+    ${desk ? `<section class="memo-panel" id="panel-operating" data-tab="operating">${desk}</section>` : ""}
+    <section class="memo-panel" id="panel-answers" data-tab="answers">
+      <div class="answers-grid">${frontHtml(run)}<div class="answers">${answerAllowed(L, run)}${answerFunders(L, run)}${answerUnsure(L, run)}${answerMoney(run)}${unverifiedLine(L)}${wordsHtml(run)}</div></div>
+      <p class="quiet memo-disclaimer panel-disclaimer">${DISCLAIMER}</p>
+    </section>
+    ${compare ? `<section class="memo-panel" id="panel-comparison" data-tab="comparison"><div class="memo-compare">${compare}</div></section>` : ""}
+    <section class="memo-panel" id="panel-drawings" data-tab="drawings">${figures}${areas ? `<div class="memo-areas">${areas}</div>` : ""}</section>
+    <section class="memo-panel" id="panel-clauses" data-tab="clauses"><div class="memo-clauses">${renderClauses(res, L, changed, run)}</div></section>
+    <section class="memo-panel" id="panel-ledger" data-tab="ledger">${rest[0]}</section>
+    <section class="memo-panel" id="panel-inputs" data-tab="inputs"><div class="inputs-grid">${rest.slice(1).join("\n")}</div></section>
   </div>`);
 
   // the run pickers leave the memo before it is replaced and come back after; a picker that had focus keeps it
@@ -192,6 +204,9 @@ export function renderMemo(run) {
   memoEl.classList.add("landed");
   placeRunTools(true);
   indexMemo(memoEl);
+  // a picker in hand that has just made or changed a comparison sits in the Comparison tab now: show it, so the
+  // keyboard is not left in a hidden panel
+  renderTabs(memoEl, focused && compare ? "comparison" : null);
   wireJumps(memoEl);
   if (focused && document.activeElement !== focused) focused.focus({ preventScroll: !!focused.closest("#side-by-side") });
   wireSideBySide(run);
@@ -203,22 +218,24 @@ export function renderMemo(run) {
   wireAreaSchedule(run);
   setPrintFooter(run);
   syncStaleBand();
+  syncIssueButton();
 }
 
 /* The memo's sheet index, in its title block, as a drawing set lists its sheets (24 Nov 2026: 11,000 to 19,000 px of
    memo with no way across it but the scroll bar). Only the parts this memo has; the layouts that leave a part out hide
    its link (app.css), and a jump opens any fold the part sits in. */
+// in the Reader's order, the paper's: the clauses before the drawings (app.css `order`)
 const MEMO_INDEX = [
   ["ask", ".memo-ask", "The ask"],
-  ["answers", ".memo-body > .answers", "The four answers"],
+  ["answers", ".memo-panel .answers", "The four answers"],
   ["compare", ".memo-compare", "The comparison"],
-  ["figures", ".memo-body > .figures", "Drawings"],
-  ["areas", ".memo-areas", "Area schedule"],
   ["clauses", ".memo-clauses", "Clauses"],
-  ["ledger", ".memo-rest .ledger", "Ledger"],
-  ["inputs", ".memo-rest .inputs-used", "Inputs"],
-  ["sources", ".memo-rest .sources", "Sources"],
-  ["stamp", ".memo-rest .stampbox", "Fingerprint"],
+  ["figures", ".memo-panel .figures", "Drawings"],
+  ["areas", ".memo-areas", "Area schedule"],
+  ["ledger", "#panel-ledger .ledger", "Ledger"],
+  ["inputs", "#panel-inputs .inputs-used", "Inputs"],
+  ["sources", "#panel-inputs .sources", "Sources"],
+  ["stamp", "#panel-inputs .stampbox", "Fingerprint"],
 ];
 
 function indexMemo(memoEl) {
@@ -245,8 +262,10 @@ function wireJumps(memoEl) {
     const t = document.getElementById(a.getAttribute("href").slice(1));
     if (!t) return;
     e.preventDefault();
+    // a part in another tab: that tab first (26 Nov 2026), then the folds the part sits in
+    const tab = tabOf(t);
+    if (tab && tabbed()) selectTab(tab, { scroll: false });
     for (let d = t.closest("details"); d; d = d.parentElement ? d.parentElement.closest("details") : null) d.open = true;
-    if (!t.getClientRects().length) setView("detailed");
     t.scrollIntoView({ behavior: scrollBehavior(), block: "start" });
     if (!t.hasAttribute("tabindex")) t.tabIndex = -1;
     t.focus({ preventScroll: true });
@@ -392,9 +411,8 @@ export function placeRunTools(intoMemo) {
     if (cell) { cell.prepend(label); eyebrow.textContent = word; hint.textContent = purpose; }
     else { tools.insertBefore(label, $("#compare-note")); eyebrow.textContent = eyebrow.dataset.text; hint.textContent = ""; }
   }
-  // the view switch stays when both pickers have moved into the Side by side card (24 Nov 2026: comparing hid
-  // Summary, Detailed and 3D preview with the row they shared)
-  tools.hidden = !$(".tool, #view-switch", tools);
+  // with both pickers in the Side by side card the row above the memo has nothing left to show
+  tools.hidden = !$(".tool", tools);
 }
 
 /* The memo's actions, Download PDF first, sit in its title block (16 Nov 2026; before, at the foot of a page some
@@ -402,11 +420,12 @@ export function placeRunTools(intoMemo) {
    opened some 17,900 px below its button). Whenever the memo is about to be replaced they go back to the export
    footer, so they are never thrown away with it; the footer shows only while it holds them. */
 function placeActions(intoMemo) {
-  const bar = $("#export-actions"), issue = $("#issue-panel"), board = $("#board-panel"), revit = $("#export-panel"), foot = $("#step-export");
+  // (26 Nov 2026) issuing moved to the top bar, beside the Revision it numbers; its form goes with it
+  const bar = $("#export-actions"), board = $("#board-panel"), revit = $("#export-panel"), foot = $("#step-export");
   if (!bar || !foot) return;
   const slot = intoMemo ? $("#memo-actions") : null;
-  if (slot) { slot.append(bar, issue, board, revit); foot.hidden = true; return; }
-  if (bar.parentElement !== foot) { $("h2", foot).after(bar); bar.after(issue); issue.after(board); foot.append(revit); }
+  if (slot) { slot.append(bar, board, revit); foot.hidden = true; return; }
+  if (bar.parentElement !== foot) { $("h2", foot).after(bar); bar.after(board); foot.append(revit); }
   foot.hidden = false;
 }
 

@@ -157,3 +157,52 @@ shelter rate and its 80 beds' running costs), the CHF what-if 64% (56%). `375-gl
 suite does not run the page's code). After the second pass: 461 tests; the committed runs regenerated again, every
 answer, gap, open-item count and fingerprint the same. Checked in the browser: a four-plex on a 10 m lot (4 of 4, two
 rows back to back, the Part 9 exit item, the plan's words), the Glen Drive comparison's reason, the fetch date in words.
+
+## The flow items, and the long pages (26 Nov 2026)
+
+Kai asked for the flow items and the long card to be fixed, with the same critique applied to the architect's memo
+("too much scrolling… create tabs… Issue button should also be more visible on top"), and for a UX designer to lay it
+out. A designer (an AI role-play, Opus) measured the page at 1366 and 2000 px and wrote a brief; it was built as written
+unless said below. Kai chose that **the money counts only the homes the first plans place**.
+
+**The flow items** (the "Large" and "Medium" lists above, and flow problems 2, 3 and 5):
+
+| Item | Now | Where |
+|---|---|---|
+| Homes priced against homes placed | **Fixed.** Where the first plans place fewer homes than entered, the pro-forma counts the placed ones, type by type, and says so ("it counts the 70 homes the first plans place, of the 105 entered"); answer 3's homes item says the money counts the placed. | `proforma.build(..., layout)`, `placed_units` |
+| A core sized from the lift count | **Fixed.** A core holds one lift, and one more for each 2.6 m it runs past 7 m (an assumption); the solver grows a core for the lifts the building wants, so every committed apartment run's elevators pass. | `layout.lift_room`, `_solve`, `_point_geometry` |
+| A budget per part of a mixed building | **Fixed.** Each part (supportive homes, shelter beds) takes its own running cost, staffing, subsidy and whether it is confirmed; the operating page adds a table by part, twinned on the page and on paper. | `operations.parts`, `proforma`, `memo/answers.js` `partsTable` |
+| What is already decided | **Fixed.** A permit issued (`permit_issued_on`) and a land agreement signed (`land_agreement_signed_on`) join the approved rezoning; the front sheet has an "Already decided" row; a permit settles the yards, trees, heritage and existing-building items. Expo as permitted carries its permit of 5 Feb 2025 and reads four open items. | `checks`, `engine.summarise` `decided`, `memo.front_sheet`, `memo/front.js` |
+
+**The long pages** (measured by the designer before; after, measured in the browser the same evening):
+
+| Screen | Before | After |
+|---|---|---|
+| Stop 02, 998 E 19th Ave, 1366 px | card 2,125 px, page 2,318, 79 controls, Continue at the foot | card 792, page 1,041, 15 controls, Continue stuck to the window's foot |
+| Architect, R1, 1366 px | 19,401 px; the ledger 10,825 px down | Answers 4,297 · Drawings 5,799 · Clauses 2,029 · Ledger 6,757 · Inputs 3,045, each one click away |
+| Operator, 375 Glen Drive, 2000 px | 14,710 px | Operating figures 1,557 px, the desk in two columns |
+| Manager, 375 Glen Drive, 2000 px | ask and answers stopped at 920 px; 526 px empty before FIG 01 | answers 880 px with the ask 708 px beside them; FIG 01 and FIG 02 side by side, the engine's sheets a row each at their own size |
+| Operator, 375 Glen Drive, 1366 px | Sign these figures at 1,574 px | at 699 px, in the first screen, beside the figures |
+| Architect, Inputs and sources, 2000 px | 2,933 px, text at 72ch in 1,530 px cards | 2,271 px, the sources beside the inputs and the fingerprint |
+
+- **The memo in tabs** for the manager, the architect and the operator: Answers, Comparison (while comparing), Drawings
+  and areas, Clauses, Ledger, Inputs and sources, and the operator's figures first for the operator. The Reader keeps
+  the long page. **The Summary | Detailed | 3D preview switch and its 3D preview page are retired**: Answers is the old
+  Summary, and FIG 01's own Plan | 3D switch, now at full width, is the 3D view.
+- **Issue in the top bar**, beside the revision it numbers, reachable from every tab; where it cannot issue it says why
+  instead of greying out ("Run again first: the option changed after R2"), and "again" only after an earlier issue.
+- **Stop 02**: the decision first, every default said in words, the rest on request; what the lot and the rules allow
+  beside the card on a wide screen; the candidates in one order; route row 02 names the suggestion.
+- **Smaller**: the top bar is one row up to 1720 px (it wrapped to 119 px at 1366 and 1536, so jumps landed under it);
+  the issue chip is capped; answer 2's other programs and answer 4's operating table are folded (the table stays open
+  for the operator); Back restores the operator's layout; the formats note is said once.
+- **The designer's review of the build** (the same role-play, in the browser at 1366, 1536 and 2000 px, light and dark)
+  found six things, all fixed and re-measured: the drawings two to a row drew the engine's sheets under their own
+  width (labels at 6.9 px) and left holes, so only FIG 01 and FIG 02 pair now; the bar wrapped again from 1500 to 1660
+  px; Massing and plans landed under the tab strip; the ask's column stood empty on a 768 px window; the Issue popover
+  lost Esc after Tab, lost typed text on a click outside and had no name. Not changed: a saved option's Homes figure
+  has no pencil at 02 (only a derived one's splits by the mix), as before.
+
+494 tests (`tests/test_panel3_flow.py` and `tests/test_memo_tabs.py` are new). The committed runs were regenerated for
+the money and the cores (fingerprints unchanged): R1 and R3 at 998 E 19th Ave a 70% gap on 70 of 105 homes placed, R2
+62% on 59 of 88; Expo's 12-storey what-if 55% on 98 of 120; Glen Drive 94% on 134 of 163, its CHF what-if 64%.

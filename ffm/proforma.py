@@ -184,10 +184,24 @@ def mortgage_constant(rate_pct: float, years: int) -> float:
     return 12 * i / (1 - (1 + i) ** -n)
 
 
-def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -> dict[str, Any]:
+def placed_units(layout: dict | None) -> dict[str, int] | None:
+    """The homes the first plans place, by type (a home counted once, on its entry floor), or None without plans. Pure."""
+    if not layout or not layout.get("floors"):
+        return None
+    out = {k: 0 for k in UNIT_KEYS}
+    for fl in layout["floors"]:
+        for z in fl.get("zones") or []:
+            if z.get("unit") in out:
+                out[z["unit"]] += 1
+    return out
+
+
+def build(site: dict, option: dict, ledger: dict, massing: dict | None = None, layout: dict | None = None) -> dict[str, Any]:
     """The pro-forma. With the run's `massing`, a floor area the option leaves blank is taken from the proposed mass
     (plate × storeys) and every line that uses it says so (15 Nov 2026: before, FIG 02 stated a floor area while
-    answer 4 said there was none)."""
+    answer 4 said there was none). With the run's `layout`, the rents, the running costs, the grant and the debt count
+    the homes the first plans place, not every home entered (25 Nov 2026, Kai: "placed homes only"; R1 priced 105 homes
+    on plans that hold 70); the floor area and its cost stay the option's."""
     F = _layer(ledger, "F")
     E = _layer(ledger, "E")
     lines: list[dict] = []
@@ -208,7 +222,12 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         return {"grade": "feasibility", "available": False, "why": f"layer F is missing {', '.join(missing)} on this date", "lines": [], "verdict": {"word": "unsure", "why": ["the assumptions layer is incomplete"], "unsure": missing}}
 
     units = _units(option)
+    entered_n = sum(units.values())
+    placed = placed_units(layout)
+    if placed is not None and sum(placed.values()) < entered_n:
+        units = {k: min(units[k], placed.get(k, 0)) for k in UNIT_KEYS}
     n = sum(units.values())
+    homes_basis = "placed" if n < entered_n else "entered"
     gfa = float(option.get("gfa_m2") or 0)
     gfa_from = "the option"
     if not gfa and massing and option.get("storeys"):
@@ -457,13 +476,51 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     staffed = {k: c for k, c in parts.items() if k != "independent"}
     staffed_words = HOUSING_WORDS[kind] if kind != "independent" else " and ".join(
         f"the {c} {'shelter beds' if k == 'shelter' else HOUSING_WORDS[k] + ' homes'}" for k, c in staffed.items())
-    staffing_missing = bool(places) and bool(staffed) and staffing is None
+    # A budget per part of a mixed building (26 Nov 2026; the operator and the towers architect on 25 Nov: a shelter,
+    # supportive homes and rental homes ran on one budget, so nobody could say what each part needs). Each staffed part
+    # takes its own running cost, staffing and subsidy where entered (`operations.parts.<kind>`); the building's own
+    # staffing and subsidy stay as the whole building's, unsplit. Rents stay by tier (a supportive home at the shelter
+    # component, a shelter bed none).
+    pin = opsin.get("parts") if isinstance(opsin.get("parts"), dict) else {}
+
+    def pe(part: str, key: str) -> float | None:
+        v = (pin.get(part) or {}).get(key) if isinstance(pin.get(part), dict) else None
+        return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+    sup_here = min(sup_n, n) if kind == "independent" else 0
+    split = [(k, c) for k, c in (("independent" if kind == "independent" else kind, n - sup_here), ("supportive", sup_here), ("shelter", beds_n if n else 0)) if c > 0]
+    mixed = len(split) > 1
+    part_costs: dict[str, float] = {}
+    if mixed:
+        own_sup = pe("supportive", "operating_cost_cad_year")
+        if sup_here and own_sup is not None:
+            opx = (opx or 0) + round(sup_here * (own_sup - per_opx))
+            part_costs["supportive"] = own_sup
+        own_shel = pe("shelter", "operating_cost_cad_year")
+        if bed_opx is not None and own_shel is not None:
+            opx = (opx or 0) + round(beds_n * own_shel) - bed_opx
+            bed_opx = round(beds_n * own_shel)
+            own_bed = own_shel
+            part_costs["shelter"] = own_shel
+    part_staff = {k: round(pe(k, "staffing_cad_year")) for k, _ in split if k != "independent" and pe(k, "staffing_cad_year") is not None}
+    part_sub = {k: round(pe(k, "operating_subsidy_cad_year")) for k, _ in split if pe(k, "operating_subsidy_cad_year") is not None}
+    whole_staff = staffing
+    if mixed and part_staff:
+        staffing = (staffing or 0) + sum(part_staff.values())
+    # a staffed part with no staffing of its own, and none for the whole building, leaves the building's staffing unknown
+    unstaffed = [k for k, _ in split if k not in ("independent",) and k not in part_staff] if mixed else []
+    staffing_missing = bool(places) and bool(staffed) and (staffing is None or bool(mixed and unstaffed and entered("support_staffing_cad_year") is None and part_staff))
     noi = round(gross - (vacancy or 0) - (opx or 0) - (reserve or 0) - (staffing or 0) + (nr_income or 0)) if gross is not None else None
     if nr_income:
         line("nonres_income", "Income from the floors that are not homes", round(nr_income), "$/yr", None, "entered: rent or a contribution to running costs from the non-residential space (the option's finance block)", False)
     # an operating subsidy, as the manager has it: counted toward what a lender would lend against only once confirmed
     subsidy = round(entered("operating_subsidy_cad_year")) if entered("operating_subsidy_cad_year") is not None and places else None
     subsidy_confirmed = bool(subsidy) and opsin.get("subsidy_confirmed") is True
+    if mixed and part_sub:
+        # a part's subsidy is confirmed by its own agreement; the building's total is confirmed only where every one is
+        each_ok = [(pin.get(k) or {}).get("subsidy_confirmed") is True for k in part_sub] + ([subsidy_confirmed] if subsidy else [])
+        subsidy = (subsidy or 0) + sum(part_sub.values())
+        subsidy_confirmed = bool(subsidy) and all(each_ok)
     # the subsidy's term (24 Nov 2026, the operator's review: a confirmed 3-year agreement was borrowed against for 40
     # years and the money read "likely"): a loan is sized on it only where the term covers the amortization
     term = entered("subsidy_term_years")
@@ -472,14 +529,17 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     beds_words = (f"; and {beds_n} beds at ${(own_bed if own_bed is not None else per_opx):,.0f} a bed a year"
                   + (" (entered)" if own_bed is not None else " (a home's figure: enter the operator's cost a bed)")) if bed_opx is not None else ""
     line("opex", "Operating cost", opx, "$/yr", None if own_opx is not None else "f.operating",
-         (f"entered: ${per_opx:,.0f} per home a year (the option's operating figures)" if own_opx is not None else f"${ops.get('operating_cost_per_unit_year_cad'):,} per unit") + beds_words,
+         (f"entered: ${per_opx:,.0f} per home a year (the option's operating figures)" if own_opx is not None else f"${ops.get('operating_cost_per_unit_year_cad'):,} per unit") + beds_words
+         + (f"; the {sup_here} supportive homes at ${part_costs['supportive']:,.0f} a home a year (entered for that part)" if "supportive" in part_costs else ""),
          (own_opx is None and is_placeholder("f.operating")) or (bed_opx is not None and own_bed is None))
     line("reserve", "Replacement reserve", reserve, "$/yr", None if own_res is not None else "f.operating",
          (f"entered: ${per_res:,.0f} per home a year" if own_res is not None else f"${ops.get('replacement_reserve_per_unit_year_cad'):,} per unit")
          + (f"; and {-(-beds_n // 4)} sleeping rooms of four beds, each held like a home" if bed_res is not None else ""),
          own_res is None and is_placeholder("f.operating"))
     line("staffing", "Support staffing", staffing, "$/yr", None,
-         "entered in the option's operating figures" if staffing is not None else
+         (("entered: " + ", ".join(([f"the whole building ${whole_staff:,.0f}"] if whole_staff else []) + [f"the {k} part ${v:,.0f}" for k, v in part_staff.items()])
+           + (f"; not entered for the {' and '.join(unstaffed)} part" if staffing_missing and unstaffed else "")) if mixed and part_staff
+          else "entered in the option's operating figures") if staffing is not None else
          (f"not entered: {staffed_words} run on staffing this screen does not estimate" if staffing_missing else "none entered"), False)
     line("noi", "Net operating income", noi, "$/yr", None, "gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy", False)
     line("subsidy", "Operating subsidy", subsidy, "$/yr", None,
@@ -598,8 +658,12 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         # no homes entered: no rent, no debt and no grant can be counted, so the gap is the whole capital cost and
         # says nothing about the funders (17 Nov 2026: Expo as permitted read a 100% gap as a verdict)
         word = "unsure"
-        why.append(f"the option has no homes entered, so there is no rent, debt or grant to set against the ${capital:,.0f} capital cost")
-        unsure.insert(0, "the unit mix (homes by type: studio, one-, two- and three-bedroom)")
+        if entered_n:
+            why.append(f"none of the {entered_n} homes entered fits the first plans, so there is no rent, debt or grant to set against the ${capital:,.0f} capital cost")
+            unsure.insert(0, "plans that hold the homes (the architect's, in Edit blocks)")
+        else:
+            why.append(f"the option has no homes entered, so there is no rent, debt or grant to set against the ${capital:,.0f} capital cost")
+            unsure.insert(0, "the unit mix (homes by type: studio, one-, two- and three-bedroom)")
     elif land_cost is None and gap_share is not None and gap_share > GAP_UNLIKELY_SHARE:
         # a land price can only add to the cost: a gap already past the line before it is past the line (20 Nov 2026:
         # it read "unsure: the land cost is not settled" with a 49% gap)
@@ -691,6 +755,34 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
         "vacancy_rate": vac, "vacancy_from": "entered" if own_vac is not None else "rule",
         "named_loan_service": loan_service or None, "nonres_income": round(nr_income) if nr_income else None,
     }
+    # the budget by part (26 Nov 2026): each part's rent, its share of vacancy, running cost and reserve, its own staffing
+    # and subsidy, and what it leaves; the building's unsplit staffing and subsidy as a row of their own
+    if mixed:
+        deep_each = (rev["deep_subsidy"] or 0) / tier_homes["deep_subsidy"] if tier_homes.get("deep_subsidy") else 0
+        label = {"independent": "Independent homes", "supportive": "Supportive homes", "transitional": "Transitional homes", "shelter": "Shelter beds"}
+        rows = []
+        for k, c in split:
+            if k == "shelter":
+                rent, cost, res_ = 0, bed_opx or 0, bed_res or 0
+            elif k == "supportive" and kind == "independent":
+                rent = round(c * deep_each)
+                cost, res_ = round(c * part_costs.get("supportive", per_opx)), round(c * per_res)
+            else:     # the homes that are not split out: the rest of the rent, cost and reserve of the homes
+                rent = (gross or 0) - round(sup_here * deep_each)
+                cost = (opx or 0) - (bed_opx or 0) - (round(sup_here * part_costs.get("supportive", per_opx)) if sup_here else 0)
+                res_ = (reserve or 0) - (bed_res or 0) - (round(sup_here * per_res) if sup_here else 0)
+            vac_ = round(rent * vac)
+            st_, sb_ = part_staff.get(k), part_sub.get(k)
+            rows.append({"key": k, "label": label.get(k, k), "places": c, "unit": "beds" if k == "shelter" else "homes", "rent": rent, "vacancy": vac_,
+                         "cost": cost, "reserve": res_, "staffing": st_, "subsidy": sb_,
+                         "staffing_missing": k != "independent" and st_ is None and whole_staff is None,
+                         "net": rent - vac_ - cost - res_ - (st_ or 0) + (sb_ or 0)})
+        whole_sub = subsidy - sum(part_sub.values()) if subsidy is not None else None
+        if whole_staff or whole_sub:
+            rows.append({"key": "whole", "label": "The whole building, not split", "places": None, "unit": "", "rent": 0, "vacancy": 0, "cost": 0, "reserve": 0,
+                         "staffing": whole_staff or None, "subsidy": whole_sub or None, "staffing_missing": False,
+                         "net": -(whole_staff or 0) + (whole_sub or 0)})
+        page["parts"] = rows
     # a shelter counted in beds: the subsidy a bed a month. Beds beside homes: one figure for the building's places, the
     # homes and the beds together (25 Nov 2026: the whole need was divided once per home and again per bed, so a funder
     # read the building's deficit as the shelter's alone)
@@ -735,10 +827,15 @@ def build(site: dict, option: dict, ledger: dict, massing: dict | None = None) -
     placeholders = [l["label"] for l in lines if l["placeholder"]]
     if placeholders:
         why.append("placeholders in use: " + ", ".join(placeholders))
+    if homes_basis == "placed":
+        why.append(f"it counts the {n} homes the first plans place, of the {entered_n} entered; the floor area and its cost are the option's")
+        line("homes", "Homes counted", n, "homes", None,
+             f"the {n} homes the first plans place, of the {entered_n} the option enters (answer 3 names the rest); the rents, running costs, grant and debt count these", False)
 
     return {
         "grade": "feasibility", "available": True,
-        "inputs": {"units": units, "units_total": n, "gfa_m2": gfa or None, "gfa_from": gfa_from if gfa else None, "rent_tiers_units": tiers, "finance": fin},
+        "inputs": {"units": units, "units_total": n, "units_entered": entered_n, "homes_basis": homes_basis,
+                   "gfa_m2": gfa or None, "gfa_from": gfa_from if gfa else None, "rent_tiers_units": tiers, "finance": fin},
         "capital": {"hard": hard, "escalation": factor, "soft": soft_cost, "contingency": contingency, "land": land_cost, "total": capital},
         "operating": {"revenue": rev, "gross": gross, "vacancy": vacancy, "operating_cost": opx, "reserve": reserve, "support_staffing": staffing,
                       "noi": noi, "subsidy": subsidy, "page": page},
@@ -955,6 +1052,26 @@ def operating_markdown(pf: dict) -> list[str]:
     L.append("> " + ("The rents and the running cost are the operator's own, as entered" if own else
                      "The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures)")
              + "; support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.")
+    L.append("")
+    L.extend(parts_markdown(pf))
+    return L
+
+
+PART_COLUMNS = (("rent", "Rent"), ("vacancy", "Vacancy"), ("cost", "Running cost"), ("reserve", "Reserve"), ("staffing", "Staffing"), ("subsidy", "Subsidy"), ("net", "Left a year"))
+
+
+def parts_markdown(pf: dict) -> list[str]:
+    """The operating page by part of a mixed building (26 Nov 2026): a row a part, as `page.parts` holds it; the page's
+    memo/answers.js partsTable draws the same rows."""
+    rows = ((((pf or {}).get("operating") or {}).get("page") or {}).get("parts")) or []
+    if not rows:
+        return []
+    L = ["#### By part of the building", "", "| Part | Places | " + " | ".join(w for _, w in PART_COLUMNS) + " |", "|---|---:|" + "---:|" * len(PART_COLUMNS)]
+    for r in rows:
+        cell = lambda k: ("not entered" if k == "staffing" and r.get("staffing_missing") else "—") if r.get(k) is None else _money(-r[k] if k in ("vacancy", "cost", "reserve", "staffing") else r[k])
+        L.append(f"| {r['label']} | {r['places'] if r.get('places') is not None else ''} {r.get('unit') or ''} | " + " | ".join(cell(k) for k, _ in PART_COLUMNS) + " |")
+    L.append("")
+    L.append("> Each part's own running cost, staffing and subsidy where the operator entered them; the rents by tier. What a part leaves a year is what it needs, or gives, before any loan payment.")
     L.append("")
     return L
 

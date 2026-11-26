@@ -88,11 +88,21 @@ async function staticLookup(q) {
     parcels = await cov("property-parcel-polygons", { where: `within_distance(geom, geom'POINT(${lon} ${lat})', 15m)`, limit: "5" });
   }
   const zoning = await cov("zoning-districts-and-labels", { where: `within_distance(geom, geom'POINT(${lon} ${lat})', 3m)`, limit: "3" });
-  // the surroundings around the parcel's centre: the City's streets, 2009 building footprints and public trees
-  // (three quick requests, paged by a hundred), else the Overpass API as python -m ffm context queries it; if
+  // the surroundings around the parcel's centre: the City's streets, lanes, 2009 building footprints and public trees
+  // (quick requests, paged by a hundred), else the Overpass API as python -m ffm context queries it; if
   // neither answers, the site still comes back, without its context
   const radius = 120;
-  const c = JSON.parse(engine.parcelCenter(JSON.stringify(parcels), q.trim())) || [lat, lon];
+  const pc = JSON.parse(engine.parcelCenter(JSON.stringify(parcels), q.trim()));
+  const c = pc || [lat, lon];
+  // as lookup.py (25 Nov 2026): the district at the parcel's centre, the SkyTrain stations for a transit tier, and the
+  // City's numbers near one its list lacks, so the nearest on the street is named and a far "nearest" parcel refused
+  const extra = {};
+  try {
+    if (pc) extra.zoning_centre = await cov("zoning-districts-and-labels", { where: `within_distance(geom, geom'POINT(${pc[1]} ${pc[0]})', 3m)`, limit: "3" });
+    extra.stations = await cov("rapid-transit-stations", { limit: "100" });
+    const nw = JSON.parse(engine.nearestWhere(q.trim()));
+    if (!found && nw) extra.nearest_rows = await cov("property-addresses", { where: nw, limit: "100" });
+  } catch (e) { /* the site comes back without them */ }
   const within = async ds => {
     const out = [];
     for (let page = 0; page < 4; page++) {
@@ -106,9 +116,9 @@ async function staticLookup(q) {
   };
   let elements = null, source = "osm", query = "";
   try {
-    const [streets, buildings, trees] = await Promise.all([within("public-streets"), within("building-footprints-2009"), within("public-trees")]);
+    const [streets, buildings, trees, lanes] = await Promise.all([within("public-streets"), within("building-footprints-2009"), within("public-trees"), within("lanes")]);
     if (streets.length) {
-      elements = JSON.parse(engine.cityElements(JSON.stringify(streets), JSON.stringify(buildings), JSON.stringify(trees)));
+      elements = JSON.parse(engine.cityElements(JSON.stringify(streets), JSON.stringify(buildings), JSON.stringify(trees), JSON.stringify(lanes)));
       source = "city";
       query = `City of Vancouver Open Data within ${radius} m: ${streets.length} streets, ${buildings.length} buildings, ${trees.length} trees`;
     }
@@ -120,7 +130,7 @@ async function staticLookup(q) {
       if (r.ok) { elements = (await r.json()).elements || []; query = ov; }
     } catch (e) { elements = null; }
   }
-  const res = JSON.parse(engine.lookupAssembleFrom(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels), elements ? JSON.stringify(elements) : "", radius, query, source));
+  const res = JSON.parse(engine.lookupAssembleFrom(q.trim(), lat, lon, display, JSON.stringify(zoning), JSON.stringify(parcels), elements ? JSON.stringify(elements) : "", radius, query, source, JSON.stringify(extra)));
   if (!elements) res.site.notes += " The context could not be fetched in the browser; the plan draws a schematic context.";
   return res;
 }

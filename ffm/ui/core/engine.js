@@ -107,12 +107,16 @@ def ffm_parse_address(address):
 def ffm_civic_address(number, street):
     return json.dumps(lookup.civic_address(number, street))
 
-def ffm_city_elements(streets_json, buildings_json, trees_json):
-    return json.dumps(lookup.city_elements(json.loads(streets_json), json.loads(buildings_json), json.loads(trees_json)))
+def ffm_city_elements(streets_json, buildings_json, trees_json, lanes_json="[]"):
+    return json.dumps(lookup.city_elements(json.loads(streets_json), json.loads(buildings_json), json.loads(trees_json), json.loads(lanes_json or "[]")))
 
-def ffm_lookup_assemble_from(address, lat, lon, display, zoning_json, parcels_json, elements_json, radius_m, query, source):
+def ffm_lookup_assemble_from(address, lat, lon, display, zoning_json, parcels_json, elements_json, radius_m, query, source, extra_json="{}"):
     elements = json.loads(elements_json) if elements_json else None
-    return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json), elements, radius_m, query, source))
+    return json.dumps(lookup.assemble(address, lat, lon, display, json.loads(zoning_json), json.loads(parcels_json), elements, radius_m, query, source,
+                                      extra=json.loads(extra_json or "{}")))
+
+def ffm_nearest_where(address):
+    return json.dumps(lookup.nearest_where(address))
 
 from ffm import propose
 
@@ -149,7 +153,7 @@ export function loadEngine() {
                suggest: pyodide.globals.get("ffm_suggest"), readSite: pyodide.globals.get("ffm_read_site"), lookupAssemble: pyodide.globals.get("ffm_lookup_assemble"),
                parcelCenter: pyodide.globals.get("ffm_parcel_center"), cityElements: pyodide.globals.get("ffm_city_elements"),
                parseAddress: pyodide.globals.get("ffm_parse_address"), civicAddress: pyodide.globals.get("ffm_civic_address"),
-               lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from"),
+               lookupAssembleFrom: pyodide.globals.get("ffm_lookup_assemble_from"), nearestWhere: pyodide.globals.get("ffm_nearest_where"),
                proposeRequest: pyodide.globals.get("ffm_propose_request"), proposalFromResponse: pyodide.globals.get("ffm_proposal_from_response"),
                layout: pyodide.globals.get("ffm_layout") };
     setEngineChip(`Engine ready in your browser · Python ${pyodide.runPython("import sys; '%d.%d' % sys.version_info[:2]")}`, "ready");

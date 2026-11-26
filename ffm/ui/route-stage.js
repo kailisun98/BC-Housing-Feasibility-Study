@@ -399,7 +399,10 @@ function cardSite() {
   if (lk && lk.site) {
     const info = lk.site.lookup || {};
     const quiet = `<button type="button" class="btn btn-quiet btn-small" id="guide-lookup-again">Look up another</button>`;
-    const main = `<button type="button" class="btn btn-primary" id="guide-use-site"${info.outside_vancouver ? " disabled" : ""}>${info.civic_mismatch ? `Yes, ${h(String(lk.site.address).split(",")[0])} is the site` : "Use this site"}</button>`;
+    // a "nearest" parcel that is plainly another lot is not offered (25 Nov 2026): look up the nearest number instead
+    const main = info.refused
+      ? (info.nearest_on_street ? `<button type="button" class="btn btn-primary" id="guide-lookup-nearest" data-address="${h(info.nearest_on_street)}">Look up ${h(String(info.nearest_on_street).split(",")[0])}</button>` : "")
+      : `<button type="button" class="btn btn-primary" id="guide-use-site"${info.outside_vancouver ? " disabled" : ""}>${info.civic_mismatch ? `Yes, ${h(String(lk.site.address).split(",")[0])} is the site` : "Use this site"}</button>`;
     return stageCard(1, "Is this the parcel?", previewFacts(lk.site), foot(quiet, main));
   }
   const busy = !!guide.busy.lookup;
@@ -432,7 +435,9 @@ function previewFacts(found) {
         <div><dt>Found</dt><dd><b>${h(found.address)}</b><span class="cont"> · from the ${info.geocoded_as && String(info.geocoded_as).includes("property address") ? "City's address list" : "address as geocoded"}</span></dd></div>
         <div><dt>District</dt><dd>${found.zoning_district ? `<b>${h(districtOf(found))}</b>${districtWords(found)}` : "<i>not found</i>"}</dd></div>
         <div><dt>Lot</dt><dd>${found.site_area_m2 ? `<b>${h(fmtNum(found.site_area_m2))} m²</b> · ${h(found.frontage_m)} × ${h(found.depth_m)} m` : "<i>no parcel polygon at the point</i>"}${p.shape && p.shape.class !== "rectangle" ? ` <span class="cont">· ${h(shapeWords(p.shape))}</span>` : ""}</dd></div>
-        ${info.civic_mismatch ? `<div><dt>Check</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street. This is the parcel found nearest the address: use it only if it is the site.${info.nearest_on_street ? ` The City's nearest number on that street is ${h(info.nearest_on_street)}: look that up instead if it is the lot.` : ""}</dd></div>` : ""}
+        ${info.refused ? `<div><dt>Not taken</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street, and this parcel is not the site: ${h(info.refused)}.${info.nearest_on_street ? ` The City's nearest number on that street is ${h(info.nearest_on_street)}.` : " Try the address as the City lists the lot."}</dd></div>`
+          : info.civic_mismatch ? `<div><dt>Check</dt><dd class="warn-text">You typed ${h(info.civic_typed)}; the City's list has no such number on this street. This is the parcel found nearest the address: use it only if it is the site.${info.nearest_on_street ? ` The City's nearest number on that street is ${h(info.nearest_on_street)}: look that up instead if it is the lot.` : ""}</dd></div>` : ""}
+        ${info.district_at_point ? `<div><dt>Note</dt><dd>The address's point fell in ${h(info.district_at_point)}; the parcel itself is in ${h(districtOf(found))}, which is used.</dd></div>` : ""}
         ${info.outside_vancouver ? `<div><dt>Check</dt><dd class="warn-text">${h(found.municipality)} is outside the City of Vancouver: the rules here cannot read its zoning.</dd></div>` : ""}
       </dl>
     </div>
@@ -528,6 +533,24 @@ function typeOffer() {
   return `<p class="help type-offer">Suggested: <b>${h(ansWord("building_type", off.value).split(":")[0])}</b>, as ${h(why)}. <button type="button" class="btn btn-small" data-use-type="${h(off.value)}">Use it</button></p>`;
 }
 
+/* What the lookup's records suggest for a site question (25 Nov 2026: the transit tier from the nearest SkyTrain station,
+   a lane behind from the City's lanes), offered under it with the reason, never applied unasked (site.suggested, set by
+   lookup.assemble). The transit question names the nearest station where nothing is suggested. */
+function siteOffer(k) {
+  const a = ANSWERS[k];
+  if (!a || a.on !== "site" || !state.site) return "";
+  const s = (state.site.suggested || {})[k];
+  if (!s) {
+    const st = k === "in_transit_oriented_area" && (state.site.lookup || {}).nearest_station;
+    return st ? `<p class="help type-offer">The nearest SkyTrain station is ${h(st.station)}, about ${h(fmtNum(st.distance_m))} m away (the City's station data, which holds no bus exchanges: tiers 4 and 5 are on the map only).</p>` : "";
+  }
+  const cur = answerValue(k);
+  const raw = a.kind === "tri" ? (s.value === true ? "yes" : s.value === false ? "no" : "") : String(s.value);
+  if (a.kind === "tri" ? cur === s.value : String(cur ?? "") === raw) return "";
+  const word = a.kind === "tri" ? (s.value ? "Yes" : "No") : ansWord(k, s.value);
+  return `<p class="help type-offer">From ${h(s.source || "the City's data")}: <b>${h(word)}</b>, as ${h(s.why)}. <button type="button" class="btn btn-small" data-use-answer="${h(k)}" data-value="${h(raw)}">Use it</button></p>`;
+}
+
 function askTable(stop) {
   const keys = Object.keys(ANSWERS).filter(k => ANSWERS[k].stop === stop && (!ANSWERS[k].when || ANSWERS[k].when(state.site || {}, answerValue)));
   if (!keys.length) return "";
@@ -537,7 +560,7 @@ function askTable(stop) {
     const where = text ? ` <span class="ask-where">Find it in ${url ? `<a href="${h(url)}" target="_blank" rel="noopener">${h(text)}</a>` : h(text)}.</span>` : "";
     return `<span class="ask-why">${h(a.why || "")}${where}</span>`;
   };
-  const rows = keys.map(k => `<tr><th scope="row"><span id="ask-${h(k)}">${h(ANSWERS[k].label)}</span>${whyOf(ANSWERS[k])}</th><td>${askControl(k, `ask-${k}`)}${k === "building_type" ? typeOffer() : ""}</td><td class="ask-who">${h(ANSWERS[k].who || "")}</td></tr>`).join("");
+  const rows = keys.map(k => `<tr><th scope="row"><span id="ask-${h(k)}">${h(ANSWERS[k].label)}</span>${whyOf(ANSWERS[k])}</th><td>${askControl(k, `ask-${k}`)}${k === "building_type" ? typeOffer() : siteOffer(k)}</td><td class="ask-who">${h(ANSWERS[k].who || "")}</td></tr>`).join("");
   const lead = stop === 1 ? `<p class="ask-lead">Not sure is a fine answer: the memo carries it as an open item, with the person on the right named to settle it.</p>` : "";
   return `${lead}<table class="ask-table"><thead><tr><th scope="col">Question</th><th scope="col">Answer</th><th scope="col">Who answers</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
@@ -648,6 +671,7 @@ function cardOption() {
         <div class="chips" role="group" aria-label="The programs in view">${progs.map(r => `<label class="chip"><input type="checkbox" class="guide-program" value="${h(r.id)}"${chosen.has(r.id) ? " checked" : ""}> <span>${h(r.title)}</span></label>`).join("")}</div>
         <details class="fold"><summary>Their published terms</summary>${stagePrograms([...chosen])}</details>
       </dd></div>
+      ${R && R.lot ? `<div><dt>What the lot takes</dt><dd>${lotTakes(R.lot)}</dd></div>` : ""}
       <div><dt>What the rules ask here</dt><dd>${reading}</dd></div>
       <div><dt>Start from</dt><dd>
         <div class="start-row">
@@ -670,6 +694,25 @@ function cardOption() {
   const lot = [site.zoning_district, site.site_area_m2 ? `${fmtNum(site.site_area_m2)} m²` : "", site.frontage_m != null ? `${fmtNum(site.frontage_m)} × ${fmtNum(site.depth_m)} m` : ""].filter(Boolean).join(" · ");
   const context = `<p class="stage-context">${h(lot)}${districtWords(site)}</p>`;
   return stageCard(2, "What goes on it?", context + dl, foot(quiet, main));
+}
+
+/* What the lot takes before any option (25 Nov 2026, both panels): the plate the yards leave, the building the schedule
+   allows outright with the homes it holds, the provincial small-scale minimum beside it, and what the use table says of
+   an apartment building, ground-oriented homes, a shelter and a clinic (suggest.lot_reading). */
+const USE_MARK = { pass: ["outright", "rm-applies"], conditional: ["conditional approval", "rm-needs"], uncertain: ["a question for the City", "rm-needs"], fail: ["not listed", "rm-not"] };
+function lotTakes(lot) {
+  const y = lot.yield || {}, p = lot.plate || {}, s = lot.ssmuh || {}, u = lot.uses;
+  const sb = p.setbacks_m || {};
+  const ph = p.placeholder_yards || (p.yards_from === "placeholder" ? ["front", "rear", "side"] : []);
+  const yardsWord = !ph.length ? "the schedule's" : ph.length === 3 ? "placeholders: the rules hold no yards for this district" : `the schedule's, the ${ph.join(" and ")} a placeholder`;
+  const plate = p.area_m2 ? `<p class="dd-line">The plate the yards leave: <b>${h(fmtNum(p.width_m))} × ${h(fmtNum(p.depth_m))} m</b>, ${h(fmtNum(Math.round(p.area_m2)))} m² <span class="cont">· yards front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m, ${h(yardsWord)}</span></p>`
+    : `<p class="dd-line warn-text">The yards leave no plate on this lot as fronted.</p>`;
+  const build = y.storeys ? `<p class="dd-line">${y.outright ? "Outright" : "Roughly"}: <b>${h(y.storeys)} storeys, ${h(fmtNum(y.gfa_m2))} m²</b>${y.fsr != null ? ` (FSR ${h(y.fsr)})` : ""}, about <b>${h(y.homes ?? "no")} homes</b> <span class="cont">· from ${h(y.from)}; the homes at ${h(y.mix_note)}</span></p>` : "";
+  const small = s.applies === true ? `<p class="dd-line">The provincial small-scale minimum: <b>${h(s.why.split(";")[0])}</b>${s.why.includes(";") ? ` <span class="cont">· ${h(s.why.split(";").slice(1).join(";").trim())}</span>` : ""}</p>`
+    : s.applies === false ? `<p class="dd-line cont">The provincial small-scale minimum does not apply: ${h(s.why)}.</p>` : "";
+  const uses = u ? `<ul class="reading-list lot-uses">${u.kinds.map(k => { const [w, c] = USE_MARK[k.status] || ["", "rm-applies"]; return `<li><span class="rmark ${c}">${h(w)}</span> <span><b>${h(k.kind)}</b>: ${h(k.finding)}</span></li>`; }).join("")}</ul><p class="help">From the district's use table (${h(u.rule_id)}). Which use a building is, the City says from the by-law's definitions.</p>`
+    : `<p class="help">The rules hold no use table for this district, so whether housing, a shelter or a clinic is a permitted use is not read here.</p>`;
+  return `${plate}${build}${small}${uses}<p class="help">Rough figures from the rules, before any option: a starting point, not a permission.</p>`;
 }
 
 export const defaultPrograms = () => state.rules.filter(r => r.layer === "E" && /chf|bcbuilds/.test(r.id)).map(r => r.id);
@@ -1028,6 +1071,13 @@ function wireStage(el) {
   const on = (sel, fn) => { const b = $(sel, el); if (b) b.addEventListener("click", fn); };
   if (guide.step === 2) wireBriefEditor(el, stageOptionNow(), renderStage);
   $$("[data-use-type]", el).forEach(b => b.addEventListener("click", () => { takeAnswer("building_type", b.dataset.useType); renderGuide(); }));
+  // a suggested site answer taken: the answer, and what came with it (a lane's distance to its centre line)
+  $$("[data-use-answer]", el).forEach(b => b.addEventListener("click", () => {
+    const k = b.dataset.useAnswer, s = ((state.site || {}).suggested || {})[k] || {};
+    for (const [p, v] of Object.entries(s.also || {})) setPath(state.site, p, v);
+    takeAnswer(k, b.dataset.value);
+    renderGuide();
+  }));
   on("#stage-back", backToMemo);
   on("#stage-resume", () => resumeDraft(stageDraft || readDraft()).catch(e => toast(e.message, true)));
   on("#stage-discard", () => { discardDraft(); renderStage(); });
@@ -1041,6 +1091,8 @@ function wireStage(el) {
   }
   on("#guide-lookup", guideLookup);
   on("#guide-lookup-again", () => { guide.lookup = null; renderGuide(); const a = $("#guide-address"); if (a) { a.focus(); a.select(); } });
+  const nearBtn = $("#guide-lookup-nearest", el);
+  if (nearBtn) nearBtn.addEventListener("click", () => { guide.address = nearBtn.dataset.address.split(",")[0]; guide.lookup = null; guideLookup(); });
   on("#guide-use-site", guideUseSite);
   const saved = $("#guide-saved-site", el);
   if (saved) saved.addEventListener("change", () => useSavedSite(saved.value));

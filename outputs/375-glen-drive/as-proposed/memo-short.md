@@ -2,7 +2,7 @@
 
 **Option:** 375 Glen Drive, as referred to public hearing (rezoned as 1015 East Hastings St; referral report, 5 Jan 2021): 15 and 13 storeys, 163 homes, an 80-bed shelter  
 **Proponent:** BC Housing with the Vancouver Aboriginal Friendship Centre Society, on City land (non profit society)  
-**Rules as of:** 2026-11-17 · **version stamp:** `c0cd775dd41c5779` · engine 0.1.0  
+**Rules as of:** 2026-11-17 · **version stamp:** `7532496a9e6ef1ff` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -161,5 +161,5 @@ Other programs written for this kind of housing, listed from their own pages and
 - Daily Hive, City Council approves First Nations shelter and social housing in Downtown Eastside (17 Feb 2021) — https://dailyhive.com/vancouver/1015-east-hastings-street-vancouver-first-nations-shelter-social-housing
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
-- Stamp (hash of rules hash + rule versions in force on 2026-11-17): `c0cd775dd41c5779`
+- Rules hash (SHA-256 over all rule files): `ca197a7ce1215016d58f8561993b2adae20ce30d3a00e015cf3316f5a2cc6128`
+- Stamp (hash of rules hash + rule versions in force on 2026-11-17): `7532496a9e6ef1ff`

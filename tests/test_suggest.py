@@ -289,7 +289,9 @@ class YardsLeaveNoEnvelope(unittest.TestCase):
         r = next(x for x in L["results"] if x["rule_id"] == "cov.rt3.setbacks")
         self.assertEqual(r["status"], "pass")
         self.assertEqual(r["values"]["min_rear_yard_m"], 16.95)
-        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "yes")
+        # the FSR, height and yards are met; RT-3 lists a Multiple Dwelling as a conditional approval use (25 Nov 2026)
+        self.assertEqual(L["summary"]["answers"]["allowed"]["outright"]["verdict"], "yes, with conditions")
+        self.assertEqual(L["summary"]["answers"]["allowed"]["routes"]["discretion"]["verdict"], "possible")
         m = massing.build(site, o, L)
         self.assertAlmostEqual(m["lot"]["frontage_m"], 15.2, delta=0.1)       # the lot turned to Keefer St
         self.assertGreater(m["envelope"]["depth_m"], 15.5)                      # about 37 - 3.7 - 16.95
@@ -300,7 +302,8 @@ class YardsLeaveNoEnvelope(unittest.TestCase):
         # without a lane the full 20.0 m stands and the envelope is shallower, but still there
         site["context"]["lane_behind"] = False
         L2 = evaluate(site, suggest.suggest(site, ["bch.chf.eligibility"], self.ON)["option"], self.ON)
-        self.assertEqual(L2["summary"]["answers"]["allowed"]["outright"]["verdict"], "yes")
+        self.assertEqual(L2["summary"]["answers"]["allowed"]["outright"]["verdict"], "yes, with conditions")   # RT-3's conditional use
+        self.assertEqual(L2["summary"]["answers"]["allowed"]["routes"]["discretion"]["verdict"], "possible")
 
     def test_a_lane_beside_the_heatley_front_does_not_rescue_it(self):
         # the lane reduction is for the rear; with Heatley as the front the yards still leave nothing, so it stays open

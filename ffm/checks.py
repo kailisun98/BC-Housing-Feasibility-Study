@@ -1320,6 +1320,76 @@ def _no_envelope(site, option, p, mins, lane, eff, W, D, short, vals) -> Result:
     return _r(UNSURE, finding, vals, action=action)
 
 
+# The uses a building of each kind is read under, in a district schedule's use table (s.2.1), in the order tried
+# (25 Nov 2026, the second panel: "use permissibility, a shelter or a clinic, is never asked"). Which use a building is
+# stays the City's to say from Section 2's definitions; a shelter, above all, may be read as any of three.
+APARTMENT_USES = ("Multiple Dwelling", "Apartment")
+GROUND_USES = ("Townhouse", "Freehold Rowhouse", "Rowhouse", "Multiplex", "Multiple Dwelling", "Apartment")   # a Triplex or a Duplex only at three or two homes
+SHELTER_USES = ("Group Residence", "Social Service Centre", "Community Care or Assisted Living Facility - Class B")
+CLINIC_USES = ("Health Care Office", "Health Enhancement Centre")
+APPROVAL_WORDS = {"outright": "an outright approval use", "conditional": "a conditional approval use, which the Director of Planning may approve"}
+
+
+def uses_for(option: Option) -> tuple[str, tuple[str, ...]]:
+    """What the option is, in a few words, and the uses in a schedule's table it can be read under. Pure."""
+    o = option or {}
+    kind = housing_kind(o)
+    if kind == "shelter":
+        return "a shelter", SHELTER_USES
+    bt = str(o.get("building_type") or "").strip().lower()
+    nonres = float(o.get("non_residential_gfa_m2") or 0) > 0
+    if bt == "ground_oriented":
+        n = _units_total(o)
+        few = (("Triplex",) if 0 < n <= 3 else ()) + (("Duplex",) if 0 < n <= 2 else ())
+        return "ground-oriented homes", GROUND_USES + few + (("Mixed-Use Residential Building",) if nonres else ())
+    what = "an apartment building" + (" with floors that are not homes" if nonres else "")
+    return what, APARTMENT_USES + (("Mixed-Use Residential Building",) if nonres else ())
+
+
+def district_outright_use(site, option, p) -> Result:
+    """Whether the schedule's use table lists the use the option is: pass where it is an outright approval use,
+    conditional where it is a conditional approval use (the Director of Planning's discretion, values
+    `conditional_use`), fail where an apartment building's uses are not in the table at all, uncertain where a shelter
+    or ground-oriented homes may be read under a use the table lacks. A rezoning sets the uses, so an option that
+    proposes one reads info. Every row is quoted with its page."""
+    uses = p.get("uses") or {}
+    what, want = uses_for(option)
+    found = [(u, uses[u]) for u in want if u in uses]
+    best = next((x for x in found if x[1]["approval"] == "outright"), found[0] if found else None)
+    rows = "; ".join(f"{v['as']}: {v['approval']} (p. {v['page']})" for _, v in found)
+    vals = {"building": what, "uses_tried": list(want), "uses_listed": {u: v["approval"] for u, v in found}}
+    parts = housing_parts(option or {})
+    if "shelter" in parts and housing_kind(option or {}) != "shelter":
+        sh = [(u, uses[u]) for u in SHELTER_USES if u in uses]
+        vals["shelter_uses_listed"] = {u: v["approval"] for u, v in sh}
+    path = _rezoning_path(option or {})
+    if path:
+        return _r(INFO, f"The rezoning ({path}) sets the uses. The schedule as it stands lists, for {what}: " + (rows or "none of " + ", ".join(want)) + ".", vals)
+    if housing_kind(option or {}) == "shelter":
+        vals["conditional_use"] = bool(found) and all(v["approval"] == "conditional" for _, v in found)
+        return _r(UNSURE, f"Which use a shelter is, the City says from the by-law's definitions; the schedule lists " + (rows if rows else f"none of {', '.join(want)}") + ".",
+                  vals, action="Manager: ask a City planner which use the shelter is (a group residence, a social service centre or a care facility) and whether this district allows it.")
+    if not best:
+        listed_mu = "Mixed-Use Residential Building" in uses and "Mixed-Use Residential Building" not in want
+        if listed_mu:
+            return _r(UNSURE, f"The schedule lists none of {', '.join(want)} for a new building; it lists homes as a Mixed-Use Residential Building ({uses['Mixed-Use Residential Building']['approval']}), "
+                              "which needs floors that are not homes.", vals,
+                      action="Manager and architect: add the floors that are not homes the schedule asks of a mixed-use building, or take a rezoning for an apartment building.")
+        if want[:len(GROUND_USES)] == GROUND_USES:
+            return _r(UNSURE, f"The schedule lists none of {', '.join(want)} for a new building, so which use these homes are is a question for the City.", vals,
+                      action="Architect: ask a City planner which use the homes are, and whether this district allows it.")
+        return _r(FAIL, f"The schedule lists none of {', '.join(want)} for a new building: {what} is not a use this district allows outright or conditionally, so it needs a rezoning.",
+                  vals, action="Manager: a rezoning (or another site) is the path; ask a City planner before any offer on the land.")
+    u, v = best
+    vals["use"] = v["as"]
+    if v["approval"] == "outright":
+        return _r(PASS, f"{v['as']} is {APPROVAL_WORDS['outright']} here (p. {v['page']}).", vals)
+    vals["conditional_use"] = True
+    are = "are" if what.endswith("homes") else "is"
+    return _r(COND, f"{v['as']} is {APPROVAL_WORDS['conditional']} (p. {v['page']}): {what} here {are} not allowed outright; {'they are' if are == 'are' else 'it is'} approved at the Director's discretion.",
+              vals, action="Architect: make the case for the conditional use with the development permit application.")
+
+
 def district_setbacks(site, option, p) -> Result:
     """A district schedule's minimum yards against the option's setbacks: pass where the option keeps them,
     conditional where it sits inside one (a relaxation to ask for), info where the option states none, uncertain where
@@ -1359,6 +1429,7 @@ def assumption(site, option, p) -> Result:
 
 CHECKS: dict[str, Callable[[Site, Option, Params], Result]] = {
     "district_setbacks": district_setbacks,
+    "district_outright_use": district_outright_use,
     "assumption": assumption,
     "district_outright_fsr": district_outright_fsr,
     "district_outright_height": district_outright_height,

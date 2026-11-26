@@ -1122,6 +1122,25 @@ The plan is `02 A2\00 Research\First Read - wish list and plan.docx` (six pieces
   `sourcesEditor` and the "What are you asking for?" field at 03 (route-stage.js); `finance.land_value_cad` and
   `decision_sought` in FIELDS; `paperDocument(run, {short})`, `exportPdf(short)`, `#pdf-short-btn`. 409 tests.
 
+## The site before an option (25 Nov 2026, piece 2 of Kai's plan)
+
+`docs/user-tests-2026-11-24/README.md`, last section, has the detail.
+- `rules/a_zoning_district.json`: 32 `cov.<district>.uses` rules (check `district_outright_use`, params `uses` {use: {approval,
+  as, page}}), generated from the schedules' use tables by a scratch script that quoted each row; the rules file is the
+  record. `checks.district_outright_use`, `uses_for`, `APARTMENT_USES` / `GROUND_USES` / `SHELTER_USES` / `CLINIC_USES`. The
+  check's name starts `district_outright`, so the outright answer and `isOutrightLimit` read it; `values.conditional_use`
+  makes `engine.by_discretion` count it as the Director's discretion. RT-3, RM-4, R1-1 and C-2A sites now read outright
+  "yes, with conditions" (a conditional use).
+- `suggest.lot_reading` / `ssmuh_homes`: `read_site` returns `lot` {plate, yield, ssmuh, uses}; the page's `lotTakes` draws it
+  at 02.
+- `lookup`: `assemble(..., extra={zoning_centre, stations, nearest_rows})` (the caller fetches; `lookup()` and the web
+  build's `staticLookup` in core/api.js both do); `refuse_nearest`, `nearest_from_rows(same_side)`, `nearest_where`,
+  `toa_from_stations` (`TOA_SKYTRAIN_BANDS`, a test keeps them equal to `bc.toa.minimum_density`'s `tiers_where`),
+  `lane_behind`, `city_elements(..., lanes)` (the City's `lanes` dataset; lanes tagged service=alley). `site.suggested`
+  {key: {value, why, source, also}}, `lookup.refused`, `lookup.district_at_point`, `lookup.nearest_station`. The page:
+  `siteOffer` under each stop-01 question, `#guide-lookup-nearest`. Fingerprints 7846c8b6a3414798 (23 Oct), 750597987a837e2e
+  (27 Oct), 7532496a9e6ef1ff (17 Nov). 423 tests.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

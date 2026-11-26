@@ -32,14 +32,14 @@ STREET_STD = {"AVENUE": "AV", "AVE": "AV", "STREET": "ST", "BOULEVARD": "BLVD", 
 STREET_SUFFIXES = {"AV", "ST", "BLVD", "DR", "RD", "PL", "CRES", "HWY", "LANE", "CRT", "WAY", "MEWS", "DIVERSION", "CONNECTOR"}
 # the surroundings from the City too: street centrelines, the 2009 LiDAR building footprints (with heights) and
 # the public trees. Three requests of a second or so, against half a minute from the public Overpass server.
-CITY_CONTEXT = {"streets": "public-streets", "buildings": "building-footprints-2009", "trees": "public-trees"}
-CITY_ATTRIBUTION = "Contains information licensed under the Open Government Licence – Vancouver (streets, building footprints 2009, public trees)"
+CITY_CONTEXT = {"streets": "public-streets", "buildings": "building-footprints-2009", "trees": "public-trees", "lanes": "lanes"}
+CITY_ATTRIBUTION = "Contains information licensed under the Open Government Licence – Vancouver (streets, lanes, building footprints 2009, public trees)"
 STREETUSE_HIGHWAY = {"arterial": "primary", "secondary arterial": "secondary", "collector": "tertiary", "residential": "residential",
                      "lane": "service", "private": "service", "leased": "service", "recreational": "path", "closed": "service"}
 SOURCES = {
     "zoning": {"title": "City of Vancouver Open Data: zoning districts and labels", "url": "https://opendata.vancouver.ca/explore/dataset/zoning-districts-and-labels/"},
     "parcel": {"title": "City of Vancouver Open Data: property parcel polygons", "url": "https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/"},
-    "context": {"title": "City of Vancouver Open Data: public streets, building footprints 2009, public trees (Open Government Licence – Vancouver)", "url": "https://opendata.vancouver.ca/explore/"},
+    "context": {"title": "City of Vancouver Open Data: public streets, lanes, building footprints 2009, public trees (Open Government Licence – Vancouver)", "url": "https://opendata.vancouver.ca/explore/"},
     "geocode": {"title": "OpenStreetMap Nominatim", "url": "https://nominatim.openstreetmap.org/"},
     "address": {"title": "City of Vancouver Open Data: property addresses", "url": "https://opendata.vancouver.ca/explore/dataset/property-addresses/"},
 }
@@ -118,23 +118,9 @@ def city_nearest(address: str) -> dict[str, Any] | None:
     """Where the City's list has no such number on the street: its nearest number on that street, with the parcel it
     belongs to (23 Nov 2026: the geocoder's point for the street put "2009 Stainsbury Ave" on 1851 Stainsbury, a different
     district, and "3350 Kingsway" on 488 Kingsway). None where the street itself is not in the list."""
-    p = parse_address(address)
-    if not p["civic_number"] or not p["like"]:
-        return None
-    like = p["like"].replace('"', "")
-    n = int(p["civic_number"])
     # civic_number is a text field in the City's dataset, so a range is asked for as the list of numbers in it
-    near = ", ".join(f'"{k}"' for k in range(max(1, n - NEAREST_CIVIC_SPAN), n + NEAREST_CIVIC_SPAN + 1))
-    rows = records_where(ADDRESS_DATASET, f'std_street like "{like}%" AND civic_number in ({near})', 100)
-    if p["suffix"]:
-        rows = [r for r in rows if str(r.get("std_street") or "").upper() == p["street"]] or rows
-    r = nearest_civic(rows, n)
-    if not r:
-        return None
-    pt = r["geo_point_2d"]
-    return {"lat": float(pt["lat"]), "lon": float(pt["lon"]), "civic_number": r.get("civic_number"), "std_street": r.get("std_street"),
-            "site_id": r.get("site_id"), "local_area": r.get("geo_local_area"),
-            "display": f"{civic_address(r.get('civic_number'), r.get('std_street'))}, Vancouver, BC (City of Vancouver property address; the nearest number to {n} on this street)"}
+    where = nearest_where(address)
+    return nearest_from_rows(records_where(ADDRESS_DATASET, where, 100), address) if where else None
 
 
 def geocode_vancouver(address: str) -> tuple[float, float, str]:
@@ -197,7 +183,7 @@ def records_within(dataset: str, lat: float, lon: float, radius_m: float, max_pa
 def city_records(lat: float, lon: float, radius_m: float) -> dict[str, list[dict]]:
     """The three context datasets around a point, fetched side by side."""
     from concurrent.futures import ThreadPoolExecutor
-    with ThreadPoolExecutor(max_workers=3) as pool:
+    with ThreadPoolExecutor(max_workers=len(CITY_CONTEXT)) as pool:
         futs = {k: pool.submit(records_within, ds, lat, lon, radius_m) for k, ds in CITY_CONTEXT.items()}
         return {k: f.result() for k, f in futs.items()}
 
@@ -211,11 +197,20 @@ def street_name_from_hblock(hblock: Any) -> str:
     return civic[2:] if civic.startswith("0 ") else civic
 
 
-def city_elements(streets: list[dict], buildings: list[dict], trees: list[dict]) -> list[dict]:
+def city_elements(streets: list[dict], buildings: list[dict], trees: list[dict], lanes: list[dict] | None = None) -> list[dict]:
     """The City's records in the shape the context builder reads (Overpass elements: ways with a geometry of
     lat/lon points and tags; nodes for trees). Pure. Streets carry a highway class from their use and their name
-    from the block; buildings their height above ground; trees their species and a crown from their height."""
+    from the block; buildings their height above ground; trees their species and a crown from their height; lanes
+    (the City's `lanes` dataset, 25 Nov 2026) are service ways tagged as OpenStreetMap tags a lane."""
     out: list[dict] = []
+    for i, s in enumerate(lanes or []):
+        geom = ((s.get("geom") or {}).get("geometry") or {})
+        coords = geom.get("coordinates") or []
+        if geom.get("type") == "MultiLineString":
+            coords = [p for line in coords for p in line]
+        if len(coords) >= 2:
+            out.append({"type": "way", "id": 4_000_000 + i, "tags": {"highway": "service", "service": "alley"},
+                        "geometry": [{"lat": float(p[1]), "lon": float(p[0])} for p in coords]})
     for i, s in enumerate(streets):
         geom = ((s.get("geom") or {}).get("geometry") or {})
         coords = geom.get("coordinates") or []
@@ -227,6 +222,8 @@ def city_elements(streets: list[dict], buildings: list[dict], trees: list[dict])
         hw = STREETUSE_HIGHWAY.get(use, "residential")
         name = "" if use == "lane" else street_name_from_hblock(s.get("hblock"))
         tags = {"highway": hw}
+        if use == "lane":
+            tags["service"] = "alley"     # as OpenStreetMap tags a lane, so lane_behind reads either source
         if name:
             tags["name"] = name
         out.append({"type": "way", "id": 1_000_000 + i, "tags": tags, "geometry": [{"lat": float(p[1]), "lon": float(p[0])} for p in coords]})
@@ -413,6 +410,160 @@ def corner_yard_front(street: dict | None, metrics: dict | None) -> str | None:
     return street["cross_street"]["name"]
 
 
+# ---------------------------------------------------------------- what the lot's surroundings suggest (25 Nov 2026)
+
+STATIONS_DATASET = "rapid-transit-stations"     # the City's SkyTrain stations: station, geo_point_2d (22 records on 25 Nov 2026)
+# the transit-oriented area tiers around a SkyTrain station, as bc.toa.minimum_density's tiers_where says them; a test
+# keeps the two the same. Bus exchanges (tiers 4 and 5) are not in the City's station data.
+TOA_SKYTRAIN_BANDS = ((200, "1"), (400, "2"), (800, "3"))
+TOA_BAND_WORDS = {"1": "within 200 m", "2": "200 to 400 m", "3": "400 to 800 m"}
+NEAREST_MAX_NUMBERS = 100   # a "nearest" parcel more than a block of civic numbers from the one typed is refused
+NEAREST_MAX_M = 50          # ... or more than this far from the City's nearest number on the street typed
+LANE_BEYOND_REAR_M = 12     # a lane's centre line within this of the rear lot line, parallel to the front, is "behind"
+
+
+def _metres(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    x, y = project(lat1, lon1)(lon2, lat2)
+    return math.hypot(x, y)
+
+
+def _ring_distance(poly_lonlat: list, lat: float, lon: float) -> float:
+    """The distance in metres from a point to the nearest point of a lot's outline (0 inside it). Pure."""
+    ring = [(float(p[0]), float(p[1])) for p in poly_lonlat]
+    if len(ring) < 3:
+        return _metres(lat, lon, ring[0][1], ring[0][0]) if ring else float("inf")
+    P = project(lat, lon)
+    pts = [P(a, b) for a, b in ring]
+    inside = False
+    for (x1, y1), (x2, y2) in zip(pts, pts[1:] + pts[:1]):
+        if (y1 > 0) != (y2 > 0) and 0 < (x2 - x1) * (0 - y1) / ((y2 - y1) or 1e-12) + x1:
+            inside = not inside
+    if inside:
+        return 0.0
+    best = float("inf")
+    for (x1, y1), (x2, y2) in zip(pts, pts[1:] + pts[:1]):
+        dx, dy = x2 - x1, y2 - y1
+        l2 = dx * dx + dy * dy
+        t = 0.0 if l2 == 0 else max(0.0, min(1.0, (-x1 * dx - y1 * dy) / l2))
+        best = min(best, math.hypot(x1 + t * dx, y1 + t * dy))
+    return best
+
+
+def toa_from_stations(stations: list[dict], poly_lonlat: list | None, center: tuple[float, float]) -> dict[str, Any] | None:
+    """The SkyTrain station nearest the lot, the distance to the lot's nearest edge, and the transit-oriented tier that
+    distance falls in (TOA_SKYTRAIN_BANDS): a suggestion for a person to confirm on the Province's map, which measures
+    from the station as it draws it. None with no stations. Pure."""
+    best = None
+    for s in stations or []:
+        pt = s.get("geo_point_2d") or {}
+        if pt.get("lat") is None:
+            continue
+        lat, lon = float(pt["lat"]), float(pt["lon"])
+        d = _ring_distance(poly_lonlat, lat, lon) if poly_lonlat and len(poly_lonlat) >= 3 else _metres(center[0], center[1], lat, lon)
+        if best is None or d < best[0]:
+            best = (d, str(s.get("station") or "a station").strip())
+    if best is None:
+        return None
+    d, name = best
+    tier = next((t for limit, t in TOA_SKYTRAIN_BANDS if d <= limit), None)
+    return {"station": name, "distance_m": round(d), "tier": tier}
+
+
+def _nearest_vec(way: dict, P) -> tuple[float, float, float, float] | None:
+    """A way's nearest point to the origin: (distance, x, y, bearing of that segment mod 180)."""
+    pts = [P(g["lon"], g["lat"]) for g in way.get("geometry") or []]
+    best = None
+    for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
+        dx, dy = x2 - x1, y2 - y1
+        l2 = dx * dx + dy * dy
+        if l2 == 0:
+            continue
+        t = max(0.0, min(1.0, (-x1 * dx - y1 * dy) / l2))
+        x, y = x1 + t * dx, y1 + t * dy
+        d = math.hypot(x, y)
+        if best is None or d < best[0]:
+            best = (d, x, y, math.degrees(math.atan2(dy, dx)) % 180)
+    return best
+
+
+def lane_behind(elements: list[dict], center: tuple[float, float], front_name: str | None, depth_m: float | None) -> dict[str, Any] | None:
+    """A lane behind the lot, from the streets around it: a lane (the City's streetuse "lane", OpenStreetMap's
+    service=alley) roughly parallel to the front street, on the side away from it, its centre line within
+    LANE_BEYOND_REAR_M of the rear lot line. Returns {distance_m from the lot's centre, to_centre_line_m from the rear
+    line, bearing_deg}; None where there is none. Pure."""
+    if not elements or not depth_m:
+        return None
+    P = project(center[0], center[1])
+    want = norm_name(front_name or "")
+    front = None
+    for e in elements:
+        tags = e.get("tags") or {}
+        if e.get("type") == "way" and "highway" in tags and want and norm_name(tags.get("name", "")) == want:
+            v = _nearest_vec(e, P)
+            if v and (front is None or v[0] < front[0]):
+                front = v
+    if front is None:
+        return None
+    best = None
+    for e in elements:
+        tags = e.get("tags") or {}
+        if e.get("type") != "way" or tags.get("service") != "alley":
+            continue
+        v = _nearest_vec(e, P)
+        if not v:
+            continue
+        d, x, y, b = v
+        skew = abs(b - front[3]) % 180
+        if min(skew, 180 - skew) > 25 or x * front[1] + y * front[2] >= 0:     # not parallel, or on the street's side
+            continue
+        to_line = d - depth_m / 2
+        if -3 <= to_line <= LANE_BEYOND_REAR_M and (best is None or d < best["distance_m"]):
+            best = {"distance_m": round(d, 1), "to_centre_line_m": round(max(0.0, to_line), 1), "bearing_deg": round(b, 1)}
+    return best
+
+
+def refuse_nearest(typed: int | None, found: int | None, typed_street: str, found_street: str, gap_m: float | None) -> str | None:
+    """Why a "nearest" parcel is not taken as the site, or None where it may be (23 Nov 2026, the second panel: 3680 E
+    Hastings St came back as 1195 E Hastings St, about 4 km away; 5050 Joyce St as 3250 Kingsway). Pure."""
+    if not typed or not found or typed == found:
+        return None
+    if typed_street and found_street and typed_street.upper() not in found_street.upper():
+        return f"the parcel found is on {found_street.title()}, not on the street typed"
+    if abs(typed - found) > NEAREST_MAX_NUMBERS:
+        return f"the parcel found is number {found}, {abs(typed - found):,} civic numbers from {typed}: more than a block away"
+    if gap_m is not None and gap_m > NEAREST_MAX_M:
+        return f"the parcel found is {gap_m:,.0f} m from the City's nearest number on the street typed"
+    return None
+
+
+def nearest_from_rows(rows: list[dict], address: str, same_side: bool = False) -> dict[str, Any] | None:
+    """city_nearest's answer from the address points it fetched (or the page fetched): the nearest number to the one
+    typed on the same street; with `same_side`, the nearest odd number to an odd one, even to even. Pure."""
+    p = parse_address(address)
+    if not p["civic_number"] or not rows:
+        return None
+    if p["suffix"]:
+        rows = [r for r in rows if str(r.get("std_street") or "").upper() == p["street"]] or rows
+    if same_side:
+        par = int(p["civic_number"]) % 2
+        rows = [r for r in rows if str(r.get("civic_number") or "").strip().isdigit() and int(str(r["civic_number"]).strip()) % 2 == par]
+    r = nearest_civic(rows, int(p["civic_number"]))
+    if not r:
+        return None
+    pt = r["geo_point_2d"]
+    return {"lat": float(pt["lat"]), "lon": float(pt["lon"]), "civic_number": r.get("civic_number"), "std_street": r.get("std_street"), "site_id": r.get("site_id")}
+
+
+def nearest_where(address: str) -> str | None:
+    """The where clause the City's address list is asked with for the numbers near the one typed (the page asks it too)."""
+    p = parse_address(address)
+    if not p["civic_number"] or not p["like"]:
+        return None
+    n = int(p["civic_number"])
+    near = ", ".join(f'"{k}"' for k in range(max(1, n - NEAREST_CIVIC_SPAN), n + NEAREST_CIVIC_SPAN + 1))
+    return f'std_street like "{p["like"].replace(chr(34), "")}%" AND civic_number in ({near})'
+
+
 def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_M) -> dict[str, Any]:
     """A proposed site file for the address, with every field's source, for a person to confirm. With `context`
     the streets, buildings and trees around the parcel come too, from the City's open data (a second or two),
@@ -435,13 +586,26 @@ def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_
         with ThreadPoolExecutor(max_workers=2) as pool:
             fz, fp = pool.submit(records_at, ZONING_DATASET, lat, lon), pool.submit(records_at, PARCEL_DATASET, lat, lon, 15)
             zoning, parcels = fz.result(), fp.result()
+    # the district at the parcel's centre, not at the point the address landed on (25 Nov 2026: 1065 Harwood St read
+    # CD-1 (852) from a point on the next lot, where its own parcel is RM-5A), the SkyTrain stations for the transit
+    # tier, and, for a number the City's list lacks, its numbers near it on the street
+    extra: dict[str, Any] = {}
+    pc = _parcel_center(parcels, address)
+    try:
+        if pc:
+            extra["zoning_centre"] = records_at(ZONING_DATASET, pc[0], pc[1])
+        extra["stations"] = _get(COV_RECORDS.format(dataset=STATIONS_DATASET), {"limit": 100}).get("results") or []
+        if not found and nearest_where(address):
+            extra["nearest_rows"] = records_where(ADDRESS_DATASET, nearest_where(address), 100)
+    except (OSError, ValueError):
+        pass
     elements, q, source, note = None, "", "osm", ""
     if context:
-        c = _parcel_center(parcels, address) or (lat, lon)
+        c = pc or (lat, lon)
         try:
             recs = city_records(c[0], c[1], radius_m)
             if recs["streets"]:
-                elements, source = city_elements(recs["streets"], recs["buildings"], recs["trees"]), "city"
+                elements, source = city_elements(recs["streets"], recs["buildings"], recs["trees"], recs.get("lanes")), "city"
                 q = f"City of Vancouver Open Data within {radius_m:.0f} m: " + ", ".join(f"{len(recs[k])} {k}" for k in recs)
         except (OSError, ValueError) as e:
             note = f"The City's context datasets could not be fetched ({e})."
@@ -450,21 +614,7 @@ def lookup(address: str, context: bool = True, radius_m: float = DEFAULT_RADIUS_
                 elements, q = overpass(c[0], c[1], radius_m)
             except (OSError, ValueError) as e:
                 note += f" The OpenStreetMap context could not be fetched either ({e}); run python -m ffm context later."
-    res = assemble(address, lat, lon, display, zoning, parcels, elements, radius_m, q, source)
-    # A number the City's list does not have: the geocoder's parcel is one candidate (it found the church at 320 East
-    # Hastings under its Gore Avenue address) and the nearest number on the same street is another (2001 for "2009
-    # Stainsbury Ave", where the geocoder landed on 1851, a different district). Neither is always right, so the site
-    # keeps the first and names the second for a person to choose (23 Nov 2026).
-    look = res["site"].get("lookup") or {}
-    if look.get("civic_mismatch"):
-        try:
-            near = city_nearest(address)
-        except (OSError, ValueError):
-            near = None
-        other = civic_address(near.get("civic_number"), near.get("std_street")) if near else None
-        if other and other.lower() not in str(res["site"].get("address") or "").lower():
-            look["nearest_on_street"] = f"{other}, Vancouver, BC"
-            res["site"]["notes"] = (f"The City's nearest number on the street you typed is {other}: look that up if it is the lot. " + str(res["site"].get("notes") or "")).strip()
+    res = assemble(address, lat, lon, display, zoning, parcels, elements, radius_m, q, source, extra=extra)
     if note.strip():
         res["site"]["notes"] += " " + note.strip()
     return res
@@ -480,12 +630,21 @@ def _parcel_center(parcels: list[dict], address: str = "") -> tuple[float, float
 
 
 def assemble(address: str, lat: float, lon: float, display: str, zoning: list[dict], parcels: list[dict],
-             elements: list[dict] | None = None, radius_m: float = DEFAULT_RADIUS_M, query: str = "", source: str = "osm") -> dict[str, Any]:
+             elements: list[dict] | None = None, radius_m: float = DEFAULT_RADIUS_M, query: str = "", source: str = "osm",
+             extra: dict | None = None) -> dict[str, Any]:
     """The proposed site from the fetched records. Pure, so the browser build can fetch and hand the records in.
     With context `elements` around the parcel (the City's, converted by city_elements, or Overpass's), the frontage
     is the side parallel to the parcel's street and the site gets its `osm` context block, credited to `source`;
-    without them the longer side is called the frontage, to confirm."""
-    z = zoning[0] if zoning else {}
+    without them the longer side is called the frontage, to confirm.
+
+    `extra` (25 Nov 2026), each optional: `zoning_centre`, the zoning records at the parcel's centre (taken over the
+    point's); `stations`, the City's SkyTrain stations (a transit tier is suggested from the nearest); `nearest_rows`,
+    the City's address points near a number its list lacks (the nearest is named, and a far "nearest" parcel refused).
+    What the records suggest goes in `site.suggested` {key: {value, why, source}}, offered to a person, never applied."""
+    extra = extra or {}
+    z_point = zoning[0] if zoning else {}
+    z = (extra.get("zoning_centre") or [None])[0] or z_point
+    zoning_at = "the parcel's centre" if extra.get("zoning_centre") else "the point the address was found at"
     p = pick_parcel(parcels, address)
     poly = (((p.get("geom") or {}).get("geometry") or {}).get("coordinates") or [[]])[0]
     civic = civic_address(p.get("civic_number"), p.get("streetname"))
@@ -506,8 +665,12 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
             cd1 = str(cd1).strip() or None
     notes = [f"Found by First Read on the address {address!r}: " + (f"the City's property address {display!r}." if "property address" in display else f"geocoded by Nominatim as {display!r}.")]
     if district:
-        notes.append(f"Zoning district {district}" + (f" (CD-1 by-law {cd1})" if cd1 else "") + " from the City's zoning districts dataset at that point."
+        notes.append(f"Zoning district {district}" + (f" (CD-1 by-law {cd1})" if cd1 else "") + f" from the City's zoning districts dataset at {zoning_at}."
                      + (f" A CD-1 district has no general schedule: its limits are in CD-1 by-law No. {cd1}." if cd1 else ""))
+        other = z_point.get("zoning_district")
+        if other and other != district:
+            notes.append(f"The address's point fell in {other}" + (f" (CD-1 by-law {z_point.get('cd_1_number')})" if z_point.get("cd_1_number") else "")
+                         + f"; the parcel itself is in {district}, which is the district used. A lot on a district line: confirm with the City's zoning map.")
     else:
         notes.append("No zoning district found at that point in the City's dataset; enter it by hand.")
     shape = None
@@ -555,8 +718,27 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     except ValueError:
         found_civic = None
     mismatch = bool(typed_civic and found_civic and typed_civic != found_civic)
-    if mismatch:
-        notes.insert(0, f"You typed {typed_civic}; the City's address list has no such number on this street, and the nearest parcel is {civic}. Use it only if that is the site.")
+    # A number the City's list does not have: the geocoder's parcel is one candidate (it found the church at 320 East
+    # Hastings under its Gore Avenue address) and the nearest number on the same street is another (2001 for "2009
+    # Stainsbury Ave"). The site keeps the first and names the second (23 Nov 2026); a first that is on another street,
+    # more than a block of numbers away or far from the second is refused (25 Nov 2026).
+    near = nearest_from_rows(extra.get("nearest_rows") or [], address) if mismatch else None
+    near_words = civic_address(near.get("civic_number"), near.get("std_street")) if near else None
+    if near_words and near_words.lower() == civic.lower():
+        near_words = None
+    # the distance is to the nearest number on the same side of the street (1065 Harwood St: 1055 next door, not 1066
+    # across the street)
+    side = nearest_from_rows(extra.get("nearest_rows") or [], address, same_side=True) if mismatch else None
+    gap = None
+    if side and metrics:
+        gap = _metres(metrics["center"]["lat"], metrics["center"]["lon"], side["lat"], side["lon"])
+    refused = refuse_nearest(typed_civic, found_civic, parse_address(address).get("like") or "", str(p.get("streetname") or ""), gap) if mismatch else None
+    if refused:
+        notes.insert(0, f"You typed {typed_civic}; the City's address list has no such number on this street, and the parcel the address was placed on, {civic}, is not taken: "
+                        f"{refused}." + (f" The City's nearest number on that street is {near_words}: look that up if it is the lot." if near_words else " Try the address as the City lists the lot."))
+    elif mismatch:
+        notes.insert(0, f"You typed {typed_civic}; the City's address list has no such number on this street, and the nearest parcel is {civic}. Use it only if that is the site."
+                        + (f" The City's nearest number on the street you typed is {near_words}: look that up if it is the lot." if near_words else ""))
     if municipality != "City of Vancouver":
         notes.insert(0, f"{municipality} is outside the City of Vancouver: the rule stack reads Vancouver's by-laws and policies, so the zoning answers will say not assessed.")
     site = {
@@ -576,12 +758,43 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         "parcel": {"polygon_lonlat": poly, "civic_number": p.get("civic_number"), "streetname": p.get("streetname"),
                    "site_id": p.get("site_id"), "metrics": metrics, "shape": shape, "street": street, "source": SOURCES["parcel"]} if poly else None,
         "lookup": {"center": {"lat": lat, "lon": lon}, "geocoded_as": display, "typed": address, "civic_typed": typed_civic, "civic_found": found_civic,
-                   "civic_mismatch": mismatch, "outside_vancouver": municipality != "City of Vancouver",
+                   "civic_mismatch": mismatch, "outside_vancouver": municipality != "City of Vancouver", "zoning_at": zoning_at,
                    "zoning_record": {k: v for k, v in z.items() if k not in ("geom", "geo_point_2d")}},
         "sources": [SOURCES["address"] if "property address" in display else SOURCES["geocode"], SOURCES["zoning"], SOURCES["parcel"]],
     }
     if cd1:
         site["cd1_bylaw_number"] = cd1
+    if near_words:
+        site["lookup"]["nearest_on_street"] = f"{near_words}, Vancouver, BC"
+    if refused:
+        site["lookup"]["refused"] = refused
+    if z_point.get("zoning_district") and z_point.get("zoning_district") != district:
+        site["lookup"]["district_at_point"] = z_point.get("zoning_district")
+    # what the surroundings suggest, offered to a person and never applied (25 Nov 2026): the transit tier from the
+    # nearest SkyTrain station, a lane behind the lot from the streets
+    suggested: dict[str, dict] = {}
+    if "stations" in extra and municipality == "City of Vancouver":
+        t = toa_from_stations(extra.get("stations") or [], poly if len(poly) >= 3 else None, center)
+        src = "City of Vancouver Open Data: rapid transit stations"
+        if t and t["tier"]:
+            band = TOA_BAND_WORDS[t["tier"]]
+            suggested["in_transit_oriented_area"] = {"value": True, "source": src,
+                                                     "why": f"{t['station']} station is about {t['distance_m']} m from the lot's nearest edge"}
+            suggested["toa_tier"] = {"value": int(t["tier"]), "source": src,
+                                     "why": f"about {t['distance_m']} m from {t['station']} station, tier {t['tier']} ({band} of a SkyTrain station); the Province's map measures from the station as it draws it, so confirm"}
+        # past 800 m nothing is suggested: a bus exchange's tiers 4 and 5 are not in the station data (3475 E Hastings St
+        # is in tier 4 beside the Kootenay Loop, 2.3 km from Rupert station), so "no" would be a guess; the distance is kept
+        if t:
+            site["lookup"]["nearest_station"] = {"station": t["station"], "distance_m": t["distance_m"], "source": src}
+    if elements and metrics and street:
+        yf = corner_yard_front(street, metrics)
+        lane = lane_behind(elements, center, yf or street.get("name"), metrics["frontage_m"] if yf else metrics["depth_m"])
+        if lane:
+            suggested["context.lane_behind"] = {"value": True, "source": "the streets around the lot" + (" (City of Vancouver Open Data: public streets)" if source == "city" else " (OpenStreetMap)"),
+                                                "why": f"a lane runs behind the lot, its centre line about {lane['to_centre_line_m']} m past the rear lot line",
+                                                "also": {"context.lane_to_centre_line_m": lane["to_centre_line_m"]}}
+    if suggested:
+        site["suggested"] = suggested
     # the area plan the rules hold, where the district itself says the lot is inside it: the Downtown-Eastside/Oppenheimer
     # District lies within the Downtown Eastside Plan's area (23 Nov 2026: a DEOD lot was read against the city-wide
     # family rule because nothing set the plan). Other districts inside the plan's area are left to the person.
@@ -600,7 +813,7 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         try:
             block = build_context(site, elements, center, radius_m, query, display)
             if source == "city":
-                block["source"] = "City of Vancouver Open Data: public streets, building footprints 2009, public trees"
+                block["source"] = "City of Vancouver Open Data: public streets, lanes, building footprints 2009, public trees"
                 block["attribution"] = CITY_ATTRIBUTION
                 block["licence_url"] = "https://opendata.vancouver.ca/pages/licence/"
                 site["sources"].append(SOURCES["context"])
@@ -627,7 +840,8 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         "depth_m": {"value": site["depth_m"], "source": "parcel", "note": "the equivalent rectangle's other side" if metrics else ""},
         "has_water_and_sewer": {"value": True, "source": None, "note": "assumed for a City of Vancouver lot"},
     }
-    return {"site": site, "fields": fields, "found": {"geocoded": bool(display), "zoning": bool(district), "parcel": bool(poly), "context": bool(site.get("osm"))}}
+    return {"site": site, "fields": fields, "refused": refused,
+            "found": {"geocoded": bool(display), "zoning": bool(district), "parcel": bool(poly), "context": bool(site.get("osm"))}}
 
 
 def civic_address(number: Any, street: Any) -> str:

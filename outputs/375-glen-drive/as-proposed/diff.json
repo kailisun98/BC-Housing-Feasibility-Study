@@ -1,6 +1,6 @@
 {
   "previous_stamp": "8a8459a0c650a9c2",
-  "current_stamp": "c0cd775dd41c5779",
+  "current_stamp": "7532496a9e6ef1ff",
   "previous_as_of": "2026-11-17",
   "current_as_of": "2026-11-17",
   "rules_changed": true,
@@ -126,6 +126,13 @@
       "finding": "Written for C-2 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.c2.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for C-2 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.c2a.outright_fsr",
       "change": "added",
       "from": null,
@@ -141,6 +148,13 @@
     },
     {
       "rule_id": "cov.c2a.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for C-2A districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.c2a.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -168,6 +182,13 @@
       "finding": "Written for C-2B districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.c2b.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for C-2B districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.c2c.outright_fsr",
       "change": "added",
       "from": null,
@@ -189,6 +210,13 @@
       "finding": "Written for C-2C districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.c2c.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for C-2C districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.c2c1.outright_fsr",
       "change": "added",
       "from": null,
@@ -204,6 +232,13 @@
     },
     {
       "rule_id": "cov.c2c1.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for C-2C1 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.c2c1.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -289,6 +324,13 @@
       "finding": "Written for FM-1 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.fm1.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for FM-1 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.m1.outright_fsr",
       "change": "added",
       "from": null,
@@ -304,6 +346,13 @@
     },
     {
       "rule_id": "cov.m1.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for M-1 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.m1.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -331,6 +380,13 @@
       "finding": "Written for R1-1 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.r1_1.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for R1-1 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm10.outright_fsr",
       "change": "added",
       "from": null,
@@ -346,6 +402,13 @@
     },
     {
       "rule_id": "cov.rm10.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-10 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm10.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -373,6 +436,13 @@
       "finding": "Written for RM-11 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rm11.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-11 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm12.outright_fsr",
       "change": "added",
       "from": null,
@@ -388,6 +458,13 @@
     },
     {
       "rule_id": "cov.rm12.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-12 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm12.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -419,6 +496,13 @@
       "finding": "Written for RM-3 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rm3.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-3 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm3a.outright_fsr",
       "change": "changed",
       "from": "not_applicable",
@@ -438,6 +522,13 @@
     },
     {
       "rule_id": "cov.rm3a.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-3A districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm3a.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -469,6 +560,13 @@
       "finding": "Written for RM-4 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rm4.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-4 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm5.outright_fsr",
       "change": "added",
       "from": null,
@@ -488,6 +586,13 @@
       "from": null,
       "to": "not_applicable",
       "finding": "Written for RM-5, RM-5A, RM-5B, RM-5C, RM-5D districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm5.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-5, RM-5A, RM-5C, RM-5B, RM-5D districts; this site is zoned CD-1 (819)."
     },
     {
       "rule_id": "cov.rm5ac.outright_fsr",
@@ -539,6 +644,13 @@
       "finding": "Written for RM-6 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rm6.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-6 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm7.outright_fsr",
       "change": "added",
       "from": null,
@@ -558,6 +670,13 @@
       "from": null,
       "to": "not_applicable",
       "finding": "Written for RM-7 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm7.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-7, RM-7A districts; this site is zoned CD-1 (819)."
     },
     {
       "rule_id": "cov.rm7a.setbacks",
@@ -588,6 +707,13 @@
       "finding": "Written for RM-8, RM-8A districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rm8.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-8, RM-8A districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm9.outright_fsr",
       "change": "added",
       "from": null,
@@ -607,6 +733,13 @@
       "from": null,
       "to": "not_applicable",
       "finding": "Written for RM-9, RM-9B districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm9.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-9 districts; this site is zoned CD-1 (819)."
     },
     {
       "rule_id": "cov.rm9a.outright_fsr",
@@ -630,7 +763,21 @@
       "finding": "Written for RM-9A districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rm9a.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-9A districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rm9b.outright_fsr",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RM-9B districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rm9b.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -658,6 +805,13 @@
       "finding": "Written for RR-1 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rr1.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RR-1 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rr2a.outright_fsr",
       "change": "added",
       "from": null,
@@ -677,6 +831,13 @@
       "from": null,
       "to": "not_applicable",
       "finding": "Written for RR-2A districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rr2a.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RR-2A, RR-2B districts; this site is zoned CD-1 (819)."
     },
     {
       "rule_id": "cov.rr2b.outright_fsr",
@@ -719,6 +880,13 @@
       "from": null,
       "to": "not_applicable",
       "finding": "Written for RR-3A districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rr3a.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RR-3A, RR-3B, RR-3C districts; this site is zoned CD-1 (819)."
     },
     {
       "rule_id": "cov.rr3bc.outright_fsr",
@@ -777,6 +945,13 @@
       "finding": "Written for RT-10 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rt10.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-10 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rt11.outright_fsr",
       "change": "added",
       "from": null,
@@ -796,6 +971,20 @@
       "from": null,
       "to": "not_applicable",
       "finding": "Written for RT-11 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rt11.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-11 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rt3.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-3 districts; this site is zoned CD-1 (819)."
     },
     {
       "rule_id": "cov.rt4.outright_fsr",
@@ -819,6 +1008,20 @@
       "finding": "Written for RT-4, RT-4A districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rt4.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-4 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rt4a.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-4A districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rt5.outright_fsr",
       "change": "added",
       "from": null,
@@ -834,6 +1037,13 @@
     },
     {
       "rule_id": "cov.rt5.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-5 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rt5.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",
@@ -861,6 +1071,13 @@
       "finding": "Written for RT-7 districts; this site is zoned CD-1 (819)."
     },
     {
+      "rule_id": "cov.rt7.uses",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-7 districts; this site is zoned CD-1 (819)."
+    },
+    {
       "rule_id": "cov.rt8.outright_fsr",
       "change": "added",
       "from": null,
@@ -876,6 +1093,13 @@
     },
     {
       "rule_id": "cov.rt8.setbacks",
+      "change": "added",
+      "from": null,
+      "to": "not_applicable",
+      "finding": "Written for RT-8 districts; this site is zoned CD-1 (819)."
+    },
+    {
+      "rule_id": "cov.rt8.uses",
       "change": "added",
       "from": null,
       "to": "not_applicable",

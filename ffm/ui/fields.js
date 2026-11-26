@@ -137,7 +137,7 @@ const FIELDS = [
   { on: "site", key: "context.lane_behind", group: "Lot", label: "A lane behind the lot", type: TRI, need: "rule", reads: ["district_setbacks"],
     ask: { stop: 1, q: "A lane behind the lot, opposite the front?", who: "you, or the architect from the survey",
       why: "A lane behind can shorten the rear yard (RT-3 takes off the distance to its centre line).", where: ["the map above, or the survey"] },
-    info: "Where the rear of the lot (the side opposite the front) runs along a lane. RT-3 reduces the 20.0 m rear yard by the distance from the rear property line to the lane's ultimate centre line (s.3.1.2.17), taken as 3.05 m, half a standard 6.1 m lane, unless the site gives its own figure (context.lane_to_centre_line_m). The open data the lookup reads carry no lanes, so a person says. Not sure leaves the full rear yard." },
+    info: "Where the rear of the lot (the side opposite the front) runs along a lane. RT-3 reduces the 20.0 m rear yard by the distance from the rear property line to the lane's ultimate centre line (s.3.1.2.17), taken as 3.05 m, half a standard 6.1 m lane, unless the site gives its own figure (context.lane_to_centre_line_m). The lookup suggests a lane from the City's lanes data, with its distance; a person takes it or not. Not sure leaves the full rear yard." },
 
   // ---- the option
   { on: "option", key: "id", group: "Option", label: "Option id", type: "slug", need: "run", ref: "file",

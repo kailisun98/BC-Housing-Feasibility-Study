@@ -2,7 +2,7 @@
 
 **Option:** What-if (hypothetical, for the demo): five storeys inside the staff benchmark with every funder question answered  
 **Proponent:** Catalyst Community Developments Society (non profit society)  
-**Rules as of:** 2026-10-23 · **version stamp:** `d8114c4301640d47` · engine 0.1.0  
+**Rules as of:** 2026-10-23 · **version stamp:** `7846c8b6a3414798` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -193,7 +193,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 `layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.
 
 ## What changed since the previous memo
-Previous stamp `d8114c4301640d47` (rules as of 2026-10-23) → current `d8114c4301640d47` (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.
+Previous stamp `7846c8b6a3414798` (rules as of 2026-10-23) → current `7846c8b6a3414798` (as of 2026-10-23). The rule files are unchanged; differences come from the as-of date or the inputs.
 
 | Rule | Change | From | To | Now reads |
 |---|---|---|---|---|
@@ -210,7 +210,7 @@ Previous stamp `d8114c4301640d47` (rules as of 2026-10-23) → current `d8114c43
 
 ## Full ledger
 
-36 of the 144 rules in force apply to this site and are listed. The other 108 are written for other districts or are not in force on this date; `ledger.json` lists them with their reasons.
+36 of the 176 rules in force apply to this site and are listed. The other 140 are written for other districts or are not in force on this date; `ledger.json` lists them with their reasons.
 
 ### Layer A: Zoning district (City of Vancouver Zoning and Development By-law)
 
@@ -340,11 +340,11 @@ Previous stamp `d8114c4301640d47` (rules as of 2026-10-23) → current `d8114c43
 - Derived by hand from the as-approved option for demonstration — https://council.vancouver.ca/20240625/documents/rr1.pdf
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
-- `a_zoning_district.json`: `e2ad71b55ff9d869…`
+- Rules hash (SHA-256 over all rule files): `ca197a7ce1215016d58f8561993b2adae20ce30d3a00e015cf3316f5a2cc6128`
+- `a_zoning_district.json`: `580ce7e4ad9dc411…`
 - `b_provincial.json`: `4d20170fb18db2b9…`
 - `c_city_policies.json`: `bc93be05c15239f8…`
 - `d_design_standards.json`: `069a3dcad4ef9601…`
 - `e_funding_programs.json`: `286bc77345ddf276…`
 - `f_assumptions.json`: `5d6aad80b4dee51f…`
-- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `d8114c4301640d47`
+- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `7846c8b6a3414798`

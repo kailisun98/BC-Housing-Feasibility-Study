@@ -405,6 +405,7 @@ CONTACTS = {      # by coverage item or check: the organisation and the role tha
     "district_setbacks": "the City of Vancouver's Development and Building Services Centre, a project facilitator",
     "district_outright_fsr": "the City of Vancouver's planning staff for the district (a pre-application enquiry)",
     "district_outright_height": "the City of Vancouver's planning staff for the district (a pre-application enquiry)",
+    "district_outright_use": "the City of Vancouver's Development and Building Services Centre, an enquiry officer (which use the building is)",
     "rezoning_policy_social_housing": "the City of Vancouver's rezoning centre, a rezoning planner (a pre-application enquiry)",
     "family_unit_share": "the City of Vancouver's rezoning centre, the rezoning planner on the file",
     "toa_status": "the City of Vancouver's planning staff, or the Province's transit-oriented areas map",
@@ -491,7 +492,7 @@ def by_discretion(r: dict) -> bool:
     """An outright limit the option exceeds within what the Director of Planning may allow: conditional, with the
     discretionary figure in its values (checks.district_outright_fsr / _height)."""
     v = r.get("values") or {}
-    return r.get("status") == COND and ("max_fsr_discretionary" in v or "max_height_m_variance" in v)
+    return r.get("status") == COND and ("max_fsr_discretionary" in v or "max_height_m_variance" in v or v.get("conditional_use") is True)
 
 
 ROUTE_LABELS = {"outright": "Outright", "discretion": "By the Director's discretion", "rezoning": "By rezoning"}
@@ -511,7 +512,10 @@ def routes(allowed: dict, outright_rules: list[dict]) -> dict[str, dict]:
         out = {"verdict": "not assessed", "why": o.get("why")}
         dsc = {"verdict": "not assessed", "why": o.get("why")}
     elif disc:
-        out = {"verdict": "no", "why": "over the schedule's outright limits"}
+        uses_only = all((r.get("values") or {}).get("conditional_use") for r in disc)
+        limits = [r for r in disc if not (r.get("values") or {}).get("conditional_use")]
+        out = {"verdict": "no", "why": ("the building is a conditional approval use in this district" if uses_only else
+                                        "over the schedule's outright limits" + (", and a conditional approval use" if len(limits) < len(disc) else ""))}
         if rest == "no":
             dsc = {"verdict": "no", "why": "another limit is exceeded beyond what the Director may allow"}
         elif rest == "not yet confirmed":

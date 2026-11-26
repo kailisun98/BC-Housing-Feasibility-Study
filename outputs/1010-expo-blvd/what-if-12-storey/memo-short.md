@@ -2,7 +2,7 @@
 
 **Option:** What-if (hypothetical, for the demo): twelve storeys with the full funder data supplied  
 **Proponent:** City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society (municipal housing provider)  
-**Rules as of:** 2026-10-23 · **version stamp:** `d8114c4301640d47` · engine 0.1.0  
+**Rules as of:** 2026-10-23 · **version stamp:** `7846c8b6a3414798` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -151,5 +151,5 @@ Other programs written for this kind of housing, listed from their own pages and
 - Derived by hand from the as-permitted option for demonstration — https://www.shapeyourcity.ca/1050-expo-blvd
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
-- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `d8114c4301640d47`
+- Rules hash (SHA-256 over all rule files): `ca197a7ce1215016d58f8561993b2adae20ce30d3a00e015cf3316f5a2cc6128`
+- Stamp (hash of rules hash + rule versions in force on 2026-10-23): `7846c8b6a3414798`

@@ -2,7 +2,7 @@
 
 **Option:** 375 Glen Drive, what-if (hypothetical): the 110 social homes alone on a 38.5 × 18.8 m plate, rents at the Community Housing Fund's 30/50/20  
 **Proponent:** BC Housing with the Vancouver Aboriginal Friendship Centre Society, on City land (non profit society)  
-**Rules as of:** 2026-11-17 · **version stamp:** `c0cd775dd41c5779` · engine 0.1.0  
+**Rules as of:** 2026-11-17 · **version stamp:** `7532496a9e6ef1ff` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -223,7 +223,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 `layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.
 
 ## What changed since the previous memo
-Previous stamp `c0cd775dd41c5779` (rules as of 2026-11-17) → current `c0cd775dd41c5779` (as of 2026-11-17). The rule files are unchanged; differences come from the as-of date or the inputs.
+Previous stamp `7532496a9e6ef1ff` (rules as of 2026-11-17) → current `7532496a9e6ef1ff` (as of 2026-11-17). The rule files are unchanged; differences come from the as-of date or the inputs.
 
 | Rule | Change | From | To | Now reads |
 |---|---|---|---|---|
@@ -240,7 +240,7 @@ Previous stamp `c0cd775dd41c5779` (rules as of 2026-11-17) → current `c0cd775d
 
 ## Full ledger
 
-36 of the 144 rules in force apply to this site and are listed. The other 108 are written for other districts or are not in force on this date; `ledger.json` lists them with their reasons.
+36 of the 176 rules in force apply to this site and are listed. The other 140 are written for other districts or are not in force on this date; `ledger.json` lists them with their reasons.
 
 ### Layer A: Zoning district (City of Vancouver Zoning and Development By-law)
 
@@ -374,11 +374,11 @@ Previous stamp `c0cd775dd41c5779` (rules as of 2026-11-17) → current `c0cd775d
 - Derived by hand from the option as referred, for demonstration; the floorplate figure is from the referral report (5 Jan 2021), Form of Development — https://council.vancouver.ca/20210119/documents/rr5.pdf
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
-- `a_zoning_district.json`: `e2ad71b55ff9d869…`
+- Rules hash (SHA-256 over all rule files): `ca197a7ce1215016d58f8561993b2adae20ce30d3a00e015cf3316f5a2cc6128`
+- `a_zoning_district.json`: `580ce7e4ad9dc411…`
 - `b_provincial.json`: `4d20170fb18db2b9…`
 - `c_city_policies.json`: `bc93be05c15239f8…`
 - `d_design_standards.json`: `069a3dcad4ef9601…`
 - `e_funding_programs.json`: `286bc77345ddf276…`
 - `f_assumptions.json`: `5d6aad80b4dee51f…`
-- Stamp (hash of rules hash + rule versions in force on 2026-11-17): `c0cd775dd41c5779`
+- Stamp (hash of rules hash + rule versions in force on 2026-11-17): `7532496a9e6ef1ff`

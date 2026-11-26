@@ -153,7 +153,9 @@ class NoRezoningProposed(unittest.TestCase):
              "units": {"studio": 30, "one_bed": 10, "two_bed": 0, "three_bed_plus": 0}}
         L = evaluate(site, o, AS_OF)
         a = L["summary"]["answers"]["allowed"]
-        self.assertEqual(a["outright"]["verdict"], "yes")
+        # C-2A lists a new building's homes only as a Mixed-Use Residential Building, a conditional approval use (25 Nov 2026)
+        self.assertEqual(a["outright"]["verdict"], "yes, with conditions")
+        self.assertEqual(a["routes"]["discretion"]["verdict"], "possible")
         self.assertEqual(a["by_rezoning"]["verdict"], "not needed")
         self.assertNotIn("cov.family_units", open_ids(L))
         self.assertNotIn("cov.irp.social_housing_rezoning", open_ids(L))
@@ -893,7 +895,9 @@ class TheSchedulesKaiSaved(unittest.TestCase):
     def test_every_schedule_read_names_its_file_and_pages(self):
         from ffm.rules_loader import load_rules, RULES_DIR
         read = [r for r in load_rules(RULES_DIR) if "inbox/city-2026-11-23/" in json.dumps(r.version_on(self.ON).source if r.version_on(self.ON) else {})]
-        self.assertEqual(len(read), 51)
+        # 51 limits read on 23 Nov 2026, and since 25 Nov each schedule's use table as well (district_outright_use)
+        self.assertEqual(len([r for r in read if r.check != "district_outright_use"]), 51)
+        self.assertEqual(len([r for r in read if r.check == "district_outright_use"]), 18)
         for r in read:
             src = r.version_on(self.ON).source
             self.assertTrue(src["verified"] and "page" in src["read_from"], r.id)

@@ -132,7 +132,7 @@ class ParcelMetrics(unittest.TestCase):
         els = lookup.city_elements(streets, buildings, trees)
         ways = [e for e in els if e["type"] == "way"]
         self.assertEqual(ways[0]["tags"], {"highway": "residential", "name": "Heatley Ave"})
-        self.assertEqual(ways[1]["tags"], {"highway": "service"})            # a lane: minor, unnamed
+        self.assertEqual(ways[1]["tags"], {"highway": "service", "service": "alley"})     # a lane: minor, unnamed, tagged as OSM tags one
         self.assertEqual(ways[2]["tags"], {"building": "yes", "height": "7.3"})
         self.assertEqual(len(ways[2]["geometry"]), 5)
         node = next(e for e in els if e["type"] == "node")

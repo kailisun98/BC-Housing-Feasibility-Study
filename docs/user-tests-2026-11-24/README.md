@@ -203,3 +203,51 @@ Not checked: a PDF printed through the server's Edge (the paper HTML is the same
 runs were regenerated: every answer, gap and fingerprint is unchanged; ledgers gain `routes`, pro-formas the
 contributions ledger, and each run a memo-short.md. 409 tests (`tests/test_memo_as_an_ask.py`).
 
+## The site before an option (25 Nov 2026, piece 2 of the plan)
+
+Both panels: "allowed" was answered before "what the lot takes", use permissibility was never asked, the transit tier
+was left unsure 150 m from a SkyTrain station, lanes were never read, and the lookup offered a "nearest" parcel
+kilometres away with the district read from the wrong point.
+
+- **What the lot takes**, at 02, before any option (`suggest.lot_reading`, in `read_site`'s `lot`): the plate the yards
+  leave (which yards are the schedule's and which placeholders), the building the schedule allows outright with the
+  homes it holds at the starting mix, the provincial small-scale minimum beside it (`suggest.ssmuh_homes`: its zones,
+  the exempt lot size, a transit-oriented area, water and sewer, the frequent bus stop), and the use table's word on an
+  apartment building, ground-oriented homes, a shelter and a clinic. On 609 Heatley Ave (RT-3, the lane taken): a
+  11.5 × 17 m plate, 3 storeys and 340 m², about 4 homes, beside the provincial minimum of 4.
+- **Uses.** 32 new layer A rules (`cov.<district>.uses`, check `district_outright_use`), one per district or district
+  group of the 17 schedules Kai saved, each read from the schedule's own use table (s.2.1) by a script that kept every
+  row's wording and page; rows written for a building already on the site ("existing as of…", "retention of…",
+  conversions) are left out. The check reads the option against it: an outright approval use passes; a conditional
+  approval use is conditional and counts as the Director's discretion in answer 1's three verdicts; an apartment
+  building the table does not list fails (a rezoning is the path); a shelter is always a question for the City (it may
+  be a group residence, a social service centre or a care facility); an option that proposes a rezoning reads info (the
+  rezoning sets the uses). What the tables say, among others: RT-4 and C-2A list no apartment building for a new
+  building (C-2A only as a mixed-use residential building), R1-1 a Multiple Dwelling of at most 8 homes as conditional,
+  RM-10 to RM-12 an "Apartment", RR-1 and RR-2 rental townhouses only, M-1 a social service centre and no housing.
+  The Downtown-Eastside/Oppenheimer plan and the CD-1s have no use rule.
+- **The district from the parcel.** The lookup reads the zoning at the parcel's centre (`extra.zoning_centre`), and says
+  where the address's point fell in another district: 1065 Harwood St now comes back as 1055 Harwood St in RM-5A, with a
+  note that the point fell in CD-1 (852).
+- **A far "nearest" refused** (`lookup.refuse_nearest`): on another street, more than a block of civic numbers away
+  (100), or more than 50 m from the City's nearest number on the same side of the street. Nothing is written or
+  printed; the page offers "Look up 3683 E Hastings St" instead of "Use this site" (3680 E Hastings St had come back as
+  117 E Hastings). The web build's own lookup now asks the City for the numbers near one it lacks, so it names the
+  nearest too.
+- **Suggested, never applied** (`site.suggested`): the transit-oriented tier from the nearest SkyTrain station in the
+  City's station data (tiers 1 to 3 by the distance to the lot's nearest edge; 1290 Burrard St, about 700 m from
+  Yaletown, is offered tier 3) and a lane behind the lot from the City's `lanes` dataset (the streets dataset holds
+  none), with its distance to the rear lot line, which RT-3's lane clause reads. Each is offered under its question at
+  01 with its reason and a Use it button. Past 800 m nothing is suggested, since a bus exchange's tiers 4 and 5 are not
+  in the station data (3475 E Hastings St is tier 4 beside the Kootenay Loop, 2.3 km from a station); the question
+  names the nearest station instead.
+- The command line's lookup prints every suggestion and the district note on stderr; stdout stays the site's JSON, or
+  nothing for a refused lookup.
+
+Checked live against the City's data (3680 E Hastings, 1065 and 1055 Harwood, 3475 E Hastings, 609 Heatley, 998 E 19th,
+2475 E 5th, 4250 Fraser, 1290 Burrard) and in the browser (the refusal and its button, the lane offer taken and the
+rear yard following it, What the lot takes, a run with the conditional use in answer 1). Not checked: the web build's
+lookup in the browser. The rule files changed, so the fingerprints moved: 7846c8b6a3414798 (23 Oct), 750597987a837e2e
+(27 Oct), 7532496a9e6ef1ff (17 Nov); every committed run's answers, gaps and open items are unchanged (998, Expo and
+Glen Drive have no use table). 423 tests (`tests/test_site_before_an_option.py`).
+

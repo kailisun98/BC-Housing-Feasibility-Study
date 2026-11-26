@@ -174,16 +174,31 @@ def cmd_lookup(a: argparse.Namespace) -> int:
     # A civic number the City's list does not have returns the nearest parcel, which can be another lot altogether
     # (23 Nov 2026: "575 Drake St" wrote a strata parcel on Richards St with the warning only inside the JSON). The
     # command says so first, and writes the file only when told the parcel is the one meant.
-    if look.get("civic_mismatch"):
-        print(f"WARNING: the City's address list has no such number on this street. The nearest parcel found is {site.get('address')} "
-              f"({site.get('zoning_district') or 'district not found'}, {site.get('site_area_m2') or 'area not found'} m²): it may be a different lot.", file=sys.stderr)
+    # a "nearest" parcel that is plainly another lot is neither written nor printed (25 Nov 2026, the second panel:
+    # without --out the wrong lot's JSON went to stdout with the warning only on stderr); stdout stays JSON or nothing
+    def warn(s: str) -> None:
+        print(s, file=sys.stderr)
+    if look.get("refused"):
+        warn(f"REFUSED: the City's address list has no such number on this street, and the parcel the address was placed on, {site.get('address')}, "
+             f"is not taken: {look['refused']}.")
         if look.get("nearest_on_street"):
-            print(f"The City's nearest number on the street you typed is {look['nearest_on_street']}: look that up instead if it is the lot.", file=sys.stderr)
+            warn(f"The City's nearest number on the street you typed is {look['nearest_on_street']}: look that up if it is the lot.")
+        warn("Nothing written or printed, whatever --accept-nearest says: try the address the City lists for the lot.")
+        return 2
+    elif look.get("civic_mismatch"):
+        warn(f"WARNING: the City's address list has no such number on this street. The nearest parcel found is {site.get('address')} "
+             f"({site.get('zoning_district') or 'district not found'}, {site.get('site_area_m2') or 'area not found'} m²): it may be a different lot.")
+        if look.get("nearest_on_street"):
+            warn(f"The City's nearest number on the street you typed is {look['nearest_on_street']}: look that up instead if it is the lot.")
         if a.out and not a.accept_nearest:
-            print(f"Not written. If {site.get('address')} is the site, run again with --accept-nearest; otherwise try the address the City lists for the lot.", file=sys.stderr)
+            warn(f"Not written. If {site.get('address')} is the site, run again with --accept-nearest; otherwise try the address the City lists for the lot.")
             return 2
+    if look.get("district_at_point"):
+        warn(f"NOTE: the address's point fell in {look['district_at_point']}; the parcel itself is in {site.get('zoning_district')}, which is used.")
     if look.get("outside_vancouver"):
-        print("WARNING: the point is outside the City of Vancouver; the zoning rules in the stack do not apply there.", file=sys.stderr)
+        warn("WARNING: the point is outside the City of Vancouver; the zoning rules in the stack do not apply there.")
+    for k, s in (site.get("suggested") or {}).items():
+        warn(f"SUGGESTED, not applied: {k} = {s['value']} ({s['why']}).")
     if a.out:
         # the site is named for the file it is written to, so the file, the site and its run folders agree (23 Nov 2026:
         # a file called 575-drake-st.json held a site called 1280-richards-st)

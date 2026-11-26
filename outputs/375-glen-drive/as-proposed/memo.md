@@ -2,7 +2,7 @@
 
 **Option:** 375 Glen Drive, as referred to public hearing (rezoned as 1015 East Hastings St; referral report, 5 Jan 2021): 15 and 13 storeys, 163 homes, an 80-bed shelter  
 **Proponent:** BC Housing with the Vancouver Aboriginal Friendship Centre Society, on City land (non profit society)  
-**Rules as of:** 2026-11-17 · **version stamp:** `c0cd775dd41c5779` · engine 0.1.0  
+**Rules as of:** 2026-11-17 · **version stamp:** `7532496a9e6ef1ff` · engine 0.1.0  
 
 > Deterministic output of the rule stack listed under *Sources*. Same inputs and rule set give the same memo. It is a feasibility screen, not legal, planning or funding advice; every number links to the document it came from, so check it there. An independent student tool: not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City of Vancouver.
 
@@ -239,7 +239,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 `layout.json` carries the blocks, the rules and every zone's coordinates; placeholders are listed in it under `assumptions`.
 
 ## What changed since the previous memo
-Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `c0cd775dd41c5779` (as of 2026-11-17). The rule files themselves changed.
+Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `7532496a9e6ef1ff` (as of 2026-11-17). The rule files themselves changed.
 
 | Rule | Change | From | To | Now reads |
 |---|---|---|---|---|
@@ -259,18 +259,23 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `c0cd775d
 | cov.c2.outright_fsr | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
 | cov.c2.outright_height | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
 | cov.c2.setbacks | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
+| cov.c2.uses | added | — | not_applicable | Written for C-2 districts; this site is zoned CD-1 (819). |
 | cov.c2a.outright_fsr | added | — | not_applicable | Written for C-2A districts; this site is zoned CD-1 (819). |
 | cov.c2a.outright_height | added | — | not_applicable | Written for C-2A districts; this site is zoned CD-1 (819). |
 | cov.c2a.setbacks | added | — | not_applicable | Written for C-2A districts; this site is zoned CD-1 (819). |
+| cov.c2a.uses | added | — | not_applicable | Written for C-2A districts; this site is zoned CD-1 (819). |
 | cov.c2b.outright_fsr | added | — | not_applicable | Written for C-2B districts; this site is zoned CD-1 (819). |
 | cov.c2b.outright_height | added | — | not_applicable | Written for C-2B districts; this site is zoned CD-1 (819). |
 | cov.c2b.setbacks | added | — | not_applicable | Written for C-2B districts; this site is zoned CD-1 (819). |
+| cov.c2b.uses | added | — | not_applicable | Written for C-2B districts; this site is zoned CD-1 (819). |
 | cov.c2c.outright_fsr | added | — | not_applicable | Written for C-2C districts; this site is zoned CD-1 (819). |
 | cov.c2c.outright_height | added | — | not_applicable | Written for C-2C districts; this site is zoned CD-1 (819). |
 | cov.c2c.setbacks | added | — | not_applicable | Written for C-2C districts; this site is zoned CD-1 (819). |
+| cov.c2c.uses | added | — | not_applicable | Written for C-2C districts; this site is zoned CD-1 (819). |
 | cov.c2c1.outright_fsr | added | — | not_applicable | Written for C-2C1 districts; this site is zoned CD-1 (819). |
 | cov.c2c1.outright_height | added | — | not_applicable | Written for C-2C1 districts; this site is zoned CD-1 (819). |
 | cov.c2c1.setbacks | added | — | not_applicable | Written for C-2C1 districts; this site is zoned CD-1 (819). |
+| cov.c2c1.uses | added | — | not_applicable | Written for C-2C1 districts; this site is zoned CD-1 (819). |
 | cov.cd1_324.floor_area | added | — | not_applicable | Written for CD-1 (324); this site is zoned CD-1 (819). |
 | cov.cd1_324.outright_height | added | — | not_applicable | Written for CD-1 (324); this site is zoned CD-1 (819). |
 | cov.cd1_819.outright_fsr | added | — | pass | FSR 6.90 (14,729 m² over 2,134.4 m², the site area the by-law fixes for its FSR) is within the outright maximum of 6.9. |
@@ -282,33 +287,43 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `c0cd775d
 | cov.family_units | changed | fail | not_applicable | The site is inside the Downtown Eastside Plan area, whose own family-unit target applies in place of the city-wide one. |
 | cov.fm1.outright_fsr | added | — | not_applicable | Written for FM-1 districts; this site is zoned CD-1 (819). |
 | cov.fm1.outright_height | added | — | not_applicable | Written for FM-1 districts; this site is zoned CD-1 (819). |
+| cov.fm1.uses | added | — | not_applicable | Written for FM-1 districts; this site is zoned CD-1 (819). |
 | cov.m1.outright_fsr | added | — | not_applicable | Written for M-1 districts; this site is zoned CD-1 (819). |
 | cov.m1.outright_height | added | — | not_applicable | Written for M-1 districts; this site is zoned CD-1 (819). |
 | cov.m1.setbacks | added | — | not_applicable | Written for M-1 districts; this site is zoned CD-1 (819). |
+| cov.m1.uses | added | — | not_applicable | Written for M-1 districts; this site is zoned CD-1 (819). |
 | cov.r1_1.outright_fsr | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
 | cov.r1_1.outright_height | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
 | cov.r1_1.setbacks | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
+| cov.r1_1.uses | added | — | not_applicable | Written for R1-1 districts; this site is zoned CD-1 (819). |
 | cov.rm10.outright_fsr | added | — | not_applicable | Written for RM-10 districts; this site is zoned CD-1 (819). |
 | cov.rm10.outright_height | added | — | not_applicable | Written for RM-10 districts; this site is zoned CD-1 (819). |
 | cov.rm10.setbacks | added | — | not_applicable | Written for RM-10 districts; this site is zoned CD-1 (819). |
+| cov.rm10.uses | added | — | not_applicable | Written for RM-10 districts; this site is zoned CD-1 (819). |
 | cov.rm11.outright_fsr | added | — | not_applicable | Written for RM-11 districts; this site is zoned CD-1 (819). |
 | cov.rm11.outright_height | added | — | not_applicable | Written for RM-11 districts; this site is zoned CD-1 (819). |
 | cov.rm11.setbacks | added | — | not_applicable | Written for RM-11 districts; this site is zoned CD-1 (819). |
+| cov.rm11.uses | added | — | not_applicable | Written for RM-11 districts; this site is zoned CD-1 (819). |
 | cov.rm12.outright_fsr | added | — | not_applicable | Written for RM-12 districts; this site is zoned CD-1 (819). |
 | cov.rm12.outright_height | added | — | not_applicable | Written for RM-12 districts; this site is zoned CD-1 (819). |
 | cov.rm12.setbacks | added | — | not_applicable | Written for RM-12 districts; this site is zoned CD-1 (819). |
+| cov.rm12.uses | added | — | not_applicable | Written for RM-12 districts; this site is zoned CD-1 (819). |
 | cov.rm3.outright_fsr | changed | not_applicable (v 2023-01-01) | not_applicable (v 2026-10-01) | Written for RM-3 districts; this site is zoned CD-1 (819). |
 | cov.rm3.outright_height | changed | not_applicable (v 2023-01-01) | not_applicable (v 2026-10-01) | Written for RM-3 districts; this site is zoned CD-1 (819). |
 | cov.rm3.setbacks | added | — | not_applicable | Written for RM-3 districts; this site is zoned CD-1 (819). |
+| cov.rm3.uses | added | — | not_applicable | Written for RM-3 districts; this site is zoned CD-1 (819). |
 | cov.rm3a.outright_fsr | changed | not_applicable (v 2023-01-01) | not_applicable (v 2026-10-01) | Written for RM-3A districts; this site is zoned CD-1 (819). |
 | cov.rm3a.outright_height | changed | not_applicable (v 2023-01-01) | not_applicable (v 2026-10-01) | Written for RM-3A districts; this site is zoned CD-1 (819). |
 | cov.rm3a.setbacks | added | — | not_applicable | Written for RM-3A districts; this site is zoned CD-1 (819). |
+| cov.rm3a.uses | added | — | not_applicable | Written for RM-3A districts; this site is zoned CD-1 (819). |
 | cov.rm4.outright_fsr | changed | not_applicable (v 2023-01-01) | not_applicable (v 2026-10-01) | Written for RM-4 districts; this site is zoned CD-1 (819). |
 | cov.rm4.outright_height | changed | not_applicable (v 2023-01-01) | not_applicable (v 2026-10-01) | Written for RM-4 districts; this site is zoned CD-1 (819). |
 | cov.rm4.setbacks | added | — | not_applicable | Written for RM-4 districts; this site is zoned CD-1 (819). |
+| cov.rm4.uses | added | — | not_applicable | Written for RM-4 districts; this site is zoned CD-1 (819). |
 | cov.rm5.outright_fsr | added | — | not_applicable | Written for RM-5 districts; this site is zoned CD-1 (819). |
 | cov.rm5.outright_height | added | — | not_applicable | Written for RM-5, RM-5A, RM-5B, RM-5C districts; this site is zoned CD-1 (819). |
 | cov.rm5.setbacks | added | — | not_applicable | Written for RM-5, RM-5A, RM-5B, RM-5C, RM-5D districts; this site is zoned CD-1 (819). |
+| cov.rm5.uses | added | — | not_applicable | Written for RM-5, RM-5A, RM-5C, RM-5B, RM-5D districts; this site is zoned CD-1 (819). |
 | cov.rm5ac.outright_fsr | added | — | not_applicable | Written for RM-5A, RM-5C districts; this site is zoned CD-1 (819). |
 | cov.rm5b.outright_fsr | added | — | not_applicable | Written for RM-5B districts; this site is zoned CD-1 (819). |
 | cov.rm5d.outright_fsr | added | — | not_applicable | Written for RM-5D districts; this site is zoned CD-1 (819). |
@@ -316,32 +331,41 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `c0cd775d
 | cov.rm6.outright_fsr | added | — | not_applicable | Written for RM-6 districts; this site is zoned CD-1 (819). |
 | cov.rm6.outright_height | added | — | not_applicable | Written for RM-6 districts; this site is zoned CD-1 (819). |
 | cov.rm6.setbacks | added | — | not_applicable | Written for RM-6 districts; this site is zoned CD-1 (819). |
+| cov.rm6.uses | added | — | not_applicable | Written for RM-6 districts; this site is zoned CD-1 (819). |
 | cov.rm7.outright_fsr | added | — | not_applicable | Written for RM-7, RM-7A districts; this site is zoned CD-1 (819). |
 | cov.rm7.outright_height | added | — | not_applicable | Written for RM-7, RM-7A districts; this site is zoned CD-1 (819). |
 | cov.rm7.setbacks | added | — | not_applicable | Written for RM-7 districts; this site is zoned CD-1 (819). |
+| cov.rm7.uses | added | — | not_applicable | Written for RM-7, RM-7A districts; this site is zoned CD-1 (819). |
 | cov.rm7a.setbacks | added | — | not_applicable | Written for RM-7A districts; this site is zoned CD-1 (819). |
 | cov.rm8.outright_fsr | added | — | not_applicable | Written for RM-8, RM-8A districts; this site is zoned CD-1 (819). |
 | cov.rm8.outright_height | added | — | not_applicable | Written for RM-8, RM-8A districts; this site is zoned CD-1 (819). |
 | cov.rm8.setbacks | added | — | not_applicable | Written for RM-8, RM-8A districts; this site is zoned CD-1 (819). |
+| cov.rm8.uses | added | — | not_applicable | Written for RM-8, RM-8A districts; this site is zoned CD-1 (819). |
 | cov.rm9.outright_fsr | added | — | not_applicable | Written for RM-9 districts; this site is zoned CD-1 (819). |
 | cov.rm9.outright_height | added | — | not_applicable | Written for RM-9, RM-9B districts; this site is zoned CD-1 (819). |
 | cov.rm9.setbacks | added | — | not_applicable | Written for RM-9, RM-9B districts; this site is zoned CD-1 (819). |
+| cov.rm9.uses | added | — | not_applicable | Written for RM-9 districts; this site is zoned CD-1 (819). |
 | cov.rm9a.outright_fsr | added | — | not_applicable | Written for RM-9A districts; this site is zoned CD-1 (819). |
 | cov.rm9a.outright_height | added | — | not_applicable | Written for RM-9A districts; this site is zoned CD-1 (819). |
 | cov.rm9a.setbacks | added | — | not_applicable | Written for RM-9A districts; this site is zoned CD-1 (819). |
+| cov.rm9a.uses | added | — | not_applicable | Written for RM-9A districts; this site is zoned CD-1 (819). |
 | cov.rm9b.outright_fsr | added | — | not_applicable | Written for RM-9B districts; this site is zoned CD-1 (819). |
+| cov.rm9b.uses | added | — | not_applicable | Written for RM-9B districts; this site is zoned CD-1 (819). |
 | cov.rr1.outright_fsr | added | — | not_applicable | Written for RR-1 districts; this site is zoned CD-1 (819). |
 | cov.rr1.outright_height | added | — | not_applicable | Written for RR-1 districts; this site is zoned CD-1 (819). |
 | cov.rr1.setbacks | added | — | not_applicable | Written for RR-1 districts; this site is zoned CD-1 (819). |
+| cov.rr1.uses | added | — | not_applicable | Written for RR-1 districts; this site is zoned CD-1 (819). |
 | cov.rr2a.outright_fsr | added | — | not_applicable | Written for RR-2A districts; this site is zoned CD-1 (819). |
 | cov.rr2a.outright_height | added | — | not_applicable | Written for RR-2A districts; this site is zoned CD-1 (819). |
 | cov.rr2a.setbacks | added | — | not_applicable | Written for RR-2A districts; this site is zoned CD-1 (819). |
+| cov.rr2a.uses | added | — | not_applicable | Written for RR-2A, RR-2B districts; this site is zoned CD-1 (819). |
 | cov.rr2b.outright_fsr | added | — | not_applicable | Written for RR-2B districts; this site is zoned CD-1 (819). |
 | cov.rr2b.outright_height | added | — | not_applicable | Written for RR-2B districts; this site is zoned CD-1 (819). |
 | cov.rr2b.setbacks | added | — | not_applicable | Written for RR-2B districts; this site is zoned CD-1 (819). |
 | cov.rr3a.outright_fsr | added | — | not_applicable | Written for RR-3A districts; this site is zoned CD-1 (819). |
 | cov.rr3a.outright_height | added | — | not_applicable | Written for RR-3A districts; this site is zoned CD-1 (819). |
 | cov.rr3a.setbacks | added | — | not_applicable | Written for RR-3A districts; this site is zoned CD-1 (819). |
+| cov.rr3a.uses | added | — | not_applicable | Written for RR-3A, RR-3B, RR-3C districts; this site is zoned CD-1 (819). |
 | cov.rr3bc.outright_fsr | added | — | not_applicable | Written for RR-3B, RR-3C districts; this site is zoned CD-1 (819). |
 | cov.rr3bc.outright_height | added | — | not_applicable | Written for RR-3B, RR-3C districts; this site is zoned CD-1 (819). |
 | cov.rr3bc.setbacks | added | — | not_applicable | Written for RR-3B, RR-3C districts; this site is zoned CD-1 (819). |
@@ -350,26 +374,34 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `c0cd775d
 | cov.rt10.outright_fsr | added | — | not_applicable | Written for RT-10 districts; this site is zoned CD-1 (819). |
 | cov.rt10.outright_height | added | — | not_applicable | Written for RT-10 districts; this site is zoned CD-1 (819). |
 | cov.rt10.setbacks | added | — | not_applicable | Written for RT-10 districts; this site is zoned CD-1 (819). |
+| cov.rt10.uses | added | — | not_applicable | Written for RT-10 districts; this site is zoned CD-1 (819). |
 | cov.rt11.outright_fsr | added | — | not_applicable | Written for RT-11 districts; this site is zoned CD-1 (819). |
 | cov.rt11.outright_height | added | — | not_applicable | Written for RT-11 districts; this site is zoned CD-1 (819). |
 | cov.rt11.setbacks | added | — | not_applicable | Written for RT-11 districts; this site is zoned CD-1 (819). |
+| cov.rt11.uses | added | — | not_applicable | Written for RT-11 districts; this site is zoned CD-1 (819). |
+| cov.rt3.uses | added | — | not_applicable | Written for RT-3 districts; this site is zoned CD-1 (819). |
 | cov.rt4.outright_fsr | added | — | not_applicable | Written for RT-4, RT-4A districts; this site is zoned CD-1 (819). |
 | cov.rt4.outright_height | added | — | not_applicable | Written for RT-4, RT-4A districts; this site is zoned CD-1 (819). |
 | cov.rt4.setbacks | added | — | not_applicable | Written for RT-4, RT-4A districts; this site is zoned CD-1 (819). |
+| cov.rt4.uses | added | — | not_applicable | Written for RT-4 districts; this site is zoned CD-1 (819). |
+| cov.rt4a.uses | added | — | not_applicable | Written for RT-4A districts; this site is zoned CD-1 (819). |
 | cov.rt5.outright_fsr | added | — | not_applicable | Written for RT-5 districts; this site is zoned CD-1 (819). |
 | cov.rt5.outright_height | added | — | not_applicable | Written for RT-5 districts; this site is zoned CD-1 (819). |
 | cov.rt5.setbacks | added | — | not_applicable | Written for RT-5 districts; this site is zoned CD-1 (819). |
+| cov.rt5.uses | added | — | not_applicable | Written for RT-5 districts; this site is zoned CD-1 (819). |
 | cov.rt7.outright_fsr | added | — | not_applicable | Written for RT-7 districts; this site is zoned CD-1 (819). |
 | cov.rt7.outright_height | added | — | not_applicable | Written for RT-7 districts; this site is zoned CD-1 (819). |
 | cov.rt7.setbacks | added | — | not_applicable | Written for RT-7 districts; this site is zoned CD-1 (819). |
+| cov.rt7.uses | added | — | not_applicable | Written for RT-7 districts; this site is zoned CD-1 (819). |
 | cov.rt8.outright_fsr | added | — | not_applicable | Written for RT-8 districts; this site is zoned CD-1 (819). |
 | cov.rt8.outright_height | added | — | not_applicable | Written for RT-8 districts; this site is zoned CD-1 (819). |
 | cov.rt8.setbacks | added | — | not_applicable | Written for RT-8 districts; this site is zoned CD-1 (819). |
+| cov.rt8.uses | added | — | not_applicable | Written for RT-8 districts; this site is zoned CD-1 (819). |
 | f.rgi_rents | added | — | info | Rent geared to income estimated at 30% of an income of 70% of the Housing Income Limit (Vancouver, in use from 1 Dec 2025: $58,000 for one bedroom or less, $72,000 for two, $86,000 for three): $1,015, $1,260 and $1,505 a month; deep-subsidy rent at the income assistance shelter allowance, $500 and $695, and for three bedrooms 30% of the deep-subsidy income limit, $769 a month. |
 
 ## Full ledger
 
-36 of the 144 rules in force apply to this site and are listed. The other 108 are written for other districts or are not in force on this date; `ledger.json` lists them with their reasons.
+36 of the 176 rules in force apply to this site and are listed. The other 140 are written for other districts or are not in force on this date; `ledger.json` lists them with their reasons.
 
 ### Layer A: Zoning district (City of Vancouver Zoning and Development By-law)
 
@@ -504,11 +536,11 @@ Previous stamp `8a8459a0c650a9c2` (rules as of 2026-11-17) → current `c0cd775d
 - Daily Hive, City Council approves First Nations shelter and social housing in Downtown Eastside (17 Feb 2021) — https://dailyhive.com/vancouver/1015-east-hastings-street-vancouver-first-nations-shelter-social-housing
 
 ## Version stamp
-- Rules hash (SHA-256 over all rule files): `b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d`
-- `a_zoning_district.json`: `e2ad71b55ff9d869…`
+- Rules hash (SHA-256 over all rule files): `ca197a7ce1215016d58f8561993b2adae20ce30d3a00e015cf3316f5a2cc6128`
+- `a_zoning_district.json`: `580ce7e4ad9dc411…`
 - `b_provincial.json`: `4d20170fb18db2b9…`
 - `c_city_policies.json`: `bc93be05c15239f8…`
 - `d_design_standards.json`: `069a3dcad4ef9601…`
 - `e_funding_programs.json`: `286bc77345ddf276…`
 - `f_assumptions.json`: `5d6aad80b4dee51f…`
-- Stamp (hash of rules hash + rule versions in force on 2026-11-17): `c0cd775dd41c5779`
+- Stamp (hash of rules hash + rule versions in force on 2026-11-17): `7532496a9e6ef1ff`

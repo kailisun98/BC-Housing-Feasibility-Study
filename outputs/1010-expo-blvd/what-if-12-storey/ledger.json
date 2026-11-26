@@ -6,16 +6,16 @@
     "engine_version": "0.1.0",
     "stamp": {
       "as_of": "2026-10-23",
-      "rules_hash": "b3ab749cf8b6581bf0c5f30bb10d5393686835ce75f9e18eaa25cbbf53345c9d",
+      "rules_hash": "ca197a7ce1215016d58f8561993b2adae20ce30d3a00e015cf3316f5a2cc6128",
       "rules_files": {
-        "a_zoning_district.json": "e2ad71b55ff9d869f06db60f635eb489874e2db990ae43007ff75196f31c5c9c",
+        "a_zoning_district.json": "580ce7e4ad9dc41159c7457556387a55e9452b92a36202ea6cf71dfc38ca5aa0",
         "b_provincial.json": "4d20170fb18db2b9debb2160d121db933f9289516511eca15ecc53500bf37118",
         "c_city_policies.json": "bc93be05c15239f89b025b4ed0de7ae90702b155b3f1b428ecaa5b06c8e512fc",
         "d_design_standards.json": "069a3dcad4ef9601cad46e5b86ae8e166f4dd98c1ec7b053bcef30377bf36343",
         "e_funding_programs.json": "286bc77345ddf276f0eb1c1ef178b9daa1d1c4e00b9ddf4ee9d5d46a1d2ee1ad",
         "f_assumptions.json": "5d6aad80b4dee51fbd2be7d89faa97528c8448e8b34bfbda22fbd758b30f3a3d"
       },
-      "stamp": "d8114c4301640d47",
+      "stamp": "7846c8b6a3414798",
       "rule_versions": [
         {
           "rule_id": "cov.rm1.outright_fsr",
@@ -795,6 +795,230 @@
           "source_url": "https://bylaws.vancouver.ca/odp/odp-downtown-eastside-oppenheimer.pdf"
         },
         {
+          "rule_id": "cov.c2.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-C-2.pdf"
+        },
+        {
+          "rule_id": "cov.c2a.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2a.pdf"
+        },
+        {
+          "rule_id": "cov.c2b.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2b.pdf"
+        },
+        {
+          "rule_id": "cov.c2c.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c.pdf"
+        },
+        {
+          "rule_id": "cov.c2c1.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c1.pdf"
+        },
+        {
+          "rule_id": "cov.fm1.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf"
+        },
+        {
+          "rule_id": "cov.m1.uses",
+          "layer": "A",
+          "version_effective_from": "2025-11-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf"
+        },
+        {
+          "rule_id": "cov.r1_1.uses",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-r1-1.pdf"
+        },
+        {
+          "rule_id": "cov.rm10.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf"
+        },
+        {
+          "rule_id": "cov.rm11.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf"
+        },
+        {
+          "rule_id": "cov.rm12.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf"
+        },
+        {
+          "rule_id": "cov.rm3.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf"
+        },
+        {
+          "rule_id": "cov.rm3a.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf"
+        },
+        {
+          "rule_id": "cov.rm4.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf"
+        },
+        {
+          "rule_id": "cov.rm5.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-5-all-districts.pdf"
+        },
+        {
+          "rule_id": "cov.rm6.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf"
+        },
+        {
+          "rule_id": "cov.rm7.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf"
+        },
+        {
+          "rule_id": "cov.rm8.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf"
+        },
+        {
+          "rule_id": "cov.rm9.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf"
+        },
+        {
+          "rule_id": "cov.rm9b.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf"
+        },
+        {
+          "rule_id": "cov.rm9a.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf"
+        },
+        {
+          "rule_id": "cov.rr1.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-1.pdf"
+        },
+        {
+          "rule_id": "cov.rr2a.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-2a-2b.pdf"
+        },
+        {
+          "rule_id": "cov.rr3a.uses",
+          "layer": "A",
+          "version_effective_from": "2026-10-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-3a-3b-3c.pdf"
+        },
+        {
+          "rule_id": "cov.rt10.uses",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf"
+        },
+        {
+          "rule_id": "cov.rt11.uses",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf"
+        },
+        {
+          "rule_id": "cov.rt3.uses",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf"
+        },
+        {
+          "rule_id": "cov.rt4.uses",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rt4a.uses",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf"
+        },
+        {
+          "rule_id": "cov.rt5.uses",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf"
+        },
+        {
+          "rule_id": "cov.rt7.uses",
+          "layer": "A",
+          "version_effective_from": "2026-06-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf"
+        },
+        {
+          "rule_id": "cov.rt8.uses",
+          "layer": "A",
+          "version_effective_from": "2026-05-01",
+          "version_effective_to": null,
+          "source_url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf"
+        },
+        {
           "rule_id": "bc.ssmuh.minimum_units",
           "layer": "B",
           "version_effective_from": "2024-06-30",
@@ -1102,6 +1326,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.c2.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "C-2 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, C-2 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-C-2.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-C-2.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for C-2 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.c2a.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1162,6 +1411,31 @@
         "section": "s.3.1.2.2 (front yard 2.5 m; the Director of Planning may decrease it, s.3.1.2.7), s.3.1.2.3 (side yard 1.8 m beside an R district), s.3.1.2.4 (rear yard 1.5 m). The effective date is the consolidation's; the clauses may be older.",
         "verified": true,
         "read_from": "inbox/zoning-by-law-district-schedule-c-2a.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for C-2A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.c2a.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "C-2A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, C-2A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2a.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-c-2a.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-10-01",
       "version_effective_to": null,
@@ -1246,6 +1520,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.c2b.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "C-2B uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, C-2B District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2b.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-c-2b.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for C-2B districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.c2c.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1318,6 +1617,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.c2c.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "C-2C uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, C-2C District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-c-2c.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for C-2C districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.c2c1.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1378,6 +1702,31 @@
         "section": "Residential rental tenure building: front yard 2.5 m (s.3.1.2.3), rear yard 4.6 m for dwelling uses (s.3.1.2.5(c)); side yard 1.5 m where the side adjoins an RM site and 0.9 m where it adjoins an RA, R1 or RT site without a lane (s.3.1.2.4), else not required. The effective date is the consolidation's; the clauses may be older.",
         "verified": true,
         "read_from": "inbox/zoning-by-law-district-schedule-c-2c1.pdf (saved by hand from the by-law site), page 10"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for C-2C1 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.c2c1.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "C-2C1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, C-2C1 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c1.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-c-2c1.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-10-01",
       "version_effective_to": null,
@@ -1594,6 +1943,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.fm1.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "FM-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-fm-1.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for FM-1 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.irp.social_housing_rezoning",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1689,6 +2063,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.m1.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "M-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2025-11-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for M-1 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.parking_minimums",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1771,6 +2170,31 @@
         "section": "s.3.1.2.6 (front yard 4.9 m), s.3.1.2.7 (side yard 1.2 m), s.3.1.2.8(b) (rear yard 10.7 m; 0.9 m in a courtyard configuration); these are the regulations for multiple dwelling of no more than 8 units (s.3.1). The effective date is the consolidation's; the clauses may be older.",
         "verified": true,
         "read_from": "inbox/zoning-by-law-district-schedule-r1-1.pdf (saved by hand from the by-law site), page 9"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for R1-1 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.r1_1.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "R1-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, R1-1 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-r1-1.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-r1-1.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-06-01",
       "version_effective_to": null,
@@ -1904,6 +2328,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rm10.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-10 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-10 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm11.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -1967,6 +2416,31 @@
         "verified": true,
         "read_on": "2026-11-23",
         "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-11 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm11.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-11 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-10-01",
       "version_effective_to": null,
@@ -2054,6 +2528,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rm12.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-12 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-12 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm3.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -2114,6 +2613,31 @@
         "section": "s.3.1.2.3 (front yard 6.1 m), s.3.1.2.4 and 3.1.2.11 (side yard 2.1 m; a corner's exterior side yard 3.0 to 6.0 m), s.3.1.2.5 and 3.1.2.12 (rear yard 10.7 m, reduced by the distance to a lane's ultimate centre line). These are the multiple dwelling regulations (s.3.1). The effective date is the consolidation's; the clauses may be older.",
         "verified": true,
         "read_from": "inbox/zoning-by-law-district-schedule-rm-3.pdf (saved by hand from the by-law site), pages 6 and 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-3 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm3.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-3 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-3 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rm-3.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-10-01",
       "version_effective_to": null,
@@ -2198,6 +2722,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rm3a.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-3A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-3A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rm-3a.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-3A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm4.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -2258,6 +2807,31 @@
         "section": "s.3.1.2.2 (maximum site frontage 45.8 m), s.3.1.2.4 (minimum front yard 6.1 m), s.3.1.2.5 and 3.1.2.9 (side yard 2.1 m; a corner site's exterior side yard 20% of the width, 3.0 to 6.0 m), s.3.1.2.6 and 3.1.2.10 (rear yard 10.7 m, reduced by the distance to the lane's ultimate centre line); s.3.1.2.11 lets the Director of Planning vary them for 100% social housing. These are the multiple dwelling regulations (s.3.1).",
         "verified": true,
         "read_from": "inbox/zoning-by-law-district-schedule-rm-4.pdf (saved by hand from the by-law site), pages 7 to 9"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-4 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm4.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-4 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rm-4.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-10-01",
       "version_effective_to": null,
@@ -2335,6 +2909,31 @@
       "version_effective_to": null,
       "status": "not_applicable",
       "finding": "Written for RM-5, RM-5A, RM-5B, RM-5C, RM-5D districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm5.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-5 and RM-5A and RM-5C and RM-5B and RM-5D uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-5, RM-5A, RM-5B, RM-5C and RM-5D Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-5-all-districts.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rm-5-all-districts.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-5, RM-5A, RM-5C, RM-5B, RM-5D districts; this site is zoned CD-1 (324).",
       "values": {
         "district": "CD-1 (324)"
       },
@@ -2513,6 +3112,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rm6.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-6 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-6 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm7.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -2581,6 +3205,31 @@
       "version_effective_to": null,
       "status": "not_applicable",
       "finding": "Written for RM-7 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm7.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-7 and RM-7A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-7, RM-7A districts; this site is zoned CD-1 (324).",
       "values": {
         "district": "CD-1 (324)"
       },
@@ -2688,6 +3337,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rm8.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-8 and RM-8A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-8, RM-8A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm9.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -2756,6 +3430,31 @@
       "version_effective_to": null,
       "status": "not_applicable",
       "finding": "Written for RM-9, RM-9B districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9 districts; this site is zoned CD-1 (324).",
       "values": {
         "district": "CD-1 (324)"
       },
@@ -2838,6 +3537,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rm9a.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), pages 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rm9b.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -2851,6 +3575,31 @@
         "verified": true,
         "read_on": "2026-11-23",
         "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), page 8"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RM-9B districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rm9b.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RM-9B uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-10-01",
       "version_effective_to": null,
@@ -2935,6 +3684,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rr1.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RR-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RR-1 District Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-1.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rr-1.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RR-1 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rr2a.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -3000,6 +3774,31 @@
       "version_effective_to": null,
       "status": "not_applicable",
       "finding": "Written for RR-2A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rr2a.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RR-2A and RR-2B uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RR-2A and RR-2B Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-2a-2b.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rr-2a-2b.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RR-2A, RR-2B districts; this site is zoned CD-1 (324).",
       "values": {
         "district": "CD-1 (324)"
       },
@@ -3144,6 +3943,31 @@
       "version_effective_to": null,
       "status": "not_applicable",
       "finding": "Written for RR-3A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rr3a.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RR-3A and RR-3B and RR-3C uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RR-3A, RR-3B and RR-3C Districts Schedule (consolidation dated October 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-3a-3b-3c.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rr-3a-3b-3c.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-10-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RR-3A, RR-3B, RR-3C districts; this site is zoned CD-1 (324).",
       "values": {
         "district": "CD-1 (324)"
       },
@@ -3298,6 +4122,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rt10.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-10 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-10 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rt11.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -3373,6 +4222,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rt11.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-11 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), pages 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-11 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rt3.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -3433,6 +4307,31 @@
         "section": "s.3.1.2.4 and 3.1.2.5 (front yard: average of the adjacent sites, at most 3.7 m), s.3.1.2.6 (side yard: 10% of the site width up to 15.0 m wide, else 1.5 m), s.3.1.2.7 and 3.1.2.17 (rear yard 20.0 m, reduced by the distance to the lane's ultimate centre line), s.3.1.2.8 (site coverage 45%); s.3.1.2.21 lets the Director of Planning vary them for affordable housing meeting s.3.1.1.2.",
         "verified": true,
         "read_from": "inbox/zoning-by-law-district-schedule-rt-3.pdf (saved by hand from the by-law site), pages 8 to 11"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-3 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt3.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-3 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/zoning-by-law-district-schedule-rt-3.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-06-01",
       "version_effective_to": null,
@@ -3520,6 +4419,56 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rt4.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-4 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt4a.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-4A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-4A districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rt5.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -3583,6 +4532,31 @@
         "verified": true,
         "read_on": "2026-11-23",
         "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 8 to 10"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-5 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt5.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-5 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-06-01",
       "version_effective_to": null,
@@ -3670,6 +4644,31 @@
       "elsewhere": "district"
     },
     {
+      "rule_id": "cov.rt7.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-7 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+      },
+      "version_effective_from": "2026-06-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-7 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
       "rule_id": "cov.rt8.outright_fsr",
       "layer": "A",
       "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
@@ -3733,6 +4732,31 @@
         "verified": true,
         "read_on": "2026-11-23",
         "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 7 and 8"
+      },
+      "version_effective_from": "2026-05-01",
+      "version_effective_to": null,
+      "status": "not_applicable",
+      "finding": "Written for RT-8 districts; this site is zoned CD-1 (324).",
+      "values": {
+        "district": "CD-1 (324)"
+      },
+      "action": "",
+      "elsewhere": "district"
+    },
+    {
+      "rule_id": "cov.rt8.uses",
+      "layer": "A",
+      "layer_title": "Zoning district (City of Vancouver Zoning and Development By-law)",
+      "title": "RT-8 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "check": "district_outright_use",
+      "source": {
+        "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+        "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+        "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+        "verified": true,
+        "read_on": "2026-11-25",
+        "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
       },
       "version_effective_from": "2026-05-01",
       "version_effective_to": null,
@@ -4769,7 +5793,7 @@
       "uncertain": 3,
       "pass": 5,
       "info": 18,
-      "not_applicable": 118
+      "not_applicable": 150
     },
     "answers": {
       "allowed": {

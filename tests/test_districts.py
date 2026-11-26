@@ -324,7 +324,8 @@ class SchedulesFromThePdfs(unittest.TestCase):
             L = evaluate(site(d), SH6, AS_OF)
             tested = {r["rule_id"] for r in L["results"] if r.get("check", "").startswith("district_") and r["status"] != "not_applicable"}
             self.assertIn(f"{prefix}.outright_fsr", tested, d)
-            self.assertTrue(all(t.startswith(prefix + ".") or t in ("cov.rm5.outright_height", "cov.rm5.setbacks") for t in tested), (d, tested))
+            self.assertTrue(all(t.startswith(prefix + ".") or t in ("cov.rm5.outright_height", "cov.rm5.setbacks")
+                                or t.endswith(".uses") for t in tested), (d, tested))      # a schedule's use table can serve its districts together
             self.assertNotIn("coverage.district_schedule", open_ids(L), d)
             for r in L["results"]:
                 if r["rule_id"] in tested:

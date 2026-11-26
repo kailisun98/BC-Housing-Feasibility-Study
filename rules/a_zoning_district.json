@@ -3453,6 +3453,2732 @@
           }
         }
       ]
+    },
+    {
+      "id": "cov.c2.uses",
+      "title": "C-2 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "C-2"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Health Care Office": {
+                "approval": "outright",
+                "as": "Health Care Office",
+                "page": 3
+              },
+              "Health Enhancement Centre": {
+                "approval": "conditional",
+                "as": "Health Enhancement Centre",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, C-2 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-C-2.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-C-2.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.c2a.uses",
+      "title": "C-2A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "C-2A"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Health Care Office": {
+                "approval": "outright",
+                "as": "Health Care Office",
+                "page": 3
+              },
+              "Health Enhancement Centre": {
+                "approval": "conditional",
+                "as": "Health Enhancement Centre",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, C-2A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2a.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-c-2a.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.c2b.uses",
+      "title": "C-2B uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "C-2B"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, C-2B District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2b.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-c-2b.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.c2c.uses",
+      "title": "C-2C uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "C-2C"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, C-2C District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-c-2c.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.c2c1.uses",
+      "title": "C-2C1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "C-2C1"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, C-2C1 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-c-2c1.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-c-2c1.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.fm1.uses",
+      "title": "FM-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "FM-1"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 2
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, FM-1 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-fm-1.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-fm-1.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.m1.uses",
+      "title": "M-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "M-1"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2025-11-01",
+          "params": {
+            "uses": {
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 2
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, M-1 District Schedule (consolidation dated November 2025)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-m-1.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-m-1.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.r1_1.uses",
+      "title": "R1-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "R1-1"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling, containing no more than 8 dwelling units",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, R1-1 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-r1-1.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-r1-1.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm10.uses",
+      "title": "RM-10 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-10"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "outright",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 4
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Health Care Office": {
+                "approval": "conditional",
+                "as": "Health Care Office",
+                "page": 4
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-10 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-10.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-10.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm11.uses",
+      "title": "RM-11 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-11"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-11 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-11.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-11.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm12.uses",
+      "title": "RM-12 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-12"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-12 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-12.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-12.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm3.uses",
+      "title": "RM-3 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-3"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 2
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-3 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-3.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm3a.uses",
+      "title": "RM-3A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-3A"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-3A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-3a.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-3a.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm4.uses",
+      "title": "RM-4 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-4"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-4 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-4.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-4.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm5.uses",
+      "title": "RM-5 and RM-5A and RM-5C and RM-5B and RM-5D uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-5",
+        "RM-5A",
+        "RM-5C",
+        "RM-5B",
+        "RM-5D"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "outright",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Health Care Office": {
+                "approval": "conditional",
+                "as": "Health Care Office, in a building protected by a heritage designation by-law",
+                "page": 3
+              },
+              "Health Enhancement Centre": {
+                "approval": "conditional",
+                "as": "Health Enhancement Centre, in a building protected by a heritage designation by-law",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-5, RM-5A, RM-5B, RM-5C and RM-5D Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-5-all-districts.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rm-5-all-districts.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm6.uses",
+      "title": "RM-6 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-6"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 2
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 2
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 2
+              },
+              "Health Care Office": {
+                "approval": "conditional",
+                "as": "Health Care Office",
+                "page": 2
+              },
+              "Health Enhancement Centre": {
+                "approval": "conditional",
+                "as": "Health Enhancement Centre",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 2
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-6 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-6.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-6.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm7.uses",
+      "title": "RM-7 and RM-7A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-7",
+        "RM-7A"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 3
+              },
+              "Freehold Rowhouse": {
+                "approval": "conditional",
+                "as": "Freehold Rowhouse",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 4
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 4
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 4
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 4
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-7 and RM-7A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-7-7a.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-7-7a.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm8.uses",
+      "title": "RM-8 and RM-8A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-8",
+        "RM-8A"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 3
+              },
+              "Freehold Rowhouse": {
+                "approval": "conditional",
+                "as": "Freehold Rowhouse",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 4
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 4
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 4
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 4
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-8 and RM-8A Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-8-8a.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-8-8a.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9.uses",
+      "title": "RM-9 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 3
+              },
+              "Freehold Rowhouse": {
+                "approval": "conditional",
+                "as": "Freehold Rowhouse, only in the RM-9 district",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex, in combination with another principal building",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 4
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9b.uses",
+      "title": "RM-9B uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9B"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex, in combination with another principal building",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 4
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9 and RM-9B District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9-9b.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9-9b.pdf (saved by hand from the by-law site), pages 3, 4 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rm9a.uses",
+      "title": "RM-9A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RM-9A"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex, in combination with another principal building",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RM-9A District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rm-9a.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rm-9a.pdf (saved by hand from the by-law site), pages 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rr1.uses",
+      "title": "RR-1 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RR-1"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 2
+              },
+              "Triplex": {
+                "approval": "conditional",
+                "as": "Triplex",
+                "page": 2
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RR-1 District Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-1.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rr-1.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rr2a.uses",
+      "title": "RR-2A and RR-2B uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RR-2A",
+        "RR-2B"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Apartment": {
+                "approval": "conditional",
+                "as": "Apartment",
+                "page": 2
+              },
+              "Townhouse": {
+                "approval": "conditional",
+                "as": "Townhouse",
+                "page": 2
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RR-2A and RR-2B Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-2a-2b.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rr-2a-2b.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rr3a.uses",
+      "title": "RR-3A and RR-3B and RR-3C uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RR-3A",
+        "RR-3B",
+        "RR-3C"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-10-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RR-3A, RR-3B and RR-3C Districts Schedule (consolidation dated October 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rr-3a-3b-3c.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rr-3a-3b-3c.pdf (saved by hand from the by-law site), pages 2 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt10.uses",
+      "title": "RT-10 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-10"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-10 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-10.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-10.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt11.uses",
+      "title": "RT-11 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-11"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 3
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 3
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill Single Detached House",
+                "page": 3
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-11 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-11.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-11.pdf (saved by hand from the by-law site), pages 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt3.uses",
+      "title": "RT-3 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-3"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-3 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-3.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/zoning-by-law-district-schedule-rt-3.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt4.uses",
+      "title": "RT-4 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-4"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex, only in the RT-4 district",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt4a.uses",
+      "title": "RT-4A uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-4A"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "uses": {
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex, only in the RT-4A district",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-4 and RT-4A Districts Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-4.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-4.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt5.uses",
+      "title": "RT-5 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-5"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 3
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 3
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-5 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-5.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-5.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt7.uses",
+      "title": "RT-7 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-7"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-06-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "outright",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-7 District Schedule (consolidation dated June 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-7.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-7.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
+    },
+    {
+      "id": "cov.rt8.uses",
+      "title": "RT-8 uses: housing, shelters and clinics",
+      "jurisdiction": "City of Vancouver",
+      "applies_to_districts": [
+        "RT-8"
+      ],
+      "check": "district_outright_use",
+      "versions": [
+        {
+          "effective_from": "2026-05-01",
+          "params": {
+            "uses": {
+              "Multiple Dwelling": {
+                "approval": "conditional",
+                "as": "Multiple Dwelling",
+                "page": 2
+              },
+              "Mixed-Use Residential Building": {
+                "approval": "conditional",
+                "as": "Mixed-Use Residential Building",
+                "page": 2
+              },
+              "Duplex": {
+                "approval": "conditional",
+                "as": "Duplex",
+                "page": 2
+              },
+              "Infill": {
+                "approval": "conditional",
+                "as": "Infill",
+                "page": 2
+              },
+              "Seniors Supportive or Independent Living Housing": {
+                "approval": "conditional",
+                "as": "Seniors Supportive or Independent Living Housing",
+                "page": 2
+              },
+              "Group Residence": {
+                "approval": "conditional",
+                "as": "Group Residence",
+                "page": 3
+              },
+              "Social Service Centre": {
+                "approval": "conditional",
+                "as": "Social Service Centre",
+                "page": 3
+              },
+              "Community Care or Assisted Living Facility - Class B": {
+                "approval": "conditional",
+                "as": "Community Care or Assisted Living Facility - Class B",
+                "page": 3
+              },
+              "Hospital": {
+                "approval": "conditional",
+                "as": "Hospital",
+                "page": 3
+              }
+            },
+            "uses_read": [
+              "Multiple Dwelling",
+              "Apartment",
+              "Mixed-Use Residential Building",
+              "Multiplex",
+              "Townhouse",
+              "Freehold Rowhouse",
+              "Rowhouse",
+              "Triplex",
+              "Duplex",
+              "Infill",
+              "Seniors Supportive or Independent Living Housing",
+              "Group Residence",
+              "Social Service Centre",
+              "Community Care or Assisted Living Facility - Class B",
+              "Health Care Office",
+              "Health Enhancement Centre",
+              "Hospital"
+            ],
+            "note": "A row written for a building already on the site (existing, retained, converted) is left out: it is not a use a new building can take."
+          },
+          "source": {
+            "title": "City of Vancouver Zoning and Development By-law, RT-8 District Schedule (consolidation dated May 2026)",
+            "url": "https://bylaws.vancouver.ca/zoning/zoning-by-law-district-schedule-rt-8.pdf",
+            "section": "s.2.1, Outright and Conditional Approval Uses: the table's rows for the uses a housing option, a shelter or a clinic is read under. A use not in the table is not a use the district allows. Which use a building is (a shelter as a group residence or a social service centre) is the City's to say from Section 2's definitions.",
+            "verified": true,
+            "read_on": "2026-11-25",
+            "read_from": "inbox/city-2026-11-23/zoning-by-law-district-schedule-rt-8.pdf (saved by hand from the by-law site), pages 2, 3 (the use table, read by a script that quotes each row in params.rows)"
+          }
+        }
+      ]
     }
   ]
 }

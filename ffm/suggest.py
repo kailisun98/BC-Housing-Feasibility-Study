@@ -1031,7 +1031,79 @@ def read_site(site: dict, on: date, rules: list[Rule] | None = None, rules_dir: 
     """The site alone against layers A to C, before any option exists: what it allows outright, which rezoning path
     it has, its transit and tree position. Run with a bare social-housing option so the policy rules speak; nothing
     is written."""
+    rules = rules if rules is not None else load_rules(rules_dir)
     probe = {"id": f"{site.get('id') or 'site'}-read", "name": "Reading the site", "tenure": "social_housing", "target_programs": []}
     L = evaluate(site, probe, on, rules=rules, rules_dir=rules_dir)
     keep = [r for r in L["results"] if r["layer"] in ("A", "B", "C") and r["status"] != "not_applicable"]
-    return {"as_of": on.isoformat(), "stamp": L["run"]["stamp"], "results": keep, "site": site}
+    return {"as_of": on.isoformat(), "stamp": L["run"]["stamp"], "results": keep, "site": site, "lot": lot_reading(site, on, rules)}
+
+
+def ssmuh_homes(site: dict, rules: list[Rule], on: date) -> dict[str, Any]:
+    """The provincial small-scale multi-unit minimum for the lot (bc.ssmuh.minimum_units): {applies, homes, why}.
+    It applies in the restricted zones the rule names, below its exempt lot size, with water and sewer, outside a
+    transit-oriented area; a frequent bus stop within 400 m raises it on a lot over 280 m². Pure."""
+    district = district_of(site)
+    p = _params(rules, on, "bc.ssmuh.minimum_units", district)
+    area = float(site.get("site_area_m2") or 0)
+    if not p:
+        return {"applies": False, "homes": None, "rule_id": "bc.ssmuh.minimum_units",
+                "why": f"{district or 'the district'} is not one of the restricted zones the provincial small-scale minimum is written for"}
+    if not area:
+        return {"applies": None, "homes": None, "rule_id": "bc.ssmuh.minimum_units", "why": "no site area, so the minimum cannot be read"}
+    if area >= p["exempt_lot_min_m2"]:
+        return {"applies": False, "homes": None, "rule_id": "bc.ssmuh.minimum_units", "why": f"the lot is {area:,.0f} m², at or over the {p['exempt_lot_min_m2']:,} m² the minimum exempts"}
+    if site.get("in_transit_oriented_area") is True:
+        return {"applies": False, "homes": None, "rule_id": "bc.ssmuh.minimum_units", "why": "the lot is in a transit-oriented area, where the TOA minimums apply instead"}
+    if site.get("has_water_and_sewer") is False:
+        return {"applies": False, "homes": None, "rule_id": "bc.ssmuh.minimum_units", "why": "the lot has no water and sewer service"}
+    near = site.get("frequent_bus_stop_within_400m")
+    base = p["units_small_lot"] if area <= p["small_lot_max_m2"] else p["units_large_lot"]
+    n = p["units_near_frequent_bus"] if (near and area >= p["near_bus_min_lot_m2"]) else base
+    why = f"at least {n} homes on a lot of {area:,.0f} m²"
+    if near is None and area >= p["near_bus_min_lot_m2"]:
+        why += f"; {p['units_near_frequent_bus']} if a prescribed frequent bus stop is within {p['frequent_bus_distance_m']} m (not answered)"
+    return {"applies": True, "homes": n, "rule_id": "bc.ssmuh.minimum_units", "why": why}
+
+
+def lot_reading(site: dict, on: date, rules: list[Rule]) -> dict[str, Any]:
+    """What the lot takes before any option (25 Nov 2026, both panels: "allowed" was answered before "what the lot
+    takes"): the plate the yards leave, the building the schedule allows outright with the homes it holds at the
+    tool's starting mix, the provincial small-scale minimum beside it, and what the schedule's use table says of an
+    apartment building, ground-oriented homes, a shelter and a clinic. Derived as the suggester derives, from the rules;
+    every figure rough, a starting point, not a permission."""
+    S = suggest(site, [], on, "outright", rules=rules, _compare_fronts=False)
+    o, f, env = S["option"], S["fields"], S.get("envelope") or {}
+    homes = sum(int(v or 0) for v in (o.get("units") or {}).values())
+    built_outright = not S.get("candidate_note")
+    basis = (f.get("storeys") or {}).get("basis")
+    yield_ = {"from": "the district schedule" if built_outright and basis == "rule" else "the provincial small-scale minimum" if f.get("ssmuh_minimum_units")
+              else "a rough envelope (no schedule for the district in the rules)",
+              "outright": built_outright and basis in ("rule", None) and not f.get("ssmuh_minimum_units") and o.get("storeys") is not None,
+              "storeys": o.get("storeys"), "height_m": o.get("height_m"), "gfa_m2": o.get("gfa_m2"),
+              "fsr": round(o["gfa_m2"] / float(site["site_area_m2"]), 2) if o.get("gfa_m2") and site.get("site_area_m2") else None,
+              "homes": homes or None, "mix_note": "the tool's starting mix and BC Housing's areas plus 10%, a placeholder",
+              "rule_ids": [x for x in {(f.get("storeys") or {}).get("rule_id"), (f.get("gfa_m2") or {}).get("rule_id")} if x],
+              "note": S.get("candidate_note") or (f.get("gfa_m2") or {}).get("note")}
+    # each yard from the schedule's rule or a placeholder (RT-3 sets a rear and a side yard and no front)
+    yard_rules = {k: (f.get(f"setbacks_m.{k}") or {}).get("rule_id") for k in ("front", "rear", "side")}
+    plate = {"width_m": env.get("plate_w_m"), "depth_m": env.get("plate_d_m"), "area_m2": env.get("plate_m2"),
+             "setbacks_m": o.get("setbacks_m"), "yards_from": next((r for r in yard_rules.values() if r), None) or "placeholder",
+             "placeholder_yards": [k for k, r in yard_rules.items() if not r]}
+    # the use table: what the schedule says of each kind of building, read by the same check the run uses
+    from .checks import district_outright_use
+    use_rule = _district_rule(rules, on, "district_outright_use", district_of(site))
+    uses = None
+    if use_rule:
+        rid, p = use_rule
+        kinds = [("An apartment building", {"tenure": "social_housing"}),
+                 ("Ground-oriented homes", {"tenure": "social_housing", "building_type": "ground_oriented"}),
+                 ("A shelter", {"tenure": "social_housing", "housing_type": "shelter"})]
+        uses = {"rule_id": rid, "kinds": []}
+        for word, probe in kinds:
+            r = district_outright_use(site, probe, p)
+            uses["kinds"].append({"kind": word, "status": r["status"], "finding": r["finding"]})
+        clinic = [(u, p["uses"][u]) for u in ("Health Care Office", "Health Enhancement Centre") if u in (p.get("uses") or {})]
+        uses["kinds"].append({"kind": "A clinic", "status": ("pass" if any(v["approval"] == "outright" for _, v in clinic) else "conditional" if clinic else "fail"),
+                              "finding": ("; ".join(f"{v['as']}: {v['approval']} (p. {v['page']})" for _, v in clinic) + "." if clinic
+                                          else "The schedule lists no health care office or health enhancement centre.")})
+    return {"plate": plate, "yield": yield_, "ssmuh": ssmuh_homes(site, rules, on), "uses": uses}

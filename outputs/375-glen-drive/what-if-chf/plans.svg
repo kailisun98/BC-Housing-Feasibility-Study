@@ -13,9 +13,9 @@
 <rect x="124.3" y="209.6" width="206.5" height="90.4" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="101.4" y="100.0" width="144.1" height="90.4" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="320.0" y="100.0" width="144.1" height="90.4" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="330.8" y="209.6" width="22.1" height="90.4" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="352.9" y="209.6" width="18.7" height="90.4" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="371.7" y="209.6" width="5.0" height="90.4" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="330.8" y="256.4" width="45.9" height="43.6" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="330.8" y="219.5" width="45.9" height="36.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="330.8" y="209.6" width="45.9" height="9.9" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="376.7" y="209.6" width="50.1" height="90.4" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="426.7" y="209.6" width="55.1" height="90.4" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
 <rect x="481.8" y="209.6" width="5.7" height="90.4" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.8"/>
@@ -46,8 +46,8 @@
 <text x="227.5" y="258.3" font-size="9.5" text-anchor="middle" fill="#1f2933">Amenity</text>
 <text x="173.5" y="148.7" font-size="9.5" text-anchor="middle" fill="#1f2933">Services, bicycles</text>
 <text x="392.1" y="148.7" font-size="9.5" text-anchor="middle" fill="#1f2933">Services, bicycles</text>
-<text x="341.8" y="258.3" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
-<text x="362.3" y="258.3" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
+<text x="353.7" y="281.7" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
+<text x="353.7" y="241.4" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
 <text x="401.8" y="258.3" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
 <text x="454.3" y="258.3" font-size="9.5" text-anchor="middle" fill="#1f2933">OT</text>
 <path d="M93.6 320.0V303.0M89.6 309.0L93.6 303.0L97.6 309.0" stroke="#1f2933" stroke-width="1.4" fill="none"/>

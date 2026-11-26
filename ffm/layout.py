@@ -999,6 +999,81 @@ def _solve_plate(site: dict, option: dict, ledger: dict, massing: dict, prog: di
     return point if point["units_placed"] >= slab["units_placed"] and rank(point) <= rank(slab) else slab
 
 
+# A declared placeholder: the least a room (not a home) measures along its strip. Rooms the solver laid narrower,
+# side by side across the whole depth of the strip, are regrouped (`_square_small_rooms`).
+ROOM_MIN_WIDTH_M = 2.4
+_ROOMS = ("other", "services", "amenity", "design_space", "non_residential", "commercial")
+
+
+def _square_small_rooms(fl: dict) -> None:
+    """Small rooms as rooms, not slots (25 Nov 2026: a 12 m² front desk was drawn 1.0 m wide and 11.85 m deep, the
+    strip's whole depth). Along a strip, neighbouring rooms narrower than ROOM_MIN_WIDTH_M are gathered until they
+    are together that wide, and stand one behind another in that shared width, each as deep as its share: every
+    room keeps its area, the first keeps the strip's outer face (the street side of the street strip, the lane side
+    of the lane strip), and nothing else on the floor moves. In place."""
+    strips: dict[tuple[float, float], list[dict]] = {}
+    for z in fl["zones"]:
+        if z["block"] in _ROOMS and z["d"] > z["w"]:
+            strips.setdefault((round(z["y"], 2), round(z["d"], 2)), []).append(z)
+    for (y, d), zs in strips.items():
+        zs.sort(key=lambda z: z["x"])
+        run: list[dict] = []
+        for z in zs + [None]:
+            touching = z is not None and run and abs(run[-1]["x"] + run[-1]["w"] - z["x"]) < 0.03
+            if z is not None and z["w"] < ROOM_MIN_WIDTH_M and (not run or touching):
+                run.append(z)
+                continue
+            # close the run: groups each at least the minimum wide, a short tail joining the group before it
+            groups: list[list[dict]] = []
+            cur: list[dict] = []
+            for r in run:
+                cur.append(r)
+                if sum(q["w"] for q in cur) >= ROOM_MIN_WIDTH_M:
+                    groups.append(cur)
+                    cur = []
+            if cur:
+                if groups:
+                    groups[-1] += cur
+                else:
+                    groups.append(cur)
+            for g in groups:
+                if len(g) < 2:
+                    # A narrow room alone beside a wide one takes a corner of it: it widens to the minimum and
+                    # shortens to its area, at the strip's outer face, and the wide room keeps its own area as two
+                    # rectangles (its main part, and the piece behind the small room): an L on the plan.
+                    s = g[0]
+                    need = ROOM_MIN_WIDTH_M - s["w"]
+                    left = next((n for n in zs if n is not s and abs(n["x"] + n["w"] - s["x"]) < 0.03), None)
+                    right = next((n for n in zs if n is not s and abs(s["x"] + s["w"] - n["x"]) < 0.03), None)
+                    nb = max((n for n in (left, right) if n and n["w"] >= ROOM_MIN_WIDTH_M + need + 1.0), key=lambda n: n["w"], default=None)
+                    if nb is None or need <= 0:
+                        continue
+                    ds = round(s["w"] * d / ROOM_MIN_WIDTH_M, 2)
+                    outer_first = s.get("side") != "rear"
+                    nb["w"] = round(nb["w"] - need, 2)
+                    if nb is left:
+                        s["x"] = round(nb["x"] + nb["w"], 2)
+                    else:
+                        nb["x"] = round(nb["x"] + need, 2)
+                    s["w"], s["d"], s["y"] = ROOM_MIN_WIDTH_M, ds, (y if outer_first else round(y + d - ds, 2))
+                    piece = dict(nb, x=s["x"], w=ROOM_MIN_WIDTH_M, y=(round(y + ds, 2) if outer_first else y), d=round(d - ds, 2))
+                    piece.pop("entry", None)
+                    for q in (nb, s, piece):
+                        if "area_m2" in q:
+                            q["area_m2"] = round(q["w"] * q["d"], 1)
+                    fl["zones"].append(piece)
+                    continue
+                gx, gw = g[0]["x"], round(sum(q["w"] for q in g), 2)
+                outer_first = g[0].get("side") != "rear"        # the street strip fills from the street, the lane strip from the lane
+                at = y if outer_first else y + d
+                for i, q in enumerate(g):
+                    share = round(d * q["w"] / gw, 2) if i < len(g) - 1 else round((y + d - at) if outer_first else (at - y), 2)
+                    q["x"], q["w"], q["d"] = gx, gw, share
+                    q["y"] = round(at, 2) if outer_first else round(at - share, 2)
+                    at = at + share if outer_first else at - share
+            run = [z] if (z is not None and z["w"] < ROOM_MIN_WIDTH_M) else []
+
+
 def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, point: dict | None, across: bool = False) -> dict[str, Any]:
     """One arrangement of the plates: along a corridor (`point` None), or the point tower `_point_geometry` drew.
     `across`: the corridor run from the street to the lane. The plate is laid out turned a quarter (its depth taken as
@@ -1389,6 +1464,7 @@ def _solve(site: dict, option: dict, ledger: dict, massing: dict, prog: dict, po
                 spare += r["left"] * r["depth"]
         fl["spare_m2"] = round(spare, 1)
         del fl["runs"]
+        _square_small_rooms(fl)
 
     plate = {"x": round(x0, 2), "y": round(y0, 2), "width_m": round(W, 2), "depth_m": round(D, 2), "storeys": storeys, "floor_to_floor_m": f2f, "double_loaded": double, "unit_depth_m": round(strip, 2),
              "arrangement": "double" if double else "single", "stacking": stacking}
@@ -1969,7 +2045,9 @@ def place_zones(site: dict, option: dict, ledger: dict, massing: dict, zones_by_
             for b in zones[i + 1:]:
                 if {a["block"], b["block"]} == {"corridor", "core"}:
                     continue
-                if not (a["x"] + a["w"] <= b["x"] + 0.01 or b["x"] + b["w"] <= a["x"] + 0.01 or a["y"] + a["d"] <= b["y"] + 0.01 or b["y"] + b["d"] <= a["y"] + 0.01):
+                # 2.5 cm of grace: the solver's own zones are rounded to the centimetre, and two rounded neighbours can
+                # read a centimetre into each other (25 Nov 2026: the memo's own plan opened with two overlaps)
+                if not (a["x"] + a["w"] <= b["x"] + 0.025 or b["x"] + b["w"] <= a["x"] + 0.025 or a["y"] + a["d"] <= b["y"] + 0.025 or b["y"] + b["d"] <= a["y"] + 0.025):
                     geometry.append({"kind": "overlap", "level": lv, "block": a["block"], "note": f"{a['label']} and {b['label']} overlap on {'the ground floor' if lv == 0 else f'level {lv + 1}'}"})
         if not go and zones and not any(z["block"] == "corridor" for z in zones) and any(z.get("unit") for z in zones):
             geometry.append({"kind": "no_corridor", "level": lv, "note": f"{'the ground floor' if lv == 0 else f'level {lv + 1}'} has units but no corridor"})

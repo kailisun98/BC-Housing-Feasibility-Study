@@ -292,6 +292,33 @@ class Editor(unittest.TestCase):
         self.assertIn("3.0 m wide, under the 7.5 m", narrow[0]["note"])
         self.assertNotIn("narrow", [g["kind"] for g in layout.place_zones(SITE, OPTION, self.L, self.m, self.zones)["geometry"]])
 
+    def test_small_rooms_are_rooms_and_the_solvers_own_plan_passes_its_own_check(self):
+        # narrow rooms side by side across a strip's whole depth are gathered into one width, one behind another
+        fl = {"zones": [
+            {"block": "design_space", "x": 0.0, "y": 0.0, "w": 2.1, "d": 12.0, "side": "front"},
+            {"block": "other", "label": "Front desk", "x": 2.1, "y": 0.0, "w": 1.0, "d": 12.0, "side": "front"},
+            {"block": "other", "label": "Dining", "x": 3.1, "y": 0.0, "w": 6.0, "d": 12.0, "side": "front"},
+            {"block": "studio", "unit": "studio", "x": 9.1, "y": 0.0, "w": 1.5, "d": 12.0, "side": "front"}]}
+        before = [round(z["w"] * z["d"], 1) for z in fl["zones"]]
+        layout._square_small_rooms(fl)
+        lobby, desk, dining, home = fl["zones"]
+        self.assertEqual((lobby["x"], lobby["w"], desk["x"], desk["w"]), (0.0, 3.1, 0.0, 3.1))     # one shared width
+        self.assertEqual(lobby["y"], 0.0)                                                              # the first keeps the street
+        self.assertAlmostEqual(desk["y"], lobby["d"], places=2)                                        # the next stands behind it
+        self.assertAlmostEqual(lobby["d"] + desk["d"], 12.0, places=2)
+        for z, a in zip(fl["zones"], before):
+            self.assertAlmostEqual(z["w"] * z["d"], a, delta=0.1)                                      # every room keeps its area
+        self.assertEqual((dining["w"], dining["d"], home["w"]), (6.0, 12.0, 1.5))                      # a wide room and a home are left alone
+        # the solver's own floors, read back as a hand placement, break nothing (zones rounded to the centimetre)
+        for site_f, opt_f, on in (("375-glen-drive", "375-glen-drive-as-proposed", date(2026, 11, 17)), ("998-e-19th-ave", "998-e-19th-ave-what-if-funder-ready", AS_OF)):
+            s, o = load_json(ROOT / "sites" / f"{site_f}.json"), load_json(ROOT / "options" / f"{opt_f}.json")
+            L = evaluate(s, o, on)
+            m = massing.build(s, o, L)
+            own = layout.solve(s, o, L, m)
+            back = layout.place_zones(s, o, L, m, layout.zones_of(own))
+            self.assertEqual([g["note"] for g in back["geometry"] if g["kind"] == "overlap"], [], site_f)
+            self.assertFalse([z for fl2 in own["floors"] for z in fl2["zones"] if z["block"] == "other" and z["d"] > z["w"] and z["w"] < 1.5 and z["d"] > 8], site_f)
+
     def test_the_memo_section_says_it_was_placed_by_hand(self):
         lay = layout.solve(SITE, dict(OPTION, layout={"zones": self.zones}), self.L, self.m)
         md = "\n".join(layout.markdown(lay))

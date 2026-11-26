@@ -8,6 +8,7 @@
    so Run the rules reproduces it and the memo says it was placed by hand. Rebuilt 17 Nov 2026. */
 
 import { $, $$, fmtNum, h, pill, setStatus, toast, todayISO } from "../core/util.js";
+import { runRules } from "../runs.js";
 import { editor, state } from "../core/state.js";
 import { postJSON } from "../core/api.js";
 import { refreshSummary, renderForm } from "../schedule.js";
@@ -61,6 +62,15 @@ function stepAt(level) {
   return out;
 }
 
+/* What the editor says is said twice: in the page's status strip, and in a line over the plate, beside the work
+   (25 Nov 2026: the strip is at the top of the page, a screen away from the control that was used). */
+function say(text, tone) {
+  setStatus(text, tone);
+  editor.msg = { text, tone: tone || "info" };
+  const el = $("#ed-msg");
+  if (el) { el.textContent = text; el.dataset.tone = editor.msg.tone; el.hidden = false; }
+}
+
 function zonesFromLayout(L) {
   const out = {};
   for (const fl of L.floors) out[String(fl.level)] = fl.zones.filter(z => z.block !== "spare").map(z => ({ block: z.block, x: z.x, y: z.y, w: z.w, d: z.d, ...(z.accessible ? { accessible: true } : {}), ...(z.block === "other" ? { label: z.label } : {}), ...(z.stairs === "scissor" ? { stairs: "scissor" } : {}), ...(z.name ? { name: z.name } : {}), ...(z.step ? { step: true } : {}),
@@ -105,7 +115,7 @@ function clashes(zs) {
   for (let i = 0; i < zs.length; i++) for (let j = i + 1; j < zs.length; j++) {
     const a = zs[i], b = zs[j];
     if ((a.block === "corridor" && b.block === "core") || (a.block === "core" && b.block === "corridor")) continue;
-    if (!(a.x + a.w <= b.x + 0.01 || b.x + b.w <= a.x + 0.01 || a.y + a.d <= b.y + 0.01 || b.y + b.d <= a.y + 0.01)) { bad.add(i); bad.add(j); }
+    if (!(a.x + a.w <= b.x + 0.025 || b.x + b.w <= a.x + 0.025 || a.y + a.d <= b.y + 0.025 || b.y + b.d <= a.y + 0.025)) { bad.add(i); bad.add(j); }
   }
   return bad;
 }
@@ -138,6 +148,9 @@ export function openEditor(resume) {
   editor.result = run.layout;
   editor.sel = null;
   if (resume && resume.level != null && run.layout.floors[resume.level]) editor.level = resume.level;   // back on the floor it was on
+  // and back in view: a run redraws the memo and takes the page to its top, a dozen screens above the editor (25 Nov 2026)
+  if (resume) setTimeout(() => { const el = $("#sheet-editor"); if (el && editor.open) { const y = el.getBoundingClientRect().top + scrollY - 130; scrollTo({ top: Math.max(0, y), behavior: "auto" }); } }, 450);
+  else editor.msg = null;
   const fig = $('.figure.sheet[data-sheet="plans"]');
   $$(".sheet-body", fig).forEach(x => { x.hidden = true; });
   $("#edit-blocks").setAttribute("aria-expanded", "true");
@@ -145,7 +158,7 @@ export function openEditor(resume) {
   $("#sheet-editor").hidden = false;
   renderEditor();
   const L = run.layout, left = (L.units_total || 0) - (L.units_placed || 0);
-  setStatus(fromOption
+  say(fromOption
     ? "Block editor: your placement, as the option carries it. Drag a block from the program onto the plate, or move one on the plate (or Tab to it and use the arrows); the engine checks every move."
     : `Block editor: the memo's own plan, ${L.units_placed ?? "?"} of ${L.units_total ?? "?"} homes placed${left > 0 ? `, ${left} left to place` : ""}. Move a block (drag it, or Tab to it and use the arrows), or Suggest a grid plan for a different plan laid out afresh on the grid.`, "info");
   checkPlacement();   // a run read from disk may predate what the editor reads (the FSR room)
@@ -159,7 +172,7 @@ export function closeEditor() {
   $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== view; });
   $("#sheet-editor").hidden = true;
   const b = $("#edit-blocks"); if (b) { b.setAttribute("aria-expanded", "false"); b.textContent = "Edit blocks"; }
-  if (editor.dirty && !editor.applied) setStatus("The editor closed with changes not applied to the option; open it again to apply them.", "info");
+  if (editor.dirty && !editor.applied) say("The editor closed with changes not applied to the option; open it again to apply them.", "info");
 }
 
 /* ---------------------------------------------------------------- undo, and the cores that stand on every floor */
@@ -175,7 +188,7 @@ function undo() {
   const was = JSON.parse(s);
   editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.angle = was.t || 0; editor.steps = was.s || null; editor.anchor = was.n || null; editor.sel = null; editor.dirty = true;
   renderEditor(); scheduleCheck();
-  setStatus("Undone.", "info");
+  say("Undone.", "info");
 }
 
 const coresNow = () => (editor.zones[String(editor.level)] || []).filter(z => z.block === "core").map(z => ({ x: z.x, y: z.y, w: z.w, d: z.d }));
@@ -222,11 +235,11 @@ function syncHomes() {
 
 /* Every change ends here: the cores follow on every floor when one was touched, the editor redraws, the engine checks. */
 function commit(core) {
-  if (syncHomes()) setStatus("The home runs through its floors: the change is made on each of them.", "info");
+  if (syncHomes()) say("The home runs through its floors: the change is made on each of them.", "info");
   if (core) {
     editor.coreMoved = true;   // from here a suggested plan keeps the cores where the architect stood them
     const L = editor.result || state.run.layout, hit = syncCores();
-    setStatus(`The cores are the same on all ${L.floors.length} floors: the stairs do not shift from level to level.${hit ? ` ${hit} block${hit === 1 ? "" : "s"} on other floors now sit${hit === 1 ? "s" : ""} on a core: move them, or Suggest a grid plan lays the program round the cores.` : ""}`, hit ? "busy" : "info");
+    say(`The cores are the same on all ${L.floors.length} floors: the stairs do not shift from level to level.${hit ? ` ${hit} block${hit === 1 ? "" : "s"} on other floors now sit${hit === 1 ? "s" : ""} on a core: move them, or Suggest a grid plan lays the program round the cores.` : ""}`, hit ? "busy" : "info");
   }
   editor.dirty = true;
   renderEditor(); scheduleCheck();
@@ -240,7 +253,11 @@ function viewOf(p, m, width) {
   let v = { x0: p.x, y0: p.y, x1: p.x + p.width_m, y1: p.y + p.depth_m, ctx: false };
   if (editor.context && m && m.lot) {
     const bb = m.lot.bbox || [0, 0, m.lot.frontage_m, m.lot.depth_m], pad = 9;
-    v = { x0: Math.min(bb[0], p.x) - pad, y0: Math.min(bb[1], p.y) - pad - 5, x1: Math.max(bb[2], p.x + p.width_m) + pad, y1: Math.max(bb[3], p.y + p.depth_m) + pad, ctx: true };
+    // "plate": the plate large, with a margin of the site round it (the lot line and the setbacks where they fall in
+    // it); "site": the whole lot and its streets, the plate small in it
+    const near = Math.max(5, 0.16 * Math.max(p.width_m, p.depth_m));
+    if (editor.zoom !== "site") v = { x0: p.x - near, y0: p.y - near, x1: p.x + p.width_m + near, y1: p.y + p.depth_m + near, ctx: true };
+    else v = { x0: Math.min(bb[0], p.x) - pad, y0: Math.min(bb[1], p.y) - pad - 5, x1: Math.max(bb[2], p.x + p.width_m) + pad, y1: Math.max(bb[3], p.y + p.depth_m) + pad, ctx: true };
   }
   // a turned mass reaches past its own rectangle: the view takes the turned outline in
   const t = (editor.angle || 0) * Math.PI / 180;
@@ -481,7 +498,7 @@ function renderEditor() {
   const floorsBtns = L.floors.map(fl => {
     const n = (editor.zones[String(fl.level)] || []).filter(z => isUnit(z.block)).length;
     const broken = (L.geometry || []).some(g => g.level === fl.level);
-    return `<button type="button" class="segbtn" data-ed-level="${fl.level}" aria-pressed="${fl.level === editor.level}" title="${h(floorName(fl.level))}: ${n} unit${n === 1 ? "" : "s"}${broken ? ", something to fix" : ""}">${h(floorName(fl.level))}<small>${n}${broken ? " !" : ""}</small></button>`;
+    return `<button type="button" class="segbtn" data-ed-level="${fl.level}" aria-pressed="${fl.level === editor.level}" title="${h(floorName(fl.level))}: ${n} unit${n === 1 ? "" : "s"}${broken ? ", something to fix" : ""}">${h(floorName(fl.level))}<small>${n}</small>${broken ? `<i class="ed-flag" aria-label="something to fix"></i>` : ""}</button>`;
   }).join("");
   const floorChecks = (L.geometry || []).filter(g => g.level === editor.level);
   const problems = (L.geometry || []).length;
@@ -492,11 +509,12 @@ function renderEditor() {
   const cap = L.capacity, f3 = v => (Math.round(v * 100) / 100).toFixed(2);
   const canAdd = !!cap && (cap.fsr_limit == null || cap.levels_room >= 1);
   const overs = oversOf(cap);
+  const groups = editor.groups || (editor.groups = { plate: false, options: false });
   const steps = editor.steps || [], step = steps[steps.length - 1] || null;
   const stepWords = s => `from ${floorName(s.from_level)} up: ${["front", "rear", "left", "right"].filter(k => s[k] > 0).map(k => `${k} ${s[k]} m`).join(", ")}`;
   const tall = cap && cap.height_limit_m != null && cap.height_with_one_more > cap.height_limit_m + 0.05 ? ` A level more stands ${cap.height_with_one_more} m high, past the ${cap.height_limit_m} m of ${cap.height_from}.` : "";
   const capNote = !cap ? "" : (cap.fsr_limit == null ? `FSR ${f3(cap.fsr)} · the rules carry no FSR limit here`
-    : `FSR ${f3(cap.fsr)} of ${f3(cap.fsr_limit)} · ${cap.levels_room >= 1 ? `room for ${cap.levels_room} more level${cap.levels_room === 1 ? "" : "s"}` : `no room for a level (${fmtNum(Math.round(cap.plate_m2))} m² needed, ${fmtNum(Math.round(cap.room_m2))} m² left)`}`);
+    : `FSR ${f3(cap.fsr)} of ${f3(cap.fsr_limit)} · ${cap.levels_room >= 1 ? (tall ? `room in the FSR for ${cap.levels_room} more level${cap.levels_room === 1 ? "" : "s"}, none in the height` : `room for ${cap.levels_room} more level${cap.levels_room === 1 ? "" : "s"}`) : `no room for a level (${fmtNum(Math.round(cap.plate_m2))} m² needed, ${fmtNum(Math.max(0, Math.round(cap.room_m2)))} m² left)`}`);
   const capTitle = !cap ? "" : (cap.fsr_limit == null ? `Add a level of ${fmtNum(Math.round(cap.plate_m2))} m²: the FSR goes to ${f3(cap.fsr_with_one_more)}; the rules carry no FSR limit for this district to hold it against`
     : (canAdd ? `Add a level of ${fmtNum(Math.round(cap.plate_m2))} m² for the program left to place: the FSR goes to ${f3(cap.fsr_with_one_more)} of ${f3(cap.fsr_limit)} (${cap.limit_from})` : `A level of ${fmtNum(Math.round(cap.plate_m2))} m² would take the FSR to ${f3(cap.fsr_with_one_more)}, past ${f3(cap.fsr_limit)} (${cap.limit_from})`));
   const levelsCtl = !cap ? "" : `<span class="ed-levels">
@@ -506,8 +524,19 @@ function renderEditor() {
   box.classList.toggle("ed-wide", wide);
   box.innerHTML = `
     <div class="ed-bar">
+      <span class="label" title="The floor shown, and the homes placed on each">Floor · homes</span>
       <div class="seg ed-floors" role="group" aria-label="Floor">${floorsBtns}</div>
       ${levelsCtl}
+      <span class="ed-tools">
+        <span class="help ed-busy" id="ed-busy"${editor.busy ? "" : " hidden"}>Checking…</span>
+        <span class="seg" role="group" aria-label="What the drawing shows"><button type="button" class="segbtn" data-ed-zoom="plate" aria-pressed="${editor.zoom !== "site"}" title="The plate large, with a margin of the site round it">Plate</button><button type="button" class="segbtn" data-ed-zoom="site" aria-pressed="${editor.zoom === "site"}" title="The whole lot with its streets and neighbours">Site</button></span>
+        <button type="button" class="btn btn-small btn-quiet" id="ed-undo"${(editor.history || []).length ? "" : " disabled"} title="Undo the last change (Ctrl+Z)">Undo</button>
+        <button type="button" class="btn btn-small" id="ed-suggest" title="A different plan from the memo's: the engine lays the whole program out afresh on this grid, round the cores where they stand; Undo brings back what was there">Suggest a grid plan</button>
+      </span>
+    </div>
+    <details class="ed-group" data-group="plate"${groups.plate ? " open" : ""}>
+      <summary><b>Plate, grid and turn</b> <span class="cont">· ${h(p.width_m)} × ${h(p.depth_m)} m${editor.plate ? " (set by hand)" : ""}${ang ? `, turned ${ang}°` : ""} · ${h(editor.bay)} m bay · ${editor.context ? "site shown" : "site hidden"}${editor.shadows ? ", shadows" : ""}</span></summary>
+      <div class="ed-bar">
       <span class="ed-grid" role="group" aria-label="Structural grid">
         <span class="label">Bay, wall to wall</span>
         <span class="seg">${BAYS.map(v => `<button type="button" class="segbtn" data-ed-bay="${v}" aria-pressed="${editor.bay === v}">${v} m</button>`).join("")}</span>
@@ -529,27 +558,27 @@ function renderEditor() {
         <label class="ed-acc" title="The property line, the setback envelope, the streets and the neighbours behind the plate"><input type="checkbox" id="ed-context"${editor.context ? " checked" : ""}> site context</label>
         <label class="ed-acc" title="${canSun ? "Shadows at the equinox, 10 am, noon and 2 pm daylight time: the mass as one box of its full height on flat ground. A first reading, not a shadow study." : "Shadows need the site's context, which gives north"}"><input type="checkbox" id="ed-shadows"${editor.shadows ? " checked" : ""}${canSun && editor.context ? "" : " disabled"}> shadows</label>
       </span>
-      <span class="ed-tools">
-        <span class="help ed-busy" id="ed-busy"${editor.busy ? "" : " hidden"}>Checking…</span>
-        <button type="button" class="btn btn-small btn-quiet" id="ed-undo"${(editor.history || []).length ? "" : " disabled"} title="Undo the last change (Ctrl+Z)">Undo</button>
-        <button type="button" class="btn btn-small" id="ed-suggest" title="A different plan from the memo's: the engine lays the whole program out afresh on this grid, round the cores where they stand; Undo brings back what was there">Suggest a grid plan</button>
-      </span>
-    </div>
-    ${variantsHtml(L)}
-    <details class="ed-step"${editor.stepOpen ? " open" : ""}>
+      </div>
+    </details>
+    <details class="ed-group" data-group="options"${groups.options ? " open" : ""}>
+      <summary><b>Options to compare</b> <span class="cont">· ${variantsHere().length ? `${variantsHere().length} kept` : "none kept: keep this plan, change the massing, keep another"}</span></summary>
+      ${variantsHtml(L)}
+    </details>
+    <details class="ed-step ed-group"${editor.stepOpen ? " open" : ""}>
       <summary><b>Step back the upper floors</b> <span class="cont">· ${steps.length ? h(steps.map(stepWords).join("; ")) : "none: every floor is the full plate"}</span></summary>
       ${steps.length ? `<ul class="ed-step-list">${steps.map(s => `<li>${h(stepWords(s))} <button type="button" class="btn btn-small btn-quiet" data-step-del="${s.from_level}" title="Take this step-back away">Remove</button></li>`).join("")}</ul>` : ""}
       <div class="ed-step-row">
-        <label class="field inline"><span class="label">From</span><select id="ed-step-from">${L.floors.filter(fl => fl.level > 0).map(fl => `<option value="${fl.level}"${Math.max(1, L.floors.length - 1) === fl.level ? " selected" : ""}>${h(floorName(fl.level))} up</option>`).join("")}</select></label>
+        <label class="field inline"><span class="label">From</span><select id="ed-step-from">${L.floors.filter(fl => fl.level > 0).map(fl => `<option value="${fl.level}"${Math.max(1, Math.round(L.floors.length * 2 / 3)) === fl.level ? " selected" : ""}>${h(floorName(fl.level))} up</option>`).join("")}</select></label>
         ${[["front", "Street side"], ["rear", "Lane side"], ["left", "Left"], ["right", "Right"]].map(([k, l]) => `<label class="field inline"><span class="label">${l} (m)</span><input type="number" id="ed-step-${k}" min="0" step="0.5" value="0" aria-label="Step back on the ${l.toLowerCase()}, metres"></label>`).join("")}
         <button type="button" class="btn btn-small" id="ed-step-apply">${steps.length ? "Add or change a step" : "Step back"}</button>
         ${steps.length > 1 ? `<button type="button" class="btn btn-small btn-quiet" id="ed-step-clear">Remove them all</button>` : ""}
-        <span class="help">The floors from there up lose a strip along each side named: a cut-out, so it comes off the floor area and the FSR. Blocks standing in it go back to the program; new ones are sized for the shallower strip. Left and right are as the plate is drawn before any turn.</span>
+        <span class="help">The floors from there up lose a strip along each side named: a cut-out, so it comes off the floor area and the FSR. The homes on that side stay, shallower and as much wider as their area needs; the ones that no longer fit go back to the program. Left and right are as the plate is drawn before any turn.</span>
       </div>
     </details>
     <div class="ed-main">
       ${programHtml(L, tr, zs, B)}
       <div class="ed-stage">
+        <div class="ed-msg" id="ed-msg" role="status" data-tone="${h((editor.msg || {}).tone || "info")}"${editor.msg ? "" : " hidden"}>${h((editor.msg || {}).text || "")}</div>
         <div class="ed-selbar" id="ed-selbar">${selBarHtml(L, zs)}</div>
         <svg class="ed-canvas" viewBox="0 0 ${frame.W.toFixed(1)} ${frame.H.toFixed(1)}" width="${width}" height="${(frame.H * width / frame.W).toFixed(0)}" role="application" tabindex="-1" aria-label="Block editor, ${h(L.floors[editor.level].name)}${turn ? ", north up" : ""}. Tab to a block; the arrows move it, Delete removes it, Ctrl+Z undoes">
           <rect x="0" y="0" width="100%" height="100%" fill="${V.ctx && site && site.osm ? HALF.parcel : "#ffffff"}"/>
@@ -569,19 +598,22 @@ function renderEditor() {
         </svg>
         <div class="ed-status">
           ${floorChecks.length ? `<ul class="finding-list">${floorChecks.map(g => `<li>${pill("fail")}<span>${h(g.note)}</span></li>`).join("")}</ul>` : `<span class="help">Nothing broken on ${h(floorWords(editor.level))}.${problems ? ` ${problems} on other floors (marked ! above).` : ""}</span>`}
-          ${nbGap != null || lotGap != null ? `<span class="help">Separation: ${nbGap != null ? `${h(nbGap.toFixed(1))} m to the nearest neighbouring building` : ""}${nbGap != null && lotGap != null ? "; " : ""}${lotGap != null ? `${h(lotGap.toFixed(1))} m to the nearest lot line` : ""}${sun ? `. Longest shadow at the equinox: ${h(Math.round(Math.max(...sun.map(x => x.len))))} m at 10 am` : ""}.</span>` : ""}
-          ${pk ? `<span class="help">${h(pk)}</span>` : ""}
+          ${overs.length ? `<span class="help ed-over">${pill("conditional")} <b>Over ${overs.length === 1 ? "a limit" : "two limits"}:</b> ${h(overs.join("; "))}. Nothing stops you; the memo will say so and staff will test the scheme against it. A smaller plate or a level fewer brings it back.</span>` : ""}
           ${L.proportions && L.proportions.status !== "pass" ? `<span class="help">${pill("conditional")} ${h(L.proportions.note)}</span>` : ""}
           ${L.daylight && L.daylight.status !== "pass" ? `<span class="help">${pill("conditional")} ${h(L.daylight.note)}</span>` : ""}
-          ${overs.length ? `<span class="help ed-over">${pill("conditional")} <b>Over ${overs.length === 1 ? "a limit" : "two limits"}:</b> ${h(overs.join("; "))}. Nothing stops you; the memo will say so and staff will test the scheme against it. A smaller plate or a level fewer brings it back.</span>` : ""}
           ${past ? `<span class="help warn-text">${h(past)} <button type="button" class="btn btn-small" id="ed-fit-turn" title="Shrink the plate, keeping its proportions, until the turned mass stands inside the setback envelope">Fit the plate to the turn</button></span>` : ""}
           ${egF ? `<span class="help">${pill(egF.status)} Exits on this floor: ${h(egressLine(egF))}${egF.notes && egF.notes.length ? ` <span class="cont">· ${h(egF.notes[0])}</span>` : ""}</span>` : ""}
+          <details class="ed-more"><summary>Separation, parkade and adjacency</summary>
+          ${nbGap != null || lotGap != null ? `<span class="help">Separation: ${nbGap != null ? `${h(nbGap.toFixed(1))} m to the nearest neighbouring building` : ""}${nbGap != null && lotGap != null ? "; " : ""}${lotGap != null ? `${h(lotGap.toFixed(1))} m to the nearest lot line` : ""}${sun ? `. Longest shadow at the equinox: ${h(Math.round(Math.max(...sun.map(x => x.len))))} m at 10 am` : ""}.</span>` : ""}
+          ${pk ? `<span class="help">${h(pk)}</span>` : ""}
           <span class="help">${h((L.adjacencies || []).filter(c => c.status === "pass").length)} adjacency rules hold, ${h((L.adjacencies || []).filter(c => c.status === "conditional").length)} conditional.</span>
+          </details>
         </div>
       </div>
     </div>
     <div class="form-actions">
-      <button type="button" class="btn btn-primary btn-small" id="ed-apply"${editor.dirty || !editor.applied ? "" : " disabled"}>${problems ? `Apply with ${problems} problem${problems === 1 ? "" : "s"}` : "Apply to the option"}</button>
+      <button type="button" class="btn btn-primary btn-small" id="ed-apply-run" title="Write the plan into the option and run the rules on it in one step: the memo, the drawings and the 3D view follow, and the editor stays open on this floor">${problems ? `Apply with ${problems} problem${problems === 1 ? "" : "s"} and run the rules` : "Apply and run the rules"}</button>
+      <button type="button" class="btn btn-small" id="ed-apply"${editor.dirty || !editor.applied ? "" : " disabled"}>${problems ? `Apply with ${problems} problem${problems === 1 ? "" : "s"}` : "Apply to the option"}</button>
       <button type="button" class="btn btn-small btn-quiet" id="ed-dxf" title="Download every floor's blocks as a DXF drawing (metres, a layer per block kind) to open in AutoCAD, Rhino or Revit">Export DXF</button>
       <button type="button" class="btn btn-small btn-quiet" id="ed-mirror" title="Flip this floor's blocks left to right about the middle of the plate; the cores stay, as they are the same on every floor">Mirror this floor</button>
       <button type="button" class="btn btn-small btn-quiet" id="ed-repeat" title="Copy this floor's blocks onto every floor above it"${editor.level >= L.floors.length - 1 ? " disabled" : ""}>Repeat this floor above</button>
@@ -717,7 +749,7 @@ function wireSel(box, ctx) {
     }
     commit(false);
     const hit = clashes(zs).has(editor.sel);
-    setStatus(`The block is now ${blockName(sel).toLowerCase()}, ${sel.w} × ${sel.d} m.${hit ? " At that width it overlaps its neighbour: move one of them, or pull an edge." : ""}`, hit ? "busy" : "info");
+    say(`The block is now ${blockName(sel).toLowerCase()}, ${sel.w} × ${sel.d} m.${hit ? " At that width it overlaps its neighbour: move one of them, or pull an edge." : ""}`, hit ? "busy" : "info");
   });
   const mv = $("#ed-move", box);
   if (mv) mv.addEventListener("change", e => {
@@ -730,7 +762,7 @@ function wireSel(box, ctx) {
     target.push(sel);
     editor.level = Number(to); editor.sel = target.length - 1;
     commit(false);
-    setStatus(spot ? `Moved to ${floorWords(Number(to))}, the first free place.` : `No room on ${floorWords(Number(to))} for a ${sel.w} × ${sel.d} m block: it sits where it was and overlaps; move or remove something.`, spot ? "info" : "busy");
+    say(spot ? `Moved to ${floorWords(Number(to))}, the first free place.` : `No room on ${floorWords(Number(to))} for a ${sel.w} × ${sel.d} m block: it sits where it was and overlaps; move or remove something.`, spot ? "info" : "busy");
   });
   const acc = $("#ed-acc", box);
   if (acc) acc.addEventListener("change", () => { snapshot(); if (acc.checked) sel.accessible = true; else delete sel.accessible; commit(false); });
@@ -797,8 +829,8 @@ function variantsHtml(L) {
     <td class="${s.heightLimit != null && s.height > s.heightLimit + 0.05 ? "warn-text" : ""}">${s.height != null ? `${s.height} m` : "–"}${s.heightLimit != null ? ` of ${s.heightLimit}` : ""}</td>
     <td>${s.placed} of ${s.total}</td><td>${s.problems || "none"}</td><td>${s.deep || "none"}</td>`;
   return `<div class="ed-variants">
-      <button type="button" class="btn btn-small btn-quiet" id="ed-keep"${kept.length >= 6 ? " disabled" : ""} title="Keep this plan, with its plate, turn, steps and levels, as an option to compare with the next one you try">Keep as an option to compare</button>
-      ${kept.length ? `<table class="plain ed-var-table"><thead><tr><th>Option</th><th>Storeys</th><th>Plate</th><th>FSR</th><th>Height</th><th>Homes placed</th><th>Problems</th><th>Deep or windowless homes</th><th></th></tr></thead><tbody>
+      <button type="button" class="btn btn-small" id="ed-keep"${kept.length >= 6 ? " disabled" : ""} title="Keep this plan, with its plate, turn, steps and levels, as an option to compare with the next one you try">Keep as an option to compare</button>
+      ${kept.length ? `<table class="plain ed-var-table"><thead><tr><th>Option</th><th>Storeys</th><th>Plate</th><th>FSR</th><th>Height</th><th>Homes placed</th><th>Problems</th><th title="Homes deeper than 10 m from their window wall, or with no outside wall">Homes short of daylight</th><th></th></tr></thead><tbody>
         ${kept.map((v, i) => `<tr><th>${h(v.name)}</th>${cells(v.sum)}<td><button type="button" class="btn btn-small btn-quiet" data-var-restore="${i}">Restore</button> <button type="button" class="btn btn-small btn-quiet" data-var-drop="${i}" aria-label="Drop option ${h(v.name)}">Drop</button></td></tr>`).join("")}
         <tr class="now"><th>Now</th>${cells(now)}<td></td></tr></tbody></table>` : ""}
     </div>`;
@@ -815,6 +847,7 @@ function rebuildSteps() {
     const k = String(fl.level);
     let zs = (editor.zones[k] || []).filter(z => !z.step);
     for (const z of zs) if (z.block === "corridor" && z.full) { z.x = z.full[0]; z.w = z.full[1]; delete z.full; }   // the corridor at its own length again
+    for (const z of zs) if (z.pre) { [z.x, z.y, z.w, z.d] = z.pre; delete z.pre; }   // and a home a step-back made shallower, as it was
     const st = stepAt(fl.level);
     if (st.front || st.rear || st.left || st.right) {
       const f = st.front || 0, r = st.rear || 0, l = st.left || 0, rt = st.right || 0, W = p.width_m, D = p.depth_m;
@@ -824,6 +857,31 @@ function rebuildSteps() {
         const a = Math.max(z.x, p.x + l), b = Math.min(z.x + z.w, p.x + W - rt);
         if (b - a > 1 && (a > z.x + 0.01 || b < z.x + z.w - 0.01)) { z.full = [z.x, z.w]; z.x = r2(a); z.w = r2(b - a); }
       }
+      // The homes and rooms standing on a stepped face stay (25 Nov 2026: a 3 m step-back emptied the whole street side
+      // of six floors): each is made shallower by the step and as much wider as it needs (a home by its type's area and
+      // minimum width at the new depth, a room to keep its area), and they close up along the strip from its start,
+      // past the cores; the ones the strip no longer holds go back to the program. `pre` keeps what each was.
+      const cores = zs.filter(z => z.block === "core"), gone = new Set();
+      const refit = (band, yOf, dOf) => {
+        let cursor = p.x + l;
+        for (const z of band.sort((a, b) => a.x - b.x)) {
+          const y = yOf(z), d = dOf(z);
+          if (d < 2.5) { gone.add(z); continue; }
+          const pr = isUnit(z.block) ? (L.program || []).find(b => b.key === z.block) : null;
+          const w = pr ? unitW(pr.gross_m2_each, pr.min_gross_m2_each, d, pr.min_width_m) : r2(z.w * z.d / d);
+          let x = Math.max(z.x, cursor);
+          for (let n = 0, hit; n < 8 && (hit = cores.find(c => !(x + w <= c.x + 0.01 || c.x + c.w <= x + 0.01 || y + d <= c.y + 0.01 || c.y + c.d <= y + 0.01))); n++) x = hit.x + hit.w;
+          if (x + w > p.x + W - rt + 0.01) { gone.add(z); continue; }
+          z.pre = [z.x, z.y, z.w, z.d];
+          z.x = r2(x); z.y = r2(y); z.w = r2(w); z.d = r2(d);
+          cursor = x + w;
+        }
+      };
+      const loose = z => z.block !== "core" && z.block !== "corridor" && z.block !== "void";
+      if (f) refit(zs.filter(z => loose(z) && Math.abs(z.y - p.y) < 0.03), z => z.y + f, z => z.d - f);
+      if (r) refit(zs.filter(z => loose(z) && Math.abs(z.y + z.d - (p.y + D)) < 0.03), z => z.y, z => z.d - r);
+      zs = zs.filter(z => !gone.has(z));
+      moved += gone.size;
       const keep = zs.filter(z => z.block === "core" || z.block === "corridor" || !strips.some(s => hits(z, s)));
       moved += zs.length - keep.length;
       zs = keep.concat(strips.map(s => ({ block: "void", step: true, name: "step-back", x: s.x, y: s.y, w: r2(s.w), d: r2(s.d) })));
@@ -842,7 +900,7 @@ function duplicateSel(ctx) {
   const clear = clearOf(z, zs.filter(o => o.block !== "corridor"));
   const beside = [[r2(sel.x + sel.w), sel.y], [r2(sel.x - sel.w), sel.y]].find(([x, y]) => x >= p.x - 0.01 && x + z.w <= p.x + p.width_m + 0.01 && (z.block === "corridor" || clear(x, y)));
   const spot = beside || freeSpot(zs, z, p, B);
-  if (!spot) { setStatus(`No free room on ${floorWords(editor.level)} for another ${blockName(sel).toLowerCase()} of ${sel.w} × ${sel.d} m, so nothing was added.`, "busy"); return; }
+  if (!spot) { say(`No free room on ${floorWords(editor.level)} for another ${blockName(sel).toLowerCase()} of ${sel.w} × ${sel.d} m, so nothing was added.`, "busy"); return; }
   z.x = spot[0]; z.y = spot[1];
   snapshot();
   zs.push(z); editor.sel = zs.length - 1;
@@ -857,7 +915,7 @@ function removeSel(zs) {
   editor.sel = zs.length ? Math.min(i, zs.length - 1) : null;
   editor.keepFocus = true;
   commit(core);
-  setStatus(`${blockName(gone)} removed${editor.sel != null ? `; ${blockName(zs[editor.sel]).toLowerCase()} is selected` : ""}. Ctrl+Z brings it back.`, "info");
+  say(`${blockName(gone)} removed${editor.sel != null ? `; ${blockName(zs[editor.sel]).toLowerCase()} is selected` : ""}. Ctrl+Z brings it back.`, "info");
 }
 
 function wireEditor(box, ctx) {
@@ -888,13 +946,13 @@ function wireEditor(box, ctx) {
     snapshot();
     editor.angle = a; editor.dirty = true;
     renderEditor(); scheduleCheck();
-    setStatus(a ? `The mass is turned ${a}° on the lot${editor.context ? "" : " (turn the site context on to see it against the property line)"}; its blocks turn with it. The engine says if a corner passes the setback envelope. Apply writes the angle into the option.` : "The mass is square to the lot again.", "info");
+    say(a ? `The mass is turned ${a}° on the lot${editor.context ? "" : " (turn the site context on to see it against the property line)"}; its blocks turn with it. The engine says if a corner passes the setback envelope. Apply writes the angle into the option.` : "The mass is square to the lot again.", "info");
   };
   $("#ed-angle", box).addEventListener("change", e => setAngle(Number(e.target.value)));
   $$("[data-ed-turn]", box).forEach(b => b.addEventListener("click", () => setAngle((editor.angle || 0) + Number(b.dataset.edTurn))));
   $("#ed-shadows", box).addEventListener("change", e => {
     editor.shadows = e.target.checked; renderEditor();
-    if (editor.shadows) setStatus("Shadows at the equinox, 10 am, noon and 2 pm daylight time, from the mass as one box of its full height on flat ground: a first reading for placing and turning the mass, not the shadow study the City asks for.", "info");
+    if (editor.shadows) say("Shadows at the equinox, 10 am, noon and 2 pm daylight time, from the mass as one box of its full height on flat ground: a first reading for placing and turning the mass, not the shadow study the City asks for.", "info");
   });
   $("#ed-context", box).addEventListener("change", e => {
     editor.context = e.target.checked;
@@ -907,7 +965,7 @@ function wireEditor(box, ctx) {
   const setBay = v => {
     if (!(v >= 3 && v <= 12)) { toast("A bay is between 3 and 12 m, wall to wall.", true); renderEditor(); return; }
     editor.bay = r2(v); renderEditor();
-    setStatus(`The grid is a ${editor.bay} m bay, the walls on its ${r2(mod())} m module. The blocks on the plate stay where they are and take the grid as they are moved; Suggest a grid plan lays the program out on it.`, "info");
+    say(`The grid is a ${editor.bay} m bay, the walls on its ${r2(mod())} m module. The blocks on the plate stay where they are and take the grid as they are moved; Suggest a grid plan lays the program out on it.`, "info");
   };
   $$("[data-ed-bay]", box).forEach(b => b.addEventListener("click", () => setBay(Number(b.dataset.edBay))));
   $("#ed-bay-other", box).addEventListener("change", e => { if (e.target.value !== "") setBay(Number(e.target.value)); });
@@ -924,7 +982,7 @@ function wireEditor(box, ctx) {
     // no free place: nothing is added (before 23 Nov 2026 the block was dropped on the front-left corner, on top of
     // what stood there, and a cut-out dropped that way came off the floor area while the home under it still counted)
     if (!spot) {
-      setStatus(`No free room on ${floorWords(editor.level)} for a ${z.w} × ${z.d} m ${blockName(z).toLowerCase()}, so nothing was added. Clear a space or try another floor; or drag it from the program onto the plate to stand it exactly where you want it, and resize it there.`, "busy");
+      say(`No free room on ${floorWords(editor.level)} for a ${z.w} × ${z.d} m ${blockName(z).toLowerCase()}, so nothing was added. Clear a space or try another floor; or drag it from the program onto the plate to stand it exactly where you want it, and resize it there.`, "busy");
       return;
     }
     z.x = spot[0]; z.y = spot[1];
@@ -990,7 +1048,7 @@ function wireEditor(box, ctx) {
     state.optionDirty = true; $("#option-dirty").hidden = false;
     editor.dirty = true;
     $("#ed-prog-label", box).value = ""; $("#ed-prog-area", box).value = "";
-    setStatus(`${label}, ${fmtNum(area)} m², is in the program (option.layout.extra_programs); it joins the list once the engine has counted it. Drag it onto the plate from there.`, "ok");
+    say(`${label}, ${fmtNum(area)} m², is in the program (option.layout.extra_programs); it joins the list once the engine has counted it. Drag it onto the plate from there.`, "ok");
     scheduleCheck();
   });
 
@@ -999,14 +1057,14 @@ function wireEditor(box, ctx) {
     for (const k of Object.keys(editor.zones)) editor.zones[k] = editor.zones[k].filter(z => z.block === "core" || z.block === "corridor");
     editor.sel = null;
     commit(false);
-    setStatus("Every block is off the plates; the cores and the corridors stay. Drag the program onto the plate, floor by floor; Undo brings the blocks back.", "info");
+    say("Every block is off the plates; the cores and the corridors stay. Drag the program onto the plate, floor by floor; Undo brings the blocks back.", "info");
   });
   $("#ed-repeat", box).addEventListener("click", () => {
     snapshot();
     const above = L.floors.filter(fl => fl.level > editor.level);
     for (const fl of above) editor.zones[String(fl.level)] = JSON.parse(JSON.stringify(zs));
     commit(false);
-    setStatus(`${floorName(editor.level)} is repeated on the ${above.length} floor${above.length === 1 ? "" : "s"} above. The program beside the plate says what that leaves to place, or puts over.`, "info");
+    say(`${floorName(editor.level)} is repeated on the ${above.length} floor${above.length === 1 ? "" : "s"} above. The program beside the plate says what that leaves to place, or puts over.`, "info");
   });
   // options kept to compare: this plan as it stands, with its plate, turn, steps and levels
   const keepBtn = $("#ed-keep", box);
@@ -1014,7 +1072,7 @@ function wireEditor(box, ctx) {
     const mine = variantsHere(), name = "ABCDEF"[mine.length] || String(mine.length + 1);
     editor.variants.push({ key: variantKey(), name, sum: summaryOf(L), state: JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0, s: editor.steps || null, n: editor.anchor || null }) });
     renderEditor();
-    setStatus(`Kept as option ${name}. Change the plate, the turn, the steps or the plan and keep another; the table compares them, and Restore brings one back onto the plate.`, "ok");
+    say(`Kept as option ${name}. Change the plate, the turn, the steps or the plan and keep another; the table compares them, and Restore brings one back onto the plate.`, "ok");
   });
   $$("[data-var-restore]", box).forEach(b => b.addEventListener("click", () => {
     const v = variantsHere()[Number(b.dataset.varRestore)]; if (!v) return;
@@ -1023,7 +1081,7 @@ function wireEditor(box, ctx) {
     editor.zones = was.z; editor.added = was.a; editor.plate = was.p; editor.angle = was.t; editor.steps = was.s; editor.anchor = was.n; editor.sel = null; editor.dirty = true;
     if (!editor.zones[String(editor.level)]) editor.level = 0;
     renderEditor(); scheduleCheck();
-    setStatus(`Option ${v.name} is back on the plate; Undo returns to what was there. Apply makes it the option's.`, "info");
+    say(`Option ${v.name} is back on the plate; Undo returns to what was there. Apply makes it the option's.`, "info");
   }));
   $$("[data-var-drop]", box).forEach(b => b.addEventListener("click", () => {
     const v = variantsHere()[Number(b.dataset.varDrop)];
@@ -1033,7 +1091,7 @@ function wireEditor(box, ctx) {
   if (fitBtn) fitBtn.addEventListener("click", () => {
     const env = editor.massing && editor.massing.envelope;
     const fit = env && env.polygon && fitTurned(p, env, editor.angle || 0, m);
-    if (!fit) { setStatus(`No plate of these proportions fits inside the setback envelope turned ${editor.angle}°: turn it less, or change the plate's proportions by hand.`, "busy"); return; }
+    if (!fit) { say(`No plate of these proportions fits inside the setback envelope turned ${editor.angle}°: turn it less, or change the plate's proportions by hand.`, "busy"); return; }
     // a plate against a corner of the envelope puts a corner out at any turn: it stands at the middle to turn
     setPlate(fit[0], fit[1], "centre");
   });
@@ -1047,7 +1105,7 @@ function wireEditor(box, ctx) {
     const moved = rebuildSteps();
     editor.sel = null;
     commit(false);
-    setStatus(spec ? `${floorName(spec.from_level)} and up step back: ${["front", "rear", "left", "right"].filter(k => spec[k] > 0).map(k => `${k} ${spec[k]} m`).join(", ")}.${moved ? ` ${moved} block${moved === 1 ? "" : "s"} stood in the strip and went back to the program: place them again, they are sized for the shallower floor.` : ""} The 3D view, the section and the elevations show the steps after Apply and Run the rules.` : "The step-backs are removed: every floor is the full plate again.", moved ? "busy" : "info");
+    say(spec ? `${floorName(spec.from_level)} and up step back: ${["front", "rear", "left", "right"].filter(k => spec[k] > 0).map(k => `${k} ${spec[k]} m`).join(", ")}. The homes on a stepped side are shallower and wider now.${moved ? ` ${moved} block${moved === 1 ? "" : "s"} no longer fit and went back to the program.` : ""} The 3D view, the section and the elevations show the steps after Apply and Run the rules.` : "The step-backs are removed: every floor is the full plate again.", moved ? "busy" : "info");
   };
   $("#ed-step-apply", box).addEventListener("click", () => {
     const num = k => Math.max(0, Number($(`#ed-step-${k}`, box).value) || 0);
@@ -1061,15 +1119,18 @@ function wireEditor(box, ctx) {
     snapshot();
     editor.steps = (editor.steps || []).filter(s => s.from_level !== Number(b.dataset.stepDel)); if (!editor.steps.length) editor.steps = null;
     rebuildSteps(); editor.sel = null; commit(false);
-    setStatus("That step-back is removed; the blocks it took off stay in the program to place again.", "info");
+    say("That step-back is removed; the blocks it took off stay in the program to place again.", "info");
   }));
+  $("#ed-apply-run", box).addEventListener("click", () => { applyEditor(); runRules(); });
+  $$("[data-ed-zoom]", box).forEach(b => b.addEventListener("click", () => { editor.zoom = b.dataset.edZoom; if (editor.zoom === "site" && !editor.context) editor.context = true; renderEditor(); }));
+  $$("details.ed-group[data-group]", box).forEach(d => d.addEventListener("toggle", () => { (editor.groups = editor.groups || {})[d.dataset.group] = d.open; }));
   $("#ed-mirror", box).addEventListener("click", () => {
     snapshot();
     for (const z of zs) if (z.block !== "core") z.x = r2(p.x + (p.x + p.width_m - (z.x + z.w)));
     editor.sel = null;
     commit(false);
     const hit = clashes(zs).size;
-    setStatus(`${floorName(editor.level)} is mirrored left to right; the cores stay where they are on every floor.${hit ? ` ${hit} block${hit === 1 ? "" : "s"} now overlap a core or each other: move them.` : ""}`, hit ? "busy" : "info");
+    say(`${floorName(editor.level)} is mirrored left to right; the cores stay where they are on every floor.${hit ? ` ${hit} block${hit === 1 ? "" : "s"} now overlap a core or each other: move them.` : ""}`, hit ? "busy" : "info");
   });
   $("#ed-apply", box).addEventListener("click", applyEditor);
   $("#ed-dxf", box).addEventListener("click", () => {
@@ -1077,7 +1138,7 @@ function wireEditor(box, ctx) {
     const blob = new Blob([dxfOf(L, editor.zones)], { type: "application/dxf" }), a = document.createElement("a");
     a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    setStatus(`${name}: every floor's blocks as closed polylines, a layer per block kind, in metres, the floors side by side with the street side down. It opens in AutoCAD, Rhino or Revit (Link CAD).`, "ok");
+    say(`${name}: every floor's blocks as closed polylines, a layer per block kind, in metres, the floors side by side with the street side down. It opens in AutoCAD, Rhino or Revit (Link CAD).`, "ok");
   });
   const reset = $("#ed-reset", box);
   if (reset) reset.addEventListener("click", () => {
@@ -1086,7 +1147,7 @@ function wireEditor(box, ctx) {
     state.optionDirty = true; $("#option-dirty").hidden = false;
     refreshSummary("option");
     renderEditor();
-    setStatus("The hand placement is out of the option: Run the rules lays the program out by itself again. The blocks stay here until the editor is closed.", "info");
+    say("The hand placement is out of the option: Run the rules lays the program out by itself again. The blocks stay here until the editor is closed.", "info");
   });
   wireSel(box, ctx);
 
@@ -1218,7 +1279,7 @@ function wireEditor(box, ctx) {
       e.preventDefault();
       const i = Number(g.dataset.i);
       select(i, false);
-      setStatus(`${blockName(zs[i])} selected, ${zs[i].w} × ${zs[i].d} m: the arrows move it a module (Shift: a bay), Delete removes it, Ctrl+Z undoes.`, "info");
+      say(`${blockName(zs[i])} selected, ${zs[i].w} × ${zs[i].d} m: the arrows move it a module (Shift: a bay), Delete removes it, Ctrl+Z undoes.`, "info");
       return;
     }
     if (k === "Escape" && editor.sel != null) { e.preventDefault(); select(null); svg.focus({ preventScroll: true }); return; }
@@ -1298,8 +1359,9 @@ async function setPlate(w, d, anchor) {
   editor.base.plate = editor.plate ? Math.round(w * d * 10) / 10 : (editor.base.auto || editor.base.plate);
   editor.dirty = true;
   await suggestPlan(false, true);
-  const L = editor.result, c = L.capacity || {}, left = L.units_total - L.units_placed;
-  setStatus(`The plate is ${L.plate.width_m} × ${L.plate.depth_m} m, ${fmtNum(Math.round(L.plate.width_m * L.plate.depth_m))} m² a floor${w == null ? ", as the floor area and the storeys give it" : ""}${c.fsr != null ? `: FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)}` : ""}` : ""}. The program is laid out on it again: ${L.units_placed} of ${L.units_total} units placed${left > 0 ? `, ${left} left to place` : ""}. ${oversOf(c).length ? `Over a limit: ${oversOf(c).join("; ")}. ` : ""}Undo brings back the plate as it was; Apply writes it into the option.`, left > 0 || oversOf(c).length ? "busy" : "ok");
+  // the homes on the plates now, after the step-backs have taken theirs off (25 Nov 2026: the message counted before that)
+  const L = editor.result, c = L.capacity || {}, trk = programTracker(L, editor.zones), left = trk.unitsLeft, onPlate = trk.unitsNeed - trk.unitsLeft;
+  say(`The plate is ${L.plate.width_m} × ${L.plate.depth_m} m, ${fmtNum(Math.round(L.plate.width_m * L.plate.depth_m))} m² a floor${w == null ? ", as the floor area and the storeys give it" : ""}${c.fsr != null ? `: FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)}` : ""}` : ""}. The program is laid out on it again: ${onPlate} of ${trk.unitsNeed} homes placed${left > 0 ? `, ${left} left to place` : ""}. ${oversOf(c).length ? `Over a limit: ${oversOf(c).join("; ")}. ` : ""}Undo brings back the plate as it was; Apply writes it into the option.`, left > 0 || oversOf(c).length ? "busy" : "ok");
 }
 
 /* The levels added in the editor, on an option: a storey each, and (where the option states them) a plate more of
@@ -1329,7 +1391,7 @@ async function addLevel() {
   const now = editor.result;
   if (now.floors[lv]) { editor.level = lv; renderEditor(); }
   const c = now.capacity || {}, left = programTracker(now, editor.zones).unitsLeft;
-  setStatus(`${floorName(lv)} is added: ${now.floors.length} storeys, FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)} (${c.limit_from})` : ""}. It has the cores and the corridor of the level under it${left ? `; ${left} units are left to place: drag them on, or Suggest a grid plan lays the program out over all ${now.floors.length} levels` : ""}. ${oversOf(c).length ? `Over a limit: ${oversOf(c).join("; ")}. ` : ""}Apply writes the storeys, floor area and height into the option.`, oversOf(c).length ? "busy" : "ok");
+  say(`${floorName(lv)} is added: ${now.floors.length} storeys, FSR ${Number(c.fsr).toFixed(2)}${c.fsr_limit != null ? ` of ${Number(c.fsr_limit).toFixed(2)} (${c.limit_from})` : ""}. It has the cores and the corridor of the level under it${left ? `; ${left} units are left to place: drag them on, or Suggest a grid plan lays the program out over all ${now.floors.length} levels` : ""}. ${oversOf(c).length ? `Over a limit: ${oversOf(c).join("; ")}. ` : ""}Apply writes the storeys, floor area and height into the option.`, oversOf(c).length ? "busy" : "ok");
 }
 
 async function removeLevel() {
@@ -1341,7 +1403,7 @@ async function removeLevel() {
   if (editor.level >= top) editor.level = top - 1;
   clearTimeout(editor.timer);
   await checkPlacement();
-  setStatus(`${floorName(top)} is taken off again, with its blocks; Undo brings it back.`, "info");
+  say(`${floorName(top)} is taken off again, with its blocks; Undo brings it back.`, "info");
 }
 
 /* the other sheets follow the check */
@@ -1417,8 +1479,8 @@ async function suggestPlan(first, noSnapshot) {
     if (editor.steps) rebuildSteps();   // the step-back's strips again, and the blocks the fresh plan stood in them taken off
     if (kept || editor.steps) scheduleCheck();   // the engine counts again what the cut-outs displaced
     updateSheets(res);
-    const L = res.layout, left = L.units_total - L.units_placed;
-    setStatus(`A grid plan, not the memo's: laid out afresh on a ${editor.bay} m bay${cores.length ? ` round your core${cores.length === 1 ? "" : "s"}` : ""}, ${L.units_placed} of ${L.units_total} units placed${left > 0 ? `; ${left} did not fit and stay in the program as left to place` : ""}. Drag to adjust; Undo brings back the plan that was there; Apply makes it the option's.`, left > 0 ? "busy" : "ok");
+    const L = res.layout, trk = programTracker(L, editor.zones), left = trk.unitsLeft;   // counted after the step-backs
+    say(`A grid plan, not the memo's: laid out afresh on a ${editor.bay} m bay${cores.length ? ` round your core${cores.length === 1 ? "" : "s"}` : ""}, ${trk.unitsNeed - trk.unitsLeft} of ${trk.unitsNeed} homes placed${left > 0 ? `; ${left} did not fit and stay in the program as left to place` : ""}. Drag to adjust; Undo brings back the plan that was there; Apply makes it the option's.`, left > 0 ? "busy" : "ok");
   } catch (e) {
     toast(`The engine could not suggest a plan: ${e.message}`, true);
   } finally {
@@ -1471,5 +1533,5 @@ function applyEditor() {
   renderEditor();
   refreshSummary("option");
   const n = Object.values(editor.zones).reduce((t, a) => t + a.length, 0);
-  setStatus(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones, with the ${editor.bay} m grid. ${nowAngle !== wasAngle ? `The mass is turned ${nowAngle}° on the lot. ` : ""}${shaped ? `The plate is ${editor.plate.w} × ${editor.plate.d} m${cut ? `, ${fmtNum(Math.round(cut))} m² of it cut out` : ""}: the option's floor area is ${fmtNum(state.option.gfa_m2)} m². ` : ""}${added ? `The option is now ${state.option.storeys} storeys${state.option.gfa_m2 != null ? `, ${fmtNum(state.option.gfa_m2)} m²` : ""}: the memo on screen is from before, so run the rules again.` : (shaped || nowAngle !== wasAngle ? "The memo on screen is from before, so run the rules again." : "Run the rules to make the memo from them;")} Save option as… keeps them.`, "ok");
+  say(`${n} blocks on ${Object.keys(editor.zones).length} floors written into the option as layout.zones, with the ${editor.bay} m grid. ${nowAngle !== wasAngle ? `The mass is turned ${nowAngle}° on the lot. ` : ""}${shaped ? `The plate is ${editor.plate.w} × ${editor.plate.d} m${cut ? `, ${fmtNum(Math.round(cut))} m² of it cut out` : ""}: the option's floor area is ${fmtNum(state.option.gfa_m2)} m². ` : ""}${added ? `The option is now ${state.option.storeys} storeys${state.option.gfa_m2 != null ? `, ${fmtNum(state.option.gfa_m2)} m²` : ""}: the memo on screen is from before, so run the rules again.` : (shaped || nowAngle !== wasAngle ? "The memo on screen is from before, so run the rules again." : "Run the rules to make the memo from them;")} Save option as… keeps them.`, "ok");
 }

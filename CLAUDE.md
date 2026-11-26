@@ -720,6 +720,25 @@ Kai found the editor clunky; `editors/blocks.js` was rewritten (the section belo
   floor's blocks; a key under the drawing). `BLOCK_TONE` / `BLOCK_WORD` in `common.js` are the tones and words. The
   editor's shadows use the same function.
 
+- **A second architects' run, and its fixes (25 Nov 2026; simulated, on 375 Glen Drive, 15 storeys).** *Way in and out:*
+  the title block's action bar has "Massing and plans" (`#open-editor-btn`, architect only; wired in `wireSheets`),
+  which goes to FIG 03 and opens the editor; a run brings the page back to the editor (`openEditor(resume)` scrolls);
+  "Apply and run the rules" does both in one. *Chrome:* the toolbar is the floors (labelled "Floor · homes", a red dot
+  for a floor with a problem), + Level, Plate | Site, Undo and Suggest, over three folds (`details.ed-group`: Plate,
+  grid and turn; Options to compare; Step back the upper floors; open state in `editor.groups`). What the editor says is
+  said in a line over the plate too (`say`, `#ed-msg`). The status box lists failures, then conditionals, then the
+  exits, with separation, parkade and adjacency folded. The program panel scrolls by itself. *View:* `editor.zoom`
+  "plate" (default: the plate with a margin of the site round it, 44% of the canvas where it was 18%) or "site".
+  *Step-backs keep the homes:* `rebuildSteps` makes the homes and rooms on a stepped face shallower and as much wider
+  as their area needs, closes them up along the strip past the cores, and takes off only what no longer fits (`pre`
+  keeps what each was; 134 homes became 130 where 43 blocks were taken off before). *Counts* in the plate and grid-plan
+  messages are read from the plates after the step-backs. *Engine:* `place_zones` gives rounded neighbours 2.5 cm of
+  grace (the memo's own plan opened with two overlaps); `_square_small_rooms` (ROOM_MIN_WIDTH_M 2.4, a declared
+  placeholder) gathers neighbouring rooms narrower than that into one width, one behind another, each keeping its area
+  and the first the strip's outer face, and a narrow room alone takes a corner of its wide neighbour, which becomes
+  two rectangles; homes and structure are not touched. The two 375 Glen Drive runs that held such rooms
+  (`as-proposed`, `what-if-chf`) were regenerated: only their layout, plans, axon and memo.html changed.
+
 ## Phase 4 (3 Nov 2026): the block editor over the solver
 
 - Engine: `layout.solve()` returns `place_zones(...)` when the option carries `layout.zones` ({"0": [{block, x,

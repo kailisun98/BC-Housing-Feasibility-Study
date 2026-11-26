@@ -669,7 +669,23 @@ table.plain td.status { white-space: nowrap; }
 .fig-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 6px 0 0; font-size: 11.5px; color: var(--muted); }
 .fig-legend span { display: inline-flex; align-items: center; gap: 5px; }
 .fig-legend i { width: 11px; height: 11px; border: 1px solid #5f6672; border-radius: 2px; }
-.ed-selbar .ed-kind { font-weight: 600; }
+/* the block editor's chrome, after a second architects' run (25 Nov 2026): groups that fold, a message line over the
+   plate, a program panel that scrolls by itself, the way in from the title block */
+[data-mode="manager"] #open-editor-btn, [data-mode="reader"] #open-editor-btn, [data-mode="operator"] #open-editor-btn { display: none !important; }
+.ed-group { font-size: 12px; border: 1px solid var(--line); border-radius: 4px; padding: 5px 10px; background: var(--field); }
+.ed-group > summary { cursor: pointer; }
+.ed-group[open] > summary { margin-bottom: 8px; }
+.ed-msg { font-size: 12.5px; padding: 6px 10px; border-radius: 4px; background: var(--group); color: var(--ink); }
+.ed-msg[data-tone="busy"] { background: var(--s-uncertain-wash, #fdf3d7); }
+.ed-msg[data-tone="ok"] { background: var(--s-pass-wash, #e3f3e8); }
+.ed-flag { display: inline-block; width: 7px; height: 7px; margin-left: 4px; border-radius: 50%; background: var(--red); vertical-align: middle; }
+.ed-more { font-size: 12px; }
+.ed-more > summary { cursor: pointer; color: var(--muted); }
+.ed-more[open] { display: flex; flex-direction: column; gap: 4px; }
+.ed-wide .ed-program { max-height: calc(100vh - var(--bars-h, 88px) - 24px); overflow-y: auto; }
+.ed-step-row .field.inline input[type=number] { width: 60px; flex: none; }
+.ed-step-row .field.inline select { width: auto; flex: none; }
+.ed-step-row .field.inline { flex: none; width: auto; }.ed-selbar .ed-kind { font-weight: 600; }
 .ed-bar select, .ed-selbar select { width: auto; flex: none; }
 .ed-selbar .field.inline { flex-direction: row; }
 .ed-levels { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }

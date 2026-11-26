@@ -447,6 +447,15 @@ function wireSheets() {
     if (editor.open) loaded.blocks.closeEditor();   // open means its module is in
     $$(".sheet-body", fig).forEach(x => { x.hidden = x.dataset.view !== b.dataset.sheetView; });
   }));
+  // the way in from the top of the memo: the title block's "Massing and plans" goes to FIG 03 and opens the editor
+  const go = $("#open-editor-btn");
+  if (go) go.onclick = () => {
+    const fig = $('.figure.sheet[data-sheet="plans"]');
+    if (!fig) { toast("Run the rules first: the plans are drawn from a run.", true); return; }
+    const y = fig.getBoundingClientRect().top + scrollY - 120;
+    scrollTo({ top: Math.max(0, y), behavior: "auto" });
+    loadBlocks().then(b => { if (!editor.open) b.openEditor(); }).catch(e => toast(`Could not load the block editor: ${e.message}`, true));
+  };
   refreshPlanFloor();
   if (editor.resume) {
     const back = editor.resume; editor.resume = null;

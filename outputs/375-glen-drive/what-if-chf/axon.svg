@@ -11,12 +11,12 @@
 <polygon points="90.0,307.8 105.1,307.8 86.1,318.7 71.0,318.7" fill="#d9e6d2" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="105.1,307.8 112.4,307.8 93.4,318.7 86.1,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="112.4,307.8 212.4,307.8 193.4,318.7 93.4,318.7" fill="#f6e7c1" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="212.4,307.8 223.1,307.8 204.2,318.7 193.4,318.7" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="223.1,307.8 232.2,307.8 213.2,318.7 204.2,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
-<polygon points="232.2,307.8 234.7,307.8 215.7,318.7 213.3,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="195.5,317.5 217.7,317.5 215.6,318.7 193.4,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="234.7,307.8 258.9,307.8 240.0,318.7 215.7,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="258.9,307.8 285.6,307.8 266.6,318.7 239.9,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
 <polygon points="285.6,307.8 288.4,307.8 269.4,318.7 266.6,318.7" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="203.3,313.1 225.5,313.1 217.7,317.5 195.5,317.5" fill="#e6dfd0" stroke="#5f6672" stroke-width="0.6"/>
+<polygon points="212.4,307.8 234.6,307.8 225.5,313.1 203.3,313.1" fill="#e2e2df" stroke="#5f6672" stroke-width="0.6"/>
 <text x="294.4" y="330.0" font-size="10" fill="#5f6672">Ground floor</text>
 <polygon points="90.0,292.1 288.4,292.1 246.4,316.3 48.0,316.3" fill="#f4f4f2" stroke="#1f2933" stroke-width="1"/>
 <polygon points="71.0,303.0 82.3,303.0 59.3,316.3 48.0,316.3" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.6"/>

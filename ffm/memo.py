@@ -96,6 +96,19 @@ def layout_open_items(lay: dict | None) -> list[dict]:
         out.append({"title": "Homes that do not fit the plates", "status": "conditional",
                     "action": f"Architect: {placed} of {total} homes fit the plates on {len(lay.get('floors') or [])} floors at the unit sizes assumed; did not fit: {words}. "
                               f"More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all {total}."})
+    # the floor area the rules test against the floor area the plans draw (25 Nov 2026: 340 m² tested, 307 m² drawn)
+    tot = lay.get("totals") or {}
+    tested, drawn = tot.get("gfa_tested_m2"), ((lay.get("area_schedule") or {}).get("totals") or {}).get("gross_m2")
+    if tested and drawn is not None and float(tested) - float(drawn) > max(10.0, 0.05 * float(tested)):
+        why = []
+        if tot.get("plates_m2") is not None and float(tested) - float(tot["plates_m2"]) > 1:
+            why.append(f"the plates the yards leave hold {float(tot['plates_m2']):,.0f} m²")
+        if tot.get("void_m2"):
+            why.append(f"{float(tot['void_m2']):,.0f} m² of the plates is open: a yard, a courtyard or a cut-out")
+        out.append({"title": "Floor area drawn under the floor area tested", "status": "conditional",
+                    "action": f"Architect: the rules test {float(tested):,.0f} m² of floor area; the first plans draw {float(drawn):,.0f} m²"
+                              + (f" ({'; '.join(why)})" if why else "") + ". Draw the plan to the floor area tested, or lower the floor area the option states: "
+                              "the FSR test, the hard cost and the funders read the option's figure."})
     broken = lay.get("geometry") or []
     if broken:
         out.append({"title": "Blocks placed by hand that break the plate", "status": "fail",
@@ -105,9 +118,15 @@ def layout_open_items(lay: dict | None) -> list[dict]:
     if eg.get("status") in ("fail", "conditional", "uncertain"):
         floors = eg.get("floors") or []
         bad = [x for x in floors if x.get("status") != "pass"]
-        out.append({"title": "Exits: travel distance, separation and dead ends (BC Building Code)", "status": eg["status"],
-                    "action": f"Architect: {len(bad)} of {len(floors)} floors {'does' if len(bad) == 1 else 'do'} not pass the exit clauses. {eg.get('summary') or ''} "
-                              "Move or add a stair; the clause figures are unverified against the code text."})
+        if eg.get("ground_oriented"):
+            # homes with their own doors have no core to move (25 Nov 2026: "Move or add a core" on a plan with none)
+            out.append({"title": "Exits: the upper homes' own stairs (BC Building Code, Part 9)", "status": eg["status"],
+                        "action": f"Architect: on {len(bad)} of {len(floors)} floors a home is reached by its own stair above the ground floor. {eg.get('summary') or ''} "
+                                  "Draw each stair and its exit and confirm them against Part 9 (9.9.9, egress from dwelling units), which the rules do not hold."})
+        else:
+            out.append({"title": "Exits: travel distance, separation and dead ends (BC Building Code)", "status": eg["status"],
+                        "action": f"Architect: {len(bad)} of {len(floors)} floors {'does' if len(bad) == 1 else 'do'} not pass the exit clauses. {eg.get('summary') or ''} "
+                                  "Move or add a stair; the clause figures are unverified against the code text."})
     return out
 
 

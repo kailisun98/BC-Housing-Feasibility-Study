@@ -230,5 +230,134 @@ class TheTowerSaysItsParts(unittest.TestCase):
         self.assertTrue(label.startswith("Proposed: 18 storeys, a 3-storey podium and a 15-storey tower"), label)
 
 
+def bare(**kw):
+    s = dict(SITE, **kw)
+    for k in ("osm", "parcel", "boundary_m", "front_face", "lookup", "context"):
+        s.pop(k, None)
+    return s
+
+
+READY = load_json(ROOT / "options" / "998-e-19th-ave-what-if-funder-ready.json")
+
+
+def go(units, storeys, gfa, h, **kw):
+    return dict(READY, building_type="ground_oriented", storeys=storeys, height_m=h, gfa_m2=gfa, residential_gfa_m2=gfa, non_residential_gfa_m2=0,
+                units=dict({"studio": 0, "one_bed": 0, "two_bed": 0, "three_bed_plus": 0}, **units), rent_tiers_units=None, accessible_units=0,
+                rezoning_path=None, approval_route="development_permit", **kw)
+
+
+def solve(site, option):
+    from ffm import massing
+    L = evaluate(site, option, date(2026, 11, 25))
+    return layout.solve(site, option, L, massing.build(site, option, L))
+
+
+class TownhousesInColumns(unittest.TestCase):
+    """#10: 3 of 4 homes on 609 Heatley and 2 of 4 on a 10 m lot; every home a full-height townhouse at 4.2 m, and the
+    services' 10 m² taking a whole home's slice of every floor."""
+
+    def test_a_ten_metre_lot_takes_its_four_plex(self):
+        lay = solve(bare(zoning_district="R1-1", frontage_m=10.1, depth_m=37.2, site_area_m2=375.7),
+                    go({"one_bed": 2, "two_bed": 2}, 3, 374, 11.0, setbacks_m={"front": 3.7, "rear": 6.0, "side": 1.2}))
+        self.assertEqual(lay["units_placed"], 4)
+        self.assertTrue(lay["plate"]["ground_oriented"]["back_to_back"])
+        spans = {z["home"]: z["levels"] for fl in lay["floors"] for z in fl["zones"] if z.get("home")}
+        self.assertTrue(any(lv[0] > 0 for lv in spans.values()))            # a home over another, by its own stair
+
+    def test_the_services_no_longer_cost_a_home(self):
+        lay = solve(bare(frontage_m=15.2, depth_m=36.6, site_area_m2=556.3), go({"two_bed": 2, "three_bed_plus": 2}, 3, 900, 10.0))
+        self.assertEqual(lay["units_placed"], 4)
+        self.assertTrue(any("shed in the yard" in w for w in lay["warnings"]))
+
+    def test_a_home_left_over_says_how_much_the_homes_need(self):
+        lay = solve(bare(zoning_district="RT-3", frontage_m=37.2, depth_m=15.2, site_area_m2=565.0),
+                    go({"one_bed": 1, "two_bed": 2, "three_bed_plus": 1}, 3, 340, 10.0, setbacks_m={"front": 3.7, "rear": 3.0, "side": 1.5}))
+        self.assertEqual(lay["units_placed"], 3)                   # 320 m² of homes in 340 m² of rows: 94%, not drawn whole
+        self.assertTrue(any("homes asked for need 320 m²" in w for w in lay["warnings"]))
+
+    def test_no_home_is_much_larger_than_it_asks_where_another_fits(self):
+        lay = solve(bare(frontage_m=15.2, depth_m=36.6, site_area_m2=556.3), go({"one_bed": 4, "two_bed": 4}, 4, 1000, 13.2))
+        self.assertEqual(lay["units_placed"], 8)
+        self.assertEqual(max(lay["plate"]["ground_oriented"]["home_spans"]), 2)
+
+    def test_the_exits_ask_for_part_9_not_a_core(self):
+        lay = solve(bare(zoning_district="R1-1", frontage_m=10.1, depth_m=37.2, site_area_m2=375.7),
+                    go({"one_bed": 2, "two_bed": 2}, 3, 374, 11.0, setbacks_m={"front": 3.7, "rear": 6.0, "side": 1.2}))
+        items = memo.layout_open_items(lay)
+        ex = next(i for i in items if i["title"].startswith("Exits"))
+        self.assertIn("Part 9", ex["action"])
+        self.assertNotIn("core", ex["action"].lower().replace("no common corridor", ""))
+        js = (ROOT / "ffm" / "ui" / "memo" / "answers.js").read_text(encoding="utf-8")
+        self.assertIn("Exits: the upper homes' own stairs (BC Building Code, Part 9)", js)
+
+
+class FloorAreaTestedAgainstDrawn(unittest.TestCase):
+    """#17: 340 m² tested beside 307 m² drawn, with nothing said."""
+
+    def test_the_gap_is_an_open_item(self):
+        lay = {"units_total": 4, "units_placed": 4, "shortfall": [], "floors": [{}] * 3, "totals": {"gfa_tested_m2": 340, "plates_m2": 340, "void_m2": 33},
+               "area_schedule": {"totals": {"gross_m2": 307}}}
+        it = next(i for i in memo.layout_open_items(lay) if i["title"] == "Floor area drawn under the floor area tested")
+        self.assertIn("the rules test 340 m²", it["action"])
+        self.assertIn("first plans draw 307 m²", it["action"])
+        self.assertIn("33 m² of the plates is open", it["action"])
+        lay["area_schedule"]["totals"]["gross_m2"] = 335
+        self.assertFalse([i for i in memo.layout_open_items(lay) if i["title"].startswith("Floor area drawn")])
+        js = (ROOT / "ffm" / "ui" / "memo" / "answers.js").read_text(encoding="utf-8")
+        self.assertIn('"Floor area drawn under the floor area tested"', js)
+
+
+class NoRezoningToBuildLess(unittest.TestCase):
+    """The C-2A benchmark: FSR 3.0 by rezoning, offered first, where 3.50 is allowed outright."""
+
+    def test_the_benchmark_is_not_offered_below_the_outright_limits(self):
+        from ffm import suggest
+        s = {"id": "t", "address": "a C-2A lot", "municipality": "Vancouver", "zoning_district": "C-2A", "site_area_m2": 599.7, "frontage_m": 18.3,
+             "depth_m": 32.8, "in_former_community_vision_area": True}
+        r = suggest.suggest(s, ["bch.chf.eligibility"], date(2026, 11, 25), "funder-ready")
+        bm = next(c for c in r["candidates"] if c["id"] == "benchmark")
+        self.assertFalse(bm["available"])
+        self.assertIn("would build less", bm["why"])
+        self.assertFalse(r["option"].get("rezoning_path"))
+        self.assertEqual(r["option"]["gfa_m2"], 2099.0)                    # FSR 3.50 outright, not the benchmark's 1,799 m²
+
+    def test_the_band_is_drawn_only_for_a_rezoning(self):
+        from ffm import massing
+        L = evaluate(SITE, OPTION, AS_OF)
+        self.assertIsNotNone(massing.build(SITE, OPTION, L)["policy_benchmark"])
+        o = {**OPTION, "rezoning_path": None, "rezoning_approved_on": None, "approval_route": "development_permit"}
+        self.assertIsNone(massing.build(SITE, o, evaluate(SITE, o, AS_OF))["policy_benchmark"])
+
+
+class TheCrossStreetRunsAlongTheLot(unittest.TestCase):
+    """1290 Burrard St was offered Burnaby St, across Burrard, while its short end is on Drake St."""
+
+    def way(self, name, pts):
+        return {"type": "way", "tags": {"name": name, "highway": "secondary"}, "geometry": [{"lon": x, "lat": y} for x, y in pts]}
+
+    def test_every_candidate_is_kept_and_the_nearest_is_offered(self):
+        front = self.way("Main Rd", [(-123.1010, 49.25002), (-123.0990, 49.25002)])
+        near = self.way("Far St", [(-123.10002, 49.2490), (-123.10002, 49.2510)])
+        nearer = self.way("Near St", [(-123.09995, 49.2495), (-123.09995, 49.2505)])
+        out = lookup.street_bearing([front, near, nearer], (49.2501, -123.0999), "Main Rd")
+        self.assertEqual([c["name"] for c in out["cross_streets"]], ["Near St", "Far St"])
+        self.assertEqual(out["cross_street"]["name"], "Near St")
+
+
+class SmallerWords(unittest.TestCase):
+    def test_a_fetched_date_is_vancouvers_day(self):
+        js = (ROOT / "ffm" / "ui" / "figures" / "common.js").read_text(encoding="utf-8")
+        self.assertIn('timeZone: "America/Vancouver"', js)
+        self.assertIn("fetched: fetchedOn(o.fetched_at)", js)
+
+    def test_a_rule_that_does_not_apply_says_why_in_a_comparison(self):
+        js = (ROOT / "ffm" / "ui" / "memo" / "clauses.js").read_text(encoding="utf-8")
+        self.assertIn('if (r.status === "not_applicable") return { proposed: r.finding', js)
+
+    def test_the_site_promises_no_two_pages(self):
+        for page in ("home.html", "how.html", "who.html"):
+            self.assertNotIn("two pages", (ROOT / "ffm" / "ui" / page).read_text(encoding="utf-8").lower(), page)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -486,10 +486,12 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         if turn:
             masses[-1].update({"angle_deg": turn, "plate_origin": [round(o_ring[0][0], 2), round(o_ring[0][1], 2)], "footprint": _turn(o_ring, turn)})
 
-    # Policy benchmark, if a rezoning policy fired.
+    # Policy benchmark, if a rezoning policy fired and the option proposes a rezoning (25 Nov 2026: the staff benchmark
+    # band was drawn over a C-2A scheme that proposed none)
+    from .checks import proposes_rezoning
     bench = None
     irp = _find(results, "cov.irp.social_housing_rezoning")
-    if irp and irp["status"] in ("pass", "conditional"):
+    if irp and irp["status"] in ("pass", "conditional") and proposes_rezoning(option):
         v = irp["values"]
         bench = {"height_m": v.get("benchmark_height_m"), "fsr": v.get("benchmark_fsr"), "rule_id": irp["rule_id"], "source": irp.get("source", {})}
 

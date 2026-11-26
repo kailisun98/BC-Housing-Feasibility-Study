@@ -593,6 +593,12 @@ function takeAnswer(key, raw) {
       site.front_street = v;
       if (v && streets.includes(v) && v !== streets[0]) site.front_face = { street: v };
       else if (site.front_face && site.front_face.street) delete site.front_face;
+      // the lookup's sentence about which street the yards are read from is replaced by the person's choice (25 Nov 2026:
+      // the memo's notes still said "read from Burnaby St" after the front was set to Burrard St)
+      if (typeof site.notes === "string") {
+        site.notes = site.notes.replace(/\s*A corner lot:[^]*?(?:the envelope and the massing\.|the massing\.)/g, "").trim();
+        if (v) site.notes = `${site.notes} The front is ${v}, chosen at 01; the yards are read from it.`.trim();
+      }
     } else {
       setPath(state.site, key, key === "toa_tier" && v != null ? Number(v) : v);
     }

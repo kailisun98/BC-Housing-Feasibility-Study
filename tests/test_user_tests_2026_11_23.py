@@ -1075,7 +1075,10 @@ class TheFourFeatures(unittest.TestCase):
         self.assertFalse(blocks & {"core", "corridor"})
         homes = [z for fl in lay["floors"] for z in fl["zones"] if z.get("home")]
         self.assertEqual(len({z["home"] for z in homes}), lay["units_placed"])
-        self.assertTrue(all(z["levels"] == [0, 2] for z in homes))                       # townhouses, three floors
+        # townhouses, each through the floors its area needs (25 Nov 2026: no longer all three whatever the home)
+        self.assertEqual(lay["units_placed"], 4)
+        self.assertTrue(all(z["levels"][0] == 0 for z in homes))
+        self.assertTrue(all(z["w"] * z["d"] * (z["levels"][1] - z["levels"][0] + 1) >= z["area_m2"] for z in homes))
         self.assertEqual(lay["egress"]["status"], "pass")
         self.assertEqual(lay["operability"]["lifts"], 0)
         self.assertEqual(next(c for c in lay["adjacencies"] if c["id"] == "own_entry")["status"], "pass")
@@ -1083,10 +1086,11 @@ class TheFourFeatures(unittest.TestCase):
 
     def test_over_three_storeys_they_stack_and_the_upper_homes_are_a_placeholder(self):
         o = dict(READY, building_type="ground_oriented", storeys=4, height_m=13.2, gfa_m2=1000, residential_gfa_m2=1000, non_residential_gfa_m2=0,
-                 units={"studio": 0, "one_bed": 4, "two_bed": 4, "three_bed_plus": 0}, rent_tiers_units=None)
+                 units={"studio": 0, "one_bed": 4, "two_bed": 4, "three_bed_plus": 0}, rent_tiers_units=None, accessible_units=0)
         lay, _, _ = self._lay(self.small(), o)
-        self.assertEqual(lay["plate"]["ground_oriented"]["home_spans"], [2, 2])
+        self.assertEqual(max(lay["plate"]["ground_oriented"]["home_spans"]), 2)                # no home over two floors
         self.assertEqual(lay["plate"]["ground_oriented"]["homes"], "stacked townhouses")
+        self.assertEqual(lay["units_placed"], 8)
         self.assertEqual(lay["egress"]["status"], "uncertain")
         self.assertIn("Part 9", lay["egress"]["summary"])
 
@@ -1206,8 +1210,9 @@ class TheGapsInWhatWasBuilt(unittest.TestCase):
         acc = [z for fl in lay["floors"] for z in fl["zones"] if z.get("accessible")]
         self.assertEqual(len(acc), 1)
         self.assertEqual((acc[0]["levels"], acc[0]["entry"]), ([0, 0], "at grade"))
-        over = [z for fl in lay["floors"][1:] for z in fl["zones"] if z.get("home") is not None and z["x"] == acc[0]["x"]]
-        self.assertTrue(over and all(z["levels"] == [1, 2] for z in over))
+        over = [z for fl in lay["floors"][1:] for z in fl["zones"] if z.get("home") is not None and z["x"] == acc[0]["x"] and z["y"] == acc[0]["y"]]
+        self.assertTrue(over and all(z["levels"][0] == 1 and z["entry"] == "by its own stair" for z in over))
+        self.assertEqual(lay["units_placed"], 4)
         self.assertEqual(lay["area_schedule"]["totals"]["homes_total"], lay["units_placed"])
         self.assertTrue(any("garden flat under a townhouse" in w for w in lay["warnings"]))
         self.assertEqual(next(i for i in lay["operability"]["items"] if i["key"] == "accessible")["status"], "pass")

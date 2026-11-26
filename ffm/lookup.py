@@ -380,16 +380,20 @@ def street_bearing(elements: list[dict], center_latlon: tuple[float, float], str
     if best is None or best[0][1] > 60:
         return None
     out = {"bearing_deg": round(best[1], 1), "name": best[2] or None, "matched_by_name": best[0][0] == 0, "distance_m": round(best[0][1], 1)}
-    cross = None
+    # every named road across the front street within 60 m, nearest first: the first is offered as the cross street, and
+    # the caller keeps the first that runs along the lot itself (25 Nov 2026: 1290 Burrard St was offered Burnaby St,
+    # across Burrard, while the lot's short end is on Drake St)
+    crosses, seen = [], set()
     for rank, d, b, name in sorted(ways, key=lambda w: w[1]):
-        if rank != 1 or d > 60 or norm_name(name) == norm_name(best[2] or ""):
+        if rank != 1 or d > 60 or norm_name(name) == norm_name(best[2] or "") or norm_name(name) in seen:
             continue
         skew = abs(b - best[1]) % 180
         if min(skew, 180 - skew) > 45:
-            cross = {"name": name, "distance_m": round(d, 1), "bearing_deg": round(b, 1)}
-            break
-    if cross:
-        out["cross_street"] = cross
+            seen.add(norm_name(name))
+            crosses.append({"name": name, "distance_m": round(d, 1), "bearing_deg": round(b, 1)})
+    if crosses:
+        out["cross_street"] = crosses[0]
+        out["cross_streets"] = crosses
     return out
 
 
@@ -683,11 +687,11 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
         metrics = parcel_metrics(poly, street["bearing_deg"])
         # a corner lot only where the cross street runs along the lot itself (25 Nov 2026: 4250 Fraser St and 2475 E 5th
         # Ave, both mid-block, were corner lots because a cross street came within 60 m of their centres)
-        x = street.get("cross_street")
+        cands = street.get("cross_streets") or ([street["cross_street"]] if street.get("cross_street") else [])
+        x = next((c for c in cands if (lambda g: g is not None and g <= CROSS_FROM_LOT_M)(adjoins(elements, c["name"], poly, center))), None)
+        street = {k: v for k, v in street.items() if k not in ("cross_street", "cross_streets")}
         if x:
-            gap = adjoins(elements, x["name"], poly, center)
-            if gap is None or gap > CROSS_FROM_LOT_M:
-                street = {k: v for k, v in street.items() if k != "cross_street"}
+            street["cross_street"] = x
     district = z.get("zoning_district") or None
     cd1 = z.get("cd_1_number") or None
     if cd1 is not None:

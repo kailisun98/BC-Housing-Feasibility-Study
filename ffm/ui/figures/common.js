@@ -65,6 +65,15 @@ export function crossingsAtX(ring, c) {
 
 /* Section A–A: the line x = c (in the lot frame, across the depth) that FIG 02 cuts and FIG 01 marks, through the
    proposed mass, a little past its middle so the plate's own label in plan stays clear of it (20 Nov 2026). Pure. */
+/* The day the context was fetched, in Vancouver (25 Nov 2026: the stored UTC timestamp's first ten characters read
+   "fetched 2026-11-26" on an evening of 25 Nov). In words, as the drawings' other dates. Pure. */
+export function fetchedOn(stamp) {
+  const d = new Date(stamp || "");
+  if (!stamp || isNaN(d)) return String(stamp || "").slice(0, 10);
+  try { return d.toLocaleDateString("en-GB", { timeZone: "America/Vancouver", day: "numeric", month: "short", year: "numeric" }); }
+  catch (e) { return String(stamp).slice(0, 10); }
+}
+
 export function sectionCut(m) {
   const mass = (m.masses || []).find(x => x.name === "proposed") || (m.masses || [])[0];
   // a tower on a podium, or a stepped mass: cut where every tier stands, else through the top one (25 Nov 2026: a tower
@@ -295,7 +304,7 @@ function osmContext(site, m, base) {
   return Object.assign({}, base, {
     ground, labels, buildings, osmTrees, streetTrees: [], roads,
     xmin: W / 2 - r, xmax: W / 2 + r, ymin: D / 2 - r, ymax: D / 2 + r, frameRadius: r * 0.75,
-    osm: { attribution: o.attribution, fetched: (o.fetched_at || "").slice(0, 10), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: front || (o.frame && o.frame.front_street),
+    osm: { attribution: o.attribution, fetched: fetchedOn(o.fetched_at), radius: o.radius_m, counts: o.counts || {}, omitted: o.buildings_on_site_omitted || [], frontStreet: front || (o.frame && o.frame.front_street),
            // the turned lot's x axis: new = R(θ)·old with θ counter-clockwise (boundary.oriented_ring), so the new x axis
            // is the old one turned θ clockwise, and a bearing counts clockwise from north: the stored bearing plus θ
            // (it was minus, which drew 375 Glen Drive fronted on E Hastings St upside down under a north-up arrow)

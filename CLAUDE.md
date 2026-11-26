@@ -1191,8 +1191,21 @@ must know:
   `syncHomes` carries only what changed there since (a removal to every floor the home spans, a move or resize as a
   shift); `rebuildSteps` clears it and shrinks a home's `levels` to the floors it keeps; `programTracker` counts a home
   once by its `home` id.
-- Not done: the ground-oriented solver's misses, the floor area tested against drawn, dates in UTC. Fingerprints
-  unchanged; 449 tests.
+- Second pass the same evening (the README's #10, #17, #21 and the "reported once" list):
+  - `layout._solve_ground_oriented` packs homes in columns (`pack(largest_first, tall, stack_first, acc_first)`, sixteen
+    tries, the best by homes placed, accessible homes, doors at grade, then m² drawn over the program); a home spans the
+    floors its area needs within `go_oversize_max` (1.3, a placeholder), smaller homes stack over by their own stair,
+    services go after the homes, and a plate of 2 × `go_row_min_m` to the courtyard's depth takes two rows back to back
+    (`ground_oriented.back_to_back`). `home_spans` is now the sorted set of spans drawn.
+  - `suggest.plans_for/homes_placed/fit_to_plans(..., building)` lay out townhouses with that solver when the manager
+    chose ground-oriented; `suggest._outright_beats_benchmark` withdraws the benchmark (and keeps funder-ready outright)
+    where the schedule allows at least the benchmark's floor area; `massing.policy_benchmark` only with a rezoning.
+  - `memo.layout_open_items` (twin `layoutOpenItems`): "Floor area drawn under the floor area tested" from
+    `layout.totals.gfa_tested_m2` against the area schedule's gross; a ground-oriented exit item asks for Part 9.
+  - `lookup.street_bearing` returns `cross_streets`; `assemble` keeps the first that adjoins the lot.
+  - Page: `fetchedOn` (Vancouver's day, in words); `splitValues` gives a not-applicable rule's finding; the front picked
+    at 01 replaces the lookup's corner sentence in `site.notes`; the site promises no "two pages".
+- Not done: the money still counts homes the plans do not place (answer 3 says so). Fingerprints unchanged; 461 tests.
 
 ## Rules from the assignment brief (binding)
 

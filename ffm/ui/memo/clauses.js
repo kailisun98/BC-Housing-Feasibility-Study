@@ -39,6 +39,9 @@ export function splitValues(r, L) {
   const ask = r.action || "";
   // the path is the allowed answer's (it was read from answers.rezoning_path, which the summary never had)
   const path = (L.summary && L.summary.answers && (L.summary.answers.allowed || {}).rezoning_path) || opt.rezoning_path || "";
+  // a rule that does not apply says why, in the ledger's words (25 Nov 2026: the Glen Drive comparison read "Not
+  // applicable · unit mix not given" where the Downtown Eastside Plan's own target applies instead)
+  if (r.status === "not_applicable") return { proposed: r.finding || "not applicable here", permitted: "—", ask: "" };
   switch (r.check) {
     case "district_outright_fsr":
       return { proposed: `FSR ${num(v.fsr && Number(v.fsr).toFixed(2))} (${num(v.gfa_m2)} m² on ${num(v.site_area_m2)} m²)`, permitted: `FSR ${num(v.max_fsr_outright)} outright`,

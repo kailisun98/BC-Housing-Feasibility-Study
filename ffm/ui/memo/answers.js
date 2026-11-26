@@ -167,6 +167,15 @@ export function layoutOpenItems(run) {
     out.push({ title: "Homes that do not fit the plate", status: "conditional",
       action: `Architect: ${lay.units_placed} of ${lay.units_total} homes fit the plate on ${(lay.floors || []).length} floors; did not fit: ${words}. More storeys, a larger plate or a smaller program. The money and the funders' checks count all ${lay.units_total}.` });
   }
+  // the floor area the rules test against the floor area the plans draw (25 Nov 2026; twin of memo.layout_open_items)
+  const tot = lay.totals || {}, tested = Number(tot.gfa_tested_m2), drawn = ((lay.area_schedule || {}).totals || {}).gross_m2;
+  if (tested && drawn != null && tested - drawn > Math.max(10, 0.05 * tested)) {
+    const why = [];
+    if (tot.plates_m2 != null && tested - tot.plates_m2 > 1) why.push(`the plates the yards leave hold ${fmtNum(Math.round(tot.plates_m2))} m²`);
+    if (tot.void_m2) why.push(`${fmtNum(Math.round(tot.void_m2))} m² of the plates is open: a yard, a courtyard or a cut-out`);
+    out.push({ title: "Floor area drawn under the floor area tested", status: "conditional",
+      action: `Architect: the rules test ${fmtNum(Math.round(tested))} m² of floor area; the first plans draw ${fmtNum(Math.round(drawn))} m²${why.length ? ` (${why.join("; ")})` : ""}. Draw the plan to the floor area tested, or lower the floor area the option states: the FSR test, the hard cost and the funders read the option's figure.` });
+  }
   const broken = lay.geometry || [];
   if (broken.length) {
     out.push({ title: "Blocks placed by hand that break the plate", status: "fail",
@@ -178,7 +187,11 @@ export function layoutOpenItems(run) {
   if (eg && ["fail", "conditional", "uncertain"].includes(eg.status)) {
     const bad = (eg.floors || []).filter(f => f.status !== "pass");
     const first = bad[0];
-    out.push({ rule_id: eg.rule_id, title: "Exits: travel distance, separation and dead ends (BC Building Code)", status: eg.status,
+    if (eg.ground_oriented) {
+      // homes with their own doors have no core to move (25 Nov 2026: "Move or add a core" on a plan with none)
+      out.push({ rule_id: eg.rule_id, title: "Exits: the upper homes' own stairs (BC Building Code, Part 9)", status: eg.status,
+        action: `Architect: on ${bad.length} of ${(eg.floors || []).length} floors a home is reached by its own stair above the ground floor. ${eg.summary || ""} Draw each stair and its exit and confirm them against Part 9 (9.9.9, egress from dwelling units), which the rules do not hold.` });
+    } else out.push({ rule_id: eg.rule_id, title: "Exits: travel distance, separation and dead ends (BC Building Code)", status: eg.status,
       action: `Architect: ${bad.length} of ${(eg.floors || []).length} floors ${bad.length === 1 ? "does" : "do"} not pass the exit clauses${first ? ` (${first.name}: ${egressLine(first)})` : ""}. ${eg.summary || ""} Move or add a core in Edit blocks; the sprinkler assumption${eg.sprinklered_is_placeholder ? " is a placeholder" : ""} and the clause figures are unverified against the code text.` });
   }
   return out;

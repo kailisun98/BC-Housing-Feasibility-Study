@@ -1546,7 +1546,8 @@
     "plates_m2": 6998.3,
     "used_m2": 6788.4,
     "spare_m2": 209.9,
-    "gfa_m2": 7000.0
+    "gfa_m2": 7000.0,
+    "gfa_tested_m2": 7000.0
   },
   "assumptions": [
     {

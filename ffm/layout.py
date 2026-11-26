@@ -159,7 +159,8 @@ def blocks(option: dict, ledger: dict) -> dict[str, Any]:
     # the program brief (the operator's, or the housing type's default): named blocks of kind "other", with where they go
     for b in brief:
         out.append({"key": "other", "label": b["label"], "count": 1, "area_m2": b["area_m2"], "source": b["source"], "brief": True,
-                    "next_to": b["next_to"], "where": b["where"], "note": b["note"] or ("the program brief" if b["source"] != "placeholder" else "the housing type's default brief, a placeholder")})
+                    "next_to": b["next_to"], "where": b["where"], "note": b["note"] or ("the program brief" if b["source"] != "placeholder" else "the housing type's default brief, a placeholder"),
+                    **({"use": "community"} if b.get("use") == "community" else {})})
     park_each, _ = LAYOUT_ASSUMPTIONS["parking_m2_per_space"]
     stalls = int(option.get("parking_spaces") or 0)
     parking = {"spaces": stalls, "area_m2": round(stalls * park_each, 1), "where": "below grade, not on the plates", "source": "placeholder" if stalls else None}
@@ -383,19 +384,28 @@ def building_type(option: dict) -> str:
     return t if t in BUILDING_TYPES else "apartment"
 
 
-def lifts_needed(homes: int, storeys: int, ground_oriented: bool = False) -> dict[str, Any]:
+def lifts_needed(homes: int, storeys: int, ground_oriented: bool = False, beds: int = 0) -> dict[str, Any]:
     """The elevators a building of this many homes and storeys wants, a declared placeholder (24 Nov 2026: an operator's
     review asked for lifts by home count; the layout drew one whatever the homes). None for ground-oriented homes or a
-    walk-up of at most three storeys (Part 9), one per `lift_homes_each` homes above that, at least two over six storeys."""
+    walk-up of at most three storeys (Part 9), one per `lift_homes_each` homes above that, at least two over six storeys.
+    Beds count too (25 Nov 2026: a six-storey, 80-bed shelter passed as "a walk-up"): each sleeping room of four is a
+    place, and a shelter that sleeps people above the ground floor needs at least one elevator, for its accessible beds."""
     each, _ = TYPOLOGY_ASSUMPTIONS["lift_homes_each"]
     floor_two, _ = TYPOLOGY_ASSUMPTIONS["lift_min_over_six"]
-    if ground_oriented or storeys <= WALKUP_MAX_STOREYS or not homes:
-        return {"lifts": 0, "words": "no elevator: " + ("each home has its own door at grade" if ground_oriented else f"{storeys} storeys or fewer, a walk-up")}
-    n = max(1, math.ceil(homes / each))
+    rooms = -(-int(beds or 0) // 4)
+    places = int(homes or 0) + rooms
+    if ground_oriented and not beds:
+        return {"lifts": 0, "words": "no elevator: each home has its own door at grade"}
+    if not places or (storeys <= WALKUP_MAX_STOREYS and not beds) or storeys <= 1:
+        return {"lifts": 0, "words": f"no elevator: {storeys} storeys or fewer, a walk-up" if places else "no elevator: no homes or beds"}
+    n = max(1, math.ceil(places / each))
     if storeys > MIDRISE_MAX_STOREYS:
         n = max(n, floor_two)
-    return {"lifts": n, "words": f"{n} elevator{'s' if n != 1 else ''} for {homes} homes on {storeys} storeys: one per {each} homes"
-                                 + (f", at least {floor_two} over {MIDRISE_MAX_STOREYS} storeys" if storeys > MIDRISE_MAX_STOREYS else "") + " (a placeholder for an elevator analysis)"}
+    what = " and ".join(x for x in (f"{homes} homes" if homes else "", f"{beds} beds in {rooms} rooms of four" if beds else "") if x)
+    return {"lifts": n, "words": f"{n} elevator{'s' if n != 1 else ''} for {what} on {storeys} storeys: one per {each} places"
+                                 + (f", at least {floor_two} over {MIDRISE_MAX_STOREYS} storeys" if storeys > MIDRISE_MAX_STOREYS else "")
+                                 + ("; a shelter that sleeps people above the ground floor needs one for its accessible beds" if beds and storeys <= WALKUP_MAX_STOREYS else "")
+                                 + " (a placeholder for an elevator analysis)"}
 
 
 # The program brief (`option.program_brief`): the spaces a kind of housing runs on beyond its homes, each a named block
@@ -474,7 +484,8 @@ def program_brief(option: dict) -> list[dict]:
         if area <= 0:
             continue
         out.append({"label": str(it["label"]).strip(), "area_m2": round(area, 1), "next_to": it.get("next_to"), "where": it.get("where") or "ground",
-                    "replaces_amenity": bool(it.get("replaces_amenity")), "source": source, "note": "; ".join(x for x in (words, it.get("note") or "") if x)})
+                    "replaces_amenity": bool(it.get("replaces_amenity")), "source": source, "note": "; ".join(x for x in (words, it.get("note") or "") if x),
+                    **({"use": "community"} if it.get("use") == "community" else {})})
     return out
 
 
@@ -672,6 +683,10 @@ def _ground_egress(floors: list[dict], tiers: list[tuple[int, int]]) -> dict[str
                     "notes": (["each home on this floor reaches its own door; the upper homes do so by their own stair, to confirm against Part 9 (9.9.9), not in the rules"] if upper
                               else ["each home on this floor has its own door and stair; no common corridor"] if homes else [])})
     overall = "uncertain" if any(f["status"] == "uncertain" for f in out) else "pass"
+    # no homes placed is no exit read, never a pass (25 Nov 2026: "0 of 6 homes fit" beside "Egress … pass")
+    if not any(f["exits"] for f in out):
+        return {"rule_id": EGRESS_RULE, "sprinklered": False, "sprinklered_is_placeholder": True, "limits": {}, "floors": out, "status": "uncertain", "scissor_stair": False,
+                "ground_oriented": True, "summary": "Egress (ground-oriented homes): no home is placed on the plates, so there are no exits to read."}
     return {"rule_id": EGRESS_RULE, "sprinklered": False, "sprinklered_is_placeholder": True, "limits": {}, "floors": out, "status": overall, "scissor_stair": False, "ground_oriented": True,
             "summary": "Egress (ground-oriented homes): every home has its own door" + (" at grade" if overall == "pass" else "; the upper homes reach theirs by their own stair, a placeholder to confirm against Part 9")
                        + "; no common corridor, exit stair or lift."}
@@ -770,11 +785,13 @@ def area_schedule(L: dict) -> dict[str, Any]:
     each floor it spans. Totals for the building and a flag where the efficiency is under EFFICIENCY_FLOOR. Pure."""
     partition, _ = LAYOUT_ASSUMPTIONS["partition_allowance"]
     rows = []
+    # the brief's spaces marked "not homes" (a hall, offices) count as non-residential (25 Nov 2026)
+    community = {b["label"] for b in (L.get("program") or []) if b.get("use") == "community"}
     for fl in L["floors"]:
         by = {g: 0.0 for g, _ in AREA_GROUPS}
         homes = {k: 0 for k in UNIT_KEYS}
         for z in fl["zones"]:
-            g = _area_group(z)
+            g = "non_residential" if z["block"] == "other" and z.get("label") in community else _area_group(z)
             if not g:
                 continue
             a = float(z["area_m2"])
@@ -827,10 +844,19 @@ def operability(L: dict, option: dict) -> dict[str, Any]:
     homes = int(L.get("units_placed") or 0)
     p = L["plate"]
     go = p.get("arrangement") == "ground_oriented"
-    lift = lifts_needed(int(L.get("units_total") or 0), int(p["storeys"]), ground_oriented=go)
+    beds_n = option.get("beds") if isinstance(option.get("beds"), (int, float)) and not isinstance(option.get("beds"), bool) else 0
+    lift = lifts_needed(int(L.get("units_total") or 0), int(p["storeys"]), ground_oriented=go, beds=int(beds_n or 0))
     cores = [z for fl in L["floors"][:1] for z in fl["zones"] if z["block"] == "core" and min(z["w"], z["d"]) >= ELEVATOR_CORE_M - 1e-6]
-    items = [{"key": "lifts", "label": "Elevators", "status": "info" if not lift["lifts"] else ("pass" if cores else "missing"),
-              "note": lift["words"] + ("" if not lift["lifts"] or cores else "; no core on the ground floor is large enough to hold an elevator") + "."}]
+    # the plans draw cores, not elevator shafts (25 Nov 2026: "4 elevators" passed in a 7 × 7 m core that draws a scissor
+    # stair and no lift): a core at least ELEVATOR_CORE_M each way is read as room for one elevator beside its stairs, and
+    # the count wanted is held against that room, never passed on the count alone
+    room = len(cores)
+    status = "info" if not lift["lifts"] else ("pass" if room >= lift["lifts"] else "missing")
+    items = [{"key": "lifts", "label": "Elevators", "status": status,
+              "note": lift["words"] + ("" if not lift["lifts"] else
+                                       (f"; the plans draw no elevator shafts: {room} core{'s' if room != 1 else ''} on the ground floor large enough for one each"
+                                        + ("" if room >= lift["lifts"] else f", so room for {room} of the {lift['lifts']}: a larger core or another one")
+                                        if room else "; no core on the ground floor is large enough to hold an elevator")) + "."}]
     staffed = kind != "independent" or any(k != "independent" for k in parts)
     for want, words in (("desk", "a staffed front desk by the entry"), ("staff office", "a staff office")):
         if staffed:

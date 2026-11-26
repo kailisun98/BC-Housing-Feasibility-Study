@@ -123,10 +123,10 @@
         <div><span class="key">Rezoning path</span>CD-1 under the Interim Rezoning Policy</div>
       </div>
       <div class="answers">
-        <div class="answer" data-verdict="fail">
+        <div class="answer" data-verdict="pass">
           <p class="q">1 · Is it allowed?</p>
-          <p class="v"><em>Not outright.</em> By rezoning: <em>yes, with conditions.</em></p>
-          <p class="f">A floor space ratio (FSR) of 2.95 against 1.20 allowed outright, and 22.3 m tall against 10.7 m. City staff's benchmark for this rezoning is <b>19.9 to 21.3 m</b>, so the height will be negotiated.</p>
+          <p class="v">Not outright. By rezoning: <em>approved.</em></p>
+          <p class="f">A floor space ratio (FSR) of 2.95 against 1.20 allowed outright, and 22.3 m tall against 10.7 m. Council approved the rezoning on <b>25 July 2024</b>, so the memo reads it as decided and does not ask for it again.</p>
         </div>
         <div class="answer" data-verdict="uncertain">
           <p class="q">2 · Does it fit the funders?</p>
@@ -135,7 +135,7 @@
         </div>
         <div class="answer" data-verdict="conditional">
           <p class="q">3 · What is still unsure?</p>
-          <p class="v"><em>Seven open items,</em> each with a named person.</p>
+          <p class="v"><em>Six open items,</em> each with a named person.</p>
           <p class="f">The tree by-law asks for 20 trees on this 2,811 m² lot and the plan leaves 17, so the architect finds room for 3 more or the project pays <b>$3,000</b> cash in lieu. The plate the setbacks leave holds <b>70 of the 105 homes</b>. The development manager supplies the funders' figures.</p>
         </div>
         <div class="answer" data-verdict="conditional">
@@ -179,7 +179,7 @@
       <li class="item">
         <span class="n">02</span><span class="key">Rules</span>
         <h3>Run the rules.</h3>
-        <p>The engine checks the option against 144 rules, each dated and cited; a CD-1 site is matched to its own by-law by number. A run takes under a second, and the same inputs under the same rules give the same memo.</p>
+        <p>The engine checks the option against 176 rules, each dated and cited; a CD-1 site is matched to its own by-law by number. A run takes under a second, and the same inputs under the same rules give the same memo.</p>
       </li>
       <li class="item">
         <span class="n">03</span><span class="key">Memo</span>
@@ -232,10 +232,12 @@
       <h2 id="numbers-h">Small enough that a firm can maintain the rules by hand.</h2>
       <p class="sub">No AI decides an answer: the same inputs give the same memo. The engine is plain Python reading the rule files, and a language model only ever drafts a rule for a person to confirm.</p>
     </div>
-    <!-- the count is the rule ids in rules/a_ to f_*.json on 20 Nov 2026: 62 + 2 + 6 + 3 + 4 + 7 = 84 -->
+    <!-- the count is the rule ids in rules/a_ to f_*.json on 25 Nov 2026: 143 + 2 + 6 + 4 + 13 + 8 = 176; the districts are
+         the layer A rules' applies_to_districts (44, RM-1 and RM-1N from the referral report, the rest from the City's PDFs)
+         and two CD-1 by-laws, 324 and 819 (819 unverified, from a referral report's draft) -->
     <ul class="stats three reveal">
-      <li><p class="v">84</p><p class="l">rules in six layers, from the zoning district to the funders and the costs, each with its source and the date it took effect</p></li>
-      <li><p class="v">21</p><p class="l">zoning districts read from the City's own PDFs, with one CD&#8209;1 by-law; a figure entered without its document says "unverified"</p></li>
+      <li><p class="v">176</p><p class="l">rules in six layers, from the zoning district to the funders and the costs, each with its source and the date it took effect</p></li>
+      <li><p class="v">44</p><p class="l">zoning districts, nearly all read from the City's own PDFs, and two CD&#8209;1 by-laws; a figure entered without its document says "unverified"</p></li>
       <li><p class="v">R1 <small>R2 R3</small></p><p class="l">every memo on a site gets a revision number, like a drawing issue, so a rule change shows up as a new revision</p></li>
     </ul>
   </div>

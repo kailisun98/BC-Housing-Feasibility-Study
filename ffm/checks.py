@@ -137,6 +137,42 @@ def fsr(site: Site, option: Option) -> float | None:
 # the suggester alike. A row of a table names the site conditions it needs; the most it allows is taken.
 SOCIAL = "social_housing"
 RENTAL_TENURES = ("social_housing", "secured_market_rental")
+NON_PROFIT_OWNERS = ("non_profit_society", "non_profit", "government", "co_op", "cooperative", "municipality", "province")
+
+
+def rezoning_approved_on(option: Option) -> str | None:
+    """The date Council approved the rezoning the option names (`rezoning_approved_on`, an ISO date), in words, or None
+    where it is a proposal. Pure."""
+    v = str((option or {}).get("rezoning_approved_on") or "").strip()
+    m = re.match(r"^(\d{4})-(\d\d)-(\d\d)", v)
+    if not m:
+        return v or None
+    months = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+    return f"{int(m.group(3))} {months[int(m.group(2)) - 1]} {m.group(1)}"
+
+
+def operator_of(option: Option) -> str:
+    """Who operates the homes: the option's operator, else the organization that signed the operating figures, else an
+    operator named in the proponent line ("…; operator BC Indigenous Housing Society"). 25 Nov 2026, three reviewers: the
+    front sheet said "Not named" beside both. The page's memo/front.js is its twin. Pure."""
+    o = option or {}
+    op = str(o.get("operator") or "").strip()
+    if op:
+        return op
+    signed = (o.get("operations") or {}).get("signed")
+    if isinstance(signed, dict) and str(signed.get("org") or "").strip():
+        return str(signed["org"]).strip()
+    m = re.search(r"\boperat(?:or|ed by)\s+([^;,()]+)", str(o.get("proponent") or ""), re.I)
+    return m.group(1).strip() if m else ""
+
+
+def non_residential_m2(option: Option) -> float:
+    """The option's floor area that is not homes: `non_residential_gfa_m2`, plus the program brief's spaces marked "not
+    homes" (`use` "community": a hall, offices, a shop). 25 Nov 2026, the manager: a 450 m² hall and 900 m² of offices in
+    the brief were invisible to C-2's non-dwelling floor area, to BC Builds and to the money. Pure."""
+    o = option or {}
+    brief = sum(float(b.get("area_m2") or 0) for b in (o.get("program_brief") or []) if isinstance(b, dict) and b.get("use") == "community")
+    return float(o.get("non_residential_gfa_m2") or 0) + brief
 
 
 def _is_corner(site: Site) -> bool:
@@ -211,6 +247,12 @@ def _over_outright(option: Option, subject: str, said: str, vals: dict, what: st
     test fails and the rezoning is named), a development permit or outright (it fails: a permit cannot approve more than
     the schedule allows), or none stated."""
     path = _rezoning_path(option)
+    approved = rezoning_approved_on(option)
+    if path and approved:
+        # a rezoning Council has approved is not asked for again (25 Nov 2026, the funder-side reader: a scheme approved in
+        # July 2024 was told to take the rezoning and make a pre-application enquiry)
+        return _r(FAIL, f"{subject} exceeds {said}, so it is not allowed outright; the rezoning ({path}) was approved by Council on {approved}, and it sets the {what} now.",
+                  vals, action="")
     if path:
         return _r(FAIL, f"{subject} exceeds {said}, so it is not allowed outright; rezoning is required ({path}), where {what} is negotiated.",
                   vals, action=f"Manager and architect: take the rezoning ({path}) and confirm with City staff the {what} they will support.")
@@ -261,12 +303,12 @@ def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
         # for the shops); short of it the base figure stands and the words say what the higher one needs.
         need = p.get("rental_min_non_dwelling_fsr")
         area = float(site.get("site_area_m2") or 0)
-        have = (float(option.get("non_residential_gfa_m2") or 0) / area) if area else 0.0
+        have = (non_residential_m2(option) / area) if area else 0.0
         if need and round(have, 2) + 1e-9 < need:
             out.update({"rental_short": {"needs_non_dwelling_fsr": need, "has_non_dwelling_fsr": round(have, 2), "max_fsr_rental": r,
                                          "needs_m2": round(need * area) if area else None},
                         "words": f" ({r} is open to a building with every home rental and {need} FSR of non-dwelling use at the street, "
-                                 f"{round(need * area):,.0f} m² on this lot; this option has {float(option.get('non_residential_gfa_m2') or 0):,.0f} m², FSR {have:.2f}; "
+                                 f"{round(need * area):,.0f} m² on this lot; this option has {non_residential_m2(option):,.0f} m², FSR {have:.2f}; "
                                  f"{p.get('rental_fsr_clause') or 'the schedule'})"})
         else:
             out.update({"max": r, "words": f" for a building with every home secured as rental ({p.get('rental_fsr_clause') or 'the schedule'}; {out['base']} otherwise)"})
@@ -276,8 +318,16 @@ def fsr_limit(site: Site, option: Option, p: Params) -> dict[str, Any]:
     # the Director's increase can be open only to some sites (RR-3 s.3.1.1.4: a corner with 40.2 m and 1,470 m²)
     if disc and p.get("fsr_discretionary_when") and not _row_fits(site, option, p["fsr_discretionary_when"]):
         disc = None
+    clause = p.get("fsr_discretionary_clause") or "the schedule"
+    # RT-3's reading (16 Nov 2026) names the same two figures otherwise (25 Nov 2026, the small-lot architect: FSR 0.67 was
+    # sent to rezoning where s.3.1.1.1 lets the Director allow 0.75, and s.3.1.1.2 1.00 for a non-profit multiple dwelling)
+    if not disc and p.get("max_fsr_conditional"):
+        disc, clause = p["max_fsr_conditional"], p.get("fsr_conditional_clause") or "s.3.1.1.1"
+    aff = p.get("max_fsr_affordable_multiple_dwelling")
+    if aff and (tenure == SOCIAL or str(option.get("owner_type_at_completion") or "").lower() in NON_PROFIT_OWNERS) and (not disc or aff > disc):
+        disc, clause = aff, ("s.3.1.1.2, a multiple dwelling with at least 25% of its homes held by a non-profit or a government "
+                             "for low-income households or people with disabilities")
     if disc:
-        clause = p.get("fsr_discretionary_clause") or "the schedule"
         narrow = p.get("narrow_site")
         W, _ = lot_as_fronted(site)
         if narrow and W and W <= narrow["max_width_m"] + 1e-9:
@@ -914,7 +964,7 @@ def bc_builds_fit(site, option, p) -> Result:
         unknown.append("share of units at least 20% below market")
     elif share + 1e-9 < p["min_below_market_unit_share"] or disc + 1e-9 < p["min_discount_to_market"]:
         fails.append(f"{_pct(share)} of units at {_pct(disc)} below market does not meet 20% at 20%")
-    gfa, nonres = option.get("gfa_m2"), option.get("non_residential_gfa_m2") or 0
+    gfa, nonres = option.get("gfa_m2"), non_residential_m2(option)
     if gfa:
         nr = nonres / gfa
         if nr > p["max_non_residential_share"]:
@@ -1337,7 +1387,7 @@ def uses_for(option: Option) -> tuple[str, tuple[str, ...]]:
     if kind == "shelter":
         return "a shelter", SHELTER_USES
     bt = str(o.get("building_type") or "").strip().lower()
-    nonres = float(o.get("non_residential_gfa_m2") or 0) > 0
+    nonres = non_residential_m2(o) > 0
     if bt == "ground_oriented":
         n = _units_total(o)
         few = (("Triplex",) if 0 < n <= 3 else ()) + (("Duplex",) if 0 < n <= 2 else ())

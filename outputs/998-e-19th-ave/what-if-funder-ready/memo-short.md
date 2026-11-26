@@ -10,7 +10,7 @@
 
 | | |
 |---|---|
-| Who is housed | 88 homes, independent rental (social housing): 26 at market rent, 44 rent geared to income, 18 deep subsidy |
+| Who is housed | 88 homes, independent rental (social housing): 26 at market rent, 44 rent geared to income, 18 deep subsidy; 59 of the 88 fit the first plans |
 | Who operates | Not named |
 | Which program | BC Builds, the Community Housing Fund. Passes this screen's eligibility checks for BC Builds and the Community Housing Fund, each read on its own |
 | The amount | Capital cost $45.6M. Asked: Community Housing Fund grant, $15.7M (illustrative). Still to find: $20.7M (45% of the cost). |
@@ -48,7 +48,7 @@ Other programs written for this kind of housing, listed from their own pages and
 | Homes that do not fit the plates | Conditional | Architect: 59 of 88 homes fit the plates on 5 floors at the unit sizes assumed; did not fit: 6 one-bedroom, 23 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 88. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $20,689,859, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $20,689,859, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
@@ -73,12 +73,12 @@ Other programs written for this kind of housing, listed from their own pages and
 | Market rent, 26 homes | $646,492 | $2,072 a month a home (the rules' figure) |
 | Rent geared to income, 44 homes | $594,720 | $1,126 a month a home (the rules' figure) |
 | Deep subsidy, 18 homes | $124,769 | $578 a month a home (the rules' figure) |
-| Vacancy | -$50,541 | the CMHC survey's rate, on all tiers |
+| Vacancy | -$50,541 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$572,000 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$52,800 |  |
 | Support staffing | none |  |
 | **Left after running costs** | **$690,640** | before any operating subsidy or loan payment |
-| Loan payment | -$627,855 | on the loan the funding counts (the capital figures above) |
+| Loan payment | -$627,855 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
 | **Subsidy needed if the capital still missing were borrowed** | **$1,336,301** | $1,265 a home a month: the payment on $29,974,644 at 6.19% over 40 years is $2,026,941 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,022,799** | $969 a home a month: 4.55% over 35 years is $1,713,439 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |

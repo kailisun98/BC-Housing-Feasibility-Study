@@ -12,8 +12,8 @@ import { setMode, setView, showInputs } from "./modes.js";
    run, then shows the other two readers. A step's `before` sets the page up for it (a mode, a guide stop, a view) and
    `action: "run"` runs the rules when the reader presses Next; the mode the reader started in comes back at the end. */
 const TOUR = [
-  { target: ".mode", title: "For the manager, the architect, or a reader", before: () => setMode("manager", false, false),
-    text: "One page, three layouts. Manager: three stops, then the memo. Architect: the site and the option as schedules beside the memo, every ledger layer open, Revit at hand. Reader: the memo alone, as on paper. This walkthrough follows the manager; the last stop shows the other two." },
+  { target: ".mode", title: "For the manager, the architect, a reader or the operator", before: () => setMode("manager", false, false),
+    text: "One page, four layouts. Manager: three stops, then the memo. Architect: the site and the option as schedules beside the memo, every ledger layer open, Revit at hand. Reader: the memo alone, as on paper. Operator: the building's operating figures to enter and sign, then the memo. This walkthrough follows the manager; the last stop shows the other three." },
   { target: "#guide", title: "Three stops", before: () => { guide.over = false; if (!state.run) { guide.step = 1; renderGuide(); } },
     text: "The left column is the route: the site, the option, the run. Each row shows its decision once made, and a click brings its card back. Nothing else lives here." },
   { target: "#stage-card", fallback: "#memo", title: "01 The site", before: () => { if (state.run) { guide.step = 1; guide.over = true; } else guide.step = 1; renderGuide(); },
@@ -29,8 +29,21 @@ const TOUR = [
     text: "Download PDF is the memo for the board, laid out for paper. Mark issued to the architect gives a draft the site's next revision number and records your name and a note; the architect's layout on this machine shows it, and they mark it issued back when the plans are drawn. To reach someone elsewhere, send the link or the PDF." },
   { target: "#view-switch", title: "Summary, Detailed, 3D preview",
     text: "How much of the memo to show: the title block and the answers; the whole memo with the clauses and the ledger; or the drawings, large, with an axonometric you can turn." },
-  { target: ".mode", title: "The architect and the reader",
-    text: "Switch to Architect and the left column holds the Site and Option schedules, one row per input, each citing the rules that read it; every ledger layer opens, Edit blocks appears on the plans, and Export to Revit leads. Switch to Reader and the memo stands alone in a reading column. That is the whole page." },
+  { target: ".mode", title: "The architect, the reader and the operator",
+    text: "Switch to Architect and the left column holds the Site and Option schedules, one row per input, each citing the rules that read it; every ledger layer opens, Edit blocks appears on the plans, and Export to Revit leads. Switch to Reader and the memo stands alone in a reading column. Switch to Operator and the memo opens on the operating figures to enter and sign; the manager can mark a memo issued to the operator. That is the whole page." },
+];
+
+/* The operator's walkthrough (25 Nov 2026, the third panel: the operator had none): the desk, the signature, the
+   checklist on the plans, then the memo, without leaving Operator mode. */
+const OPERATOR_TOUR = [
+  { target: "#operator-desk", fallback: "#memo", title: "The operator's figures",
+    text: "What it takes to run the building for the years after it opens: rents by tier, vacancy, the running cost a home and a bed, support staffing, the operating subsidy and its term. Each figure you enter stands over the screen's placeholder; blank keeps the placeholder, and the memo says which it used." },
+  { target: "#op-sign", fallback: "#operator-desk", title: "Sign them as yours",
+    text: "Your name and organization go on the memo beside the figures once you Run again. Change a figure after signing and the signature is withdrawn at once, so the memo never reads an edited figure as signed." },
+  { target: "#operator-desk h3", fallback: "#operator-desk", title: "What an operator checks on the plans",
+    text: "The area schedule, then a checklist read off the first plans: the elevators, a desk that sees the entry, laundry, the services room and the accessible homes. The plans are the tool's first layout, not the architect's, so a missing item is a question for the architect." },
+  { target: ".answers", fallback: "#memo", title: "Then the memo",
+    text: "The four answers, as every reader has them; the money's operating page reads your figures once you Run again. Mark it issued back to the development manager when the figures are yours." },
 ];
 
 /* The reader's walkthrough: the memo as it is on their screen, without switching them to the manager's layout
@@ -62,7 +75,7 @@ export function startTour(at = 0) {
   tour.modeBefore = state.mode;
   tour.viewBefore = state.view;
   // a reader with a memo open is walked through the memo they have; anyone else through the manager's flow
-  tour.list = state.mode === "reader" && state.run ? READER_TOUR : TOUR;
+  tour.list = state.mode === "reader" && state.run ? READER_TOUR : state.mode === "operator" && state.run ? OPERATOR_TOUR : TOUR;
   tour.returnTo = document.activeElement && document.activeElement !== document.body ? document.activeElement : $("#tour-link");
   tour.spot = document.createElement("div");
   tour.spot.className = "tour-spot";
@@ -141,7 +154,12 @@ async function tourNext() {
 async function showTourStep(i) {
   if (!tour.active) return;
   if (i < 0) i = 0;
-  if (i >= tour.list.length) { const reader = tour.list === READER_TOUR; endTour(); toast(reader ? "That is the memo. Download PDF keeps a copy." : "That is the whole page. Start from an address whenever you like."); return; }
+  if (i >= tour.list.length) {
+    const said = tour.list === READER_TOUR ? "That is the memo. Download PDF keeps a copy."
+      : tour.list === OPERATOR_TOUR ? "That is the operator's desk. Enter the figures, sign them, then Run again."
+      : "That is the whole page. Start from an address whenever you like.";
+    endTour(); toast(said); return;
+  }
   tour.i = i;
   const step = tour.list[i];
   // a stop may set the page up for itself, a demo loaded or a card brought forward, and may wait for it

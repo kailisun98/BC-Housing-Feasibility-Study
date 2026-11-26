@@ -708,11 +708,12 @@ function lotTakes(lot) {
   const plate = p.area_m2 ? `<p class="dd-line">The plate the yards leave: <b>${h(fmtNum(p.width_m))} × ${h(fmtNum(p.depth_m))} m</b>, ${h(fmtNum(Math.round(p.area_m2)))} m² <span class="cont">· yards front ${h(sb.front)}, rear ${h(sb.rear)}, sides ${h(sb.side)} m, ${h(yardsWord)}</span></p>`
     : `<p class="dd-line warn-text">The yards leave no plate on this lot as fronted.</p>`;
   const build = y.storeys ? `<p class="dd-line">${y.outright ? "Outright" : "Roughly"}: <b>${h(y.storeys)} storeys, ${h(fmtNum(y.gfa_m2))} m²</b>${y.fsr != null ? ` (FSR ${h(y.fsr)})` : ""}, about <b>${h(y.homes ?? "no")} homes</b> <span class="cont">· from ${h(y.from)}; the homes at ${h(y.mix_note)}</span></p>` : "";
+  const director = y.discretionary_fsr ? `<p class="dd-line">By the Director of Planning's discretion: <b>up to FSR ${h(y.discretionary_fsr)}</b> <span class="cont">· ${h(y.discretionary_clause || "the schedule")}; a discretionary approval with the permit, never assumed</span></p>` : "";
   const small = s.applies === true ? `<p class="dd-line">The provincial small-scale minimum: <b>${h(s.why.split(";")[0])}</b>${s.why.includes(";") ? ` <span class="cont">· ${h(s.why.split(";").slice(1).join(";").trim())}</span>` : ""}</p>`
     : s.applies === false ? `<p class="dd-line cont">The provincial small-scale minimum does not apply: ${h(s.why)}.</p>` : "";
   const uses = u ? `<ul class="reading-list lot-uses">${u.kinds.map(k => { const [w, c] = USE_MARK[k.status] || ["", "rm-applies"]; return `<li><span class="rmark ${c}">${h(w)}</span> <span><b>${h(k.kind)}</b>: ${h(k.finding)}</span></li>`; }).join("")}</ul><p class="help">From the district's use table (${h(u.rule_id)}). Which use a building is, the City says from the by-law's definitions.</p>`
     : `<p class="help">The rules hold no use table for this district, so whether housing, a shelter or a clinic is a permitted use is not read here.</p>`;
-  return `${plate}${build}${small}${uses}<p class="help">Rough figures from the rules, before any option: a starting point, not a permission.</p>`;
+  return `${plate}${build}${director}${small}${uses}<p class="help">Rough figures from the rules, before any option: a starting point, not a permission.</p>`;
 }
 
 export const defaultPrograms = () => state.rules.filter(r => r.layer === "E" && /chf|bcbuilds/.test(r.id)).map(r => r.id);
@@ -993,7 +994,8 @@ function sourcesEditor(fin) {
       <td>${sel("kind", SOURCE_KINDS, s.kind, i, `Source ${i + 1}: kind`)}</td>
       <td><input type="number" min="0" step="any" inputmode="decimal" data-src="${i}" data-f="amount_cad" value="${h(s.amount_cad ?? "")}" placeholder="$" aria-label="Source ${i + 1}: amount in dollars"></td>
       <td>${sel("status", SOURCE_STATUSES, s.status, i, `Source ${i + 1}: status`)}</td>
-      <td><button type="button" class="btn btn-quiet btn-small" data-src-remove="${i}" aria-label="Remove source ${i + 1}">Remove</button></td></tr>`;
+      <td><button type="button" class="btn btn-quiet btn-small" data-src-remove="${i}" aria-label="Remove source ${i + 1}">Remove</button></td></tr>${s.kind === "loan" ? `
+      <tr class="src-loan"><td colspan="5"><span class="cont">Repaid at</span> <input type="number" min="0" step="any" inputmode="decimal" data-src="${i}" data-f="rate_pct" value="${h(s.rate_pct ?? "")}" placeholder="%" aria-label="Source ${i + 1}: interest rate, percent"> <span class="cont">% over</span> <input type="number" min="1" step="1" inputmode="numeric" data-src="${i}" data-f="amortization_years" value="${h(s.amortization_years ?? "")}" placeholder="years" aria-label="Source ${i + 1}: amortization in years"> <span class="cont">years · blank: this screen's mortgage terms. Its payment comes off what the net income can carry.</span></td></tr>` : ""}`;
   return `<div class="src-editor"><p class="label">Capital sources, each with its status</p>
       ${rows.length ? `<table class="plain src-edit"><thead><tr><th scope="col">Source</th><th scope="col">Kind</th><th scope="col">Amount ($)</th><th scope="col">Status</th><th><span class="sr-only">Remove</span></th></tr></thead><tbody>${rows.map(row).join("")}</tbody></table>` : ""}
       <button type="button" class="btn btn-small" id="src-add">Add a source</button>
@@ -1036,7 +1038,8 @@ function cardRun() {
     "operations.rent_deep_monthly_cad": "Blank: the shelter allowance by bedrooms ($500, $695, $769). 0 for a shelter.",
     "operations.subsidy_term_years": "Blank: no term, so no loan is sized on the subsidy.",
     "operations.replacement_reserve_per_unit_year_cad": "Blank: the $600 placeholder.",
-    "operations.vacancy_rate": "Blank: the CMHC market rate, 3.7%.",
+    "operations.vacancy_rate": "A percent (2) or a share (0.02). Blank: the CMHC market rate, 3.7%.",
+    "operations.operating_cost_per_bed_year_cad": "Shelter beds beside homes. Blank: each bed costed as a home.",
     "operations.subsidy_source": "The funder and the agreement, in a few words.",
     "operations.operating_cost_per_unit_year_cad": "Blank: the placeholder in the assumptions.",
     "operations.support_staffing_cad_year": supported ? "Never assumed. Blank leaves the money answer unsure." : "Blank: none.",
@@ -1229,21 +1232,22 @@ function wireStage(el) {
     renderForm($("#option-form"), OPTION_FIELDS, state.option, onOptionChange);
     markStale("the money in");
     saveDraft();
-    if (redraw) { renderStage(); const b = $("#src-add"); if (b) b.focus(); }
+    if (redraw) { renderStage(); const b = $("#src-add"); if (b && redraw === "add") b.focus(); }
   };
   const srcList = () => { state.option.finance = state.option.finance || {}; if (!Array.isArray(state.option.finance.sources)) state.option.finance.sources = []; return state.option.finance.sources; };
   $$("[data-src]", el).forEach(c => c.addEventListener(c.tagName === "SELECT" ? "change" : "input", () => {
     if (!state.option) return;
     const list = srcList(), i = Number(c.dataset.src), f = c.dataset.f;
     list[i] = list[i] || {};
-    list[i][f] = f === "amount_cad" ? (c.value.trim() === "" ? null : Number(c.value)) : c.value;
-    srcChanged(false);
+    list[i][f] = ["amount_cad", "rate_pct", "amortization_years"].includes(f) ? (c.value.trim() === "" ? null : Number(c.value)) : c.value;
+    srcChanged(f === "kind");      // a loan shows its rate and term
+    if (f === "kind") { const k = $(`[data-src="${i}"][data-f="kind"]`); if (k) k.focus(); }
   }));
-  on("#src-add", () => { if (!state.option) return; srcList().push({ name: "", kind: "grant", amount_cad: null, status: "assumed" }); srcChanged(true); });
+  on("#src-add", () => { if (!state.option) return; srcList().push({ name: "", kind: "grant", amount_cad: null, status: "assumed" }); srcChanged("add"); });
   $$("[data-src-remove]", el).forEach(b => b.addEventListener("click", () => {
     if (!state.option) return;
     srcList().splice(Number(b.dataset.srcRemove), 1);
-    srcChanged(true);
+    srcChanged("add");
   }));
   const conf = $("#ops-confirmed", el);
   if (conf) conf.addEventListener("change", () => {

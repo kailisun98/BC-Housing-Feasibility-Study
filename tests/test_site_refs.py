@@ -12,9 +12,10 @@ ROOT = Path(__file__).resolve().parent.parent
 CASE = ROOT / "ffm" / "ui" / "case.html"
 R1 = ROOT / "outputs" / "998-e-19th-ave" / "as-approved" / "ledger.json"
 # the words the page uses for a rule, and the rule
-WORDS = {"Interim Rezoning Policy": "cov.irp.social_housing_rezoning", "Protection of Trees By-law": "cov.trees.replacement",
+WORDS = {"Protection of Trees By-law": "cov.trees.replacement",
          "BC Builds": "bc.bcbuilds.eligibility", "Community Housing Fund": "bch.chf.eligibility"}
-# (20 Nov 2026: the exits pass in the regenerated R1, so the page no longer cites them as an open item)
+# (20 Nov 2026: the exits pass in the regenerated R1, so the page no longer cites them as an open item; 25 Nov 2026: the
+# rezoning Council approved is no longer asked, so the Interim Rezoning Policy is not an open item either)
 
 
 from ffm.engine import memo_refs, takes_ref   # the tool's count: only the rules that apply to the site (20 Nov 2026)

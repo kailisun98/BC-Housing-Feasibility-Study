@@ -43,9 +43,12 @@ export function answerAllowed(L, run = null) {
   const notNeeded = bz.verdict === "not needed";
   // within the Director's discretion is not outright (25 Nov 2026): the three verdicts under this line say which
   const discretion = ((ans.allowed.routes || {}).discretion || {}).verdict === "possible";
-  const outSaid = discretion ? "Not outright: within what the Director of Planning may allow." : outrightWords(o, outLines);
+  // a rezoning Council approved (25 Nov 2026): not "rezoning required" beside "approved"; the date from bz.why
+  const approved = bz.verdict === "approved";
+  const approvedOn = approved ? ((String(bz.why || "").match(/ on (\d{1,2} \w+ \d{4})/) || [])[1] || "") : "";
+  const outSaid = approved ? "Not outright." : discretion ? "Not outright: within what the Director of Planning may allow." : outrightWords(o, outLines);
   let verdict = proposes ? h(outSaid) : `<em>${h(outSaid)}</em>`;
-  if (proposes) verdict += ` By rezoning: <em>${h(bz.verdict)}</em>.`;
+  if (proposes) verdict += ` By rezoning: <em>${h(bz.verdict)}${approvedOn ? `, ${h(approvedOn)}` : ""}</em>.`;
   else if (notNeeded) verdict += " No rezoning needed.";
   const district = districtOf(site) || "the district";
   let body = "";
@@ -54,15 +57,25 @@ export function answerAllowed(L, run = null) {
   // each finding cites the rule it came from (A1, its title), so a CD-1 site shows its own by-law's rules (17 Nov 2026)
   // a Fail here is against the district's own limits, without a rezoning; on an approved scheme it read as "failed"
   // (24 Nov 2026, critique), so the heading says what the limits are and what replaces them when a rezoning is proposed
-  const outSub = `Outright under ${h(district)} <span class="cont">· the limits without a rezoning${proposes && outLines.some(r => r.status === "fail") ? "; going past them is what the rezoning below is for" : ""}</span>`;
+  const outSub = `Outright under ${h(district)} <span class="cont">· the limits without a rezoning${approved ? "; the rezoning below, approved, sets them now" : proposes && outLines.some(r => r.status === "fail") ? "; going past them is what the rezoning below is for" : ""}</span>`;
   if (outLines.length) {
     body += `<p class="path ans-sub">${outSub}</p>
       <ul class="finding-list rule-list">${outLines.map(r => ruleItem(r, `${leadCont(r.finding)} <span class="cont">(${h(r.title)})</span>`)).join("")}</ul>`;
   } else if (!o.why) body += `<p class="path ans-sub">${outSub}</p>`;
   if (path) {
-    body += `<p class="path ans-sub">${proposes ? "By rezoning" : "Approval route, no rezoning"}: ${h(path)}</p>`;
+    // a rezoning Council has approved is said as decided (25 Nov 2026, the funder-side reader)
+    body += `<p class="path ans-sub">${approved ? `By rezoning, approved by Council${approvedOn ? ` on ${h(approvedOn)}` : ""}` : proposes ? "By rezoning" : "Approval route, no rezoning"}: ${h(path)}${approved ? ` <span class="cont">· it sets the limits now${policy.length ? "; what the City's rules still read of the scheme is listed below" : ""}</span>` : ""}</p>`;
     if (policy.length) body += `<ul class="finding-list rule-list">${policy.map(r => ruleItem(r, `<span class="title">${h(r.title)}:</span> <span class="cont">${h(r.finding)}</span>`)).join("")}</ul>`;
-  } else body += `<p class="path ans-sub">${notNeeded ? "Allowed outright; no rezoning is proposed or needed" : "No rezoning path stated"}</p>`;
+  } else {
+    // "allowed outright" only where the outright answer says so (25 Nov 2026: a permit route on a lot whose yards leave
+    // no plate read "Allowed outright" under "Outright: not yet confirmed"); else the route's own reason
+    const outOk = ["yes", "yes, with conditions"].includes(o.verdict);
+    const said = !notNeeded ? "No rezoning path stated"
+      : discretion ? "Within what the Director of Planning may allow; no rezoning is proposed or needed"
+      : outOk ? "Allowed outright; no rezoning is proposed or needed"
+      : `No rezoning proposed: ${bz.why || "the option names another approval route"}`;
+    body += `<p class="path ans-sub">${h(said)}</p>`;
+  }
   const status = verdictStatus(proposes ? bz.verdict : o.verdict);   // the operative answer: by rezoning when a path is stated
   // the figures worker's drawing of outright against proposed (figures/envelope.js, envelopeFigure(run)) goes here
   const drawing = run ? envelopeFigure(run) : "";
@@ -214,7 +227,8 @@ export function answerUnsure(L, run) {
 
 /* The fourth answer: the feasibility-grade pro-forma from layer F and layer E, four lines and the verdict; the
    line-by-line table with every source opens under it. */
-export const money = x => (x === null || x === undefined ? "not given" : `$${fmtNum(Math.round(x))}`);
+// a loss reads −$52,880 and nothing reads $-0 (25 Nov 2026: "$-2,753,356" and "$-0" on the operating table)
+export const money = x => { if (x === null || x === undefined) return "not given"; const r = Math.round(x) || 0; return r < 0 ? `−$${fmtNum(-r)}` : `$${fmtNum(r)}`; };
 
 /* A source's short name for a table cell: the publisher and the document up to the first comma or semicolon. */
 const shortSource = s => { const t = String((s && s.title) || (s && s.url) || ""); const cut = t.split(/[;(]/)[0]; return (cut.length > 72 ? cut.slice(0, 70).replace(/\s+\S*$/, "") + "…" : cut).trim(); };
@@ -293,18 +307,28 @@ export function operatingRows(pf) {
     if (!t.homes) continue;
     rows.push({ label: `${t.label}, ${t.homes} homes`, value: t.rent_year, note: `${t.rent_month_per_home != null ? `${usd(t.rent_month_per_home)} a month a home` : "no rent figure"} (${FROM_WORD[t.from] || t.from})`, kind: "income", ph: t.from === "placeholder" });
   }
-  rows.push({ label: "Vacancy", value: -(p.vacancy || 0), note: "the CMHC survey's rate, on all tiers", kind: "cost" });
-  rows.push({ label: "Operating cost", value: p.operating_cost != null ? -p.operating_cost : null, note: p.operating_cost_per_home != null ? `${usd(p.operating_cost_per_home)} a home a year (${FROM_WORD[p.operating_cost_from] || ""})` : "not entered: enter the operator's running cost per bed", kind: "cost", ph: p.operating_cost_from === "placeholder", warn: p.operating_cost == null });
-  rows.push({ label: "Replacement reserve", value: -(p.reserve || 0), note: "", kind: "cost" });
+  // the twin of proforma.operating_rows (25 Nov 2026: the vacancy's own basis, the non-residential income, what the
+  // subsidy leaves, the named loans' payments, one figure per place where beds stand beside homes)
+  rows.push({ label: "Vacancy", value: -(p.vacancy || 0), note: `${p.vacancy_rate != null ? `${(p.vacancy_rate * 100).toFixed(1)}%, ` : ""}${p.vacancy_from === "entered" ? "entered, on all tiers" : "the CMHC survey's rate, on all tiers"}`, kind: "cost" });
+  // the beds beside homes are in the figure, and the note says so (25 Nov 2026; twin of proforma.operating_rows)
+  const bedsNote = p.beds_operating_cost != null && p.beds ? `; and ${p.beds} beds at ${usd(p.beds_cost_per_bed)} a bed a year (${p.beds_cost_from === "entered" ? "entered" : "a home’s figure"})` : "";
+  rows.push({ label: "Operating cost", value: p.operating_cost != null ? -p.operating_cost : null, note: (p.operating_cost_per_home != null ? `${usd(p.operating_cost_per_home)} a home a year (${FROM_WORD[p.operating_cost_from] || ""})` : "not entered: enter the operator's running cost per bed") + bedsNote, kind: "cost", ph: p.operating_cost_from === "placeholder", warn: p.operating_cost == null });
+  rows.push({ label: "Replacement reserve", value: -(p.reserve || 0), note: p.beds_operating_cost != null && p.beds ? `with ${Math.ceil(p.beds / 4)} sleeping rooms of four beds, each held like a home` : "", kind: "cost" });
   rows.push({ label: "Support staffing", value: p.support_staffing != null ? -p.support_staffing : null, note: p.support_staffing != null ? "entered" : (p.staffing_missing ? "not entered, and this kind of housing runs on it" : ""), kind: "cost", warn: !!p.staffing_missing });
+  if (p.nonres_income) rows.push({ label: "Income from the floors that are not homes", value: p.nonres_income, note: "entered: rent or a contribution to running costs", kind: "income" });
   rows.push({ label: "Left after running costs", value: p.net_before_subsidy, note: "before any operating subsidy or loan payment", kind: "result" });
-  if (p.subsidy) rows.push({ label: "Operating subsidy entered", value: p.subsidy, note: `${p.subsidy_source ? `${p.subsidy_source}; ` : ""}${p.subsidy_confirmed ? "confirmed" : "not yet confirmed"}`, kind: "income", warn: !p.subsidy_confirmed });
-  rows.push({ label: "Loan payment", value: -(p.debt_service || 0), note: "on the loan the funding counts", kind: "cost" });
+  if (p.subsidy) {
+    rows.push({ label: "Operating subsidy entered", value: p.subsidy, note: `${p.subsidy_source ? `${p.subsidy_source}; ` : ""}${p.subsidy_confirmed ? "confirmed" : "not yet confirmed"}`, kind: "income", warn: !p.subsidy_confirmed });
+    rows.push({ label: "Left after the subsidy", value: p.net_after_subsidy, note: "what the subsidy entered leaves, before any loan payment", kind: "result" });
+  }
+  if (p.named_loan_service) rows.push({ label: "Payments on the named loans", value: -p.named_loan_service, note: "the capital sources entered as loans, each at its own terms", kind: "cost" });
+  rows.push({ label: "Loan payment", value: -(p.debt_service || 0), note: "on the mortgage the funding counts", kind: "cost" });
   if (p.subsidy_to_run == null) rows.push({ label: "Subsidy needed to run it", value: null, note: "not given: the support staffing is not entered, so what running it costs is not known", kind: "ask", warn: true });
   else {
     const per = [];
     if (p.subsidy_to_run_per_home_month != null && homes) per.push(`${usd(p.subsidy_to_run_per_home_month)} a home a month over ${homes} homes`);
     if (p.beds && p.subsidy_to_run_per_bed_month != null) per.push(`${usd(p.subsidy_to_run_per_bed_month)} a bed a month over ${p.beds} beds`);
+    if (p.subsidy_to_run_per_place_month != null) per.push(`${usd(p.subsidy_to_run_per_place_month)} a month for each of its ${homes + p.beds} places (${homes} homes and ${p.beds} beds): the building's whole need, shared over its places, not the shelter's alone`);
     rows.push({ label: "Subsidy needed to run it", value: p.subsidy_to_run, note: `${p.subsidy_to_run ? (per.length ? per.join("; ") + "; " : "") : "none: the rents cover the running costs; "}before any loan payment`, kind: "ask" });
   }
   const f = p.if_gap_financed;

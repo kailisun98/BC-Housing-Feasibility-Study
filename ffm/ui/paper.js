@@ -131,20 +131,29 @@ export function paperDocument(run, { short = false } = {}) {
 
   const mark = s => `<span class="st st-${h(s || "na")}">${h(STATUS_WORD[s] || cap(s) || "—")}</span>`;
   const vmark = w => `<span class="st st-${h(verdictStatus(w) || "na")}">${h(cap(w || "—"))}</span>`;
+  const approvedRz = ans.allowed.by_rezoning.verdict === "approved";     // a rezoning Council approved (25 Nov 2026)
   // each rule that decides an answer, with its status; an option over the district's own FSR or height reads "not
   // allowed outright: rezoning required" (20 Nov 2026: the engine reads that as fail now)
   const decidedBy = (o, outright = false) => {
     const items = ["fail", "conditional", "uncertain"].flatMap(k => (o[k] || []).map(id => {
-      const why = outright && isOutrightLimit({ check: checkOf[id] }) && k !== "conditional" ? "over the outright limit: rezoning required" : (STATUS_WORD[k] || k).toLowerCase();
+      // the use table is not a limit to exceed (25 Nov 2026: a shelter's use read "over the outright limit: rezoning required")
+      const use = checkOf[id] === "district_outright_use";
+      const why = use ? (k === "fail" ? "not a use the district allows: a rezoning" : k === "conditional" ? "a conditional approval use, the Director's discretion" : "which use it is: a question for the City")
+        : outright && isOutrightLimit({ check: checkOf[id] }) && k !== "conditional" ? (approvedRz ? "over the outright limit: the approved rezoning sets it" : "over the outright limit: rezoning required") : (STATUS_WORD[k] || k).toLowerCase();
       return `<li>${refTag(id)} ${h(titleOf[id] || id)} <span class="muted">(${h(why)})</span></li>`;
     }));
+    // a verdict nothing was tested for says why, never that nothing stands in the way (25 Nov 2026); an approved
+    // rezoning says who approved it and when
+    if (!items.length && o.verdict === "approved") return `<span class="muted">${h(cap(o.why || "approved"))}.</span>`;
+    if (!items.length && o.verdict === "not assessed") return `<span class="muted">Not assessed: ${h(o.why || "the rules hold nothing to test here")}.</span>`;
     return items.length ? `<ul class="refs">${items.join("")}</ul>` : `<span class="muted">No rule stands in the way.</span>`;
   };
   const unsure = [...(ans.unsure || []), ...layoutOpenItems(run).map(u => ({ ...u, rule_id: u.rule_id || "layout", finding: "" }))];   // the drawings' open items join the rules'
   // the outright answer in the words the screen uses
   const outLines = res.filter(r => isOutrightLimit(r) && r.status !== "not_applicable");
   const routes = ans.allowed.routes || null;
-  const outWords = (routes && routes.discretion.verdict === "possible" ? "Not outright: within what the Director of Planning may allow, below"
+  const outWords = (approvedRz ? "Not outright: the rezoning Council approved sets the limits, below"
+    : routes && routes.discretion.verdict === "possible" ? "Not outright: within what the Director of Planning may allow, below"
     : outrightWords(ans.allowed.outright, outLines)).replace(/\.$/, "");
   const rmark = w => `<span class="st st-${h(routeStatus(w) || "na")}">${h(cap(w || "—"))}</span>`;
   // on paper the outright row says the district's limits as written, so the Director's discretion is never read as outright
@@ -285,7 +294,7 @@ export function paperDocument(run, { short = false } = {}) {
     const short = (Lay.shortfall || []).length ? ` Did not fit: ${Lay.shortfall.map(s => `${s.units ? `${s.units} ` : ""}${s.label.toLowerCase()} (${fmtNum(Math.round(s.area_m2))} m²)`).join("; ")}.` : "";
     figures += `
       <figure class="fig"><div class="draw sheet">${S.plans || ""}</div>
-        <figcaption><b>Figure 3 · Plans by program.</b> ${h(Lay.units_placed)} of ${h(Lay.units_total)} units on ${h(Lay.floors.length)} floors of ${h(Lay.plate.width_m)} × ${h(Lay.plate.depth_m)} m. Adjacency rules read back from the plates: ${h(rules)}.${h(short)}</figcaption></figure>
+        <figcaption>${(run.issues || []).some(i => i.to === "manager") ? "" : `<b class="unv">FIRST LAYOUT FROM THE RULES · NOT YET CHECKED BY THE ARCHITECT</b> `}<b>Figure 3 · Plans by program.</b> ${h(Lay.units_placed)} of ${h(Lay.units_total)} units on ${h(Lay.floors.length)} floors of ${h(Lay.plate.width_m)} × ${h(Lay.plate.depth_m)} m. Adjacency rules read back from the plates: ${h(rules)}.${h(short)}</figcaption></figure>
       <figure class="fig"><div class="draw sheet">${S.stacking || ""}</div><figcaption><b>Figure 4 · Stacking.</b> One bar per floor, top first; each segment the share of the plate a block takes.</figcaption></figure>
       <figure class="fig"><div class="draw sheet">${S.elevations || ""}</div><figcaption><b>Figure 5 · Preliminary elevations.</b> Storeys × floor to floor, one window per unit as the rhythm, the outright height dashed. A placeholder for the elevation study, not a design.</figcaption></figure>
       <figure class="fig"><div class="draw sheet">${S["site-plan"] || ""}</div><figcaption><b>Figure 6 · Code site plan.</b> The yards dimensioned, the setback envelope, the footprint, the tree barriers where surveyed, and the table a plan checker reads.</figcaption></figure>`;

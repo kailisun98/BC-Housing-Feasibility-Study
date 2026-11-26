@@ -10,20 +10,20 @@
 
 | | |
 |---|---|
-| Who is housed | 105 homes, independent rental (social housing) |
+| Who is housed | 105 homes, independent rental (social housing); 70 of the 105 fit the first plans |
 | Who operates | Not named |
 | Which program | BC Builds, the Community Housing Fund. Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $54.1M. Asked: nothing from a program. Still to find: $30.5M (56% of the cost). |
 | The decision wanted | not stated |
-| The answers | Outright: no · By the Director's discretion: none in the schedule · By rezoning: yes, with conditions · The funders' criteria: Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed · The money: Needs more sources |
-| The top 3 of 7 open items | 1. Yards not checked: no RM-1 yard rule in the rules (uncertain). 2. Heritage register and designation (uncertain). 3. BC Builds: eligibility and below-market requirement (uncertain). |
+| The answers | Outright: no · By the Director's discretion: none in the schedule · By rezoning: approved · The funders' criteria: Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed · The money: Needs more sources |
+| The top 3 of 6 open items | 1. Yards not checked: no RM-1 yard rule in the rules (uncertain). 2. Heritage register and designation (uncertain). 3. BC Builds: eligibility and below-market requirement (uncertain). |
 
 ## 1. Is it allowed?
-**Outright: no** · **By the Director's discretion: none in the schedule** (the schedule gives the Director no increase for this) · **By rezoning: yes, with conditions**
+**Outright: no** · **By the Director's discretion: none in the schedule** (the schedule gives the Director no increase for this) · **By rezoning: approved** (Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024; it sets the limits now)
 
-**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. (cov.rm1.outright_fsr) Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated. (cov.rm1.outright_height)
+**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the density now. (cov.rm1.outright_fsr) Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the height now. (cov.rm1.outright_height)
 
-**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): yes, with conditions.**
+**By rezoning: approved.** Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024; it sets the limits now.
 - *Conditional* — Interim Rezoning Policy for Social Housing in Former Community Vision Areas: Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.
 - *Conditional* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit.
 
@@ -45,14 +45,13 @@ Other programs written for this kind of housing, listed from their own pages and
 |---|---|---|
 | Yards not checked: no RM-1 yard rule in the rules | Uncertain | Architect: read the yard clauses in the RM-1 schedule and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
 | Heritage register and designation | Uncertain | Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. Ask: the City of Vancouver's heritage planners (the Heritage Register and designations). |
-| Interim Rezoning Policy for Social Housing in Former Community Vision Areas | Conditional | Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case. Ask: the City of Vancouver's rezoning centre, a rezoning planner (a pre-application enquiry). |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Conditional | Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu. Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Builds: eligibility and below-market requirement | Uncertain | Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices. Ask: BC Builds, through the address on each Property Opportunity Notice. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (rent-tier split; accessible unit count; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 | Homes that do not fit the plates | Conditional | Architect: 70 of 105 homes fit the plates on 6 floors at the unit sizes assumed; did not fit: 6 one-bedroom, 29 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 105. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $30,499,464, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No Community Housing Fund grant is counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $30,499,464, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No Community Housing Fund grant is counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
@@ -76,12 +75,12 @@ Other programs written for this kind of housing, listed from their own pages and
 | | A year | |
 |---|---:|---|
 | Market rent, 105 homes | $2,598,180 | $2,062 a month a home (the rules' figure) |
-| Vacancy | -$96,133 | the CMHC survey's rate, on all tiers |
+| Vacancy | -$96,133 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$682,500 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$63,000 |  |
 | Support staffing | none |  |
 | **Left after running costs** | **$1,756,547** | before any operating subsidy or loan payment |
-| Loan payment | -$1,596,861 | on the loan the funding counts (the capital figures above) |
+| Loan payment | -$1,596,861 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
 | **Subsidy needed if the capital still missing were borrowed** | **$1,902,745** | $1,510 a home a month: the payment on $54,114,027 at 6.19% over 40 years is $3,659,292 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,336,771** | $1,061 a home a month: 4.55% over 35 years is $3,093,318 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
@@ -90,7 +89,7 @@ Other programs written for this kind of housing, listed from their own pages and
 
 | Line | Figure | From | Note |
 |---|---|---|---|
-| Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 1,250 m² that is not homes, priced as if it were |
+| Hard cost base | $4,693 per m² | `f.hard_cost_base` (placeholder) | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 1,250 m² that is not homes, priced as if it were; a placeholder until a cost consultant's rate for this building is entered |
 | Escalation to the index in force on the run date | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-27) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date |
 | Hard cost | $40,084,465 | `f.hard_cost_base` | 8,299 m² × $4,693 × 1.0292 |
 | Soft costs | $10,021,116 | `f.soft_costs` (placeholder) | 25% of hard cost |
@@ -181,7 +180,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 
 ### What an operator checks first
 
-- *pass* — Elevators: 2 elevators for 105 homes on 6 storeys: one per 70 homes (a placeholder for an elevator analysis).
+- *missing* — Elevators: 2 elevators for 105 homes on 6 storeys: one per 70 places (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one.
 - *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
 - *missing* — Garbage, recycling and services: 0 m² of services for 70 homes; about 21 m² (0.3 m² a home, a placeholder) is what a garbage and recycling room for this many homes takes
 - *missing* — Accessible homes: 0 accessible homes drawn, 4 wanted (BC Housing's 5% of 70)
@@ -216,8 +215,8 @@ Previous stamp `7846c8b6a3414798` (rules as of 2026-10-23) → current `75059798
 |---|---|---|---|---|
 | Interim Rezoning Policy for Social Housing in Former Community Vision Areas (`cov.irp.social_housing_rezoning`, v 2023-11-01) | Conditional | Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff. | benchmark fsr = 3; height m = 22.3; fsr = 2.953 | [Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026), s.3.1.1; staff benchmark from the 998 E 19th Ave referral report](https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf) |
 | Off-street parking minimums (`cov.parking_minimums`, v 2024-06-26) | Info | No minimum off-street parking applies citywide since June 2024; the option provides 68 vehicle and 260 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage. | parking spaces = 68; bicycle spaces = 260 | [City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide), Parking By-law amendments, June 2024](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
-| RM-1 outright floor space ratio (`cov.rm1.outright_fsr`, v 2023-01-01) | Fail | FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. | fsr = 2.953; max fsr outright = 1.2; gfa m2 = 8,299; site area m2 = 2,810.7 | [City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule, Existing zoning; RM-1 District Schedule s.4.7](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
-| RM-1 outright maximum height (`cov.rm1.outright_height`, v 2023-01-01) | Fail | Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated. | height m = 22.3; max height m outright = 10.7; storeys = 6 | [City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule, Existing zoning; RM-1 District Schedule s.4.3](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| RM-1 outright floor space ratio (`cov.rm1.outright_fsr`, v 2023-01-01) | Fail | FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the density now. | fsr = 2.953; max fsr outright = 1.2; gfa m2 = 8,299; site area m2 = 2,810.7 | [City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright FSR 1.20); RM-1 District Schedule, Existing zoning; RM-1 District Schedule s.4.7](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| RM-1 outright maximum height (`cov.rm1.outright_height`, v 2023-01-01) | Fail | Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the height now. | height m = 22.3; max height m outright = 10.7; storeys = 6 | [City of Vancouver referral report, 998 E 19th Ave (states RM-1 outright height 10.7 m / 35 ft); RM-1 District Schedule, Existing zoning; RM-1 District Schedule s.4.3](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
 
 ### Layer B: Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)
 

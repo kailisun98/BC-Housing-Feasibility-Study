@@ -7,7 +7,7 @@
   "origin": "front-left lot corner; x along frontage, y into the lot, z up",
   "edited": false,
   "plate": {
-    "x": 18.05,
+    "x": 18.28,
     "y": 3.0,
     "width_m": 38.5,
     "depth_m": 18.8,
@@ -263,14 +263,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "three_bed_plus",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "door": [
-            26.26,
+            26.49,
             13.3
           ],
           "exit": [
-            20.25,
+            20.48,
             12.4
           ]
         },
@@ -290,14 +290,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "two_bed",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "door": [
-            24.93,
+            25.16,
             13.3
           ],
           "exit": [
-            20.25,
+            20.48,
             12.4
           ]
         },
@@ -317,14 +317,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "two_bed",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "door": [
-            24.93,
+            25.16,
             13.3
           ],
           "exit": [
-            20.25,
+            20.48,
             12.4
           ]
         },
@@ -344,14 +344,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "two_bed",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "door": [
-            24.93,
+            25.16,
             13.3
           ],
           "exit": [
-            20.25,
+            20.48,
             12.4
           ]
         },
@@ -371,14 +371,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "two_bed",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "door": [
-            24.93,
+            25.16,
             13.3
           ],
           "exit": [
-            20.25,
+            20.48,
             12.4
           ]
         },
@@ -398,14 +398,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "two_bed",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "door": [
-            24.93,
+            25.16,
             13.3
           ],
           "exit": [
-            20.25,
+            20.48,
             12.4
           ]
         },
@@ -421,18 +421,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 6.39,
+        "farthest_travel_m": 6.38,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "one_bed",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "door": [
-            48.86,
+            49.09,
             11.5
           ],
           "exit": [
-            54.35,
+            54.58,
             12.4
           ]
         },
@@ -448,18 +448,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 6.39,
+        "farthest_travel_m": 6.38,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "one_bed",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "door": [
-            48.86,
+            49.09,
             11.5
           ],
           "exit": [
-            54.35,
+            54.58,
             12.4
           ]
         },
@@ -475,18 +475,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 6.39,
+        "farthest_travel_m": 6.38,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "one_bed",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "door": [
-            48.86,
+            49.09,
             11.5
           ],
           "exit": [
-            54.35,
+            54.58,
             12.4
           ]
         },
@@ -502,18 +502,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 6.39,
+        "farthest_travel_m": 6.38,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "one_bed",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "door": [
-            48.86,
+            49.09,
             11.5
           ],
           "exit": [
-            54.35,
+            54.58,
             12.4
           ]
         },
@@ -529,18 +529,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 6.39,
+        "farthest_travel_m": 6.38,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "one_bed",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "door": [
-            48.86,
+            49.09,
             11.5
           ],
           "exit": [
-            54.35,
+            54.58,
             12.4
           ]
         },
@@ -560,14 +560,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "studio",
-          "x": 45.41,
+          "x": 25.09,
           "y": 13.3,
           "door": [
-            47.71,
+            27.39,
             13.3
           ],
           "exit": [
-            54.35,
+            34.03,
             12.4
           ]
         },
@@ -587,14 +587,14 @@
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "studio",
-          "x": 45.41,
+          "x": 25.09,
           "y": 13.3,
           "door": [
-            47.71,
+            27.39,
             13.3
           ],
           "exit": [
-            54.35,
+            34.03,
             12.4
           ]
         },
@@ -610,18 +610,18 @@
         "exits_required": 2,
         "separation_m": 36.3,
         "separation_min_m": 9.0,
-        "farthest_travel_m": 7.23,
+        "farthest_travel_m": 7.22,
         "travel_limit_m": 45.0,
         "farthest_unit": {
           "block": "studio",
-          "x": 45.72,
+          "x": 45.95,
           "y": 3.0,
           "door": [
-            48.02,
+            48.26,
             11.5
           ],
           "exit": [
-            54.35,
+            54.58,
             12.4
           ]
         },
@@ -644,7 +644,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -653,7 +653,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -662,7 +662,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -671,7 +671,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -681,7 +681,7 @@
         {
           "block": "design_space",
           "label": "Lobby (entry)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 2.94,
           "d": 8.5,
@@ -692,7 +692,7 @@
         {
           "block": "other",
           "label": "Supportive: 24/7 front desk",
-          "x": 20.99,
+          "x": 21.22,
           "y": 3.0,
           "w": 1.41,
           "d": 8.5,
@@ -702,7 +702,7 @@
         {
           "block": "amenity",
           "label": "Amenity",
-          "x": 22.4,
+          "x": 22.63,
           "y": 3.0,
           "w": 19.41,
           "d": 8.5,
@@ -712,7 +712,7 @@
         {
           "block": "services",
           "label": "Services, bicycles",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 13.55,
           "d": 8.5,
@@ -722,7 +722,7 @@
         {
           "block": "services",
           "label": "Services, bicycles",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 13.55,
           "d": 8.5,
@@ -732,7 +732,7 @@
         {
           "block": "services",
           "label": "Services, bicycles",
-          "x": 41.81,
+          "x": 42.04,
           "y": 3.0,
           "w": 4.31,
           "d": 4.1,
@@ -742,7 +742,7 @@
         {
           "block": "other",
           "label": "Supportive: Staff office",
-          "x": 41.81,
+          "x": 42.04,
           "y": 7.1,
           "w": 4.31,
           "d": 3.47,
@@ -752,7 +752,7 @@
         {
           "block": "other",
           "label": "Supportive: Staff washroom",
-          "x": 41.81,
+          "x": 42.04,
           "y": 10.57,
           "w": 4.31,
           "d": 0.93,
@@ -762,7 +762,7 @@
         {
           "block": "other",
           "label": "Supportive: Program room",
-          "x": 46.13,
+          "x": 46.36,
           "y": 3.0,
           "w": 4.71,
           "d": 8.5,
@@ -772,7 +772,7 @@
         {
           "block": "other",
           "label": "Supportive: Laundry",
-          "x": 50.83,
+          "x": 51.06,
           "y": 3.0,
           "w": 5.18,
           "d": 8.5,
@@ -782,7 +782,7 @@
         {
           "block": "other",
           "label": "Supportive: Harm reduction room",
-          "x": 56.01,
+          "x": 56.24,
           "y": 3.0,
           "w": 0.54,
           "d": 8.5,
@@ -800,7 +800,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -809,7 +809,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -818,7 +818,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -827,7 +827,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -837,7 +837,7 @@
         {
           "block": "other",
           "label": "Supportive: Harm reduction room",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 0.64,
           "d": 8.5,
@@ -847,7 +847,7 @@
         {
           "block": "three_bed_plus",
           "label": "Three-bedroom+",
-          "x": 18.69,
+          "x": 18.92,
           "y": 3.0,
           "w": 12.02,
           "d": 8.5,
@@ -859,7 +859,7 @@
         {
           "block": "three_bed_plus",
           "label": "Three-bedroom+",
-          "x": 30.71,
+          "x": 30.94,
           "y": 3.0,
           "w": 12.02,
           "d": 8.5,
@@ -871,7 +871,7 @@
         {
           "block": "three_bed_plus",
           "label": "Three-bedroom+",
-          "x": 42.73,
+          "x": 42.96,
           "y": 3.0,
           "w": 12.02,
           "d": 8.5,
@@ -883,7 +883,7 @@
         {
           "block": "three_bed_plus",
           "label": "Three-bedroom+",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 12.02,
           "d": 8.5,
@@ -895,7 +895,7 @@
         {
           "block": "three_bed_plus",
           "label": "Three-bedroom+",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 12.02,
           "d": 8.5,
@@ -907,17 +907,17 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 54.76,
+          "x": 54.99,
           "y": 3.0,
           "w": 1.79,
           "d": 8.5,
-          "area_m2": 15.2,
+          "area_m2": 15.3,
           "side": "front"
         },
         {
           "block": "spare",
           "label": "Spare",
-          "x": 32.27,
+          "x": 32.5,
           "y": 13.3,
           "w": 1.53,
           "d": 8.5,
@@ -927,7 +927,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.82,
+          "x": 53.05,
           "y": 13.3,
           "w": 1.53,
           "d": 8.5,
@@ -945,7 +945,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -954,7 +954,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -963,7 +963,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -972,7 +972,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -982,7 +982,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -994,7 +994,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 27.41,
+          "x": 27.64,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1006,7 +1006,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 36.78,
+          "x": 37.01,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1018,7 +1018,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 46.14,
+          "x": 46.37,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1030,7 +1030,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1042,7 +1042,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1054,7 +1054,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 55.51,
+          "x": 55.74,
           "y": 3.0,
           "w": 1.04,
           "d": 8.5,
@@ -1064,7 +1064,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.61,
+          "x": 29.84,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1074,7 +1074,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.16,
+          "x": 50.39,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1092,7 +1092,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1101,7 +1101,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -1110,7 +1110,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1119,7 +1119,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -1129,7 +1129,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1141,7 +1141,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 27.41,
+          "x": 27.64,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1153,7 +1153,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 36.78,
+          "x": 37.01,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1165,7 +1165,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 46.14,
+          "x": 46.37,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1177,7 +1177,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1189,7 +1189,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1201,7 +1201,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 55.51,
+          "x": 55.74,
           "y": 3.0,
           "w": 1.04,
           "d": 8.5,
@@ -1211,7 +1211,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.61,
+          "x": 29.84,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1221,7 +1221,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.16,
+          "x": 50.39,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1239,7 +1239,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1248,7 +1248,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -1257,7 +1257,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1266,7 +1266,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -1276,7 +1276,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1288,7 +1288,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 27.41,
+          "x": 27.64,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1300,7 +1300,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 36.78,
+          "x": 37.01,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1312,7 +1312,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 46.14,
+          "x": 46.37,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1324,7 +1324,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1336,7 +1336,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1348,7 +1348,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 55.51,
+          "x": 55.74,
           "y": 3.0,
           "w": 1.04,
           "d": 8.5,
@@ -1358,7 +1358,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.61,
+          "x": 29.84,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1368,7 +1368,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.16,
+          "x": 50.39,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1386,7 +1386,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1395,7 +1395,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -1404,7 +1404,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1413,7 +1413,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -1423,7 +1423,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1435,7 +1435,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 27.41,
+          "x": 27.64,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1447,7 +1447,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 36.78,
+          "x": 37.01,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1459,7 +1459,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 46.14,
+          "x": 46.37,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1471,7 +1471,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1483,7 +1483,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1495,7 +1495,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 55.51,
+          "x": 55.74,
           "y": 3.0,
           "w": 1.04,
           "d": 8.5,
@@ -1505,7 +1505,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.61,
+          "x": 29.84,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1515,7 +1515,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.16,
+          "x": 50.39,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1533,7 +1533,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1542,7 +1542,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -1551,7 +1551,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1560,7 +1560,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -1570,7 +1570,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1582,7 +1582,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 27.41,
+          "x": 27.64,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1594,7 +1594,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 36.78,
+          "x": 37.01,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1606,7 +1606,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 46.14,
+          "x": 46.37,
           "y": 3.0,
           "w": 9.36,
           "d": 8.5,
@@ -1618,7 +1618,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1630,7 +1630,7 @@
         {
           "block": "two_bed",
           "label": "Two-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 9.36,
           "d": 8.5,
@@ -1642,7 +1642,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 55.51,
+          "x": 55.74,
           "y": 3.0,
           "w": 1.04,
           "d": 8.5,
@@ -1652,7 +1652,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.61,
+          "x": 29.84,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1662,7 +1662,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.16,
+          "x": 50.39,
           "y": 13.3,
           "w": 4.19,
           "d": 8.5,
@@ -1680,7 +1680,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1689,7 +1689,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -1698,7 +1698,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1707,7 +1707,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -1717,7 +1717,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1729,7 +1729,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 24.9,
+          "x": 25.13,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1741,7 +1741,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 31.74,
+          "x": 31.97,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1753,7 +1753,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 38.59,
+          "x": 38.82,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1765,7 +1765,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1777,7 +1777,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -1789,7 +1789,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -1801,7 +1801,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.1,
+          "x": 27.33,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -1813,7 +1813,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 47.65,
+          "x": 47.88,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -1825,7 +1825,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.29,
+          "x": 52.52,
           "y": 3.0,
           "w": 4.26,
           "d": 8.5,
@@ -1835,7 +1835,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 31.71,
+          "x": 31.94,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -1845,7 +1845,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.26,
+          "x": 52.49,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -1863,7 +1863,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1872,7 +1872,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -1881,7 +1881,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -1890,7 +1890,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -1900,7 +1900,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1912,7 +1912,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 24.9,
+          "x": 25.13,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1924,7 +1924,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 31.74,
+          "x": 31.97,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1936,7 +1936,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 38.59,
+          "x": 38.82,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1948,7 +1948,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -1960,7 +1960,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -1972,7 +1972,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -1984,7 +1984,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.1,
+          "x": 27.33,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -1996,7 +1996,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 47.65,
+          "x": 47.88,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2008,7 +2008,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.29,
+          "x": 52.52,
           "y": 3.0,
           "w": 4.26,
           "d": 8.5,
@@ -2018,7 +2018,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 31.71,
+          "x": 31.94,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2028,7 +2028,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.26,
+          "x": 52.49,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2046,7 +2046,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2055,7 +2055,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -2064,7 +2064,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2073,7 +2073,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -2083,7 +2083,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2095,7 +2095,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 24.9,
+          "x": 25.13,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2107,7 +2107,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 31.74,
+          "x": 31.97,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2119,7 +2119,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 38.59,
+          "x": 38.82,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2131,7 +2131,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2143,7 +2143,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -2155,7 +2155,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -2167,7 +2167,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.1,
+          "x": 27.33,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2179,7 +2179,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 47.65,
+          "x": 47.88,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2191,7 +2191,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.29,
+          "x": 52.52,
           "y": 3.0,
           "w": 4.26,
           "d": 8.5,
@@ -2201,7 +2201,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 31.71,
+          "x": 31.94,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2211,7 +2211,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.26,
+          "x": 52.49,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2229,7 +2229,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2238,7 +2238,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -2247,7 +2247,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2256,7 +2256,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -2266,7 +2266,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2278,7 +2278,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 24.9,
+          "x": 25.13,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2290,7 +2290,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 31.74,
+          "x": 31.97,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2302,7 +2302,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 38.59,
+          "x": 38.82,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2314,7 +2314,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2326,7 +2326,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -2338,7 +2338,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -2350,7 +2350,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.1,
+          "x": 27.33,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2362,7 +2362,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 47.65,
+          "x": 47.88,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2374,7 +2374,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.29,
+          "x": 52.52,
           "y": 3.0,
           "w": 4.26,
           "d": 8.5,
@@ -2384,7 +2384,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 31.71,
+          "x": 31.94,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2394,7 +2394,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.26,
+          "x": 52.49,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2412,7 +2412,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2421,7 +2421,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -2430,7 +2430,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2439,7 +2439,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -2449,7 +2449,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2461,7 +2461,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 24.9,
+          "x": 25.13,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2473,7 +2473,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 31.74,
+          "x": 31.97,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2485,7 +2485,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 38.59,
+          "x": 38.82,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2497,7 +2497,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2509,7 +2509,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -2521,7 +2521,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 6.85,
           "d": 8.5,
@@ -2533,7 +2533,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.1,
+          "x": 27.33,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2545,7 +2545,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 47.65,
+          "x": 47.88,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2557,7 +2557,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.29,
+          "x": 52.52,
           "y": 3.0,
           "w": 4.26,
           "d": 8.5,
@@ -2567,7 +2567,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 31.71,
+          "x": 31.94,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2577,7 +2577,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 52.26,
+          "x": 52.49,
           "y": 13.3,
           "w": 2.09,
           "d": 8.5,
@@ -2595,7 +2595,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2604,7 +2604,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -2613,7 +2613,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2622,7 +2622,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -2632,7 +2632,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2644,7 +2644,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 24.9,
+          "x": 25.13,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2656,7 +2656,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 31.74,
+          "x": 31.97,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2668,7 +2668,7 @@
         {
           "block": "one_bed",
           "label": "One-bedroom",
-          "x": 38.59,
+          "x": 38.82,
           "y": 3.0,
           "w": 6.85,
           "d": 8.5,
@@ -2680,7 +2680,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 45.44,
+          "x": 45.67,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2692,7 +2692,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 50.05,
+          "x": 50.28,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2704,7 +2704,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2716,7 +2716,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 24.86,
+          "x": 25.09,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2728,7 +2728,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2740,7 +2740,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 45.41,
+          "x": 45.64,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2752,7 +2752,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 54.66,
+          "x": 54.89,
           "y": 3.0,
           "w": 1.89,
           "d": 8.5,
@@ -2762,7 +2762,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.47,
+          "x": 29.7,
           "y": 13.3,
           "w": 4.33,
           "d": 8.5,
@@ -2772,7 +2772,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.02,
+          "x": 50.25,
           "y": 13.3,
           "w": 4.33,
           "d": 8.5,
@@ -2790,7 +2790,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2799,7 +2799,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -2808,7 +2808,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -2817,7 +2817,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -2827,7 +2827,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2839,7 +2839,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 22.66,
+          "x": 22.89,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2851,7 +2851,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.27,
+          "x": 27.5,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2863,7 +2863,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 31.89,
+          "x": 32.12,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2875,7 +2875,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 36.5,
+          "x": 36.73,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2887,7 +2887,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 41.11,
+          "x": 41.34,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2899,7 +2899,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 45.72,
+          "x": 45.95,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2911,7 +2911,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 50.33,
+          "x": 50.56,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -2923,7 +2923,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2935,7 +2935,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 24.86,
+          "x": 25.09,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2947,7 +2947,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2959,7 +2959,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 45.41,
+          "x": 45.64,
           "y": 13.3,
           "w": 4.61,
           "d": 8.5,
@@ -2971,7 +2971,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 54.94,
+          "x": 55.17,
           "y": 3.0,
           "w": 1.61,
           "d": 8.5,
@@ -2981,7 +2981,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 29.47,
+          "x": 29.7,
           "y": 13.3,
           "w": 4.33,
           "d": 8.5,
@@ -2991,7 +2991,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 50.02,
+          "x": 50.25,
           "y": 13.3,
           "w": 4.33,
           "d": 8.5,
@@ -3009,7 +3009,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -3018,7 +3018,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 33.8,
+          "x": 34.03,
           "y": 11.5,
           "w": 7.0,
           "d": 10.3,
@@ -3027,7 +3027,7 @@
         {
           "block": "core",
           "label": "Core (stairs, elevator)",
-          "x": 54.35,
+          "x": 54.58,
           "y": 11.5,
           "w": 2.2,
           "d": 10.3,
@@ -3036,7 +3036,7 @@
         {
           "block": "corridor",
           "label": "Corridor",
-          "x": 18.05,
+          "x": 18.28,
           "y": 11.5,
           "w": 38.5,
           "d": 1.8,
@@ -3046,7 +3046,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 18.05,
+          "x": 18.28,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3058,7 +3058,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 22.66,
+          "x": 22.89,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3070,7 +3070,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 27.27,
+          "x": 27.5,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3082,7 +3082,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 31.89,
+          "x": 32.12,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3094,7 +3094,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 36.5,
+          "x": 36.73,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3106,7 +3106,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 41.11,
+          "x": 41.34,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3118,7 +3118,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 45.72,
+          "x": 45.95,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3130,7 +3130,7 @@
         {
           "block": "studio",
           "label": "Studio",
-          "x": 50.33,
+          "x": 50.56,
           "y": 3.0,
           "w": 4.61,
           "d": 8.5,
@@ -3142,7 +3142,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 54.94,
+          "x": 55.17,
           "y": 3.0,
           "w": 1.61,
           "d": 8.5,
@@ -3152,7 +3152,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 20.25,
+          "x": 20.48,
           "y": 13.3,
           "w": 13.55,
           "d": 8.5,
@@ -3162,7 +3162,7 @@
         {
           "block": "spare",
           "label": "Spare",
-          "x": 40.8,
+          "x": 41.03,
           "y": 13.3,
           "w": 13.55,
           "d": 8.5,
@@ -3343,10 +3343,10 @@
           "amenity": 0.0,
           "services": 0.0,
           "non_residential": 0.0,
-          "spare": 41.2
+          "spare": 41.3
         },
         "partitions_m2": 37.9,
-        "gross_m2": 744.4,
+        "gross_m2": 744.5,
         "efficiency": 0.636
       },
       {
@@ -3638,10 +3638,10 @@
         "amenity": 165.0,
         "services": 248.1,
         "non_residential": 0.0,
-        "spare": 1221.5
+        "spare": 1221.6
       },
       "partitions_m2": 487.6,
-      "gross_m2": 11166.6,
+      "gross_m2": 11166.7,
       "homes": {
         "three_bed_plus": 5,
         "two_bed": 30,
@@ -3695,8 +3695,8 @@
       {
         "key": "lifts",
         "label": "Elevators",
-        "status": "pass",
-        "note": "2 elevators for 110 homes on 15 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis)."
+        "status": "missing",
+        "note": "2 elevators for 110 homes on 15 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one."
       },
       {
         "key": "desk",
@@ -3742,7 +3742,7 @@
       }
     ],
     "lifts": 2,
-    "status": "pass",
-    "summary": "Operability: the items an operator checks first are on the plans; 2 elevators for 110 homes on 15 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis)."
+    "status": "missing",
+    "summary": "Operability: elevators missing; 2 elevators for 110 homes on 15 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis)."
   }
 }

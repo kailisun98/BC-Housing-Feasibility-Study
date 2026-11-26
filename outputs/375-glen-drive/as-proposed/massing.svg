@@ -3,29 +3,29 @@
 <text x="48" y="44" font-size="14" font-weight="600">Plan · 375-glen-drive · the lot polygon, 60.2 × 37.0 m across, 2,134 m² recorded</text>
 <polygon points="128.7,260.6 355.2,260.6 352.5,72.0 48.0,72.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5" stroke-dasharray="" fill-opacity="1.0"/>
 <polygon points="138.7,245.3 339.7,245.3 337.4,87.3 71.2,87.3" fill="none" stroke="#c81e1e" stroke-width="1.5" stroke-dasharray="6 4" fill-opacity="1.0"/>
-<polygon points="140.0,245.3 336.3,245.3 336.3,123.4 140.0,123.4" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
-<polygon points="140.0,245.3 336.3,245.3 336.3,115.3 140.0,115.3" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
-<text x="48" y="276.5764705882353" fill="#5f6672">street side at the bottom · dashed = setback envelope, plate box 38.5 × 30.5 m</text>
+<polygon points="138.7,245.3 337.5,245.3 337.5,124.9 138.7,124.9" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.9"/>
+<polygon points="138.7,245.3 337.5,245.3 337.5,116.9 138.7,116.9" fill="#3c8cdc" stroke="#2a6fb8" stroke-width="1.5" stroke-dasharray="" fill-opacity="0.5"/>
+<text x="48" y="276.5764705882353" fill="#5f6672">street side at the bottom · dashed = setback envelope, plate box 38.98 × 30.53 m</text>
 <text x="415.156862745098" y="44" font-size="14" font-weight="600">Section across the frontage · heights in m</text>
 <line x1="415.156862745098" y1="332.0" x2="722.313725490196" y2="332.0" stroke="#1f2933" stroke-width="1.5"/>
-<rect x="507.2" y="83.2" width="196.3" height="248.8" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5"/>
-<text x="513.2" y="326.0" fill="#1f2933">Outright: FSR 6.9, 51.0 m · 16 storeys (grey)</text>
-<rect x="507.2" y="72.0" width="196.3" height="260.0" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
-<line x1="507.2" y1="316.5" x2="703.5" y2="316.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="300.9" x2="703.5" y2="300.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="285.4" x2="703.5" y2="285.4" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="269.8" x2="703.5" y2="269.8" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="254.3" x2="703.5" y2="254.3" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="238.7" x2="703.5" y2="238.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="223.2" x2="703.5" y2="223.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="207.6" x2="703.5" y2="207.6" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="192.1" x2="703.5" y2="192.1" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="176.5" x2="703.5" y2="176.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="161.0" x2="703.5" y2="161.0" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="145.4" x2="703.5" y2="145.4" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="129.9" x2="703.5" y2="129.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<line x1="507.2" y1="114.3" x2="703.5" y2="114.3" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
-<text x="513.2" y="66.0" fill="#2a6fb8" font-weight="600">Proposed: 15 storeys, FSR 6.90 · 51.0 m</text>
+<rect x="505.9" y="83.2" width="198.7" height="248.8" fill="#bdbdbd" stroke="#8e8e8e" stroke-width="1.5"/>
+<text x="511.9" y="326.0" fill="#1f2933">Outright: FSR 6.9, 51.0 m · 16 storeys (grey)</text>
+<rect x="505.9" y="72.0" width="198.7" height="260.0" fill="#3c8cdc" fill-opacity="0.45" stroke="#2a6fb8" stroke-width="1.5"/>
+<line x1="505.9" y1="316.5" x2="704.6" y2="316.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="300.9" x2="704.6" y2="300.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="285.4" x2="704.6" y2="285.4" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="269.8" x2="704.6" y2="269.8" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="254.3" x2="704.6" y2="254.3" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="238.7" x2="704.6" y2="238.7" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="223.2" x2="704.6" y2="223.2" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="207.6" x2="704.6" y2="207.6" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="192.1" x2="704.6" y2="192.1" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="176.5" x2="704.6" y2="176.5" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="161.0" x2="704.6" y2="161.0" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="145.4" x2="704.6" y2="145.4" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="129.9" x2="704.6" y2="129.9" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<line x1="505.9" y1="114.3" x2="704.6" y2="114.3" stroke="#2a6fb8" stroke-width="0.6" stroke-opacity="0.6"/>
+<text x="511.9" y="66.0" fill="#2a6fb8" font-weight="600">Proposed: 15 storeys, FSR 6.90 · 51.0 m</text>
 <text x="48" y="372.0" fill="#1f2933">Proposed: 15 storeys, FSR 6.90: plate 982 m² × 15 = 14,729 m² (FSR 6.90), 51.0 m high</text>
 <text x="48" y="388.0" fill="#1f2933">Outright: FSR 6.9, 51.0 m: plate 920 m² × 16 = 14,727 m² (FSR 6.90), 48.8 m high</text>
 <text x="48" y="404.0" fill="#1f2933">Trees: Schedule C requires 12, plan leaves 36 (shortfall 0); keep 1.0 m from side lines, 1.5 m from the building, 2.5 m apart</text>

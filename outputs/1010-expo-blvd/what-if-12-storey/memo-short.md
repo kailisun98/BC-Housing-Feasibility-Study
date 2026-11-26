@@ -10,13 +10,13 @@
 
 | | |
 |---|---|
-| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy |
-| Who operates | Not named |
+| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy; 101 of the 120 fit the first plans |
+| Who operates | BC Indigenous Housing Society; the operating figures are not signed by an operator |
 | Which program | BC Builds, the Community Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $62.6M. Asked: Community Housing Fund grant, $21.4M (illustrative). Still to find: $28.2M (45% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Needs more sources |
-| The top 3 of 5 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. Transit-oriented area minimum allowable height and density (uncertain). 3. Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu (uncertain). |
+| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. The agreement between the owner and the operator (uncertain). 3. Transit-oriented area minimum allowable height and density (uncertain). |
 
 *The short memo: the full memo (memo.md) adds the massing, the layout, every rule in force and the version stamp's files.*
 
@@ -45,13 +45,14 @@ Other programs written for this kind of housing, listed from their own pages and
 | Item | Status | Who / what |
 |---|---|---|
 | Yards not checked: no CD-1 (324) yard rule in the rules | Uncertain | Architect: read the yard clauses in CD-1 (324)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
+| The agreement between the owner and the operator | Uncertain | Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it. Ask: the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes. |
 | Transit-oriented area minimum allowable height and density | Uncertain | Manager: check the City's transit-oriented areas map for this address and record the tier at 01. Ask: the City of Vancouver's planning staff, or the Province's transit-oriented areas map. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 | Homes that do not fit the plates | Conditional | Architect: 101 of 120 homes fit the plates on 12 floors at the unit sizes assumed; did not fit: 11 one-bedroom, 8 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 120. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
@@ -76,12 +77,12 @@ Other programs written for this kind of housing, listed from their own pages and
 | Market rent, 36 homes | $899,856 | $2,083 a month a home (the rules' figure) |
 | Rent geared to income, 60 homes | $819,000 | $1,138 a month a home (the rules' figure) |
 | Deep subsidy, 24 homes | $168,595 | $585 a month a home (the rules' figure) |
-| Vacancy | -$69,836 | the CMHC survey's rate, on all tiers |
+| Vacancy | -$69,836 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$780,000 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$72,000 |  |
 | Support staffing | none |  |
 | **Left after running costs** | **$965,615** | before any operating subsidy or loan payment |
-| Loan payment | -$877,832 | on the loan the funding counts (the capital figures above) |
+| Loan payment | -$877,832 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
 | **Subsidy needed if the capital still missing were borrowed** | **$1,822,447** | $1,266 a home a month: the payment on $41,230,182 at 6.19% over 40 years is $2,788,062 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,391,224** | $966 a home a month: 4.55% over 35 years is $2,356,839 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |

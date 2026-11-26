@@ -5912,6 +5912,14 @@
           "contact": "the City of Vancouver's Development and Building Services Centre, a project facilitator"
         },
         {
+          "rule_id": "coverage.operator_agreement",
+          "title": "The agreement between the owner and the operator",
+          "status": "uncertain",
+          "finding": "The proponent is City of Vancouver (Non-Market Housing Development and Operations) with BC Housing; operator BC Indigenous Housing Society and the homes are operated by BC Indigenous Housing Society; how the operator holds the homes (a lease, an air-space parcel, an operating agreement) is not stated.",
+          "action": "Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it. Ask: the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes.",
+          "contact": "the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes"
+        },
+        {
           "rule_id": "bc.toa.minimum_density",
           "title": "Transit-oriented area minimum allowable height and density",
           "status": "uncertain",

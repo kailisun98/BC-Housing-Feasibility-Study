@@ -11,23 +11,19 @@
 | | |
 |---|---|
 | Who is housed | No homes entered, independent rental (social housing) |
-| Who operates | Not named |
+| Who operates | BC Indigenous Housing Society; the operating figures are not signed by an operator |
 | Which program | the Community Housing Fund, the CMHC Affordable Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $151.4M. Asked: nothing from a program. Still to find: $151.4M (100% of the cost). |
 | The decision wanted | not stated |
-| The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Unsure |
-| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. Transit-oriented area minimum allowable height and density (uncertain). 3. Family-unit requirement in rezonings (uncertain). |
+| The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not needed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Unsure |
+| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. The agreement between the owner and the operator (uncertain). 3. Transit-oriented area minimum allowable height and density (uncertain). |
 
 ## 1. Is it allowed?
-**Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not yet confirmed**
+**Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not needed** (the option is allowed outright and proposes no rezoning)
 
 **Outright, under CD-1 (324): yes.** Residential floor area 23,215 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 5.94 on 3,908.0 m²). (cov.cd1_324.floor_area) Height 88.4 m is within the outright maximum of 91.0 m. (cov.cd1_324.outright_height)
 
-**By rezoning (False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program): not yet confirmed.**
-- *Uncertain* — Transit-oriented area minimum allowable height and density: Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.
-- *Uncertain* — Family-unit requirement in rezonings: Unit mix missing.
-- *Uncertain* — Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755): Social housing definition cannot be confirmed: missing share of units for households below the Housing Income Limits, housing agreement term.
-- *Uncertain* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 43 trees on a 3,908 m² site; no tree survey is on file.
+**By rezoning: not needed.** The option is allowed outright and proposes no rezoning.
 
 ## 2. Does it fit the funders?
 **Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The CMHC Affordable Housing Fund: no intake is open now (closed 19 Dec 2025: the application portal is closed and all program funding is committed).
@@ -40,14 +36,14 @@
 | Item | Status | Who / what |
 |---|---|---|
 | Yards not checked: no CD-1 (324) yard rule in the rules | Uncertain | Architect: read the yard clauses in CD-1 (324)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
+| The agreement between the owner and the operator | Uncertain | Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it. Ask: the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes. |
 | Transit-oriented area minimum allowable height and density | Uncertain | Manager: check the City's transit-oriented areas map for this address and record the tier at 01. Ask: the City of Vancouver's planning staff, or the Province's transit-oriented areas map. |
-| Family-unit requirement in rezonings | Uncertain | Enter the unit counts by bedroom type. Ask: the City of Vancouver's rezoning centre, the rezoning planner on the file. |
 | Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755) | Uncertain | Manager: supply share of units for households below the Housing Income Limits, housing agreement term. Ask: the City of Vancouver's housing policy staff, who draft the Housing Agreement. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (rent-tier split; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 
 ## 4. Does the money work? (feasibility grade)
-**Unsure.** The option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost. Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Unsure.** The option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost. Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 - Capital cost **$151,374,523**: hard $112,129,276 (escalated ×1.0292), soft $28,032,319, contingency $11,212,928, land $0.
 - Net operating income **not given a year**: rent not given less vacancy not given, operating cost not given and reserve not given.
@@ -63,7 +59,7 @@
 
 | Line | Figure | From | Note |
 |---|---|---|---|
-| Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 29 storeys, above the six a wood frame reaches |
+| Hard cost base | $4,693 per m² | `f.hard_cost_base` (placeholder) | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 29 storeys, above the six a wood frame reaches; a placeholder until a cost consultant's rate for this building is entered |
 | Escalation to the index in force on the run date | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-23) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date |
 | Hard cost | $112,129,276 | `f.hard_cost_base` | 23,215 m² × $4,693 × 1.0292 |
 | Soft costs | $28,032,319 | `f.soft_costs` (placeholder) | 25% of hard cost |
@@ -87,8 +83,8 @@
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
 ## Massing derived from the rules
-- **Proposed: 29 storeys, FSR 5.94** — plate 800 m² × 29 storeys = 23,215 m² (FSR 5.94), 88.45 m high, inside a 31.5 × 27.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
-- **Outright: FSR 6.04, 91.0 m** — plate 814 m² × 29 storeys = 23,604 m² (FSR 6.04), 88.45 m high, inside a 31.5 × 27.5 m setback envelope. Derived from: cov.cd1_324.floor_area, cov.cd1_324.outright_height, option.setbacks_m, option.floor_to_floor_m.
+- **Proposed: 29 storeys, FSR 5.94** — plate 800 m² × 29 storeys = 23,215 m² (FSR 5.94), 88.45 m high, inside a 31.61 × 27.51 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- **Outright: FSR 6.04, 91.0 m** — plate 814 m² × 29 storeys = 23,604 m² (FSR 6.04), 88.45 m high, inside a 31.61 × 27.51 m setback envelope. Derived from: cov.cd1_324.floor_area, cov.cd1_324.outright_height, option.setbacks_m, option.floor_to_floor_m.
 - Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 
 ![Massing plan and section](massing.svg)
@@ -96,7 +92,7 @@
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
 
 ## Layouts derived from the option
-29 floors of 31.5 × 25.41 m (800 m² each); a point tower, the homes round a corridor ringing the core, 7.41 m deep in front and behind and 10.45 m beside; 0 of 0 units placed.
+29 floors of 31.61 × 25.32 m (800 m² each); a point tower, the homes round a corridor ringing the core, 7.36 m deep in front and behind and 10.5 m beside; 0 of 0 units placed.
 
 | Block | Count | Area | From |
 |---|---|---|---|
@@ -152,42 +148,42 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 29 floors: 29 pass; the core's two
 
 | Floor | Homes | Circulation m² | Cores m² | Services m² | Spare m² | Gross m² | Efficiency |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| Ground floor | 0 | 63 | 49 | 576 | 111 | 799 | 0% |
-| Level 2 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 3 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 4 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 5 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 6 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 7 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 8 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 9 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 10 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 11 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 12 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 13 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 14 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 15 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 16 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 17 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 18 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 19 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 20 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 21 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 22 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 23 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 24 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 25 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 26 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 27 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 28 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| Level 29 | 0 | 63 | 49 | 0 | 688 | 801 | 0% |
-| **Total** | 0 | 1,839 | 1,421 | 576 | 19,380 | 23,216 | 0% |
+| Ground floor | 0 | 63 | 49 | 576 | 111 | 800 | 0% |
+| Level 2 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 3 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 4 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 5 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 6 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 7 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 8 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 9 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 10 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 11 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 12 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 13 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 14 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 15 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 16 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 17 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 18 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 19 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 20 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 21 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 22 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 23 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 24 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 25 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 26 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 27 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 28 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| Level 29 | 0 | 63 | 49 | 0 | 688 | 800 | 0% |
+| **Total** | 0 | 1,839 | 1,421 | 576 | 19,375 | 23,211 | 0% |
 
 Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). The same table is `area-schedule.csv` beside this memo.
 
 ### What an operator checks first
 
-- *info* — Elevators: no elevator: 29 storeys or fewer, a walk-up.
+- *info* — Elevators: no elevator: no homes or beds.
 - *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
 - *pass* — Garbage, recycling and services: 576 m² of services for 0 homes
 - *pass* — Accessible homes: 0 accessible homes drawn, 0 wanted (BC Housing's 5% of 0)
@@ -215,7 +211,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 |---|---|---|---|---|
 | CD-1 (324) maximum residential floor area by sub-area (800-1100 Pacific Blvd) (`cov.cd1_324.floor_area`, v 2024-04-23) | Pass | Residential floor area 23,215 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 5.94 on 3,908.0 m²). | fsr = 5.94; max fsr outright = 6.04; gfa m2 = 23,215; site area m2 = 3,908; max floor area m2 = 23,600 | [City of Vancouver CD-1 (324) By-law No. 7248, 800-1100 Pacific Boulevard (consolidated to By-law No. 14009, 23 Apr 2024), s.6.2 and Table 1a [By-law 14009, 2024]: the residential floor area in sub-area A must not exceed 19,300 m² and in sub-area B 23,600 m²; the sub-areas are drawn on Schedule A (sub-area B is the triangle between Expo Blvd, Pacific Blvd and the Cambie Bridge approach). s.6.1 Table 1: 249,543 m² of residential floor area for the whole CD-1, which a site outside the sub-areas shares and this rule does not test. s.6.4 and 6.5: exclusions (balconies up to 12% of the residential floor area, amenity up to 10%). s.6.6: the Development Permit Board may permit up to 1% more within Table 2's neighbourhood totals. s.5.2: in sub-areas A and B at least 35% of the units must suit families, with two or more bedrooms (not tested by this rule). The effective date is By-law 14009's enactment.](https://cd1-bylaws.vancouver.ca/cd-1(324).pdf) |
 | CD-1 (324) maximum height (800-1100 Pacific Blvd) (`cov.cd1_324.outright_height`, v 2024-04-23) | Pass | Height 88.4 m is within the outright maximum of 91.0 m. | height m = 88.4; max height m outright = 91; storeys = 29 | [City of Vancouver CD-1 (324) By-law No. 7248, 800-1100 Pacific Boulevard (consolidated to By-law No. 14009, 23 Apr 2024), s.7.1 [By-law 8715, 2003]: the maximum building height measured above the base surface, excluding the mechanical penthouse and roof, will be 91 m. The by-law sets no yards; the form of development decides them. The effective date is the consolidation's (By-law 14009).](https://cd1-bylaws.vancouver.ca/cd-1(324).pdf) |
-| Interim Rezoning Policy for Social Housing in Former Community Vision Areas (`cov.irp.social_housing_rezoning`, v 2023-11-01) | Not applicable | The site is outside the former Community Vision areas; social housing there is considered under the Affordable Housing Policies (1989) or an area plan. |  | [Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026), s.3.1.1; staff benchmark from the 998 E 19th Ave referral report](https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf) |
+| Interim Rezoning Policy for Social Housing in Former Community Vision Areas (`cov.irp.social_housing_rezoning`, v 2023-11-01) | Not applicable | No rezoning is proposed (the option's approval route says so), so the rezoning policy is not read. |  | [Interim Rezoning Policy for Social Housing, Seniors Housing, and Institutional, Cultural and Recreational Uses in Former Community Vision Areas (approved 1 Nov 2023, amended 31 Mar 2026), s.3.1.1; staff benchmark from the 998 E 19th Ave referral report](https://guidelines.vancouver.ca/policy-rezoning-former-community-visions-areas.pdf) |
 | Off-street parking minimums (`cov.parking_minimums`, v 2024-06-26) | Info | No minimum off-street parking applies citywide since June 2024; the option provides 63 vehicle and 536 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage. | parking spaces = 63; bicycle spaces = 536 | [City of Vancouver, housing and transit-friendly actions passed June 2024 (minimum parking requirements eliminated citywide), Parking By-law amendments, June 2024](https://vancouver.ca/news-calendar/city-passes-housing-transit-friendly-action-june-2024.aspx) |
 
 ### Layer B: Provincial overrides (Bill 44 SSMUH, Bill 47 transit-oriented areas)
@@ -231,7 +227,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 | Below-market rental housing policy for rezonings (secured market rental) (`cov.below_market_rental`, v 2023-01-01) | Not applicable | The below-market rental policy applies to 100% secured market rental rezonings; social housing is governed by the social housing definition instead. |  | [City of Vancouver, Policy: Below-Market Rental Housing for Rezonings, Policy requirements](https://guidelines.vancouver.ca/policy-below-market-rental-housing-for-rezonings.pdf) |
 | Development cost levy and community amenity contribution treatment of social housing (`cov.dcl_cac_social_housing`, v 2023-01-01) | Info | Social housing is exempt from development cost levies and from community amenity contributions in a rezoning. The exemption's value is worth stating in the memo. | dcl exempt = True; cac exempt = True | [998 E 19th Ave referral report: CAC exempt under the policy's social housing exemption; DCL exempt as church and social housing (estimated value $3,075,715 at 30 Sep 2023 rates), Public benefits](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
 | Downtown Eastside Plan: family-unit target in rezonings (`cov.dtes.family_units`, v 2014-03-15) | Not applicable | The site is not recorded inside the Downtown Eastside Plan area (site.area_plan); the city-wide family-unit rule applies. |  | [City of Vancouver referral report, CD-1 Rezoning: 1015 East Hastings Street (5 Jan 2021), stating the Downtown Eastside Plan's family housing target, Policy context: 'a family housing target of 25% two- and three-bedroom units (except seniors and supportive housing)'; Housing, Unit Mix: 25% of all units for social housing and market rental housing designed for families, met by 35 two-bedroom and 5 three-bedroom units of 163](https://council.vancouver.ca/20210119/documents/rr5.pdf) |
-| Family-unit requirement in rezonings (`cov.family_units`, v 1992-01-01) | Uncertain | Unit mix missing. |  | [High-Density Housing for Families with Children Guidelines (1992) as applied in rezonings; the 998 E 19th Ave referral report states the 35% policy minimum, Unit mix; family units 38 of 105 (36%) against a 35% minimum](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
+| Family-unit requirement in rezonings (`cov.family_units`, v 1992-01-01) | Not applicable | No rezoning is proposed (the option's approval route says so), and this requirement is read in rezonings; a development permit is read against the district's own schedule or plan. |  | [High-Density Housing for Families with Children Guidelines (1992) as applied in rezonings; the 998 E 19th Ave referral report states the 35% policy minimum, Unit mix; family units 38 of 105 (36%) against a 35% minimum](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
 | Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755) (`cov.social_housing_definition`, v 2023-01-01) | Uncertain | Social housing definition cannot be confirmed: missing share of units for households below the Housing Income Limits, housing agreement term. | share below hils = None; owner type at completion = city; housing agreement years = None | [998 E 19th Ave referral report: social housing as defined in the Vancouver Development Cost Levy By-law No. 9755 (at least 30% of units for households below the Housing Income Limits, rents not exceeding 30% of income, owned by a non-profit or government, secured by housing agreement for the longer of 60 years and the life of the building), Tenure and affordability; Housing Agreement and Section 219 covenant](https://council.vancouver.ca/20240625/documents/rr1.pdf) |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu (`cov.trees.replacement`, v 2023-01-01) | Uncertain | Schedule C requires 43 trees on a 3,908 m² site; no tree survey is on file. | site area m2 = 3,908; schedule c required = 43; existing = 0; retained = 0; removed = 0; replacements proposed = 0; trees after = 0; shortfall = 43; cash in lieu cad = 43000; survey scope = every tree on the site, within 2 m of the boundary, and on the adjoining street | [City of Vancouver Protection of Trees By-law No. 9958 (consolidated), Schedule A (s.1.2), Schedule C (ss.5.1, 5.2, 6.2), s.6.2 cash in lieu, s.6.5 siting, s.7.2 arborist report](https://bylaws.vancouver.ca/9958c.PDF) |
 

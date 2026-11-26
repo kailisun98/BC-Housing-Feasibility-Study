@@ -4,9 +4,9 @@
 <text x="48" y="44" font-size="14" font-weight="600">Code site plan · metres, project north up</text>
 <polygon points="154.4,136.0 176.2,159.4 222.4,208.3 229.8,216.0 237.3,223.7 244.9,231.2 252.5,238.7 260.3,246.0 268.1,253.2 276.0,260.4 283.9,267.4 292.0,274.3 300.1,281.2 308.3,287.9 316.5,294.5 324.9,301.0 333.3,307.5 341.8,313.7 350.3,319.9 359.0,326.1 367.6,332.0 376.4,337.9 385.2,343.7 394.1,349.4 403.1,354.9 412.1,360.3 421.2,365.7 430.4,370.9 439.6,376.0 448.9,381.0 458.2,385.9 467.7,390.7 477.2,395.4 486.8,399.9 496.3,404.4 502.5,407.1 508.7,409.7 514.9,412.1 521.3,414.4 527.7,416.5 534.2,418.5 540.7,420.3 547.3,422.0 545.7,406.6 543.8,391.3 541.7,376.2 539.4,361.1 536.8,346.3 533.9,331.6 530.9,317.1 527.5,302.8 482.2,113.0 473.6,114.5 465.1,116.0 456.6,117.4 448.0,118.6 439.6,119.7 431.1,120.8 422.7,121.7 414.3,122.4 405.9,123.2 397.5,123.7 389.2,124.2 380.9,124.6 372.7,124.9 364.4,125.0 356.2,125.1 348.1,125.1 339.9,124.9 331.9,124.6 323.8,124.2 315.7,123.7 307.8,123.1 299.8,122.4 291.9,121.5 284.1,120.6 276.2,119.6 268.4,118.5 260.7,117.2 253.0,115.8 245.3,114.3 237.7,112.7 230.1,111.1 222.7,109.2 170.2,102.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.5"/>
 <polygon points="172.0,133.0 255.3,220.7 293.6,256.2 342.2,295.7 393.3,331.3 437.6,358.0 483.7,382.2 508.4,393.5 520.0,398.2 529.7,401.5 524.8,363.5 516.4,320.2 471.0,129.8 450.1,133.2 407.0,137.9 356.3,139.9 322.9,139.0 282.2,135.3 250.3,130.3 220.1,123.8 178.9,118.1" fill="none" stroke="#c81e1e" stroke-width="1.2" stroke-dasharray="6 4"/>
-<polygon points="473.1,140.3 317.9,140.3 317.9,275.8 473.1,275.8" fill="none" stroke="#c81e1e" stroke-width="0.8" stroke-dasharray="2 2"/>
-<polygon points="473.1,140.3 317.9,140.3 317.9,265.4 473.1,265.4" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
-<text x="323.9" y="154.3" font-size="10" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">31.5 × 25.4 m</text>
+<polygon points="473.5,140.2 317.8,140.2 317.8,275.8 473.5,275.8" fill="none" stroke="#c81e1e" stroke-width="0.8" stroke-dasharray="2 2"/>
+<polygon points="473.5,140.2 317.8,140.2 317.8,264.9 473.5,264.9" fill="#8fb8e3" fill-opacity="0.55" stroke="#245f9c" stroke-width="1.2"/>
+<text x="323.8" y="154.2" font-size="10" fill="#1f2933" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">31.61 × 25.31 m</text>
 <path d="M350.9 125.1L350.9 139.7" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
 <text x="354.9" y="135.9" font-size="9.5" fill="#c81e1e" stroke="#ffffff" stroke-width="2.5" paint-order="stroke">front 3.0 m</text>
 <path d="M350.9 301.7L350.9 320.3" stroke="#c81e1e" stroke-width="0.8" fill="none" marker-start="url(#tick)" marker-end="url(#tick)"/>
@@ -25,7 +25,7 @@
 <g transform="rotate(32.1 198.0 454.0)"><circle cx="198.0" cy="454.0" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="198.0,443.9 202.6,460.1 198.0,456.2 193.3,460.1" fill="#1f2933"/></g>
 <text x="208.6" y="441.1" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
 <text x="48" y="488.0" font-size="11" fill="#5f6672">Lot polygon 2,690 m² (irregular); dashed red: the setback envelope, dotted: the plate box</text>
-<text x="48" y="504.0" font-size="11" fill="#5f6672">31.5 × 27.5 m; blue: the footprint.</text>
+<text x="48" y="504.0" font-size="11" fill="#5f6672">31.61 × 27.51 m; blue: the footprint.</text>
 <text x="48" y="540.0" font-size="12" font-weight="600">What the plan checker reads</text>
 <line x1="48" y1="567.0" x2="653.7" y2="567.0" stroke="#e1e5ea" stroke-width="0.8"/>
 <text x="48.0" y="562.0" font-size="11" fill="#5f6672">Site area</text>

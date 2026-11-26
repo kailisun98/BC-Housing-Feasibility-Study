@@ -522,6 +522,33 @@ def lane_behind(elements: list[dict], center: tuple[float, float], front_name: s
     return best
 
 
+CROSS_FROM_LOT_M = 12      # a cross street's centre line within this of the lot's own edge makes a corner lot
+
+
+def adjoins(elements: list[dict], name: str, poly_lonlat: list, center: tuple[float, float]) -> float | None:
+    """How far the named street's centre line comes to the lot's outline, in metres, or None where it is not among the
+    elements. Pure."""
+    if not name or not poly_lonlat or len(poly_lonlat) < 3:
+        return None
+    P = project(center[0], center[1])
+    ring = [P(float(p[0]), float(p[1])) for p in poly_lonlat]
+    want = norm_name(name)
+    best = None
+    for e in elements or []:
+        tags = e.get("tags") or {}
+        if e.get("type") != "way" or norm_name(tags.get("name", "")) != want:
+            continue
+        pts = [P(g["lon"], g["lat"]) for g in e.get("geometry") or []]
+        for (x1, y1), (x2, y2) in zip(pts, pts[1:]):
+            dx, dy = x2 - x1, y2 - y1
+            l2 = dx * dx + dy * dy or 1e-12
+            for qx, qy in ring:
+                t = max(0.0, min(1.0, ((qx - x1) * dx + (qy - y1) * dy) / l2))
+                d = math.hypot(qx - (x1 + t * dx), qy - (y1 + t * dy))
+                best = d if best is None or d < best else best
+    return best
+
+
 def refuse_nearest(typed: int | None, found: int | None, typed_street: str, found_street: str, gap_m: float | None) -> str | None:
     """Why a "nearest" parcel is not taken as the site, or None where it may be (23 Nov 2026, the second panel: 3680 E
     Hastings St came back as 1195 E Hastings St, about 4 km away; 5050 Joyce St as 3250 Kingsway). Pure."""
@@ -654,6 +681,13 @@ def assemble(address: str, lat: float, lon: float, display: str, zoning: list[di
     street = street_bearing(elements, center, street_name) if (elements and metrics) else None
     if street:
         metrics = parcel_metrics(poly, street["bearing_deg"])
+        # a corner lot only where the cross street runs along the lot itself (25 Nov 2026: 4250 Fraser St and 2475 E 5th
+        # Ave, both mid-block, were corner lots because a cross street came within 60 m of their centres)
+        x = street.get("cross_street")
+        if x:
+            gap = adjoins(elements, x["name"], poly, center)
+            if gap is None or gap > CROSS_FROM_LOT_M:
+                street = {k: v for k, v in street.items() if k != "cross_street"}
     district = z.get("zoning_district") or None
     cd1 = z.get("cd_1_number") or None
     if cd1 is not None:

@@ -11,25 +11,21 @@
 | | |
 |---|---|
 | Who is housed | No homes entered, independent rental (social housing) |
-| Who operates | Not named |
+| Who operates | BC Indigenous Housing Society; the operating figures are not signed by an operator |
 | Which program | the Community Housing Fund, the CMHC Affordable Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $151.4M. Asked: nothing from a program. Still to find: $151.4M (100% of the cost). |
 | The decision wanted | not stated |
-| The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Unsure |
-| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. Transit-oriented area minimum allowable height and density (uncertain). 3. Family-unit requirement in rezonings (uncertain). |
+| The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not needed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Unsure |
+| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. The agreement between the owner and the operator (uncertain). 3. Transit-oriented area minimum allowable height and density (uncertain). |
 
 *The short memo: the full memo (memo.md) adds the massing, the layout, every rule in force and the version stamp's files.*
 
 ## 1. Is it allowed?
-**Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not yet confirmed**
+**Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not needed** (the option is allowed outright and proposes no rezoning)
 
 **Outright, under CD-1 (324): yes.** Residential floor area 23,215 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 5.94 on 3,908.0 m²). (cov.cd1_324.floor_area) Height 88.4 m is within the outright maximum of 91.0 m. (cov.cd1_324.outright_height)
 
-**By rezoning (False Creek North ODP and CD-1 amendments approved after the 13 Jul 2023 public hearing; development permit through the SHORT program): not yet confirmed.**
-- *Uncertain* — Transit-oriented area minimum allowable height and density: Whether the site lies in one of Vancouver's 29 transit-oriented areas is not confirmed.
-- *Uncertain* — Family-unit requirement in rezonings: Unit mix missing.
-- *Uncertain* — Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755): Social housing definition cannot be confirmed: missing share of units for households below the Housing Income Limits, housing agreement term.
-- *Uncertain* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 43 trees on a 3,908 m² site; no tree survey is on file.
+**By rezoning: not needed.** The option is allowed outright and proposes no rezoning.
 
 ## 2. Does it fit the funders?
 **Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed.** The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now. The CMHC Affordable Housing Fund: no intake is open now (closed 19 Dec 2025: the application portal is closed and all program funding is committed).
@@ -42,14 +38,14 @@
 | Item | Status | Who / what |
 |---|---|---|
 | Yards not checked: no CD-1 (324) yard rule in the rules | Uncertain | Architect: read the yard clauses in CD-1 (324)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
+| The agreement between the owner and the operator | Uncertain | Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it. Ask: the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes. |
 | Transit-oriented area minimum allowable height and density | Uncertain | Manager: check the City's transit-oriented areas map for this address and record the tier at 01. Ask: the City of Vancouver's planning staff, or the Province's transit-oriented areas map. |
-| Family-unit requirement in rezonings | Uncertain | Enter the unit counts by bedroom type. Ask: the City of Vancouver's rezoning centre, the rezoning planner on the file. |
 | Social housing definition (Zoning and Development By-law s.2; DCL By-law 9755) | Uncertain | Manager: supply share of units for households below the Housing Income Limits, housing agreement term. Ask: the City of Vancouver's housing policy staff, who draft the Housing Agreement. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (rent-tier split; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 
 ## 4. Does the money work? (feasibility grade)
-**Unsure.** The option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost. Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Unsure.** The option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost. Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 - Capital cost **$151,374,523**: hard $112,129,276 (escalated ×1.0292), soft $28,032,319, contingency $11,212,928, land $0.
 - Net operating income **not given a year**: rent not given less vacancy not given, operating cost not given and reserve not given.

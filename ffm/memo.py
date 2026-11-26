@@ -123,6 +123,9 @@ def _cad(x) -> str:
     return f"${x / 1e6:,.1f}M" if abs(x) >= 1e6 else f"${x:,.0f}"
 
 
+from .checks import operator_of      # who operates: the option's operator, the signing organization, or the proponent line
+
+
 def front_sheet(ledger: dict, proforma: dict | None = None, layout: dict | None = None) -> dict:
     """The memo's front sheet, shaped as an ask (25 Nov 2026; all four first-panel reviewers: "who is housed, who
     operates, which program, the amount, the top three risks"). Read from the ledger, the pro-forma and the layout alone,
@@ -150,8 +153,11 @@ def front_sheet(ledger: dict, proforma: dict | None = None, layout: dict | None 
     tiers = opt.get("rent_tiers_units") or {}
     if any(tiers.get(k) for k in TIER_WORDS):
         housed += ": " + ", ".join(f"{int(tiers[k])} {w}" for k, w in TIER_WORDS.items() if tiers.get(k))
+    lay = layout or {}
+    if homes and lay.get("units_total") and lay.get("units_placed") is not None and lay["units_placed"] < lay["units_total"]:
+        housed += f"; {lay['units_placed']} of the {lay['units_total']} fit the first plans"
     signed = (opt.get("operations") or {}).get("signed") if isinstance((opt.get("operations") or {}).get("signed"), dict) else None
-    op = str(opt.get("operator") or "").strip()
+    op = operator_of(opt)
     operator = (op or "Not named") + ("; the operating figures are signed by " + signed["by"] if signed and signed.get("by")
                                       else "; the operating figures are not signed by an operator" if op else "")
     targets = opt.get("target_programs") or []
@@ -270,7 +276,14 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
              + (f" Not assessed: {o['why']}; the envelope is the option's own figure, not a permitted one." if o.get("why") else ""))
     L.append("")
     from .checks import proposes_rezoning
-    if bz.get("verdict") == "needed":
+    if bz.get("verdict") == "approved":
+        # a rezoning Council has approved (25 Nov 2026): said as decided; what else the rules read is listed under it
+        L.append(f"**By rezoning: approved.** {bz['why'][:1].upper() + bz['why'][1:]}.")
+        for r in res:
+            if r["layer"] in ("A", "B", "C") and r["status"] in ("fail", "conditional", "uncertain") and not r.get("check", "").startswith("district_outright"):
+                L.append(f"- *{STATUS_WORD[r['status']]}* — {r['title']}: {r['finding']}")
+        L.append("")
+    elif bz.get("verdict") == "needed":
         L.append(f"**By rezoning: needed.** {bz['why'][:1].upper() + bz['why'][1:]}.")
     elif bz.get("verdict") == "not needed":
         L.append(f"**By rezoning: not needed.** {bz['why'][:1].upper() + bz['why'][1:]}.")
@@ -337,7 +350,10 @@ def markdown(ledger: dict, massing: dict | None = None, diff: dict | None = None
     if massing and not short:
         L.append("## Massing derived from the rules")
         for mm in massing["masses"]:
-            L.append(f"- **{mm['label']}** — plate {mm['plate_area_m2']:,.0f} m² × {mm['storeys']} storeys = {mm['gfa_m2']:,.0f} m² "
+            # a tower's podium and tower plates each times their storeys (25 Nov 2026: "1,750 m² × 18 = 15,000 m²")
+            made = (f"podium {mm['plate_area_m2']:,.0f} m² × {mm['podium_storeys']} + tower {mm['tower']['area_m2']:,.0f} m² × {mm['storeys'] - mm['podium_storeys']} storeys"
+                    if mm.get("tower") and mm.get("podium_storeys") else f"plate {mm['plate_area_m2']:,.0f} m² × {mm['storeys']} storeys")
+            L.append(f"- **{mm['label']}** — {made} = {mm['gfa_m2']:,.0f} m² "
                      f"(FSR {mm['fsr']:.2f}), {mm['height_m']} m high, inside a {massing['envelope']['width_m']} × {massing['envelope']['depth_m']} m setback envelope. "
                      f"Derived from: {', '.join(mm['derived_from'])}.")
         if massing.get("policy_benchmark"):

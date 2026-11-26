@@ -31,7 +31,9 @@ class TypicalCase(unittest.TestCase):
 
     def test_fsr_and_height_exceed_outright_and_route_to_rezoning(self):
         # over the outright maximum with a rezoning path: a fail on the outright test that says the rezoning is required
-        # (Kai, 20 Nov 2026); before, uncertain
+        # (Kai, 20 Nov 2026); before, uncertain. Read as a proposal: the committed option records Council's approval
+        # (25 Nov 2026), which the next test reads.
+        self.L = evaluate(SITE, {**OPTION, "rezoning_approved_on": None}, AS_OF)
         f = by_id(self.L, "cov.rm1.outright_fsr")
         self.assertEqual(f["status"], "fail")
         self.assertAlmostEqual(f["values"]["fsr"], 2.953, places=3)
@@ -50,6 +52,23 @@ class TypicalCase(unittest.TestCase):
         open_ids = [u["rule_id"] for u in self.L["summary"]["answers"]["unsure"]]
         self.assertNotIn("cov.rm1.outright_fsr", open_ids)
         self.assertNotIn("cov.rm1.outright_height", open_ids)
+
+    def test_an_approved_rezoning_is_not_asked_again(self):
+        # 25 Nov 2026, the funder-side reader: "As approved by Council, 25 Jul 2024" read "rezoning is required ...
+        # prepare the shadow and daylight case"
+        allowed = self.L["summary"]["answers"]["allowed"]
+        self.assertEqual(allowed["by_rezoning"]["verdict"], "approved")
+        self.assertIn("25 Jul 2024", allowed["by_rezoning"]["why"])
+        self.assertEqual(allowed["routes"]["rezoning"]["verdict"], "approved")
+        self.assertEqual(allowed["outright"]["verdict"], "no")                     # the district's limits as written
+        f = by_id(self.L, "cov.rm1.outright_fsr")
+        self.assertIn("was approved by Council on 25 Jul 2024", f["finding"])
+        self.assertEqual(f["action"], "")
+        open_ids = [u["rule_id"] for u in self.L["summary"]["answers"]["unsure"]]
+        self.assertNotIn("cov.irp.social_housing_rezoning", open_ids)            # the policy it was read against
+        self.assertIn("cov.trees.replacement", open_ids)                         # the permit still asks it
+        from ffm import memo
+        self.assertIn("**By rezoning: approved.** Council approved the rezoning", memo.markdown(self.L))
 
     def test_without_a_path_the_exceedance_fails_and_is_an_open_item(self):
         L = evaluate(SITE, {**OPTION, "rezoning_path": None}, AS_OF)
@@ -70,7 +89,7 @@ class TypicalCase(unittest.TestCase):
 
     def test_the_memo_leads_answer_1_with_the_outright_answer(self):
         from ffm import memo
-        md = memo.markdown(self.L)
+        md = memo.markdown(evaluate(SITE, {**OPTION, "rezoning_approved_on": None}, AS_OF))
         self.assertIn("**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required", md)
         self.assertIn("**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): yes, with conditions.**", md)
 

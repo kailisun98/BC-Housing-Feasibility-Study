@@ -97,7 +97,10 @@ function programTracker(L, zones) {
     const mine = all.filter(z => b.key === "other" ? (z.block === "other" && String(z.label || "").trim().toLowerCase() === String(b.label).trim().toLowerCase())
       : b.key === "non_residential" ? (z.block === "non_residential" || z.block === "commercial") : z.block === b.key);
     const placedArea = mine.reduce((t, z) => t + z.w * z.d, 0);
-    return unit ? { key: b.key, label: b.label, unit: true, need: b.count, placed: mine.length, left: b.count - mine.length, each: b.gross_m2_each, min: b.min_gross_m2_each, minW: b.min_width_m }
+    // a home that runs through its floors is one home, however many floors it stands on (25 Nov 2026: three-storey
+    // townhouses read three times each, "4 over" on a program of four)
+    const homes = new Set(mine.map((z, i) => (z.home != null && z.levels ? `h${z.home}` : `z${i}`))).size;
+    return unit ? { key: b.key, label: b.label, unit: true, need: b.count, placed: homes, left: b.count - homes, each: b.gross_m2_each, min: b.min_gross_m2_each, minW: b.min_width_m }
       : { key: b.key, label: b.label, unit: false, need: b.area_m2, placed: Math.round(placedArea), left: Math.round(b.area_m2 - placedArea) };
   });
   // a use placed in whole modules runs a little over its area: over is said past 15%
@@ -181,11 +184,15 @@ export function closeEditor() {
 function snapshot() {
   (editor.history = editor.history || []).push(JSON.stringify({ z: editor.zones, a: editor.added || 0, p: editor.plate || null, t: editor.angle || 0, s: editor.steps || null, n: editor.anchor || null, m: editor.shift || null }));
   if (editor.history.length > 60) editor.history.shift();
+  // the homes on the floor in view as they stand before this change: what syncHomes carries to their other floors is
+  // what the architect changed here, measured against this, never what another floor happens to lack
+  editor.homesWas = { level: editor.level, homes: new Map((editor.zones[String(editor.level)] || []).filter(z => z.home != null).map(z => [z.home, { x: z.x, y: z.y, w: z.w, d: z.d, block: z.block }])) };
 }
 
 function undo() {
   const s = (editor.history || []).pop();
   if (!s) return;
+  editor.homesWas = null;
   const was = JSON.parse(s);
   editor.zones = was.z; editor.added = was.a; editor.plate = was.p || null; editor.angle = was.t || 0; editor.steps = was.s || null; editor.anchor = was.n || null; editor.shift = was.m || null; editor.sel = null; editor.dirty = true;
   renderEditor(); scheduleCheck();
@@ -211,21 +218,38 @@ function syncCores() {
 }
 
 /* A ground-oriented home runs through its floors (`home`, `levels`, 25 Nov 2026: it was edited floor by floor): a
-   home moved, resized or retyped on the floor in view is the same on every floor it spans, and one removed here is
-   removed from them all. Returns how many floors were changed besides this one. */
+   home moved, resized or retyped on the floor in view is moved, resized or retyped by as much on every floor it spans,
+   and one removed here is removed from them all. Only what changed on this floor since the last snapshot is carried
+   (25 Nov 2026, the small-lot architect: a home missing from a stepped-back top floor, or from the floor a block was
+   dropped on, was read as removed and taken off every floor; and a stepped floor's shallower home was copied onto the
+   full floors under it). A change goes over as a shift, so each floor keeps its own depth. Returns how many blocks on
+   other floors were changed. */
 function syncHomes() {
-  const here = editor.zones[String(editor.level)] || [];
-  const ids = new Map(here.filter(z => z.home != null).map(z => [z.home, z]));
+  const was = editor.homesWas;
+  editor.homesWas = null;
+  if (!was || was.level !== editor.level || !was.homes.size) return 0;   // nothing measured on this floor: nothing carried
+  const now = new Map((editor.zones[String(editor.level)] || []).filter(z => z.home != null).map(z => [z.home, z]));
+  const gone = new Set([...was.homes.keys()].filter(id => !now.has(id)));
+  const moves = new Map();
+  for (const [id, b] of was.homes) {
+    const z = now.get(id);
+    if (!z) continue;
+    const m = { dx: z.x - b.x, dy: z.y - b.y, dw: z.w - b.w, dd: z.d - b.d, block: z.block !== b.block ? z.block : null };
+    if (m.block || [m.dx, m.dy, m.dw, m.dd].some(v => Math.abs(v) > 1e-6)) moves.set(id, m);
+  }
+  if (!gone.size && !moves.size) return 0;
   let changed = 0;
   for (const [k, zs] of Object.entries(editor.zones)) {
     if (Number(k) === editor.level) continue;
     const kept = [];
     for (const z of zs) {
       if (z.home == null || !z.levels || editor.level < z.levels[0] || editor.level > z.levels[1]) { kept.push(z); continue; }
-      const src = ids.get(z.home);
-      if (!src) { changed++; continue; }                      // removed on this floor: removed from all of its floors
-      if (src.x !== z.x || src.y !== z.y || src.w !== z.w || src.d !== z.d || src.block !== z.block) {
-        Object.assign(z, { x: src.x, y: src.y, w: src.w, d: src.d, block: src.block }); changed++;
+      if (gone.has(z.home)) { changed++; continue; }         // removed on this floor: removed from all of its floors
+      const m = moves.get(z.home);
+      if (m) {
+        z.x = r2(z.x + m.dx); z.y = r2(z.y + m.dy); z.w = r2(Math.max(0.5, z.w + m.dw)); z.d = r2(Math.max(0.5, z.d + m.dd));
+        if (m.block) z.block = m.block;
+        changed++;
       }
       kept.push(z);
     }
@@ -953,6 +977,13 @@ function rebuildSteps() {
     }
     editor.zones[k] = zs;
   }
+  // a home that runs through its floors keeps the floors it still has (25 Nov 2026: a step-back that took a townhouse's
+  // top floor took the whole home with it): its `levels` shrink to the floors it still stands on
+  const at = new Map();
+  for (const [k, zs] of Object.entries(editor.zones)) for (const z of zs) if (z.home != null && z.levels) (at.get(z.home) || at.set(z.home, []).get(z.home)).push(Number(k));
+  for (const zs of Object.values(editor.zones)) for (const z of zs) if (z.home != null && z.levels) { const a = at.get(z.home); z.levels = [Math.min(...a), Math.max(...a)]; }
+  // the step-back decides every floor itself: nothing on the floor in view is carried to the others by syncHomes
+  editor.homesWas = null;
   return moved;
 }
 
@@ -962,6 +993,7 @@ function duplicateSel(ctx) {
   const { p, B, zs } = ctx, sel = editor.sel != null ? zs[editor.sel] : null;
   if (!sel) return;
   const z = JSON.parse(JSON.stringify(sel));
+  delete z.home; delete z.levels; delete z.pre;   // a copy is a block of its own on this floor, not the same home again
   const clear = clearOf(z, zs.filter(o => o.block !== "corridor"));
   const beside = [[r2(sel.x + sel.w), sel.y], [r2(sel.x - sel.w), sel.y]].find(([x, y]) => x >= p.x - 0.01 && x + z.w <= p.x + p.width_m + 0.01 && (z.block === "corridor" || clear(x, y)));
   const spot = beside || freeSpot(zs, z, p, B);

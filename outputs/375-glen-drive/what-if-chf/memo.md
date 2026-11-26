@@ -13,7 +13,7 @@
 | Who is housed | 110 homes, independent rental (social housing), 25 of them supportive homes: 33 at market rent, 55 rent geared to income, 22 deep subsidy |
 | Who operates | Not named |
 | Which program | the Community Housing Fund. Passes this screen's eligibility checks for the Community Housing Fund |
-| The amount | Capital cost $70.9M. Asked: Community Housing Fund grant, $19.6M (illustrative). Still to find: $39.8M (56% of the cost). |
+| The amount | Capital cost $70.9M. Asked: Community Housing Fund grant, $19.6M (illustrative). Still to find: $45.7M (64% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Passes this screen's eligibility checks for the Community Housing Fund · The money: Needs more sources |
 | The top 3 of 7 open items | 1. District schedule figures entered unverified (CD-1 (819)) (uncertain). 2. Yards not checked: no CD-1 (819) yard rule in the rules (uncertain). 3. Parts of the building the funders answer does not test (uncertain). |
@@ -52,14 +52,14 @@ Other programs written for this kind of housing, listed from their own pages and
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $39,847,815, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes, so the running costs here are the building's alone and the subsidy it needs is not known. Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $45,699,607, 64% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes, so the running costs here are the building's alone and the subsidy it needs is not known. Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$70,924,281**: hard $52,536,505 (escalated ×1.0311), soft $13,134,126, contingency $5,253,650, land $0.
-- Net operating income **$854,671 a year**: rent $1,698,516 less vacancy $62,845, operating cost $715,000 and reserve $66,000.
-- Funding **$31,076,466**: grants $19,586,490, equity $0, supportable debt $11,489,976 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
-- Gap **$39,847,815** (56% of the capital cost).
+- Net operating income **$419,391 a year**: rent $1,246,512 less vacancy $46,121, operating cost $715,000 and reserve $66,000.
+- Funding **$25,224,674**: grants $19,586,490, equity $0, supportable debt $5,638,184 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
+- Gap **$45,699,607** (64% of the capital cost).
 - Left to a person: a hard cost for this building (15 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre; support staffing and who pays for it (the 25 supportive housing homes run on an operating agreement; none is entered).
 
 **Where the money comes from**, each source with its status:
@@ -67,55 +67,55 @@ Other programs written for this kind of housing, listed from their own pages and
 | Source | Amount | Status |
 |---|---|---|
 | Community Housing Fund grant | $19,586,490 | illustrative: nobody has offered it |
-| Mortgage the net income carries | $11,489,976 | sized by this screen |
-| Still to find | $39,847,815 | to find |
+| Mortgage the net income carries | $5,638,184 | sized by this screen |
+| Still to find | $45,699,607 | to find |
 
 ### What it takes to run, a year
 
 | | A year | |
 |---|---:|---|
-| Market rent, 33 homes | $820,548 | $2,072 a month a home (the rules' figure) |
+| Market rent, 8 homes | $198,921 | $2,072 a month a home (the rules' figure) |
 | Rent geared to income, 55 homes | $728,700 | $1,104 a month a home (the rules' figure) |
-| Deep subsidy, 22 homes | $149,268 | $565 a month a home (the rules' figure) |
-| Vacancy | -$62,845 | the CMHC survey's rate, on all tiers |
+| Deep subsidy, 47 homes | $318,891 | $565 a month a home (the rules' figure) |
+| Vacancy | -$46,121 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$715,000 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$66,000 |  |
 | Support staffing | not entered | not entered, and this kind of housing runs on it |
-| **Left after running costs** | **$854,671** | before any operating subsidy or loan payment |
-| Loan payment | -$776,974 | on the loan the funding counts (the capital figures above) |
+| **Left after running costs** | **$419,391** | before any operating subsidy or loan payment |
+| Loan payment | -$381,265 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **not entered** | not given: the support staffing is not entered, so what running it costs is not known |
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.
 
 | Line | Figure | From | Note |
 |---|---|---|---|
-| Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 15 storeys, above the six a wood frame reaches |
+| Hard cost base | $4,693 per m² | `f.hard_cost_base` (placeholder) | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 15 storeys, above the six a wood frame reaches; a placeholder until a cost consultant's rate for this building is entered |
 | Escalation to the index in force on the run date | ×1.0311 | `f.escalation_bcpi` | BCPI 109.4 (2026-07-01, the last quarter published 120 days before the run date 2026-11-17) over 106.1 (2024-07-01) |
 | Hard cost | $52,536,505 | `f.hard_cost_base` | 10,857 m² × $4,693 × 1.0311 |
 | Soft costs | $13,134,126 | `f.soft_costs` (placeholder) | 25% of hard cost |
 | Contingency | $5,253,650 | `f.soft_costs` (placeholder) | 10% of hard cost |
 | Land | $0 | `f.land` | nominal: the owner is a municipality, and this screen carries the land of a church, a society or a government at $0 on a long lease or a transfer (F3) |
 | Capital cost | $70,924,281 | the option | hard + soft + contingency + land |
-| Market rent | $820,548 a year | `f.rents` | CMHC October 2025, 33 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
+| Market rent | $198,921 a year | `f.rents` | CMHC October 2025, 8 units; some unit types priced at the CMHC all-units average: the table has no figure for them |
 | Rent-geared-to-income | $728,700 a year | `f.rgi_rents` | 30% of an income of 70% of the Housing Income Limit (Vancouver), the way BC Housing's call documents estimate it: $1,015 a month for one bedroom or less, $1,260 for two, $1,505 for three; an estimate, so enter the operator's own rent when there is one |
-| Deep-subsidy rent | $149,268 a year | `f.rgi_rents` | the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit |
-| Vacancy | $62,845 a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
+| Deep-subsidy rent | $318,891 a year | `f.rgi_rents` | the income assistance shelter allowance, $500 a month for one bedroom or less and $695 for two; $769 for three, 30% of the deep-subsidy income limit; the 25 supportive homes at the shelter component of income assistance, taken out of the market tier |
+| Vacancy | $46,121 a year | `f.rents` | 3.7% of gross rent, the CMHC survey's rate |
 | Operating cost | $715,000 a year | `f.operating` (placeholder) | $6,500 per unit |
 | Replacement reserve | $66,000 a year | `f.operating` (placeholder) | $600 per unit |
 | Support staffing | not given a year | the option | not entered: the 25 supportive housing homes run on staffing this screen does not estimate |
-| Net operating income | $854,671 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
+| Net operating income | $419,391 a year | the option | gross rent less vacancy, operating cost, reserve and support staffing, before any operating subsidy |
 | Operating subsidy | not given a year | the option | none entered |
 | Community Housing Fund grant | $19,586,490 | `bch.chf.eligibility` | $178,059 per unit × 110; illustrative, at the 2026-27 provisional rate; no intake is open, so no grant is committed or implied |
 | Equity | $0 | the option | none entered |
-| Supportable debt | $11,489,976 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $776,974 a year in payments |
-| Funding | $31,076,466 | the option | grants + equity + supportable debt |
-| Gap | $39,847,815 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
+| Supportable debt | $5,638,184 | `f.mortgage` | the largest loan the net operating income carries: the lender wants net income 1.10 times the loan payment (the debt coverage ratio), at 6.19% repaid over 40 years (the amortization), $381,265 a year in payments |
+| Funding | $25,224,674 | the option | grants + equity + supportable debt |
+| Gap | $45,699,607 | the option | capital cost less funding; a negative gap is headroom, and a gap above the 15% line (this tool's screening line, not a funder's rule) of the capital cost reads Needs more sources |
 
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
 ## Massing derived from the rules
-- **Proposed: 15 storeys, FSR 5.09** — plate 724 m² × 15 storeys = 10,857 m² (FSR 5.09), 45.75 m high, inside a 38.5 × 30.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m, option.massing.width_m, option.massing.depth_m, option.massing, site.front_face.
-- **Outright: FSR 6.9, 51.0 m** — plate 920 m² × 16 storeys = 14,727 m² (FSR 6.90), 48.8 m high, inside a 38.5 × 30.5 m setback envelope. Derived from: cov.cd1_819.outright_fsr, cov.cd1_819.outright_height, option.setbacks_m, option.floor_to_floor_m, site.front_face.
+- **Proposed: 15 storeys, FSR 5.09** — plate 724 m² × 15 storeys = 10,857 m² (FSR 5.09), 45.75 m high, inside a 38.98 × 30.53 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m, option.massing.width_m, option.massing.depth_m, option.massing, site.front_face.
+- **Outright: FSR 6.9, 51.0 m** — plate 920 m² × 16 storeys = 14,727 m² (FSR 6.90), 48.8 m high, inside a 38.98 × 30.53 m setback envelope. Derived from: cov.cd1_819.outright_fsr, cov.cd1_819.outright_height, option.setbacks_m, option.floor_to_floor_m, site.front_face.
 - Note: Lot is not a clean rectangle: frontage x depth = 1,941 m² against a recorded 2,134 m²; the plan uses the rectangle, the FSR uses the recorded area.
 - Note: The lot polygon measures 1,926 m² against a recorded site area of 2,134 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 
@@ -201,7 +201,7 @@ Homes are counted net of their partitions (8% of a home's gross is its walls, sh
 
 ### What an operator checks first
 
-- *pass* — Elevators: 2 elevators for 110 homes on 15 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis).
+- *missing* — Elevators: 2 elevators for 110 homes on 15 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one.
 - *pass* — Desk: a staffed front desk by the entry drawn
 - *pass* — Staff office: a staff office drawn
 - *pass* — Desk sees the entry: the desk is beside the entry

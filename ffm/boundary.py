@@ -542,8 +542,44 @@ def largest_rect(poly: list, step: float = 0.5, exclude: dict | None = None) -> 
     if best[0] <= 0:
         return None
     _, c, r, w, hgt = best
-    return {"x": round(x0 + c * step, 2), "y": round(y0 + r * step, 2), "w": round(w * step, 2), "d": round(hgt * step, 2),
-            "area_m2": round(w * hgt * step * step, 1)}
+    x, y, w, d = _grow(pts, x0 + c * step, y0 + r * step, w * step, hgt * step, step, exclude)
+    return {"x": round(x, 2), "y": round(y, 2), "w": round(w, 2), "d": round(d, 2), "area_m2": round(w * d, 1)}
+
+
+def _rect_in(pts: list, x: float, y: float, w: float, d: float, exclude: dict | None) -> bool:
+    """The rectangle stands inside the polygon: its edges, read every 0.25 m a hair inside, are inside, no vertex of the
+    polygon is inside it, and it does not overlap `exclude`. Pure."""
+    if exclude and x < exclude["x"] + exclude["w"] - 1e-6 and x + w > exclude["x"] + 1e-6 and y < exclude["y"] + exclude["d"] - 1e-6 and y + d > exclude["y"] + 1e-6:
+        return False
+    e = 1e-4
+    nw, nd = max(2, int(w / 0.25) + 2), max(2, int(d / 0.25) + 2)
+    xs = [x + e + (w - 2 * e) * i / (nw - 1) for i in range(nw)]
+    ys = [y + e + (d - 2 * e) * j / (nd - 1) for j in range(nd)]
+    edge = [(a, y + e) for a in xs] + [(a, y + d - e) for a in xs] + [(x + e, b) for b in ys] + [(x + w - e, b) for b in ys]
+    if not all(point_in(p, pts) for p in edge):
+        return False
+    return not any(x + e < px < x + w - e and y + e < py < y + d - e for px, py in pts)
+
+
+def _grow(pts: list, x: float, y: float, w: float, d: float, step: float, exclude: dict | None) -> tuple[float, float, float, float]:
+    """The grid's answer pushed out to the polygon (25 Nov 2026, the small-lot architect: the plate box was 11.5 × 17 m
+    where the yards leave 12.2 × 17.4): each side moves out by up to a step, as far as the rectangle stays inside,
+    found by halving to a few millimetres. Twice round, since one side's room can depend on another's. Pure."""
+    for _ in range(2):
+        for side in ("left", "right", "front", "rear"):
+            lo, hi = 0.0, step
+            for _ in range(7):
+                mid = (lo + hi) / 2
+                cand = {"left": (x - mid, y, w + mid, d), "right": (x, y, w + mid, d),
+                        "front": (x, y - mid, w, d + mid), "rear": (x, y, w, d + mid)}[side]
+                if _rect_in(pts, *cand, exclude):
+                    lo = mid
+                else:
+                    hi = mid
+            if lo > 0:
+                x, y, w, d = {"left": (x - lo, y, w + lo, d), "right": (x, y, w + lo, d),
+                              "front": (x, y - lo, w, d + lo), "rear": (x, y, w, d + lo)}[side]
+    return x, y, w, d
 
 
 WING_MIN_SIDE_M = 9.8      # the shallowest wing homes are laid out in (a single-loaded corridor and one strip)

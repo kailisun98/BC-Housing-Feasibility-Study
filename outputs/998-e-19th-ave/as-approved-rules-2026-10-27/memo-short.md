@@ -10,22 +10,22 @@
 
 | | |
 |---|---|
-| Who is housed | 105 homes, independent rental (social housing) |
+| Who is housed | 105 homes, independent rental (social housing); 70 of the 105 fit the first plans |
 | Who operates | Not named |
 | Which program | BC Builds, the Community Housing Fund. Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $54.1M. Asked: nothing from a program. Still to find: $30.5M (56% of the cost). |
 | The decision wanted | not stated |
-| The answers | Outright: no · By the Director's discretion: none in the schedule · By rezoning: yes, with conditions · The funders' criteria: Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed · The money: Needs more sources |
-| The top 3 of 7 open items | 1. Yards not checked: no RM-1 yard rule in the rules (uncertain). 2. Heritage register and designation (uncertain). 3. BC Builds: eligibility and below-market requirement (uncertain). |
+| The answers | Outright: no · By the Director's discretion: none in the schedule · By rezoning: approved · The funders' criteria: Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed · The money: Needs more sources |
+| The top 3 of 6 open items | 1. Yards not checked: no RM-1 yard rule in the rules (uncertain). 2. Heritage register and designation (uncertain). 3. BC Builds: eligibility and below-market requirement (uncertain). |
 
 *The short memo: the full memo (memo.md) adds the massing, the layout, every rule in force and the version stamp's files.*
 
 ## 1. Is it allowed?
-**Outright: no** · **By the Director's discretion: none in the schedule** (the schedule gives the Director no increase for this) · **By rezoning: yes, with conditions**
+**Outright: no** · **By the Director's discretion: none in the schedule** (the schedule gives the Director no increase for this) · **By rezoning: approved** (Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024; it sets the limits now)
 
-**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated. (cov.rm1.outright_fsr) Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated. (cov.rm1.outright_height)
+**Outright, under RM-1: no.** FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the density now. (cov.rm1.outright_fsr) Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the height now. (cov.rm1.outright_height)
 
-**By rezoning (CD-1 under the Interim Rezoning Policy for Social Housing): yes, with conditions.**
+**By rezoning: approved.** Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024; it sets the limits now.
 - *Conditional* — Interim Rezoning Policy for Social Housing in Former Community Vision Areas: Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.
 - *Conditional* — Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu: Schedule C requires 20 trees on 2,811 m²; the option keeps 1 of 9 and plants 16, leaving 17, a shortfall of 3: plant 3 more at the by-law setbacks or pay $3,000 cash in lieu; the final count is set at the development permit.
 
@@ -47,14 +47,13 @@ Other programs written for this kind of housing, listed from their own pages and
 |---|---|---|
 | Yards not checked: no RM-1 yard rule in the rules | Uncertain | Architect: read the yard clauses in the RM-1 schedule and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
 | Heritage register and designation | Uncertain | Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. Ask: the City of Vancouver's heritage planners (the Heritage Register and designations). |
-| Interim Rezoning Policy for Social Housing in Former Community Vision Areas | Conditional | Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case. Ask: the City of Vancouver's rezoning centre, a rezoning planner (a pre-application enquiry). |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Conditional | Architect: find room for the missing trees (1 m from side lines, 1.5 m from the building, 2.5 m apart) or budget the cash in lieu. Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Builds: eligibility and below-market requirement | Uncertain | Manager: state the below-market share and discount; BC Builds applies opportunity by opportunity, so check the current Property Opportunity Notices. Ask: BC Builds, through the address on each Property Opportunity Notice. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (rent-tier split; accessible unit count; land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 | Homes that do not fit the plates | Conditional | Architect: 70 of 105 homes fit the plates on 6 floors at the unit sizes assumed; did not fit: 6 one-bedroom, 29 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 105. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $30,499,464, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No Community Housing Fund grant is counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $30,499,464, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No Community Housing Fund grant is counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
@@ -78,12 +77,12 @@ Other programs written for this kind of housing, listed from their own pages and
 | | A year | |
 |---|---:|---|
 | Market rent, 105 homes | $2,598,180 | $2,062 a month a home (the rules' figure) |
-| Vacancy | -$96,133 | the CMHC survey's rate, on all tiers |
+| Vacancy | -$96,133 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$682,500 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$63,000 |  |
 | Support staffing | none |  |
 | **Left after running costs** | **$1,756,547** | before any operating subsidy or loan payment |
-| Loan payment | -$1,596,861 | on the loan the funding counts (the capital figures above) |
+| Loan payment | -$1,596,861 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
 | **Subsidy needed if the capital still missing were borrowed** | **$1,902,745** | $1,510 a home a month: the payment on $54,114,027 at 6.19% over 40 years is $3,659,292 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,336,771** | $1,061 a home a month: 4.55% over 35 years is $3,093,318 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |

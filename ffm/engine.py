@@ -271,13 +271,24 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     # An option allowed outright that proposes no rezoning is not read against the rules written for rezonings (23 Nov
     # 2026: an outright C-2A scheme listed the Community Vision map and the family-unit minimum as open items, and the
     # command line printed "by rezoning: no"). The by-rezoning answer says it is not needed.
-    from .checks import proposes_rezoning, housing_kind, HOUSING_WORDS, approval_route, ROUTE_WORDS
+    from .checks import proposes_rezoning, housing_kind, HOUSING_WORDS, approval_route, ROUTE_WORDS, rezoning_approved_on
     rezoning_only = lambda r: r.get("check") in ("family_unit_share", "rezoning_policy_social_housing")
     route = approval_route(option)
     no_rezoning_needed = not outside and tested and outright["verdict"] in ("yes", "yes, with conditions") and not proposes_rezoning(option)
     if no_rezoning_needed:
+        # within the Director's discretion is not "allowed outright" (25 Nov 2026, two reviewers: "Outright: No" stood
+        # beside "the option is allowed outright")
+        discretion = any(by_discretion(r) for r in outright_rules)
         by_rezoning = {"verdict": "not needed", "fail": [], "conditional": [], "uncertain": [],
-                       "why": "the option is allowed outright and proposes no rezoning"}
+                       "why": ("the option proposes no rezoning and needs none: it is within what the schedule lets the Director of Planning allow, "
+                               "a discretionary approval with the development permit" if discretion
+                               else "the option is allowed outright and proposes no rezoning")}
+    elif not outside and proposes_rezoning(option) and rezoning_approved_on(option):
+        # a rezoning Council has approved is answered, not asked again (25 Nov 2026, the funder-side reader): the rules
+        # written for a rezoning application are not read as open items; what the permit still asks (trees) stays
+        no_rezoning_needed = True
+        by_rezoning = {"verdict": "approved", "fail": [], "conditional": [], "uncertain": [],
+                       "why": f"Council approved the rezoning ({option.get('rezoning_path')}) on {rezoning_approved_on(option)}; it sets the limits now"}
     elif route in ("development_permit", "outright") and not outside and outright["verdict"] == "no":
         # the option says a permit, but it exceeds what the schedule allows outright: a permit cannot approve that
         # (24 Nov 2026: "rezoning is required (none)" stood beside "By rezoning: not needed")
@@ -349,7 +360,9 @@ def summarise(results: list[dict], option: dict, site: dict | None = None) -> di
     # Who runs the building (23 Nov 2026: a funder-side reader asks it first, and no memo said): an open item where the
     # housing runs on its operator (supportive, transitional, a shelter) and none is named; and, where the operator is
     # not the proponent, the agreement between them until the land tenure is chosen.
-    operator, proponent = str(option.get("operator") or "").strip(), str(option.get("proponent") or "").strip()
+    from .checks import operator_of
+    # the operator the option names, the signing organization, or one in the proponent line (25 Nov 2026)
+    operator, proponent = operator_of(option), str(option.get("proponent") or "").strip()
     if (kind != "independent" or staffed) and not operator:
         extra_open.append({"rule_id": "coverage.operator", "title": "Who operates the homes", "status": "uncertain",
                            "finding": f"The option {'is ' + HOUSING_WORDS[kind] if kind != 'independent' else 'has ' + said} and names no operator; the operator's experience with the people housed, its staffing and its budget are what a funder reads first.",

@@ -13,7 +13,7 @@
 | Who is housed | 110 homes, independent rental (social housing), 25 of them supportive homes: 33 at market rent, 55 rent geared to income, 22 deep subsidy |
 | Who operates | Not named |
 | Which program | the Community Housing Fund. Passes this screen's eligibility checks for the Community Housing Fund |
-| The amount | Capital cost $70.9M. Asked: Community Housing Fund grant, $19.6M (illustrative). Still to find: $39.8M (56% of the cost). |
+| The amount | Capital cost $70.9M. Asked: Community Housing Fund grant, $19.6M (illustrative). Still to find: $45.7M (64% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Passes this screen's eligibility checks for the Community Housing Fund · The money: Needs more sources |
 | The top 3 of 7 open items | 1. District schedule figures entered unverified (CD-1 (819)) (uncertain). 2. Yards not checked: no CD-1 (819) yard rule in the rules (uncertain). 3. Parts of the building the funders answer does not test (uncertain). |
@@ -54,14 +54,14 @@ Other programs written for this kind of housing, listed from their own pages and
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $39,847,815, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes, so the running costs here are the building's alone and the subsidy it needs is not known. Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $45,699,607, 64% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). No support staffing is entered for the 25 supportive housing homes, so the running costs here are the building's alone and the subsidy it needs is not known. Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
 - Capital cost **$70,924,281**: hard $52,536,505 (escalated ×1.0311), soft $13,134,126, contingency $5,253,650, land $0.
-- Net operating income **$854,671 a year**: rent $1,698,516 less vacancy $62,845, operating cost $715,000 and reserve $66,000.
-- Funding **$31,076,466**: grants $19,586,490, equity $0, supportable debt $11,489,976 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
-- Gap **$39,847,815** (56% of the capital cost).
+- Net operating income **$419,391 a year**: rent $1,246,512 less vacancy $46,121, operating cost $715,000 and reserve $66,000.
+- Funding **$25,224,674**: grants $19,586,490, equity $0, supportable debt $5,638,184 at 6.19% repaid over 40 years, the loan the lender sizes so net income is 1.10 times the payment.
+- Gap **$45,699,607** (64% of the capital cost).
 - Left to a person: a hard cost for this building (15 storeys, above the six a wood frame reaches): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre; support staffing and who pays for it (the 25 supportive housing homes run on an operating agreement; none is entered).
 
 **Where the money comes from**, each source with its status:
@@ -69,22 +69,22 @@ Other programs written for this kind of housing, listed from their own pages and
 | Source | Amount | Status |
 |---|---|---|
 | Community Housing Fund grant | $19,586,490 | illustrative: nobody has offered it |
-| Mortgage the net income carries | $11,489,976 | sized by this screen |
-| Still to find | $39,847,815 | to find |
+| Mortgage the net income carries | $5,638,184 | sized by this screen |
+| Still to find | $45,699,607 | to find |
 
 ### What it takes to run, a year
 
 | | A year | |
 |---|---:|---|
-| Market rent, 33 homes | $820,548 | $2,072 a month a home (the rules' figure) |
+| Market rent, 8 homes | $198,921 | $2,072 a month a home (the rules' figure) |
 | Rent geared to income, 55 homes | $728,700 | $1,104 a month a home (the rules' figure) |
-| Deep subsidy, 22 homes | $149,268 | $565 a month a home (the rules' figure) |
-| Vacancy | -$62,845 | the CMHC survey's rate, on all tiers |
+| Deep subsidy, 47 homes | $318,891 | $565 a month a home (the rules' figure) |
+| Vacancy | -$46,121 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$715,000 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$66,000 |  |
 | Support staffing | not entered | not entered, and this kind of housing runs on it |
-| **Left after running costs** | **$854,671** | before any operating subsidy or loan payment |
-| Loan payment | -$776,974 | on the loan the funding counts (the capital figures above) |
+| **Left after running costs** | **$419,391** | before any operating subsidy or loan payment |
+| Loan payment | -$381,265 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **not entered** | not given: the support staffing is not entered, so what running it costs is not known |
 
 > The rents and the running cost are placeholders until the operator's own are entered (the option's operating figures); support staffing and an operating subsidy are never assumed. A funder compares the subsidy a home a month, or a bed a month for a shelter.

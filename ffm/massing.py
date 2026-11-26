@@ -410,7 +410,8 @@ def build(site: dict, option: dict, ledger: dict) -> dict[str, Any]:
         masses[-1].update({"footprint": p_ring, "plate_width_m": round(p_w, 2), "plate_depth_m": round(depth, 2), "plate_area_m2": round(plate, 1),
                            "tower": {"x": round(tx, 2), "y": round(ty, 2), "w": round(tw_, 2), "d": round(td_, 2), "area_m2": round(t_area, 1)},
                            "podium_storeys": P, "gfa_m2": round(total, 1), "fsr": round(total / area, 3) if area else None,
-                           "label": f"Proposed: a tower of {storeys} storeys" + (f" on a {P}-storey podium" if P else "") + (f", FSR {total / area:.2f}" if area else "")})
+                           # "a tower of 18 storeys on a 3-storey podium" read as 21 (25 Nov 2026): the storeys in all, then the parts
+                           "label": f"Proposed: {storeys} storeys" + (f", a {P}-storey podium and a {storeys - P}-storey tower" if P else ", a tower") + (f", FSR {total / area:.2f}" if area else "")})
         masses[-1]["derived_from"].append("option.building_type (tower), option.podium_storeys, option.tower_plate_m2")
         if P:
             t_ring = lot_rect(tx, ty, tw_, td_)

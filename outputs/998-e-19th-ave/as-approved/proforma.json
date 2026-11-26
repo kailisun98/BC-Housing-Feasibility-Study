@@ -68,6 +68,9 @@
       "operating_cost": 682500,
       "operating_cost_per_home": 6500,
       "operating_cost_from": "placeholder",
+      "beds_operating_cost": null,
+      "beds_cost_per_bed": null,
+      "beds_cost_from": null,
       "reserve": 63000,
       "support_staffing": null,
       "staffing_missing": false,
@@ -100,7 +103,11 @@
           "subsidy_year": 1336771,
           "per_home_month": 1061
         }
-      }
+      },
+      "vacancy_rate": 0.037,
+      "vacancy_from": "rule",
+      "named_loan_service": null,
+      "nonres_income": null
     }
   },
   "funding": {
@@ -157,7 +164,7 @@
     "why": [
       "the gap is $30,499,464, 56% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule)",
       "no Community Housing Fund grant is counted: the rent tiers are not entered, so the fund's 30 / 50 / 20 mix is not tested (answer 2)",
-      "placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve"
+      "placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve"
     ],
     "unsure": [
       "a hard cost for this building (1,250 m² that is not homes, priced as if it were): the base is a small wood-frame catalogue figure, so enter a cost consultant's rate a square metre",
@@ -172,8 +179,8 @@
       "value": 4693.0,
       "unit": "$/m²",
       "rule_id": "f.hard_cost_base",
-      "note": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 1,250 m² that is not homes, priced as if it were",
-      "placeholder": false
+      "note": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 1,250 m² that is not homes, priced as if it were; a placeholder until a cost consultant's rate for this building is entered",
+      "placeholder": true
     },
     {
       "key": "escalation",

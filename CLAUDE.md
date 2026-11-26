@@ -1162,6 +1162,38 @@ The plan is `02 A2\00 Research\First Read - wish list and plan.docx` (six pieces
   `siteOffer` under each stop-01 question, `#guide-lookup-nearest`. Fingerprints 7846c8b6a3414798 (23 Oct), 750597987a837e2e
   (27 Oct), 7532496a9e6ef1ff (17 Nov). 423 tests.
 
+## The third simulated panel and its fixes (25 Nov 2026)
+
+`docs/user-tests-2026-11-25/`: five AI role-plays walked the site and the tool in a browser (never quote or credit them).
+Its README ranks 21 defects and, in "What was fixed", says what changed for each and what did not. What a later session
+must know:
+- **An approved rezoning** is `option.rezoning_approved_on` (ISO date; `checks.rezoning_approved_on` gives it in words):
+  `by_rezoning.verdict` "approved", the rezoning-only rules leave the open items, `_over_outright` says the rezoning was
+  approved and sets no action. `VERDICT_STATUS` / `ROUTE_STATUS` map "approved" to pass. 998 as approved carries
+  2024-07-25; Expo as permitted carries `approval_route: development_permit` instead (outright yes, rezoning not needed).
+- **Reopening a run** restores the run's own option and site where they differ from the saved files (`runs.differs`),
+  and the guide takes that option as used: signed operating figures and capital sources survive Run again.
+- `checks.operator_of` (operator, else the signing organization, else "operator X" in the proponent line);
+  `checks.non_residential_m2` (adds brief items with `use: "community"`); `fsr_limit` reads RT-style
+  `max_fsr_conditional` and `max_fsr_affordable_multiple_dwelling` as the Director's discretion (`NON_PROFIT_OWNERS`).
+- `proforma`: supportive homes at the deep-subsidy (shelter) tier, transitional at RGI (`tier_basis`); beds beside homes
+  cost `operations.operating_cost_per_bed_year_cad` or a home's figure, with a reserve a room of four (page keys
+  `beds_operating_cost`, `beds_cost_per_bed`, `beds_cost_from`); a vacancy over 1 is a percent, capped at 0.5; a loan
+  source takes `rate_pct` / `amortization_years` and its payment comes off the income before the mortgage is sized
+  (`named_loan_service`); `hard_rate` is a placeholder until a rate is entered; `_money` never prints $-0.
+- `layout.lifts_needed(..., beds)`; `operability` holds the lifts wanted against ground-floor cores of at least
+  `ELEVATOR_CORE_M` (one each), so the committed apartment runs read elevators "missing" in the operator checklist.
+- `lookup.adjoins` / `CROSS_FROM_LOT_M` (12 m): a cross street must run along the lot to make a corner.
+- `boundary.largest_rect` pushes the grid's box out to the polygon (`_grow`, `_rect_in`).
+- Page: `figures/common.js` `sectionCut` cuts through every tier; `tour.js` `OPERATOR_TOUR`; who.html has a fourth
+  flow (the operator), `.flows` is two columns.
+- Block editor, homes through floors: `snapshot()` records the floor in view's homes (`editor.homesWas`), and
+  `syncHomes` carries only what changed there since (a removal to every floor the home spans, a move or resize as a
+  shift); `rebuildSteps` clears it and shrinks a home's `levels` to the floors it keeps; `programTracker` counts a home
+  once by its `home` id.
+- Not done: the ground-oriented solver's misses, the floor area tested against drawn, dates in UTC. Fingerprints
+  unchanged; 449 tests.
+
 ## Rules from the assignment brief (binding)
 
 - Ask permission before using anyone's documents or data.

@@ -255,14 +255,14 @@
 <line x1="650" y1="1016" x2="656" y2="1016" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="1019.0" font-size="9.5" fill="#5f6672">+3.05 m</text>
 <text x="48" y="1041.0" font-size="11" fill="#5f6672">Ground floor</text>
-<rect x="128.0" y="1024" width="374.8" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
+<rect x="128.0" y="1024" width="374.5" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
 <text x="132.0" y="1041.0" font-size="10" fill="#1f2933">Services, bicycles</text>
-<rect x="502.8" y="1024" width="31.9" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
-<text x="506.8" y="1041.0" font-size="10" fill="#1f2933">C</text>
-<rect x="534.7" y="1024" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
-<text x="538.7" y="1041.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="575.9" y="1024" width="72.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="579.9" y="1041.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="502.5" y="1024" width="31.9" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="506.5" y="1041.0" font-size="10" fill="#1f2933">C</text>
+<rect x="534.3" y="1024" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="538.3" y="1041.0" font-size="10" fill="#1f2933">CR</text>
+<rect x="575.6" y="1024" width="72.4" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="579.6" y="1041.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="1050" x2="656" y2="1050" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="1053.0" font-size="9.5" fill="#5f6672">+0.0 m</text>
 <g transform="translate(0.0 1076.0)">
@@ -287,7 +287,7 @@
 <rect x="48.0" y="27.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
 <text x="64.0" y="37.0" fill="#5f6672" font-size="11">Spare · SP</text>
 </g>
-<text x="48.0" y="1144.0" font-size="12" fill="#1f2933">0 of 0 units placed on 29 floors of 31.5 × 25.41 m (800 m² each)</text>
+<text x="48.0" y="1144.0" font-size="12" fill="#1f2933">0 of 0 units placed on 29 floors of 31.61 × 25.32 m (800 m² each)</text>
 <text x="48.0" y="1160.0" font-size="12" fill="#1f2933">A segment too short for its name carries its short name from the key, or none; the levels at</text>
 <text x="48.0" y="1176.0" font-size="12" fill="#1f2933">the right are each floor's height above the ground floor.</text>
 <text x="48.0" y="1192.0" font-size="12" fill="#1f2933">Rules as of 23 Oct 2026 · drawn from the option and the massing, not a design</text>

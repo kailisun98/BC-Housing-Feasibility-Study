@@ -3,6 +3,7 @@
    memo.front_sheet in the engine; it reads the ledger, the pro-forma and the layout and adds no figure of its own. */
 
 import { cap, h, pill } from "../core/util.js";
+import { state } from "../core/state.js";
 import { layoutOpenItems, moneyWord, MONEY_STATUS } from "./answers.js";
 
 const HOUSING = { supportive: "supportive housing", transitional: "transitional housing", shelter: "a shelter" };
@@ -29,6 +30,17 @@ function kindOf(o) {
   return total && Number(o.supportive_units || 0) >= total ? "supportive" : "independent";
 }
 
+/* checks.operator_of: the option's operator, the organization that signed the operating figures, or one named in the
+   proponent line. */
+export function operatorOf(o) {
+  const op = String(o.operator || "").trim();
+  if (op) return op;
+  const sg = (o.operations || {}).signed;
+  if (sg && typeof sg === "object" && String(sg.org || "").trim()) return String(sg.org).trim();
+  const m = /\boperat(?:or|ed by)\s+([^;,()]+)/i.exec(String(o.proponent || ""));
+  return m ? m[1].trim() : "";
+}
+
 export function frontOf(run) {
   const L = run.ledger, o = L.inputs.option || {}, ans = L.summary.answers, pf = run.proforma;
   const kind = kindOf(o);
@@ -41,8 +53,11 @@ export function frontOf(run) {
   if (sup && kind === "independent") housed += `, ${sup} of them supportive homes`;
   const t = o.rent_tiers_units || {};
   if (TIERS.some(([k]) => t[k])) housed += ": " + TIERS.filter(([k]) => t[k]).map(([k, w]) => `${t[k]} ${w}`).join(", ");
+  // homes the plans do not hold are said beside the count the money prices (25 Nov 2026)
+  const lay = run.layout || {};
+  if (homes && lay.units_total && lay.units_placed != null && lay.units_placed < lay.units_total) housed += `; ${lay.units_placed} of the ${lay.units_total} fit the first plans`;
   const ops = o.operations || {}, signed = ops.signed && typeof ops.signed === "object" ? ops.signed : null;
-  const op = String(o.operator || "").trim();
+  const op = operatorOf(o);
   const operator = (op || "Not named") + (signed && signed.by ? `; the operating figures are signed by ${signed.by}` : op ? "; the operating figures are not signed by an operator" : "");
   const targets = o.target_programs || [];
   const named = L.results.filter(r => r.layer === "E" && targets.includes(r.rule_id)).map(programName);
@@ -74,7 +89,7 @@ export function frontOf(run) {
 
 /* A route's verdict as a status, for its mark. */
 const ROUTE_STATUS = { yes: "pass", "yes, with conditions": "conditional", no: "fail", "not yet confirmed": "uncertain", "not assessed": "uncertain",
-  possible: "conditional", "not needed": "na", "none in the schedule": "na", needed: "conditional" };
+  possible: "conditional", "not needed": "na", "none in the schedule": "na", needed: "conditional", approved: "pass" };
 export const routeStatus = v => ROUTE_STATUS[v] || "";
 
 export function amountWords(m) {
@@ -97,7 +112,7 @@ export function frontHtml(run) {
       ${row("Who operates", h(f.operator))}
       ${row("Which program", h(f.programs))}
       ${row("The amount", h(amountWords(f.money)))}
-      ${row("The decision wanted", f.decision ? h(f.decision) : `<i>not stated</i> <span class="cont">· at 03, "What are you asking for?"</span>`)}
+      ${row("The decision wanted", f.decision ? h(f.decision) : `<i>not stated</i>${state.mode === "manager" ? ` <span class="cont">· at 03, "What are you asking for?"</span>` : ""}`)}
       ${row("The answers", `<ul class="ask-verdicts">${marks}</ul>`)}
       ${row(f.open_items.length ? `The top ${f.open_items.length} of ${f.open_total} open items` : "Open items", open)}
     </dl>

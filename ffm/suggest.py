@@ -990,6 +990,16 @@ def suggest(site: dict, programs: list[str] | None, on: date, candidate: str = "
     for k in ("housing_type", "building_type", "podium_storeys", "tower_plate_m2", "beds"):
         if (fixed_given or {}).get(k) not in (None, ""):
             option[k] = fixed_given[k]
+    # supportive and transitional homes are not the Community Housing Fund's tiers (25 Nov 2026: a supportive building
+    # was offered 41 / 69 / 28): every home at the shelter component, or rent geared to income, as the pro-forma prices them
+    homes_n = sum(int(v or 0) for v in (option.get("units") or {}).values())
+    if kind in ("supportive", "transitional") and homes_n:
+        only = "deep_subsidy" if kind == "supportive" else "rgi"
+        option["rent_tiers_units"] = {k: (homes_n if k == only else 0) for k in ("market", "rgi", "deep_subsidy")}
+        for k in ("market", "rgi", "deep_subsidy"):
+            fields[f"rent_tiers_units.{k}"] = {"value": option["rent_tiers_units"][k], "rule_id": None, "basis": "placeholder",
+                                               "note": ("every supportive home at the shelter component of income assistance" if kind == "supportive"
+                                                        else "every transitional home rent geared to income") + ", not the Community Housing Fund's tiers"}
     if kind == "shelter":
         option["units"] = {k: 0 for k in (option.get("units") or {})} or option.get("units")
         option["rent_tiers_units"] = None
@@ -1084,6 +1094,13 @@ def lot_reading(site: dict, on: date, rules: list[Rule]) -> dict[str, Any]:
               "homes": homes or None, "mix_note": "the tool's starting mix and BC Housing's areas plus 10%, a placeholder",
               "rule_ids": [x for x in {(f.get("storeys") or {}).get("rule_id"), (f.get("gfa_m2") or {}).get("rule_id")} if x],
               "note": S.get("candidate_note") or (f.get("gfa_m2") or {}).get("note")}
+    # what the Director of Planning may allow above it (25 Nov 2026: RT-3's 0.75, and 1.00 for a non-profit multiple
+    # dwelling, never appeared before an option was run)
+    r_fsr = _district_rule(rules, on, "district_outright_fsr", district_of(site))
+    if r_fsr:
+        lim = fsr_limit(site, SOCIAL_PROBE, r_fsr[1])
+        if lim.get("discretionary"):
+            yield_["discretionary_fsr"], yield_["discretionary_clause"] = lim["discretionary"], lim["discretionary_clause"]
     # each yard from the schedule's rule or a placeholder (RT-3 sets a rear and a side yard and no front)
     yard_rules = {k: (f.get(f"setbacks_m.{k}") or {}).get("rule_id") for k in ("front", "rear", "side")}
     plate = {"width_m": env.get("plate_w_m"), "depth_m": env.get("plate_d_m"), "area_m2": env.get("plate_m2"),

@@ -1,0 +1,89 @@
+# Funder-side officer and board member: reading test, 25 Nov 2026
+
+Seat: a simulated reviewer (AI role-play), reading as (a) a funder-side development officer of the kind who reads provincial non-profit housing proposals and (b) a volunteer board member of a housing society who must vote on pre-development spending. Not a practitioner, and not speaking for BC Housing or any funder. Neither of us ran the tool; we read the website, the Reader layout and the paper memo (full and short) on a private server (port 8795). Runs read: 998-e-19th-ave/as-approved (R1), what-if-funder-ready (R2) and their comparison, 375-glen-drive/as-proposed (and first-run), 1010-expo-blvd/what-if-12-storey (and as-permitted), plus a phone-width read of 998 R1.
+
+Test artefact to discount: during the session another session wrote an R4 and two drafts to the shared outputs folder for 998 E 19th Ave. I report only what that exposed about the design (item 4.4), not the runs themselves.
+
+(Saved by the coordinating session from the reviewer's returned text: the harness does not let a subagent write files.)
+
+## 1. Verdicts
+
+**Board member.** I would not vote pre-development money on this memo, and I would not know what I was voting on: the memo says "THE DECISION WANTED: not stated · at 03, "What are you asking for?"". Page one does give me the four questions, the money gap and a named person for each open item, which is more than I usually get. But the memo for a scheme Council approved in July 2024 tells me "rezoning required" and asks us to "prepare the shadow and daylight case". Its $54.1M cost rests on a quadplex and townhouse rate that is not on its list of placeholders, and its title block says in amber that only "70 fit" of 105 homes, which reads as a design failure. The comparison then makes the hypothetical look $9.8M better only by counting a grant from a call that did not proceed. Before any vote I would ask: what are we being asked to spend, what is already decided on this site, and what is the gap without grants nobody has offered?
+
+**Funder-side officer.** I would not take this as a pre-application. I would take it as a well-organised intake checklist from a proponent. Several things are citable: clause references with source links, program intake statuses with read dates, the 15% line marked "this tool's screening line, not a funder's rule", and the "illustrative: nobody has offered it" status. Several things I could not cite or repeat: the capital costs, the per-home CHF grant figures (two different ones in circulation), "Outright Yes" on 375 Glen read from an unverified draft by-law at exactly its limits, and a red "Fail" against our own fund's mix for a project with a BC Housing proponent and a market-rental wing. Before reading further I would ask for an operator, a cost consultant's rate, the land agreement and the intended program for the supportive and shelter components.
+
+## 2. The reading flow
+
+1. **Home.** The hero states "each answer cites the clause and the date of the rules behind it". It took me a while to find who made the tool: the footer says "ARCH 540, UBC ... fall 2026 · Kai". Nothing above the fold says student project, and the GitHub link is named "BC-Housing-Feasibility-Study", which a funder could read as an affiliation. The home page then says "checks the option against 144 rules" and, further down, "84 rules in six layers". The memo says 176.
+2. **How it works.** Clear diagrams. Two things undercut trust: "The approved case has eight" open items against "leaves seven open items" further down the same page, and the honest line "the construction cost is a figure for two- to four-unit buildings". That caveat matters more than anything else on the page, and it sits in a footnote.
+3. **Who it's for.** "On a board ... Start with Flow 3, two pages and a decision." That is the right promise, but the memo neither keeps it to two pages nor states a decision. The mock memo on the same page says "OPEN ITEMS · 8" next to "Seven open items". The user sessions are described as "scheduled" with dates already past and no results reported.
+4. **The case.** This page says "With fewer homes the gap grows to 45%". The gap falls, from 56% to 45%. The open-item table quotes "the indicative grant at 2025-26 rates would be $17,977,155", while the memo now says $18,696,195 at the 2026-27 rate. The page also says "Its exits pass on every floor" without the memo's UNVERIFIED tag.
+5. **Reader, 998 R1.** The title block is clear, and the disclaimer under it is good. "The ask" is the right idea, but three of its seven rows are blank or circular ("Not named", "not stated · at 03", "Asked: nothing from a program"). "By the Director's discretion" is undefined at first use (which Director?), and the glossary is collapsed at the bottom. On screen, the floor-by-floor Area schedule appears between The ask and answer 1, so the first thing after the summary is a dense 11-column table. Answers 1 to 3 read well. Answer 4 is dense, and the facts that matter most (hard-cost basis, all-market rents) sit in a grey paragraph under the chart.
+6. **Reader, R2 and comparison.** The title block summary "the gap $20.7M here, $30.5M in R1" is what a board would remember. The sentence that defuses it ("'Passes the screen' means ... not that the money is found") sits deep inside the folded comparison.
+7. **Paper.** The short PDF is not short: about 7 to 8 letter pages, of which about 2.5 are sources, including sources for shelter and homelessness programs that do not apply to this site. The full PDF runs to about 31 pages. Its title block says "R1 · run 25 Nov 2026" against "RULES AS OF 23 Oct 2026" and has no issued-by, checked-by or issue date. The full memo has an "operator checks" table (laundry, garbage and accessible homes all "missing") that the screen never shows.
+8. **375 Glen and 1010 Expo.** See section 3.
+9. **Phone.** No sideways page scroll, which is good. Covered in 4.9.
+
+## 3. Defects and misleading statements, ranked by harm
+
+1. **The capital cost is a quadplex rate, not marked as a placeholder** (all runs, answer 4). "Every line" says: "average of Quadplex 01 ($425/sf), Quadplex 02 ... Townhouse ...; NOT written for this building". Yet "Placeholders in use" lists only soft costs, contingency, operating cost and reserve. On 375 Glen a 15-storey tower and on 1010 Expo a 12- to 29-storey tower are priced the same way. Every gap percentage and verdict rests on this figure. It should carry the PLACEHOLDER tag and be shown as a range. *Verified twice.*
+2. **The comparison's money headline is only a grant nobody offered** (998 R2 vs R1, title block and comparison). "The gap $20.7M here, $30.5M in R1" counts a $15.7M CHF grant labelled illustrative, from a call that "did not proceed". Without it R2's gap is about $36.4M (80% of cost), worse than R1, because debt falls by $14.3M. case.html makes it worse with "the gap grows to 45%". Every money comparison should show the gap with and without uncommitted sources. *Verified twice.*
+3. **The memo re-asks rezonings that were already granted** (998 R1 answers 1 and 3; 1010 both runs). 998's own option line says "As approved by Council, 25 Jul 2024", yet the memo says "Not outright: rezoning required", tells the team to "prepare the shadow and daylight case" and to make "a pre-application enquiry". 1010 says "By rezoning: Not yet confirmed" two lines above "CD-1 amendments approved after the 13 Jul 2023 public hearing". A board would conclude a public hearing still lies ahead. The memo needs a "what is already decided" line. *Verified twice.*
+4. **BC Builds "Pass" contradicts the rents** (998 R2, clauses and comparison). The clause reads "100% of units at 20% below market". The Ask says "26 at market rent", and the operating table prices those 26 at $2,072 a month, the full CMHC figure. An officer would catch this first. *Verified twice.*
+5. **"Subsidy needed to run it: $0" on social housing priced at full market** (998 R1, operating table, screen and paper). Every home is priced at market ("Market rent, 105 homes"), while C5 passes on "30% of units below HILs". The $0 and "the rents cover the running costs" read as a finding. It should read "not known: rents not split". *Verified twice.*
+6. **"70 fit" of 105 homes is an artefact of the tool's own layout** (998 R1 title block, amber; R2 "59 fit" of 88). The area schedule leaves 355 m² spare (175 m² on level 6), yet 29 of 30 studios (about 39 m² each) "did not fit". In R2, 23 of 24 studios. Showing this in the title block of a Council-approved scheme tells a board the building does not work. Move it to the drawings, labelled as the tool's layout limit. *Verified twice.*
+7. **"Rules as of" does not fix the rules, and R1 changes without a new number.** 375 R1 and R2 both say "rules as of 17 Nov 2026" but apply BC Builds v2024-02-13 against v2026-01-01 and CHF v2025-05-30 against v2026-04-01. The glossary says "each rule is applied in the version that was in force that day". 998 R1, sold on the site as "R1 · 23 Oct 2026", prints "run 25 Nov 2026" and contains program pages "read 23 Nov 2026"; its run folder was rewritten today. A cited memo has to stay what it was when cited. *Verified twice.*
+8. **375 Glen: the funder test is misapplied and the zoning answer overstated.** (a) The CHF 30/50/20 test is applied to all 163 homes, counting the secured-market-rental wing's 89 homes as the fund's "market" tier, and the red "Fail" is open item #1. (b) The proponent is shown as "BC Housing with ... · non-profit society". (c) The headline says "Outright Yes", but A1 and A2 are UNVERIFIED draft provisions met exactly (FSR 6.90 against 6.9, 51.0 m against 51.0 m). The verdict should carry "against the draft by-law, unverified". *(a) and (b) verified once; (c) verified twice.*
+9. **Two CHF grant figures, both precise to the dollar** (998 memo against case.html): $18,696,195 ("2026-27 provisional rate", $178,059 a home) against $17,977,155 ("2025-26 rates"). A precise per-home grant from a fund with no open call reads as an entitlement. *Verified twice.*
+10. **The operator is named in one place and "Not named" in another** (1010, both runs). The proponent line says "operator BC Indigenous Housing Society"; The Ask says "WHO OPERATES: Not named". *Verified twice.*
+11. **Grant counting is inconsistent** (1010 R2 against 998 R1). 1010 R2 counts $21.4M of CHF grant while E2 is "not yet confirmed" (land tenure missing); 998 R1 counts nothing while E2 is "not yet confirmed". *Verified once.*
+12. **"60-year agreement" against "land tenure missing"** (998 R1, 1010 R2). The title block shows the tenure as a 60-year agreement while E2 asks for land tenure. The housing agreement and the land lease are different things, and the memo never says so. *Verified twice.*
+13. **A meaningless comparison for 1010 Expo.** R1 has no homes entered, and its pricing gives "$151.4M gap, 100% of the cost" for a real project under construction. The comparison then says "R1's gap is the larger". It should refuse to compare money when one side has no homes. *Verified once.*
+14. **"Pass" on a rule entered from memory** (D2 exits, all runs). The source note says the clauses were "entered from recollection ... not read from the code text", and the result shows as a green Pass. case.html repeats "exits pass" with no caveat. *Verified twice.*
+15. **Wrong reason in the 375 comparison.** It says "Not applicable: unit mix not given". The mix is given; the ledger's real reason is the Downtown Eastside Plan. *Verified twice.*
+16. **Website counts disagree:** 84, 144 and 176 rules; 7 and 8 open items for the same memo (how.html, who.html). *Verified twice.*
+17. **Operator checks appear only on paper**, and the accessible homes are counted on the wrong base: "4 wanted (BC Housing's 5% of 70)" when the program is 105 homes. *Verified once.*
+18. **Internal notes and broken sentences in what a funder receives:** "before the user sessions", "for the demo", "replace from the arborist report before the user session"; "A project enters not stated on the page read"; "the funders answer does not test". *Verified twice.*
+
+## 4. Interface problems, ranked
+
+1. **Tool-step references in a reader's memo.** "at 03, "What are you asking for?"", "Name a source and its status at 03", "record the tier at 01". A board member has no 03.
+2. **The top three open items are ranked by status, not consequence.** For 998 R1 they are the yards, heritage and BC Builds. The $30.5M gap and "Who operates: Not named" are not open items at all. The Project Development Fund, the pre-development loan our board would actually be weighing, is relegated to "Not targeted, listed in the ledger".
+3. **The area schedule is out of order.** On screen (1024 px and 375 px) it sits between The ask and answer 1, against the "In this memo" order. *Verified twice.*
+4. **Revisions mix options with rule dates, and comparisons pick themselves.** For 998, R1 is the approved scheme, R2 a what-if, R3 the approved scheme under new rules, and today R4 another what-if. By drawing convention R4 supersedes R1; here it does not. Opening the same link (`run=...what-if-funder-ready`, no compare) gave R2 against R1 at first, and later R2 against R4. A link sent to a board must show what the sender saw.
+5. **The glossary is at the end, collapsed, and incomplete.** Missing: Director's discretion, ODP, the SHORT program, Property Opportunity Notice, take-out terms, Class D, DCL/CAC, net to gross, Section 219 covenant, DBH, "feasibility grade", "the rules' figure", "deterministic", "rule stack". Terms are not linked at first use.
+6. **The short PDF is hidden and long.** It sits under "More formats", runs about 8 pages, and about a third of it is sources, some for programs that do not apply. The site promises "two pages".
+7. **Answer 2 wording.** "Whether it passes this screen's eligibility checks for BC Builds and the Community Housing Fund is not yet confirmed" appears three times in one screen. "Each read on its own" is unexplained. A green "Passes" next to a fund with no intake is louder than the grey caveat.
+8. **The walkthrough is out of date.** It skips The ask, Words and the short PDF, and step 5 points at "Summary, Detailed, 3D preview", which are hidden in the Reader layout.
+9. **Phone.** The address and title block fill the first screen. The area schedule shows one word per line with columns cut off. Disclosure headings ("Where the money comes from · each source...") split into two columns. The Manager, Architect and Operator switch is prominent for a reader who should only read.
+10. **The paper title block lacks an issue stamp.** It shows "RUN" and "printed" dates but no "issued", "prepared by" or "checked by". Who stands behind R1?
+11. **Status colours.** A red "Fail" on outright limits for a scheme Council approved alarms a lay reader. "Over the outright limit" would do.
+12. **Home page framing.** "15% feasibility bar" on the home page lacks the memo's "this tool's own". The student status is only in the footer.
+
+## 5. What works and I trust
+
+- The disclaimer at the top of every screen memo and the paper: "not affiliated with, reviewed by or a position of BC Housing, the Province, CMHC or the City".
+- The 15% line is consistently "this tool's screening line, not a funder's rule".
+- "illustrative: nobody has offered it", and "'Passes the screen' means the funders' published criteria are met, not that the money is found."
+- "The criteria are not the money" as a bridge from answer 2 to answer 4.
+- Intake status with read dates: "The Community Housing Fund's 2025 call did not proceed (February 2026), so no intake is open now."
+- Each open item names who resolves it, what to do and whom to ask. The lanes make that scannable.
+- The "Every line" table: figure, formula, rule and source on one row, with the PLACEHOLDER and UNVERIFIED tags.
+- On 375 Glen: "Subsidy needed to run it: not entered ... OPEN", and the four supportive and shelter items. That is exactly what an officer asks first.
+- The heights-to-scale strip in answer 1 and the section in the comparison: readable at a glance.
+- The listed-but-not-tested programs, each with its entry route.
+
+## 6. Wish list (top five first)
+
+1. **A "decision for the board" block on page one** (S): the pre-development amount asked, what it buys, and the conditions to stop. Drop every "at 03" from reader and paper views.
+2. **Mark the hard cost as a placeholder and give the capital cost as a range** (S to M). Hold back the gap percentage, or show it greyed, until a cost consultant's rate is entered.
+3. **"What is already decided on this site"** (M): rezoning enacted or approved with the date, DP issued, land agreement. Read answer 1 against today's zoning when the site has been rezoned.
+4. **Show the gap twice everywhere**, counting committed sources only and then all sources, including the comparison headline and the case page (S).
+5. **Issued revisions that are frozen and stamped** (M): issued by, checked by, issue date; links pinned to a revision and to a named comparison; option and revision shown separately (for example "Option B, R1"), so a what-if never outranks the scheme.
+6. Rank open items by consequence, and add the gap and the missing operator as open items (S).
+7. A pre-development section: the Project Development Fund, the budget being voted, and what it resolves (M).
+8. Glossary links at first use, plus the missing terms (S).
+9. A real two-page board PDF that cites only the sources used on those two pages (M).
+10. Funder fit applied only to the homes seeking that fund, so a mixed building is not failed on its market wing (L).
+11. An officer's line: subsidy a home a month and grant a home, with what each assumes (S).
+12. Fix the website's counts and case.html's stale grant figure and "gap grows" (S).

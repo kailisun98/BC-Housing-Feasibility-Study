@@ -2226,14 +2226,14 @@
       "version_effective_from": "2023-01-01",
       "version_effective_to": null,
       "status": "fail",
-      "finding": "FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where density is negotiated.",
+      "finding": "FSR 2.95 exceeds the outright maximum of 1.2, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the density now.",
       "values": {
         "fsr": 2.953,
         "max_fsr_outright": 1.2,
         "gfa_m2": 8299.0,
         "site_area_m2": 2810.7
       },
-      "action": "Manager and architect: take the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) and confirm with City staff the density they will support."
+      "action": ""
     },
     {
       "rule_id": "cov.rm1.outright_height",
@@ -2251,13 +2251,13 @@
       "version_effective_from": "2023-01-01",
       "version_effective_to": null,
       "status": "fail",
-      "finding": "Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; rezoning is required (CD-1 under the Interim Rezoning Policy for Social Housing), where height is negotiated.",
+      "finding": "Height 22.3 m exceeds the outright maximum of 10.7 m, so it is not allowed outright; the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) was approved by Council on 25 Jul 2024, and it sets the height now.",
       "values": {
         "height_m": 22.3,
         "max_height_m_outright": 10.7,
         "storeys": 6
       },
-      "action": "Manager and architect: take the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) and confirm with City staff the height they will support."
+      "action": ""
     },
     {
       "rule_id": "cov.rm10.outright_fsr",
@@ -5833,13 +5833,11 @@
           "uncertain": []
         },
         "by_rezoning": {
-          "verdict": "yes, with conditions",
+          "verdict": "approved",
           "fail": [],
-          "conditional": [
-            "cov.irp.social_housing_rezoning",
-            "cov.trees.replacement"
-          ],
-          "uncertain": []
+          "conditional": [],
+          "uncertain": [],
+          "why": "Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024; it sets the limits now"
         },
         "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing",
         "approval_route": null,
@@ -5861,12 +5859,9 @@
           },
           "rezoning": {
             "label": "By rezoning",
-            "verdict": "yes, with conditions",
-            "why": null,
-            "rules": [
-              "cov.irp.social_housing_rezoning",
-              "cov.trees.replacement"
-            ]
+            "verdict": "approved",
+            "why": "Council approved the rezoning (CD-1 under the Interim Rezoning Policy for Social Housing) on 25 Jul 2024; it sets the limits now",
+            "rules": []
           }
         }
       },
@@ -5961,14 +5956,6 @@
           "finding": "The rules hold no heritage rule, and a church site is where the City's Heritage Register and heritage designations are most likely to apply; a listed building changes what can be demolished and how the rezoning is read.",
           "action": "Architect: check the Vancouver Heritage Register and any heritage designation or revitalization agreement for this address. Ask: the City of Vancouver's heritage planners (the Heritage Register and designations).",
           "contact": "the City of Vancouver's heritage planners (the Heritage Register and designations)"
-        },
-        {
-          "rule_id": "cov.irp.social_housing_rezoning",
-          "title": "Interim Rezoning Policy for Social Housing in Former Community Vision Areas",
-          "status": "conditional",
-          "finding": "Eligible for consideration as 100% social housing under the policy; height 22.3 m is above the staff benchmark of 19.9 to 21.3 m. The policy sets no maximum, so the number is negotiated with staff.",
-          "action": "Manager and architect: expect staff to test the scheme against the RM-4 benchmark; prepare the shadow and daylight case. Ask: the City of Vancouver's rezoning centre, a rezoning planner (a pre-application enquiry).",
-          "contact": "the City of Vancouver's rezoning centre, a rezoning planner (a pre-application enquiry)"
         },
         {
           "rule_id": "cov.trees.replacement",
@@ -9795,6 +9782,7 @@
       "developer_partner": true,
       "tenure": "social_housing",
       "rezoning_path": "CD-1 under the Interim Rezoning Policy for Social Housing",
+      "rezoning_approved_on": "2024-07-25",
       "storeys": 6,
       "height_m": 22.3,
       "gfa_m2": 8299.0,

@@ -102,7 +102,15 @@ export function envelopeFigure(run) {
     if (lim) aSub = out && Math.abs(lim - out.h) < 0.05 ? `At ${whose} height limit of ${m1(lim)} m.` : `Under ${whose} height limit of ${m1(lim)} m.`;
   }
   let bHead;
-  if (allowed) bHead = `<b>Within what is allowed today:</b> no rezoning, a development permit${o.verdict === "yes, with conditions" ? ", with conditions" : ""}.`;
+  // within the Director's discretion is not outright (25 Nov 2026): said as the permit it is
+  const byDirector = ((allowedAns.routes || {}).discretion || {}).verdict === "possible";
+  if (allowed && byDirector) bHead = `<b>Within what the Director of Planning may allow:</b> no rezoning, a development permit at the Director's discretion.`;
+  else if (allowed) bHead = `<b>Within what is allowed today:</b> no rezoning, a development permit${o.verdict === "yes, with conditions" ? ", with conditions" : ""}.`;
+  // a rezoning Council approved (25 Nov 2026): said as decided, with its date
+  else if (o.verdict === "no" && path && (allowedAns.by_rezoning || {}).verdict === "approved") {
+    const on = (String(allowedAns.by_rezoning.why || "").match(/ on (\d{1,2} \w+ \d{4})/) || [])[1];
+    bHead = `<b>Rezoned:</b> Council approved it${on ? ` on ${h(on)}` : ""}, after a public hearing.`;
+  }
   else if (o.verdict === "no") bHead = path ? `<b>Needs rezoning:</b> a Council decision after a public hearing.` : `<b>Not allowed outright</b>, and no rezoning path is stated.`;
   else if (notAssessed) bHead = `<b>Proposed.</b> Whether it needs a rezoning waits on the outright limits.`;
   else bHead = `<b>Outright not yet confirmed.</b>${path ? " If it is not allowed, a rezoning: a Council decision after a public hearing." : ""}`;

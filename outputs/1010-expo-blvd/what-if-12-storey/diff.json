@@ -86,11 +86,18 @@
     {
       "rule_id": "cov.family_units",
       "change": "changed",
-      "from": "uncertain",
+      "from": "not_applicable",
       "to": "pass",
       "from_version": "1992-01-01",
       "to_version": "1992-01-01",
       "finding": "48 of 120 units (40.0%) have two or more bedrooms, against a 35.0% minimum."
+    },
+    {
+      "rule_id": "cov.irp.social_housing_rezoning",
+      "change": "finding_changed",
+      "from": "not_applicable",
+      "to": "not_applicable",
+      "finding": "The site is outside the former Community Vision areas; social housing there is considered under the Affordable Housing Policies (1989) or an area plan."
     },
     {
       "rule_id": "cov.parking_minimums",

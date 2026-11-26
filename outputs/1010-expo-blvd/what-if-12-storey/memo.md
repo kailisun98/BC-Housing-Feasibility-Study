@@ -10,13 +10,13 @@
 
 | | |
 |---|---|
-| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy |
-| Who operates | Not named |
+| Who is housed | 120 homes, independent rental (social housing): 36 at market rent, 60 rent geared to income, 24 deep subsidy; 101 of the 120 fit the first plans |
+| Who operates | BC Indigenous Housing Society; the operating figures are not signed by an operator |
 | Which program | BC Builds, the Community Housing Fund. Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed |
 | The amount | Capital cost $62.6M. Asked: Community Housing Fund grant, $21.4M (illustrative). Still to find: $28.2M (45% of the cost). |
 | The decision wanted | not stated |
 | The answers | Outright: yes · By the Director's discretion: not needed · By rezoning: not yet confirmed · The funders' criteria: Whether it passes this screen's eligibility checks for the Community Housing Fund is not yet confirmed · The money: Needs more sources |
-| The top 3 of 5 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. Transit-oriented area minimum allowable height and density (uncertain). 3. Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu (uncertain). |
+| The top 3 of 6 open items | 1. Yards not checked: no CD-1 (324) yard rule in the rules (uncertain). 2. The agreement between the owner and the operator (uncertain). 3. Transit-oriented area minimum allowable height and density (uncertain). |
 
 ## 1. Is it allowed?
 **Outright: yes** · **By the Director's discretion: not needed** (within the outright limits) · **By rezoning: not yet confirmed**
@@ -43,13 +43,14 @@ Other programs written for this kind of housing, listed from their own pages and
 | Item | Status | Who / what |
 |---|---|---|
 | Yards not checked: no CD-1 (324) yard rule in the rules | Uncertain | Architect: read the yard clauses in CD-1 (324)'s by-law and set the setbacks to them, or confirm the figures drawn are a relaxation to ask for. Ask: the City of Vancouver's Development and Building Services Centre, a project facilitator. |
+| The agreement between the owner and the operator | Uncertain | Manager, with both boards: settle who owns the homes at completion and the instrument between owner and operator, then choose how the land is held; a funder takes its security against it. Ask: the two societies' boards and their lawyers; then BC Housing's development manager for the security it takes. |
 | Transit-oriented area minimum allowable height and density | Uncertain | Manager: check the City's transit-oriented areas map for this address and record the tier at 01. Ask: the City of Vancouver's planning staff, or the Province's transit-oriented areas map. |
 | Protection of Trees By-law 9958: minimum trees, protection distances, cash in lieu | Uncertain | Architect: obtain the arborist report and survey (every tree on the site, within 2 m of the boundary, and on the adjoining street). Ask: a certified arborist, then the City staff who review trees with the development permit. |
 | BC Housing Community Housing Fund: eligibility and unit mix | Uncertain | Manager: supply what is missing (land tenure). Ask: BC Housing, a development manager in Development and Asset Strategies. |
 | Homes that do not fit the plates | Conditional | Architect: 101 of 120 homes fit the plates on 12 floors at the unit sizes assumed; did not fit: 11 one-bedroom, 8 studio. More storeys, a larger plate, smaller homes or a smaller program. The funders' checks and the money count all 120. |
 
 ## 4. Does the money work? (feasibility grade)
-**Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve.
+**Needs more sources.** The gap is $28,248,704, 45% of the capital cost, more than the 15% line (this tool's screening line, not a funder's rule). Placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve.
 
 **For the development manager:** Look for more sources as well: other grants (answer 2 lists the programs and whether each is taking proposals; a municipal grant, a capital campaign or a foundation), more equity, a land contribution or a partner. A revised memo counts what is found as other grants or equity.
 
@@ -74,12 +75,12 @@ Other programs written for this kind of housing, listed from their own pages and
 | Market rent, 36 homes | $899,856 | $2,083 a month a home (the rules' figure) |
 | Rent geared to income, 60 homes | $819,000 | $1,138 a month a home (the rules' figure) |
 | Deep subsidy, 24 homes | $168,595 | $585 a month a home (the rules' figure) |
-| Vacancy | -$69,836 | the CMHC survey's rate, on all tiers |
+| Vacancy | -$69,836 | 3.7%, the CMHC survey's rate, on all tiers |
 | Operating cost | -$780,000 | $6,500 a home a year (placeholder) |
 | Replacement reserve | -$72,000 |  |
 | Support staffing | none |  |
 | **Left after running costs** | **$965,615** | before any operating subsidy or loan payment |
-| Loan payment | -$877,832 | on the loan the funding counts (the capital figures above) |
+| Loan payment | -$877,832 | on the mortgage the funding counts (the capital figures above) |
 | **Subsidy needed to run it** | **$0** | none: the rents cover the running costs; before any loan payment |
 | **Subsidy needed if the capital still missing were borrowed** | **$1,822,447** | $1,266 a home a month: the payment on $41,230,182 at 6.19% over 40 years is $2,788,062 a year. An illustration on this screen's mortgage terms, not a funder's financing |
 | **The same, on BC Builds' published take-out terms** | **$1,391,224** | $966 a home a month: 4.55% over 35 years is $2,356,839 a year. The program's page gives the rate; whether this project gets that loan is the program's to say |
@@ -88,7 +89,7 @@ Other programs written for this kind of housing, listed from their own pages and
 
 | Line | Figure | From | Note |
 |---|---|---|---|
-| Hard cost base | $4,693 per m² | `f.hard_cost_base` | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 12 storeys, above the six a wood frame reaches |
+| Hard cost base | $4,693 per m² | `f.hard_cost_base` (placeholder) | average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 12 storeys, above the six a wood frame reaches; a placeholder until a cost consultant's rate for this building is entered |
 | Escalation to the index in force on the run date | ×1.0292 | `f.escalation_bcpi` | BCPI 109.2 (2026-04-01, the last quarter published 120 days before the run date 2026-10-23) over 106.1 (2024-07-01); the rule's newest observation is 109.4 (2026-07-01), published after that date |
 | Hard cost | $46,368,342 | `f.hard_cost_base` | 9,600 m² × $4,693 × 1.0292 |
 | Soft costs | $11,592,086 | `f.soft_costs` (placeholder) | 25% of hard cost |
@@ -113,8 +114,8 @@ Other programs written for this kind of housing, listed from their own pages and
 > A feasibility screen, not a lender's model: hard costs from a Class D catalogue estimate escalated by the Statistics Canada index, rents from the CMHC survey, debt at the posted five-year rate under CMHC's coverage ratio. Placeholders are marked; replace them with the project's own budget before anyone relies on the gap.
 
 ## Massing derived from the rules
-- **Proposed: 12 storeys, FSR 2.46** — plate 800 m² × 12 storeys = 9,600 m² (FSR 2.46), 36.6 m high, inside a 31.5 × 27.5 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
-- **Outright: FSR 6.04, 91.0 m** — plate 814 m² × 29 storeys = 23,604 m² (FSR 6.04), 88.45 m high, inside a 31.5 × 27.5 m setback envelope. Derived from: cov.cd1_324.floor_area, cov.cd1_324.outright_height, option.setbacks_m, option.floor_to_floor_m.
+- **Proposed: 12 storeys, FSR 2.46** — plate 800 m² × 12 storeys = 9,600 m² (FSR 2.46), 36.6 m high, inside a 31.61 × 27.51 m setback envelope. Derived from: option.gfa_m2, option.storeys, option.setbacks_m, option.floor_to_floor_m.
+- **Outright: FSR 6.04, 91.0 m** — plate 814 m² × 29 storeys = 23,604 m² (FSR 6.04), 88.45 m high, inside a 31.61 × 27.51 m setback envelope. Derived from: cov.cd1_324.floor_area, cov.cd1_324.outright_height, option.setbacks_m, option.floor_to_floor_m.
 - Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 
 ![Massing plan and section](massing.svg)
@@ -122,7 +123,7 @@ Other programs written for this kind of housing, listed from their own pages and
 `massing.json` carries the same geometry for the Revit script (`revit/ffm_massing_pyrevit.py`).
 
 ## Layouts derived from the option
-12 floors of 31.5 × 25.4 m (800 m² each); a point tower, the homes round a corridor ringing the core, 7.4 m deep in front and behind and 10.45 m beside; 101 of 120 units placed.
+12 floors of 31.61 × 25.31 m (800 m² each); a point tower, the homes round a corridor ringing the core, 7.35 m deep in front and behind and 10.5 m beside; 101 of 120 units placed.
 
 | Block | Count | Area | From |
 |---|---|---|---|
@@ -145,7 +146,7 @@ Adjacency rules, in plain words, read back from the plates:
 - *pass* — accessible: next to the core, on the lowest residential floor. 6 accessible units from the ground floor (2 there) to level 2, nearest the core
 
 Did not fit on the plates: One-bedroom × 11 (640 m²); Studio × 8 (314 m²). More storeys, a larger plate or a smaller program.
-- Note: Daylight (a placeholder for the architect's study, not a rule): 35 homes run 10.4 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.
+- Note: Daylight (a placeholder for the architect's study, not a rule): 35 homes run 10.5 m from the window wall, past the 10 m a home is usually lit to. A shallower plate, a courtyard cut out of it, or wider homes.
 - Note: The lot polygon measures 2,690 m² against a recorded site area of 3,908 m²; the FSR uses the recorded area, the plan the polygon. Check which is the development site.
 - Note: The homes are 66% of the floor area (net to gross), under the 70% this screen flags: cores, corridors or spare floor take more than a cost consultant would expect.
 
@@ -153,16 +154,16 @@ Did not fit on the plates: One-bedroom × 11 (640 m²); Studio × 8 (314 m²). M
 
 Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest travel 9.2 m, limit 45 m; the core's two exits are a scissor stair, its doors on the core's opposite faces, 14.0 m apart as smoke would go round the core (3.4.2.3.(3)); the two stairs need a smoke-tight fire separation between them, rated as the floors, with no openings. Read against `bcbc.exits` (BC Building Code 2024, Div B 3.4.2.1, 3.4.2.3, 3.4.2.5, 3.3.1.9; figures entered from recollection and to be verified against the code text). Sprinklered is assumed (a declared placeholder; `sprinklered: false` on the option switches the limits). Exits are the core zones, a core 7 m wide or wider read as two 2.2 m stairs at its ends (a placeholder); travel runs from a unit's door along the corridor to the nearest core.
 
-- *pass* — Ground floor: 2 exits, 2 required · travel 7.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 2: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 3: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 4: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 5: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 6: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 7: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 8: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 9: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
-- *pass* — Level 10: 2 exits, 2 required · travel 8.9 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Ground floor: 2 exits, 2 required · travel 8.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 2: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 3: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 4: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 5: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 6: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 7: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 8: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 9: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
+- *pass* — Level 10: 2 exits, 2 required · travel 9.0 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
 - *pass* — Level 11: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
 - *pass* — Level 12: 2 exits, 2 required · travel 9.2 m, limit 45 m · separation 14.0 m, at least 9 m · dead end 1.8 m, limit 6 m.
 
@@ -170,25 +171,25 @@ Egress (sprinklered, BCBC 2024 Part 3): pass; 12 floors: 12 pass; farthest trave
 
 | Floor | Homes | Homes m² | Circulation m² | Cores m² | Amenity m² | Services m² | Spare m² | Gross m² | Efficiency |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| Ground floor | 2 | 168 | 88 | 49 | 180 | 260 | 40 | 799 | 21% |
-| Level 2 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 3 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 4 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 5 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 6 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 7 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 8 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
-| Level 9 | 9 | 574 | 63 | 49 | 0 | 0 | 68 | 800 | 72% |
+| Ground floor | 2 | 168 | 88 | 49 | 180 | 260 | 41 | 800 | 21% |
+| Level 2 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 3 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 4 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 5 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 6 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 7 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 8 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
+| Level 9 | 9 | 574 | 63 | 49 | 0 | 0 | 67 | 800 | 72% |
 | Level 10 | 9 | 554 | 63 | 49 | 0 | 0 | 89 | 800 | 69% |
-| Level 11 | 9 | 495 | 63 | 49 | 0 | 0 | 154 | 800 | 62% |
-| Level 12 | 9 | 495 | 63 | 49 | 0 | 0 | 154 | 800 | 62% |
-| **Total** | 101 | 6,304 | 786 | 588 | 180 | 260 | 979 | 9,601 | 66% |
+| Level 11 | 9 | 495 | 63 | 49 | 0 | 0 | 153 | 800 | 62% |
+| Level 12 | 9 | 495 | 63 | 49 | 0 | 0 | 153 | 800 | 62% |
+| **Total** | 101 | 6,308 | 786 | 588 | 180 | 260 | 975 | 9,601 | 66% |
 
 Homes are counted net of their partitions (8% of a home's gross is its walls, shown apart); a home over more than one floor is counted once, on its entry floor. Cut-outs (a courtyard, a podium roof) are not floor area. Efficiency is the homes' net over the gross; under 70% is flagged (a placeholder for what a cost consultant would query). **Flagged.** The same table is `area-schedule.csv` beside this memo.
 
 ### What an operator checks first
 
-- *pass* — Elevators: 2 elevators for 120 homes on 12 storeys: one per 70 homes, at least 2 over 6 storeys (a placeholder for an elevator analysis).
+- *missing* — Elevators: 2 elevators for 120 homes on 12 storeys: one per 70 places, at least 2 over 6 storeys (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one.
 - *missing* — Laundry: no shared laundry on the plans; in-suite laundry is the architect's and operator's choice to state
 - *pass* — Garbage, recycling and services: 260 m² of services for 101 homes
 - *pass* — Accessible homes: 6 accessible homes drawn, 6 wanted (BC Housing's 5% of 101)
@@ -221,7 +222,8 @@ Previous stamp `7846c8b6a3414798` (rules as of 2026-10-23) → current `7846c8b6
 | cov.cd1_324.floor_area | finding changed | pass | pass | Residential floor area 9,600 m² is within sub-area B's 23,600 m², the most the by-law allows there (FSR 2.46 on 3,908.0 m²). |
 | cov.cd1_324.outright_height | finding changed | pass | pass | Height 36.6 m is within the outright maximum of 91.0 m. |
 | cov.chip.program | finding changed | not_applicable | not_applicable | Not for this option: the program takes non profit society or housing cooperative proponents, and this one is a municipal housing provider. |
-| cov.family_units | changed | uncertain | pass | 48 of 120 units (40.0%) have two or more bedrooms, against a 35.0% minimum. |
+| cov.family_units | changed | not_applicable | pass | 48 of 120 units (40.0%) have two or more bedrooms, against a 35.0% minimum. |
+| cov.irp.social_housing_rezoning | finding changed | not_applicable | not_applicable | The site is outside the former Community Vision areas; social housing there is considered under the Affordable Housing Policies (1989) or an area plan. |
 | cov.parking_minimums | finding changed | info | info | No minimum off-street parking applies citywide since June 2024; the option provides 30 vehicle and 220 bicycle spaces. Bicycle spaces are set by the Parking By-law at the development permit stage. |
 | cov.social_housing_definition | changed | uncertain | pass | Meets the City's social housing definition: 30.0% of units for households below HILs (minimum 30.0%), owned by a city, secured for 60 years. |
 

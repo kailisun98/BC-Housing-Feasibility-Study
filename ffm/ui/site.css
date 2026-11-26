@@ -218,6 +218,7 @@ a:hover .arrow, button:hover .arrow { transform: translate(2px, -2px); }
 .hw-sheet .row rect, .who-sheet .row rect { fill: var(--lt-na-wash); }
 .hw-sheet .row .q, .who-sheet .row .q { font: 600 8px var(--sans); letter-spacing: .08em; text-transform: uppercase; fill: var(--lt-na-text); }
 .hw-sheet .row .v { font: 600 11px var(--sans); fill: var(--paper-ink); letter-spacing: -.01em; }
+.hw-sheet .row.pass rect, .who-sheet .row.pass rect { fill: var(--lt-pass-wash); } .hw-sheet .row.pass .q, .who-sheet .row.pass .q { fill: var(--lt-pass-text); }
 .hw-sheet .row.fail rect, .who-sheet .row.fail rect { fill: var(--lt-fail-wash); } .hw-sheet .row.fail .q, .who-sheet .row.fail .q { fill: var(--lt-fail-text); }
 .hw-sheet .row.uncertain rect, .hw-sheet .row.conditional rect, .who-sheet .row.uncertain rect, .who-sheet .row.conditional rect { fill: var(--lt-conditional-wash); }
 .hw-sheet .row.uncertain .q, .hw-sheet .row.conditional .q, .who-sheet .row.uncertain .q, .who-sheet .row.conditional .q { fill: var(--lt-conditional-text); }
@@ -624,7 +625,7 @@ svg.links path.head { stroke: var(--fg-2); }
 }
 
 /* a flow: numbered steps down a line, each with the screen it lands on */
-.flows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; }
+.flows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px 56px; }   /* four flows, two a row (25 Nov 2026) */
 .flow { display: flex; flex-direction: column; gap: 0; }
 .flow .flow-head { padding-bottom: 16px; border-bottom: 1px solid var(--line-2); margin-bottom: 8px; }
 .flow[id] { scroll-margin-top: calc(var(--nav-h) + 16px); }

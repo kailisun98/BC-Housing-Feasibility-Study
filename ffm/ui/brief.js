@@ -59,6 +59,13 @@ export function briefOf(o) {
   return { items, own: false };
 }
 
+/* Whether a space is for the building's residents or a floor that is not homes (25 Nov 2026, the manager: a 450 m²
+   community hall and 900 m² of offices were invisible to the zoning, funder and money checks). A space the manager
+   names is guessed from its name until they choose; the engine counts the "not homes" rows as non-residential floor
+   area (checks.non_residential_m2). */
+const NOT_HOMES = /community|hall|church|worship|office|shop|retail|store|caf[eé]|restaurant|clinic|daycare|child ?care|drop-?in|commercial|gallery|studio space|food bank/i;
+export const useOf = it => it.use || (NOT_HOMES.test(it.label || "") ? "community" : "residents");
+
 export function briefEditor(o) {
   if (!o) return "";
   const { items, own } = briefOf(o);
@@ -66,13 +73,14 @@ export function briefEditor(o) {
   const row = (it, i) => `<tr data-i="${i}">
       <td><input type="text" class="brief-label" value="${h(it.label)}" aria-label="Space" maxlength="60"></td>
       <td><input type="number" class="brief-area" value="${h(it.area_m2)}" min="0" step="any" inputmode="decimal" aria-label="Area, m²"></td>
+      <td><select class="brief-use" aria-label="For"><option value="residents"${useOf(it) === "residents" ? " selected" : ""}>the residents</option><option value="community"${useOf(it) === "community" ? " selected" : ""}>not homes: community, offices, shops</option></select></td>
       <td><select class="brief-where" aria-label="Where"><option value="ground"${it.where !== "upper" ? " selected" : ""}>ground floor</option><option value="upper"${it.where === "upper" ? " selected" : ""}>upper floors</option></select></td>
       <td><label class="chip"><input type="checkbox" class="brief-entry"${it.next_to === "entry" ? " checked" : ""}> <span>by the entry</span></label></td>
       <td><button type="button" class="btn btn-quiet btn-small brief-remove" aria-label="Remove ${h(it.label)}">Remove</button></td>
     </tr>`;
-  return `<details class="fold brief-fold"${kind !== "independent" || own ? " open" : ""}><summary>What it runs on <span class="cont">· ${own ? "the brief entered" : kind === "independent" ? "no brief: the amenity and services only" : `the default brief for ${h(kind)} housing, placeholders`}</span></summary>
-    <p class="help">The spaces the building needs beyond its homes. The engine lays each out: "by the entry" beside the lobby, "upper floors" above the ground floor. ${own ? "" : "Change any figure and the brief becomes yours."}</p>
-    <div class="table-scroll"><table class="plain brief-table"><thead><tr><th scope="col">Space</th><th scope="col">m²</th><th scope="col">Where</th><th scope="col">Next to</th><th scope="col"><span class="sr-only">Remove</span></th></tr></thead>
+  return `<details class="fold brief-fold"${kind !== "independent" || own ? " open" : ""}><summary>What it runs on, and space that is not homes <span class="cont">· ${own ? "the brief entered" : kind === "independent" ? "none yet: add a community hall, offices or a shop here" : `the default brief for ${h(kind)} housing, placeholders`}</span></summary>
+    <p class="help">The spaces the building needs beyond its homes, and any floors that are not homes. The engine lays each out: "by the entry" beside the lobby, "upper floors" above the ground floor. A space "not homes" counts as non-residential floor area in the zoning, the funders' checks and the money. ${own ? "" : "Change any figure and the brief becomes yours."}</p>
+    <div class="table-scroll"><table class="plain brief-table"><thead><tr><th scope="col">Space</th><th scope="col">m²</th><th scope="col">For</th><th scope="col">Where</th><th scope="col">Next to</th><th scope="col"><span class="sr-only">Remove</span></th></tr></thead>
       <tbody>${items.map(row).join("")}</tbody></table></div>
     <div class="form-actions"><button type="button" class="btn btn-small" id="brief-add">Add a space</button>${own ? `<button type="button" class="btn btn-quiet btn-small" id="brief-reset">Back to the default brief</button>` : ""}</div>
   </details>`;
@@ -100,7 +108,7 @@ export function wireBriefEditor(el, o, rerender) {
   if (!fold || !o) return;
   const read = () => $$("tbody tr", fold).map(tr => ({
     label: ($(".brief-label", tr).value || "").trim(), area_m2: Number($(".brief-area", tr).value) || 0,
-    where: $(".brief-where", tr).value, next_to: $(".brief-entry", tr).checked ? "entry" : null,
+    where: $(".brief-where", tr).value, next_to: $(".brief-entry", tr).checked ? "entry" : null, use: $(".brief-use", tr).value,
     ...(/dining/i.test($(".brief-label", tr).value || "") ? { replaces_amenity: true } : {}),
   })).filter(x => x.label && x.area_m2 > 0);
   $$("input, select", fold).forEach(c => c.addEventListener("change", () => save(read(), "The program brief is yours now; the next run lays it out.")));

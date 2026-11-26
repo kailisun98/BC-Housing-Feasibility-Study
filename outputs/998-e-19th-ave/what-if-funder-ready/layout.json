@@ -1810,8 +1810,8 @@
       {
         "key": "lifts",
         "label": "Elevators",
-        "status": "pass",
-        "note": "2 elevators for 88 homes on 5 storeys: one per 70 homes (a placeholder for an elevator analysis)."
+        "status": "missing",
+        "note": "2 elevators for 88 homes on 5 storeys: one per 70 places (a placeholder for an elevator analysis); the plans draw no elevator shafts: 1 core on the ground floor large enough for one each, so room for 1 of the 2: a larger core or another one."
       },
       {
         "key": "laundry",
@@ -1840,6 +1840,6 @@
     ],
     "lifts": 2,
     "status": "missing",
-    "summary": "Operability: laundry, garbage, recycling and services missing; 2 elevators for 88 homes on 5 storeys: one per 70 homes (a placeholder for an elevator analysis)."
+    "summary": "Operability: elevators, laundry, garbage, recycling and services missing; 2 elevators for 88 homes on 5 storeys: one per 70 places (a placeholder for an elevator analysis)."
   }
 }

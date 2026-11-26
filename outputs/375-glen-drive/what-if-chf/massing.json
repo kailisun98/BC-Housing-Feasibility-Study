@@ -93,8 +93,8 @@
         33.99
       ]
     ],
-    "width_m": 38.5,
-    "depth_m": 30.5,
+    "width_m": 38.98,
+    "depth_m": 30.53,
     "area_m2": 1419.8,
     "setbacks_m": {
       "front": 3.0,
@@ -102,11 +102,11 @@
       "side": 3.0
     },
     "box": {
-      "x": 18.05,
+      "x": 17.8,
       "y": 3.0,
-      "w": 38.5,
-      "d": 30.5,
-      "area_m2": 1174.2
+      "w": 38.98,
+      "d": 30.53,
+      "area_m2": 1190.0
     },
     "note": "the lot polygon inset by the setbacks (front for edges facing the street, rear for edges facing away, side for the rest); the plate box is the largest rectangle inside it"
   },
@@ -116,19 +116,19 @@
       "label": "Proposed: 15 storeys, FSR 5.09",
       "footprint": [
         [
-          18.05,
+          18.28,
           3.0
         ],
         [
-          56.55,
+          56.78,
           3.0
         ],
         [
-          56.55,
+          56.78,
           21.8
         ],
         [
-          18.05,
+          18.28,
           21.8
         ]
       ],
@@ -176,10 +176,10 @@
         "rotate": false,
         "clamped": false,
         "box": {
-          "x": 18.05,
+          "x": 17.8,
           "y": 3.0,
-          "w": 38.5,
-          "d": 30.5
+          "w": 38.98,
+          "d": 30.53
         }
       }
     },
@@ -188,24 +188,24 @@
       "label": "Outright: FSR 6.9, 51.0 m",
       "footprint": [
         [
-          18.05,
+          17.8,
           3.0
         ],
         [
-          56.55,
+          56.78,
           3.0
         ],
         [
-          56.55,
-          26.908
+          56.78,
+          26.614
         ],
         [
-          18.05,
-          26.908
+          17.8,
+          26.614
         ]
       ],
-      "plate_width_m": 38.5,
-      "plate_depth_m": 23.91,
+      "plate_width_m": 38.98,
+      "plate_depth_m": 23.61,
       "at_street_corner": "right",
       "base_z": 0.0,
       "height_m": 48.8,

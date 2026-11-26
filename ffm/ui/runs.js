@@ -304,6 +304,13 @@ export async function openRun(runId) {
   const dateMoved = wasAsOf && wasAsOf !== run.as_of;
   enableExports(run);
   await syncInputsTo(run);
+  // the manager's route stands on the run's option, as it was run: 02 shows it, it is not derived again (25 Nov 2026:
+  // reopening R1 offered a fresh suggestion of 80 homes where R1 had 74)
+  if (state.option && !state.optionDirty) {
+    guide.suggestion = null; guide.suggestionUsed = true; guide.appliedOption = state.option; guide.suggestStale = false;
+    guide.mine = {}; guide.answers = {}; guide.optionSeen = true; guide.readStale = true;
+    guide.programs = (state.option.target_programs || []).slice();
+  }
   // the run's own site names its revisions, whether or not the inputs followed it (unsaved edits keep them where they are)
   const runSite = run.run_id.split("/")[0];
   if (!state.revisions.has(run.run_id)) await loadRuns(runSite);
@@ -394,6 +401,30 @@ async function syncInputsTo(run) {
     // run's own option, so the drawings and the card never describe two different buildings
     takeRunOption();
   }
+  // whatever the files say, the inputs are the run's own (25 Nov 2026, three reviewers: a saved option file came back
+  // in place of what the run read, so the operator's signed figures, the capital sources and the brief were lost, and
+  // the next Run again ran a different project). A saved file the run departs from stays saved; the cards carry the
+  // run's inputs, unsaved, and say so.
+  if (inputs.option && state.option && differs(inputs.option, state.option)) takeRunOption();
+  if (inputs.site && state.site && differs(inputs.site, state.site)) {
+    state.site = Object.assign(blankSite(), JSON.parse(JSON.stringify(inputs.site)));
+    state.siteDirty = false;
+    renderForm($("#site-form"), SITE_FIELDS, state.site, onSiteChange);
+    $("#site-dirty").hidden = false;
+    refreshSummary("site");
+  }
+}
+
+/* Two inputs that say different things: a key either sets to a value the other does not (blanks are alike). Pure. */
+const blankish = v => v == null || v === "" || (Array.isArray(v) && !v.length) || (typeof v === "object" && !Array.isArray(v) && !Object.keys(v).length);
+const stable = v => JSON.stringify(v, (k, x) => (x && typeof x === "object" && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map(n => [n, x[n]])) : x));
+export function differs(a, b) {
+  for (const k of new Set([...Object.keys(a || {}), ...Object.keys(b || {})])) {
+    const x = (a || {})[k], y = (b || {})[k];
+    if (blankish(x) && blankish(y)) continue;
+    if (stable(x) !== stable(y)) return true;
+  }
+  return false;
 }
 
 const diffCache = new Map();

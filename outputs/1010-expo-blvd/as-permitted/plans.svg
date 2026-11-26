@@ -3,66 +3,66 @@
 <text x="48" y="44" font-size="14" font-weight="600">Plans by program · metres, street at the bottom</text>
 <text x="78.0" y="78.0" font-size="13" font-weight="600">Ground floor · 111 m² spare</text>
 <text x="78.0" y="93.0" font-size="10.5" fill="#2f7d4a">Egress: 2 exits, 2 required · separation 14.0 m, at least 9 m · pass</text>
-<rect x="78.0" y="100.0" width="247.9" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-<rect x="174.4" y="172.4" width="55.1" height="55.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="160.3" y="227.5" width="83.4" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="160.3" y="158.3" width="83.4" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="160.3" y="172.4" width="14.2" height="55.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="229.5" y="172.4" width="14.2" height="55.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="78.0" y="100.0" width="247.9" height="58.3" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="78.0" y="241.7" width="247.9" height="58.3" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="78.0" y="159.2" width="82.3" height="82.5" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="243.7" y="158.2" width="82.3" height="83.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
-<rect x="174.4" y="188.9" width="55.1" height="22.0" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
-<path d="M183.9 188.9v22.0M188.3 188.9v22.0M192.7 188.9v22.0M197.1 188.9v22.0M201.5 188.9v22.0M205.9 188.9v22.0M210.3 188.9v22.0M214.7 188.9v22.0M219.1 188.9v22.0" stroke="#5f6672" stroke-width="0.5" fill="none"/>
-<path d="M174.4 188.9L229.5 211.0M174.4 211.0L229.5 188.9" stroke="#1f2933" stroke-width="0.7" fill="none"/>
-<line x1="174.4" y1="203.5" x2="174.4" y2="196.4" stroke="#ffffff" stroke-width="1.6"/>
-<path d="M181.5 203.5L174.4 203.5M174.4 196.4L176.3 196.7L178.0 197.4L179.4 198.5L180.6 200.0L181.3 201.7L181.5 203.5" stroke="#1f2933" stroke-width="0.7" fill="none"/>
-<line x1="229.5" y1="203.5" x2="229.5" y2="196.4" stroke="#ffffff" stroke-width="1.6"/>
-<path d="M222.4 203.5L229.5 203.5M229.5 196.4L227.7 196.7L226.0 197.4L224.5 198.5L223.4 200.0L222.7 201.7L222.4 203.5" stroke="#1f2933" stroke-width="0.7" fill="none"/>
-<text x="202.0" y="238.1" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
-<text x="202.0" y="168.9" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
-<text x="202.0" y="132.7" font-size="9.5" text-anchor="middle" fill="#1f2933">Services, bicycles</text>
-<text x="202.0" y="274.3" font-size="9.5" text-anchor="middle" fill="#1f2933">Services, bicycles</text>
-<text x="119.1" y="203.9" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
-<text x="284.8" y="203.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
-<path d="M202.0 320.0V303.0M198.0 309.0L202.0 303.0L206.0 309.0" stroke="#1f2933" stroke-width="1.4" fill="none"/>
-<text x="208.0" y="319.0" font-size="9.5" fill="#1f2933">entry</text>
-<path d="M78.0 327.0H325.9M78.0 323.0V331.0M325.9 323.0V331.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
-<text x="202.0" y="339.0" font-size="10" text-anchor="middle" fill="#5f6672">31.5 m</text>
-<text x="202.0" y="352.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">EXPO BLVD · STREET SIDE</text>
+<rect x="78.0" y="100.0" width="249.7" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="175.2" y="172.4" width="55.3" height="55.3" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="160.9" y="227.6" width="83.7" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="160.9" y="158.1" width="83.7" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="160.9" y="172.4" width="14.2" height="55.3" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="230.4" y="172.4" width="14.2" height="55.3" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="100.0" width="249.7" height="58.1" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="241.9" width="249.7" height="58.1" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="158.6" width="82.9" height="83.3" fill="#e2e2df" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="244.7" y="158.1" width="82.9" height="83.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="175.2" y="188.9" width="55.3" height="22.1" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M184.6 188.9v22.1M189.1 188.9v22.1M193.5 188.9v22.1M197.9 188.9v22.1M202.3 188.9v22.1M206.8 188.9v22.1M211.2 188.9v22.1M215.6 188.9v22.1M220.0 188.9v22.1" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<path d="M175.2 188.9L230.4 211.1M175.2 211.1L230.4 188.9" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="175.2" y1="203.6" x2="175.2" y2="196.4" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M182.3 203.6L175.2 203.6M175.2 196.4L177.0 196.7L178.7 197.4L180.2 198.5L181.3 200.0L182.0 201.7L182.3 203.6" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="230.4" y1="203.6" x2="230.4" y2="196.4" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M223.3 203.6L230.4 203.6M230.4 196.4L228.6 196.7L226.9 197.4L225.4 198.5L224.3 200.0L223.6 201.7L223.3 203.6" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="202.8" y="238.3" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="202.8" y="168.7" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="202.8" y="132.6" font-size="9.5" text-anchor="middle" fill="#1f2933">Services, bicycles</text>
+<text x="202.8" y="274.4" font-size="9.5" text-anchor="middle" fill="#1f2933">Services, bicycles</text>
+<text x="119.5" y="203.7" font-size="9.5" text-anchor="middle" fill="#1f2933">SV</text>
+<text x="286.2" y="203.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<path d="M202.8 320.0V303.0M198.8 309.0L202.8 303.0L206.8 309.0" stroke="#1f2933" stroke-width="1.4" fill="none"/>
+<text x="208.8" y="319.0" font-size="9.5" fill="#1f2933">entry</text>
+<path d="M78.0 327.0H327.7M78.0 323.0V331.0M327.7 323.0V331.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="202.8" y="339.0" font-size="10" text-anchor="middle" fill="#5f6672">31.61 m</text>
+<text x="202.8" y="352.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">EXPO BLVD · STREET SIDE</text>
 <line x1="66.0" y1="100.0" x2="66.0" y2="300.0" stroke="#5f6672" stroke-width="0.8"/>
-<text x="62.0" y="200.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 200.0)">25.41 m</text>
+<text x="62.0" y="200.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 200.0)">25.32 m</text>
 <text x="78.0" y="376.0" font-size="13" font-weight="600">Typical floor (levels 2 to 29) · 688 m² spare</text>
 <text x="78.0" y="391.0" font-size="10.5" fill="#2f7d4a">Egress: 2 exits, 2 required · separation 14.0 m, at least 9 m · pass</text>
-<rect x="78.0" y="398.0" width="247.9" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
-<rect x="174.4" y="470.4" width="55.1" height="55.1" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="160.3" y="525.5" width="83.4" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="160.3" y="456.3" width="83.4" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="160.3" y="470.4" width="14.2" height="55.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="229.5" y="470.4" width="14.2" height="55.1" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
-<rect x="78.0" y="539.7" width="247.9" height="58.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
-<rect x="78.0" y="398.0" width="247.9" height="58.3" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
-<rect x="78.0" y="456.2" width="82.3" height="83.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
-<rect x="243.7" y="456.2" width="82.3" height="83.4" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
-<rect x="174.4" y="486.9" width="55.1" height="22.0" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
-<path d="M183.9 486.9v22.0M188.3 486.9v22.0M192.7 486.9v22.0M197.1 486.9v22.0M201.5 486.9v22.0M205.9 486.9v22.0M210.3 486.9v22.0M214.7 486.9v22.0M219.1 486.9v22.0" stroke="#5f6672" stroke-width="0.5" fill="none"/>
-<path d="M174.4 486.9L229.5 509.0M174.4 509.0L229.5 486.9" stroke="#1f2933" stroke-width="0.7" fill="none"/>
-<line x1="174.4" y1="501.5" x2="174.4" y2="494.4" stroke="#ffffff" stroke-width="1.6"/>
-<path d="M181.5 501.5L174.4 501.5M174.4 494.4L176.3 494.7L178.0 495.4L179.4 496.5L180.6 498.0L181.3 499.7L181.5 501.5" stroke="#1f2933" stroke-width="0.7" fill="none"/>
-<line x1="229.5" y1="501.5" x2="229.5" y2="494.4" stroke="#ffffff" stroke-width="1.6"/>
-<path d="M222.4 501.5L229.5 501.5M229.5 494.4L227.7 494.7L226.0 495.4L224.5 496.5L223.4 498.0L222.7 499.7L222.4 501.5" stroke="#1f2933" stroke-width="0.7" fill="none"/>
-<text x="202.0" y="536.1" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
-<text x="202.0" y="466.9" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
-<text x="202.0" y="572.3" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
-<text x="202.0" y="430.7" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
-<text x="119.1" y="501.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
-<text x="284.8" y="501.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
-<path d="M78.0 625.0H325.9M78.0 621.0V629.0M325.9 621.0V629.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
-<text x="202.0" y="637.0" font-size="10" text-anchor="middle" fill="#5f6672">31.5 m</text>
-<text x="202.0" y="650.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">EXPO BLVD · STREET SIDE</text>
+<rect x="78.0" y="398.0" width="249.7" height="200.0" fill="#f4f4f2" stroke="#1f2933" stroke-width="1.2"/>
+<rect x="175.2" y="470.4" width="55.3" height="55.3" fill="#c9c9c5" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="160.9" y="525.6" width="83.7" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="160.9" y="456.1" width="83.7" height="14.2" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="160.9" y="470.4" width="14.2" height="55.3" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="230.4" y="470.4" width="14.2" height="55.3" fill="#f4f4f2" stroke="#5f6672" stroke-width="0.8"/>
+<rect x="78.0" y="539.9" width="249.7" height="58.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="398.0" width="249.7" height="58.1" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="78.0" y="456.1" width="82.9" height="83.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="244.7" y="456.1" width="82.9" height="83.7" fill="#ffffff" stroke="#5f6672" stroke-width="0.8" stroke-dasharray="3 2"/>
+<rect x="175.2" y="486.9" width="55.3" height="22.1" fill="#ffffff" stroke="#1f2933" stroke-width="0.9"/>
+<path d="M184.6 486.9v22.1M189.1 486.9v22.1M193.5 486.9v22.1M197.9 486.9v22.1M202.3 486.9v22.1M206.8 486.9v22.1M211.2 486.9v22.1M215.6 486.9v22.1M220.0 486.9v22.1" stroke="#5f6672" stroke-width="0.5" fill="none"/>
+<path d="M175.2 486.9L230.4 509.1M175.2 509.1L230.4 486.9" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="175.2" y1="501.6" x2="175.2" y2="494.4" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M182.3 501.6L175.2 501.6M175.2 494.4L177.0 494.7L178.7 495.4L180.2 496.5L181.3 498.0L182.0 499.7L182.3 501.6" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<line x1="230.4" y1="501.6" x2="230.4" y2="494.4" stroke="#ffffff" stroke-width="1.6"/>
+<path d="M223.3 501.6L230.4 501.6M230.4 494.4L228.6 494.7L226.9 495.4L225.4 496.5L224.3 498.0L223.6 499.7L223.3 501.6" stroke="#1f2933" stroke-width="0.7" fill="none"/>
+<text x="202.8" y="536.3" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="202.8" y="466.7" font-size="9.5" text-anchor="middle" fill="#1f2933">Corridor</text>
+<text x="202.8" y="572.4" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<text x="202.8" y="430.6" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<text x="119.5" y="501.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<text x="286.2" y="501.5" font-size="9.5" text-anchor="middle" fill="#1f2933">Spare</text>
+<path d="M78.0 625.0H327.7M78.0 621.0V629.0M327.7 621.0V629.0" stroke="#5f6672" stroke-width="0.8" fill="none"/>
+<text x="202.8" y="637.0" font-size="10" text-anchor="middle" fill="#5f6672">31.61 m</text>
+<text x="202.8" y="650.0" font-size="10" font-weight="600" letter-spacing="0.5" text-anchor="middle" fill="#5f6672">EXPO BLVD · STREET SIDE</text>
 <line x1="66.0" y1="398.0" x2="66.0" y2="598.0" stroke="#5f6672" stroke-width="0.8"/>
-<text x="62.0" y="498.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 498.0)">25.41 m</text>
+<text x="62.0" y="498.0" font-size="10" text-anchor="middle" fill="#5f6672" transform="rotate(-90 62.0 498.0)">25.32 m</text>
 <g transform="translate(0.0 682.0)">
 <rect x="48.0" y="-9.0" width="12" height="12" fill="#f0cf9a" stroke="#5f6672" stroke-width="0.8"/>
 <text x="64.0" y="1.0" fill="#5f6672" font-size="11">Non-residential · NR</text>
@@ -86,14 +86,14 @@
 <text x="437.8" y="37.0" fill="#5f6672" font-size="11">Spare · SP</text>
 </g>
 <circle cx="54" cy="738.0" r="3.2" fill="#245f9c"/><text x="64" y="742.0" font-size="11" fill="#5f6672">accessible unit</text>
-<rect x="48.0" y="758.0" width="39.4" height="5" fill="#1f2933"/>
-<rect x="87.4" y="758.0" width="39.4" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
+<rect x="48.0" y="758.0" width="39.5" height="5" fill="#1f2933"/>
+<rect x="87.5" y="758.0" width="39.5" height="5" fill="#ffffff" stroke="#1f2933" stroke-width="0.8"/>
 <text x="48.0" y="774.0" font-size="9.5" text-anchor="middle" fill="#5f6672">0</text>
-<text x="87.4" y="774.0" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
-<text x="126.7" y="774.0" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
-<g transform="rotate(-147.9 178.1 760.0)"><circle cx="178.1" cy="760.0" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="178.1,749.9 182.7,766.0 178.1,762.2 173.5,766.0" fill="#1f2933"/></g>
-<text x="167.5" y="780.9" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
-<text x="48.0" y="802.0" font-size="12" fill="#1f2933">A point tower: homes 7.41 m deep in front and behind, 10.45 m beside, round</text>
+<text x="87.5" y="774.0" font-size="9.5" text-anchor="middle" fill="#5f6672">5</text>
+<text x="127.0" y="774.0" font-size="9.5" text-anchor="middle" fill="#5f6672">10 m</text>
+<g transform="rotate(-147.9 178.4 760.0)"><circle cx="178.4" cy="760.0" r="11.0" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/><polygon points="178.4,749.9 183.0,766.0 178.4,762.2 173.8,766.0" fill="#1f2933"/></g>
+<text x="167.8" y="780.9" font-size="11" font-weight="600" text-anchor="middle" fill="#1f2933">N</text>
+<text x="48.0" y="802.0" font-size="12" fill="#1f2933">A point tower: homes 7.36 m deep in front and behind, 10.5 m beside, round</text>
 <text x="48.0" y="818.0" font-size="12" fill="#1f2933">a 1.8 m corridor ringing the core;</text>
 <text x="48.0" y="834.0" font-size="12" fill="#1f2933">partitions +8% over net areas (declared placeholders). The rules read back</text>
 <text x="48.0" y="850.0" font-size="12" fill="#1f2933">from the plates are listed with the figure.</text>

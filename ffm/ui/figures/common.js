@@ -67,6 +67,16 @@ export function crossingsAtX(ring, c) {
    proposed mass, a little past its middle so the plate's own label in plan stays clear of it (20 Nov 2026). Pure. */
 export function sectionCut(m) {
   const mass = (m.masses || []).find(x => x.name === "proposed") || (m.masses || [])[0];
+  // a tower on a podium, or a stepped mass: cut where every tier stands, else through the top one (25 Nov 2026: a tower
+  // set to one side of its podium was missed by the cut, and the section drew the podium and a line)
+  const extent = ring => { const v = (ring || []).map(p => Number(p[0])).filter(Number.isFinite); return v.length ? [Math.min(...v), Math.max(...v)] : null; };
+  const tiers = ((mass && mass.tiers) || []).map(t => extent(t.footprint)).filter(Boolean);
+  if (tiers.length > 1) {
+    const lo = Math.max(...tiers.map(e => e[0])), hi = Math.min(...tiers.map(e => e[1]));
+    if (hi - lo > 0.5) return lo + 0.72 * (hi - lo);
+    const top = tiers[tiers.length - 1];
+    return (top[0] + top[1]) / 2;
+  }
   const xs = ((mass && mass.footprint) || []).map(p => Number(p[0])).filter(Number.isFinite);
   if (xs.length) return Math.min(...xs) + 0.72 * (Math.max(...xs) - Math.min(...xs));
   const b = m.envelope && m.envelope.box;

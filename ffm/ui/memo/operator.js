@@ -32,7 +32,8 @@ const HELP = {
   "operations.operating_subsidy_cad_year": "What you have or are seeking from a funder.",
   "operations.subsidy_term_years": "A loan is sized on the subsidy only where its term covers the 40-year loan.",
   "operations.replacement_reserve_per_unit_year_cad": "Blank: the $600 placeholder.",
-  "operations.vacancy_rate": "A share: 0.02 is 2%. Blank: the CMHC market rate, 3.7%.",
+  "operations.vacancy_rate": "A percent (2) or a share (0.02), both 2%; at most 50%. Blank: the CMHC market rate, 3.7%.",
+  "operations.operating_cost_per_bed_year_cad": "Beds beside homes. Blank: each bed costed as a home, and the memo says so.",
   "operations.subsidy_source": "The funder and the agreement, in a few words.",
 };
 
@@ -83,9 +84,16 @@ export function wireOperatorDesk() {
     const raw = inp.value.trim();
     state.option.operations = state.option.operations || {};
     setPath(state.option, inp.dataset.op, raw === "" ? null : inp.dataset.text ? raw : Number(raw));
-    // a figure changed after signing is no longer the signed figure
-    if (state.option.operations.signed) state.option.operations.signed = null;
-    changed("the operating figures");
+    // a figure changed after signing is no longer the signed figure, and the desk says so at once (25 Nov 2026: the
+    // heading kept "signed by" until the next run, which then came back unsigned without a word)
+    const wasSigned = state.option.operations.signed;
+    if (wasSigned) state.option.operations.signed = null;
+    if (changed("the operating figures") && wasSigned) {
+      const head = $("#op-desk-h .cont", desk);
+      if (head) head.textContent = "· changed after signing: sign again, or the memo reads them unsigned";
+      const btn = $("#op-sign", desk); if (btn) btn.textContent = "Sign these figures";
+      setStatus(`A figure changed after ${wasSigned.by} signed: the signature is withdrawn. Sign again before Run again, or the memo reads the figures unsigned.`, "busy");
+    }
   }));
   const conf = $("#op-confirmed", desk);
   if (conf) conf.addEventListener("change", () => {

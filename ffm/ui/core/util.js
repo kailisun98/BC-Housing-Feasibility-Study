@@ -26,7 +26,7 @@ export function scrollBehavior() { return reducedMotion() ? "auto" : "smooth"; }
 export function cap(s) { s = String(s || ""); return s.charAt(0).toUpperCase() + s.slice(1); }
 
 /* The status a verdict word stands for, so a card can wear its colour. */
-const VERDICT_STATUS = { no: "fail", yes: "pass", "yes, with conditions": "conditional", "not yet confirmed": "uncertain", "not assessed": "uncertain" };
+const VERDICT_STATUS = { no: "fail", yes: "pass", "yes, with conditions": "conditional", "not yet confirmed": "uncertain", "not assessed": "uncertain", approved: "pass" };
 
 export function verdictStatus(word) { return VERDICT_STATUS[word] || ""; }
 

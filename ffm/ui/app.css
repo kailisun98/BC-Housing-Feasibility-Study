@@ -1083,6 +1083,9 @@ table.plain td.status { white-space: nowrap; }
 [data-mode="reader"] .memo .memo-compare { order: 3; }
 [data-mode="reader"] .memo .memo-clauses { order: 5; }
 [data-mode="reader"] .memo .figures { order: 6; }
+/* the front sheet before the answers, the area schedule after the drawings (25 Nov 2026: it stood before answer 1) */
+[data-mode="reader"] .memo > .memo-ask { order: 1; }
+[data-mode="reader"] .memo .memo-areas { order: 6; }
 [data-mode="reader"] .memo .memo-rest { order: 7; }
 /* a reference chip on the theme's own group fill (17 Nov 2026: `--panel-2` was never defined, so the chip kept a light
    fallback under night ink, 1.06:1) */

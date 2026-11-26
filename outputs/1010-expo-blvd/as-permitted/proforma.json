@@ -43,6 +43,9 @@
       "operating_cost": null,
       "operating_cost_per_home": null,
       "operating_cost_from": "placeholder",
+      "beds_operating_cost": null,
+      "beds_cost_per_bed": null,
+      "beds_cost_from": null,
       "reserve": null,
       "support_staffing": null,
       "staffing_missing": false,
@@ -59,7 +62,11 @@
       "after_debt_service": null,
       "subsidy_to_run": null,
       "subsidy_to_run_per_home_month": null,
-      "if_gap_financed": null
+      "if_gap_financed": null,
+      "vacancy_rate": 0.037,
+      "vacancy_from": "rule",
+      "named_loan_service": null,
+      "nonres_income": null
     }
   },
   "funding": {
@@ -94,7 +101,7 @@
     "word": "unsure",
     "why": [
       "the option has no homes entered, so there is no rent, debt or grant to set against the $151,374,523 capital cost",
-      "placeholders in use: Soft costs, Contingency, Operating cost, Replacement reserve"
+      "placeholders in use: Hard cost base, Soft costs, Contingency, Operating cost, Replacement reserve"
     ],
     "unsure": [
       "the unit mix (homes by type: studio, one-, two- and three-bedroom)",
@@ -109,8 +116,8 @@
       "value": 4693.0,
       "unit": "$/m²",
       "rule_id": "f.hard_cost_base",
-      "note": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 29 storeys, above the six a wood frame reaches",
-      "placeholder": false
+      "note": "average of Quadplex 01 ($425/sf), Quadplex 02 ($438/sf) and Townhouse ($446/sf); NOT written for this building: 29 storeys, above the six a wood frame reaches; a placeholder until a cost consultant's rate for this building is entered",
+      "placeholder": true
     },
     {
       "key": "escalation",

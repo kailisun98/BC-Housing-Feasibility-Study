@@ -7,14 +7,14 @@
 <text x="132.0" y="89.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="72" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="89.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="72" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="89.0" font-size="10" fill="#1f2933">3B × 1</text>
-<rect x="267.5" y="72" width="226.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="201.1" y="72" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="89.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="267.5" y="72" width="227.0" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="89.0" font-size="10" fill="#1f2933">One-bedroom × 6</text>
-<rect x="494.4" y="72" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<rect x="494.4" y="72" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
 <text x="498.4" y="89.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="548.2" y="72" width="99.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="552.2" y="89.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="548.6" y="72" width="99.4" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="552.6" y="89.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="98" x2="656" y2="98" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="101.0" font-size="9.5" fill="#5f6672">+33.55 m</text>
 <text x="48" y="123.0" font-size="11" fill="#5f6672">Level 11</text>
@@ -22,14 +22,14 @@
 <text x="132.0" y="123.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="106" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="123.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="106" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="123.0" font-size="10" fill="#1f2933">3B × 1</text>
-<rect x="267.5" y="106" width="226.9" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="201.1" y="106" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="123.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="267.5" y="106" width="227.0" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="123.0" font-size="10" fill="#1f2933">One-bedroom × 6</text>
-<rect x="494.4" y="106" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<rect x="494.4" y="106" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
 <text x="498.4" y="123.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="548.2" y="106" width="99.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="552.2" y="123.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="548.6" y="106" width="99.4" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="552.6" y="123.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="132" x2="656" y2="132" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="135.0" font-size="9.5" fill="#5f6672">+30.5 m</text>
 <text x="48" y="157.0" font-size="11" fill="#5f6672">Level 10</text>
@@ -37,16 +37,16 @@
 <text x="132.0" y="157.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="140" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="157.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="140" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="157.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="140" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="157.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="140" width="155.2" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="157.0" font-size="10" fill="#1f2933">Two-bedroom × 3</text>
-<rect x="422.6" y="140" width="113.5" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
-<text x="426.6" y="157.0" font-size="10" fill="#1f2933">One-bedroom × 3</text>
-<rect x="536.1" y="140" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<rect x="422.7" y="140" width="113.5" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<text x="426.7" y="157.0" font-size="10" fill="#1f2933">One-bedroom × 3</text>
+<rect x="536.1" y="140" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
 <text x="540.1" y="157.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="590.0" y="140" width="58.0" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="594.0" y="157.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="590.3" y="140" width="57.7" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="594.3" y="157.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="166" x2="656" y2="166" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="169.0" font-size="9.5" fill="#5f6672">+27.45 m</text>
 <text x="48" y="191.0" font-size="11" fill="#5f6672">Level 9</text>
@@ -54,16 +54,16 @@
 <text x="132.0" y="191.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="174" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="191.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="174" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="191.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="174" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="191.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="174" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="191.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="174" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="174" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="191.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="174" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="191.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="174" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="191.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="174" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="191.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="174" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="191.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="200" x2="656" y2="200" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="203.0" font-size="9.5" fill="#5f6672">+24.4 m</text>
 <text x="48" y="225.0" font-size="11" fill="#5f6672">Level 8</text>
@@ -71,16 +71,16 @@
 <text x="132.0" y="225.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="208" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="225.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="208" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="225.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="208" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="225.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="208" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="225.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="208" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="208" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="225.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="208" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="225.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="208" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="225.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="208" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="225.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="208" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="225.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="234" x2="656" y2="234" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="237.0" font-size="9.5" fill="#5f6672">+21.35 m</text>
 <text x="48" y="259.0" font-size="11" fill="#5f6672">Level 7</text>
@@ -88,16 +88,16 @@
 <text x="132.0" y="259.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="242" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="259.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="242" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="259.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="242" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="259.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="242" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="259.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="242" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="242" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="259.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="242" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="259.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="242" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="259.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="242" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="259.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="242" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="259.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="268" x2="656" y2="268" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="271.0" font-size="9.5" fill="#5f6672">+18.3 m</text>
 <text x="48" y="293.0" font-size="11" fill="#5f6672">Level 6</text>
@@ -105,16 +105,16 @@
 <text x="132.0" y="293.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="276" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="293.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="276" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="293.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="276" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="293.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="276" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="293.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="276" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="276" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="293.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="276" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="293.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="276" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="293.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="276" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="293.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="276" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="293.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="302" x2="656" y2="302" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="305.0" font-size="9.5" fill="#5f6672">+15.25 m</text>
 <text x="48" y="327.0" font-size="11" fill="#5f6672">Level 5</text>
@@ -122,16 +122,16 @@
 <text x="132.0" y="327.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="310" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="327.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="310" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="327.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="310" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="327.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="310" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="327.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="310" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="310" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="327.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="310" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="327.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="310" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="327.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="310" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="327.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="310" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="327.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="336" x2="656" y2="336" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="339.0" font-size="9.5" fill="#5f6672">+12.2 m</text>
 <text x="48" y="361.0" font-size="11" fill="#5f6672">Level 4</text>
@@ -139,16 +139,16 @@
 <text x="132.0" y="361.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="344" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="361.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="344" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="361.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="344" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="361.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="344" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="361.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="344" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="344" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="361.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="344" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="361.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="344" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="361.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="344" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="361.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="344" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="361.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="370" x2="656" y2="370" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="373.0" font-size="9.5" fill="#5f6672">+9.15 m</text>
 <text x="48" y="395.0" font-size="11" fill="#5f6672">Level 3</text>
@@ -156,16 +156,16 @@
 <text x="132.0" y="395.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="378" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="395.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="378" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="395.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="378" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="395.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="378" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="395.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="378" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="378" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="395.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="378" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="395.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="378" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="395.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="378" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="395.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="378" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="395.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="404" x2="656" y2="404" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="407.0" font-size="9.5" fill="#5f6672">+6.1 m</text>
 <text x="48" y="429.0" font-size="11" fill="#5f6672">Level 2</text>
@@ -173,34 +173,34 @@
 <text x="132.0" y="429.0" font-size="10" fill="#1f2933">C</text>
 <rect x="159.8" y="412" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
 <text x="163.8" y="429.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="201.0" y="412" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="205.0" y="429.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="201.1" y="412" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="205.1" y="429.0" font-size="10" fill="#1f2933">3B × 1</text>
 <rect x="267.5" y="412" width="206.9" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
 <text x="271.5" y="429.0" font-size="10" fill="#1f2933">Two-bedroom × 4</text>
-<rect x="474.4" y="412" width="75.6" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
+<rect x="474.4" y="412" width="75.7" height="26" fill="#b9d4f0" stroke="#ffffff" stroke-width="1"/>
 <text x="478.4" y="429.0" font-size="10" fill="#1f2933">1B × 2</text>
-<rect x="550.0" y="412" width="53.9" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
-<text x="554.0" y="429.0" font-size="10" fill="#1f2933">ST × 2</text>
-<rect x="603.9" y="412" width="44.1" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="607.9" y="429.0" font-size="10" fill="#1f2933">Spare</text>
+<rect x="550.1" y="412" width="54.1" height="26" fill="#dbe9f8" stroke="#ffffff" stroke-width="1"/>
+<text x="554.1" y="429.0" font-size="10" fill="#1f2933">ST × 2</text>
+<rect x="604.2" y="412" width="43.8" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="608.2" y="429.0" font-size="10" fill="#1f2933">Spare</text>
 <line x1="650" y1="438" x2="656" y2="438" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="441.0" font-size="9.5" fill="#5f6672">+3.05 m</text>
 <text x="48" y="463.0" font-size="11" fill="#5f6672">Ground floor</text>
-<rect x="128.0" y="446" width="117.1" height="26" fill="#f6e7c1" stroke="#ffffff" stroke-width="1"/>
+<rect x="128.0" y="446" width="117.0" height="26" fill="#f6e7c1" stroke="#ffffff" stroke-width="1"/>
 <text x="132.0" y="463.0" font-size="10" fill="#1f2933">Amenity</text>
-<rect x="245.1" y="446" width="169.2" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
-<text x="249.1" y="463.0" font-size="10" fill="#1f2933">Services, bicycles</text>
-<rect x="414.4" y="446" width="31.9" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
-<text x="418.4" y="463.0" font-size="10" fill="#1f2933">C</text>
-<rect x="446.2" y="446" width="41.3" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
-<text x="450.2" y="463.0" font-size="10" fill="#1f2933">CR</text>
-<rect x="487.5" y="446" width="66.5" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
-<text x="491.5" y="463.0" font-size="10" fill="#1f2933">3B × 1</text>
-<rect x="554.0" y="446" width="51.8" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
-<text x="558.0" y="463.0" font-size="10" fill="#1f2933">2B × 1</text>
-<rect x="605.8" y="446" width="25.9" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-<text x="609.8" y="463.0" font-size="10" fill="#1f2933">SP</text>
-<rect x="631.7" y="446" width="16.3" height="26" fill="#d9e6d2" stroke="#ffffff" stroke-width="1"/>
+<rect x="245.0" y="446" width="169.0" height="26" fill="#e2e2df" stroke="#ffffff" stroke-width="1"/>
+<text x="249.0" y="463.0" font-size="10" fill="#1f2933">Services, bicycles</text>
+<rect x="413.9" y="446" width="31.8" height="26" fill="#c9c9c5" stroke="#ffffff" stroke-width="1"/>
+<text x="417.9" y="463.0" font-size="10" fill="#1f2933">C</text>
+<rect x="445.8" y="446" width="41.2" height="26" fill="#f4f4f2" stroke="#ffffff" stroke-width="1"/>
+<text x="449.8" y="463.0" font-size="10" fill="#1f2933">CR</text>
+<rect x="487.0" y="446" width="66.4" height="26" fill="#6b9fd4" stroke="#ffffff" stroke-width="1"/>
+<text x="491.0" y="463.0" font-size="10" fill="#1f2933">3B × 1</text>
+<rect x="553.4" y="446" width="51.7" height="26" fill="#8fb8e3" stroke="#ffffff" stroke-width="1"/>
+<text x="557.4" y="463.0" font-size="10" fill="#1f2933">2B × 1</text>
+<rect x="605.1" y="446" width="26.6" height="26" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+<text x="609.1" y="463.0" font-size="10" fill="#1f2933">SP</text>
+<rect x="631.8" y="446" width="16.2" height="26" fill="#d9e6d2" stroke="#ffffff" stroke-width="1"/>
 <line x1="650" y1="472" x2="656" y2="472" stroke="#5f6672" stroke-width="0.8"/>
 <text x="658" y="475.0" font-size="9.5" fill="#5f6672">+0.0 m</text>
 <g transform="translate(0.0 498.0)">
@@ -225,7 +225,7 @@
 <rect x="48.0" y="27.0" width="12" height="12" fill="#ffffff" stroke="#5f6672" stroke-width="0.8"/>
 <text x="64.0" y="37.0" fill="#5f6672" font-size="11">Spare · SP</text>
 </g>
-<text x="48.0" y="566.0" font-size="12" fill="#1f2933">101 of 120 units placed on 12 floors of 31.5 × 25.4 m (800 m² each)</text>
+<text x="48.0" y="566.0" font-size="12" fill="#1f2933">101 of 120 units placed on 12 floors of 31.61 × 25.31 m (800 m² each)</text>
 <text x="48.0" y="582.0" font-size="12" fill="#1f2933">Did not fit: One-bedroom × 11, 640 m²</text>
 <text x="48.0" y="598.0" font-size="12" fill="#1f2933">Did not fit: Studio × 8, 314 m²</text>
 <text x="48.0" y="614.0" font-size="12" fill="#1f2933">A segment too short for its name carries its short name from the key, or none; the levels at</text>

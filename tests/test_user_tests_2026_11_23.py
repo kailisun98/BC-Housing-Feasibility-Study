@@ -960,7 +960,10 @@ class TheSecondPanelsDefects(unittest.TestCase):
     UI = Path(__file__).resolve().parent.parent / "ffm" / "ui"
 
     def test_supportive_housing_is_sent_to_its_programs_route_not_to_grants(self):
-        o = dict(READY, housing_type="supportive", supportive_units=88, operations={"support_staffing_cad_year": 10_000})
+        # supportive homes pay the shelter component (25 Nov 2026), so an operating subsidy carries the running costs here and
+        # the capital is what remains in question
+        o = dict(READY, housing_type="supportive", supportive_units=88, operations={"support_staffing_cad_year": 10_000, "operating_subsidy_cad_year": 2_000_000,
+                                                                                    "subsidy_confirmed": True, "subsidy_term_years": 5})
         pf, _ = self._pf(SITE, o)
         self.assertTrue(proforma.next_step(pf).startswith("For supportive housing, the capital comes by the program's own route"))
         self.assertIsNone(pf["operating"]["page"]["if_gap_financed"])

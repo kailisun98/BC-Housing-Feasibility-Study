@@ -220,10 +220,21 @@ export function wireFigures(run) {
   }
 }
 
+/* How a mass's floor area is made, in words: one plate times its storeys, or a tower's podium and tower plates each
+   times theirs (25 Nov 2026: "plate 1,750 m² × 18 = 15,000 m²" on a tower whose upper 15 floors are 650 m²). */
+export function plateWords(x) {
+  if (x.tower && x.podium_storeys) {
+    const P = Number(x.podium_storeys), S = Number(x.storeys);
+    return `podium ${fmtNum(x.plate_area_m2)} m² × ${P} + tower ${fmtNum(x.tower.area_m2)} m² × ${S - P}`;
+  }
+  if (x.tower) return `tower plate ${fmtNum(x.tower.area_m2)} m² × ${x.storeys}`;
+  return `plate ${fmtNum(x.plate_area_m2)} m² × ${x.storeys}`;
+}
+
 /* One mass in words. Where no plate fits it says so instead of "plate 0 m² × 3 = 0 m² (FSR 0.00)" (20 Nov 2026). */
 export function massLine(x) {
   if (!(x.plate_area_m2 > 0)) return `<b>${h(x.label)}</b>: no plate fits on the lot as fronted.`;
-  return `<b>${h(x.label)}</b>: plate ${fmtNum(x.plate_area_m2)} m² × ${x.storeys} = ${fmtNum(x.gfa_m2)} m² (FSR ${Number(x.fsr).toFixed(2)}), ${h(x.height_m)} m high.`;
+  return `<b>${h(x.label)}</b>: ${plateWords(x)} = ${fmtNum(x.gfa_m2)} m² (FSR ${Number(x.fsr).toFixed(2)}), ${h(x.height_m)} m high.`;
 }
 
 /* FIG 01's caption and FIG 02's, two or three short lines each with the figures that matter in ink (20 Nov 2026: four
@@ -275,7 +286,7 @@ function sectionCaption(m) {
   const hm = v => { const r = Math.round(Number(v) * 100) / 100; return Math.abs(r * 10 - Math.round(r * 10)) < 1e-6 ? r.toFixed(1) : r.toFixed(2); };
   const parts = [];
   if (pm) parts.push(pm.plate_area_m2 > 0
-    ? `<b>Proposed: ${h(pm.storeys)} storeys, ${hm(pm.height_m)} m</b>, plate ${fmtNum(pm.plate_area_m2)} m² × ${h(pm.storeys)} = ${fmtNum(pm.gfa_m2)} m², FSR ${Number(pm.fsr).toFixed(2)}.`
+    ? `<b>Proposed: ${h(pm.storeys)} storeys, ${hm(pm.height_m)} m</b>, ${plateWords(pm)} = ${fmtNum(pm.gfa_m2)} m², FSR ${Number(pm.fsr).toFixed(2)}.`
     : `<b>Proposed: ${h(pm.storeys)} storeys, ${hm(pm.height_m)} m</b>; no plate fits on the lot as fronted.`);
   if (om) parts.push(`<b>Outright: ${h(om.storeys)} storeys, ${hm(om.height_m)} m</b>${lim ? (Math.abs(lim - om.height_m) > 0.05 ? `, whole storeys under the ${hm(lim)} m limit` : `, at the ${hm(lim)} m limit`) : ""}, FSR ${h(om.fsr)}${om.plate_area_m2 > 0 ? "" : "; no plate fits"}.`);
   if (b && b.height_m) parts.push(`Staff benchmark ${hm(b.height_m[0])} to ${hm(b.height_m[1])} m, about FSR ${h(b.fsr)} (<code>${h(b.rule_id)}</code>).`);

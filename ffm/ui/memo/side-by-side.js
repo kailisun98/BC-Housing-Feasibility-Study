@@ -195,13 +195,17 @@ export function renderSideBySide(run) {
   // (24 Nov 2026, critique: "Yes", "No" and "6 open" sat in pills beside the memo's Pass and Fail)
   const vword = (status, words) => `<span class="vword vw-${h(status || "na")}">${h(words)}</span>`;
   const verdictCell = w => vword(verdictStatus(w), cap(w));
+  // outright as written: a run that carries the three verdicts gives its own, so the Director's discretion reads "no"
+  const outrightOf = a => ((a.routes || {}).outright || {}).verdict || a.outright.verdict;
   const fundCell = L => { const f = ans(L).funded, note = intakeNote(f); return `${vword(verdictStatus(f.verdict), fundedWord(f))}${note ? `<div class="cont side-cellnote">${h(note)}</div>` : ""}`; };
   const moneyCell = pf => (pf ? `${vword(MONEY_STATUS[pf.verdict.word] || "uncertain", moneyWord(pf.verdict))}<div class="cont side-cellnote">${h(moneyPhrase(pf).replace(/^[^:]*:\s*/, ""))}</div>` : `<span class="cont">not computed</span>`);
   // the open items as answer 3 counts them: the rules' and the drawings' (answers.layoutOpenItems), so the two agree
   const openOf = s => [...(ans(s.L).unsure || []), ...layoutOpenItems({ layout: s.lay })];
   const openCell = s => { const u = openOf(s); return u.length ? vword(u.some(x => x.status === "fail") ? "fail" : "uncertain", `${u.length} open item${u.length === 1 ? "" : "s"}`) : vword("pass", "Nothing open"); };
   const head = [
-    ["Allowed outright", verdictCell(ans(left.L).allowed.outright.verdict), verdictCell(ans(right.L).allowed.outright.verdict)],
+    // the three verdicts where the runs carry them, so the Director's discretion is never read as outright (25 Nov 2026)
+    ["Allowed outright", verdictCell(outrightOf(ans(left.L).allowed)), verdictCell(outrightOf(ans(right.L).allowed))],
+    ...(ans(left.L).allowed.routes || ans(right.L).allowed.routes ? [["By the Director's discretion", verdictCell(((ans(left.L).allowed.routes || {}).discretion || {}).verdict || "—"), verdictCell(((ans(right.L).allowed.routes || {}).discretion || {}).verdict || "—")]] : []),
     ["By rezoning", verdictCell(ans(left.L).allowed.by_rezoning.verdict), verdictCell(ans(right.L).allowed.by_rezoning.verdict)],
     // the funders' criteria and the money beside each other, so passing the screen never reads as funded
     ["Funders' criteria", fundCell(left.L), fundCell(right.L)],
